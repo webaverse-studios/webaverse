@@ -83,6 +83,7 @@ export function makeAvatar(app) {
 }
 export function applyCharacterActionsToAvatar(character, rig) {
   const jumpAction = character.getAction('jump');
+  const activateAction = character.getAction('activate');
   const doubleJumpAction = character.getAction('doubleJump');
   const landAction = character.getAction('land');
   const flyAction = character.getAction('fly');
@@ -112,15 +113,35 @@ export function applyCharacterActionsToAvatar(character, rig) {
   // const swordTopDownSlash = character.getAction('swordTopDownSlash');
   // const swordTopDownSlashAnimation = swordTopDownSlash ? swordTopDownSlash.animation : '';
 
+  const checkStartEndEvents = actionName => {
+    rig[actionName + 'Start'] = false;
+    rig[actionName + 'End'] = false;
+    if (rig[actionName + 'State'] !== rig[actionName + 'LastState']) {
+      if (rig[actionName + 'State']) rig[actionName + 'Start'] = true;
+      else rig[actionName + 'End'] = true;
+    }
+    rig[actionName + 'LastState'] = rig[actionName + 'State'];
+  }
+
   rig.jumpState = !!jumpAction;
+  checkStartEndEvents('jump');
   rig.jumpTime = character.actionInterpolants.jump.get();
   rig.doubleJumpState = !!doubleJumpAction;
+  checkStartEndEvents('doubleJump');
   rig.doubleJumpTime = character.actionInterpolants.doubleJump.get();
+  rig.landState = !!landAction;
+  checkStartEndEvents('land');
   rig.landTime = character.actionInterpolants.land.get();
   rig.lastLandStartTime = landAction ? landAction.time : 0;
-  rig.landWithMoving = landAction?.isMoving;
+  if (landAction) {
+    rig.landWithMoving = landAction.isMoving;
+  }
   rig.flyState = !!flyAction;
+  checkStartEndEvents('fly');
   rig.flyTime = flyAction ? character.actionInterpolants.fly.get() : -1;
+  rig.activateState = !!activateAction;
+  rig.activateAnimation = activateAction ? activateAction.animationName : '';
+  checkStartEndEvents('activate');
   rig.activateTime = character.actionInterpolants.activate.get();
   rig.swimState = !!swimAction;
   rig.swimTime = swimAction ? character.actionInterpolants.swim.get() : -1;
@@ -140,6 +161,14 @@ export function applyCharacterActionsToAvatar(character, rig) {
         rig.useAnimationCombo = [];
       }
     }
+    rig.useState = useAction?.animation;
+    // console.log(JSON.stringify(rig.useState));
+    checkStartEndEvents('use');
+    rig.useComboState = useAction?.animationCombo;
+    checkStartEndEvents('useCombo'); // after index changed, will same array values but different array
+    rig.useEnvelopeState = useAction?.animationEnvelope;
+    checkStartEndEvents('useEnvelope');
+    // rig.useEnvelopeFactor = character.actionInterpolants.useEnvelope.getNormalized();
     if (useAction?.animationEnvelope) {
       rig.useAnimationEnvelope = useAction.animationEnvelope;
     } else {
@@ -173,6 +202,7 @@ export function applyCharacterActionsToAvatar(character, rig) {
   rig.vowels[4] = character.avatarFace.manuallySetMouth ? 0 : rig.vowels[4];
 
   rig.narutoRunState = !!narutoRunAction && !crouchAction;
+  checkStartEndEvents('narutoRun');
   rig.narutoRunTime = character.actionInterpolants.narutoRun.get();
   rig.aimState = !!aimAction;
   rig.aimTime = character.actionInterpolants.aim.get();
@@ -182,16 +212,21 @@ export function applyCharacterActionsToAvatar(character, rig) {
   // rig.aimDirection.set(0, 0, -1);
   // aimAction && rig.aimDirection.applyQuaternion(rig.inputs.hmd.quaternion);
   rig.sitState = !!sitAction;
+  checkStartEndEvents('sit');
   rig.sitAnimation = sitAnimation;
 
   // XXX this needs to be based on the current loadout index
   rig.holdState = wearAction?.holdAnimation === 'pick_up_idle';
+  checkStartEndEvents('hold');
   if (rig.holdState) rig.unuseAnimation = null;
   // rig.danceState = !!danceAction;
+  checkStartEndEvents('dance');
   rig.danceFactor = character.actionInterpolants.dance.get();
   if (danceAction) {
     rig.danceAnimation = danceAnimation;
   }
+  rig.emoteState = !!emoteAction;
+  checkStartEndEvents('emote');
   rig.emoteFactor = character.actionInterpolants.emote.get();
   rig.emoteAnimation = emoteAnimation;
   // rig.throwState = !!throwAction;
@@ -208,13 +243,15 @@ export function applyCharacterActionsToAvatar(character, rig) {
   rig.fallLoopFrom = fallLoopAction ? fallLoopAction.from : '';
   // rig.fallLoopAnimation = fallLoopAnimation;
   rig.fallLoopState = !!fallLoopAction;
-  rig.landState = !!landAction;
+  checkStartEndEvents('fallLoop');
   // rig.swordSideSlashTime = character.actionInterpolants.swordSideSlash.get();
   // rig.swordSideSlashAnimation = swordSideSlashAnimation;
   // rig.swordSideSlashState = !!swordSideSlash;
   // rig.swordTopDownSlashTime = character.actionInterpolants.swordTopDownSlash.get();
   // rig.swordTopDownSlashAnimation = swordTopDownSlashAnimation;
   // rig.swordTopDownSlashState = !!swordTopDownSlash;
+  rig.hurtState = !!hurtAction;
+  checkStartEndEvents('hurt');
   rig.hurtAnimation = (hurtAction?.animation) || '';
   rig.hurtTime = character.actionInterpolants.hurt.get();
   rig.movementsTime = character.actionInterpolants.movements.get();

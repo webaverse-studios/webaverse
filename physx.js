@@ -2274,6 +2274,373 @@ const physxWorker = (() => {
     }
   }
 
+  // AnimationSystem
+
+  w.createAnimationAvatar = (mixerPtr) => {
+    const ptr = Module._createAnimationAvatar(
+      mixerPtr,
+    )
+    return ptr;
+  }
+  w.updateAvatar = (animationAvatarPtr, values) => {
+    values.forEach((value, i) => {
+      scratchStack.f32[i] = value;
+    })
+    Module._updateAvatar(
+      animationAvatarPtr, scratchStack.ptr,
+    )
+  }
+  w.updateAvatarString = (animationAvatarPtr, strings) => {
+    let index = 0;
+    strings.forEach((string, j) => {
+      const encoder = new TextEncoder() // todo: reuse ?
+      const bytes = encoder.encode(string)
+      const stringByteLength = bytes.length;
+      scratchStack.u8[index++] = stringByteLength;
+      for (let i = 0; i < stringByteLength; i++) {
+        scratchStack.u8[index++] = bytes[i];
+      }
+    })
+
+    const numStrings = strings.length;
+
+    Module._updateAvatarString(
+      animationAvatarPtr, scratchStack.ptr, numStrings,
+    )
+  }
+  w.createAnimationMixer = () => {
+    const ptr = Module._createAnimationMixer(
+    )
+    return ptr;
+  }
+  w.updateAnimationMixer = (mixerPtr, timeS) => {
+    const outputBufferOffsetMain = Module._updateAnimationMixer(
+      mixerPtr, timeS,
+    )
+    // console.log(outputBufferOffsetMain)
+    // debugger
+    const resultValues = [];
+    const headMain = outputBufferOffsetMain / Float32Array.BYTES_PER_ELEMENT;
+    for (let i = 0; i < 53; i++) {
+      let value;
+      const outputBufferOffset = Module.HEAPU32[headMain + i];
+      const head = outputBufferOffset / Float32Array.BYTES_PER_ELEMENT;
+      const valueSize = Module.HEAPF32[head];
+      const x = Module.HEAPF32[head + 1];
+      const y = Module.HEAPF32[head + 2];
+      const z = Module.HEAPF32[head + 3];
+      if (valueSize === 3) {
+        value = [x, y, z];
+      } else if (valueSize === 4) {
+        const w = Module.HEAPF32[head + 4];
+        value = [x, y, z, w];
+      }
+      resultValues.push(value);
+    }
+
+    let outputBufferOffset = Module.HEAPU32[headMain + 53];
+    const head = outputBufferOffset / Float32Array.BYTES_PER_ELEMENT;
+    const finishedFlag = Module.HEAPF32[head];
+    resultValues.push(finishedFlag);
+
+    // if (finishedFlag) debugger
+    outputBufferOffset = Module.HEAPU32[headMain + 54];
+    // head = outputBufferOffset / Float32Array.BYTES_PER_ELEMENT;
+    // const finishedAnimationIndex = Module.HEAPF32[head];
+    // values.push(finishedAnimationIndex);
+    const motionPtr = outputBufferOffset;
+    resultValues.push(motionPtr);
+
+    // console.log(finishedFlag);
+    // if (finishedFlag) {
+    //   console.log(finishedAnimationIndex);
+    //   debugger
+    // }
+
+    return resultValues;
+  }
+  w.getFinishedMotionName = (mixerPtr) => {
+    const nameByteLength = Module._getFinishedMotionName(
+      mixerPtr, scratchStack.ptr,
+    )
+
+    const decoder = new TextDecoder()
+    const name = decoder.decode(scratchStack.u8.slice(0, nameByteLength))
+    return name;
+  }
+  w.createAnimationMapping = (isPosition, index, isFirstBone, isLastBone, isTop, isArm) => {
+    Module._createAnimationMapping(
+      isPosition, index, isFirstBone, isLastBone, isTop, isArm
+    )
+  }
+  // w.createAnimationMixer = () => {
+  //   const ptr = Module._createAnimationMixer(
+  //   )
+  //   return ptr;
+  // }
+  w.createAnimation = (name, duration) => {
+    // https://rob-blackbourn.github.io/blog/webassembly/wasm/strings/javascript/c/libc/wasm-libc/clang/2020/06/20/wasm-string-passing.html
+    // https://stackoverflow.com/questions/20024690/is-there-byte-data-type-in-c
+    // Encode the string in utf-8.
+    const encoder = new TextEncoder() // todo: reuse ?
+    const bytes = encoder.encode(name)
+    // console.log(name, bytes)
+    const nameByteLength = bytes.length;
+    for (let i = 0; i < nameByteLength; i++) {
+      scratchStack.u8[i] = bytes[i];
+    }
+
+    const ptr = Module._createAnimation(
+      scratchStack.ptr,
+      nameByteLength,
+      duration,
+    )
+    return ptr;
+  }
+  w.createMotion = (mixer, animation) => {
+    const ptr = Module._createMotion(
+      mixer, animation,
+    )
+    return ptr;
+  }
+  w.getAnimation = (name) => {
+    const encoder = new TextEncoder() // todo: reuse ?
+    const bytes = encoder.encode(name)
+    const nameByteLength = bytes.length;
+    for (let i = 0; i < nameByteLength; i++) {
+      scratchStack.u8[i] = bytes[i];
+    }
+
+    const ptr = Module._getAnimation(
+      scratchStack.ptr, nameByteLength,
+    )
+    return ptr;
+  }
+  w.createMotion = (mixer, animation) => {
+    const ptr = Module._createMotion(
+      mixer, animation,
+    )
+    return ptr;
+  }
+  w.getMotion = (mixerPtr, name) => {
+    const encoder = new TextEncoder() // todo: reuse ?
+    const bytes = encoder.encode(name)
+    const nameByteLength = bytes.length;
+    for (let i = 0; i < nameByteLength; i++) {
+      scratchStack.u8[i] = bytes[i];
+    }
+
+    const ptr = Module._getMotion(
+      mixerPtr, scratchStack.ptr, nameByteLength,
+    )
+    return ptr;
+  }
+  w.getMotionName = (mixerPtr, motionPtr) => {
+    const nameByteLength = Module._getMotionName(
+      mixerPtr, motionPtr, scratchStack.ptr,
+    )
+
+    const decoder = new TextDecoder()
+    const name = decoder.decode(scratchStack.u8.slice(0, nameByteLength))
+    return name;
+  }
+  w.createNode = (mixer, type = AnimationNodeType.LIST, index = 0) => { // todo: rename: createAnimationNode
+    // debugger
+    const ptr = Module._createNode(
+      mixer, type, index,
+    )
+    return ptr;
+  }
+  w.getNode = (mixerPtr, name) => {
+    const encoder = new TextEncoder() // todo: reuse ?
+    const bytes = encoder.encode(name)
+    const nameByteLength = bytes.length;
+    for (let i = 0; i < nameByteLength; i++) {
+      scratchStack.u8[i] = bytes[i];
+    }
+
+    const ptr = Module._getNode(
+      mixerPtr, scratchStack.ptr, nameByteLength,
+    )
+    return ptr;
+  }
+  window.nodeReferenceCount = {}; // test
+  w.addChild = (parentNode, childNode) => { // input: ptrs of nodes
+
+    if (!parentNode) debugger
+    if (!childNode) debugger
+
+    Module._addChild(
+      parentNode, childNode,
+    )
+
+    if (window.nodeReferenceCount[childNode]) {
+      window.nodeReferenceCount[childNode]++
+    } else {
+      window.nodeReferenceCount[childNode] = 1;
+    }
+  }
+  w.setRootNode = (mixerPtr, nodePtr) => {
+    Module._setRootNode(
+      mixerPtr, nodePtr,
+    )
+  }
+  w.createInterpolant = (animationName, parameterPositions, sampleValues, valueSize) => {
+    const allocator = new Allocator(Module);
+
+    if (valueSize === 3) {
+      //
+    } else if (valueSize === 4) {
+      //
+    } else {
+      debugger
+    }
+
+    const parameterPositionsTypedArray = allocator.alloc(Float32Array, parameterPositions.length);
+    parameterPositionsTypedArray.set(parameterPositions);
+
+    const sampleValuesTypedArray = allocator.alloc(Float32Array, sampleValues.length);
+    sampleValuesTypedArray.set(sampleValues);
+
+    const encoder = new TextEncoder() // todo: reuse ?
+    const bytes = encoder.encode(animationName)
+    const animationNameByteLength = bytes.length;
+    for (let i = 0; i < animationNameByteLength; i++) {
+      scratchStack.u8[i] = bytes[i];
+    }
+
+    Module._createInterpolant(
+      scratchStack.ptr,
+      animationNameByteLength,
+      parameterPositions.length,
+      parameterPositionsTypedArray.byteOffset,
+      sampleValues.length,
+      sampleValuesTypedArray.byteOffset,
+      valueSize, // only support 3 (vector) and 4 (quaternion)
+    )
+
+    // allocator.freeAll(); // can't free sampleValuesTypedArray, need persist in wasm for later use.
+  }
+  // w.evaluateInterpolant = (animationIndex, interpolantIndex, t) => {
+  //   const outputBufferOffset = Module._evaluateInterpolant(
+  //     animationIndex,
+  //     interpolantIndex,
+  //     t,
+  //   )
+
+  //   let head = outputBufferOffset / Float32Array.BYTES_PER_ELEMENT;
+  //   let tail = head + 1;
+  //   const valueSize = Module.HEAPF32[head];
+
+  //   head = tail;
+  //   tail = head + 1;
+  //   const x = Module.HEAPF32[head];
+
+  //   head = tail;
+  //   tail = head + 1;
+  //   const y = Module.HEAPF32[head];
+
+  //   head = tail;
+  //   tail = head + 1;
+  //   const z = Module.HEAPF32[head];
+
+  //   if (valueSize === 3) {
+  //     return [x, y, z];
+  //   } else if (valueSize === 4) {
+  //     head = tail;
+  //     tail = head + 1;
+  //     const w = Module.HEAPF32[head];
+
+  //     return [x, y, z, w];
+  //   } else {
+  //     debugger
+  //   }
+  // }
+  // w.getAnimationValues = (animationIndex, t) => {
+  //   const outputBufferOffsetMain = Module._getAnimationValues(
+  //     animationIndex,
+  //     t,
+  //   )
+  //   const values = [];
+  //   const headMain = outputBufferOffsetMain / Float32Array.BYTES_PER_ELEMENT;
+  //   for (let i = 0; i < 53; i++) {
+  //     let value;
+  //     const outputBufferOffset = Module.HEAPU32[headMain + i];
+  //     const head = outputBufferOffset / Float32Array.BYTES_PER_ELEMENT;
+  //     const valueSize = Module.HEAPF32[head];
+  //     const x = Module.HEAPF32[head + 1];
+  //     const y = Module.HEAPF32[head + 2];
+  //     const z = Module.HEAPF32[head + 3];
+  //     if (valueSize === 3) {
+  //       value = [x, y, z];
+  //     } else if (valueSize === 4) {
+  //       const w = Module.HEAPF32[head + 4];
+  //       value = [x, y, z, w];
+  //     }
+  //     values.push(value);
+  //   }
+  //   return values;
+  // }
+  w.crossFadeTwo = (parentNode, duration, targetFactor) => {
+    Module._crossFadeTwo(
+      parentNode, duration, targetFactor,
+    )
+  }
+  w.crossFadeSolitary = (parentNode, duration, targetNode) => {
+    Module._crossFadeSolitary(
+      parentNode, duration, targetNode,
+    )
+  }
+  w.setWeight = (nodePtr, weight) => { // todo: renmae: setWeight() // todo: general setProp/Attribute().
+    // console.log(nodePtr)
+    // if (nodePtr === 0) debugger
+    Module._setWeight(
+      nodePtr,
+      weight,
+    )
+  }
+  w.setFactor = (nodePtr, factor) => { // todo: general setProp/Attribute().
+    Module._setFactor(
+      nodePtr,
+      factor,
+    )
+  }
+  w.setArg = (nodePtr, arg) => {
+    Module._setArg(
+      nodePtr,
+      arg,
+    )
+  }
+  w.getWeight = (nodePtr) => {
+    return Module._getWeight(
+      nodePtr,
+    )
+  }
+  w.getFactor = (nodePtr) => {
+    return Module._getFactor(
+      nodePtr,
+    )
+  }
+  w.getChildren = (nodePtr) => {
+    const count = Module._getChildren(
+      nodePtr, scratchStack.ptr,
+    )
+    const children = [];
+    for (let i = 0; i < count; i++) {
+      const childNode = scratchStack.u32[i];
+      children.push(childNode);
+    }
+    return children;
+  }
+
+  w.play = (motion) => Module._play(motion);
+  w.stop = (motion) => Module._stop(motion);
+  w.setTimeBias = (motion, timeBias) => Module._setTimeBias(motion, timeBias);
+  w.setSpeed = (motion, speed) => Module._setSpeed(motion, speed);
+  w.setLoop = (motion, loopType) => Module._setLoop(motion, loopType); // todo: Rename to `setMotionLoop` or `motionSetLoop` `motion_setLoop`.
+
+  // End AnimationSystem
+
   return w;
 })()
 
