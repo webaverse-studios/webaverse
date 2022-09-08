@@ -254,6 +254,8 @@ export function applyCharacterActionsToAvatar(character, rig) {
   checkStartEndEvents('hurt');
   rig.hurtAnimation = (hurtAction?.animation) || '';
   rig.hurtTime = character.actionInterpolants.hurt.get();
+
+  rig.mirrorFactor = character.actionInterpolants.mirror.getNormalized();
   rig.movementsTime = character.actionInterpolants.movements.get();
   rig.movementsTransitionTime = character.actionInterpolants.movementsTransition.get();
   rig.sprintTime = character.actionInterpolants.sprint.get();

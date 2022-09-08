@@ -1871,7 +1871,7 @@ class Avatar {
         <div style="display:;">keysDirection: --- ${false&&window.logVector3(window.ioManager?.keysDirection)}</div>
       */
       window.domInfo.innerHTML += `<div style="display:;">actions: --- ${window.localPlayer.getActionsArray().map(n=>n.type)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">mirrorFactor: --- ${this.mirrorFactor.toFixed(2)}</div>`;
+      window.domInfo.innerHTML += `<div style="display:;">mirrorFactor: --- ${this.mirrorFactor?.toFixed(2)}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">idleWalkFactor: --- ${this.idleWalkFactor.toFixed(2)}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">walkRunFactor: --- ${this.walkRunFactor.toFixed(2)}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">landWithMoving: --- ${this.landWithMoving}</div>`;
