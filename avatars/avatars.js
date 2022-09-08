@@ -1872,7 +1872,8 @@ class Avatar {
       */
       window.domInfo.innerHTML += `<div style="display:;">actions: --- ${window.localPlayer.getActionsArray().map(n=>n.type)}</div>`;
       window.domInfo.innerHTML += `<div style="display:;">angle: --- ${window.logNum(this.getAngle())}</div>`;
-      window.domInfo.innerHTML += `<div style="display:;">mirrorFactor: --- ${this.mirrorFactor?.toFixed(2)}</div>`;
+      window.domInfo.innerHTML += `<div style="display:;">mirrorFactor:  --- ${this.mirrorFactor?.toFixed(2)}</div>`;
+      window.domInfo.innerHTML += `<div style="display:;">mirrorFactor2: --- ${this.mirrorFactor2?.toFixed(2)}</div>`;
       window.domInfo.innerHTML += `<div style="display:;">forwardFactor:            --- ${this.forwardFactor?.toFixed(2)}</div>`;
       window.domInfo.innerHTML += `<div style="display:;">backwardFactor:           --- ${this.backwardFactor?.toFixed(2)}</div>`;
       window.domInfo.innerHTML += `<div style="display:;">leftFactor:               --- ${this.leftFactor?.toFixed(2)}</div>`;
