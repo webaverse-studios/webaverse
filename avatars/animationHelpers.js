@@ -465,6 +465,14 @@ export const _updateAnimation = avatar => {
     const mirrorRightFactor = avatar.mirrorFactor * rightFactor;
     const mirrorLeftFactorReverse = mirrorFactorReverse * leftFactor;
     const mirrorRightFactorReverse = mirrorFactorReverse * rightFactor;
+    avatar.forwardFactor = forwardFactor; // test
+    avatar.backwardFactor = backwardFactor; // test
+    avatar.leftFactor = leftFactor; // test
+    avatar.rightFactor = rightFactor; // test
+    avatar.mirrorLeftFactorReverse = mirrorLeftFactorReverse; // test
+    avatar.mirrorLeftFactor = mirrorLeftFactor; // test
+    avatar.mirrorRightFactorReverse = mirrorRightFactorReverse; // test
+    avatar.mirrorRightFactor = mirrorRightFactor; // test
 
     const holdFactor = avatar.walkRunFactor * 0.7 + avatar.crouchFactor * (1 - avatar.idleWalkFactor) * 0.5;
 
