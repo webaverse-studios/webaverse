@@ -543,7 +543,7 @@ export const _updateAnimation = avatar => {
 
       // other
       avatar.landWithMoving,
-      avatar.dashAttacking,
+      0, //avatar.dashAttacking,
       avatar.useEnvelopeState,
     ]);
 
