@@ -27,15 +27,7 @@ import {
   // getNextPhysicsId,
 } from '../util.js';
 
-import {
-  crouchMaxTime,
-  // useMaxTime,
-  aimMaxTime,
-  // avatarInterpolationFrameRate,
-  // avatarInterpolationTimeDelay,
-  // avatarInterpolationNumFrames,
-  narutoRunTimeFactor,
-} from '../constants.js';
+import game from '../game.js';
 
 let animations;
 let animationStepIndices;
@@ -46,7 +38,8 @@ let doubleJumpAnimation;
 let fallLoopAnimation;
 let floatAnimation;
 let useAnimations;
-let aimAnimations;
+let useComboAnimations;
+let bowAnimations;
 let sitAnimations;
 let danceAnimations;
 let emoteAnimations;
@@ -301,7 +294,7 @@ export const loadPromise = (async () => {
   floatAnimation = animations.find(a => a.isFloat);
   // rifleAnimation = animations.find(a => a.isRifle);
   // hitAnimation = animations.find(a => a.isHit);
-  aimAnimations = {
+  useComboAnimations = {
     swordSideIdle: animations.index['sword_idle_side.fbx'],
     swordSideIdleStatic: animations.index['sword_idle_side_static.fbx'],
     swordSideSlash: animations.index['sword_side_slash.fbx'],
@@ -309,10 +302,13 @@ export const loadPromise = (async () => {
     swordTopDownSlash: animations.index['sword_topdown_slash.fbx'],
     swordTopDownSlashStep: animations.index['sword_topdown_slash_step.fbx'],
     swordUndraw: animations.index['sword_undraw.fbx'],
+    dashAttack: animations.find(a => a.isDashAttack),
   };
-  useAnimations = mergeAnimations({
+  window.useComboAnimations = useComboAnimations;
+  useAnimations = {
     combo: animations.find(a => a.isCombo),
     slash: animations.find(a => a.isSlash),
+    dashAttack: animations.find(a => a.isDashAttack),
     rifle: animations.find(a => a.isRifle),
     pistol: animations.find(a => a.isPistol),
     magic: animations.find(a => a.isMagic),
@@ -320,10 +316,14 @@ export const loadPromise = (async () => {
     drink: animations.find(a => a.isDrinking),
     throw: animations.find(a => a.isThrow),
     pickUpThrow: animations.find(a => a.isPickUpThrow),
+  };
+  window.useAnimations = useAnimations;
+  bowAnimations = {
     bowDraw: animations.find(a => a.isBowDraw),
     bowIdle: animations.find(a => a.isBowIdle),
     bowLoose: animations.find(a => a.isBowLoose),
-  }, aimAnimations);
+  };
+  window.bowAnimations = bowAnimations;
   sitAnimations = {
     chair: animations.find(a => a.isSitting),
     saddle: animations.find(a => a.isSitting),
@@ -454,6 +454,8 @@ export const _createAnimation = avatar => {
 export const _updateAnimation = avatar => {
   const timeS = performance.now() / 1000;
 
+  const player = metaversefile.getPlayerByAppInstanceId(avatar.app.getComponent('instanceId'));
+
   const updateValues = () => {
     const angle = avatar.getAngle();
     const forwardFactor = 1 - MathUtils.clamp(Math.abs(angle) / (Math.PI / 2), 0, 1);
@@ -553,7 +555,7 @@ export const _updateAnimation = avatar => {
 
       // other
       avatar.landWithMoving,
-      0, //avatar.dashAttacking,
+      avatar.dashAttacking,
       avatar.useEnvelopeState,
     ]);
 
@@ -590,6 +592,55 @@ export const _updateAnimation = avatar => {
     }
   };
   doUpdate();
+
+  const handleFinishedEvent = () => {
+    const finishedFlag = resultValues[53];
+    // console.log(finishedFlag)
+    if (finishedFlag) {
+      // const motionPtr = resultValues[54]; // tod: why still works ?
+      // if (isDebugger) console.log('---finished', avatar.getMotion(motion));
+      // if (isDebugger) console.log('---finished', physx.physxWorker.getMotionName(avatar.mixerPtr, motionPtr)); // tod: why still works ?
+      const finishedMotionName = physx.physxWorker.getFinishedMotionName(avatar.mixerPtr);
+      if (isDebugger) console.log('---finishedMotionName', finishedMotionName);
+
+      // this.dispatchEvent({
+      //   type: 'finished',
+      //   motion,
+      // });
+      // debugger;
+      // console.log('finished');
+
+      const handleAnimationEnd = (finishedMotionName, trigger) => {
+        if ([
+          'drink',
+          'combo',
+          'dashAttack',
+          'swordSideSlash',
+          'swordSideSlashStep',
+          'swordTopDownSlash',
+          'swordTopDownSlashStep',
+          'dashAttack',
+        ].includes(finishedMotionName)) {
+          game.handleAnimationEnd();
+        }
+      };
+
+      handleAnimationEnd(finishedMotionName, 'finished');
+
+      if (finishedMotionName === 'land' || finishedMotionName === 'land2') {
+        // console.log('land finished', player);
+        player?.removeAction('land');
+      }
+      for (const key in hurtAnimations) { // todo
+        const motionName = key;
+        if (finishedMotionName === motionName) {
+          player?.removeAction('hurt');
+          break;
+        }
+      }
+    }
+  };
+  handleFinishedEvent();
 };
 
 export {

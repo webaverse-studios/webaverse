@@ -195,6 +195,8 @@ export function applyCharacterActionsToAvatar(character, rig) {
   };
   _handlePickUp();
 
+  rig.dashAttacking = character.hasAction('dashAttack');
+
   rig.manuallySetMouth  = character.avatarFace.manuallySetMouth;
   rig.vowels[1] = character.avatarFace.manuallySetMouth ? 0 : rig.vowels[1];
   rig.vowels[2] = character.avatarFace.manuallySetMouth ? 0 : rig.vowels[2];

@@ -139,6 +139,7 @@ export const airFriction = groundFriction;
 // export const swimFriction = 0.2;
 export const flyFriction = groundFriction;
 export const swimFriction = groundFriction;
+export const dashAttackFriction = 1;
 
 export const aimTransitionMaxTime = 150;
 

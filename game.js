@@ -49,6 +49,7 @@ const localRay = new THREE.Ray();
 
 const physicsScene = physicsManager.getScene();
 let isMouseUp = false;
+let needContinueCombo = false;
 
 // const zeroVector = new THREE.Vector3(0, 0, 0);
 // const oneVector = new THREE.Vector3(1, 1, 1);
@@ -397,8 +398,9 @@ const _getNextUseIndex = animationCombo => {
   }
 }
 const _startUse = () => {
+  const localPlayer = playersManager.getLocalPlayer();
   const wearApp = loadoutManager.getSelectedApp();
-  if (wearApp) {
+  if (wearApp &&  !localPlayer.hasAction('jump') && !localPlayer.hasAction('fly') && !localPlayer.hasAction('narutoRun')) { // will add jump/fly/narutoRun specific useAnimations afterwards.
     const useComponent = wearApp.getComponent('use');
     if (useComponent) {
       const localPlayer = playersManager.getLocalPlayer();
@@ -406,7 +408,24 @@ const _startUse = () => {
       if (!useAction) {
         const {instanceId} = wearApp;
         const {boneAttachment, animation, animationCombo, animationEnvelope, ik, behavior, position, quaternion, scale} = useComponent;
-        const index = _getNextUseIndex(animationCombo);
+        let index = 0;
+
+        if ( // dashAttack
+          localPlayer.avatar?.walkRunFactor >= 1 &&
+          (
+            animation === 'combo' ||
+            animationCombo?.length > 0
+          )
+        ) {
+          localPlayer.addAction({type: 'dashAttack'});
+          localVector.copy(cameraManager.lastNonzeroDirectionVectorRotated).setY(0)
+            .normalize()
+            .multiplyScalar(10);
+          localPlayer.characterPhysics.applyWasd(localVector);
+        } else {
+          index = _getNextUseIndex(animationCombo);
+        }
+
         const newUseAction = {
           type: 'use',
           instanceId,
@@ -442,10 +461,23 @@ const _endUse = () => {
   }
 };
 const _mousedown = () => {
+  const localPlayer = metaversefileApi.useLocalPlayer();
+  const useAction = localPlayer.getAction('use');
+  if (useAction?.animationCombo?.length > 0 && useAction.index < useAction.animationCombo.length - 1) {
+    needContinueCombo = true;
+  }
   _startUse();
 };
 const _mouseup = () => {
-  isMouseUp = true;
+  const localPlayer = metaversefileApi.useLocalPlayer();
+  const useAction = localPlayer.getAction('use');
+  if (!(
+    useAction?.animation ||
+    useAction?.animationCombo?.length > 0
+  )) {
+    _endUse();
+  }
+  // isMouseUp = true;
 };
 
 const _grab = object => {
@@ -609,7 +641,6 @@ const _gameUpdate = (timestamp, timeDiff) => {
     } /* else {
 
     } */
-    ioManager.setMovementEnabled(!pickUpAction);
   }
   _handlePickUp();
 
@@ -923,6 +954,8 @@ const _gameUpdate = (timestamp, timeDiff) => {
       if (currentThrowing && !lastThrowing) {
         // console.log('got throw action', useAction, localPlayer);
 
+        localPlayer.removeAction('use');
+
         const app = metaversefileApi.getAppByInstanceId(useAction.instanceId);
         localPlayer.unwear(app, {
           dropStartPosition: localVector.copy(localPlayer.position)
@@ -999,22 +1032,12 @@ const _gameUpdate = (timestamp, timeDiff) => {
     crosshairEl.style.visibility = visible ? null : 'hidden';
   }
 
-  const _updateUse = () => {
-    const useAction = localPlayer.getAction('use');
-    if (useAction) {
-      if (useAction.animation === 'pickUpThrow') {
-        const useTime = localPlayer.actionInterpolants.use.get();
-        if (useTime / 1000 >= throwAnimationDuration) {
-          _endUse();
-        }
-      } else if (isMouseUp) {
-        _endUse();
-      }
-
-    }
-    isMouseUp = false;
-  };
-  _updateUse();
+  const useAction = localPlayer.getAction('use');
+  const isUsingSwords = useAction?.animation || useAction?.animationCombo?.length > 0;
+  ioManager.setMovementEnabled(!(
+    localPlayer.hasAction('pickUp') ||
+    isUsingSwords
+  ));
 };
 const _pushAppUpdates = () => {
   world.appManager.pushAppUpdates();
@@ -1356,7 +1379,7 @@ class GameManager extends EventTarget {
   }
 
   menuDoubleTap() {
-    if (!this.isCrouched()) {
+    if (!this.isCrouched() && !this.isBowing()) {
       const localPlayer = playersManager.getLocalPlayer();
       const narutoRunAction = localPlayer.getAction('narutoRun');
       if (!narutoRunAction) {
@@ -1407,6 +1430,10 @@ class GameManager extends EventTarget {
   isCrouched() {
     const localPlayer = playersManager.getLocalPlayer();
     return localPlayer.hasAction('crouch');
+  }
+  isBowing() {
+    const localPlayer = playersManager.getLocalPlayer();
+    return localPlayer.getAction('use')?.animationEnvelope?.length > 0;
   }
   isSwimming() {
     const localPlayer = playersManager.getLocalPlayer();
@@ -1613,11 +1640,12 @@ class GameManager extends EventTarget {
     let speed = 0;
     
     const isCrouched = gameManager.isCrouched();
+    const isBowing = gameManager.isBowing();
     const isSwimming = gameManager.isSwimming();
     const isFlying = gameManager.isFlying();
-    const isRunning = ioManager.keys.shift && !isCrouched;
+    const isRunning = ioManager.keys.shift && !isCrouched && !isBowing;
     const isMovingBackward = gameManager.isMovingBackward();
-    if (isCrouched && !isMovingBackward) {
+    if ((isCrouched || isBowing) && !isMovingBackward) {
       speed = crouchSpeed;
     } else if (gameManager.isFlying()) {
       speed = flySpeed;
@@ -1715,6 +1743,19 @@ class GameManager extends EventTarget {
     });
     downloadFile(blob, 'scene.scn');
     // console.log('got scene', scene);
+  }
+  handleAnimationEnd() {
+    _endUse();
+
+    if (needContinueCombo) {
+      needContinueCombo = false;
+      _startUse();
+    } else {
+      lastUseIndex = 0;
+    }
+
+    const localPlayer = playersManager.getLocalPlayer();
+    localPlayer.removeAction('dashAttack');
   }
   update = _gameUpdate;
   pushAppUpdates = _pushAppUpdates;

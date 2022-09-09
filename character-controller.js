@@ -539,6 +539,8 @@ const controlActionTypes = [
   'crouch',
   'fly',
   'sit',
+  'use',
+  'dashAttack',
   'swim',
 ];
 class StateCharacter extends Character {
