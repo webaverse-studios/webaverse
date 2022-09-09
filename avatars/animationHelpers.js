@@ -516,7 +516,7 @@ export const _updateAnimation = avatar => {
       avatar.idleWalkFactor,
       avatar.walkRunFactor,
       avatar.crouchFactor,
-      0, // avatar.flyDashFactor,
+      // avatar.flyDashFactor,
 
       holdFactor,
 
