@@ -411,7 +411,7 @@ const _startUse = () => {
         let index = 0;
 
         if ( // dashAttack
-          localPlayer.avatar?.walkRunFactor >= 1 &&
+          localPlayer.avatar?.walkRunFactor >= 0.9 && // note: because of velocity damping, can't check === 1
           (
             animation === 'combo' ||
             animationCombo?.length > 0
