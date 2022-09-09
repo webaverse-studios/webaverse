@@ -501,6 +501,7 @@ export const _updateAnimation = avatar => {
 
     // console.log(avatar.jumpEnd)
     // console.log(avatar.doubleJumpEnd)
+    console.log(avatar.hurtStart, avatar.hurtEnd)
     physx.physxWorker.updateAvatar(avatar.animationAvatarPtr, [
       // values ---
       forwardFactor,
