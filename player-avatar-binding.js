@@ -157,15 +157,16 @@ export function applyCharacterActionsToAvatar(character, rig) {
     if (useAction?.animationCombo) {
       rig.useAnimationCombo = useAction.animationCombo;
     } else {
-      if (rig.useAnimationCombo.length > 0) {
+      // if (rig.useAnimationCombo.length > 0) {
         rig.useAnimationCombo = [];
-      }
+      // }
     }
+    // console.log(rig.useAnimationCombo)
     rig.useState = useAction?.animation;
     // console.log(JSON.stringify(rig.useState));
     checkStartEndEvents('use');
     rig.useComboState = useAction?.animationCombo;
-    checkStartEndEvents('useCombo'); // after index changed, will same array values but different array
+    // checkStartEndEvents('useCombo'); // after index changed, will same array values but different array
     rig.useEnvelopeState = useAction?.animationEnvelope;
     checkStartEndEvents('useEnvelope');
     // rig.useEnvelopeFactor = character.actionInterpolants.useEnvelope.getNormalized();
@@ -221,8 +222,8 @@ export function applyCharacterActionsToAvatar(character, rig) {
   rig.holdState = wearAction?.holdAnimation === 'pick_up_idle';
   // checkStartEndEvents('hold');
   if (rig.holdState) rig.unuseAnimation = null;
-  // rig.danceState = !!danceAction;
-  checkStartEndEvents('dance');
+  rig.danceState = !!danceAction;
+  // checkStartEndEvents('dance');
   rig.danceFactor = character.actionInterpolants.dance.get();
   if (danceAction) {
     rig.danceAnimation = danceAnimation;

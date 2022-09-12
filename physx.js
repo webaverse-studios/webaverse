@@ -2296,6 +2296,7 @@ const physxWorker = (() => {
       const encoder = new TextEncoder() // todo: reuse ?
       const bytes = encoder.encode(string)
       const stringByteLength = bytes.length;
+      // if (j === 6) console.log(stringByteLength, string)
       scratchStack.u8[index++] = stringByteLength;
       for (let i = 0; i < stringByteLength; i++) {
         scratchStack.u8[index++] = bytes[i];
