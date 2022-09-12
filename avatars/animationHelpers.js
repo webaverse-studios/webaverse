@@ -671,17 +671,37 @@ export const _applyAnimation = (avatar, now) => {
   const angleBetweenAnimations = Math.abs(angleDifference(keyWalkAnimationAnglesMirror[0].angle, keyWalkAnimationAnglesMirror[1].angle));
   const angleFactor = (angleBetweenAnimations - angleToClosestAnimation) / angleBetweenAnimations;
   const isBackward = _getAngleToBackwardAnimation(keyWalkAnimationAnglesMirror) < Math.PI * 0.4;
+  if (avatar === window.localPlayer.avatar) window.domInfo.innerHTML += `<div style="display:;">isBackward: --- ${isBackward}</div>`;
   if (isBackward !== avatar.lastIsBackward) {
     avatar.backwardAnimationSpec = {
-      startFactor: avatar.lastBackwardFactor,
+      startFactor: avatar.lastBackwardFactor, // 0 ~ 1
       endFactor: isBackward ? 1 : 0,
       startTime: now,
-      endTime: now + 150,
+      // endTime: now + 150,
+      endTime: now + 1000,
     };
     avatar.lastIsBackward = isBackward;
   }
   let mirrorFactor;
   if (avatar.backwardAnimationSpec) {
+    // if (avatar === window.localPlayer.avatar) window.domInfo.innerHTML += `<div style="display:;">backwardAnimationSpec.startFactor: --- ${avatar.backwardAnimationSpec.startFactor}</div>`;
+    // if (avatar === window.localPlayer.avatar) window.domInfo.innerHTML += `<div style="display:;">backwardAnimationSpec.endFactor: --- ${avatar.backwardAnimationSpec.endFactor}</div>`;
+    // if (avatar === window.localPlayer.avatar) window.domInfo.innerHTML += `<div style="display:;">backwardAnimationSpec.startTime: --- ${avatar.backwardAnimationSpec.startTime}</div>`;
+    // if (avatar === window.localPlayer.avatar) window.domInfo.innerHTML += `<div style="display:;">backwardAnimationSpec.endTime: --- ${avatar.backwardAnimationSpec.endTime}</div>`;
+    if (avatar === window.localPlayer.avatar) {
+      console.log('backwardAnimationSpec.startFactor', avatar.backwardAnimationSpec.startFactor);
+      // console.log('backwardAnimationSpec.endFactor', avatar.backwardAnimationSpec.endFactor);
+      // console.log('backwardAnimationSpec.startTime', avatar.backwardAnimationSpec.startTime);
+      // console.log('backwardAnimationSpec.endTime', avatar.backwardAnimationSpec.endTime);
+    }
+    /* backwardAnimationSpec
+    {
+      endFactor: 1
+      endTime: 57378.324
+      startFactor: 0
+      startTime: 57228.324
+    } */
+    debugger
     const f = (now - avatar.backwardAnimationSpec.startTime) / (avatar.backwardAnimationSpec.endTime - avatar.backwardAnimationSpec.startTime);
     if (f >= 1) {
       mirrorFactor = avatar.backwardAnimationSpec.endFactor;
@@ -697,6 +717,7 @@ export const _applyAnimation = (avatar, now) => {
     mirrorFactor = isBackward ? 1 : 0;
   }
   avatar.lastBackwardFactor = mirrorFactor;
+  if (avatar === window.localPlayer.avatar) window.domInfo.innerHTML += `<div style="display:;">mirrorFactor: --- ${window.logNum(mirrorFactor)}</div>`;
 
   if (avatar.emoteAnimation !== avatar.lastEmoteAnimation) {
     avatar.lastEmoteTime = avatar.emoteAnimation ? now : 0;
