@@ -550,7 +550,8 @@ export const _updateAnimation = (avatar, now) => {
     const holdFactor = avatar.walkRunFactor * 0.7 + avatar.crouchFactor * (1 - avatar.idleWalkFactor) * 0.5;
 
     const useAnimationComboName = avatar.useAnimationCombo[avatar.useAnimationIndex];
-    // console.log(useAnimationComboName)
+    // console.log('js: useAnimation:', avatar.useAnimation)
+    // console.log('js: useAnimationComboName:', useAnimationComboName)
     physx.physxWorker.updateAvatarString(avatar.animationAvatarPtr, [
       defaultSitAnimation, // todo: send to wasm only once.
       defaultEmoteAnimation,
@@ -611,7 +612,7 @@ export const _updateAnimation = (avatar, now) => {
       // avatar.doubleJumpEnd,
       // avatar.narutoRunEnd,
       // avatar.activateEnd,
-      avatar.useEnd,
+      // avatar.useEnd,
       // avatar.useComboEnd,
       avatar.useEnvelopeEnd,
       // avatar.sitEnd,
@@ -627,7 +628,7 @@ export const _updateAnimation = (avatar, now) => {
       // avatar.jumpStart,
       // avatar.doubleJumpStart,
       // avatar.narutoRunStart,
-      avatar.useStart,
+      // avatar.useStart,
       // avatar.useComboStart,
       avatar.useEnvelopeStart,
       // avatar.sitStart,

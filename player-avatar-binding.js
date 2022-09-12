@@ -148,7 +148,7 @@ export function applyCharacterActionsToAvatar(character, rig) {
   
   const _handleUse = () => {
     if (useAction?.animation) {
-      rig.useAnimation = useAction.animation;
+      rig.useAnimation = useAction.animation ?? ''; // Can't use null, will transfer "null" to wasm. Can use undefined.
     } else {
       if (rig.useAnimation) {
         rig.useAnimation = '';
@@ -162,9 +162,9 @@ export function applyCharacterActionsToAvatar(character, rig) {
       // }
     }
     // console.log(rig.useAnimationCombo)
-    rig.useState = useAction?.animation;
+    // rig.useState = useAction?.animation;
     // console.log(JSON.stringify(rig.useState));
-    checkStartEndEvents('use');
+    // checkStartEndEvents('use');
     rig.useComboState = useAction?.animationCombo;
     // checkStartEndEvents('useCombo'); // after index changed, will same array values but different array
     rig.useEnvelopeState = useAction?.animationEnvelope;

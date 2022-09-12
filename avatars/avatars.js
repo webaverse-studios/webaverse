@@ -884,7 +884,7 @@ class Avatar {
     this.swimAnimTime = 0;
 
     this.useTime = NaN;
-    this.useAnimation = null;
+    this.useAnimation = ''; // Can't use null, will transfer "null" to wasm. Can use undefined.
     this.useAnimationCombo = [];
     this.useAnimationEnvelope = [];
     this.unuseAnimation = null;
