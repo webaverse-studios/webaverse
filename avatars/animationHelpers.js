@@ -451,18 +451,87 @@ export const _createAnimation = avatar => {
   avatar.animationAvatarPtr = physx.physxWorker.createAnimationAvatar(avatar.mixerPtr);
 };
 
-export const _updateAnimation = avatar => {
+export const _updateAnimation = (avatar, now) => {
   const timeS = performance.now() / 1000;
 
   const player = metaversefile.getPlayerByAppInstanceId(avatar.app.getComponent('instanceId'));
 
+  const angle = avatar.getAngle();
+  const _getMirrorAnimationAngles = (animationAngles, key) => {
+    const animations = animationAngles.map(({animation}) => animation);
+    const animationAngleArrayMirror = animationsAngleArraysMirror[key];
+
+    const backwardIndex = animations.findIndex(a => a.isBackward);
+    if (backwardIndex !== -1) {
+      // const backwardAnimationAngle = animationAngles[backwardIndex];
+      // const angleToBackwardAnimation = Math.abs(angleDifference(angle, backwardAnimationAngle.angle));
+      // if (angleToBackwardAnimation < Math.PI * 0.3) {
+      const sideIndex = backwardIndex === 0 ? 1 : 0;
+      const wrongAngle = animationAngles[sideIndex].angle;
+      const newAnimationAngle = animationAngleArrayMirror.find(animationAngle => animationAngle.matchAngle === wrongAngle);
+      animationAngles = animationAngles.slice();
+      animationAngles[sideIndex] = newAnimationAngle;
+      // animations[sideIndex] = newAnimationAngle.animation;
+      // return {
+      // return animationAngles;
+      // angleToBackwardAnimation,
+      // };
+      // }
+    }
+    // return {
+    return animationAngles;
+    // angleToBackwardAnimation: Infinity,
+    // ;
+  };
+  const _getAngleToBackwardAnimation = animationAngles => {
+    const animations = animationAngles.map(({animation}) => animation);
+
+    const backwardIndex = animations.findIndex(a => a.isBackward);
+    if (backwardIndex !== -1) {
+      const backwardAnimationAngle = animationAngles[backwardIndex];
+      const angleToBackwardAnimation = Math.abs(angleDifference(angle, backwardAnimationAngle.angle));
+      return angleToBackwardAnimation;
+    } else {
+      return Infinity;
+    }
+  };
+  const keyWalkAnimationAngles = getClosest2AnimationAngles('walk', angle);
+  const keyWalkAnimationAnglesMirror = _getMirrorAnimationAngles(keyWalkAnimationAngles, 'walk');
+  const isBackward = _getAngleToBackwardAnimation(keyWalkAnimationAnglesMirror) < Math.PI * 0.4;
+  if (isBackward !== avatar.lastIsBackward) {
+    avatar.backwardAnimationSpec = {
+      startFactor: avatar.lastBackwardFactor,
+      endFactor: isBackward ? 1 : 0,
+      startTime: now,
+      endTime: now + 150,
+    };
+    avatar.lastIsBackward = isBackward;
+  }
+  let mirrorFactor;
+  if (avatar.backwardAnimationSpec) {
+    const f = (now - avatar.backwardAnimationSpec.startTime) / (avatar.backwardAnimationSpec.endTime - avatar.backwardAnimationSpec.startTime);
+    if (f >= 1) {
+      mirrorFactor = avatar.backwardAnimationSpec.endFactor;
+      avatar.backwardAnimationSpec = null;
+    } else {
+      mirrorFactor = avatar.backwardAnimationSpec.startFactor +
+        Math.pow(
+          f,
+          0.5,
+        ) * (avatar.backwardAnimationSpec.endFactor - avatar.backwardAnimationSpec.startFactor);
+    }
+  } else {
+    mirrorFactor = isBackward ? 1 : 0;
+  }
+  avatar.lastBackwardFactor = mirrorFactor;
+  if (avatar === window.localPlayer.avatar) window.domInfo.innerHTML += `<div style="display:;">mirrorFactor: --- ${window.logNum(mirrorFactor)}</div>`;
+
   const updateValues = () => {
-    const angle = avatar.getAngle();
     const forwardFactor = 1 - MathUtils.clamp(Math.abs(angle) / (Math.PI / 2), 0, 1);
     const backwardFactor = 1 - MathUtils.clamp((Math.PI - Math.abs(angle)) / (Math.PI / 2), 0, 1);
     const leftFactor = 1 - MathUtils.clamp(Math.abs(angle - Math.PI / 2) / (Math.PI / 2), 0, 1);
     const rightFactor = 1 - MathUtils.clamp(Math.abs(angle - -Math.PI / 2) / (Math.PI / 2), 0, 1);
-    const mirrorFactor = MathUtils.clamp((Math.abs(angle) - Math.PI / 2) / (Math.PI / 4), 0, 1);
+    // const mirrorFactor = MathUtils.clamp((Math.abs(angle) - Math.PI / 2) / (Math.PI / 4), 0, 1);
     const mirrorFactorReverse = 1 - mirrorFactor;
     const mirrorLeftFactor = mirrorFactor * leftFactor;
     const mirrorRightFactor = mirrorFactor * rightFactor;

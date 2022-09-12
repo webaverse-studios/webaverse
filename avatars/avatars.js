@@ -1940,7 +1940,7 @@ class Avatar {
       // window.domInfo.innerHTML += `<div style="display:;">blendList.length: --- ${this.blendList?.length}</div>`;
       // window.domInfo.innerHTML += `<div s  tyle="display:;">blendList: --- ${this.blendList?.map(applyFn=>applyFn.name.slice('applyFn'.length))}</div>`;
     }
-    _updateAnimation(this);
+    _updateAnimation(this, now);
 
     if (this.poseAnimation) {
       _overwritePose(this.poseAnimation);
