@@ -603,6 +603,7 @@ export const _updateAnimation = (avatar, now) => {
       avatar.fallLoopState,
       avatar.hurtState,
       avatar.danceState,
+      avatar.useEnvelopeState,
 
       // action end events ---
       // avatar.landEnd,
@@ -614,7 +615,7 @@ export const _updateAnimation = (avatar, now) => {
       // avatar.activateEnd,
       // avatar.useEnd,
       // avatar.useComboEnd,
-      avatar.useEnvelopeEnd,
+      // avatar.useEnvelopeEnd,
       // avatar.sitEnd,
       // avatar.emoteEnd,
       // avatar.hurtEnd,
@@ -630,7 +631,7 @@ export const _updateAnimation = (avatar, now) => {
       // avatar.narutoRunStart,
       // avatar.useStart,
       // avatar.useComboStart,
-      avatar.useEnvelopeStart,
+      // avatar.useEnvelopeStart,
       // avatar.sitStart,
       // avatar.emoteStart,
       // avatar.hurtStart,
@@ -641,7 +642,6 @@ export const _updateAnimation = (avatar, now) => {
       // other
       avatar.landWithMoving,
       avatar.dashAttacking,
-      avatar.useEnvelopeState,
     ]);
 
     // console.log(avatar.useComboStart, useAnimationComboName)

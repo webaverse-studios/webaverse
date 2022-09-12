@@ -165,10 +165,12 @@ export function applyCharacterActionsToAvatar(character, rig) {
     // rig.useState = useAction?.animation;
     // console.log(JSON.stringify(rig.useState));
     // checkStartEndEvents('use');
-    rig.useComboState = useAction?.animationCombo;
+    // rig.useComboState = useAction?.animationCombo;
     // checkStartEndEvents('useCombo'); // after index changed, will same array values but different array
-    rig.useEnvelopeState = useAction?.animationEnvelope;
-    checkStartEndEvents('useEnvelope');
+    rig.useEnvelopeState = !!(useAction?.animationEnvelope);
+    // console.log(rig.useEnvelopeState)
+    // console.log(JSON.stringify(rig.useEnvelopeState));
+    // checkStartEndEvents('useEnvelope');
     // rig.useEnvelopeFactor = character.actionInterpolants.useEnvelope.getNormalized();
     if (useAction?.animationEnvelope) {
       rig.useAnimationEnvelope = useAction.animationEnvelope;
