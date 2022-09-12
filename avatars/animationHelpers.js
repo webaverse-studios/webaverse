@@ -570,7 +570,7 @@ export const _updateAnimation = (avatar, now) => {
 
     // console.log(avatar.jumpEnd)
     // console.log(avatar.doubleJumpEnd)
-    console.log(avatar.hurtStart, avatar.hurtEnd)
+    // console.log(avatar.hurtStart, avatar.hurtEnd)
     physx.physxWorker.updateAvatar(avatar.animationAvatarPtr, [
       // values ---
       forwardFactor,
@@ -589,39 +589,52 @@ export const _updateAnimation = (avatar, now) => {
 
       holdFactor,
 
+      // action states ---
+      avatar.jumpState,
+      avatar.doubleJumpState,
+      avatar.landState,
+      avatar.flyState,
+      avatar.activateState,
+      avatar.narutoRunState,
+      avatar.sitState,
+      avatar.holdState,
+      avatar.emoteState,
+      avatar.fallLoopState,
+      avatar.hurtState,
+
       // action end events ---
-      avatar.landEnd,
-      avatar.fallLoopEnd,
-      avatar.flyEnd,
-      avatar.jumpEnd,
-      avatar.doubleJumpEnd,
-      avatar.narutoRunEnd,
-      avatar.activateEnd,
+      // avatar.landEnd,
+      // avatar.fallLoopEnd,
+      // avatar.flyEnd,
+      // avatar.jumpEnd,
+      // avatar.doubleJumpEnd,
+      // avatar.narutoRunEnd,
+      // avatar.activateEnd,
       avatar.useEnd,
       avatar.useComboEnd,
       avatar.useEnvelopeEnd,
-      avatar.sitEnd,
-      avatar.emoteEnd,
-      avatar.hurtEnd,
+      // avatar.sitEnd,
+      // avatar.emoteEnd,
+      // avatar.hurtEnd,
       avatar.danceEnd,
-      avatar.holdEnd,
+      // avatar.holdEnd,
 
       // action start events ---
-      avatar.landStart,
-      avatar.fallLoopStart,
-      avatar.flyStart,
-      avatar.jumpStart,
-      avatar.doubleJumpStart,
-      avatar.narutoRunStart,
+      // avatar.landStart,
+      // avatar.fallLoopStart,
+      // avatar.flyStart,
+      // avatar.jumpStart,
+      // avatar.doubleJumpStart,
+      // avatar.narutoRunStart,
       avatar.useStart,
       avatar.useComboStart,
       avatar.useEnvelopeStart,
-      avatar.sitStart,
-      avatar.emoteStart,
-      avatar.hurtStart,
+      // avatar.sitStart,
+      // avatar.emoteStart,
+      // avatar.hurtStart,
       avatar.danceStart,
-      avatar.holdStart,
-      avatar.activateStart,
+      // avatar.holdStart,
+      // avatar.activateStart,
 
       // other
       avatar.landWithMoving,
