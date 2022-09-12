@@ -268,16 +268,11 @@ class CharacterPhysics {
               this.character.hasAction('jump') ||
               this.character.hasAction('fallLoop')
             ) {
-              const isMoving = this.character.avatar.idleWalkFactor > 0;
               this.character.setControlAction({
                 type: 'land',
                 time: now,
-                isMoving,
+                isMoving: this.character.avatar.idleWalkFactor > 0,
               });
-              console.log(isMoving)
-              setTimeout(() => { // todo: don't use setTimeout ?
-                this.character.removeAction('land');
-              }, isMoving ? 150 : 533); // todo: use constants ?
               this.character.removeAction('doubleJump');
             }
           }

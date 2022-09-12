@@ -218,17 +218,17 @@ class NpcManager extends EventTarget {
         // };
         // app.addEventListener('hittrackeradded', hittrackeradd);
 
-          const handleHitEvent = e => {
-            if (!npcPlayer.hasAction('hurt')) {
-              const newAction = {
-                type: 'hurt',
-                animation: 'pain_back',
-              };
-              npcPlayer.addAction(newAction);
-              npcPlayer.removeAction('use');
+        const handleHitEvent = e => {
+          if (!npcPlayer.hasAction('hurt')) {
+            const newAction = {
+              type: 'hurt',
+              animation: 'pain_back',
             };
+            npcPlayer.addAction(newAction);
+            npcPlayer.removeAction('use');
           };
-          app.addEventListener('hit', handleHitEvent)
+        };
+        app.addEventListener('hit', handleHitEvent)
 
         const activate = () => {
           if (!npcPlayer.isInParty) {

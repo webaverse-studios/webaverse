@@ -16,8 +16,8 @@ const capsuleUpQuaternion = new THREE.Quaternion().setFromAxisAngle(
   new THREE.Vector3(0, 0, 1),
   Math.PI / 2
 )
-// const textEncoder = new TextEncoder();
-// const textDecoder = new TextDecoder();
+const textEncoder = new TextEncoder();
+const textDecoder = new TextDecoder();
 
 const physx = {};
 
@@ -2293,8 +2293,7 @@ const physxWorker = (() => {
   w.updateAvatarString = (animationAvatarPtr, strings) => {
     let index = 0;
     strings.forEach((string, j) => {
-      const encoder = new TextEncoder() // todo: reuse ?
-      const bytes = encoder.encode(string)
+      const bytes = textEncoder.encode(string)
       const stringByteLength = bytes.length;
       // if (j === 6) console.log(stringByteLength, string)
       scratchStack.u8[index++] = stringByteLength;
@@ -2365,8 +2364,7 @@ const physxWorker = (() => {
       mixerPtr, scratchStack.ptr,
     )
 
-    const decoder = new TextDecoder()
-    const name = decoder.decode(scratchStack.u8.slice(0, nameByteLength))
+    const name = textDecoder.decode(scratchStack.u8.slice(0, nameByteLength))
     return name;
   }
   w.createAnimationMapping = (isPosition, index, isFirstBone, isLastBone, isTop, isArm) => {
@@ -2383,8 +2381,7 @@ const physxWorker = (() => {
     // https://rob-blackbourn.github.io/blog/webassembly/wasm/strings/javascript/c/libc/wasm-libc/clang/2020/06/20/wasm-string-passing.html
     // https://stackoverflow.com/questions/20024690/is-there-byte-data-type-in-c
     // Encode the string in utf-8.
-    const encoder = new TextEncoder() // todo: reuse ?
-    const bytes = encoder.encode(name)
+    const bytes = textEncoder.encode(name)
     // console.log(name, bytes)
     const nameByteLength = bytes.length;
     for (let i = 0; i < nameByteLength; i++) {
@@ -2405,8 +2402,7 @@ const physxWorker = (() => {
     return ptr;
   }
   w.getAnimation = (name) => {
-    const encoder = new TextEncoder() // todo: reuse ?
-    const bytes = encoder.encode(name)
+    const bytes = textEncoder.encode(name)
     const nameByteLength = bytes.length;
     for (let i = 0; i < nameByteLength; i++) {
       scratchStack.u8[i] = bytes[i];
@@ -2424,8 +2420,7 @@ const physxWorker = (() => {
     return ptr;
   }
   w.getMotion = (mixerPtr, name) => {
-    const encoder = new TextEncoder() // todo: reuse ?
-    const bytes = encoder.encode(name)
+    const bytes = textEncoder.encode(name)
     const nameByteLength = bytes.length;
     for (let i = 0; i < nameByteLength; i++) {
       scratchStack.u8[i] = bytes[i];
@@ -2441,8 +2436,7 @@ const physxWorker = (() => {
       mixerPtr, motionPtr, scratchStack.ptr,
     )
 
-    const decoder = new TextDecoder()
-    const name = decoder.decode(scratchStack.u8.slice(0, nameByteLength))
+    const name = textDecoder.decode(scratchStack.u8.slice(0, nameByteLength))
     return name;
   }
   w.createNode = (mixer, type = AnimationNodeType.LIST, index = 0) => { // todo: rename: createAnimationNode
@@ -2453,8 +2447,7 @@ const physxWorker = (() => {
     return ptr;
   }
   w.getNode = (mixerPtr, name) => {
-    const encoder = new TextEncoder() // todo: reuse ?
-    const bytes = encoder.encode(name)
+    const bytes = textEncoder.encode(name)
     const nameByteLength = bytes.length;
     for (let i = 0; i < nameByteLength; i++) {
       scratchStack.u8[i] = bytes[i];
@@ -2465,21 +2458,20 @@ const physxWorker = (() => {
     )
     return ptr;
   }
-  window.nodeReferenceCount = {}; // test
-  w.addChild = (parentNode, childNode) => { // input: ptrs of nodes
-
-    if (!parentNode) debugger
-    if (!childNode) debugger
+  // window.nodeReferenceCount = {}; // test
+  w.addChild = (parentNodePtr, childNodePtr) => { // input: ptrs of nodes
+    // if (!parentNode) debugger
+    // if (!childNode) debugger
 
     Module._addChild(
-      parentNode, childNode,
+      parentNodePtr, childNodePtr,
     )
 
-    if (window.nodeReferenceCount[childNode]) {
-      window.nodeReferenceCount[childNode]++
-    } else {
-      window.nodeReferenceCount[childNode] = 1;
-    }
+    // if (window.nodeReferenceCount[childNode]) {
+    //   window.nodeReferenceCount[childNode]++
+    // } else {
+    //   window.nodeReferenceCount[childNode] = 1;
+    // }
   }
   w.setRootNode = (mixerPtr, nodePtr) => {
     Module._setRootNode(
@@ -2503,8 +2495,7 @@ const physxWorker = (() => {
     const sampleValuesTypedArray = allocator.alloc(Float32Array, sampleValues.length);
     sampleValuesTypedArray.set(sampleValues);
 
-    const encoder = new TextEncoder() // todo: reuse ?
-    const bytes = encoder.encode(animationName)
+    const bytes = textEncoder.encode(animationName)
     const animationNameByteLength = bytes.length;
     for (let i = 0; i < animationNameByteLength; i++) {
       scratchStack.u8[i] = bytes[i];
