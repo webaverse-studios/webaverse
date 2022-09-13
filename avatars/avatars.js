@@ -92,8 +92,8 @@ const maxHeadTargetTime = 2000;
     const localPlayer = metaversefile.useLocalPlayer();
     Object.defineProperty(bone, 'stiffnessForce', {
       get() {
-        localVector.set(localPlayer.characterPhysics.velocity.x, 0, localPlayer.characterPhysics.velocity.z);
-        const f = Math.pow(Math.min(Math.max(localVector.length()*2 - Math.abs(localPlayer.characterPhysics.velocity.y)*0.5, 0), 4), 2);
+        localVector.set(localPlayer?.characterPhysics.velocity.x, 0, localPlayer?.characterPhysics.velocity.z);
+        const f = Math.pow(Math.min(Math.max(localVector.length()*2 - Math.abs(localPlayer?.characterPhysics.velocity.y)*0.5, 0), 4), 2);
         return initialStiffnessForce * (0.1 + 0.1*f);
       },
       set(v) {},
@@ -1859,18 +1859,18 @@ class Avatar {
       _motionControls.call(this)
     }
     
-    if (this === window.localPlayer.avatar) {
+    if (this === window.localPlayer?.avatar) {
       window.avatar = this;
       window.mixer = this.mixer;
       // window.motiono = this.motiono;
     }
-    if (true && this === window.localPlayer.avatar) {
+    if (true && this === window.localPlayer?.avatar) {
       // console.log(window.logNum(this.getAngle()));
 
       /*
         <div style="display:;">keysDirection: --- ${false&&window.logVector3(window.ioManager?.keysDirection)}</div>
       */
-      window.domInfo.innerHTML += `<div style="display:;">actions: --- ${window.localPlayer.getActionsArray().map(n=>n.type)}</div>`;
+      window.domInfo.innerHTML += `<div style="display:;">actions: --- ${window.localPlayer?.getActionsArray().map(n=>n.type)}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">angle: --- ${window.logNum(this.getAngle())}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">mirrorFactor:  --- ${this.mirrorFactor?.toFixed(2)}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">mirrorFactor2: --- ${this.mirrorFactor2?.toFixed(2)}</div>`;
@@ -1887,8 +1887,8 @@ class Avatar {
       // window.domInfo.innerHTML += `<div style="display:;">landWithMoving: --- ${this.landWithMoving}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">currentSpeed: --- ${this.currentSpeed.toFixed(2)}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">avatar.direction: --- ${window.logVector3(this.direction)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">velocity: --- ${window.logVector3(localPlayer.characterPhysics.velocity)} - ${window.logNum(localPlayer.characterPhysics.velocity.length())}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">velocity: --- ${window.logVector3(localPlayer.characterPhysics.velocity)}</div>`;
+      // window.domInfo.innerHTML += `<div style="display:;">velocity: --- ${window.logVector3(localPlayer?.characterPhysics.velocity)} - ${window.logNum(localPlayer?.characterPhysics.velocity.length())}</div>`;
+      // window.domInfo.innerHTML += `<div style="display:;">velocity: --- ${window.logVector3(localPlayer?.characterPhysics.velocity)}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">useEnvelopeFactor: --- ${this.useEnvelopeFactor.toFixed(2)}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">crouchFactor: --- ${this.crouchFactor.toFixed(2)}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">jumpState: --- ${this.jumpState}</div>`;

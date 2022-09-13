@@ -27,7 +27,7 @@ import {
   // getNextPhysicsId,
 } from '../util.js';
 
-import game from '../game.js';
+// import game from '../game.js';
 
 let animations;
 let animationStepIndices;
@@ -452,6 +452,8 @@ export const _createAnimation = avatar => {
 };
 
 export const _updateAnimation = (avatar, now) => {
+  if (!avatar.app) return;
+
   const timeS = performance.now() / 1000;
 
   const player = metaversefile.getPlayerByAppInstanceId(avatar.app.getComponent('instanceId'));
@@ -524,7 +526,7 @@ export const _updateAnimation = (avatar, now) => {
     mirrorFactor = isBackward ? 1 : 0;
   }
   avatar.lastBackwardFactor = mirrorFactor;
-  if (avatar === window.localPlayer.avatar) window.domInfo.innerHTML += `<div style="display:;">mirrorFactor: --- ${window.logNum(mirrorFactor)}</div>`;
+  if (avatar === window.localPlayer?.avatar) window.domInfo.innerHTML += `<div style="display:;">mirrorFactor: --- ${window.logNum(mirrorFactor)}</div>`;
 
   const updateValues = () => {
     const forwardFactor = 1 - MathUtils.clamp(Math.abs(angle) / (Math.PI / 2), 0, 1);
@@ -706,7 +708,7 @@ export const _updateAnimation = (avatar, now) => {
           'swordTopDownSlashStep',
           'dashAttack',
         ].includes(finishedMotionName)) {
-          game.handleAnimationEnd();
+          // game.handleAnimationEnd();
         }
       };
 
