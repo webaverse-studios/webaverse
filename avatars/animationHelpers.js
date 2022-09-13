@@ -671,7 +671,7 @@ export const _applyAnimation = (avatar, now) => {
   const angleBetweenAnimations = Math.abs(angleDifference(keyWalkAnimationAnglesMirror[0].angle, keyWalkAnimationAnglesMirror[1].angle));
   const angleFactor = (angleBetweenAnimations - angleToClosestAnimation) / angleBetweenAnimations;
   const isBackward = _getAngleToBackwardAnimation(keyWalkAnimationAnglesMirror) < Math.PI * 0.4;
-  if (avatar === window.localPlayer.avatar) window.domInfo.innerHTML += `<div style="display:;">isBackward: --- ${isBackward}</div>`;
+  if (avatar === window.localPlayer?.avatar) window.domInfo.innerHTML += `<div style="display:;">isBackward: --- ${isBackward}</div>`;
   if (isBackward !== avatar.lastIsBackward) {
     avatar.backwardAnimationSpec = {
       startFactor: avatar.lastBackwardFactor, // 0 ~ 1
@@ -684,11 +684,11 @@ export const _applyAnimation = (avatar, now) => {
   }
   let mirrorFactor;
   if (avatar.backwardAnimationSpec) {
-    // if (avatar === window.localPlayer.avatar) window.domInfo.innerHTML += `<div style="display:;">backwardAnimationSpec.startFactor: --- ${avatar.backwardAnimationSpec.startFactor}</div>`;
-    // if (avatar === window.localPlayer.avatar) window.domInfo.innerHTML += `<div style="display:;">backwardAnimationSpec.endFactor: --- ${avatar.backwardAnimationSpec.endFactor}</div>`;
-    // if (avatar === window.localPlayer.avatar) window.domInfo.innerHTML += `<div style="display:;">backwardAnimationSpec.startTime: --- ${avatar.backwardAnimationSpec.startTime}</div>`;
-    // if (avatar === window.localPlayer.avatar) window.domInfo.innerHTML += `<div style="display:;">backwardAnimationSpec.endTime: --- ${avatar.backwardAnimationSpec.endTime}</div>`;
-    if (avatar === window.localPlayer.avatar) {
+    // if (avatar === window.localPlayer?.avatar) window.domInfo.innerHTML += `<div style="display:;">backwardAnimationSpec.startFactor: --- ${avatar.backwardAnimationSpec.startFactor}</div>`;
+    // if (avatar === window.localPlayer?.avatar) window.domInfo.innerHTML += `<div style="display:;">backwardAnimationSpec.endFactor: --- ${avatar.backwardAnimationSpec.endFactor}</div>`;
+    // if (avatar === window.localPlayer?.avatar) window.domInfo.innerHTML += `<div style="display:;">backwardAnimationSpec.startTime: --- ${avatar.backwardAnimationSpec.startTime}</div>`;
+    // if (avatar === window.localPlayer?.avatar) window.domInfo.innerHTML += `<div style="display:;">backwardAnimationSpec.endTime: --- ${avatar.backwardAnimationSpec.endTime}</div>`;
+    if (avatar === window.localPlayer?.avatar) {
       console.log('backwardAnimationSpec.startFactor', avatar.backwardAnimationSpec.startFactor);
       // console.log('backwardAnimationSpec.endFactor', avatar.backwardAnimationSpec.endFactor);
       // console.log('backwardAnimationSpec.startTime', avatar.backwardAnimationSpec.startTime);
@@ -717,7 +717,7 @@ export const _applyAnimation = (avatar, now) => {
     mirrorFactor = isBackward ? 1 : 0;
   }
   avatar.lastBackwardFactor = mirrorFactor;
-  if (avatar === window.localPlayer.avatar) window.domInfo.innerHTML += `<div style="display:;">mirrorFactor: --- ${window.logNum(mirrorFactor)}</div>`;
+  if (avatar === window.localPlayer?.avatar) window.domInfo.innerHTML += `<div style="display:;">mirrorFactor: --- ${window.logNum(mirrorFactor)}</div>`;
 
   if (avatar.emoteAnimation !== avatar.lastEmoteAnimation) {
     avatar.lastEmoteTime = avatar.emoteAnimation ? now : 0;

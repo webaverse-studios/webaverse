@@ -1864,12 +1864,12 @@ class Avatar {
     this.calcedVelocity.copy(positionDiff).divideScalar(timeDiffS);
     this.lastPosition.copy(this.inputs.hmd.position);
     //
-    if (this === window.localPlayer.avatar) {
+    if (this === window.localPlayer?.avatar) {
       window.avatar = this;
       window.mixer = this.mixer;
       // window.motiono = this.motiono;
     }
-    if (true && this === window.localPlayer.avatar) {
+    if (true && this === window.localPlayer?.avatar) {
       // console.log(window.logNum(this.getAngle()));
 
       /*
