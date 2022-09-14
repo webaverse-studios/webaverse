@@ -11,10 +11,10 @@ import {ImmediateGLBufferAttribute} from './ImmediateGLBufferAttribute.js';
 const localVector2D = new THREE.Vector2();
 // const localVector2D2 = new THREE.Vector2();
 // const localVector3D = new THREE.Vector3();
-const localVector3D2 = new THREE.Vector3();
-const localVector3D3 = new THREE.Vector3();
-const currentChunkMin = new THREE.Vector3();
-const currentChunkMax = new THREE.Vector3();
+// const localVector3D2 = new THREE.Vector3();
+// const localVector3D3 = new THREE.Vector3();
+// const currentChunkMin = new THREE.Vector3();
+// const currentChunkMax = new THREE.Vector3();
 const localMatrix = new THREE.Matrix4();
 const localSphere = new THREE.Sphere();
 const localBox = new THREE.Box3();
@@ -157,7 +157,7 @@ export class GeometryPositionIndexBinding {
   }
 }
 
-const chunkAllocationDataSize =      // 35
+/* const chunkAllocationDataSize =      // 35
   Int32Array.BYTES_PER_ELEMENT +     // id
   Int32Array.BYTES_PER_ELEMENT * 3 + // min
   Int32Array.BYTES_PER_ELEMENT +     // enterFace
@@ -197,9 +197,9 @@ class ChunkAllocationData {
       localOffset += Uint8Array.BYTES_PER_ELEMENT;
     }
   }
-}
+} */
 
-function deserializeChunkAllocationData(dataView, serializeId) {
+/* function deserializeChunkAllocationData(dataView, serializeId) {
   let offset = serializeId * chunkAllocationDataSize;
   let localOffset = 0;
   const id = dataView.getInt32(offset + localOffset, true);
@@ -238,7 +238,7 @@ function deserializeDrawListBuffer(arrayBuffer, bufferAddress){
   index += Int32Array.BYTES_PER_ELEMENT * numDrawCalls;
 
   return DrawCalls;
-}
+} */
 
 export class GeometryAllocator {
   constructor(
@@ -403,7 +403,7 @@ export class GeometryAllocator {
           this.boundingData[lastIndex * 6 + 5];
       }
 
-      if (this.hasOcclusionCulling) {
+      /* if (this.hasOcclusionCulling) {
         this.minData[freeIndex * 4 + 0] = this.minData[lastIndex * 4 + 0];
         this.minData[freeIndex * 4 + 1] = this.minData[lastIndex * 4 + 1];
         this.minData[freeIndex * 4 + 2] = this.minData[lastIndex * 4 + 2];
@@ -417,7 +417,7 @@ export class GeometryAllocator {
           lastIndex
         );
         freeChunk.serialize(this.chunkAllocationDataView, freeIndex); // free
-      }
+      } */
     }
 
     this.numDraws--;
