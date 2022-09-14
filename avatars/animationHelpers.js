@@ -677,8 +677,7 @@ export const _applyAnimation = (avatar, now) => {
       startFactor: avatar.lastBackwardFactor, // 0 ~ 1
       endFactor: isBackward ? 1 : 0,
       startTime: now,
-      // endTime: now + 150,
-      endTime: now + 1000,
+      endTime: now + 150,
     };
     avatar.lastIsBackward = isBackward;
   }
@@ -701,7 +700,6 @@ export const _applyAnimation = (avatar, now) => {
       startFactor: 0
       startTime: 57228.324
     } */
-    debugger
     const f = (now - avatar.backwardAnimationSpec.startTime) / (avatar.backwardAnimationSpec.endTime - avatar.backwardAnimationSpec.startTime);
     if (f >= 1) {
       mirrorFactor = avatar.backwardAnimationSpec.endFactor;
