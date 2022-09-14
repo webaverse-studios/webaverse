@@ -2167,8 +2167,10 @@ class Avatar extends EventTarget {
     return this.poseManager.vrTransforms.floorHeight;
   }
 
-  dispatchAnimationFinishedEvent() {
-    this.dispatchEvent(new MessageEvent('animationEnd'));
+  dispatchAnimationFinishedEvent(finishedActionName) {
+    this.dispatchEvent(new MessageEvent('animationEnd', {
+      data: {finishedActionName}
+    }));
   }
 
   /* say(audio) {

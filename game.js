@@ -1040,7 +1040,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
     isUsingSwords
   ));
   
-  const handleAnimationEnd = () => {
+  const handleAnimationFinished = () => {
     if (localPlayer.needEndUse) {
       localPlayer.needEndUse = false;
       _endUse();
@@ -1055,7 +1055,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
       localPlayer.removeAction('dashAttack');
     }
   }
-  handleAnimationEnd();
+  handleAnimationFinished();
 };
 const _pushAppUpdates = () => {
   world.appManager.pushAppUpdates();

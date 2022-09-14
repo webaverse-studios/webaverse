@@ -688,45 +688,37 @@ export const _updateAnimation = (avatar, now) => {
       // if (isDebugger) console.log('---finished', avatar.getMotion(motion));
       // if (isDebugger) console.log('---finished', physx.physxWorker.getMotionName(avatar.mixerPtr, motionPtr)); // tod: why still works ?
       const finishedMotionName = physx.physxWorker.getFinishedMotionName(avatar.mixerPtr);
-      if (isDebugger) console.log('---finishedMotionName', finishedMotionName);
+      console.log('---finishedMotionName', finishedMotionName);
 
-      avatar.dispatchAnimationFinishedEvent();
+      const getFinishedActionName = () => {
+        for (const key in useAnimations) {
+          const motionName = key;
+          if (finishedMotionName === motionName) {
+            return 'use';
+          }
+        }
 
-      // this.dispatchEvent({
-      //   type: 'finished',
-      //   motion,
-      // });
-      // debugger;
-      // console.log('finished');
+        for (const key in useComboAnimations) {
+          const motionName = key;
+          if (finishedMotionName === motionName) {
+            return 'use';
+          }
+        }
 
-      const handleAnimationEnd = (finishedMotionName, trigger) => {
-        if ([
-          'drink',
-          'combo',
-          'dashAttack',
-          'swordSideSlash',
-          'swordSideSlashStep',
-          'swordTopDownSlash',
-          'swordTopDownSlashStep',
-          'dashAttack',
-        ].includes(finishedMotionName)) {
-          // game.handleAnimationEnd();
+        for (const key in hurtAnimations) {
+          const motionName = key;
+          if (finishedMotionName === motionName) {
+            return 'hurt';
+          }
+        }
+
+        if (finishedMotionName === 'land' || finishedMotionName === 'land2') { // todo: add landAnimations.
+          return 'land';
         }
       };
+      const finishedActionName = getFinishedActionName();
 
-      handleAnimationEnd(finishedMotionName, 'finished');
-
-      if (finishedMotionName === 'land' || finishedMotionName === 'land2') {
-        // console.log('land finished', player);
-        player?.removeAction('land');
-      }
-      for (const key in hurtAnimations) { // todo
-        const motionName = key;
-        if (finishedMotionName === motionName) {
-          player?.removeAction('hurt');
-          break;
-        }
-      }
+      avatar.dispatchAnimationFinishedEvent(finishedActionName);
     }
   };
   handleFinishedEvent();
