@@ -27,7 +27,7 @@ import {
   // getNextPhysicsId,
 } from '../util.js';
 
-// import game from '../game.js';
+// import game from '../game.js'; // can't import game.js in here, will cause offscreen-engine error.
 
 let animations;
 let animationStepIndices;
@@ -689,6 +689,8 @@ export const _updateAnimation = (avatar, now) => {
       // if (isDebugger) console.log('---finished', physx.physxWorker.getMotionName(avatar.mixerPtr, motionPtr)); // tod: why still works ?
       const finishedMotionName = physx.physxWorker.getFinishedMotionName(avatar.mixerPtr);
       if (isDebugger) console.log('---finishedMotionName', finishedMotionName);
+
+      avatar.dispatchAnimationFinishedEvent();
 
       // this.dispatchEvent({
       //   type: 'finished',

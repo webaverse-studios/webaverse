@@ -50,7 +50,7 @@ const localRay = new THREE.Ray();
 
 const physicsScene = physicsManager.getScene();
 let isMouseUp = false;
-let needContinueCombo = false;
+let needContinueCombo = false; // todo: move to character-controller ?
 
 // const zeroVector = new THREE.Vector3(0, 0, 0);
 // const oneVector = new THREE.Vector3(1, 1, 1);
@@ -1039,6 +1039,23 @@ const _gameUpdate = (timestamp, timeDiff) => {
     localPlayer.hasAction('pickUp') ||
     isUsingSwords
   ));
+  
+  const handleAnimationEnd = () => {
+    if (localPlayer.needEndUse) {
+      localPlayer.needEndUse = false;
+      _endUse();
+
+      if (needContinueCombo) {
+        needContinueCombo = false;
+        _startUse();
+      } else {
+        lastUseIndex = 0;
+      }
+
+      localPlayer.removeAction('dashAttack');
+    }
+  }
+  handleAnimationEnd();
 };
 const _pushAppUpdates = () => {
   world.appManager.pushAppUpdates();
@@ -1770,19 +1787,6 @@ class GameManager extends EventTarget {
     });
     downloadFile(blob, 'scene.scn');
     // console.log('got scene', scene);
-  }
-  handleAnimationEnd() {
-    _endUse();
-
-    if (needContinueCombo) {
-      needContinueCombo = false;
-      _startUse();
-    } else {
-      lastUseIndex = 0;
-    }
-
-    const localPlayer = playersManager.getLocalPlayer();
-    localPlayer.removeAction('dashAttack');
   }
   update = _gameUpdate;
   pushAppUpdates = _pushAppUpdates;

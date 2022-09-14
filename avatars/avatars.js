@@ -392,8 +392,9 @@ const _makeDebugMesh = (avatar) => {
 // const testMesh = new THREE.Mesh(g, m);
 // scene.add(testMesh);
 
-class Avatar {
+class Avatar extends EventTarget {
 	constructor(avatarRenderer, options = {}) {
+    super();
     this.avatarRenderer = avatarRenderer;
     const object = avatarRenderer.controlObject;
     this.object = object;
@@ -1859,12 +1860,12 @@ class Avatar {
       _motionControls.call(this)
     }
     
-    if (this === window.localPlayer?.avatar) {
+    if (false && this === window.localPlayer?.avatar) {
       window.avatar = this;
       window.mixer = this.mixer;
       // window.motiono = this.motiono;
     }
-    if (true && this === window.localPlayer?.avatar) {
+    if (false && this === window.localPlayer?.avatar) {
       // console.log(window.logNum(this.getAngle()));
 
       /*
@@ -2164,6 +2165,10 @@ class Avatar {
 
   getFloorHeight() {
     return this.poseManager.vrTransforms.floorHeight;
+  }
+
+  dispatchAnimationFinishedEvent() {
+    this.dispatchEvent(new MessageEvent('animationEnd'));
   }
 
   /* say(audio) {

@@ -162,6 +162,8 @@ class Character extends THREE.Object3D {
     
     this.voicePack = null;
     this.voiceEndpoint = null;
+
+    this.needEndUse = false;
   }
   setSpawnPoint(position, quaternion) {
     this.position.copy(position);
@@ -534,6 +536,12 @@ class Character extends THREE.Object3D {
       this.eyeballTargetEnabled = false;
     }
   }
+  handleAnimationEnd(e) {
+    // const avatar = e.target;
+    if (this.hasAction('use')) {
+      this.needEndUse = true; // tell next frame need endUse();
+    }
+  }
   destroy() {
     this.characterHups.destroy();
   }
@@ -819,9 +827,11 @@ class AvatarCharacter extends StateCharacter {
 
     const _setNextAvatarApp = (app) => {
       (() => {
+        this.avatar && this.avatar.removeEventListener('animationEnd', this.handleAnimationEnd);
         const avatar = switchAvatar(this.avatar, app);
         if (!cancelFn.isLive()) return;
         this.avatar = avatar;
+        this.avatar.addEventListener('animationEnd', this.handleAnimationEnd.bind(this));
 
         this.dispatchEvent({
           type: 'avatarchange',
