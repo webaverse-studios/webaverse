@@ -567,7 +567,7 @@ export const _updateAnimation = (avatar, now) => {
       avatar.emoteAnimation,
       avatar.danceAnimation,
       avatar.holdAnimation,
-      avatar.activateAnimation,
+      avatar.activateAnimation, // todo: activateAnimationName
       avatar.hurtAnimation,
     ]);
 
@@ -591,6 +591,8 @@ export const _updateAnimation = (avatar, now) => {
       // avatar.flyDashFactor,
 
       holdFactor,
+
+      avatar.activateTime,
 
       // action states ---
       avatar.jumpState,
