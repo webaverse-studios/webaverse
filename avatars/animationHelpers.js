@@ -646,6 +646,7 @@ export const _updateAnimation = (avatar, now) => {
       // other
       avatar.landWithMoving,
       avatar.dashAttacking,
+      avatar.landTime,
     ]);
 
     // console.log(avatar.useComboStart, useAnimationComboName)
