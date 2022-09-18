@@ -2325,14 +2325,14 @@ const physxWorker = (() => {
       let value;
       const outputBufferOffset = Module.HEAPU32[headMain + i];
       const head = outputBufferOffset / Float32Array.BYTES_PER_ELEMENT;
-      const valueSize = Module.HEAPF32[head];
-      const x = Module.HEAPF32[head + 1];
-      const y = Module.HEAPF32[head + 2];
-      const z = Module.HEAPF32[head + 3];
-      if (valueSize === 3) {
+      const isPosition = i === 0;
+      const x = Module.HEAPF32[head + 0];
+      const y = Module.HEAPF32[head + 1];
+      const z = Module.HEAPF32[head + 2];
+      if (isPosition) {
         value = [x, y, z];
-      } else if (valueSize === 4) {
-        const w = Module.HEAPF32[head + 4];
+      } else {
+        const w = Module.HEAPF32[head + 3];
         value = [x, y, z, w];
       }
       resultValues.push(value);
