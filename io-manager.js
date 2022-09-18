@@ -255,7 +255,6 @@ const _updateIo = timeDiff => {
       }
       ioManager.lastCtrlKey = ioManager.keys.ctrl;
     }
-    cameraManager.lastNonzeroDirectionVectorRotated.copy(keysDirection);
     if (physicsScene.getPhysicsEnabled()) {
       const speed = movementEnabled ? game.getSpeed() : 0;
       const velocity = keysDirection.normalize().multiplyScalar(speed);

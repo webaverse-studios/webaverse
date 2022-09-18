@@ -1037,13 +1037,6 @@ export default () => {
     if (result) {
       return localPlayer;
     } else {
-      for (let i = 0; i < npcManager.npcs.length; i++) {
-        const npcPlayer = npcManager.npcs[i];
-        const remoteApp = npcPlayer.appManager.getAppByInstanceId(instanceId);
-        if (remoteApp) {
-          return npcPlayer;
-        }
-      }
       for (const remotePlayer in playersManager.getRemotePlayers()) {
         const remoteApp = remotePlayer.appManager.getAppByInstanceId(instanceId);
         if (remoteApp) {

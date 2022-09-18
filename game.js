@@ -50,7 +50,6 @@ const localRay = new THREE.Ray();
 
 const physicsScene = physicsManager.getScene();
 let isMouseUp = false;
-let needContinueCombo = false; // todo: move to character-controller ?
 
 // const zeroVector = new THREE.Vector3(0, 0, 0);
 // const oneVector = new THREE.Vector3(1, 1, 1);
@@ -399,9 +398,8 @@ const _getNextUseIndex = animationCombo => {
   }
 }
 const _startUse = () => {
-  const localPlayer = playersManager.getLocalPlayer();
   const wearApp = loadoutManager.getSelectedApp();
-  if (wearApp &&  !localPlayer.hasAction('jump') && !localPlayer.hasAction('fly') && !localPlayer.hasAction('narutoRun')) { // will add jump/fly/narutoRun specific useAnimations afterwards.
+  if (wearApp) {
     const useComponent = wearApp.getComponent('use');
     if (useComponent) {
       const localPlayer = playersManager.getLocalPlayer();
@@ -409,24 +407,7 @@ const _startUse = () => {
       if (!useAction) {
         const {instanceId} = wearApp;
         const {boneAttachment, animation, animationCombo, animationEnvelope, ik, behavior, position, quaternion, scale} = useComponent;
-        let index = 0;
-
-        if ( // dashAttack
-          localPlayer.avatar?.walkRunFactor >= 0.9 && // note: because of velocity damping, can't check === 1
-          (
-            animation === 'combo' ||
-            animationCombo?.length > 0
-          )
-        ) {
-          localPlayer.addAction({type: 'dashAttack'});
-          localVector.copy(cameraManager.lastNonzeroDirectionVectorRotated).setY(0)
-            .normalize()
-            .multiplyScalar(10);
-          localPlayer.characterPhysics.applyWasd(localVector);
-        } else {
-          index = _getNextUseIndex(animationCombo);
-        }
-
+        const index = _getNextUseIndex(animationCombo);
         const newUseAction = {
           type: 'use',
           instanceId,
@@ -462,23 +443,10 @@ const _endUse = () => {
   }
 };
 const _mousedown = () => {
-  const localPlayer = metaversefileApi.useLocalPlayer();
-  const useAction = localPlayer.getAction('use');
-  if (useAction?.animationCombo?.length > 0 && useAction.index < useAction.animationCombo.length - 1) {
-    needContinueCombo = true;
-  }
   _startUse();
 };
 const _mouseup = () => {
-  const localPlayer = metaversefileApi.useLocalPlayer();
-  const useAction = localPlayer.getAction('use');
-  if (!(
-    useAction?.animation ||
-    useAction?.animationCombo?.length > 0
-  )) {
-    _endUse();
-  }
-  // isMouseUp = true;
+  isMouseUp = true;
 };
 
 const _grab = object => {
@@ -642,6 +610,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
     } /* else {
 
     } */
+    ioManager.setMovementEnabled(!pickUpAction);
   }
   _handlePickUp();
 
@@ -955,8 +924,6 @@ const _gameUpdate = (timestamp, timeDiff) => {
       if (currentThrowing && !lastThrowing) {
         // console.log('got throw action', useAction, localPlayer);
 
-        localPlayer.removeAction('use');
-
         const app = metaversefileApi.getAppByInstanceId(useAction.instanceId);
         localPlayer.unwear(app, {
           dropStartPosition: localVector.copy(localPlayer.position)
@@ -1033,29 +1000,22 @@ const _gameUpdate = (timestamp, timeDiff) => {
     crosshairEl.style.visibility = visible ? null : 'hidden';
   }
 
-  const useAction = localPlayer.getAction('use');
-  const isUsingSwords = useAction?.animation || useAction?.animationCombo?.length > 0;
-  ioManager.setMovementEnabled(!(
-    localPlayer.hasAction('pickUp') ||
-    isUsingSwords
-  ));
-  
-  const handleAnimationFinished = () => {
-    if (localPlayer.needEndUse) {
-      localPlayer.needEndUse = false;
-      _endUse();
-
-      if (needContinueCombo) {
-        needContinueCombo = false;
-        _startUse();
-      } else {
-        lastUseIndex = 0;
+  const _updateUse = () => {
+    const useAction = localPlayer.getAction('use');
+    if (useAction) {
+      if (useAction.animation === 'pickUpThrow') {
+        const useTime = localPlayer.actionInterpolants.use.get();
+        if (useTime / 1000 >= throwAnimationDuration) {
+          _endUse();
+        }
+      } else if (isMouseUp) {
+        _endUse();
       }
 
-      localPlayer.removeAction('dashAttack');
     }
-  }
-  handleAnimationFinished();
+    isMouseUp = false;
+  };
+  _updateUse();
 };
 const _pushAppUpdates = () => {
   world.appManager.pushAppUpdates();
@@ -1397,7 +1357,7 @@ class GameManager extends EventTarget {
   }
 
   menuDoubleTap() {
-    if (!this.isCrouched() && !this.isBowing()) {
+    if (!this.isCrouched()) {
       const localPlayer = playersManager.getLocalPlayer();
       const narutoRunAction = localPlayer.getAction('narutoRun');
       if (!narutoRunAction) {
@@ -1448,10 +1408,6 @@ class GameManager extends EventTarget {
   isCrouched() {
     const localPlayer = playersManager.getLocalPlayer();
     return localPlayer.hasAction('crouch');
-  }
-  isBowing() {
-    const localPlayer = playersManager.getLocalPlayer();
-    return localPlayer.getAction('use')?.animationEnvelope?.length > 0;
   }
   isSwimming() {
     const localPlayer = playersManager.getLocalPlayer();
@@ -1658,12 +1614,11 @@ class GameManager extends EventTarget {
     let speed = 0;
     
     const isCrouched = gameManager.isCrouched();
-    const isBowing = gameManager.isBowing();
     const isSwimming = gameManager.isSwimming();
     const isFlying = gameManager.isFlying();
-    const isRunning = ioManager.keys.shift && !isCrouched && !isBowing;
+    const isRunning = ioManager.keys.shift && !isCrouched;
     const isMovingBackward = gameManager.isMovingBackward();
-    if ((isCrouched || isBowing) && !isMovingBackward) {
+    if (isCrouched && !isMovingBackward) {
       speed = crouchSpeed;
     } else if (gameManager.isFlying()) {
       speed = flySpeed;

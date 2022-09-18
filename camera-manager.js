@@ -178,7 +178,6 @@ class CameraManager extends EventTarget {
     this.lastFocusChangeTime = 0; // XXX this needs to be removed
     this.fovFactor = 0;
     this.lastNonzeroDirectionVector = new THREE.Vector3(0, 0, -1);
-    this.lastNonzeroDirectionVectorRotated = new THREE.Vector3(0, 0, -1);
 
     this.targetType = 'dynamic';
     this.target = null;
