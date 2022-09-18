@@ -27,6 +27,16 @@ import {
   // getNextPhysicsId,
 } from '../util.js';
 
+import {
+  crouchMaxTime,
+  // useMaxTime,
+  aimMaxTime,
+  // avatarInterpolationFrameRate,
+  // avatarInterpolationTimeDelay,
+  // avatarInterpolationNumFrames,
+  narutoRunTimeFactor,
+} from '../constants.js';
+
 // import game from '../game.js'; // can't import game.js in here, will cause offscreen-engine error.
 
 let animations;
@@ -454,9 +464,16 @@ export const _createAnimation = avatar => {
 export const _updateAnimation = (avatar, now) => {
   if (!avatar.app) return;
 
-  const timeS = performance.now() / 1000;
+  // const timeS = performance.now() / 1000;
+  // console.log('now', now)
+  const nowS = now / 1000;
 
-  const player = metaversefile.getPlayerByAppInstanceId(avatar.app.getComponent('instanceId'));
+  const player = metaversefile.getPlayerByAppInstanceId(avatar.app.getComponent('instanceId')); // todo: del
+
+  if (avatar.emoteAnimation !== avatar.lastEmoteAnimation) {
+    avatar.lastEmoteTime = avatar.emoteAnimation ? now : 0;
+  }
+  avatar.lastEmoteAnimation = avatar.emoteAnimation;
 
   const angle = avatar.getAngle();
   const _getMirrorAnimationAngles = (animationAngles, key) => {
@@ -554,12 +571,14 @@ export const _updateAnimation = (avatar, now) => {
     const useAnimationComboName = avatar.useAnimationCombo[avatar.useAnimationIndex];
     // console.log('js: useAnimation:', avatar.useAnimation)
     // console.log('js: useAnimationComboName:', useAnimationComboName)
+    // console.log('js: narutoRunTimeFactor: ', avatar.narutoRunTimeFactor)
     physx.physxWorker.updateAvatarString(avatar.animationAvatarPtr, [
       defaultSitAnimation, // todo: send to wasm only once.
       defaultEmoteAnimation,
       defaultDanceAnimation,
       defaultHoldAnimation,
       defaultActivateAnimation,
+      defaultNarutoRunAnimation,
       // ---
       avatar.useAnimation,
       useAnimationComboName, // todo: avatar.useAnimationCombo[avatar.useAnimationIndex]; ?
@@ -651,6 +670,15 @@ export const _updateAnimation = (avatar, now) => {
       avatar.landTime,
       avatar.fallLoopFactor,
       avatar.fallLoopTime,
+      avatar.flyTime,
+      avatar.doubleJumpTime,
+      avatar.jumpTime,
+      avatar.narutoRunTime,
+      narutoRunTimeFactor,
+      avatar.danceFactor,
+      crouchMaxTime,
+      avatar.emoteFactor,
+      avatar.lastEmoteTime,
     ]);
 
     // console.log(avatar.useComboStart, useAnimationComboName)
@@ -659,7 +687,7 @@ export const _updateAnimation = (avatar, now) => {
 
   let resultValues;
   const doUpdate = () => {
-    resultValues = physx.physxWorker.updateAnimationMixer(avatar.mixerPtr, timeS);
+    resultValues = physx.physxWorker.updateAnimationMixer(avatar.mixerPtr, now, nowS);
     let index = 0;
     for (const spec of avatar.animationMappings) {
       const {

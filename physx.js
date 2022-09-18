@@ -2313,9 +2313,9 @@ const physxWorker = (() => {
     )
     return ptr;
   }
-  w.updateAnimationMixer = (mixerPtr, timeS) => {
+  w.updateAnimationMixer = (mixerPtr, now, nowS) => {
     const outputBufferOffsetMain = Module._updateAnimationMixer(
-      mixerPtr, timeS,
+      mixerPtr, now, nowS,
     )
     // console.log(outputBufferOffsetMain)
     // debugger
