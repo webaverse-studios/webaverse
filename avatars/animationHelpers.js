@@ -569,6 +569,8 @@ export const _updateAnimation = (avatar, now) => {
       avatar.holdAnimation,
       avatar.activateAnimation, // todo: activateAnimationName
       avatar.hurtAnimation,
+      // ---
+      avatar.fallLoopFrom,
     ]);
 
     // console.log(avatar.jumpEnd)
@@ -647,6 +649,8 @@ export const _updateAnimation = (avatar, now) => {
       avatar.landWithMoving,
       avatar.dashAttacking,
       avatar.landTime,
+      avatar.fallLoopFactor,
+      avatar.fallLoopTime,
     ]);
 
     // console.log(avatar.useComboStart, useAnimationComboName)
