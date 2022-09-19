@@ -685,6 +685,7 @@ export const _updateAnimation = (avatar, now) => {
       avatar.lastEmoteTime,
       avatar.useTime,
       avatar.useAnimationEnvelope.length,
+      avatar.hurtTime, // todo: why only get hurt once ? js side regression ?
     ]);
 
     // console.log(avatar.useComboStart, useAnimationComboName)
