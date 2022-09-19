@@ -570,7 +570,7 @@ export const _updateAnimation = (avatar, now) => {
 
     const useAnimationComboName = avatar.useAnimationCombo[avatar.useAnimationIndex];
     // console.log('js: useAnimation:', avatar.useAnimation)
-    // console.log('js: useAnimationComboName:', useAnimationComboName)
+    console.log('js: useAnimationComboName:', useAnimationComboName)
     // console.log('js: narutoRunTimeFactor: ', avatar.narutoRunTimeFactor)
     physx.physxWorker.updateAvatarString(avatar.animationAvatarPtr, [
       defaultSitAnimation, // todo: send to wasm only once.
