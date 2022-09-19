@@ -570,9 +570,9 @@ export const _updateAnimation = (avatar, now) => {
 
     const useAnimationComboName = avatar.useAnimationCombo[avatar.useAnimationIndex];
     // console.log('js: useAnimation:', avatar.useAnimation)
-    console.log('js: useAnimationComboName:', useAnimationComboName)
+    // console.log('js: useAnimationComboName:', useAnimationComboName)
     // console.log('js: narutoRunTimeFactor: ', avatar.narutoRunTimeFactor)
-    physx.physxWorker.updateAvatarString(avatar.animationAvatarPtr, [
+    const strings = [
       defaultSitAnimation, // todo: send to wasm only once.
       defaultEmoteAnimation,
       defaultDanceAnimation,
@@ -590,7 +590,11 @@ export const _updateAnimation = (avatar, now) => {
       avatar.hurtAnimation,
       // ---
       avatar.fallLoopFrom,
-    ]);
+    ];
+    avatar.useAnimationEnvelope.forEach(useAnimationEnvelopeName => {
+      strings.push(useAnimationEnvelopeName);
+    });
+    physx.physxWorker.updateAvatarString(avatar.animationAvatarPtr, strings);
 
     // console.log(avatar.jumpEnd)
     // console.log(avatar.doubleJumpEnd)
@@ -680,6 +684,7 @@ export const _updateAnimation = (avatar, now) => {
       avatar.emoteFactor,
       avatar.lastEmoteTime,
       avatar.useTime,
+      avatar.useAnimationEnvelope.length,
     ]);
 
     // console.log(avatar.useComboStart, useAnimationComboName)
