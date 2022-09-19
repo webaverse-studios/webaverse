@@ -679,6 +679,7 @@ export const _updateAnimation = (avatar, now) => {
       crouchMaxTime,
       avatar.emoteFactor,
       avatar.lastEmoteTime,
+      avatar.useTime,
     ]);
 
     // console.log(avatar.useComboStart, useAnimationComboName)
