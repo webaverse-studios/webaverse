@@ -1872,6 +1872,8 @@ class Avatar extends EventTarget {
         <div style="display:;">keysDirection: --- ${false&&window.logVector3(window.ioManager?.keysDirection)}</div>
       */
       window.domInfo.innerHTML += `<div style="display:;">actions: --- ${window.localPlayer?.getActionsArray().map(n=>n.type)}</div>`;
+      window.domInfo.innerHTML += `<div style="display:;">unuseAnimation: --- ${this.unuseAnimation || ''}</div>`;
+      window.domInfo.innerHTML += `<div style="display:;">unuseTime: --- ${window.logNum(this.unuseTime)}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">angle: --- ${window.logNum(this.getAngle())}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">mirrorFactor:  --- ${this.mirrorFactor?.toFixed(2)}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">mirrorFactor2: --- ${this.mirrorFactor2?.toFixed(2)}</div>`;

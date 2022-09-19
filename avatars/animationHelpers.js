@@ -568,6 +568,8 @@ export const _updateAnimation = (avatar, now) => {
 
     const holdFactor = avatar.walkRunFactor * 0.7 + avatar.crouchFactor * (1 - avatar.idleWalkFactor) * 0.5;
 
+    // console.log(avatar.unuseAnimation, avatar.unuseTime)
+
     const useAnimationComboName = avatar.useAnimationCombo[avatar.useAnimationIndex];
     // console.log('js: useAnimation:', avatar.useAnimation)
     // console.log('js: useAnimationComboName:', useAnimationComboName)
@@ -588,6 +590,7 @@ export const _updateAnimation = (avatar, now) => {
       avatar.holdAnimation,
       avatar.activateAnimation, // todo: activateAnimationName
       avatar.hurtAnimation,
+      avatar.unuseAnimation || '', // note: can't send null to wasm, will turn to string value "null".
       // ---
       avatar.fallLoopFrom,
     ];
@@ -686,6 +689,7 @@ export const _updateAnimation = (avatar, now) => {
       avatar.useTime,
       avatar.useAnimationEnvelope.length,
       avatar.hurtTime, // todo: why only get hurt once ? js side regression ?
+      avatar.unuseTime,
     ]);
 
     // console.log(avatar.useComboStart, useAnimationComboName)
