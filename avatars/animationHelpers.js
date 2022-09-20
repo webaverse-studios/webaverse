@@ -717,6 +717,7 @@ export const _applyAnimation = (avatar, now) => {
   }
   avatar.lastBackwardFactor = mirrorFactor;
   if (avatar === window.localPlayer?.avatar) window.domInfo.innerHTML += `<div style="display:;">mirrorFactor: --- ${window.logNum(mirrorFactor)}</div>`;
+  if (avatar === window.localPlayer?.avatar) window.domInfo.innerHTML += `<div style="display:;">angleFactor: --- ${window.logNum(angleFactor)}</div>`;
 
   if (avatar.emoteAnimation !== avatar.lastEmoteAnimation) {
     avatar.lastEmoteTime = avatar.emoteAnimation ? now : 0;

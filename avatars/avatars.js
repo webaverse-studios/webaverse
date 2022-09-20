@@ -1875,7 +1875,7 @@ class Avatar {
       /*
         <div style="display:;">keysDirection: --- ${false&&window.logVector3(window.ioManager?.keysDirection)}</div>
       */
-      // window.domInfo.innerHTML += `<div style="display:;">actions: --- ${window.localPlayer.getActionsArray().map(n=>n.type)}</div>`;
+      window.domInfo.innerHTML += `<div style="display:;">actions: --- ${window.localPlayer.getActionsArray().map(n=>n.type)}</div>`;
       window.domInfo.innerHTML += `<div style="display:;">angle: --- ${window.logNum(this.getAngle())}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">mirrorFactor:  --- ${this.mirrorFactor?.toFixed(2)}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">mirrorFactor2: --- ${this.mirrorFactor2?.toFixed(2)}</div>`;
@@ -1917,7 +1917,7 @@ class Avatar {
       // window.domInfo.innerHTML += `<div style="display:;">fallLoopState: --- ${this.fallLoopState}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">narutoRunState: --- ${this.narutoRunState}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">sitState: --- ${this.sitState}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">aimAnimation: --- ${this.aimAnimation}</div>`;
+      window.domInfo.innerHTML += `<div style="display:;">aimAnimation: --- ${this.aimAnimation}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">danceAnimation: --- ${this.danceAnimation}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">hurtAnimation: --- ${this.hurtAnimation}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">poseAnimation: --- ${this.poseAnimation}</div>`;
