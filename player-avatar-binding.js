@@ -178,7 +178,7 @@ export function applyCharacterActionsToAvatar(character, rig) {
   rig.aimTime = character.actionInterpolants.aim.get();
   rig.aimRightTransitionTime = character.actionInterpolants.aimRightTransition.get();
   rig.aimLeftTransitionTime = character.actionInterpolants.aimLeftTransition.get();
-  rig.aimAnimation = (aimAction?.characterAnimation) || '';
+  rig.aimAnimation = (aimAction?.playerAnimation) || '';
   // rig.aimDirection.set(0, 0, -1);
   // aimAction && rig.aimDirection.applyQuaternion(rig.inputs.hmd.quaternion);
   rig.sitState = !!sitAction;

@@ -661,6 +661,8 @@ export const _updateAnimation = (avatar, now) => {
       avatar.useAnimationEnvelope.length,
       avatar.hurtTime, // todo: why only get hurt once ? js side regression ?
       avatar.unuseTime,
+      avatar.aimTime,
+      aimMaxTime,
     ]);
 
     const useAnimationComboName = avatar.useAnimationCombo[avatar.useAnimationIndex];
@@ -684,6 +686,7 @@ export const _updateAnimation = (avatar, now) => {
       avatar.activateAnimation, // todo: activateAnimationName
       avatar.hurtAnimation,
       avatar.unuseAnimation || '', // note: can't send null to wasm, will turn to string value "null".
+      avatar.aimAnimation || '',
       // ---
       avatar.fallLoopFrom,
     ];
