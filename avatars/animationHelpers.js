@@ -570,35 +570,6 @@ export const _updateAnimation = (avatar, now) => {
 
     // console.log(avatar.unuseAnimation, avatar.unuseTime)
 
-    const useAnimationComboName = avatar.useAnimationCombo[avatar.useAnimationIndex];
-    // console.log('js: useAnimation:', avatar.useAnimation)
-    // console.log('js: useAnimationComboName:', useAnimationComboName)
-    // console.log('js: narutoRunTimeFactor: ', avatar.narutoRunTimeFactor)
-    const strings = [
-      defaultSitAnimation, // todo: send to wasm only once.
-      defaultEmoteAnimation,
-      defaultDanceAnimation,
-      defaultHoldAnimation,
-      defaultActivateAnimation,
-      defaultNarutoRunAnimation,
-      // ---
-      avatar.useAnimation,
-      useAnimationComboName, // todo: avatar.useAnimationCombo[avatar.useAnimationIndex]; ?
-      avatar.sitAnimation,
-      avatar.emoteAnimation,
-      avatar.danceAnimation,
-      avatar.holdAnimation,
-      avatar.activateAnimation, // todo: activateAnimationName
-      avatar.hurtAnimation,
-      avatar.unuseAnimation || '', // note: can't send null to wasm, will turn to string value "null".
-      // ---
-      avatar.fallLoopFrom,
-    ];
-    avatar.useAnimationEnvelope.forEach(useAnimationEnvelopeName => {
-      strings.push(useAnimationEnvelopeName);
-    });
-    physx.physxWorker.updateAvatarString(avatar.animationAvatarPtr, strings);
-
     // console.log(avatar.jumpEnd)
     // console.log(avatar.doubleJumpEnd)
     // console.log(avatar.hurtStart, avatar.hurtEnd)
@@ -691,6 +662,35 @@ export const _updateAnimation = (avatar, now) => {
       avatar.hurtTime, // todo: why only get hurt once ? js side regression ?
       avatar.unuseTime,
     ]);
+
+    const useAnimationComboName = avatar.useAnimationCombo[avatar.useAnimationIndex];
+    // console.log('js: useAnimation:', avatar.useAnimation)
+    // console.log('js: useAnimationComboName:', useAnimationComboName)
+    // console.log('js: narutoRunTimeFactor: ', avatar.narutoRunTimeFactor)
+    const strings = [
+      defaultSitAnimation, // todo: send to wasm only once.
+      defaultEmoteAnimation,
+      defaultDanceAnimation,
+      defaultHoldAnimation,
+      defaultActivateAnimation,
+      defaultNarutoRunAnimation,
+      // ---
+      avatar.useAnimation,
+      useAnimationComboName, // todo: avatar.useAnimationCombo[avatar.useAnimationIndex]; ?
+      avatar.sitAnimation,
+      avatar.emoteAnimation,
+      avatar.danceAnimation,
+      avatar.holdAnimation,
+      avatar.activateAnimation, // todo: activateAnimationName
+      avatar.hurtAnimation,
+      avatar.unuseAnimation || '', // note: can't send null to wasm, will turn to string value "null".
+      // ---
+      avatar.fallLoopFrom,
+    ];
+    avatar.useAnimationEnvelope.forEach(useAnimationEnvelopeName => {
+      strings.push(useAnimationEnvelopeName);
+    });
+    physx.physxWorker.updateAvatarString(avatar.animationAvatarPtr, strings);
 
     // console.log(avatar.useComboStart, useAnimationComboName)
   };
