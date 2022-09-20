@@ -2317,8 +2317,6 @@ const physxWorker = (() => {
     const outputBufferOffsetMain = Module._updateAnimationMixer(
       mixerPtr, now, nowS,
     )
-    // console.log(outputBufferOffsetMain)
-    // debugger
     const resultValues = [];
     const headMain = outputBufferOffsetMain / Float32Array.BYTES_PER_ELEMENT;
     for (let i = 0; i < 53; i++) {
@@ -2338,51 +2336,15 @@ const physxWorker = (() => {
       resultValues.push(value);
     }
 
-    let outputBufferOffset = Module.HEAPU32[headMain + 53];
-    const head = outputBufferOffset / Float32Array.BYTES_PER_ELEMENT;
-    const finishedFlag = Module.HEAPF32[head];
-    resultValues.push(finishedFlag);
-
-    // if (finishedFlag) debugger
-    outputBufferOffset = Module.HEAPU32[headMain + 54];
-    // head = outputBufferOffset / Float32Array.BYTES_PER_ELEMENT;
-    // const finishedAnimationIndex = Module.HEAPF32[head];
-    // values.push(finishedAnimationIndex);
-    const motionPtr = outputBufferOffset;
-    resultValues.push(motionPtr);
-
-    // console.log(finishedFlag);
-    // if (finishedFlag) {
-    //   console.log(finishedAnimationIndex);
-    //   debugger
-    // }
-
     return resultValues;
-  }
-  w.getFinishedMotionName = (mixerPtr) => {
-    const nameByteLength = Module._getFinishedMotionName(
-      mixerPtr, scratchStack.ptr,
-    )
-
-    const name = textDecoder.decode(scratchStack.u8.slice(0, nameByteLength))
-    return name;
   }
   w.createAnimationMapping = (isPosition, index, isFirstBone, isLastBone, isTop, isArm) => {
     Module._createAnimationMapping(
       isPosition, index, isFirstBone, isLastBone, isTop, isArm
     )
   }
-  // w.createAnimationMixer = () => {
-  //   const ptr = Module._createAnimationMixer(
-  //   )
-  //   return ptr;
-  // }
   w.createAnimation = (name, duration) => {
-    // https://rob-blackbourn.github.io/blog/webassembly/wasm/strings/javascript/c/libc/wasm-libc/clang/2020/06/20/wasm-string-passing.html
-    // https://stackoverflow.com/questions/20024690/is-there-byte-data-type-in-c
-    // Encode the string in utf-8.
     const bytes = textEncoder.encode(name)
-    // console.log(name, bytes)
     const nameByteLength = bytes.length;
     for (let i = 0; i < nameByteLength; i++) {
       scratchStack.u8[i] = bytes[i];
@@ -2392,12 +2354,6 @@ const physxWorker = (() => {
       scratchStack.ptr,
       nameByteLength,
       duration,
-    )
-    return ptr;
-  }
-  w.createMotion = (mixer, animation) => {
-    const ptr = Module._createMotion(
-      mixer, animation,
     )
     return ptr;
   }
@@ -2430,53 +2386,6 @@ const physxWorker = (() => {
       mixerPtr, scratchStack.ptr, nameByteLength,
     )
     return ptr;
-  }
-  w.getMotionName = (mixerPtr, motionPtr) => {
-    const nameByteLength = Module._getMotionName(
-      mixerPtr, motionPtr, scratchStack.ptr,
-    )
-
-    const name = textDecoder.decode(scratchStack.u8.slice(0, nameByteLength))
-    return name;
-  }
-  w.createNode = (mixer, type = AnimationNodeType.LIST, index = 0) => { // todo: rename: createAnimationNode
-    // debugger
-    const ptr = Module._createNode(
-      mixer, type, index,
-    )
-    return ptr;
-  }
-  w.getNode = (mixerPtr, name) => {
-    const bytes = textEncoder.encode(name)
-    const nameByteLength = bytes.length;
-    for (let i = 0; i < nameByteLength; i++) {
-      scratchStack.u8[i] = bytes[i];
-    }
-
-    const ptr = Module._getNode(
-      mixerPtr, scratchStack.ptr, nameByteLength,
-    )
-    return ptr;
-  }
-  // window.nodeReferenceCount = {}; // test
-  w.addChild = (parentNodePtr, childNodePtr) => { // input: ptrs of nodes
-    // if (!parentNode) debugger
-    // if (!childNode) debugger
-
-    Module._addChild(
-      parentNodePtr, childNodePtr,
-    )
-
-    // if (window.nodeReferenceCount[childNode]) {
-    //   window.nodeReferenceCount[childNode]++
-    // } else {
-    //   window.nodeReferenceCount[childNode] = 1;
-    // }
-  }
-  w.setRootNode = (mixerPtr, nodePtr) => {
-    Module._setRootNode(
-      mixerPtr, nodePtr,
-    )
   }
   w.createInterpolant = (animationName, parameterPositions, sampleValues, valueSize) => {
     const allocator = new Allocator(Module);
@@ -2513,123 +2422,6 @@ const physxWorker = (() => {
 
     // allocator.freeAll(); // can't free sampleValuesTypedArray, need persist in wasm for later use.
   }
-  // w.evaluateInterpolant = (animationIndex, interpolantIndex, t) => {
-  //   const outputBufferOffset = Module._evaluateInterpolant(
-  //     animationIndex,
-  //     interpolantIndex,
-  //     t,
-  //   )
-
-  //   let head = outputBufferOffset / Float32Array.BYTES_PER_ELEMENT;
-  //   let tail = head + 1;
-  //   const valueSize = Module.HEAPF32[head];
-
-  //   head = tail;
-  //   tail = head + 1;
-  //   const x = Module.HEAPF32[head];
-
-  //   head = tail;
-  //   tail = head + 1;
-  //   const y = Module.HEAPF32[head];
-
-  //   head = tail;
-  //   tail = head + 1;
-  //   const z = Module.HEAPF32[head];
-
-  //   if (valueSize === 3) {
-  //     return [x, y, z];
-  //   } else if (valueSize === 4) {
-  //     head = tail;
-  //     tail = head + 1;
-  //     const w = Module.HEAPF32[head];
-
-  //     return [x, y, z, w];
-  //   } else {
-  //     debugger
-  //   }
-  // }
-  // w.getAnimationValues = (animationIndex, t) => {
-  //   const outputBufferOffsetMain = Module._getAnimationValues(
-  //     animationIndex,
-  //     t,
-  //   )
-  //   const values = [];
-  //   const headMain = outputBufferOffsetMain / Float32Array.BYTES_PER_ELEMENT;
-  //   for (let i = 0; i < 53; i++) {
-  //     let value;
-  //     const outputBufferOffset = Module.HEAPU32[headMain + i];
-  //     const head = outputBufferOffset / Float32Array.BYTES_PER_ELEMENT;
-  //     const valueSize = Module.HEAPF32[head];
-  //     const x = Module.HEAPF32[head + 1];
-  //     const y = Module.HEAPF32[head + 2];
-  //     const z = Module.HEAPF32[head + 3];
-  //     if (valueSize === 3) {
-  //       value = [x, y, z];
-  //     } else if (valueSize === 4) {
-  //       const w = Module.HEAPF32[head + 4];
-  //       value = [x, y, z, w];
-  //     }
-  //     values.push(value);
-  //   }
-  //   return values;
-  // }
-  w.crossFadeTwo = (parentNode, duration, targetFactor) => {
-    Module._crossFadeTwo(
-      parentNode, duration, targetFactor,
-    )
-  }
-  w.crossFadeSolitary = (parentNode, duration, targetNode) => {
-    Module._crossFadeSolitary(
-      parentNode, duration, targetNode,
-    )
-  }
-  w.setWeight = (nodePtr, weight) => { // todo: renmae: setWeight() // todo: general setProp/Attribute().
-    // console.log(nodePtr)
-    // if (nodePtr === 0) debugger
-    Module._setWeight(
-      nodePtr,
-      weight,
-    )
-  }
-  w.setFactor = (nodePtr, factor) => { // todo: general setProp/Attribute().
-    Module._setFactor(
-      nodePtr,
-      factor,
-    )
-  }
-  w.setArg = (nodePtr, arg) => {
-    Module._setArg(
-      nodePtr,
-      arg,
-    )
-  }
-  w.getWeight = (nodePtr) => {
-    return Module._getWeight(
-      nodePtr,
-    )
-  }
-  w.getFactor = (nodePtr) => {
-    return Module._getFactor(
-      nodePtr,
-    )
-  }
-  w.getChildren = (nodePtr) => {
-    const count = Module._getChildren(
-      nodePtr, scratchStack.ptr,
-    )
-    const children = [];
-    for (let i = 0; i < count; i++) {
-      const childNode = scratchStack.u32[i];
-      children.push(childNode);
-    }
-    return children;
-  }
-
-  w.play = (motion) => Module._play(motion);
-  w.stop = (motion) => Module._stop(motion);
-  w.setTimeBias = (motion, timeBias) => Module._setTimeBias(motion, timeBias);
-  w.setSpeed = (motion, speed) => Module._setSpeed(motion, speed);
-  w.setLoop = (motion, loopType) => Module._setLoop(motion, loopType); // todo: Rename to `setMotionLoop` or `motionSetLoop` `motion_setLoop`.
 
   // End AnimationSystem
 
