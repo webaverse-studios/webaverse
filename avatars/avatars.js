@@ -1905,6 +1905,7 @@ class Avatar extends EventTarget {
       // window.domInfo.innerHTML += `<div style="display:;">flyDashFactor: --- ${this.flyDashFactor?.toFixed(2)}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">landState: --- ${this.landState}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">landFactor: --- ${this.landFactor?.toFixed(2)}</div>`;
+      window.domInfo.innerHTML += `<div style="display:;">landFactor: --- ${this.landFactor}</div>`;
       // window.domInfo.innerHTML += `<div style="display:none;">landTime: --- ${Math.floor(this.landTime)}</div>`;
       // window.domInfo.innerHTML += `<div style="display:none;">landTransitionTime: --- ${Math.floor(this.landTransitionTime)}</div>`;
       // window.domInfo.innerHTML += `<div style="display:;">sitState: --- ${this.sitState}</div>`;
