@@ -607,6 +607,7 @@ export const _updateAnimation = (avatar, now) => {
       avatar.hurtState,
       avatar.danceState,
       avatar.useEnvelopeState,
+      avatar.pickUpState,
 
       // action end events ---
       // avatar.landEnd,
@@ -663,6 +664,7 @@ export const _updateAnimation = (avatar, now) => {
       avatar.unuseTime,
       avatar.aimTime,
       aimMaxTime,
+      avatar.pickUpTime,
     ]);
 
     const useAnimationComboName = avatar.useAnimationCombo[avatar.useAnimationIndex];
