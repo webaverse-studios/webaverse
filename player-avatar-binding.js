@@ -107,6 +107,7 @@ export function applyCharacterActionsToAvatar(character, rig) {
   const fallLoopAction = character.getAction('fallLoop');
   // const fallLoopAnimation = fallLoopAction ? fallLoopAction.animation : '';
   const hurtAction = character.getAction('hurt');
+  const activateAction = character.getAction('activate');
   // const swordSideSlash = character.getAction('swordSideSlash');
   // const swordSideSlashAnimation = swordSideSlash ? swordSideSlash.animation : '';
   // const swordTopDownSlash = character.getAction('swordTopDownSlash');
@@ -122,6 +123,7 @@ export function applyCharacterActionsToAvatar(character, rig) {
   rig.flyState = !!flyAction;
   rig.flyTime = flyAction ? character.actionInterpolants.fly.get() : -1;
   rig.activateTime = character.actionInterpolants.activate.get();
+  rig.activateAnimation = activateAction?.animationName || '';
   rig.swimState = !!swimAction;
   rig.swimTime = swimAction ? character.actionInterpolants.swim.get() : -1;
   
