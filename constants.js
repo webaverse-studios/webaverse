@@ -186,3 +186,20 @@ export const defaultWorldSeed = 100;
 export const minAvatarQuality = 1;
 export const maxAvatarQuality = 4;
 export const defaultAvatarQuality = 3;
+
+export const AnimationName = {};
+const animationNames = [
+  'combo',
+  'slash',
+  'dashAttack',
+  'rifle',
+  'pistol',
+  'magic',
+  'eat',
+  'drink',
+  'throw',
+  'pickUpThrow',
+];
+animationNames.forEach((animationName, i) => {
+  AnimationName[animationName] = i + 1;
+});

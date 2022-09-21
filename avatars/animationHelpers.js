@@ -35,6 +35,7 @@ import {
   // avatarInterpolationTimeDelay,
   // avatarInterpolationNumFrames,
   narutoRunTimeFactor,
+  AnimationName,
 } from '../constants.js';
 
 // import game from '../game.js'; // can't import game.js in here, will cause offscreen-engine error.
@@ -411,6 +412,17 @@ export const loadPromise = (async () => {
 });
 
 export const _createAnimation = avatar => {
+  // console.log('js AnimationName.combo:', AnimationName.combo);
+  // console.log('js AnimationName.slash:', AnimationName.slash);
+  // console.log('js AnimationName.dashAttack:', AnimationName.dashAttack);
+  // console.log('js AnimationName.rifle:', AnimationName.rifle);
+  // console.log('js AnimationName.pistol:', AnimationName.pistol);
+  // console.log('js AnimationName.magic:', AnimationName.magic);
+  // console.log('js AnimationName.eat:', AnimationName.eat);
+  // console.log('js AnimationName.drink:', AnimationName.drink);
+  // console.log('js AnimationName.throw:', AnimationName.throw);
+  // console.log('js AnimationName.pickUpThrow:', AnimationName.pickUpThrow);
+
   // debugger
   // const player = metaversefile.getPlayerByAppInstanceId(avatar.app.getComponent('instanceId'));
   // console.log({player});
@@ -665,6 +677,7 @@ export const _updateAnimation = (avatar, now) => {
       avatar.aimTime,
       aimMaxTime,
       avatar.pickUpTime,
+      AnimationName[avatar.useAnimation] || 0,
     ]);
 
     const useAnimationComboName = avatar.useAnimationCombo[avatar.useAnimationIndex];
@@ -679,7 +692,7 @@ export const _updateAnimation = (avatar, now) => {
       defaultActivateAnimation,
       defaultNarutoRunAnimation,
       // ---
-      avatar.useAnimation,
+      // avatar.useAnimation,
       useAnimationComboName, // todo: avatar.useAnimationCombo[avatar.useAnimationIndex]; ?
       avatar.sitAnimation,
       avatar.emoteAnimation,
