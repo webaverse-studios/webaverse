@@ -50,6 +50,7 @@ let fallLoopAnimation;
 let floatAnimation;
 let useAnimations;
 let useComboAnimations;
+let aimAnimations;
 let bowAnimations;
 let sitAnimations;
 let danceAnimations;
@@ -305,7 +306,7 @@ export const loadPromise = (async () => {
   floatAnimation = animations.find(a => a.isFloat);
   // rifleAnimation = animations.find(a => a.isRifle);
   // hitAnimation = animations.find(a => a.isHit);
-  useComboAnimations = {
+  aimAnimations = {
     swordSideIdle: animations.index['sword_idle_side.fbx'],
     swordSideIdleStatic: animations.index['sword_idle_side_static.fbx'],
     swordSideSlash: animations.index['sword_side_slash.fbx'],
@@ -313,13 +314,10 @@ export const loadPromise = (async () => {
     swordTopDownSlash: animations.index['sword_topdown_slash.fbx'],
     swordTopDownSlashStep: animations.index['sword_topdown_slash_step.fbx'],
     swordUndraw: animations.index['sword_undraw.fbx'],
-    dashAttack: animations.find(a => a.isDashAttack),
   };
-  window.useComboAnimations = useComboAnimations;
-  useAnimations = {
+  useAnimations = mergeAnimations({
     combo: animations.find(a => a.isCombo),
     slash: animations.find(a => a.isSlash),
-    dashAttack: animations.find(a => a.isDashAttack),
     rifle: animations.find(a => a.isRifle),
     pistol: animations.find(a => a.isPistol),
     magic: animations.find(a => a.isMagic),
@@ -327,9 +325,6 @@ export const loadPromise = (async () => {
     drink: animations.find(a => a.isDrinking),
     throw: animations.find(a => a.isThrow),
     pickUpThrow: animations.find(a => a.isPickUpThrow),
-  };
-  window.useAnimations = useAnimations;
-  bowAnimations = {
     bowDraw: animations.find(a => a.isBowDraw),
     bowIdle: animations.find(a => a.isBowIdle),
     bowLoose: animations.find(a => a.isBowLoose),
