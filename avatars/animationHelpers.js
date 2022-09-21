@@ -678,6 +678,11 @@ export const _updateAnimation = (avatar, now) => {
       aimMaxTime,
       avatar.pickUpTime,
       AnimationName[avatar.useAnimation] || 0,
+      AnimationName[avatar.emoteAnimation] || 0,
+      AnimationName[avatar.sitAnimation] || 0,
+      AnimationName[avatar.danceAnimation] || 0,
+      AnimationName[avatar.activateAnimation] || 0,
+      AnimationName[avatar.hurtAnimation] || 0,
     ]);
 
     const useAnimationComboName = avatar.useAnimationCombo[avatar.useAnimationIndex];
@@ -694,12 +699,11 @@ export const _updateAnimation = (avatar, now) => {
       // ---
       // avatar.useAnimation,
       useAnimationComboName, // todo: avatar.useAnimationCombo[avatar.useAnimationIndex]; ?
-      avatar.sitAnimation,
-      avatar.emoteAnimation,
-      avatar.danceAnimation,
-      avatar.holdAnimation,
-      avatar.activateAnimation, // todo: activateAnimationName
-      avatar.hurtAnimation,
+      // avatar.sitAnimation,
+      // avatar.emoteAnimation,
+      // avatar.danceAnimation,
+      // avatar.activateAnimation, // todo: activateAnimationName
+      // avatar.hurtAnimation,
       avatar.unuseAnimation || '', // note: can't send null to wasm, will turn to string value "null".
       avatar.aimAnimation || '',
       // ---

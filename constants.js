@@ -189,6 +189,7 @@ export const defaultAvatarQuality = 3;
 
 export const AnimationName = {};
 const animationNames = [
+  // useAnimations
   'combo',
   'slash',
   'dashAttack',
@@ -199,6 +200,40 @@ const animationNames = [
   'drink',
   'throw',
   'pickUpThrow',
+  // emoteAnimations
+  'alert',
+  'alertSoft',
+  'angry',
+  'angrySoft',
+  'embarrassed',
+  'embarrassedSoft',
+  'headNod',
+  'headNodSoft',
+  'headShake',
+  'headShakeSoft',
+  'sad',
+  'sadSoft',
+  'surprise',
+  'surpriseSoft',
+  'victory',
+  'victorySoft',
+  // sitAnimations
+  'chair',
+  'saddle',
+  'stand',
+  // danceAnimations
+  'dansu',
+  'powerup',
+  // activateAnimations
+  'grab_forward',
+  'grab_down',
+  'grab_up',
+  'grab_left',
+  'grab_right',
+  'pick_up',
+  // hurtAnimations
+  'pain_back',
+  'pain_arch',
 ];
 animationNames.forEach((animationName, i) => {
   AnimationName[animationName] = i + 1;
