@@ -234,6 +234,31 @@ const animationNames = [
   // hurtAnimations
   'pain_back',
   'pain_arch',
+  // useComboAnimations
+  'swordSideIdle',
+  'swordSideIdleStatic',
+  'swordSideSlash',
+  'swordSideSlashStep',
+  'swordTopDownSlash',
+  'swordTopDownSlashStep',
+  'swordUndraw',
+  'dashAttack',
+  // bowAnimations
+  'bowDraw',
+  'bowIdle',
+  'bowLoose',
+  // pickUpAnimations
+  'pickUp',
+  'pickUpIdle',
+  'pickUpThrow',
+  'putDown',
+  'pickUpZelda',
+  'pickUpIdleZelda',
+  'putDownZelda',
+  // narutoRunAnimations
+  'narutoRun',
+  // holdAnimations
+  'pick_up_idle',
 ];
 animationNames.forEach((animationName, i) => {
   AnimationName[animationName] = i + 1;

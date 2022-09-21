@@ -580,12 +580,14 @@ export const _updateAnimation = (avatar, now) => {
 
     const holdFactor = avatar.walkRunFactor * 0.7 + avatar.crouchFactor * (1 - avatar.idleWalkFactor) * 0.5;
 
+    const useAnimationComboName = avatar.useAnimationCombo[avatar.useAnimationIndex];
+
     // console.log(avatar.unuseAnimation, avatar.unuseTime)
 
     // console.log(avatar.jumpEnd)
     // console.log(avatar.doubleJumpEnd)
     // console.log(avatar.hurtStart, avatar.hurtEnd)
-    physx.physxWorker.updateAvatar(avatar.animationAvatarPtr, [
+    const values = [
       // values ---
       forwardFactor,
       backwardFactor,
@@ -621,40 +623,6 @@ export const _updateAnimation = (avatar, now) => {
       avatar.useEnvelopeState,
       avatar.pickUpState,
 
-      // action end events ---
-      // avatar.landEnd,
-      // avatar.fallLoopEnd,
-      // avatar.flyEnd,
-      // avatar.jumpEnd,
-      // avatar.doubleJumpEnd,
-      // avatar.narutoRunEnd,
-      // avatar.activateEnd,
-      // avatar.useEnd,
-      // avatar.useComboEnd,
-      // avatar.useEnvelopeEnd,
-      // avatar.sitEnd,
-      // avatar.emoteEnd,
-      // avatar.hurtEnd,
-      // avatar.danceEnd,
-      // avatar.holdEnd,
-
-      // action start events ---
-      // avatar.landStart,
-      // avatar.fallLoopStart,
-      // avatar.flyStart,
-      // avatar.jumpStart,
-      // avatar.doubleJumpStart,
-      // avatar.narutoRunStart,
-      // avatar.useStart,
-      // avatar.useComboStart,
-      // avatar.useEnvelopeStart,
-      // avatar.sitStart,
-      // avatar.emoteStart,
-      // avatar.hurtStart,
-      // avatar.danceStart,
-      // avatar.holdStart,
-      // avatar.activateStart,
-
       // other
       avatar.landWithMoving,
       avatar.dashAttacking,
@@ -683,36 +651,49 @@ export const _updateAnimation = (avatar, now) => {
       AnimationName[avatar.danceAnimation] || 0,
       AnimationName[avatar.activateAnimation] || 0,
       AnimationName[avatar.hurtAnimation] || 0,
-    ]);
+      AnimationName[defaultSitAnimation] || 0,
+      AnimationName[defaultEmoteAnimation] || 0,
+      AnimationName[defaultDanceAnimation] || 0,
+      AnimationName[defaultHoldAnimation] || 0,
+      AnimationName[defaultActivateAnimation] || 0,
+      AnimationName[defaultNarutoRunAnimation] || 0,
+      AnimationName[useAnimationComboName] || 0,
+      AnimationName[avatar.unuseAnimation] || 0,
+      AnimationName[avatar.aimAnimation] || 0,
+      avatar.fallLoopFrom === 'jump' ? 1 : 0,
+    ];
+    avatar.useAnimationEnvelope.forEach(useAnimationEnvelopeName => {
+      values.push(AnimationName[useAnimationEnvelopeName] || 0);
+    });
+    physx.physxWorker.updateAvatar(avatar.animationAvatarPtr, values);
 
-    const useAnimationComboName = avatar.useAnimationCombo[avatar.useAnimationIndex];
     // console.log('js: useAnimation:', avatar.useAnimation)
     // console.log('js: useAnimationComboName:', useAnimationComboName)
     // console.log('js: narutoRunTimeFactor: ', avatar.narutoRunTimeFactor)
-    const strings = [
-      defaultSitAnimation, // todo: send to wasm only once.
-      defaultEmoteAnimation,
-      defaultDanceAnimation,
-      defaultHoldAnimation,
-      defaultActivateAnimation,
-      defaultNarutoRunAnimation,
-      // ---
-      // avatar.useAnimation,
-      useAnimationComboName, // todo: avatar.useAnimationCombo[avatar.useAnimationIndex]; ?
-      // avatar.sitAnimation,
-      // avatar.emoteAnimation,
-      // avatar.danceAnimation,
-      // avatar.activateAnimation, // todo: activateAnimationName
-      // avatar.hurtAnimation,
-      avatar.unuseAnimation || '', // note: can't send null to wasm, will turn to string value "null".
-      avatar.aimAnimation || '',
-      // ---
-      avatar.fallLoopFrom,
-    ];
-    avatar.useAnimationEnvelope.forEach(useAnimationEnvelopeName => {
-      strings.push(useAnimationEnvelopeName);
-    });
-    physx.physxWorker.updateAvatarString(avatar.animationAvatarPtr, strings);
+    // const strings = [
+    //   defaultSitAnimation, // todo: send to wasm only once.
+    //   defaultEmoteAnimation,
+    //   defaultDanceAnimation,
+    //   defaultHoldAnimation,
+    //   defaultActivateAnimation,
+    //   defaultNarutoRunAnimation,
+    //   // ---
+    //   // avatar.useAnimation,
+    //   useAnimationComboName, // todo: avatar.useAnimationCombo[avatar.useAnimationIndex]; ?
+    //   // avatar.sitAnimation,
+    //   // avatar.emoteAnimation,
+    //   // avatar.danceAnimation,
+    //   // avatar.activateAnimation, // todo: activateAnimationName
+    //   // avatar.hurtAnimation,
+    //   avatar.unuseAnimation || '', // note: can't send null to wasm, will turn to string value "null".
+    //   avatar.aimAnimation || '',
+    //   // ---
+    //   avatar.fallLoopFrom,
+    // ];
+    // avatar.useAnimationEnvelope.forEach(useAnimationEnvelopeName => {
+    //   strings.push(useAnimationEnvelopeName);
+    // });
+    // physx.physxWorker.updateAvatarString(avatar.animationAvatarPtr, strings);
 
     // console.log(avatar.useComboStart, useAnimationComboName)
   };
