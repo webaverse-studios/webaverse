@@ -92,8 +92,8 @@ const maxHeadTargetTime = 2000;
     const localPlayer = metaversefile.useLocalPlayer();
     Object.defineProperty(bone, 'stiffnessForce', {
       get() {
-        localVector.set(localPlayer?.characterPhysics.velocity.x, 0, localPlayer?.characterPhysics.velocity.z);
-        const f = Math.pow(Math.min(Math.max(localVector.length()*2 - Math.abs(localPlayer?.characterPhysics.velocity.y)*0.5, 0), 4), 2);
+        localVector.set(localPlayer.characterPhysics.velocity.x, 0, localPlayer.characterPhysics.velocity.z);
+        const f = Math.pow(Math.min(Math.max(localVector.length()*2 - Math.abs(localPlayer.characterPhysics.velocity.y)*0.5, 0), 4), 2);
         return initialStiffnessForce * (0.1 + 0.1*f);
       },
       set(v) {},
@@ -392,9 +392,8 @@ const _makeDebugMesh = (avatar) => {
 // const testMesh = new THREE.Mesh(g, m);
 // scene.add(testMesh);
 
-class Avatar extends EventTarget {
+class Avatar {
 	constructor(avatarRenderer, options = {}) {
-    super();
     this.avatarRenderer = avatarRenderer;
     const object = avatarRenderer.controlObject;
     this.object = object;
@@ -2169,12 +2168,6 @@ class Avatar extends EventTarget {
 
   getFloorHeight() {
     return this.poseManager.vrTransforms.floorHeight;
-  }
-
-  dispatchAnimationFinishedEvent(finishedActionName) {
-    this.dispatchEvent(new MessageEvent('animationEnd', {
-      data: {finishedActionName}
-    }));
   }
 
   /* say(audio) {

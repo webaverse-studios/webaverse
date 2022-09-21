@@ -17,7 +17,7 @@ const capsuleUpQuaternion = new THREE.Quaternion().setFromAxisAngle(
   Math.PI / 2
 )
 const textEncoder = new TextEncoder();
-const textDecoder = new TextDecoder();
+// const textDecoder = new TextDecoder();
 
 const physx = {};
 
@@ -2288,24 +2288,6 @@ const physxWorker = (() => {
     })
     Module._updateAvatar(
       animationAvatarPtr, scratchStack.ptr,
-    )
-  }
-  w.updateAvatarString = (animationAvatarPtr, strings) => {
-    let index = 0;
-    strings.forEach((string, j) => {
-      const bytes = textEncoder.encode(string)
-      const stringByteLength = bytes.length;
-      // if (j === 6) console.log(stringByteLength, string)
-      scratchStack.u8[index++] = stringByteLength;
-      for (let i = 0; i < stringByteLength; i++) {
-        scratchStack.u8[index++] = bytes[i];
-      }
-    })
-
-    const numStrings = strings.length;
-
-    Module._updateAvatarString(
-      animationAvatarPtr, scratchStack.ptr, numStrings,
     )
   }
   w.createAnimationMixer = () => {
