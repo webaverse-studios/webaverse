@@ -2339,6 +2339,29 @@ const physxWorker = (() => {
     )
     return ptr;
   }
+  w.setAnimationGroup = (animationPtr, groupName, keyName) => {
+    let index = 0;
+    let bytes;
+
+    bytes = textEncoder.encode(groupName)
+    const groupNameByteLength = bytes.length;
+    for (let i = 0; i < groupNameByteLength; i++) {
+      scratchStack.u8[index++] = bytes[i];
+    }
+
+    bytes = textEncoder.encode(keyName)
+    const keyNameByteLength = bytes.length;
+    for (let i = 0; i < keyNameByteLength; i++) {
+      scratchStack.u8[index++] = bytes[i];
+    }
+
+    Module._setAnimationGroup(
+      animationPtr,
+      scratchStack.ptr,
+      groupNameByteLength,
+      keyNameByteLength,
+    )
+  }
   w.getAnimation = (name) => {
     const bytes = textEncoder.encode(name)
     const nameByteLength = bytes.length;

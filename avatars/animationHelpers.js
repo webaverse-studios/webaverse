@@ -43,28 +43,9 @@ let animations;
 let animationStepIndices;
 // let animationsBaseModel;
 let createdWasmAnimations = false;
-let jumpAnimation;
-let doubleJumpAnimation;
-let fallLoopAnimation;
-let floatAnimation;
-let useAnimations;
-let aimAnimations;
-let sitAnimations;
-let danceAnimations;
-let emoteAnimations;
-let pickUpAnimations;
-// let throwAnimations;
-// let crouchAnimations;
-let activateAnimations;
-let narutoRunAnimations;
-// let jumpAnimationSegments;
-// let chargeJump;
-// let standCharge;
-// let fallLoop;
-// let swordSideSlash;
-// let swordTopDownSlash;
-let hurtAnimations;
-let holdAnimations;
+
+const animationGroups = {};
+animationGroups.single = {};
 
 const defaultSitAnimation = 'chair';
 // const defaultUseAnimation = 'combo';
@@ -296,23 +277,23 @@ export const loadPromise = (async () => {
   // swordSideSlash = animations.find(a => a.isSwordSideSlash);
   // swordTopDownSlash = animations.find(a => a.isSwordTopDownSlash)
 
-  jumpAnimation = animations.find(a => a.isJump);
-  doubleJumpAnimation = animations.find(a => a.isDoubleJump);
-  fallLoopAnimation = animations.index['falling.fbx'];
-  // sittingAnimation = animations.find(a => a.isSitting);
-  floatAnimation = animations.find(a => a.isFloat);
-  // rifleAnimation = animations.find(a => a.isRifle);
-  // hitAnimation = animations.find(a => a.isHit);
-  aimAnimations = {
+  animationGroups.single.jump = animations.find(a => a.isJump);
+  animationGroups.single.doubleJump = animations.find(a => a.isDoubleJump);
+  animationGroups.single.fallLoop = animations.index['falling.fbx'];
+  // animationGroups.single.sitting = animations.find(a => a.isSitting);
+  animationGroups.single.float = animations.find(a => a.isFloat);
+  // animationGroups.single.rifle = animations.find(a => a.isRifle);
+  // animationGroups.single.hit = animations.find(a => a.isHit);
+  animationGroups.aim = {
     swordSideIdle: animations.index['sword_idle_side.fbx'],
-    swordSideIdleStatic: animations.index['sword_idle_side_static.fbx'],
+    // swordSideIdleStatic: animations.index['sword_idle_side_static.fbx'],
     swordSideSlash: animations.index['sword_side_slash.fbx'],
     swordSideSlashStep: animations.index['sword_side_slash_step.fbx'],
     swordTopDownSlash: animations.index['sword_topdown_slash.fbx'],
     swordTopDownSlashStep: animations.index['sword_topdown_slash_step.fbx'],
-    swordUndraw: animations.index['sword_undraw.fbx'],
+    // swordUndraw: animations.index['sword_undraw.fbx'],
   };
-  useAnimations = mergeAnimations({
+  animationGroups.use = mergeAnimations({
     combo: animations.find(a => a.isCombo),
     slash: animations.find(a => a.isSlash),
     rifle: animations.find(a => a.isRifle),
@@ -326,17 +307,17 @@ export const loadPromise = (async () => {
     bowIdle: animations.find(a => a.isBowIdle),
     bowLoose: animations.find(a => a.isBowLoose),
     pickaxe: animations.find(a => a.isPickaxe),
-  }, aimAnimations);
-  sitAnimations = {
+  }, animationGroups.aim);
+  animationGroups.sit = {
     chair: animations.find(a => a.isSitting),
     saddle: animations.find(a => a.isSitting),
     stand: animations.find(a => a.isSkateboarding),
   };
-  danceAnimations = {
+  animationGroups.dance = {
     dansu: animations.find(a => a.isDancing),
     powerup: animations.find(a => a.isPowerUp),
   };
-  emoteAnimations = {
+  animationGroups.emote = {
     alert: animations.find(a => a.isAlert),
     alertSoft: animations.find(a => a.isAlertSoft),
     angry: animations.find(a => a.isAngry),
@@ -354,7 +335,7 @@ export const loadPromise = (async () => {
     victory: animations.find(a => a.isVictory),
     victorySoft: animations.find(a => a.isVictorySoft),
   };
-  pickUpAnimations = {
+  animationGroups.pickUp = {
     pickUp: animations.find(a => a.isPickUp),
     pickUpIdle: animations.find(a => a.isPickUpIdle),
     pickUpThrow: animations.find(a => a.isPickUpThrow),
@@ -363,30 +344,42 @@ export const loadPromise = (async () => {
     pickUpIdleZelda: animations.find(a => a.isPickUpIdleZelda),
     putDownZelda: animations.find(a => a.isPutDownZelda),
   };
-  /* throwAnimations = {
+  /* animationGroups.throw = {
     throw: animations.find(a => a.isThrow),
     pickUpThrow: animations.find(a => a.isPickUpThrow),
   }; */
-  /* crouchAnimations = {
+  /* animationGroups.crouch = {
       crouch: animations.find(a => a.isCrouch),
     }; */
-  activateAnimations = {
-    grab_forward: {animation: animations.index['grab_forward.fbx'], speedFactor: 1.2},
-    grab_down: {animation: animations.index['grab_down.fbx'], speedFactor: 1.7},
-    grab_up: {animation: animations.index['grab_up.fbx'], speedFactor: 1.2},
-    grab_left: {animation: animations.index['grab_left.fbx'], speedFactor: 1.2},
-    grab_right: {animation: animations.index['grab_right.fbx'], speedFactor: 1.2},
-    pick_up: {animation: animations.index['pick_up.fbx'], speedFactor: 1},
+  // animationGroups.activate = { // todo: speedFactor
+  //   grab_forward: {animation: animations.index['grab_forward.fbx'], speedFactor: 1.2},
+  //   grab_down: {animation: animations.index['grab_down.fbx'], speedFactor: 1.7},
+  //   grab_up: {animation: animations.index['grab_up.fbx'], speedFactor: 1.2},
+  //   grab_left: {animation: animations.index['grab_left.fbx'], speedFactor: 1.2},
+  //   grab_right: {animation: animations.index['grab_right.fbx'], speedFactor: 1.2},
+  //   pick_up: {animation: animations.index['pick_up.fbx'], speedFactor: 1},
+  // };
+  animationGroups.activate = {
+    grab_forward: animations.index['grab_forward.fbx'],
+    grab_down: animations.index['grab_down.fbx'],
+    grab_up: animations.index['grab_up.fbx'],
+    grab_left: animations.index['grab_left.fbx'],
+    grab_right: animations.index['grab_right.fbx'],
+    pick_up: animations.index['pick_up.fbx'],
   };
-  narutoRunAnimations = {
+  animationGroups.narutoRun = {
     narutoRun: animations.find(a => a.isNarutoRun),
   };
-  hurtAnimations = {
+  animationGroups.hurt = {
     pain_back: animations.index['pain_back.fbx'],
     pain_arch: animations.index['pain_arch.fbx'],
   };
-  holdAnimations = {
+  animationGroups.hold = {
     pick_up_idle: animations.index['pick_up_idle.fbx'],
+  };
+  animationGroups.land = {
+    landing: animations.index['landing.fbx'],
+    landing2: animations.index['landing 2.fbx'],
   };
   {
     const down10QuaternionArray = new Quaternion()
@@ -396,7 +389,7 @@ export const loadPromise = (async () => {
       'mixamorigSpine1.quaternion',
       'mixamorigSpine2.quaternion',
     ].forEach(k => {
-      narutoRunAnimations.narutoRun.interpolants[k].evaluate = t => down10QuaternionArray;
+      animationGroups.narutoRu.narutoRun.interpolants[k].evaluate = t => down10QuaternionArray;
     });
   }
 })().catch(err => {
@@ -432,7 +425,7 @@ export const _createAnimation = avatar => {
       const animation = animations.index[fileName];
       animation.index = animationIndex;
       const animationPtr = physx.physxWorker.createAnimation(animation.name, animation.duration);
-      // animation.ptr = animationPtr;
+      animation.ptr = animationPtr;
       // for (const k in animation.interpolants) { // maybe wrong interpolant index order
       for (const spec of avatar.animationMappings) { // correct interpolant index order
         const {
@@ -449,6 +442,19 @@ export const _createAnimation = avatar => {
         );
       }
       animationIndex++;
+    }
+
+    // note: can't use animationGroups to create wasm animations, there'are duplicated animations.
+    for (const groupName in animationGroups) {
+      for (const keyName in animationGroups[groupName]) {
+        const animation = animationGroups[groupName][keyName];
+        physx.physxWorker.setAnimationGroup(
+          animation.ptr,
+          groupName,
+          keyName,
+        );
+        // console.log('js', groupName, keyName, animation.name)
+      }
     }
 
     //
@@ -678,6 +684,7 @@ export const _updateAnimation = (avatar, now) => {
   doUpdate();
 };
 
+const emoteAnimations = animationGroups.emote;
 export {
   animations,
   animationStepIndices,
