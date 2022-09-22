@@ -38,7 +38,6 @@ import {
   AnimationName,
 } from '../constants.js';
 
-// import game from '../game.js'; // can't import game.js in here, will cause offscreen-engine error.
 
 let animations;
 let animationStepIndices;
@@ -418,10 +417,6 @@ export const _createAnimation = avatar => {
   // console.log('js AnimationName.throw:', AnimationName.throw);
   // console.log('js AnimationName.pickUpThrow:', AnimationName.pickUpThrow);
 
-  // debugger
-  // const player = metaversefile.getPlayerByAppInstanceId(avatar.app.getComponent('instanceId'));
-  // console.log({player});
-
   if (!createdWasmAnimations) { // note: just need to create wasm animations only once globally.
     for (const spec of avatar.animationMappings) {
       physx.physxWorker.createAnimationMapping(
@@ -474,8 +469,6 @@ export const _updateAnimation = (avatar, now) => {
   // const timeS = performance.now() / 1000;
   // console.log('now', now)
   const nowS = now / 1000;
-
-  const player = metaversefile.getPlayerByAppInstanceId(avatar.app.getComponent('instanceId')); // todo: del
 
   if (avatar.emoteAnimation !== avatar.lastEmoteAnimation) {
     avatar.lastEmoteTime = avatar.emoteAnimation ? now : 0;
@@ -550,7 +543,7 @@ export const _updateAnimation = (avatar, now) => {
     mirrorFactor = isBackward ? 1 : 0;
   }
   avatar.lastBackwardFactor = mirrorFactor;
-  if (avatar === window.localPlayer?.avatar) window.domInfo.innerHTML += `<div style="display:;">mirrorFactor: --- ${window.logNum(mirrorFactor)}</div>`;
+  // if (avatar === window.localPlayer?.avatar) window.domInfo.innerHTML += `<div style="display:;">mirrorFactor: --- ${window.logNum(mirrorFactor)}</div>`;
 
   const updateValues = () => {
     const forwardFactor = 1 - MathUtils.clamp(Math.abs(angle) / (Math.PI / 2), 0, 1);
@@ -723,49 +716,6 @@ export const _updateAnimation = (avatar, now) => {
     }
   };
   doUpdate();
-
-  const handleFinishedEvent = () => {
-    const finishedFlag = resultValues[53];
-    // console.log(finishedFlag)
-    if (finishedFlag) {
-      // const motionPtr = resultValues[54]; // tod: why still works ?
-      // if (isDebugger) console.log('---finished', avatar.getMotion(motion));
-      // if (isDebugger) console.log('---finished', physx.physxWorker.getMotionName(avatar.mixerPtr, motionPtr)); // tod: why still works ?
-      const finishedMotionName = physx.physxWorker.getFinishedMotionName(avatar.mixerPtr);
-      console.log('---finishedMotionName', finishedMotionName);
-
-      const getFinishedActionName = () => {
-        for (const key in useAnimations) {
-          const motionName = key;
-          if (finishedMotionName === motionName) {
-            return 'use';
-          }
-        }
-
-        for (const key in useComboAnimations) {
-          const motionName = key;
-          if (finishedMotionName === motionName) {
-            return 'use';
-          }
-        }
-
-        for (const key in hurtAnimations) {
-          const motionName = key;
-          if (finishedMotionName === motionName) {
-            return 'hurt';
-          }
-        }
-
-        if (finishedMotionName === 'land' || finishedMotionName === 'land2') { // todo: add landAnimations.
-          return 'land';
-        }
-      };
-      const finishedActionName = getFinishedActionName();
-
-      avatar.dispatchAnimationFinishedEvent(finishedActionName);
-    }
-  };
-  handleFinishedEvent();
 };
 
 export {

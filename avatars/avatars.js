@@ -1860,12 +1860,12 @@ class Avatar {
       _motionControls.call(this)
     }
     
-    if (true && this === window.localPlayer?.avatar) {
+    if (false && this === window.localPlayer?.avatar) {
       window.avatar = this;
       window.mixer = this.mixer;
       // window.motiono = this.motiono;
     }
-    if (true && this === window.localPlayer?.avatar) {
+    if (false && this === window.localPlayer?.avatar) {
       // console.log(window.logNum(this.getAngle()));
 
       /*
@@ -1944,7 +1944,9 @@ class Avatar {
       // window.domInfo.innerHTML += `<div style="display:;">blendList.length: --- ${this.blendList?.length}</div>`;
       // window.domInfo.innerHTML += `<div s  tyle="display:;">blendList: --- ${this.blendList?.map(applyFn=>applyFn.name.slice('applyFn'.length))}</div>`;
     }
-    _updateAnimation(this, now);
+    for (let i = 0; i < 200; i++) {
+      _updateAnimation(this, now);
+    }
 
     if (this.poseAnimation) {
       _overwritePose(this.poseAnimation);
