@@ -47,6 +47,8 @@ let createdWasmAnimations = false;
 const animationGroups = {};
 animationGroups.single = {};
 
+let emoteAnimations;
+
 const defaultSitAnimation = 'chair';
 // const defaultUseAnimation = 'combo';
 const defaultDanceAnimation = 'dansu';
@@ -392,6 +394,8 @@ export const loadPromise = (async () => {
       animationGroups.narutoRu.narutoRun.interpolants[k].evaluate = t => down10QuaternionArray;
     });
   }
+
+  emoteAnimations = animationGroups.emote;
 })().catch(err => {
   console.log('load avatar animations error', err);
 });
@@ -684,7 +688,6 @@ export const _updateAnimation = (avatar, now) => {
   doUpdate();
 };
 
-const emoteAnimations = animationGroups.emote;
 export {
   animations,
   animationStepIndices,
