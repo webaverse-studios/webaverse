@@ -2369,7 +2369,7 @@ const physxWorker = (() => {
     )
     return ptr;
   }
-  w.createInterpolant = (animationName, parameterPositions, sampleValues, valueSize) => {
+  w.createInterpolant = (animationPtr, parameterPositions, sampleValues, valueSize) => {
     const allocator = new Allocator(Module);
 
     if (valueSize === 3) {
@@ -2386,15 +2386,8 @@ const physxWorker = (() => {
     const sampleValuesTypedArray = allocator.alloc(Float32Array, sampleValues.length);
     sampleValuesTypedArray.set(sampleValues);
 
-    const bytes = textEncoder.encode(animationName)
-    const animationNameByteLength = bytes.length;
-    for (let i = 0; i < animationNameByteLength; i++) {
-      scratchStack.u8[i] = bytes[i];
-    }
-
     Module._createInterpolant(
-      scratchStack.ptr,
-      animationNameByteLength,
+      animationPtr,
       parameterPositions.length,
       parameterPositionsTypedArray.byteOffset,
       sampleValues.length,

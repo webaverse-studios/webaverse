@@ -432,7 +432,7 @@ export const _createAnimation = avatar => {
       const animation = animations.index[fileName];
       animation.index = animationIndex;
       const animationPtr = physx.physxWorker.createAnimation(animation.name, animation.duration);
-      animation.ptr = animationPtr;
+      // animation.ptr = animationPtr;
       // for (const k in animation.interpolants) { // maybe wrong interpolant index order
       for (const spec of avatar.animationMappings) { // correct interpolant index order
         const {
@@ -442,8 +442,7 @@ export const _createAnimation = avatar => {
         const track = animation.tracks.index[k];
         const valueSize = track.type === 'vector' ? 3 : 4;
         physx.physxWorker.createInterpolant(
-          // animationIndex, // todo: use ptr instead of index.
-          animation.name,
+          animationPtr,
           track.times,
           track.values,
           valueSize,
