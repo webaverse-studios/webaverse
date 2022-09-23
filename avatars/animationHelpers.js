@@ -47,6 +47,7 @@ const animationGroups = {};
 animationGroups.single = {};
 
 let emoteAnimations;
+let speedFactors;
 
 const defaultSitAnimation = 'chair';
 // const defaultUseAnimation = 'combo';
@@ -353,14 +354,6 @@ export const loadPromise = (async () => {
   /* animationGroups.crouch = {
       crouch: animations.find(a => a.isCrouch),
     }; */
-  // animationGroups.activate = { // todo: speedFactor
-  //   grab_forward: {animation: animations.index['grab_forward.fbx'], speedFactor: 1.2},
-  //   grab_down: {animation: animations.index['grab_down.fbx'], speedFactor: 1.7},
-  //   grab_up: {animation: animations.index['grab_up.fbx'], speedFactor: 1.2},
-  //   grab_left: {animation: animations.index['grab_left.fbx'], speedFactor: 1.2},
-  //   grab_right: {animation: animations.index['grab_right.fbx'], speedFactor: 1.2},
-  //   pick_up: {animation: animations.index['pick_up.fbx'], speedFactor: 1},
-  // };
   animationGroups.activate = {
     grab_forward: animations.index['grab_forward.fbx'],
     grab_down: animations.index['grab_down.fbx'],
@@ -368,6 +361,14 @@ export const loadPromise = (async () => {
     grab_left: animations.index['grab_left.fbx'],
     grab_right: animations.index['grab_right.fbx'],
     pick_up: animations.index['pick_up.fbx'],
+  };
+  speedFactors = {
+    grab_forward: 1.2,
+    grab_down: 1.7,
+    grab_up: 1.2,
+    grab_left: 1.2,
+    grab_right: 1.2,
+    pick_up: 1,
   };
   animationGroups.narutoRun = {
     narutoRun: animations.find(a => a.isNarutoRun),
@@ -454,7 +455,14 @@ export const _createAnimation = avatar => {
 
     //
 
-    physx.physxWorker.initAnimationSystem();
+    physx.physxWorker.initAnimationSystem([
+      speedFactors.grab_forward,
+      speedFactors.grab_down,
+      speedFactors.grab_up,
+      speedFactors.grab_left,
+      speedFactors.grab_right,
+      speedFactors.pick_up,
+    ]);
     initedAnimationSystem = true;
   }
 

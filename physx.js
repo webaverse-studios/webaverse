@@ -2375,8 +2375,13 @@ const physxWorker = (() => {
     )
     return ptr;
   }
-  w.initAnimationSystem = () => {
-    Module._initAnimationSystem()
+  w.initAnimationSystem = (values) => {
+    values.forEach((value, i) => {
+      scratchStack.f32[i] = value;
+    })
+    Module._initAnimationSystem(
+      scratchStack.ptr,
+    )
   }
   w.createInterpolant = (animationPtr, parameterPositions, sampleValues, valueSize) => {
     const allocator = new Allocator(Module);
