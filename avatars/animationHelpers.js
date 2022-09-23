@@ -608,7 +608,6 @@ export const _updateAnimation = (avatar, now) => {
       avatar.holdState,
       avatar.pickUpState,
 
-      // other
       avatar.landWithMoving,
       avatar.landTime,
       avatar.fallLoopFactor,
