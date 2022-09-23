@@ -463,6 +463,13 @@ export const _createAnimation = avatar => {
       speedFactors.grab_left,
       speedFactors.grab_right,
       speedFactors.pick_up,
+
+      AnimationUInt[defaultSitAnimation] || 0,
+      AnimationUInt[defaultEmoteAnimation] || 0,
+      AnimationUInt[defaultDanceAnimation] || 0,
+      AnimationUInt[defaultHoldAnimation] || 0,
+      AnimationUInt[defaultActivateAnimation] || 0,
+      AnimationUInt[defaultNarutoRunAnimation] || 0,
     ]);
     initedAnimationSystem = true;
   }
@@ -628,12 +635,6 @@ export const _updateAnimation = (avatar, now) => {
       AnimationUInt[avatar.danceAnimation] || 0,
       AnimationUInt[avatar.activateAnimation] || 0,
       AnimationUInt[avatar.hurtAnimation] || 0,
-      AnimationUInt[defaultSitAnimation] || 0, // todo: put into initAnimationSystem()
-      AnimationUInt[defaultEmoteAnimation] || 0,
-      AnimationUInt[defaultDanceAnimation] || 0,
-      AnimationUInt[defaultHoldAnimation] || 0,
-      AnimationUInt[defaultActivateAnimation] || 0,
-      AnimationUInt[defaultNarutoRunAnimation] || 0,
       AnimationUInt[useAnimationComboName] || 0,
       AnimationUInt[avatar.unuseAnimation] || 0,
       AnimationUInt[avatar.aimAnimation] || 0,
