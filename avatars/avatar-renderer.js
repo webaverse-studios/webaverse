@@ -395,7 +395,7 @@ const _getMergedBoundingSphere = o => {
 const _loadGlbObject = async (glbData, srcUrl, {
   signal = null,
 } = {}) => {
-  let cleanupFn = null;
+  let cleanupFn;
   let object = null;
   try {
     object = await new Promise((accept, reject) => {
@@ -411,9 +411,7 @@ const _loadGlbObject = async (glbData, srcUrl, {
       gltfLoader.parse(glbData, srcUrl, accept, reject);
     });
   } finally {
-    if (cleanupFn) {
-      cleanupFn();
-    }
+    cleanupFn();
   }
   return object;
 };
