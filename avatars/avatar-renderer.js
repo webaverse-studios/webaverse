@@ -229,6 +229,7 @@ const _toonShaderify = async (o, signal) => {
 
     const convertPromise = new VRMMaterialImporter().convertGLTFMaterials(o);
     convertPromise.then(() => {
+      signal.removeEventListener('abort', abort);
       accept();
     });
   });
