@@ -426,7 +426,7 @@ export const _createAnimation = avatar => {
 
         const track = animation.tracks.index[k];
         const valueSize = track.type === 'vector' ? 3 : 4;
-        physx.physxWorker.createInterpolant(
+        physx.physxWorker.createAnimationInterpolant(
           animationPtr,
           track.times,
           track.values,
@@ -646,7 +646,7 @@ export const _updateAnimation = (avatar, now) => {
     avatar.useAnimationEnvelope.forEach(useAnimationEnvelopeName => {
       values.push(AnimationName[useAnimationEnvelopeName] || 0);
     });
-    physx.physxWorker.updateAvatar(avatar.animationAvatarPtr, values);
+    physx.physxWorker.updateAnimationAvatar(avatar.animationAvatarPtr, values);
   };
   updateValues();
 
