@@ -50,6 +50,10 @@ import universe from './universe.js';
 import npcManager from './npc-manager.js';
 import settingsManager from './settings-manager.js';
 
+import Stats from 'stats.js';
+var stats = new Stats();
+document.body.appendChild(stats.dom);
+
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
 const localQuaternion = new THREE.Quaternion();
@@ -296,6 +300,7 @@ export default class Webaverse extends EventTarget {
     
     let lastTimestamp = performance.now();
     const animate = (timestamp, frame) => {
+      stats.begin();
       performanceTracker.startFrame();
 
       const _frame = () => {
@@ -368,6 +373,7 @@ export default class Webaverse extends EventTarget {
       _frame();
 
       performanceTracker.endFrame();
+      stats.end();
     }
     renderer.setAnimationLoop(animate);
 

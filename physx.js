@@ -2282,11 +2282,11 @@ const physxWorker = (() => {
     )
     return ptr;
   }
-  w.updateAvatar = (animationAvatarPtr, values) => {
+  w.updateAnimationAvatar = (animationAvatarPtr, values) => {
     values.forEach((value, i) => {
       scratchStack.f32[i] = value;
     })
-    Module._updateAvatar(
+    Module._updateAnimationAvatar(
       animationAvatarPtr, scratchStack.ptr,
     )
   }
@@ -2339,37 +2339,39 @@ const physxWorker = (() => {
     )
     return ptr;
   }
-  w.getAnimation = (name) => {
-    const bytes = textEncoder.encode(name)
-    const nameByteLength = bytes.length;
-    for (let i = 0; i < nameByteLength; i++) {
-      scratchStack.u8[i] = bytes[i];
+  w.setAnimationGroup = (animationPtr, groupName, keyName, keyNameUInt) => {
+    let index = 0;
+    let bytes;
+
+    bytes = textEncoder.encode(groupName)
+    const groupNameByteLength = bytes.length;
+    for (let i = 0; i < groupNameByteLength; i++) {
+      scratchStack.u8[index++] = bytes[i];
     }
 
-    const ptr = Module._getAnimation(
-      scratchStack.ptr, nameByteLength,
-    )
-    return ptr;
-  }
-  w.createMotion = (mixer, animation) => {
-    const ptr = Module._createMotion(
-      mixer, animation,
-    )
-    return ptr;
-  }
-  w.getMotion = (mixerPtr, name) => {
-    const bytes = textEncoder.encode(name)
-    const nameByteLength = bytes.length;
-    for (let i = 0; i < nameByteLength; i++) {
-      scratchStack.u8[i] = bytes[i];
+    bytes = textEncoder.encode(keyName)
+    const keyNameByteLength = bytes.length;
+    for (let i = 0; i < keyNameByteLength; i++) {
+      scratchStack.u8[index++] = bytes[i];
     }
 
-    const ptr = Module._getMotion(
-      mixerPtr, scratchStack.ptr, nameByteLength,
+    Module._setAnimationGroup(
+      animationPtr,
+      scratchStack.ptr,
+      groupNameByteLength,
+      keyNameByteLength,
+      keyNameUInt,
     )
-    return ptr;
   }
-  w.createInterpolant = (animationName, parameterPositions, sampleValues, valueSize) => {
+  w.initAnimationSystem = (values) => {
+    values.forEach((value, i) => {
+      scratchStack.f32[i] = value;
+    })
+    Module._initAnimationSystem(
+      scratchStack.ptr,
+    )
+  }
+  w.createAnimationInterpolant = (animationPtr, parameterPositions, sampleValues, valueSize) => {
     const allocator = new Allocator(Module);
 
     if (valueSize === 3) {
@@ -2386,15 +2388,8 @@ const physxWorker = (() => {
     const sampleValuesTypedArray = allocator.alloc(Float32Array, sampleValues.length);
     sampleValuesTypedArray.set(sampleValues);
 
-    const bytes = textEncoder.encode(animationName)
-    const animationNameByteLength = bytes.length;
-    for (let i = 0; i < animationNameByteLength; i++) {
-      scratchStack.u8[i] = bytes[i];
-    }
-
-    Module._createInterpolant(
-      scratchStack.ptr,
-      animationNameByteLength,
+    Module._createAnimationInterpolant(
+      animationPtr,
       parameterPositions.length,
       parameterPositionsTypedArray.byteOffset,
       sampleValues.length,

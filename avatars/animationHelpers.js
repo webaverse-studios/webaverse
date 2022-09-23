@@ -35,39 +35,19 @@ import {
   // avatarInterpolationTimeDelay,
   // avatarInterpolationNumFrames,
   narutoRunTimeFactor,
-  AnimationName,
 } from '../constants.js';
 
-// import game from '../game.js'; // can't import game.js in here, will cause offscreen-engine error.
-
+const AnimationName = {};
 let animations;
 let animationStepIndices;
 // let animationsBaseModel;
-let createdWasmAnimations = false;
-let jumpAnimation;
-let doubleJumpAnimation;
-let fallLoopAnimation;
-let floatAnimation;
-let useAnimations;
-let useComboAnimations;
-let aimAnimations;
-let bowAnimations;
-let sitAnimations;
-let danceAnimations;
+let initedAnimationSystem = false;
+
+const animationGroups = {};
+animationGroups.single = {};
+
 let emoteAnimations;
-let pickUpAnimations;
-// let throwAnimations;
-// let crouchAnimations;
-let activateAnimations;
-let narutoRunAnimations;
-// let jumpAnimationSegments;
-// let chargeJump;
-// let standCharge;
-// let fallLoop;
-// let swordSideSlash;
-// let swordTopDownSlash;
-let hurtAnimations;
-let holdAnimations;
+let speedFactors;
 
 const defaultSitAnimation = 'chair';
 // const defaultUseAnimation = 'combo';
@@ -299,23 +279,23 @@ export const loadPromise = (async () => {
   // swordSideSlash = animations.find(a => a.isSwordSideSlash);
   // swordTopDownSlash = animations.find(a => a.isSwordTopDownSlash)
 
-  jumpAnimation = animations.find(a => a.isJump);
-  doubleJumpAnimation = animations.find(a => a.isDoubleJump);
-  fallLoopAnimation = animations.index['falling.fbx'];
-  // sittingAnimation = animations.find(a => a.isSitting);
-  floatAnimation = animations.find(a => a.isFloat);
-  // rifleAnimation = animations.find(a => a.isRifle);
-  // hitAnimation = animations.find(a => a.isHit);
-  aimAnimations = {
+  animationGroups.single.jump = animations.find(a => a.isJump);
+  animationGroups.single.doubleJump = animations.find(a => a.isDoubleJump);
+  animationGroups.single.fallLoop = animations.index['falling.fbx'];
+  // animationGroups.single.sitting = animations.find(a => a.isSitting);
+  animationGroups.single.float = animations.find(a => a.isFloat);
+  // animationGroups.single.rifle = animations.find(a => a.isRifle);
+  // animationGroups.single.hit = animations.find(a => a.isHit);
+  animationGroups.aim = {
     swordSideIdle: animations.index['sword_idle_side.fbx'],
-    swordSideIdleStatic: animations.index['sword_idle_side_static.fbx'],
+    // swordSideIdleStatic: animations.index['sword_idle_side_static.fbx'],
     swordSideSlash: animations.index['sword_side_slash.fbx'],
     swordSideSlashStep: animations.index['sword_side_slash_step.fbx'],
     swordTopDownSlash: animations.index['sword_topdown_slash.fbx'],
     swordTopDownSlashStep: animations.index['sword_topdown_slash_step.fbx'],
-    swordUndraw: animations.index['sword_undraw.fbx'],
+    // swordUndraw: animations.index['sword_undraw.fbx'],
   };
-  useAnimations = mergeAnimations({
+  animationGroups.use = mergeAnimations({
     combo: animations.find(a => a.isCombo),
     slash: animations.find(a => a.isSlash),
     rifle: animations.find(a => a.isRifle),
@@ -329,17 +309,17 @@ export const loadPromise = (async () => {
     bowIdle: animations.find(a => a.isBowIdle),
     bowLoose: animations.find(a => a.isBowLoose),
     pickaxe: animations.find(a => a.isPickaxe),
-  }, aimAnimations);
-  sitAnimations = {
+  }, animationGroups.aim);
+  animationGroups.sit = {
     chair: animations.find(a => a.isSitting),
     saddle: animations.find(a => a.isSitting),
     stand: animations.find(a => a.isSkateboarding),
   };
-  danceAnimations = {
+  animationGroups.dance = {
     dansu: animations.find(a => a.isDancing),
     powerup: animations.find(a => a.isPowerUp),
   };
-  emoteAnimations = {
+  animationGroups.emote = {
     alert: animations.find(a => a.isAlert),
     alertSoft: animations.find(a => a.isAlertSoft),
     angry: animations.find(a => a.isAngry),
@@ -357,7 +337,8 @@ export const loadPromise = (async () => {
     victory: animations.find(a => a.isVictory),
     victorySoft: animations.find(a => a.isVictorySoft),
   };
-  pickUpAnimations = {
+  emoteAnimations = animationGroups.emote;
+  animationGroups.pickUp = {
     pickUp: animations.find(a => a.isPickUp),
     pickUpIdle: animations.find(a => a.isPickUpIdle),
     pickUpThrow: animations.find(a => a.isPickUpThrow),
@@ -366,30 +347,42 @@ export const loadPromise = (async () => {
     pickUpIdleZelda: animations.find(a => a.isPickUpIdleZelda),
     putDownZelda: animations.find(a => a.isPutDownZelda),
   };
-  /* throwAnimations = {
+  /* animationGroups.throw = {
     throw: animations.find(a => a.isThrow),
     pickUpThrow: animations.find(a => a.isPickUpThrow),
   }; */
-  /* crouchAnimations = {
+  /* animationGroups.crouch = {
       crouch: animations.find(a => a.isCrouch),
     }; */
-  activateAnimations = {
-    grab_forward: {animation: animations.index['grab_forward.fbx'], speedFactor: 1.2},
-    grab_down: {animation: animations.index['grab_down.fbx'], speedFactor: 1.7},
-    grab_up: {animation: animations.index['grab_up.fbx'], speedFactor: 1.2},
-    grab_left: {animation: animations.index['grab_left.fbx'], speedFactor: 1.2},
-    grab_right: {animation: animations.index['grab_right.fbx'], speedFactor: 1.2},
-    pick_up: {animation: animations.index['pick_up.fbx'], speedFactor: 1},
+  animationGroups.activate = {
+    grab_forward: animations.index['grab_forward.fbx'],
+    grab_down: animations.index['grab_down.fbx'],
+    grab_up: animations.index['grab_up.fbx'],
+    grab_left: animations.index['grab_left.fbx'],
+    grab_right: animations.index['grab_right.fbx'],
+    pick_up: animations.index['pick_up.fbx'],
   };
-  narutoRunAnimations = {
+  speedFactors = {
+    grab_forward: 1.2,
+    grab_down: 1.7,
+    grab_up: 1.2,
+    grab_left: 1.2,
+    grab_right: 1.2,
+    pick_up: 1,
+  };
+  animationGroups.narutoRun = {
     narutoRun: animations.find(a => a.isNarutoRun),
   };
-  hurtAnimations = {
+  animationGroups.hurt = {
     pain_back: animations.index['pain_back.fbx'],
     pain_arch: animations.index['pain_arch.fbx'],
   };
-  holdAnimations = {
+  animationGroups.hold = {
     pick_up_idle: animations.index['pick_up_idle.fbx'],
+  };
+  animationGroups.land = {
+    landing: animations.index['landing.fbx'],
+    landing2: animations.index['landing 2.fbx'],
   };
   {
     const down10QuaternionArray = new Quaternion()
@@ -399,7 +392,7 @@ export const loadPromise = (async () => {
       'mixamorigSpine1.quaternion',
       'mixamorigSpine2.quaternion',
     ].forEach(k => {
-      narutoRunAnimations.narutoRun.interpolants[k].evaluate = t => down10QuaternionArray;
+      animationGroups.narutoRu.narutoRun.interpolants[k].evaluate = t => down10QuaternionArray;
     });
   }
 })().catch(err => {
@@ -407,22 +400,7 @@ export const loadPromise = (async () => {
 });
 
 export const _createAnimation = avatar => {
-  // console.log('js AnimationName.combo:', AnimationName.combo);
-  // console.log('js AnimationName.slash:', AnimationName.slash);
-  // console.log('js AnimationName.dashAttack:', AnimationName.dashAttack);
-  // console.log('js AnimationName.rifle:', AnimationName.rifle);
-  // console.log('js AnimationName.pistol:', AnimationName.pistol);
-  // console.log('js AnimationName.magic:', AnimationName.magic);
-  // console.log('js AnimationName.eat:', AnimationName.eat);
-  // console.log('js AnimationName.drink:', AnimationName.drink);
-  // console.log('js AnimationName.throw:', AnimationName.throw);
-  // console.log('js AnimationName.pickUpThrow:', AnimationName.pickUpThrow);
-
-  // debugger
-  // const player = metaversefile.getPlayerByAppInstanceId(avatar.app.getComponent('instanceId'));
-  // console.log({player});
-
-  if (!createdWasmAnimations) { // note: just need to create wasm animations only once globally.
+  if (!initedAnimationSystem) { // note: just need to create wasm animations only once globally.
     for (const spec of avatar.animationMappings) {
       physx.physxWorker.createAnimationMapping(
         spec.isPosition,
@@ -448,9 +426,8 @@ export const _createAnimation = avatar => {
 
         const track = animation.tracks.index[k];
         const valueSize = track.type === 'vector' ? 3 : 4;
-        physx.physxWorker.createInterpolant(
-          // animationIndex, // todo: use ptr instead of index.
-          animation.name,
+        physx.physxWorker.createAnimationInterpolant(
+          animationPtr,
           track.times,
           track.values,
           valueSize,
@@ -459,23 +436,45 @@ export const _createAnimation = avatar => {
       animationIndex++;
     }
 
+    // note: can't use animationGroups to create wasm animations, there'are duplicated animations.
+    let keyNameUInt = 1;
+    for (const groupName in animationGroups) {
+      for (const keyName in animationGroups[groupName]) {
+        const animation = animationGroups[groupName][keyName];
+        AnimationName[keyName] = keyNameUInt;
+        physx.physxWorker.setAnimationGroup(
+          animation.ptr,
+          groupName,
+          keyName,
+          keyNameUInt,
+        );
+        // console.log('js', groupName, keyName, animation.name)
+        keyNameUInt++;
+      }
+    }
+
     //
 
-    createdWasmAnimations = true;
+    physx.physxWorker.initAnimationSystem([
+      speedFactors.grab_forward,
+      speedFactors.grab_down,
+      speedFactors.grab_up,
+      speedFactors.grab_left,
+      speedFactors.grab_right,
+      speedFactors.pick_up,
+    ]);
+    initedAnimationSystem = true;
   }
 
-  avatar.mixerPtr = physx.physxWorker.createAnimationMixer(); // todo: rename: animationMixer
+  avatar.mixerPtr = physx.physxWorker.createAnimationMixer();
   avatar.animationAvatarPtr = physx.physxWorker.createAnimationAvatar(avatar.mixerPtr);
 };
 
 export const _updateAnimation = (avatar, now) => {
-  if (!avatar.app) return;
-
-  // const timeS = performance.now() / 1000;
-  // console.log('now', now)
   const nowS = now / 1000;
-
-  const player = metaversefile.getPlayerByAppInstanceId(avatar.app.getComponent('instanceId')); // todo: del
+  const landTimeS = nowS - avatar.lastLandStartTime / 1000 + 0.8; // in order to align landing 2.fbx with walk/run
+  const timeSinceLastMove = now - avatar.lastMoveTime;
+  const timeSinceLastMoveS = timeSinceLastMove / 1000;
 
   if (avatar.emoteAnimation !== avatar.lastEmoteAnimation) {
     avatar.lastEmoteTime = avatar.emoteAnimation ? now : 0;
@@ -550,7 +549,7 @@ export const _updateAnimation = (avatar, now) => {
     mirrorFactor = isBackward ? 1 : 0;
   }
   avatar.lastBackwardFactor = mirrorFactor;
-  if (avatar === window.localPlayer?.avatar) window.domInfo.innerHTML += `<div style="display:;">mirrorFactor: --- ${window.logNum(mirrorFactor)}</div>`;
+  // if (avatar === window.localPlayer?.avatar) window.domInfo.innerHTML += `<div style="display:;">mirrorFactor: --- ${window.logNum(mirrorFactor)}</div>`;
 
   const updateValues = () => {
     const forwardFactor = 1 - MathUtils.clamp(Math.abs(angle) / (Math.PI / 2), 0, 1);
@@ -563,25 +562,18 @@ export const _updateAnimation = (avatar, now) => {
     const mirrorRightFactor = mirrorFactor * rightFactor;
     const mirrorLeftFactorReverse = mirrorFactorReverse * leftFactor;
     const mirrorRightFactorReverse = mirrorFactorReverse * rightFactor;
-    avatar.forwardFactor = forwardFactor; // test
-    avatar.backwardFactor = backwardFactor; // test
-    avatar.leftFactor = leftFactor; // test
-    avatar.rightFactor = rightFactor; // test
-    avatar.mirrorFactor = mirrorFactor; // test
-    avatar.mirrorLeftFactorReverse = mirrorLeftFactorReverse; // test
-    avatar.mirrorLeftFactor = mirrorLeftFactor; // test
-    avatar.mirrorRightFactorReverse = mirrorRightFactorReverse; // test
-    avatar.mirrorRightFactor = mirrorRightFactor; // test
-
-    const holdFactor = avatar.walkRunFactor * 0.7 + avatar.crouchFactor * (1 - avatar.idleWalkFactor) * 0.5;
+    // avatar.forwardFactor = forwardFactor; // test
+    // avatar.backwardFactor = backwardFactor; // test
+    // avatar.leftFactor = leftFactor; // test
+    // avatar.rightFactor = rightFactor; // test
+    // avatar.mirrorFactor = mirrorFactor; // test
+    // avatar.mirrorLeftFactorReverse = mirrorLeftFactorReverse; // test
+    // avatar.mirrorLeftFactor = mirrorLeftFactor; // test
+    // avatar.mirrorRightFactorReverse = mirrorRightFactorReverse; // test
+    // avatar.mirrorRightFactor = mirrorRightFactor; // test
 
     const useAnimationComboName = avatar.useAnimationCombo[avatar.useAnimationIndex];
 
-    // console.log(avatar.unuseAnimation, avatar.unuseTime)
-
-    // console.log(avatar.jumpEnd)
-    // console.log(avatar.doubleJumpEnd)
-    // console.log(avatar.hurtStart, avatar.hurtEnd)
     const values = [
       // values ---
       forwardFactor,
@@ -596,31 +588,20 @@ export const _updateAnimation = (avatar, now) => {
       avatar.idleWalkFactor,
       avatar.walkRunFactor,
       avatar.crouchFactor,
-      // avatar.flyDashFactor,
-
-      holdFactor,
 
       avatar.activateTime,
 
       // action states ---
       avatar.jumpState,
       avatar.doubleJumpState,
-      avatar.landState,
       avatar.flyState,
-      avatar.activateState,
       avatar.narutoRunState,
       avatar.sitState,
       avatar.holdState,
-      avatar.emoteState,
-      avatar.fallLoopState,
-      avatar.hurtState,
-      avatar.danceState,
-      avatar.useEnvelopeState,
       avatar.pickUpState,
 
       // other
       avatar.landWithMoving,
-      avatar.dashAttacking,
       avatar.landTime,
       avatar.fallLoopFactor,
       avatar.fallLoopTime,
@@ -646,7 +627,7 @@ export const _updateAnimation = (avatar, now) => {
       AnimationName[avatar.danceAnimation] || 0,
       AnimationName[avatar.activateAnimation] || 0,
       AnimationName[avatar.hurtAnimation] || 0,
-      AnimationName[defaultSitAnimation] || 0,
+      AnimationName[defaultSitAnimation] || 0, // todo: put into initAnimationSystem()
       AnimationName[defaultEmoteAnimation] || 0,
       AnimationName[defaultDanceAnimation] || 0,
       AnimationName[defaultHoldAnimation] || 0,
@@ -656,41 +637,13 @@ export const _updateAnimation = (avatar, now) => {
       AnimationName[avatar.unuseAnimation] || 0,
       AnimationName[avatar.aimAnimation] || 0,
       avatar.fallLoopFrom === 'jump' ? 1 : 0,
+      landTimeS,
+      timeSinceLastMoveS,
     ];
     avatar.useAnimationEnvelope.forEach(useAnimationEnvelopeName => {
       values.push(AnimationName[useAnimationEnvelopeName] || 0);
     });
-    physx.physxWorker.updateAvatar(avatar.animationAvatarPtr, values);
-
-    // console.log('js: useAnimation:', avatar.useAnimation)
-    // console.log('js: useAnimationComboName:', useAnimationComboName)
-    // console.log('js: narutoRunTimeFactor: ', avatar.narutoRunTimeFactor)
-    // const strings = [
-    //   defaultSitAnimation, // todo: send to wasm only once.
-    //   defaultEmoteAnimation,
-    //   defaultDanceAnimation,
-    //   defaultHoldAnimation,
-    //   defaultActivateAnimation,
-    //   defaultNarutoRunAnimation,
-    //   // ---
-    //   // avatar.useAnimation,
-    //   useAnimationComboName, // todo: avatar.useAnimationCombo[avatar.useAnimationIndex]; ?
-    //   // avatar.sitAnimation,
-    //   // avatar.emoteAnimation,
-    //   // avatar.danceAnimation,
-    //   // avatar.activateAnimation, // todo: activateAnimationName
-    //   // avatar.hurtAnimation,
-    //   avatar.unuseAnimation || '', // note: can't send null to wasm, will turn to string value "null".
-    //   avatar.aimAnimation || '',
-    //   // ---
-    //   avatar.fallLoopFrom,
-    // ];
-    // avatar.useAnimationEnvelope.forEach(useAnimationEnvelopeName => {
-    //   strings.push(useAnimationEnvelopeName);
-    // });
-    // physx.physxWorker.updateAvatarString(avatar.animationAvatarPtr, strings);
-
-    // console.log(avatar.useComboStart, useAnimationComboName)
+    physx.physxWorker.updateAnimationAvatar(avatar.animationAvatarPtr, values);
   };
   updateValues();
 
@@ -707,65 +660,26 @@ export const _updateAnimation = (avatar, now) => {
       } = spec;
 
       const result = resultValues[index];
-
-      if (isPosition) { // _clearXZ
-        result[0] = 0;
-        result[2] = 0;
-      }
-
       dst.fromArray(result);
 
+      // ignore all animation position except y
       if (isPosition) {
-        dst.y *= avatar.height; // XXX avatar could be made perfect by measuring from foot to hips instead
+        if (avatar.swimState) {
+          // animations position is height-relative
+          dst.y *= avatar.height; // XXX avatar could be made perfect by measuring from foot to hips instead
+        } else if (avatar.jumpState || avatar.doubleJumpState || avatar.fallLoopState) {
+          // force height in the jump case to overide the animation
+          dst.y = avatar.height * 0.55;
+        } else {
+          // animations position is height-relative
+          dst.y *= avatar.height; // XXX avatar could be made perfect by measuring from foot to hips instead
+        }
       }
 
       index++;
     }
   };
   doUpdate();
-
-  const handleFinishedEvent = () => {
-    const finishedFlag = resultValues[53];
-    // console.log(finishedFlag)
-    if (finishedFlag) {
-      // const motionPtr = resultValues[54]; // tod: why still works ?
-      // if (isDebugger) console.log('---finished', avatar.getMotion(motion));
-      // if (isDebugger) console.log('---finished', physx.physxWorker.getMotionName(avatar.mixerPtr, motionPtr)); // tod: why still works ?
-      const finishedMotionName = physx.physxWorker.getFinishedMotionName(avatar.mixerPtr);
-      console.log('---finishedMotionName', finishedMotionName);
-
-      const getFinishedActionName = () => {
-        for (const key in useAnimations) {
-          const motionName = key;
-          if (finishedMotionName === motionName) {
-            return 'use';
-          }
-        }
-
-        for (const key in useComboAnimations) {
-          const motionName = key;
-          if (finishedMotionName === motionName) {
-            return 'use';
-          }
-        }
-
-        for (const key in hurtAnimations) {
-          const motionName = key;
-          if (finishedMotionName === motionName) {
-            return 'hurt';
-          }
-        }
-
-        if (finishedMotionName === 'land' || finishedMotionName === 'land2') { // todo: add landAnimations.
-          return 'land';
-        }
-      };
-      const finishedActionName = getFinishedActionName();
-
-      avatar.dispatchAnimationFinishedEvent(finishedActionName);
-    }
-  };
-  handleFinishedEvent();
 };
 
 export {
