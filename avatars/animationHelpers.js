@@ -584,29 +584,19 @@ export const _updateAnimation = (avatar, now) => {
       avatar.walkRunFactor,
       avatar.crouchFactor,
 
-      holdFactor,
-
       avatar.activateTime,
 
       // action states ---
       avatar.jumpState,
       avatar.doubleJumpState,
-      avatar.landState,
       avatar.flyState,
-      avatar.activateState,
       avatar.narutoRunState,
       avatar.sitState,
       avatar.holdState,
-      avatar.emoteState,
-      avatar.fallLoopState,
-      avatar.hurtState,
-      avatar.danceState,
-      avatar.useEnvelopeState,
       avatar.pickUpState,
 
       // other
       avatar.landWithMoving,
-      avatar.dashAttacking,
       avatar.landTime,
       avatar.fallLoopFactor,
       avatar.fallLoopTime,
