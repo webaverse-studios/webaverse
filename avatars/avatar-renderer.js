@@ -392,6 +392,32 @@ const _getMergedBoundingSphere = o => {
   return sphere;
 };
 
+const _loadGlbObject = async (glbData, srcUrl, {
+  signal = null,
+} = {}) => {
+  let cleanupFn = null;
+  let object = null;
+  try {
+    object = await new Promise((accept, reject) => {
+      const abort = () => {
+        reject(signal.reason);
+      };
+      signal.addEventListener('abort', abort);
+      cleanupFn = () => {
+        signal.removeEventListener('abort', abort);
+      };
+
+      const {gltfLoader} = loaders;
+      gltfLoader.parse(glbData, srcUrl, accept, reject);
+    });
+  } finally {
+    if (cleanupFn) {
+      cleanupFn();
+    }
+  }
+  return object;
+};
+
 export class AvatarRenderer /* extends EventTarget */ {
   constructor({
     arrayBuffer,
@@ -599,16 +625,7 @@ export class AvatarRenderer /* extends EventTarget */ {
                   ], {
                     signal,
                   });
-                  const object = await new Promise((accept, reject) => {
-                    const abort = () => {
-                      reject(signal.reason);
-                      signal.removeEventListener('abort', abort);
-                    };
-                    signal.addEventListener('abort', abort);
-
-                    const {gltfLoader} = loaders;
-                    gltfLoader.parse(glbData, this.srcUrl, accept, reject);
-                  });
+                  const object = await _loadGlbObject(glbData, this.srcUrl, {signal});
                   // downloadFile(new Blob([glbData], {type: 'application/octet-stream'}), 'avatar.glb');
                   const glb = object.scene;
                   _forAllMeshes(glb, o => {
@@ -649,16 +666,7 @@ export class AvatarRenderer /* extends EventTarget */ {
                   ], {
                     signal,
                   });
-                  const object = await new Promise((accept, reject) => {
-                    const abort = () => {
-                      reject(signal.reason);
-                      signal.removeEventListener('abort', abort);
-                    };
-                    signal.addEventListener('abort', abort);
-
-                    const {gltfLoader} = loaders;
-                    gltfLoader.parse(glbData, this.srcUrl, accept, reject);
-                  });
+                  const object = await _loadGlbObject(glbData, this.srcUrl, {signal});
                   const glb = object.scene;
                   _forAllMeshes(glb, o => {
                     _enableShadows(o);
@@ -689,16 +697,7 @@ export class AvatarRenderer /* extends EventTarget */ {
               await Promise.all([
                 (async () => {
                   const glbData = this.arrayBuffer;
-                  const object = await new Promise((accept, reject) => {
-                    const abort = () => {
-                      reject(signal.reason);
-                      signal.removeEventListener('abort', abort);
-                    };
-                    signal.addEventListener('abort', abort);
-
-                    const {gltfLoader} = loaders;
-                    gltfLoader.parse(glbData, this.srcUrl, accept, reject);
-                  });
+                  const object = await _loadGlbObject(glbData, this.srcUrl, {signal});
                   const glb = object.scene;
 
                   await _toonShaderify(object, signal);
