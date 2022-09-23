@@ -884,7 +884,7 @@ class Avatar {
     this.swimAnimTime = 0;
 
     this.useTime = NaN;
-    this.useAnimation = ''; // Can't use null, will transfer "null" to wasm. Can use undefined.
+    this.useAnimation = null;
     this.useAnimationCombo = [];
     this.useAnimationEnvelope = [];
     this.unuseAnimation = null;
@@ -938,7 +938,7 @@ class Avatar {
     // this.aimDirection = new THREE.Vector3();
     this.hurtTime = NaN;
     this.hurtAnimation = null;
-    this.activateAnimation = '';
+    this.activateAnimation = null;
 
     // internal state
     this.movementsTime = 0;

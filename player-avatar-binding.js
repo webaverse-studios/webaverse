@@ -123,7 +123,7 @@ export function applyCharacterActionsToAvatar(character, rig) {
   rig.flyState = !!flyAction;
   rig.flyTime = flyAction ? character.actionInterpolants.fly.get() : -1;
   rig.activateTime = character.actionInterpolants.activate.get();
-  rig.activateAnimation = activateAction?.animationName || '';
+  rig.activateAnimation = activateAction?.animationName;
   rig.swimState = !!swimAction;
   rig.swimTime = swimAction ? character.actionInterpolants.swim.get() : -1;
   

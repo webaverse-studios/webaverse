@@ -1,8 +1,8 @@
-import {Vector3, Quaternion, AnimationClip, MathUtils} from 'three';
-import metaversefile from 'metaversefile';
+import {Vector3, Quaternion, /* AnimationClip, */ MathUtils} from 'three';
+// import metaversefile from 'metaversefile';
 import {/* VRMSpringBoneImporter, VRMLookAtApplyer, */ VRMCurveMapper} from '@pixiv/three-vrm/lib/three-vrm.module.js';
 // import easing from '../easing.js';
-import {easing} from '../math-utils.js';
+// import {easing} from '../math-utils.js';
 import loaders from '../loaders.js';
 import {zbdecode} from 'zjs/encoding.mjs';
 import physx from '../physx.js';
@@ -115,14 +115,14 @@ const animationsIdleArrays = {
   crouch: {name: 'Crouch Idle.fbx'},
 };
 
-const cubicBezier = easing(0, 1, 0, 1);
+// const cubicBezier = easing(0, 1, 0, 1);
 
-const _clearXZ = (dst, isPosition) => {
-  if (isPosition) {
-    dst.x = 0;
-    dst.z = 0;
-  }
-};
+// const _clearXZ = (dst, isPosition) => {
+//   if (isPosition) {
+//     dst.x = 0;
+//     dst.z = 0;
+//   }
+// };
 
 const _normalizeAnimationDurations = (animations, baseAnimation, factor = 1) => {
   for (let i = 1; i < animations.length; i++) {
