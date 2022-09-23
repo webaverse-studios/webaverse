@@ -219,23 +219,47 @@ const _setDepthWrite = o => {
   o.material.alphaToCoverage = true;
   // o.material.alphaTest = 0.5;
 };
-const _toonShaderify = async (o, signal) => {
-  return new Promise((accept, reject) => {
+
+const _abortablePromise = async (promise, {
+  signal = null
+} = {}) => {
+  let cleanupFn;
+  const signalPromise = new Promise((accept, reject) => {
     const abort = () => {
       reject(signal.reason);
-      signal.removeEventListener('abort', abort);
     };
     signal.addEventListener('abort', abort);
-
-    const convertPromise = new VRMMaterialImporter().convertGLTFMaterials(o);
-    convertPromise.then(() => {
-      accept();
+    cleanupFn = () => {
       signal.removeEventListener('abort', abort);
+    };
+
+    promise.then((result) => {
+      accept(result);
     }).catch(err => {
       reject(err);
-      signal.removeEventListener('abort', abort);
     });
   });
+  try {
+    return await signalPromise;
+  } finally {
+    cleanupFn();
+  }
+};
+
+const _toonShaderify = async (o, {
+  signal = null
+} = {}) => {
+  await _abortablePromise(new VRMMaterialImporter().convertGLTFMaterials(o), {signal});
+};
+
+const _loadGlbObject = async (glbData, srcUrl, {
+  signal = null,
+} = {}) => {
+  const promise = new Promise((accept, reject) => {
+    const {gltfLoader} = loaders;
+    gltfLoader.parse(glbData, srcUrl, accept, reject);
+  });
+  return await _abortablePromise(promise, {signal});
 };
 
 const mapTypes = [
@@ -390,30 +414,6 @@ const _getMergedBoundingSphere = o => {
     }
   });
   return sphere;
-};
-
-const _loadGlbObject = async (glbData, srcUrl, {
-  signal = null,
-} = {}) => {
-  let cleanupFn;
-  let object = null;
-  try {
-    object = await new Promise((accept, reject) => {
-      const abort = () => {
-        reject(signal.reason);
-      };
-      signal.addEventListener('abort', abort);
-      cleanupFn = () => {
-        signal.removeEventListener('abort', abort);
-      };
-
-      const {gltfLoader} = loaders;
-      gltfLoader.parse(glbData, srcUrl, accept, reject);
-    });
-  } finally {
-    cleanupFn();
-  }
-  return object;
 };
 
 export class AvatarRenderer /* extends EventTarget */ {
@@ -698,7 +698,7 @@ export class AvatarRenderer /* extends EventTarget */ {
                   const object = await _loadGlbObject(glbData, this.srcUrl, {signal});
                   const glb = object.scene;
 
-                  await _toonShaderify(object, signal);
+                  await _toonShaderify(object, {signal});
                   _forAllMeshes(glb, o => {
                     _addAnisotropy(o, 16);
                     _enableShadows(o);
