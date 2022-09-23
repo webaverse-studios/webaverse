@@ -2371,16 +2371,8 @@ const physxWorker = (() => {
       scratchStack.ptr,
     )
   }
-  w.createAnimationInterpolant = (animationPtr, parameterPositions, sampleValues, valueSize) => {
+  w.createAnimationInterpolant = (animationPtr, parameterPositions, sampleValues, valueSize) => { // `valueSize` only support 3 ( Vector ) and 4 ( Quaternion ).
     const allocator = new Allocator(Module);
-
-    if (valueSize === 3) {
-      //
-    } else if (valueSize === 4) {
-      //
-    } else {
-      debugger
-    }
 
     const parameterPositionsTypedArray = allocator.alloc(Float32Array, parameterPositions.length);
     parameterPositionsTypedArray.set(parameterPositions);
