@@ -2374,24 +2374,6 @@ const physxWorker = (() => {
     )
     return ptr;
   }
-  w.createMotion = (mixer, animation) => {
-    const ptr = Module._createMotion(
-      mixer, animation,
-    )
-    return ptr;
-  }
-  w.getMotion = (mixerPtr, name) => {
-    const bytes = textEncoder.encode(name)
-    const nameByteLength = bytes.length;
-    for (let i = 0; i < nameByteLength; i++) {
-      scratchStack.u8[i] = bytes[i];
-    }
-
-    const ptr = Module._getMotion(
-      mixerPtr, scratchStack.ptr, nameByteLength,
-    )
-    return ptr;
-  }
   w.createInterpolant = (animationPtr, parameterPositions, sampleValues, valueSize) => {
     const allocator = new Allocator(Module);
 
