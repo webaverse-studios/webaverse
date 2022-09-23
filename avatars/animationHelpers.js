@@ -336,6 +336,7 @@ export const loadPromise = (async () => {
     victory: animations.find(a => a.isVictory),
     victorySoft: animations.find(a => a.isVictorySoft),
   };
+  emoteAnimations = animationGroups.emote;
   animationGroups.pickUp = {
     pickUp: animations.find(a => a.isPickUp),
     pickUpIdle: animations.find(a => a.isPickUpIdle),
@@ -393,8 +394,6 @@ export const loadPromise = (async () => {
       animationGroups.narutoRu.narutoRun.interpolants[k].evaluate = t => down10QuaternionArray;
     });
   }
-
-  emoteAnimations = animationGroups.emote;
 })().catch(err => {
   console.log('load avatar animations error', err);
 });
