@@ -229,8 +229,11 @@ const _toonShaderify = async (o, signal) => {
 
     const convertPromise = new VRMMaterialImporter().convertGLTFMaterials(o);
     convertPromise.then(() => {
-      signal.removeEventListener('abort', abort);
       accept();
+      signal.removeEventListener('abort', abort);
+    }).catch(err => {
+      reject(err);
+      signal.removeEventListener('abort', abort);
     });
   });
 };
@@ -424,6 +427,7 @@ export class AvatarRenderer /* extends EventTarget */ {
     this.crunchedModel = null;
     this.optimizedModel = null;
     this.mesh = null;
+    this.currentMesh = null;
 
     //
 
@@ -741,19 +745,20 @@ export class AvatarRenderer /* extends EventTarget */ {
         if (caughtError.isAbortError) {
           return; // bail
         } else {
-          throw caughtError;
+          console.warn(caughtError);
         }
       } else {
         this.abortController = null;
+        // set the new avatar mesh
+        this.currentMesh = this.#getCurrentMesh();
       }
     }
 
     // remove the placeholder mesh
     this.placeholderMesh.parent.remove(this.placeholderMesh);
 
-    // add the new avatar mesh
-    const currentMesh = this.#getCurrentMesh();
-    this.scene.add(currentMesh);
+    // add the avatar mesh
+    this.scene.add(this.currentMesh);
   }
   adjustQuality(delta) {
     const newQuality = Math.min(Math.max(this.quality + delta, minAvatarQuality), maxAvatarQuality);
