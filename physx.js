@@ -2374,6 +2374,9 @@ const physxWorker = (() => {
     )
     return ptr;
   }
+  w.initAnimationSystem = () => {
+    Module._initAnimationSystem()
+  }
   w.createInterpolant = (animationPtr, parameterPositions, sampleValues, valueSize) => {
     const allocator = new Allocator(Module);
 

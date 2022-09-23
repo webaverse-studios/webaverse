@@ -38,11 +38,10 @@ import {
   AnimationName,
 } from '../constants.js';
 
-
 let animations;
 let animationStepIndices;
 // let animationsBaseModel;
-let createdWasmAnimations = false;
+let initedAnimationSystem = false;
 
 const animationGroups = {};
 animationGroups.single = {};
@@ -412,7 +411,7 @@ export const _createAnimation = avatar => {
   // console.log('js AnimationName.throw:', AnimationName.throw);
   // console.log('js AnimationName.pickUpThrow:', AnimationName.pickUpThrow);
 
-  if (!createdWasmAnimations) { // note: just need to create wasm animations only once globally.
+  if (!initedAnimationSystem) { // note: just need to create wasm animations only once globally.
     for (const spec of avatar.animationMappings) {
       physx.physxWorker.createAnimationMapping(
         spec.isPosition,
@@ -463,7 +462,8 @@ export const _createAnimation = avatar => {
 
     //
 
-    createdWasmAnimations = true;
+    physx.physxWorker.initAnimationSystem();
+    initedAnimationSystem = true;
   }
 
   avatar.mixerPtr = physx.physxWorker.createAnimationMixer(); // todo: rename: animationMixer
