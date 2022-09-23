@@ -2339,7 +2339,7 @@ const physxWorker = (() => {
     )
     return ptr;
   }
-  w.setAnimationGroup = (animationPtr, groupName, keyName) => {
+  w.setAnimationGroup = (animationPtr, groupName, keyName, keyNameUInt) => {
     let index = 0;
     let bytes;
 
@@ -2360,6 +2360,7 @@ const physxWorker = (() => {
       scratchStack.ptr,
       groupNameByteLength,
       keyNameByteLength,
+      keyNameUInt,
     )
   }
   w.getAnimation = (name) => {

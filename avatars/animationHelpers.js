@@ -35,9 +35,9 @@ import {
   // avatarInterpolationTimeDelay,
   // avatarInterpolationNumFrames,
   narutoRunTimeFactor,
-  AnimationName,
 } from '../constants.js';
 
+const AnimationName = {};
 let animations;
 let animationStepIndices;
 // let animationsBaseModel;
@@ -400,17 +400,6 @@ export const loadPromise = (async () => {
 });
 
 export const _createAnimation = avatar => {
-  // console.log('js AnimationName.combo:', AnimationName.combo);
-  // console.log('js AnimationName.slash:', AnimationName.slash);
-  // console.log('js AnimationName.dashAttack:', AnimationName.dashAttack);
-  // console.log('js AnimationName.rifle:', AnimationName.rifle);
-  // console.log('js AnimationName.pistol:', AnimationName.pistol);
-  // console.log('js AnimationName.magic:', AnimationName.magic);
-  // console.log('js AnimationName.eat:', AnimationName.eat);
-  // console.log('js AnimationName.drink:', AnimationName.drink);
-  // console.log('js AnimationName.throw:', AnimationName.throw);
-  // console.log('js AnimationName.pickUpThrow:', AnimationName.pickUpThrow);
-
   if (!initedAnimationSystem) { // note: just need to create wasm animations only once globally.
     for (const spec of avatar.animationMappings) {
       physx.physxWorker.createAnimationMapping(
@@ -448,15 +437,19 @@ export const _createAnimation = avatar => {
     }
 
     // note: can't use animationGroups to create wasm animations, there'are duplicated animations.
+    let keyNameUInt = 1;
     for (const groupName in animationGroups) {
       for (const keyName in animationGroups[groupName]) {
         const animation = animationGroups[groupName][keyName];
+        AnimationName[keyName] = keyNameUInt;
         physx.physxWorker.setAnimationGroup(
           animation.ptr,
           groupName,
           keyName,
+          keyNameUInt,
         );
         // console.log('js', groupName, keyName, animation.name)
+        keyNameUInt++;
       }
     }
 
