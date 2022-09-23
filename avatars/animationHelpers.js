@@ -465,9 +465,10 @@ export const _createAnimation = avatar => {
 export const _updateAnimation = (avatar, now) => {
   if (!avatar.app) return;
 
-  // const timeS = performance.now() / 1000;
-  // console.log('now', now)
   const nowS = now / 1000;
+  const landTimeS = nowS - avatar.lastLandStartTime / 1000 + 0.8; // in order to align landing 2.fbx with walk/run
+  const timeSinceLastMove = now - avatar.lastMoveTime;
+  const timeSinceLastMoveS = timeSinceLastMove / 1000;
 
   if (avatar.emoteAnimation !== avatar.lastEmoteAnimation) {
     avatar.lastEmoteTime = avatar.emoteAnimation ? now : 0;
@@ -631,6 +632,8 @@ export const _updateAnimation = (avatar, now) => {
       AnimationName[avatar.unuseAnimation] || 0,
       AnimationName[avatar.aimAnimation] || 0,
       avatar.fallLoopFrom === 'jump' ? 1 : 0,
+      landTimeS,
+      timeSinceLastMoveS,
     ];
     avatar.useAnimationEnvelope.forEach(useAnimationEnvelopeName => {
       values.push(AnimationName[useAnimationEnvelopeName] || 0);
