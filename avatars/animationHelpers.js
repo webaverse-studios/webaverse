@@ -655,12 +655,6 @@ export const _updateAnimation = (avatar, now) => {
       } = spec;
 
       const result = resultValues[index];
-
-      if (isPosition) { // _clearXZ
-        result[0] = 0;
-        result[2] = 0;
-      }
-
       dst.fromArray(result);
 
       // ignore all animation position except y
