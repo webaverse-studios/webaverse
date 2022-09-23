@@ -37,14 +37,15 @@ import {
   narutoRunTimeFactor,
 } from '../constants.js';
 
-const AnimationName = {};
 let animations;
 let animationStepIndices;
 // let animationsBaseModel;
+
 let initedAnimationSystem = false;
 
 const animationGroups = {};
 animationGroups.single = {};
+const AnimationUInt = {};
 
 let emoteAnimations;
 let speedFactors;
@@ -441,7 +442,7 @@ export const _createAnimation = avatar => {
     for (const groupName in animationGroups) {
       for (const keyName in animationGroups[groupName]) {
         const animation = animationGroups[groupName][keyName];
-        AnimationName[keyName] = keyNameUInt;
+        AnimationUInt[keyName] = keyNameUInt;
         physx.physxWorker.setAnimationGroup(
           animation.ptr,
           groupName,
@@ -621,27 +622,27 @@ export const _updateAnimation = (avatar, now) => {
       avatar.aimTime,
       aimMaxTime,
       avatar.pickUpTime,
-      AnimationName[avatar.useAnimation] || 0,
-      AnimationName[avatar.emoteAnimation] || 0,
-      AnimationName[avatar.sitAnimation] || 0,
-      AnimationName[avatar.danceAnimation] || 0,
-      AnimationName[avatar.activateAnimation] || 0,
-      AnimationName[avatar.hurtAnimation] || 0,
-      AnimationName[defaultSitAnimation] || 0, // todo: put into initAnimationSystem()
-      AnimationName[defaultEmoteAnimation] || 0,
-      AnimationName[defaultDanceAnimation] || 0,
-      AnimationName[defaultHoldAnimation] || 0,
-      AnimationName[defaultActivateAnimation] || 0,
-      AnimationName[defaultNarutoRunAnimation] || 0,
-      AnimationName[useAnimationComboName] || 0,
-      AnimationName[avatar.unuseAnimation] || 0,
-      AnimationName[avatar.aimAnimation] || 0,
+      AnimationUInt[avatar.useAnimation] || 0,
+      AnimationUInt[avatar.emoteAnimation] || 0,
+      AnimationUInt[avatar.sitAnimation] || 0,
+      AnimationUInt[avatar.danceAnimation] || 0,
+      AnimationUInt[avatar.activateAnimation] || 0,
+      AnimationUInt[avatar.hurtAnimation] || 0,
+      AnimationUInt[defaultSitAnimation] || 0, // todo: put into initAnimationSystem()
+      AnimationUInt[defaultEmoteAnimation] || 0,
+      AnimationUInt[defaultDanceAnimation] || 0,
+      AnimationUInt[defaultHoldAnimation] || 0,
+      AnimationUInt[defaultActivateAnimation] || 0,
+      AnimationUInt[defaultNarutoRunAnimation] || 0,
+      AnimationUInt[useAnimationComboName] || 0,
+      AnimationUInt[avatar.unuseAnimation] || 0,
+      AnimationUInt[avatar.aimAnimation] || 0,
       avatar.fallLoopFrom === 'jump' ? 1 : 0,
       landTimeS,
       timeSinceLastMoveS,
     ];
     avatar.useAnimationEnvelope.forEach(useAnimationEnvelopeName => {
-      values.push(AnimationName[useAnimationEnvelopeName] || 0);
+      values.push(AnimationUInt[useAnimationEnvelopeName] || 0);
     });
     physx.physxWorker.updateAnimationAvatar(avatar.animationAvatarPtr, values);
   };
