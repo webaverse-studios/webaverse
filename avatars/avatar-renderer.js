@@ -249,7 +249,8 @@ const _abortablePromise = async (promise, {
 const _toonShaderify = async (o, {
   signal = null
 } = {}) => {
-  await _abortablePromise(new VRMMaterialImporter().convertGLTFMaterials(o), {signal});
+  const promise = new VRMMaterialImporter().convertGLTFMaterials(o);
+  return await _abortablePromise(promise, {signal});
 };
 
 const _loadGlbObject = async (glbData, srcUrl, {
