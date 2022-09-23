@@ -466,7 +466,7 @@ export const _createAnimation = avatar => {
     initedAnimationSystem = true;
   }
 
-  avatar.mixerPtr = physx.physxWorker.createAnimationMixer(); // todo: rename: animationMixer
+  avatar.mixerPtr = physx.physxWorker.createAnimationMixer();
   avatar.animationAvatarPtr = physx.physxWorker.createAnimationAvatar(avatar.mixerPtr);
 };
 
