@@ -471,8 +471,6 @@ export const _createAnimation = avatar => {
 };
 
 export const _updateAnimation = (avatar, now) => {
-  if (!avatar.app) return;
-
   const nowS = now / 1000;
   const landTimeS = nowS - avatar.lastLandStartTime / 1000 + 0.8; // in order to align landing 2.fbx with walk/run
   const timeSinceLastMove = now - avatar.lastMoveTime;
@@ -564,17 +562,16 @@ export const _updateAnimation = (avatar, now) => {
     const mirrorRightFactor = mirrorFactor * rightFactor;
     const mirrorLeftFactorReverse = mirrorFactorReverse * leftFactor;
     const mirrorRightFactorReverse = mirrorFactorReverse * rightFactor;
-    avatar.forwardFactor = forwardFactor; // test
-    avatar.backwardFactor = backwardFactor; // test
-    avatar.leftFactor = leftFactor; // test
-    avatar.rightFactor = rightFactor; // test
-    avatar.mirrorFactor = mirrorFactor; // test
-    avatar.mirrorLeftFactorReverse = mirrorLeftFactorReverse; // test
-    avatar.mirrorLeftFactor = mirrorLeftFactor; // test
-    avatar.mirrorRightFactorReverse = mirrorRightFactorReverse; // test
-    avatar.mirrorRightFactor = mirrorRightFactor; // test
+    // avatar.forwardFactor = forwardFactor; // test
+    // avatar.backwardFactor = backwardFactor; // test
+    // avatar.leftFactor = leftFactor; // test
+    // avatar.rightFactor = rightFactor; // test
+    // avatar.mirrorFactor = mirrorFactor; // test
+    // avatar.mirrorLeftFactorReverse = mirrorLeftFactorReverse; // test
+    // avatar.mirrorLeftFactor = mirrorLeftFactor; // test
+    // avatar.mirrorRightFactorReverse = mirrorRightFactorReverse; // test
+    // avatar.mirrorRightFactor = mirrorRightFactor; // test
 
-    const holdFactor = avatar.walkRunFactor * 0.7 + avatar.crouchFactor * (1 - avatar.idleWalkFactor) * 0.5;
     const useAnimationComboName = avatar.useAnimationCombo[avatar.useAnimationIndex];
 
     const values = [
@@ -630,7 +627,7 @@ export const _updateAnimation = (avatar, now) => {
       AnimationName[avatar.danceAnimation] || 0,
       AnimationName[avatar.activateAnimation] || 0,
       AnimationName[avatar.hurtAnimation] || 0,
-      AnimationName[defaultSitAnimation] || 0,
+      AnimationName[defaultSitAnimation] || 0, // todo: put into initAnimationSystem()
       AnimationName[defaultEmoteAnimation] || 0,
       AnimationName[defaultDanceAnimation] || 0,
       AnimationName[defaultHoldAnimation] || 0,
