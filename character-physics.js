@@ -169,7 +169,7 @@ class CharacterPhysics {
         this.character.getAction('swim').onSurface &&
         !this.character.hasAction('fly')
       ) {
-        if (this.character.characterPhysics.velocity.y > 0) {
+        if (this.character.characterPhysics.velocity.y >= 0) {
           localVector3.y = 0;
         }
       }
