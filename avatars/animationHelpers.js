@@ -385,17 +385,21 @@ export const loadPromise = (async () => {
     landing: animations.index['landing.fbx'],
     landing2: animations.index['landing 2.fbx'],
   };
-  {
-    const down10QuaternionArray = new Quaternion()
-      .setFromAxisAngle(new Vector3(1, 0, 0), Math.PI * 0.1)
-      .toArray();
-    [
-      'mixamorigSpine1.quaternion',
-      'mixamorigSpine2.quaternion',
-    ].forEach(k => {
-      animationGroups.narutoRu.narutoRun.interpolants[k].evaluate = t => down10QuaternionArray;
-    });
-  }
+  animationGroups.swim = {
+    breaststroke: animations.index['Swimming.fbx'],
+    freestyle: animations.index['freestyle.fbx'],
+  };
+  // { // todo:
+  //   const down10QuaternionArray = new Quaternion()
+  //     .setFromAxisAngle(new Vector3(1, 0, 0), Math.PI * 0.1)
+  //     .toArray();
+  //   [
+  //     'mixamorigSpine1.quaternion',
+  //     'mixamorigSpine2.quaternion',
+  //   ].forEach(k => {
+  //     animationGroups.narutoRun.narutoRun.interpolants[k].evaluate = t => down10QuaternionArray;
+  //   });
+  // }
 })().catch(err => {
   console.log('load avatar animations error', err);
 });
@@ -596,8 +600,12 @@ export const _updateAnimation = (avatar, now) => {
       avatar.idleWalkFactor,
       avatar.walkRunFactor,
       avatar.crouchFactor,
+      avatar.sprintFactor,
+      avatar.movementsTransitionFactor,
 
       avatar.activateTime,
+      avatar.swimTime,
+      avatar.movementsTime,
 
       // action states ---
       avatar.jumpState,
@@ -607,8 +615,9 @@ export const _updateAnimation = (avatar, now) => {
       avatar.sitState,
       avatar.holdState,
       avatar.pickUpState,
+      avatar.swimState,
 
-      // other
+      // todo: re-order
       avatar.landWithMoving,
       avatar.landTime,
       avatar.fallLoopFactor,
