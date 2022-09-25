@@ -46,25 +46,43 @@ class ProcGenInstance {
     const tracker = new LodChunkTracker(opts2);
     return tracker;
   }
-  async generateChunk(position, lod, lodArray, generateFlags, {signal} = {}) {
+  async generateChunk(
+    position,
+    lod,
+    lodArray,
+    generateFlags,
+    numGrassInstances,
+    {
+      signal = null,
+    } = {},
+  ) {
     await this.pgWorkerManager.waitForLoad();
 
     position.toArray(localArray2D);
-    const result = await this.pgWorkerManager.generateChunk(localArray2D, lod, lodArray, generateFlags, {signal});
+    const result = await this.pgWorkerManager.generateChunk(
+      localArray2D,
+      lod,
+      lodArray,
+      generateFlags,
+      numGrassInstances,
+      {
+        signal,
+      },
+    );
     return result;
   }
+  /* async generateGrass(position, lod, numInstances, {signal} = {}) {
+    await this.pgWorkerManager.waitForLoad();
+
+    position.toArray(localArray2D);
+    const result = await this.pgWorkerManager.generateGrass(localArray2D, lod, numInstances, {signal});
+    return result;
+  } */
   async generateVegetation(position, lod, numInstances, {signal} = {}) {
     await this.pgWorkerManager.waitForLoad();
 
     position.toArray(localArray2D);
     const result = await this.pgWorkerManager.generateVegetation(localArray2D, lod, numInstances, {signal});
-    return result;
-  }
-  async generateGrass(position, lod, numInstances, {signal} = {}) {
-    await this.pgWorkerManager.waitForLoad();
-
-    position.toArray(localArray2D);
-    const result = await this.pgWorkerManager.generateGrass(localArray2D, lod, numInstances, {signal});
     return result;
   }
   /* async getLightMapper({
