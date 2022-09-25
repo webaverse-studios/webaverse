@@ -237,50 +237,50 @@ export class AvatarCharacterSfx {
     if (!this.character.hasAction('sit')) {
       _handleStep();
     }
-    // const _handleSwim = () => {
-    //   if(this.character.hasAction('swim')){
-    //       // const candidateAudios = soundFiles.water;
-    //       // console.log(candidateAudios);
-    //       if(this.character.getAction('swim').animationType === 'breaststroke'){
-    //           if(this.setSwimmingHand && this.character.actionInterpolants.movements.get() % breaststrokeDuration <= breaststrokeOffset){
-    //               this.setSwimmingHand = false;
-    //               this.currentSwimmingHand = null;
-    //           }
-    //           else if(!this.setSwimmingHand && this.character.actionInterpolants.movements.get() % breaststrokeDuration > breaststrokeOffset){
-    //               let regex = new RegExp('^water/swim[0-9]*.wav$');
-    //               const candidateAudios = soundFiles.water.filter(f => regex.test(f.name));
-    //               const audioSpec = candidateAudios[Math.floor(Math.random() * candidateAudios.length)];
-    //               if(this.character.getAction('swim').onSurface)
-    //                 sounds.playSound(audioSpec);
+    const _handleSwim = () => {
+      if(this.character.hasAction('swim')){
+          // const candidateAudios = soundFiles.water;
+          // console.log(candidateAudios);
+          if(this.character.getAction('swim').animationType === 'breaststroke'){
+              if(this.setSwimmingHand && this.character.actionInterpolants.movements.get() % breaststrokeDuration <= breaststrokeOffset){
+                  this.setSwimmingHand = false;
+                  this.currentSwimmingHand = null;
+              }
+              else if(!this.setSwimmingHand && this.character.actionInterpolants.movements.get() % breaststrokeDuration > breaststrokeOffset){
+                  let regex = new RegExp('^water/swim[0-9]*.wav$');
+                  const candidateAudios = soundFiles.water.filter(f => regex.test(f.name));
+                  const audioSpec = candidateAudios[Math.floor(Math.random() * candidateAudios.length)];
+                  if(this.character.getAction('swim').onSurface)
+                    sounds.playSound(audioSpec);
 
-    //               this.setSwimmingHand = true;
-    //               this.currentSwimmingHand = 'right';
-    //           }
+                  this.setSwimmingHand = true;
+                  this.currentSwimmingHand = 'right';
+              }
 
-    //       }
-    //       else if(this.character.getAction('swim').animationType === 'freestyle'){
-    //           let regex = new RegExp('^water/swim_fast[0-9]*.wav$');
-    //           const candidateAudios = soundFiles.water.filter(f => regex.test(f.name));
-    //           const audioSpec = candidateAudios[Math.floor(Math.random() * candidateAudios.length)];
+          }
+          else if(this.character.getAction('swim').animationType === 'freestyle'){
+              let regex = new RegExp('^water/swim_fast[0-9]*.wav$');
+              const candidateAudios = soundFiles.water.filter(f => regex.test(f.name));
+              const audioSpec = candidateAudios[Math.floor(Math.random() * candidateAudios.length)];
 
-    //           if(this.setSwimmingHand && this.character.actionInterpolants.movements.get() % freestyleDuration <= freestyleOffset){
-    //               // console.log('left hand')
-    //               if(this.character.getAction('swim').onSurface)
-    //                 sounds.playSound(audioSpec);
-    //               this.currentSwimmingHand = 'left';
-    //               this.setSwimmingHand = false;
-    //           }
-    //           else if(!this.setSwimmingHand && this.character.actionInterpolants.movements.get() % freestyleDuration > freestyleOffset){
-    //               // console.log('right hand')
-    //               if(this.character.getAction('swim').onSurface)
-    //                 sounds.playSound(audioSpec);
-    //               this.currentSwimmingHand = 'right';
-    //               this.setSwimmingHand = true;
-    //           }
-    //       }  
-    //   }
-    // }
-    // _handleSwim();
+              if(this.setSwimmingHand && this.character.actionInterpolants.movements.get() % freestyleDuration <= freestyleOffset){
+                  // console.log('left hand')
+                  if(this.character.getAction('swim').onSurface)
+                    sounds.playSound(audioSpec);
+                  this.currentSwimmingHand = 'left';
+                  this.setSwimmingHand = false;
+              }
+              else if(!this.setSwimmingHand && this.character.actionInterpolants.movements.get() % freestyleDuration > freestyleOffset){
+                  // console.log('right hand')
+                  if(this.character.getAction('swim').onSurface)
+                    sounds.playSound(audioSpec);
+                  this.currentSwimmingHand = 'right';
+                  this.setSwimmingHand = true;
+              }
+          }  
+      }
+    }
+    _handleSwim();
 
     const _handleNarutoRun = () => {
       this.currentQ.copy(this.character.quaternion);
