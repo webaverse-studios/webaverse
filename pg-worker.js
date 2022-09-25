@@ -176,6 +176,49 @@ const _cloneChunkResult = chunkResult => {
     barrierGeometry: barrierGeometry2,
   };
 };
+const _cloneInstancesResult = vegetationResult => {
+  const {instances} = vegetationResult;
+
+  const _getVegetationGeometrySize = () => {
+    let size = 0;
+    for (let i = 0; i < instances.length; i++) {
+      const instance = instances[i];
+      const {ps, qs} = instance;
+      size += ps.length * ps.constructor.BYTES_PER_ELEMENT;
+      size += qs.length * qs.constructor.BYTES_PER_ELEMENT;
+    }
+    return size;
+  };
+  const size = _getVegetationGeometrySize();
+
+  const arrayBuffer = new ArrayBuffer(size);
+  let index = 0;
+
+  const instances2 = Array(instances.length);
+  for (let i = 0; i < instances.length; i++) {
+    const instance = instances[i];
+    const {instanceId, ps, qs} = instance;
+
+    const ps2 = new ps.constructor(arrayBuffer, index, ps.length);
+    ps2.set(ps);
+    index += ps.length * ps.constructor.BYTES_PER_ELEMENT;
+
+    const qs2 = new qs.constructor(arrayBuffer, index, qs.length);
+    qs2.set(qs);
+    index += qs.length * qs.constructor.BYTES_PER_ELEMENT;
+
+    instances2[i] = {
+      instanceId,
+      ps: ps2,
+      qs: qs2,
+    };
+  }
+
+  return {
+    arrayBuffer,
+    instances: instances2,
+  };
+};
 
 const instances = new Map();
 
@@ -267,7 +310,7 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
       return spec;
     }
     case 'generateChunk': {
-      const {chunkPosition, lod, lodArray} = args;
+      const {chunkPosition, lod, lodArray, generateFlagsInt} = args;
       const instance = instances.get(instanceKey);
       if (!instance) throw new Error('generateChunk : instance not found');
 
@@ -280,6 +323,7 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
         position.y,
         lod,
         lodArray,
+        generateFlagsInt,
       );
       const chunkResult2 = _cloneChunkResult(chunkResult);
 
@@ -298,26 +342,63 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
         ],
       };
     }
+    case 'generateGrass': {
+      const {chunkPosition, lod, numGrassInstances} = args;
+      const instance = instances.get(instanceKey);
+      if (!instance) throw new Error('generateGrass : instance not found');
+
+      const position = localVector2D.fromArray(chunkPosition)
+        .multiplyScalar(chunkWorldSize);
+      const grassResult = await pg.createChunkGrassAsync(
+        instance,
+        taskId,
+        position.x,
+        position.y,
+        lod,
+        numGrassInstances
+      );
+      const grassResult2 = _cloneInstancesResult(grassResult);
+
+      const _freeInstancesResult = grassResult => {
+        pg.free(grassResult.bufferAddress);
+      };
+      _freeInstancesResult(grassResult);
+
+      const spec = {
+        result: grassResult2,
+        transfers: [
+          grassResult2.arrayBuffer,
+        ],
+      };
+      return spec;
+    }
     case 'generateVegetation': {
-      const {chunkPosition, lod} = args;
+      const {chunkPosition, lod, numVegetationInstances} = args;
       const instance = instances.get(instanceKey);
       if (!instance) throw new Error('generateVegetation : instance not found');
 
       const position = localVector2D.fromArray(chunkPosition)
         .multiplyScalar(chunkWorldSize);
-      const {
-        ps,
-        qs,
-        instances: instancesResult,
-      } = await pg.createChunkVegetationAsync(instance, taskId, position.x, position.z, lod);
+      const vegetationResult = await pg.createChunkVegetationAsync(
+        instance,
+        taskId,
+        position.x,
+        position.y,
+        lod,
+        numVegetationInstances
+      );
+      const vegetationResult2 = _cloneInstancesResult(vegetationResult);
+
+      const _freeInstancesResult = vegetationResult => {
+        pg.free(vegetationResult.bufferAddress);
+      };
+      _freeInstancesResult(vegetationResult);
 
       const spec = {
-        result: {
-          ps,
-          qs,
-          instances: instancesResult,
-        },
-        transfers: [ps.buffer, qs.buffer, instancesResult.buffer],
+        result: vegetationResult2,
+        transfers: [
+          vegetationResult2.arrayBuffer,
+        ],
       };
       return spec;
     }

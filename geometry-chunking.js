@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+// import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {getRenderer} from './renderer.js';
 import {FreeList} from './geometry-util.js';
 import {getBoundingSize} from './util.js';
@@ -11,9 +11,8 @@ const localBox = new THREE.Box3();
 const localFrustum = new THREE.Frustum();
 const localDataTexture = new THREE.DataTexture();
 
-export class DrawCallBinding {
-  constructor(geometryIndex, freeListEntry, allocator) {
-    this.geometryIndex = geometryIndex;
+export class ChunkBinding {
+  constructor(freeListEntry, allocator) {
     this.freeListEntry = freeListEntry;
     this.allocator = allocator;
   }
@@ -23,9 +22,9 @@ export class DrawCallBinding {
   getTextureOffset(name) {
     const texture = this.getTexture(name);
     const {itemSize} = texture;
-    return this.freeListEntry * this.allocator.maxInstancesPerGeometryPerDrawCall * itemSize;
+    return this.freeListEntry * this.allocator.maxInstancesPerDrawCall * itemSize;
   }
-  getInstanceCount() {
+  /* getInstanceCount() {
     return this.allocator.getInstanceCount(this);
   }
   setInstanceCount(instanceCount) {
@@ -36,7 +35,7 @@ export class DrawCallBinding {
   }
   decrementInstanceCount() {
     return this.allocator.decrementInstanceCount(this);
-  }
+  } */
   updateTexture(name, dataIndex, dataLength) {
     const texture = this.getTexture(name);
 
@@ -157,58 +156,24 @@ export class DrawCallBinding {
   }
 }
 
-/* const _swapTextureAttributes = (texture, i, j, maxInstancesPerDrawCall) => {
-  const {itemSize} = texture;
-  const startOffset = i * maxInstancesPerDrawCall;
-  const dstStart = (startOffset + j) * itemSize;
-  const srcStart = (startOffset + maxInstancesPerDrawCall - 1) * itemSize;
-  const count = itemSize;
-  texture.image.data.copyWithin(
-    dstStart,
-    srcStart,
-    srcStart + count
-  );
-};
-const _swapBoundingDataSphere = (instanceBoundingData, i, j, maxInstancesPerDrawCall) => {
-  const dstStart = (startOffset + j) * 4;
-  const srcStart = (startOffset + maxInstancesPerDrawCall - 1) * 4;
-  instanceBoundingData.copyWithin(
-    dstStart,
-    srcStart,
-    srcStart + 4
-  );
-};
-const _swapBoundingDataBox = (instanceBoundingData, i, j, maxInstancesPerDrawCall) => {
-  const dstStart = (startOffset + j) * 6;
-  const srcStart = (startOffset + maxInstancesPerDrawCall - 1) * 6;
-  instanceBoundingData.copyWithin(
-    dstStart,
-    srcStart,
-    srcStart + 6
-  );
-}; */
-export class InstancedGeometryAllocator {
-  constructor(instanceTextureSpecs, {
-    maxNumGeometries,
-    maxInstancesPerGeometryPerDrawCall,
-    maxDrawCallsPerGeometry,
+export class ChunkedGeometryAllocator {
+  constructor(geometry, instanceTextureSpecs, {
+    maxInstancesPerDrawCall,
+    maxDrawCalls,
     boundingType = null,
-    // instanceBoundingType = null,
+    instanceBoundingType = null,
   }) {
-    this.maxNumGeometries = maxNumGeometries;
-    this.maxInstancesPerGeometryPerDrawCall = maxInstancesPerGeometryPerDrawCall;
-    this.maxDrawCallsPerGeometry = maxDrawCallsPerGeometry;
+    this.maxInstancesPerDrawCall = maxInstancesPerDrawCall;
+    this.maxDrawCalls = maxDrawCalls;
     this.boundingType = boundingType;
-    // this.instanceBoundingType = instanceBoundingType;
+    this.instanceBoundingType = instanceBoundingType;
     
-    this.drawStarts = new Int32Array(maxNumGeometries * maxDrawCallsPerGeometry);
-    this.drawCounts = new Int32Array(maxNumGeometries * maxDrawCallsPerGeometry);
-    this.drawInstanceCounts = new Int32Array(maxNumGeometries * maxDrawCallsPerGeometry);
+    this.drawStarts = new Int32Array(maxDrawCalls);
+    this.drawCounts = new Int32Array(maxDrawCalls);
+    this.drawInstanceCounts = new Int32Array(maxDrawCalls);
     
     const boundingSize = getBoundingSize(boundingType);
-    this.boundingData = new Float32Array(maxNumGeometries * maxDrawCallsPerGeometry * boundingSize);
-    // const instanceBoundingSize = getBoundingSize(instanceBoundingType);
-    // this.instanceBoundingData = new Float32Array(geometries.length * maxDrawCallsPerGeometry * maxInstancesPerGeometryPerDrawCall * instanceBoundingSize);
+    this.boundingData = new Float32Array(maxDrawCalls * boundingSize);
  
     this.testBoundingFn = (() => {
       if (this.boundingType === 'sphere') {
@@ -227,40 +192,35 @@ export class InstancedGeometryAllocator {
         return null;
       }
     })();
-    /* this.swapBoundingDataFn = (() => {
-      if (this.boundingType === 'sphere') {
-        return _swapBoundingDataSphere;
-      } else if (this.boundingType === 'box') {
-        return _swapBoundingDataBox;
-      } else {
-        // throw new Error('Invalid bounding type: ' + this.boundingType);
-        return null;
-      }
-    })();
-    this.testInstanceBoundingFn = (() => {
-      if (this.boundingType === 'sphere') {
-        return (j, frustum) => {
-          const sphereIndex = j;
-          localSphere.center.fromArray(this.instanceBoundingData, sphereIndex * 4);
-          localSphere.radius = this.instanceBoundingData[sphereIndex * 4 + 3];
-          return frustum.intersectsSphere(localSphere);
-        };
-      } else if (this.boundingType === 'box') {
-        return (j, frustum) => {
-          const boxIndex = j;
-          localBox.min.fromArray(this.boundingData, boxIndex * 6);
-          localBox.max.fromArray(this.boundingData, boxIndex * 6 + 3);
-          return frustum.intersectsBox(localBox);
-        };
-      } else {
-        // throw new Error('Invalid bounding type: ' + this.boundingType);
-        return null;
-      }
-    })(); */
 
     {
-      this.geometry = null;
-      this.geometryRegistry = new Map();
+      /* const numGeometries = geometries.length;
+      const geometryRegistry = Array(numGeometries);
+      let positionIndex = 0;
+      let indexIndex = 0;
+      for (let i = 0; i < numGeometries; i++) {
+        const geometry = geometries[i];
+
+        const positionCount = geometry.attributes.position.count;
+        const indexCount = geometry.index.count;
+        const spec = {
+          position: {
+            start: positionIndex,
+            count: positionCount,
+          },
+          index: {
+            start: indexIndex,
+            count: indexCount,
+          },
+        };
+        geometryRegistry[i] = spec;
+
+        positionIndex += positionCount;
+        indexIndex += indexCount;
+      }
+      this.geometryRegistry = geometryRegistry;
+      this.geometry = BufferGeometryUtils.mergeBufferGeometries(geometries); */
+      this.geometry = geometry;
 
       this.texturesArray = instanceTextureSpecs.map(spec => {
         let {
@@ -272,11 +232,11 @@ export class InstancedGeometryAllocator {
 
         // compute the minimum size of a texture that can hold the data
 
-        let itemCount = maxNumGeometries * maxDrawCallsPerGeometry * maxInstancesPerGeometryPerDrawCall;
-        /* if (!instanced) {
+        /* let itemCount = numGeometries * maxDrawCallsPerGeometry * maxInstancesPerDrawCall;
+        if (!instanced) {
           itemCount = maxSlotsPerGeometry * numGeometries;
         } */
-        // let itemCount = maxDrawCalls * maxInstancesPerDrawCall;
+        let itemCount = maxDrawCalls * maxInstancesPerDrawCall;
         /* if (isNaN(itemCount)) {
           debugger;
         } */
@@ -288,19 +248,19 @@ export class InstancedGeometryAllocator {
         }
         const textureSizePx = Math.min(Math.max(Math.pow(2, Math.ceil(Math.log2(Math.sqrt(neededItems4)))), 16), 2048);
         const itemSizeSnap = itemSize > 4 ? 4 : itemSize;
-        // console.log('textureSizePx', name, textureSizePx, itemCount);
 
-        const format = (() => {
+        /* const format = (() => {
           if (itemSize === 1) {
             return THREE.RedFormat;
           } else if (itemSize === 2) {
             return THREE.RGFormat;
           } else if (itemSize === 3) {
             return THREE.RGBFormat;
-          } else /*if (itemSize >= 4)*/ {
+          } else {
             return THREE.RGBAFormat;
           }
-        })();
+        })(); */
+        const format = THREE.RGBAFormat;
         const type = (() => {
           if (Type === Float32Array) {
             return THREE.FloatType;
@@ -344,108 +304,27 @@ export class InstancedGeometryAllocator {
         this.textureIndexes[name] = i;
       }
 
-      this.freeList = new FreeList(maxNumGeometries * maxDrawCallsPerGeometry);
+      this.freeList = new FreeList(maxDrawCalls);
     }
   }
-  setGeometries(geometries) {
-    const geometry = new THREE.BufferGeometry();
-
-    // attributes
-    const attributeSpecs = [
-      {
-        name: 'position',
-        itemSize: 3,
-      },
-      {
-        name: 'normal',
-        itemSize: 3,
-      },
-      {
-        name: 'uv',
-        itemSize: 2,
-      },
-    ];
-    for (let i = 0; i < attributeSpecs.length; i++) {
-      const attributeSpec = attributeSpecs[i];
-      const {
-        name,
-        itemSize,
-      } = attributeSpec;
-
-      let sum = 0;
-      for (let i = 0; i < geometries.length; i++) {
-        const lodGeometries = geometries[i];
-        const lod0Geometry = lodGeometries[0];
-        const attribute = lod0Geometry.attributes[name];
-        sum += attribute.array.length;
-      }
-
-      const array = new Float32Array(sum);
-      let index = 0;
-      for (let i = 0; i < geometries.length; i++) {
-        const lodGeometries = geometries[i];
-        const lod0Geometry = lodGeometries[0];
-        const attribute = lod0Geometry.attributes[name];
-        array.set(attribute.array, index);
-        index += attribute.array.length;
-      }
-      geometry.setAttribute(name, new THREE.BufferAttribute(array, itemSize));
-    }
-
-    // indices
-    {
-      let sum = 0;
-      for (let i = 0; i < geometries.length; i++) {
-        const lodGeometries = geometries[i];
-        for (let j = 0; j < lodGeometries.length; j++) {
-          const lodGeometry = lodGeometries[j];
-          sum += lodGeometry.index.array.length;
-        }
-      }
-
-      const index = new Uint32Array(sum);
-      let positionIndex = 0;
-      let indexIndex = 0;
-      for (let i = 0; i < geometries.length; i++) {
-        const lodGeometries = geometries[i];
-
-        const geometryRegistryArray = Array(lodGeometries.length);
-        for (let j = 0; j < lodGeometries.length; j++) {
-          const lodGeometry = lodGeometries[j];
-          geometryRegistryArray[j] = {
-            index: {
-              start: indexIndex,
-              count: lodGeometry.index.array.length,
-            },
-          };
-          for (let k = 0; k < lodGeometry.index.array.length; k++) {
-            index[indexIndex + k] = lodGeometry.index.array[k] + positionIndex;
-          }
-          indexIndex += lodGeometry.index.array.length;
-        }
-        this.geometryRegistry.set(i, geometryRegistryArray);
-
-        const lod0Geometry = lodGeometries[0];
-        positionIndex += lod0Geometry.attributes.position.array.length / 3;
-      }
-      geometry.setIndex(new THREE.BufferAttribute(index, 1));
-    }
-
-    this.geometry = geometry;
-
-    // console.log('set geometries', geometry, Array.from(this.geometryRegistry.values()));
-  }
-  allocDrawCall(geometryIndex, lodIndex, instanceCount, boundingObject) {
+  allocChunk(instanceCount, boundingObject) {
     const freeListEntry = this.freeList.alloc(1);
-    const drawCall = new DrawCallBinding(geometryIndex, freeListEntry, this);
+    const drawCall = new ChunkBinding(freeListEntry, this);
 
-    const geometrySpec = this.geometryRegistry.get(geometryIndex)[lodIndex];
+    /* const geometrySpec = this.geometryRegistry[geometryIndex];
     const {
       index: {
         start,
         count,
       },
-    } = geometrySpec;
+    } = geometrySpec; */
+    const start = 0;
+    const {
+      index: {
+        // start,
+        count,
+      },
+    } = this.geometry;
 
     this.drawStarts[freeListEntry] = start * this.geometry.index.array.BYTES_PER_ELEMENT;
     this.drawCounts[freeListEntry] = count;
@@ -460,8 +339,8 @@ export class InstancedGeometryAllocator {
     
     return drawCall;
   }
-  freeDrawCall(drawCall) {
-    const {freeListEntry} = drawCall;
+  freeChunk(chunk) {
+    const {freeListEntry} = chunk;
 
     this.drawStarts[freeListEntry] = 0;
     this.drawCounts[freeListEntry] = 0;
@@ -502,7 +381,7 @@ export class InstancedGeometryAllocator {
     multiDrawCounts.length = this.drawCounts.length;
     multiDrawInstanceCounts.length = this.drawInstanceCounts.length;
 
-    if (this.testBoundingFn || this.testInstanceBoundingFn) {
+    if (this.testBoundingFn) {
       const projScreenMatrix = localMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
       localFrustum.setFromProjectionMatrix(projScreenMatrix);
     }
@@ -511,34 +390,7 @@ export class InstancedGeometryAllocator {
       if (!this.testBoundingFn || this.testBoundingFn(i, localFrustum)) {
         multiDrawStarts[i] = this.drawStarts[i];
         multiDrawCounts[i] = this.drawCounts[i];
-        
-        /* if (this.instanceBoundingType) {
-          const startOffset = i * this.maxInstancesPerDrawCall;
-
-          // arrange the instanced draw list :
-          // - apply per-instance frustum culling
-          // - swapping the bounding data into place
-          // - accumulate the real instance draw count
-          const maxDrawableInstances = this.drawInstanceCounts[i];
-          let instancesToDraw = 0;
-          for (let j = 0; j < maxDrawableInstances; j++) {
-            if (!this.testInstanceBoundingFn || this.testInstanceBoundingFn(startOffset + j, localFrustum)) {
-              instancesToDraw++;
-            } else {
-              // swap this instance with the last instance to remove it
-              for (const texture of this.texturesArray) {
-                _swapTextureAttributes(texture, i, j, this.maxInstancesPerDrawCall);
-              }
-              if (this.swapBoundingDataFn) {
-                  this.swapBoundingDataFn(this.instanceBoundingData, i, j, this.maxInstancesPerDrawCall);
-              }
-            }
-          }
-
-          multiDrawInstanceCounts[i] = instancesToDraw;
-        } else { */
-          multiDrawInstanceCounts[i] = this.drawInstanceCounts[i];
-        // }
+        multiDrawInstanceCounts[i] = this.drawInstanceCounts[i];
       } else {
         multiDrawStarts[i] = 0;
         multiDrawCounts[i] = 0;
@@ -548,7 +400,7 @@ export class InstancedGeometryAllocator {
   }
 }
 
-export class InstancedBatchedMesh extends THREE.InstancedMesh {
+export class ChunkedBatchedMesh extends THREE.InstancedMesh {
   constructor(geometry, material, allocator) {
     super(geometry, material);
     

@@ -58,12 +58,14 @@ import procGenManager from './procgen-manager.js';
 import cardsManager from './cards-manager.js';
 import * as geometryBuffering from './geometry-buffering.js';
 import * as geometryBatching from './geometry-batching.js';
+import * as geometryChunking from './geometry-chunking.js';
 import * as atlasing from './atlasing.js';
 import * as spriting from './spriting.js';
 import * as gpuTaskManager from './gpu-task-manager.js';
 import * as generationTaskManager from './generation-task-manager.js';
 import ioManager from './io-manager.js';
-import {lightsManager} from './lights-manager.js';
+import {lightsManager} from './engine-hooks/lights/lights-manager.js';
+import {skyManager} from './engine-hooks/environment/skybox/sky-manager.js';
 
 const localVector2D = new THREE.Vector2();
 
@@ -454,6 +456,9 @@ metaversefile.setApi({
   },
   useLightsManager() {
     return lightsManager;
+  },
+  useSkyManager() {
+    return skyManager;
   },
   useChatManager() {
     return chatManager;
@@ -1246,6 +1251,9 @@ export default () => {
   },
   useGeometryBatching() {
     return geometryBatching;
+  },
+  useGeometryChunking() {
+    return geometryChunking;
   },
   useAtlasing() {
     return atlasing;
