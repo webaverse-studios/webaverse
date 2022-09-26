@@ -223,27 +223,22 @@ const _setDepthWrite = o => {
 const _abortablePromise = async (promise, {
   signal = null
 } = {}) => {
-  let cleanupFn;
   const signalPromise = new Promise((accept, reject) => {
     const abort = () => {
+      signal.removeEventListener('abort', abort);
       reject(signal.reason);
     };
     signal.addEventListener('abort', abort);
-    cleanupFn = () => {
-      signal.removeEventListener('abort', abort);
-    };
 
     promise.then((result) => {
+      signal.removeEventListener('abort', abort);
       accept(result);
     }).catch(err => {
+      signal.removeEventListener('abort', abort);
       reject(err);
     });
   });
-  try {
-    return await signalPromise;
-  } finally {
-    cleanupFn();
-  }
+  return await signalPromise;
 };
 
 const _toonShaderify = async (o, {
