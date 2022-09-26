@@ -442,18 +442,69 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
       indices,
     };
   };
+  const _parseInstances = () => {
+    const bufferAddress = dataView.getUint32(index, true);
+    index += Uint32Array.BYTES_PER_ELEMENT;
+
+    const dataView2 = new DataView(arrayBuffer, bufferAddress);
+    let index2 = 0;
+    
+    const numInstances = dataView2.getUint32(index2, true);
+    index2 += Uint32Array.BYTES_PER_ELEMENT;
+    
+    const instances = Array(numInstances);
+    for (let i = 0; i < numInstances; i++) {
+      const instanceId = dataView2.getInt32(index2, true);
+      index2 += Int32Array.BYTES_PER_ELEMENT;
+  
+      const psSize = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+      const ps = new Float32Array(dataView2.buffer, dataView2.byteOffset + index2, psSize);
+      index2 += psSize * Float32Array.BYTES_PER_ELEMENT;
+  
+      const qsSize = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+      const qs = new Float32Array(dataView2.buffer, dataView2.byteOffset + index2, qsSize);
+      index2 += qsSize * Float32Array.BYTES_PER_ELEMENT;
+  
+      instances[i] = {
+        instanceId,
+        ps,
+        qs,
+      };
+    }
+  
+    return {
+      bufferAddress,
+      instances,
+    };
+  };
 
   const terrainGeometry = _parseTerrainVertexBuffer();
   const waterGeometry = _parseWaterVertexBuffer();
   const barrierGeometry = _parseBarrierVertexBuffer();
+  const vegetationInstances = _parseInstances();
+  const grassInstances = _parseInstances();
+  
   return {
     bufferAddress,
     terrainGeometry,
     waterGeometry,
     barrierGeometry,
+    vegetationInstances,
+    grassInstances,
   };
 };
-w.createChunkMeshAsync = async (inst, taskId, x, z, lod, lodArray, generateFlagsInt) => {
+w.createChunkMeshAsync = async (
+  inst,
+  taskId,
+  x, z,
+  lod,
+  lodArray,
+  generateFlagsInt,
+  numVegetationInstances,
+  numGrassInstances,
+) => {
   const allocator = new Allocator(Module);
 
   const lodArray2 = allocator.alloc(Int32Array, 2);
@@ -466,6 +517,8 @@ w.createChunkMeshAsync = async (inst, taskId, x, z, lod, lodArray, generateFlags
     lod,
     lodArray2.byteOffset,
     generateFlagsInt,
+    numVegetationInstances,
+    numGrassInstances,
   );
   const p = makePromise();
   cbs.set(taskId, p);
@@ -484,7 +537,7 @@ w.createChunkMeshAsync = async (inst, taskId, x, z, lod, lodArray, generateFlags
     return null;
   }
 };
-w.createChunkGrassAsync = async (inst, taskId, x, z, lod, numGrassInstances) => {
+/* w.createChunkGrassAsync = async (inst, taskId, x, z, lod, numGrassInstances) => {
   Module._createChunkGrassAsync(
     inst,
     taskId,
@@ -507,8 +560,8 @@ w.createChunkGrassAsync = async (inst, taskId, x, z, lod, numGrassInstances) => 
   } else {
     return null;
   }
-};
-w.createChunkVegetationAsync = async (inst, taskId, x, z, lod, numVegetationInstances) => {
+}; */
+/* w.createChunkVegetationAsync = async (inst, taskId, x, z, lod, numVegetationInstances) => {
   Module._createChunkVegetationAsync(
     inst,
     taskId,
@@ -531,7 +584,7 @@ w.createChunkVegetationAsync = async (inst, taskId, x, z, lod, numVegetationInst
   } else {
     return null;
   }
-};
+}; */
 
 //
 
@@ -677,7 +730,7 @@ w.getChunkAoAsync = async (inst, taskId, x, y, z, lod) => {
   return aos2;
 }; */
 
-function _parseInstances(arrayBuffer, bufferAddress) {
+const _parseInstances = (arrayBuffer, bufferAddress) => {
   const dataView = new DataView(arrayBuffer, bufferAddress);
   let index = 0;
 
@@ -710,7 +763,7 @@ function _parseInstances(arrayBuffer, bufferAddress) {
     bufferAddress,
     instances,
   };
-}
+};
 /* w.createGrassSplatAsync = async (inst, taskId, x, z, lod, priority) => {
   // const allocator = new Allocator(Module);
 
