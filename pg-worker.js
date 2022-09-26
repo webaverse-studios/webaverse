@@ -19,6 +19,7 @@ const _cloneChunkResult = chunkResult => {
     terrainGeometry,
     waterGeometry,
     barrierGeometry,
+    vegetationInstances,
     grassInstances,
   } = chunkResult;
 
@@ -61,11 +62,13 @@ const _cloneChunkResult = chunkResult => {
   const terrainGeometrySize = _getTerrainGeometrySize();
   const waterGeometrySize = _getWaterGeometrySize();
   const barrierGeometrySize = _getBarrierGeometrySize();
+  const vegetationInstancesSize = _getInstancesSize(vegetationInstances);
   const grassInstancesSize = _getInstancesSize(grassInstances);
   const arrayBuffer = new ArrayBuffer(
     terrainGeometrySize +
     waterGeometrySize +
     barrierGeometrySize +
+    vegetationInstancesSize +
     grassInstancesSize
   );
   let index = 0;
@@ -209,6 +212,7 @@ const _cloneChunkResult = chunkResult => {
   const terrainGeometry2 = _cloneTerrainGeometry();
   const waterGeometry2 = _cloneWaterGeometry();
   const barrierGeometry2 = _cloneBarrierGeometry();
+  const vegetationInstances2 = _cloneInstances(vegetationInstances);
   const grassInstances2 = _cloneInstances(grassInstances);
 
   return {
@@ -216,6 +220,7 @@ const _cloneChunkResult = chunkResult => {
     terrainGeometry: terrainGeometry2,
     waterGeometry: waterGeometry2,
     barrierGeometry: barrierGeometry2,
+    vegetationInstances: vegetationInstances2,
     grassInstances: grassInstances2,
   };
 };
@@ -363,6 +368,7 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
         lod,
         lodArray,
         generateFlagsInt,
+        numVegetationInstances,
         numGrassInstances,
       } = args;
       const instance = instances.get(instanceKey);
@@ -378,6 +384,7 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
         lod,
         lodArray,
         generateFlagsInt,
+        numVegetationInstances,
         numGrassInstances,
       );
       const chunkResult2 = _cloneChunkResult(chunkResult);
@@ -428,7 +435,7 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
       };
       return spec;
     } */
-    case 'generateVegetation': {
+    /* case 'generateVegetation': {
       const {chunkPosition, lod, numVegetationInstances} = args;
       const instance = instances.get(instanceKey);
       if (!instance) throw new Error('generateVegetation : instance not found');
@@ -457,7 +464,7 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
         ],
       };
       return spec;
-    }
+    } */
     /* case 'generateLiquidChunk': {
       const {chunkPosition, lod, lodArray} = args;
       const instance = instances.get(instanceKey);

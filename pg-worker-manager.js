@@ -190,6 +190,7 @@ export class PGWorkerManager {
     lod,
     lodArray,
     generateFlags,
+    numVegetationInstances,
     numGrassInstances,
     {
       signal = null,
@@ -202,6 +203,7 @@ export class PGWorkerManager {
       lod,
       lodArray,
       generateFlagsInt,
+      numVegetationInstances,
       numGrassInstances,
     }, {signal});
     // signal.throwIfAborted();
@@ -217,7 +219,7 @@ export class PGWorkerManager {
     // signal.throwIfAborted();
     return result;
   } */
-  async generateVegetation(chunkPosition, lod, numVegetationInstances, {signal} = {}) {
+  /* async generateVegetation(chunkPosition, lod, numVegetationInstances, {signal} = {}) {
     const result = await this.worker.request('generateVegetation', {
       instance: this.instance,
       chunkPosition,
@@ -226,7 +228,7 @@ export class PGWorkerManager {
     }, {signal});
     // signal.throwIfAborted();
     return result;
-  }
+  } */
   /* async generateLiquidChunk(chunkPosition, lod, lodArray, {signal} = {}) {
     const result = await this.worker.request('generateLiquidChunk', {
       instance: this.instance,

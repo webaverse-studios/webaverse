@@ -476,6 +476,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
   const terrainGeometry = _parseTerrainVertexBuffer();
   const waterGeometry = _parseWaterVertexBuffer();
   const barrierGeometry = _parseBarrierVertexBuffer();
+  const vegetationInstances = _parseInstances();
   const grassInstances = _parseInstances();
   
   return {
@@ -483,6 +484,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
     terrainGeometry,
     waterGeometry,
     barrierGeometry,
+    vegetationInstances,
     grassInstances,
   };
 };
@@ -493,6 +495,7 @@ w.createChunkMeshAsync = async (
   lod,
   lodArray,
   generateFlagsInt,
+  numVegetationInstances,
   numGrassInstances,
 ) => {
   const allocator = new Allocator(Module);
@@ -507,6 +510,7 @@ w.createChunkMeshAsync = async (
     lod,
     lodArray2.byteOffset,
     generateFlagsInt,
+    numVegetationInstances,
     numGrassInstances,
   );
   const p = makePromise();
@@ -550,7 +554,7 @@ w.createChunkMeshAsync = async (
     return null;
   }
 }; */
-w.createChunkVegetationAsync = async (inst, taskId, x, z, lod, numVegetationInstances) => {
+/* w.createChunkVegetationAsync = async (inst, taskId, x, z, lod, numVegetationInstances) => {
   Module._createChunkVegetationAsync(
     inst,
     taskId,
@@ -573,7 +577,7 @@ w.createChunkVegetationAsync = async (inst, taskId, x, z, lod, numVegetationInst
   } else {
     return null;
   }
-};
+}; */
 
 //
 
