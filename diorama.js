@@ -653,9 +653,7 @@ const createPlayerDiorama = ({
         for (const light of lightsManager.lights) {
           const oldParent = light.parent;
           restoreFn.push(() => {
-            if(oldParent){
-              oldParent.add(light);
-            }
+            oldParent.add(light);
           });
           scene.add(light);
         }
