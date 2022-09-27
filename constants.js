@@ -198,24 +198,24 @@ export const defaultAvatarQuality = 3;
 // ------ todo: Use infos from wasm.
 
 export const AnimationGroupIndex = {
-  Single: 0,
+  single: 0,
   //
-  Walk: 1,
-  Run: 2,
-  Crouch: 3,
+  walk: 1,
+  run: 2,
+  crouch: 3,
   //
-  Activate: 4,
-  Aim: 5,
-  Dance: 6,
-  Emote: 7,
-  Hold: 8,
-  Hurt: 9,
-  Land: 10,
-  NarutoRun: 11,
-  PickUp: 12,
-  Sit: 13,
-  Swim: 14,
-  Use: 15,
+  activate: 4,
+  aim: 5,
+  dance: 6,
+  emote: 7,
+  hold: 8,
+  hurt: 9,
+  land: 10,
+  narutoRun: 11,
+  pickUp: 12,
+  sit: 13,
+  swim: 14,
+  use: 15,
 };
 
 // ---
@@ -348,7 +348,7 @@ export const UseAnimationIndex = {
   magic: 4,
   eat: 5,
   drink: 6,
-  throw: 7, // note: Have to use uppercase. Lower case "throw" will cause key word conflict error "error: expected identifier".
+  throw: 7,
   pickUpThrow: 8,
   bowDraw: 9,
   bowIdle: 10,
