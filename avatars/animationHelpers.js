@@ -35,7 +35,16 @@ import {
   // avatarInterpolationTimeDelay,
   // avatarInterpolationNumFrames,
   narutoRunTimeFactor,
+  UseAnimationIndex,
+  EmoteAnimationIndex,
+  SitAnimationIndex,
+  DanceAnimationIndex,
+  ActivateAnimationIndex,
+  HurtAnimationIndex,
+  AimAnimationIndex,
 } from '../constants.js';
+
+window.UseAnimationIndex = UseAnimationIndex;
 
 let animations;
 let animationStepIndices;
@@ -44,8 +53,8 @@ let animationStepIndices;
 let initedAnimationSystem = false;
 
 const animationGroups = {};
+window.animationGroups = animationGroups;
 animationGroups.single = {};
-const AnimationUInt = {};
 
 let emoteAnimations;
 let speedFactors;
@@ -446,7 +455,6 @@ export const _createAnimation = avatar => {
     for (const groupName in animationGroups) {
       for (const keyName in animationGroups[groupName]) {
         const animation = animationGroups[groupName][keyName];
-        AnimationUInt[keyName] = keyNameUInt;
         physx.physxWorker.setAnimationGroup(
           animation.ptr,
           groupName,
@@ -467,13 +475,6 @@ export const _createAnimation = avatar => {
       speedFactors.grab_left,
       speedFactors.grab_right,
       speedFactors.pick_up,
-
-      AnimationUInt[defaultSitAnimation] || 0,
-      AnimationUInt[defaultEmoteAnimation] || 0,
-      AnimationUInt[defaultDanceAnimation] || 0,
-      AnimationUInt[defaultHoldAnimation] || 0,
-      AnimationUInt[defaultActivateAnimation] || 0,
-      AnimationUInt[defaultNarutoRunAnimation] || 0,
     ]);
     initedAnimationSystem = true;
   }
@@ -638,25 +639,27 @@ export const _updateAnimation = (avatar, now) => {
       avatar.aimTime,
       aimMaxTime,
       avatar.pickUpTime,
-      AnimationUInt[avatar.useAnimation] || 0,
-      AnimationUInt[avatar.emoteAnimation] || 0,
-      AnimationUInt[avatar.sitAnimation] || 0,
-      AnimationUInt[avatar.danceAnimation] || 0,
-      AnimationUInt[avatar.activateAnimation] || 0,
-      AnimationUInt[avatar.hurtAnimation] || 0,
-      AnimationUInt[useAnimationComboName] || 0,
-      AnimationUInt[avatar.unuseAnimation] || 0,
-      AnimationUInt[avatar.aimAnimation] || 0,
+      UseAnimationIndex[avatar.useAnimation],
+      EmoteAnimationIndex[avatar.emoteAnimation],
+      SitAnimationIndex[avatar.sitAnimation],
+      DanceAnimationIndex[avatar.danceAnimation],
+      ActivateAnimationIndex[avatar.activateAnimation],
+      HurtAnimationIndex[avatar.hurtAnimation],
+      UseAnimationIndex[useAnimationComboName],
+      UseAnimationIndex[avatar.unuseAnimation],
+      AimAnimationIndex[avatar.aimAnimation],
       avatar.fallLoopFrom === 'jump' ? 1 : 0,
       landTimeS,
       timeSinceLastMoveS,
     ];
     avatar.useAnimationEnvelope.forEach(useAnimationEnvelopeName => {
-      values.push(AnimationUInt[useAnimationEnvelopeName] || 0);
+      values.push(UseAnimationIndex[useAnimationEnvelopeName] || 0);
     });
     physx.physxWorker.updateAnimationAvatar(avatar.animationAvatarPtr, values);
   };
   updateValues();
+
+  // console.log(avatar.useAnimation)
 
   let resultValues;
   const doUpdate = () => {

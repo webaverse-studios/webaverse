@@ -194,3 +194,169 @@ export const defaultWorldSeed = 100;
 export const minAvatarQuality = 1;
 export const maxAvatarQuality = 4;
 export const defaultAvatarQuality = 3;
+
+// ------ todo: Use infos from wasm.
+
+export const AnimationGroupIndex = {
+  Single: 0,
+  //
+  Walk: 1,
+  Run: 2,
+  Crouch: 3,
+  //
+  Activate: 4,
+  Aim: 5,
+  Dance: 6,
+  Emote: 7,
+  Hold: 8,
+  Hurt: 9,
+  Land: 10,
+  NarutoRun: 11,
+  PickUp: 12,
+  Sit: 13,
+  Swim: 14,
+  Use: 15,
+};
+
+// ---
+
+export const SingleAnimationIndex = {
+  idle: 0,
+  crouchIdle: 1,
+  jump: 2,
+  doubleJump: 3,
+  fallLoop: 4,
+  float: 5,
+};
+
+// ---
+
+export const WalkAnimationIndex = {
+  forward: 0,
+  backward: 1,
+  left: 2,
+  leftMirror: 3,
+  right: 4,
+  rightMirror: 5,
+};
+
+export const RunAnimationIndex = {
+  forward: 0,
+  backward: 1,
+  left: 2,
+  leftMirror: 3,
+  right: 4,
+  rightMirror: 5,
+};
+
+export const CrouchAnimationIndex = {
+  forward: 0,
+  backward: 1,
+  left: 2,
+  leftMirror: 3,
+  right: 4,
+  rightMirror: 5,
+};
+
+// ---
+
+export const ActivateAnimationIndex = {
+  grab_forward: 0,
+  grab_down: 1,
+  grab_up: 2,
+  grab_left: 3,
+  grab_right: 4,
+  pick_up: 5,
+};
+
+export const AimAnimationIndex = {
+  swordSideIdle: 0,
+  swordSideSlash: 1,
+  swordSideSlashStep: 2,
+  swordTopDownSlash: 3,
+  swordTopDownSlashStep: 4,
+};
+
+export const DanceAnimationIndex = {
+  dansu: 0,
+  powerup: 1,
+};
+
+export const EmoteAnimationIndex = {
+  alert: 0,
+  alertSoft: 1,
+  angry: 2,
+  angrySoft: 3,
+  embarrassed: 4,
+  embarrassedSoft: 5,
+  headNod: 6,
+  headNodSoft: 7,
+  headShake: 8,
+  headShakeSoft: 9,
+  sad: 10,
+  sadSoft: 11,
+  surprise: 12,
+  surpriseSoft: 13,
+  victory: 14,
+  victorySoft: 15,
+};
+
+export const HoldAnimationIndex = {
+  pick_up_idle: 0,
+};
+
+export const HurtAnimationIndex = {
+  pain_back: 0,
+  pain_arch: 1,
+};
+
+export const LandAnimationIndex = {
+  landing: 0,
+  landing2: 1,
+};
+
+export const NarutoRunAnimationIndex = {
+  narutoRun: 0,
+};
+
+export const PickUpAnimationIndex = {
+  pickUp: 0,
+  pickUpIdle: 1,
+  pickUpThrow: 2,
+  putDown: 3,
+  pickUpZelda: 4,
+  pickUpIdleZelda: 5,
+  putDownZelda: 6,
+};
+
+export const SitAnimationIndex = {
+  chair: 0,
+  saddle: 1,
+  stand: 2,
+};
+
+export const SwimAnimationIndex = {
+  breaststroke: 0,
+  freestyle: 1,
+};
+
+export const UseAnimationIndex = {
+  combo: 0,
+  slash: 1,
+  rifle: 2,
+  pistol: 3,
+  magic: 4,
+  eat: 5,
+  drink: 6,
+  throw: 7, // note: Have to use uppercase. Lower case "throw" will cause key word conflict error "error: expected identifier".
+  pickUpThrow: 8,
+  bowDraw: 9,
+  bowIdle: 10,
+  bowLoose: 11,
+  pickaxe: 12,
+  swordSideIdle: 13,
+  swordSideSlash: 14,
+  swordSideSlashStep: 15,
+  swordTopDownSlash: 16,
+  swordTopDownSlashStep: 17,
+};
