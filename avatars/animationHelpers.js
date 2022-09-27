@@ -648,7 +648,7 @@ export const _updateAnimation = (avatar, now) => {
       UseAnimationIndex[useAnimationComboName],
       UseAnimationIndex[avatar.unuseAnimation],
       AimAnimationIndex[avatar.aimAnimation],
-      avatar.fallLoopFrom === 'jump' ? 1 : 0,
+      avatar.fallLoopFrom === 'jump' ? 0 : -1,
       landTimeS,
       timeSinceLastMoveS,
     ];
