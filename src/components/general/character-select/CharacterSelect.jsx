@@ -104,7 +104,7 @@ export const CharacterSelect = () => {
             const app = await metaversefile.createAppAsync({
                 start_url: typeContentToUrl('application/npc', detachedCharacter),
             });
-            return npcManager.getNpcByApp(app);
+            return npcManager.getDetachedNpcByApp(app);
         },
     }));
     const [ themeSongLoader, setThemeSongLoader ] = useState(() => new CachedLoader({
@@ -113,7 +113,7 @@ export const CharacterSelect = () => {
             signal.addEventListener('abort', () => {
               live = false;
             });
-            themeSong = await LocalPlayer.fetchThemeSong(targetCharacter.themeSongUrl);
+            const themeSong = await LocalPlayer.fetchThemeSong(targetCharacter.themeSongUrl);
             if (!live) return;
             return themeSong;
         },

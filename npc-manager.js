@@ -45,6 +45,10 @@ class NpcManager extends EventTarget {
     return this.npcs.find(npc => this.getAppByNpc(npc) === app);
   }
 
+  getDetachedNpcByApp(app) {
+    return this.detachedNpcs.find(npc => this.getAppByNpc(npc) === app);
+  }
+
   async initDefaultPlayer() {
     const defaultPlayerSpec = await characterSelectManager.getDefaultSpecAsync();
     const localPlayer = metaversefile.useLocalPlayer();
