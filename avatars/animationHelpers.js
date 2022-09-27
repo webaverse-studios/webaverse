@@ -450,22 +450,6 @@ export const _createAnimation = avatar => {
       animationIndex++;
     }
 
-    // note: can't use animationGroups to create wasm animations, there'are duplicated animations.
-    let keyNameUInt = 1;
-    for (const groupName in animationGroups) {
-      for (const keyName in animationGroups[groupName]) {
-        const animation = animationGroups[groupName][keyName];
-        physx.physxWorker.setAnimationGroup(
-          animation.ptr,
-          groupName,
-          keyName,
-          keyNameUInt,
-        );
-        // console.log('js', groupName, keyName, animation.name)
-        keyNameUInt++;
-      }
-    }
-
     //
 
     physx.physxWorker.initAnimationSystem([
