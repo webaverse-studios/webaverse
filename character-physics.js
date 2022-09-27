@@ -70,7 +70,7 @@ class CharacterPhysics {
     this.capsuleHeight = characterHeight - characterWidth;
 
     const contactOffset = 0.01 * this.capsuleHeight;
-    const stepOffset = 0.2 * this.capsuleHeight;
+    const stepOffset = 0.1 * this.capsuleHeight;
 
     const position = this.character.position.clone();
 
