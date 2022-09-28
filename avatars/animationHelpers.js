@@ -288,25 +288,6 @@ export const loadPromise = (async () => {
   // swordSideSlash = animations.find(a => a.isSwordSideSlash);
   // swordTopDownSlash = animations.find(a => a.isSwordTopDownSlash)
 
-  animationGroups.emote = {
-    alert: animations.find(a => a.isAlert),
-    alertSoft: animations.find(a => a.isAlertSoft),
-    angry: animations.find(a => a.isAngry),
-    angrySoft: animations.find(a => a.isAngrySoft),
-    embarrassed: animations.find(a => a.isEmbarrassed),
-    embarrassedSoft: animations.find(a => a.isEmbarrassedSoft),
-    headNod: animations.find(a => a.isHeadNod),
-    headNodSoft: animations.find(a => a.isHeadNodSingle),
-    headShake: animations.find(a => a.isHeadShake),
-    headShakeSoft: animations.find(a => a.isHeadShakeSingle),
-    sad: animations.find(a => a.isSad),
-    sadSoft: animations.find(a => a.isSadSoft),
-    surprise: animations.find(a => a.isSurprise),
-    surpriseSoft: animations.find(a => a.isSurpriseSoft),
-    victory: animations.find(a => a.isVictory),
-    victorySoft: animations.find(a => a.isVictorySoft),
-  };
-  emoteAnimations = animationGroups.emote;
   speedFactors = { // todo: define in wasm directly.
     grab_forward: 1.2,
     grab_down: 1.7,
@@ -380,6 +361,31 @@ export const _createAnimation = avatar => {
       speedFactors.grab_right,
       speedFactors.pick_up,
     ]);
+
+    // get data back from wasm to js ------------------------------------------------
+
+    animationGroups.emote = { // todo: wasm api
+      alert: animations.find(a => a.isAlert),
+      alertSoft: animations.find(a => a.isAlertSoft),
+      angry: animations.find(a => a.isAngry),
+      angrySoft: animations.find(a => a.isAngrySoft),
+      embarrassed: animations.find(a => a.isEmbarrassed),
+      embarrassedSoft: animations.find(a => a.isEmbarrassedSoft),
+      headNod: animations.find(a => a.isHeadNod),
+      headNodSoft: animations.find(a => a.isHeadNodSingle),
+      headShake: animations.find(a => a.isHeadShake),
+      headShakeSoft: animations.find(a => a.isHeadShakeSingle),
+      sad: animations.find(a => a.isSad),
+      sadSoft: animations.find(a => a.isSadSoft),
+      surprise: animations.find(a => a.isSurprise),
+      surpriseSoft: animations.find(a => a.isSurpriseSoft),
+      victory: animations.find(a => a.isVictory),
+      victorySoft: animations.find(a => a.isVictorySoft),
+    };
+    emoteAnimations = animationGroups.emote;
+
+    // end: get data back from wasm to js ------------------------------------------------
+
     initedAnimationSystem = true;
   }
 
