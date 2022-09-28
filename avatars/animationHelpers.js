@@ -54,7 +54,6 @@ let initedAnimationSystem = false;
 
 const animationGroups = {};
 window.animationGroups = animationGroups;
-animationGroups.single = {};
 
 let emoteAnimations;
 let speedFactors;
@@ -289,46 +288,6 @@ export const loadPromise = (async () => {
   // swordSideSlash = animations.find(a => a.isSwordSideSlash);
   // swordTopDownSlash = animations.find(a => a.isSwordTopDownSlash)
 
-  animationGroups.single.jump = animations.find(a => a.isJump);
-  animationGroups.single.doubleJump = animations.find(a => a.isDoubleJump);
-  animationGroups.single.fallLoop = animations.index['falling.fbx'];
-  // animationGroups.single.sitting = animations.find(a => a.isSitting);
-  animationGroups.single.float = animations.find(a => a.isFloat);
-  // animationGroups.single.rifle = animations.find(a => a.isRifle);
-  // animationGroups.single.hit = animations.find(a => a.isHit);
-  animationGroups.aim = {
-    swordSideIdle: animations.index['sword_idle_side.fbx'],
-    // swordSideIdleStatic: animations.index['sword_idle_side_static.fbx'],
-    swordSideSlash: animations.index['sword_side_slash.fbx'],
-    swordSideSlashStep: animations.index['sword_side_slash_step.fbx'],
-    swordTopDownSlash: animations.index['sword_topdown_slash.fbx'],
-    swordTopDownSlashStep: animations.index['sword_topdown_slash_step.fbx'],
-    // swordUndraw: animations.index['sword_undraw.fbx'],
-  };
-  animationGroups.use = mergeAnimations({
-    combo: animations.find(a => a.isCombo),
-    slash: animations.find(a => a.isSlash),
-    rifle: animations.find(a => a.isRifle),
-    pistol: animations.find(a => a.isPistol),
-    magic: animations.find(a => a.isMagic),
-    eat: animations.find(a => a.isEating),
-    drink: animations.find(a => a.isDrinking),
-    throw: animations.find(a => a.isThrow),
-    pickUpThrow: animations.find(a => a.isPickUpThrow),
-    bowDraw: animations.find(a => a.isBowDraw),
-    bowIdle: animations.find(a => a.isBowIdle),
-    bowLoose: animations.find(a => a.isBowLoose),
-    pickaxe: animations.find(a => a.isPickaxe),
-  }, animationGroups.aim);
-  animationGroups.sit = {
-    chair: animations.find(a => a.isSitting),
-    saddle: animations.find(a => a.isSitting),
-    stand: animations.find(a => a.isSkateboarding),
-  };
-  animationGroups.dance = {
-    dansu: animations.find(a => a.isDancing),
-    powerup: animations.find(a => a.isPowerUp),
-  };
   animationGroups.emote = {
     alert: animations.find(a => a.isAlert),
     alertSoft: animations.find(a => a.isAlertSoft),
@@ -348,31 +307,7 @@ export const loadPromise = (async () => {
     victorySoft: animations.find(a => a.isVictorySoft),
   };
   emoteAnimations = animationGroups.emote;
-  animationGroups.pickUp = {
-    pickUp: animations.find(a => a.isPickUp),
-    pickUpIdle: animations.find(a => a.isPickUpIdle),
-    pickUpThrow: animations.find(a => a.isPickUpThrow),
-    putDown: animations.find(a => a.isPutDown),
-    pickUpZelda: animations.find(a => a.isPickUpZelda),
-    pickUpIdleZelda: animations.find(a => a.isPickUpIdleZelda),
-    putDownZelda: animations.find(a => a.isPutDownZelda),
-  };
-  /* animationGroups.throw = {
-    throw: animations.find(a => a.isThrow),
-    pickUpThrow: animations.find(a => a.isPickUpThrow),
-  }; */
-  /* animationGroups.crouch = {
-      crouch: animations.find(a => a.isCrouch),
-    }; */
-  animationGroups.activate = {
-    grab_forward: animations.index['grab_forward.fbx'],
-    grab_down: animations.index['grab_down.fbx'],
-    grab_up: animations.index['grab_up.fbx'],
-    grab_left: animations.index['grab_left.fbx'],
-    grab_right: animations.index['grab_right.fbx'],
-    pick_up: animations.index['pick_up.fbx'],
-  };
-  speedFactors = {
+  speedFactors = { // todo: define in wasm directly.
     grab_forward: 1.2,
     grab_down: 1.7,
     grab_up: 1.2,
@@ -380,24 +315,9 @@ export const loadPromise = (async () => {
     grab_right: 1.2,
     pick_up: 1,
   };
-  animationGroups.narutoRun = {
-    narutoRun: animations.find(a => a.isNarutoRun),
-  };
-  animationGroups.hurt = {
-    pain_back: animations.index['pain_back.fbx'],
-    pain_arch: animations.index['pain_arch.fbx'],
-  };
-  animationGroups.hold = {
-    pick_up_idle: animations.index['pick_up_idle.fbx'],
-  };
-  animationGroups.land = {
-    landing: animations.index['landing.fbx'],
-    landing2: animations.index['landing 2.fbx'],
-  };
-  animationGroups.swim = {
-    breaststroke: animations.index['Swimming.fbx'],
-    freestyle: animations.index['freestyle.fbx'],
-  };
+  // animationGroups.narutoRun = { // todo:
+  //   narutoRun: animations.find(a => a.isNarutoRun),
+  // };
   // { // todo:
   //   const down10QuaternionArray = new Quaternion()
   //     .setFromAxisAngle(new Vector3(1, 0, 0), Math.PI * 0.1)
