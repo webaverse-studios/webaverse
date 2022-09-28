@@ -289,6 +289,8 @@ export const CharacterSelect = () => {
             return () => {
                 clearTimeout(timeout);
             };
+        } else {
+            musicManager.stopCurrentMusic();
         }
     }, [opened, targetCharacter]);
     useEffect(() => {
