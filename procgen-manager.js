@@ -12,6 +12,28 @@ const localArray2D = Array(2);
 
 //
 
+const GenerateFlags = {
+  // none: 0,
+  terrain: 1 << 0,
+  water: 1 << 1,
+  barrier: 1 << 2,
+  vegetation: 1 << 3,
+  grass: 1 << 4,
+  poi: 1 << 5,
+};
+const _generateFlagsToInt = generateFlags => {
+  let result = 0;
+  generateFlags.terrain && (result |= GenerateFlags.terrain);
+  generateFlags.water && (result |= GenerateFlags.water);
+  generateFlags.barrier && (result |= GenerateFlags.barrier);
+  generateFlags.vegetation && (result |= GenerateFlags.vegetation);
+  generateFlags.grass && (result |= GenerateFlags.grass);
+  generateFlags.poi && (result |= GenerateFlags.poi);
+  return result;
+};
+
+//
+
 class ProcGenInstance {
   constructor(instance, {
     chunkSize,
@@ -53,6 +75,7 @@ class ProcGenInstance {
     generateFlags,
     numVegetationInstances,
     numGrassInstances,
+    numPoiInstances,
     {
       signal = null,
     } = {},
@@ -60,13 +83,15 @@ class ProcGenInstance {
     await this.pgWorkerManager.waitForLoad();
 
     position.toArray(localArray2D);
+    const generateFlagsInt = _generateFlagsToInt(generateFlags);
     const result = await this.pgWorkerManager.generateChunk(
       localArray2D,
       lod,
       lodArray,
-      generateFlags,
+      generateFlagsInt,
       numVegetationInstances,
       numGrassInstances,
+      numPoiInstances,
       {
         signal,
       },
