@@ -1070,7 +1070,9 @@ class LocalPlayer extends UninterpolatedPlayer {
     this.detached = opts.detached ?? false;
   }
   async setPlayerSpec(playerSpec) {
-    const p = this.setAvatarUrl({url: playerSpec.avatarUrl});
+    const p = this.setAvatarUrl({
+      url: playerSpec.avatarUrl,
+    });
     
     overrides.userVoiceEndpoint.set(playerSpec.voice ?? null);
     overrides.userVoicePack.set(playerSpec.voicePack ?? null);
