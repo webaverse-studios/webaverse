@@ -14,7 +14,7 @@ import { chatManager } from '../../../../chat-manager.js';
 import musicManager from '../../../../music-manager.js';
 import { CachedLoader } from '../../../CachedLoader.jsx';
 import { RpgText } from '../../../RpgText.jsx';
-import { chatTextSpeed, maxAvatarQuality } from '../../../../constants.js';
+import { chatTextSpeed, characterSelectAvatarQuality } from '../../../../constants.js';
 import { VoiceEndpointVoicer } from '../../../../voice-output/voice-endpoint-voicer.js';
 import * as voices from '../../../../voices.js';
 import {getVoiceEndpointUrl} from '../../../../voice-output/voice-endpoint-voicer.js';
@@ -104,7 +104,7 @@ export const CharacterSelect = () => {
             const app = await metaversefile.createAppAsync({
                 start_url: typeContentToUrl('application/npc', detachedCharacter),
                 components: {
-                    quality: maxAvatarQuality,
+                    quality: characterSelectAvatarQuality,
                 },
             });
             return npcManager.getDetachedNpcByApp(app);
