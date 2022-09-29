@@ -273,21 +273,6 @@ export const loadPromise = (async () => {
   // fallLoop = animations.find(a => a.isFallLoop);
   // swordSideSlash = animations.find(a => a.isSwordSideSlash);
   // swordTopDownSlash = animations.find(a => a.isSwordTopDownSlash)
-  
-  // animationGroups.narutoRun = { // todo:
-  //   narutoRun: animations.find(a => a.isNarutoRun),
-  // };
-  // { // todo:
-  //   const down10QuaternionArray = new Quaternion()
-  //     .setFromAxisAngle(new Vector3(1, 0, 0), Math.PI * 0.1)
-  //     .toArray();
-  //   [
-  //     'mixamorigSpine1.quaternion',
-  //     'mixamorigSpine2.quaternion',
-  //   ].forEach(k => {
-  //     animationGroups.narutoRun.narutoRun.interpolants[k].evaluate = t => down10QuaternionArray;
-  //   });
-  // }
 })().catch(err => {
   console.log('load avatar animations error', err);
 });
