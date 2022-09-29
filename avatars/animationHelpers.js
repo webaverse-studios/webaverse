@@ -57,19 +57,6 @@ window.animationGroups = animationGroups;
 
 let emoteAnimations;
 
-const defaultSitAnimation = 'chair';
-// const defaultUseAnimation = 'combo';
-const defaultDanceAnimation = 'dansu';
-const defaultHoldAnimation = 'pick_up_idle';
-const defaultEmoteAnimation = 'angry';
-// const defaultThrowAnimation = 'throw';
-// const defaultCrouchAnimation = 'crouch';
-const defaultActivateAnimation = 'grab_forward';
-const defaultNarutoRunAnimation = 'narutoRun';
-// const defaultchargeJumpAnimation = 'chargeJump';
-// const defaultStandChargeAnimation = 'standCharge';
-// const defaultHurtAnimation = 'pain_back';
-
 const animationsAngleArrays = {
   walk: [
     {name: 'left strafe walking.fbx', angle: Math.PI / 2},
