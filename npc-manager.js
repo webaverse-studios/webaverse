@@ -87,7 +87,7 @@ class NpcManager extends EventTarget {
     quaternion,
     scale,
     detached,
-    components
+    components,
   }) {
     const npcPlayer = new LocalPlayer({
       npc: true,
