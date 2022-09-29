@@ -112,7 +112,7 @@ class NpcManager extends EventTarget {
       npcPlayer.updateMatrixWorld();
     }
 
-    await npcPlayer.setAvatarUrl({u: avatarUrl, components});
+    await npcPlayer.setAvatarUrl({url: avatarUrl, components});
     npcPlayer.updateAvatar(0, 0);
 
     return npcPlayer;

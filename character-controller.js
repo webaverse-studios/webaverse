@@ -1070,7 +1070,7 @@ class LocalPlayer extends UninterpolatedPlayer {
     this.detached = opts.detached ?? false;
   }
   async setPlayerSpec(playerSpec) {
-    const p = this.setAvatarUrl({u: playerSpec.avatarUrl});
+    const p = this.setAvatarUrl({url: playerSpec.avatarUrl});
     
     overrides.userVoiceEndpoint.set(playerSpec.voice ?? null);
     overrides.userVoicePack.set(playerSpec.voicePack ?? null);
@@ -1085,12 +1085,12 @@ class LocalPlayer extends UninterpolatedPlayer {
     this.#setAvatarAppFromOwnAppManager(app);
   }
   async setAvatarUrl({
-    u,
+    url,
     components = [],
   }) {
     const localAvatarEpoch = ++this.avatarEpoch;
     const avatarApp = await this.appManager.addTrackedApp(
-      u,
+      url,
       new THREE.Vector3(),
       new THREE.Quaternion(),
       new THREE.Vector3(1, 1, 1),
