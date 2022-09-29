@@ -402,7 +402,6 @@ const _parseBarrierResult = (arrayBuffer, bufferAddress) => {
     index += Uint32Array.BYTES_PER_ELEMENT * numIndices;
   
     return {
-      bufferAddress,
       positions,
       normals,
       uvs,
