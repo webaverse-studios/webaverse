@@ -43,9 +43,6 @@ let animationStepIndices;
 
 let initedAnimationSystem = false;
 
-const animationGroups = {};
-window.animationGroups = animationGroups;
-
 const UseAnimationIndexes = {};
 const EmoteAnimationIndexes = {};
 const SitAnimationIndexes = {};
@@ -149,7 +146,6 @@ async function loadAnimations() {
       animation.tracks.index[track.name] = track;
     }
   }
-  window.animations = animations;
 
   /* const animationIndices = animationStepIndices.find(i => i.name === 'Fast Run.fbx');
           for (let i = 0; i < animationIndices.leftFootYDeltas.length; i++) {
@@ -316,7 +312,6 @@ export const _createAnimation = avatar => {
     //
 
     const animationGroupDeclarations = physx.physxWorker.initAnimationSystem();
-    console.log('animationGroupDeclarations', animationGroupDeclarations)
 
     // get data back from wasm to js ------------------------------------------------
 
@@ -457,7 +452,6 @@ export const _updateAnimation = (avatar, now) => {
     mirrorFactor = isBackward ? 1 : 0;
   }
   avatar.lastBackwardFactor = mirrorFactor;
-  // if (avatar === window.localPlayer?.avatar) window.domInfo.innerHTML += `<div style="display:;">mirrorFactor: --- ${window.logNum(mirrorFactor)}</div>`;
 
   const updateValues = () => {
     const forwardFactor = 1 - MathUtils.clamp(Math.abs(angle) / (Math.PI / 2), 0, 1);
