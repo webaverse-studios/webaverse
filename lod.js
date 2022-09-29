@@ -680,20 +680,10 @@ export class LodChunkTracker {
   onPostUpdate(fn) {
     this.listeners.postUpdate.push(fn);
   }
-  /* onChunkDataRequest(fn) {
-    this.listeners.chunkDataRequest.push(fn);
-  } */
   onChunkAdd(fn) {
     this.listeners.chunkAdd.push(fn);
   }
   onChunkRemove(fn) {
-    /* const hash = _getHashChunk(chunk);
-    let list = this.listeners.chunkRemove.get(hash);
-    if (!list) {
-      list = [];
-      this.listeners.chunkRemove.set(hash, list);
-    }
-    list.push(fn); */
     this.listeners.chunkRemove.push(fn);
   }
 
@@ -704,59 +694,13 @@ export class LodChunkTracker {
       this.listeners.postUpdate.splice(index, 1);
     }
   }
-  /* offChunkDataRequest(fn) {
-    const index = this.listeners.chunkDataRequest.indexOf(fn);
-    if (index !== -1) {
-      this.listeners.chunkDataRequest.splice(index, 1);
-    }
-  }
-  offChunkAdd(fn) {
-    const index = this.listeners.chunkAdd.indexOf(fn);
-    if (index !== -1) {
-      this.listeners.chunkAdd.splice(index, 1);
-    }
-  }
-  offChunkRemove(chunk, fn) {
-    const hash = _getHashChunk(chunk);
-    const list = this.listeners.chunkRemove.get(hash);
-    if (list) {
-      const index = list.indexOf(fn);
-      if (index !== -1) {
-        list.splice(index, 1);
-
-        if (list.length === 0) {
-          this.listeners.chunkRemove.delete(hash);
-        }
-      }
-    }
-  } */
 
   // emitter
-  postUpdate(result) {
+  postUpdate(position) {
     for (const listener of this.listeners.postUpdate) {
-      listener(result);
+      listener(position);
     }
   }
-  /* chunkDataRequest(result) {
-    for (const listener of this.listeners.chunkDataRequest) {
-      listener(result);
-    }
-  }
-  chunkAdd(result) {
-    for (const listener of this.listeners.chunkAdd) {
-      listener(result);
-    }
-  }
-  chunkRemove(chunk) {
-    const hash = _getHashChunk(chunk);
-    let list = this.listeners.chunkRemove.get(hash);
-    if (list) {
-      list = list.slice();
-      for (const listener of list) {
-        listener(chunk);
-      }
-    }
-  } */
   
   handleChunkAdd(dataRequest) {
     for (const listener of this.listeners.chunkAdd) {
