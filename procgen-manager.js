@@ -13,7 +13,6 @@ const localArray2D = Array(2);
 //
 
 const GenerateFlags = {
-  // none: 0,
   terrain: 1 << 0,
   water: 1 << 1,
   vegetation: 1 << 2,
@@ -44,9 +43,6 @@ class ProcGenInstance {
       seed,
       instance,
     });
-
-    // this.lightmapper = null;
-    // this.heightfieldMapper = null;
   }
   setCamera(worldPosition, cameraPosition, cameraQuaternion, projectionMatrix) {
     this.pgWorkerManager.setCamera(worldPosition, cameraPosition, cameraQuaternion, projectionMatrix);
@@ -96,50 +92,6 @@ class ProcGenInstance {
     );
     return result;
   }
-  /* async generateGrass(position, lod, numInstances, {signal} = {}) {
-    await this.pgWorkerManager.waitForLoad();
-
-    position.toArray(localArray2D);
-    const result = await this.pgWorkerManager.generateGrass(localArray2D, lod, numInstances, {signal});
-    return result;
-  } */
-  /* async generateVegetation(position, lod, numInstances, {signal} = {}) {
-    await this.pgWorkerManager.waitForLoad();
-
-    position.toArray(localArray2D);
-    const result = await this.pgWorkerManager.generateVegetation(localArray2D, lod, numInstances, {signal});
-    return result;
-  } */
-  /* async getLightMapper({
-    size,
-    debug = false,
-  }) {
-    if (!this.lightmapper) {
-      // const {chunkSize, range} = this;
-      this.lightmapper = new LightMapper({
-        // chunkSize,
-        // terrainSize,
-        // range,
-        procGenInstance: this,
-        size,
-        debug,
-      });
-    }
-    return this.lightmapper;
-  }
-  async getHeightfieldMapper({
-    size,
-    debug = false,
-  } = {}) {
-    if (!this.heightfieldMapper) {
-      this.heightfieldMapper = new HeightfieldMapper({
-        procGenInstance: this,
-        size,
-        debug,
-      });
-    }
-    return this.heightfieldMapper;
-  } */
 }
 
 class ProcGenManager {
