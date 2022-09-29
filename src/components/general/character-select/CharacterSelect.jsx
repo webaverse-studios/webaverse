@@ -135,6 +135,9 @@ export const CharacterSelect = () => {
             ]);
             if (!live) return;
 
+            if (!characterIntro) {
+                throw new Error('empty character intro response');
+            }
             // preload audio
             const voiceEndpoint = voices.voiceEndpoints.find(voiceEndpoint => voiceEndpoint.name === targetCharacter.voice);
             if (!voiceEndpoint) {
