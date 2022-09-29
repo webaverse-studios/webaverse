@@ -1,7 +1,5 @@
 import * as THREE from 'three';
 import {defaultChunkSize} from './constants.js';
-import {abortError} from './lock-manager.js';
-import {makePromise} from './util.js';
 
 const localVector2D = new THREE.Vector2();
 
@@ -14,59 +12,6 @@ class OctreeNode {
     // this.onload = null;
   }
 }
-/* const containsPoint = (a, p) => {
-  return p.x >= a.min.x && p.x < a.min.x + a.lod &&
-    p.y >= a.min.y && p.y < a.min.y + a.lod &&
-    p.z >= a.min.z && p.z < a.min.z + a.lod;
-};
-const findLeafNodeForPosition = (nodes, p) => {
-  for (const node of nodes) {
-    if (containsPoint(node, p)) {
-      return node;
-    }
-  }
-  return null;
-}; */
-
-/* class DataRequest {
-  constructor(node) {
-    this.node = node;
-
-    this.abortController = new AbortController();
-    this.signal = this.abortController.signal;
-
-    this.loadPromise = makePromise();
-
-    this.node.dataRequest = this;
-
-    this.renderData = undefined;
-    this.loadPromise.then(renderData => {
-      this.renderData = renderData;
-      this.node.load(renderData);
-    }, err => {
-      const renderData = null;
-      this.renderData = renderData;
-      this.node.load(renderData);
-    });
-  }
-  replaceNode(node) {
-    this.node = node;
-    this.node.dataRequest = this;
-  }
-  cancel() {
-    this.abortController.abort(abortError);
-  }
-  waitForLoad() {
-    return this.loadPromise;
-  }
-  waitUntil(p) {
-    p.then(result => {
-      this.loadPromise.accept(result);
-    }).catch(err => {
-      this.loadPromise.reject(err);
-    });
-  }
-} */
 
 //
 
@@ -86,7 +31,6 @@ export class LodChunkTracker {
     this.tracker = null;
     this.chunks = [];
     this.displayChunks = []; // for debug mesh
-    // this.renderedChunks = new Map(); // hash -> OctreeNode
     this.dataRequests = new Map(); // hash -> DataRequest
     this.lastUpdateCoord = new THREE.Vector2(NaN, NaN);
 
@@ -107,16 +51,6 @@ export class LodChunkTracker {
     this.debug = debug;
     if (debug) {
       const maxChunks = 4096;
-      
-      /* const instancedCubeGeometry = new THREE.InstancedBufferGeometry();
-      {
-        const cubeGeometry = new THREE.BoxBufferGeometry(1, 1, 1)
-          .translate(0.5, 0.5, 0.5);
-        for (const k in cubeGeometry.attributes) {
-          instancedCubeGeometry.setAttribute(k, cubeGeometry.attributes[k]);
-        }
-        instancedCubeGeometry.setIndex(cubeGeometry.index);
-      } */
 
       const instancedPlaneGeometry = new THREE.InstancedBufferGeometry();
       {
@@ -249,7 +183,6 @@ export class LodChunkTracker {
       newDataRequests,
       // keepDataRequests,
       cancelDataRequests,
-      // chunkMin,
     } = trackerUpdateSpec;
 
     const _reifyNode = nodeSpec => {
