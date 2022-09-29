@@ -331,14 +331,9 @@ export const _createAnimation = avatar => {
 
     //
 
-    physx.physxWorker.initAnimationSystem([
-      // speedFactors.grab_forward,
-      // speedFactors.grab_down,
-      // speedFactors.grab_up,
-      // speedFactors.grab_left,
-      // speedFactors.grab_right,
-      // speedFactors.pick_up,
-    ]);
+    const animationGroupDeclarations = physx.physxWorker.initAnimationSystem();
+
+    console.log('animationGroupDeclarations', animationGroupDeclarations)
 
     // get data back from wasm to js ------------------------------------------------
 
