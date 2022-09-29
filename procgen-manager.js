@@ -92,6 +92,27 @@ class ProcGenInstance {
     );
     return result;
   }
+  async generateBarrier(
+    position,
+    minLod,
+    maxLod,
+    {
+      signal = null,
+    } = {},
+  ) {
+    await this.pgWorkerManager.waitForLoad();
+
+    position.toArray(localArray2D);
+    const result = await this.pgWorkerManager.generateBarrier(
+      localArray2D,
+      minLod,
+      maxLod,
+      {
+        signal,
+      },
+    );
+    return result;
+  }
 }
 
 class ProcGenManager {
