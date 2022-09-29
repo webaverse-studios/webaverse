@@ -371,41 +371,35 @@ const _parseBarrierResult = (arrayBuffer, bufferAddress) => {
   let index = 0;
 
   const _parseBarrierVertexBuffer = () => {
-    const bufferAddress = dataView.getUint32(index, true);
-    index += Uint32Array.BYTES_PER_ELEMENT;
-
-    const dataView2 = new DataView(arrayBuffer, bufferAddress);
-    let index2 = 0;
-
     // positions
-    const numPositions = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const positions = new Float32Array(arrayBuffer, bufferAddress + index2, numPositions * 3);
-    index2 += Float32Array.BYTES_PER_ELEMENT * numPositions * 3;
+    const numPositions = dataView.getUint32(index, true);
+    index += Uint32Array.BYTES_PER_ELEMENT;
+    const positions = new Float32Array(arrayBuffer, bufferAddress + index, numPositions * 3);
+    index += Float32Array.BYTES_PER_ELEMENT * numPositions * 3;
   
     // normals
-    const numNormals = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const normals = new Float32Array(arrayBuffer, bufferAddress + index2, numNormals * 3);
-    index2 += Float32Array.BYTES_PER_ELEMENT * numNormals * 3;
+    const numNormals = dataView.getUint32(index, true);
+    index += Uint32Array.BYTES_PER_ELEMENT;
+    const normals = new Float32Array(arrayBuffer, bufferAddress + index, numNormals * 3);
+    index += Float32Array.BYTES_PER_ELEMENT * numNormals * 3;
   
     // uvs
-    const numUvs = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const uvs = new Float32Array(arrayBuffer, bufferAddress + index2, numUvs * 2);
-    index2 += Float32Array.BYTES_PER_ELEMENT * numUvs * 2;
+    const numUvs = dataView.getUint32(index, true);
+    index += Uint32Array.BYTES_PER_ELEMENT;
+    const uvs = new Float32Array(arrayBuffer, bufferAddress + index, numUvs * 2);
+    index += Float32Array.BYTES_PER_ELEMENT * numUvs * 2;
 
     // positions2D
-    const numPositions2D = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const positions2D = new Int32Array(arrayBuffer, bufferAddress + index2, numPositions2D * 2);
-    index2 += Int32Array.BYTES_PER_ELEMENT * numPositions2D * 2;
+    const numPositions2D = dataView.getUint32(index, true);
+    index += Uint32Array.BYTES_PER_ELEMENT;
+    const positions2D = new Int32Array(arrayBuffer, bufferAddress + index, numPositions2D * 2);
+    index += Int32Array.BYTES_PER_ELEMENT * numPositions2D * 2;
   
     // indices
-    const numIndices = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const indices = new Uint32Array(arrayBuffer, bufferAddress + index2, numIndices);
-    index2 += Uint32Array.BYTES_PER_ELEMENT * numIndices;
+    const numIndices = dataView.getUint32(index, true);
+    index += Uint32Array.BYTES_PER_ELEMENT;
+    const indices = new Uint32Array(arrayBuffer, bufferAddress + index, numIndices);
+    index += Uint32Array.BYTES_PER_ELEMENT * numIndices;
   
     return {
       bufferAddress,
@@ -417,11 +411,59 @@ const _parseBarrierResult = (arrayBuffer, bufferAddress) => {
     };
   };
 
+  const _parseLeafNodes = () => {
+    const numLeafNodes = dataView.getUint32(index, true);
+    index += Uint32Array.BYTES_PER_ELEMENT;
+    
+    const leafNodes = Array(numLeafNodes);
+    for (let i = 0; i < numLeafNodes; i++) {
+      const min = new Int32Array(arrayBuffer, bufferAddress + index, 2);
+      index += Int32Array.BYTES_PER_ELEMENT * 2;
+      
+      const lod = dataView.getInt32(index, true);
+      index += Int32Array.BYTES_PER_ELEMENT;
+      
+      leafNodes[i] = {
+        min,
+        lod,
+      };
+    }
+    
+    const leafNodesMin = new Int32Array(arrayBuffer, bufferAddress + index, 2);
+    index += Int32Array.BYTES_PER_ELEMENT * 2;
+    
+    const leafNodesMax = new Int32Array(arrayBuffer, bufferAddress + index, 2);
+    index += Int32Array.BYTES_PER_ELEMENT * 2;
+    
+    const w = leafNodesMax[0] - leafNodesMin[0];
+    const h = leafNodesMax[1] - leafNodesMin[1];
+
+    const leafNodesIndex = new Int32Array(arrayBuffer, bufferAddress + index, w * h);
+    index += Int32Array.BYTES_PER_ELEMENT * w * h;
+    
+    return {
+      leafNodes,
+      leafNodesMin,
+      leafNodesMax,
+      leafNodesIndex,
+    };
+  };
+
   const barrierGeometry = _parseBarrierVertexBuffer();
+  const {
+    leafNodes,
+    leafNodesMin,
+    leafNodesMax,
+    leafNodesIndex,
+  } = _parseLeafNodes();
 
   return {
     bufferAddress,
     barrierGeometry,
+    leafNodes,
+    leafNodesMin,
+    leafNodesMax,
+    leafNodesIndex,
   };
 };
 w.createBarrierMeshAsync = async (
