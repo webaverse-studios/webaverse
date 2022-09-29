@@ -56,7 +56,6 @@ const animationGroups = {};
 window.animationGroups = animationGroups;
 
 let emoteAnimations;
-let speedFactors;
 
 const defaultSitAnimation = 'chair';
 // const defaultUseAnimation = 'combo';
@@ -287,15 +286,7 @@ export const loadPromise = (async () => {
   // fallLoop = animations.find(a => a.isFallLoop);
   // swordSideSlash = animations.find(a => a.isSwordSideSlash);
   // swordTopDownSlash = animations.find(a => a.isSwordTopDownSlash)
-
-  speedFactors = { // todo: define in wasm directly.
-    grab_forward: 1.2,
-    grab_down: 1.7,
-    grab_up: 1.2,
-    grab_left: 1.2,
-    grab_right: 1.2,
-    pick_up: 1,
-  };
+  
   // animationGroups.narutoRun = { // todo:
   //   narutoRun: animations.find(a => a.isNarutoRun),
   // };
@@ -354,12 +345,12 @@ export const _createAnimation = avatar => {
     //
 
     physx.physxWorker.initAnimationSystem([
-      speedFactors.grab_forward,
-      speedFactors.grab_down,
-      speedFactors.grab_up,
-      speedFactors.grab_left,
-      speedFactors.grab_right,
-      speedFactors.pick_up,
+      // speedFactors.grab_forward,
+      // speedFactors.grab_down,
+      // speedFactors.grab_up,
+      // speedFactors.grab_left,
+      // speedFactors.grab_right,
+      // speedFactors.pick_up,
     ]);
 
     // get data back from wasm to js ------------------------------------------------
