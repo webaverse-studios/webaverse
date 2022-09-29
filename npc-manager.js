@@ -87,6 +87,7 @@ class NpcManager extends EventTarget {
     quaternion,
     scale,
     detached,
+    components
   }) {
     const npcPlayer = new LocalPlayer({
       npc: true,
@@ -111,7 +112,7 @@ class NpcManager extends EventTarget {
       npcPlayer.updateMatrixWorld();
     }
 
-    await npcPlayer.setAvatarUrl(avatarUrl);
+    await npcPlayer.setAvatarUrl({u: avatarUrl, components});
     npcPlayer.updateAvatar(0, 0);
 
     return npcPlayer;
@@ -461,6 +462,7 @@ class NpcManager extends EventTarget {
         quaternion: app.quaternion,
         scale: app.scale,
         detached: npcDetached,
+        components: app.components,
       });
 
       this.addPlayerApp(app, newNpcPlayer, json);
