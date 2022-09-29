@@ -35,7 +35,7 @@ export class GeometryAllocator {
     {
       this.geometry = new THREE.BufferGeometry();
       for (const attributeSpec of attributeSpecs) {
-        const { name, Type, itemSize } = attributeSpec;
+        const {name, Type, itemSize} = attributeSpec;
 
         const array = new Type(bufferSize * itemSize);
         this.geometry.setAttribute(
