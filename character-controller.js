@@ -53,7 +53,7 @@ import overrides from './overrides.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
-// const localQuaternion = new THREE.Quaternion();
+const localQuaternion = new THREE.Quaternion();
 // const localQuaternion2 = new THREE.Quaternion();
 const localMatrix = new THREE.Matrix4();
 const localMatrix2 = new THREE.Matrix4();
@@ -1070,7 +1070,7 @@ class LocalPlayer extends UninterpolatedPlayer {
     this.detached = opts.detached ?? false;
   }
   async setPlayerSpec(playerSpec) {
-    const p = this.setAvatarUrl(playerSpec.avatarUrl);
+    const p = this.loadAvatar(playerSpec.avatarUrl);
     
     overrides.userVoiceEndpoint.set(playerSpec.voice ?? null);
     overrides.userVoicePack.set(playerSpec.voicePack ?? null);
@@ -1084,9 +1084,17 @@ class LocalPlayer extends UninterpolatedPlayer {
   setAvatarApp(app) {
     this.#setAvatarAppFromOwnAppManager(app);
   }
-  async setAvatarUrl(u) {
+  async loadAvatar(url, {
+    components = [],
+  } = {}) {
     const localAvatarEpoch = ++this.avatarEpoch;
-    const avatarApp = await this.appManager.addTrackedApp(u);
+    const avatarApp = await this.appManager.addTrackedApp(
+      url,
+      localVector.set(0, 0, 0),
+      localQuaternion.set(0, 0, 0, 1),
+      localVector2.set(1, 1, 1),
+      components,
+    );
     // avatarApp.parent.remove(avatarApp);
     if (this.avatarEpoch !== localAvatarEpoch) {
       this.appManager.removeTrackedApp(avatarApp.instanceId);

@@ -45,6 +45,10 @@ class NpcManager extends EventTarget {
     return this.npcs.find(npc => this.getAppByNpc(npc) === app);
   }
 
+  getDetachedNpcByApp(app) {
+    return this.detachedNpcs.find(npc => this.getAppByNpc(npc) === app);
+  }
+
   async initDefaultPlayer() {
     const defaultPlayerSpec = await characterSelectManager.getDefaultSpecAsync();
     const localPlayer = metaversefile.useLocalPlayer();
@@ -83,6 +87,7 @@ class NpcManager extends EventTarget {
     quaternion,
     scale,
     detached,
+    components,
   }) {
     const npcPlayer = new LocalPlayer({
       npc: true,
@@ -107,7 +112,9 @@ class NpcManager extends EventTarget {
       npcPlayer.updateMatrixWorld();
     }
 
-    await npcPlayer.setAvatarUrl(avatarUrl);
+    await npcPlayer.loadAvatar(avatarUrl, {
+      components,
+    });
     npcPlayer.updateAvatar(0, 0);
 
     return npcPlayer;
@@ -457,6 +464,7 @@ class NpcManager extends EventTarget {
         quaternion: app.quaternion,
         scale: app.scale,
         detached: npcDetached,
+        components: app.components,
       });
 
       this.addPlayerApp(app, newNpcPlayer, json);
