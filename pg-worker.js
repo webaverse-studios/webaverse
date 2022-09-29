@@ -40,14 +40,14 @@ const _cloneChunkResult = chunkResult => {
       waterGeometry.indices.length * waterGeometry.indices.constructor.BYTES_PER_ELEMENT;
     return size;
   };
-  const _getBarrierGeometrySize = () => {
+  /* const _getBarrierGeometrySize = () => {
     let size = barrierGeometry.positions.length * barrierGeometry.positions.constructor.BYTES_PER_ELEMENT +
       barrierGeometry.normals.length * barrierGeometry.normals.constructor.BYTES_PER_ELEMENT +
       barrierGeometry.uvs.length * barrierGeometry.uvs.constructor.BYTES_PER_ELEMENT +
       barrierGeometry.positions2D.length * barrierGeometry.positions2D.constructor.BYTES_PER_ELEMENT +
       barrierGeometry.indices.length * barrierGeometry.indices.constructor.BYTES_PER_ELEMENT;
     return size;
-  };
+  }; */
   const _getPQIInstancesSize = instancesResult => {
     const {instances} = instancesResult;
     let size = 0;
@@ -69,14 +69,14 @@ const _cloneChunkResult = chunkResult => {
 
   const terrainGeometrySize = _getTerrainGeometrySize();
   const waterGeometrySize = _getWaterGeometrySize();
-  const barrierGeometrySize = _getBarrierGeometrySize();
+  // const barrierGeometrySize = _getBarrierGeometrySize();
   const vegetationInstancesSize = _getPQIInstancesSize(vegetationInstances);
   const grassInstancesSize = _getPQIInstancesSize(grassInstances);
   const poiInstancesSize = _getPIInstancesSize(poiInstances);
   const arrayBuffer = new ArrayBuffer(
     terrainGeometrySize +
     waterGeometrySize +
-    barrierGeometrySize +
+    // barrierGeometrySize +
     vegetationInstancesSize +
     grassInstancesSize +
     poiInstancesSize
@@ -166,7 +166,7 @@ const _cloneChunkResult = chunkResult => {
       indices,
     };
   };
-  const _cloneBarrierGeometry = () => {
+  /* const _cloneBarrierGeometry = () => {
     const positions = new barrierGeometry.positions.constructor(arrayBuffer, index, barrierGeometry.positions.length);
     positions.set(barrierGeometry.positions);
     index += barrierGeometry.positions.length * barrierGeometry.positions.constructor.BYTES_PER_ELEMENT;
@@ -194,7 +194,7 @@ const _cloneChunkResult = chunkResult => {
       positions2D,
       indices,
     };
-  };
+  }; */
   const _clonePQIInstances = instancesResult => {
     const {instances} = instancesResult;
     const instances2 = Array(instances.length);
@@ -235,7 +235,7 @@ const _cloneChunkResult = chunkResult => {
 
   const terrainGeometry2 = _cloneTerrainGeometry();
   const waterGeometry2 = _cloneWaterGeometry();
-  const barrierGeometry2 = _cloneBarrierGeometry();
+  // const barrierGeometry2 = _cloneBarrierGeometry();
   const vegetationInstances2 = _clonePQIInstances(vegetationInstances);
   const grassInstances2 = _clonePQIInstances(grassInstances);
   const poiInstances2 = _clonePIInstances(poiInstances);
@@ -244,13 +244,13 @@ const _cloneChunkResult = chunkResult => {
     arrayBuffer,
     terrainGeometry: terrainGeometry2,
     waterGeometry: waterGeometry2,
-    barrierGeometry: barrierGeometry2,
+    // barrierGeometry: barrierGeometry2,
     vegetationInstances: vegetationInstances2,
     grassInstances: grassInstances2,
     poiInstances: poiInstances2,
   };
 };
-const _cloneInstancesResult = instancesResult => {
+/* const _cloneInstancesResult = instancesResult => {
   const {instances} = instancesResult;
 
   const _getInstancesSize = () => {
@@ -297,7 +297,7 @@ const _cloneInstancesResult = instancesResult => {
     arrayBuffer,
     instances: instances2,
   };
-};
+}; */
 
 const instances = new Map();
 
@@ -314,7 +314,7 @@ const _cloneTrackerUpdate = trackerUpdate => {
     newDataRequests: trackerUpdate.newDataRequests.map(_cloneNode),
     keepDataRequests: trackerUpdate.keepDataRequests.map(_cloneNode),
     cancelDataRequests: trackerUpdate.cancelDataRequests.map(_cloneNode),
-    chunkMin: trackerUpdate.chunkMin,
+    // chunkMin: trackerUpdate.chunkMin,
   };
 };
 
@@ -420,7 +420,6 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
       const _freeChunkResult = chunkResult => {
         pg.free(chunkResult.terrainGeometry.bufferAddress);
         pg.free(chunkResult.waterGeometry.bufferAddress);
-        pg.free(chunkResult.barrierGeometry.bufferAddress);
         pg.free(chunkResult.grassInstances.bufferAddress);
         pg.free(chunkResult.poiInstances.bufferAddress);
         pg.free(chunkResult.bufferAddress);

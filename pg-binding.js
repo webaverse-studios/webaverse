@@ -100,24 +100,24 @@ const _parseTrackerUpdate = bufferAddress => {
       newNodes,
     };
   }; */
-  const _parseChunkMin = () => {
+  /* const _parseChunkMin = () => {
     const min = new Int32Array(Module.HEAPU8.buffer, bufferAddress + index, 2).slice();
     index += 2 * Int32Array.BYTES_PER_ELEMENT;
     return min;
-  };
+  }; */
 
   const leafNodes = _parseNodes();
   const newDataRequests = _parseNodes();
   const keepDataRequests = _parseNodes();
   const cancelDataRequests = _parseNodes();
-  const chunkMin = _parseChunkMin();
+  // const chunkMin = _parseChunkMin();
 
   return {
     leafNodes,
     newDataRequests,
     keepDataRequests,
     cancelDataRequests,
-    chunkMin,
+    // chunkMin,
   };
 };
 w.createTracker = (inst, lod, lod1Range) => {
@@ -257,6 +257,7 @@ w.eraseSphereDamage = function() {
 }; */
 
 //
+
 const _parseChunkResult = (arrayBuffer, bufferAddress) => {
   const dataView = new DataView(arrayBuffer, bufferAddress);
   let index = 0;
@@ -389,7 +390,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
       indices,
     };
   };
-  const _parseBarrierVertexBuffer = () => {
+  /* const _parseBarrierVertexBuffer = () => {
     const bufferAddress = dataView.getUint32(index, true);
     index += Uint32Array.BYTES_PER_ELEMENT;
 
@@ -434,7 +435,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
       positions2D,
       indices,
     };
-  };
+  }; */
   const _parsePQIInstances = () => {
     const bufferAddress = dataView.getUint32(index, true);
     index += Uint32Array.BYTES_PER_ELEMENT;
@@ -498,7 +499,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
 
   const terrainGeometry = _parseTerrainVertexBuffer();
   const waterGeometry = _parseWaterVertexBuffer();
-  const barrierGeometry = _parseBarrierVertexBuffer();
+  // const barrierGeometry = _parseBarrierVertexBuffer();
   const vegetationInstances = _parsePQIInstances();
   const grassInstances = _parsePQIInstances();
   const poiInstances = _parsePIInstances();
@@ -507,7 +508,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
     bufferAddress,
     terrainGeometry,
     waterGeometry,
-    barrierGeometry,
+    // barrierGeometry,
     vegetationInstances,
     grassInstances,
     poiInstances,
@@ -549,6 +550,96 @@ w.createChunkMeshAsync = async (
 
   if (outputBufferOffset) {
     const result = _parseChunkResult(
+      Module.HEAP8.buffer,
+      Module.HEAP8.byteOffset + outputBufferOffset
+    );
+    return result;
+  } else {
+    return null;
+  }
+};
+
+//
+
+const _parseBarrierResult = (arrayBuffer, bufferAddress) => {
+  const dataView = new DataView(arrayBuffer, bufferAddress);
+  let index = 0;
+
+  const _parseBarrierVertexBuffer = () => {
+    const bufferAddress = dataView.getUint32(index, true);
+    index += Uint32Array.BYTES_PER_ELEMENT;
+
+    const dataView2 = new DataView(arrayBuffer, bufferAddress);
+    let index2 = 0;
+
+    // positions
+    const numPositions = dataView2.getUint32(index2, true);
+    index2 += Uint32Array.BYTES_PER_ELEMENT;
+    const positions = new Float32Array(arrayBuffer, bufferAddress + index2, numPositions * 3);
+    index2 += Float32Array.BYTES_PER_ELEMENT * numPositions * 3;
+  
+    // normals
+    const numNormals = dataView2.getUint32(index2, true);
+    index2 += Uint32Array.BYTES_PER_ELEMENT;
+    const normals = new Float32Array(arrayBuffer, bufferAddress + index2, numNormals * 3);
+    index2 += Float32Array.BYTES_PER_ELEMENT * numNormals * 3;
+  
+    // uvs
+    const numUvs = dataView2.getUint32(index2, true);
+    index2 += Uint32Array.BYTES_PER_ELEMENT;
+    const uvs = new Float32Array(arrayBuffer, bufferAddress + index2, numUvs * 2);
+    index2 += Float32Array.BYTES_PER_ELEMENT * numUvs * 2;
+
+    // positions2D
+    const numPositions2D = dataView2.getUint32(index2, true);
+    index2 += Uint32Array.BYTES_PER_ELEMENT;
+    const positions2D = new Int32Array(arrayBuffer, bufferAddress + index2, numPositions2D * 2);
+    index2 += Int32Array.BYTES_PER_ELEMENT * numPositions2D * 2;
+  
+    // indices
+    const numIndices = dataView2.getUint32(index2, true);
+    index2 += Uint32Array.BYTES_PER_ELEMENT;
+    const indices = new Uint32Array(arrayBuffer, bufferAddress + index2, numIndices);
+    index2 += Uint32Array.BYTES_PER_ELEMENT * numIndices;
+  
+    return {
+      bufferAddress,
+      positions,
+      normals,
+      uvs,
+      positions2D,
+      indices,
+    };
+  };
+
+  const barrierGeometry = _parseBarrierVertexBuffer();
+
+  return {
+    bufferAddress,
+    barrierGeometry,
+  };
+};
+w.createBarrierMeshAsync = async (
+  inst,
+  taskId,
+  x, z,
+  minLod,
+  maxLod,
+) => {
+  Module._createBarrierMeshAsync(
+    inst,
+    taskId,
+    x, z,
+    minLod,
+    maxLod
+  );
+  const p = makePromise();
+  cbs.set(taskId, p);
+
+  const outputBufferOffset = await p;
+
+  if (outputBufferOffset) {
+    const result = _parseBarrierResult(
       Module.HEAP8.buffer,
       Module.HEAP8.byteOffset + outputBufferOffset
     );

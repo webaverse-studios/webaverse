@@ -728,9 +728,9 @@ export class LodChunkTracker {
     let {
       leafNodes,
       newDataRequests,
-      keepDataRequests,
+      // keepDataRequests,
       cancelDataRequests,
-      chunkMin,
+      // chunkMin,
     } = trackerUpdateSpec;
 
     const _reifyNode = nodeSpec => {
@@ -741,15 +741,13 @@ export class LodChunkTracker {
         lodArray,
       );
     };
-    leafNodes = leafNodes.map(_reifyNode);
+    if (this.debug) {
+      leafNodes = leafNodes.map(_reifyNode);
+      this.displayChunks = leafNodes;
+    }
     newDataRequests = newDataRequests.map(_reifyNode);
-    keepDataRequests = keepDataRequests.map(_reifyNode);
+    // keepDataRequests = keepDataRequests.map(_reifyNode);
     cancelDataRequests = cancelDataRequests.map(_reifyNode);
-
-    // debug mesh
-    this.displayChunks = leafNodes;
-    // console.log('got leaf nodes', leafNodes);
-    // debugger;
 
     for (const cancelDataRequest of cancelDataRequests) {
       this.handleChunkRemove(cancelDataRequest);
@@ -757,82 +755,8 @@ export class LodChunkTracker {
     for (const newDataRequest of newDataRequests) {
       this.handleChunkAdd(newDataRequest);
     }
-    /* for (const keepDataRequest of keepDataRequests) {
-      this.handleKeepChunk(keepDataRequest);
-    } */
 
-    /* // data requests
-    {
-      // cancel old data requests
-      const oldDataRequests = Array.from(this.dataRequests.entries());
-      for (const [hash, oldDataRequest] of oldDataRequests) {
-        const matchingLeafNode = leafNodes.find(leafNode => {
-          return equalsNodeLod(leafNode, oldDataRequest.node)
-        });
-        if (matchingLeafNode) {
-          // keep the data request
-          oldDataRequest.replaceNode(matchingLeafNode);
-        } else {
-          // cancel the data request
-          oldDataRequest.cancel();
-          // forget the data request
-          this.dataRequests.delete(hash);
-        }
-      }
-
-      // add new data requests
-      for (const chunk of leafNodes) {
-        const hash = _getHashChunk(chunk);
-        if (!this.dataRequests.has(hash)) {
-          const dataRequest = new DataRequest(chunk);
-          const {signal} = dataRequest;
-          let waited = false;
-
-          this.chunkDataRequest({
-            chunk,
-            waitUntil(promise) {
-              dataRequest.waitUntil(promise);
-              waited = true;
-            },
-            signal,
-          });
-
-          if (!waited) {
-            dataRequest.waitUntil(Promise.resolve({
-              unwaited: true,
-            }));
-          }
-          this.dataRequests.set(hash, dataRequest);
-        }
-      }
-    }
-
-    {
-      const oldRenderedChunks = Array.from(this.renderedChunks.values());
-      const newRenderedChunks = Array.from(this.dataRequests.values()).map(dataRequest => dataRequest.node);
-      const addChunk = (chunk, isNew) => {
-        const oldLeafNode = findLeafNodeForPosition(oldRenderedChunks, chunk.min);
-        const newLeafNode = findLeafNodeForPosition(newRenderedChunks, chunk.min);
-        let maxLodChunk;
-        if (oldLeafNode && newLeafNode) {
-          maxLodChunk = oldLeafNode.lod > newLeafNode.lod ? oldLeafNode : newLeafNode;
-        } else if (oldLeafNode) {
-          maxLodChunk = oldLeafNode;
-        } else if (newLeafNode) {
-          maxLodChunk = newLeafNode;
-        } else {
-          throw new Error('no chunk match in any leaf set');
-        }
-      };
-      for (const chunk of oldRenderedChunks) {
-        addChunk(chunk, false);
-      }
-      for (const chunk of newRenderedChunks) {
-        addChunk(chunk, true);
-      }
-    } */
-
-    this.postUpdate(chunkMin);
+    this.postUpdate(position);
   }
   update(position) {
     // update coordinate
@@ -844,6 +768,7 @@ export class LodChunkTracker {
           this.isUpdating = true;
 
           const positionClone = position.clone();
+          // const currentCoordClone = currentCoord.clone();
           await this.updateInternal(positionClone);
 
           this.isUpdating = false;
