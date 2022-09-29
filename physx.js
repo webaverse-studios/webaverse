@@ -2347,10 +2347,8 @@ const physxWorker = (() => {
     const jsonStrByteLength = Module._initAnimationSystem(
       scratchStack.ptr,
     )
-    console.log('jsonStrByteLength', jsonStrByteLength)
 
     const jsonStr = textDecoder.decode(scratchStack.u8.slice(0, jsonStrByteLength));
-    console.log('jsonStr', jsonStr)
     const animationGroupDeclarations = JSON.parse(jsonStr);
 
     const lowerCaseFirstLetter = (string) => {

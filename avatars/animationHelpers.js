@@ -427,15 +427,6 @@ export const _updateAnimation = (avatar, now) => {
     const mirrorRightFactor = mirrorFactor * rightFactor;
     const mirrorLeftFactorReverse = mirrorFactorReverse * leftFactor;
     const mirrorRightFactorReverse = mirrorFactorReverse * rightFactor;
-    // avatar.forwardFactor = forwardFactor; // test
-    // avatar.backwardFactor = backwardFactor; // test
-    // avatar.leftFactor = leftFactor; // test
-    // avatar.rightFactor = rightFactor; // test
-    // avatar.mirrorFactor = mirrorFactor; // test
-    // avatar.mirrorLeftFactorReverse = mirrorLeftFactorReverse; // test
-    // avatar.mirrorLeftFactor = mirrorLeftFactor; // test
-    // avatar.mirrorRightFactorReverse = mirrorRightFactorReverse; // test
-    // avatar.mirrorRightFactor = mirrorRightFactor; // test
 
     const useAnimationComboName = avatar.useAnimationCombo[avatar.useAnimationIndex];
 
@@ -485,7 +476,7 @@ export const _updateAnimation = (avatar, now) => {
       avatar.lastEmoteTime,
       avatar.useTime,
       avatar.useAnimationEnvelope.length,
-      avatar.hurtTime, // todo: why only get hurt once ? js side regression ?
+      avatar.hurtTime,
       avatar.unuseTime,
       avatar.aimTime,
       aimMaxTime,
@@ -509,8 +500,6 @@ export const _updateAnimation = (avatar, now) => {
     physx.physxWorker.updateAnimationAvatar(avatar.animationAvatarPtr, values);
   };
   updateValues();
-
-  // console.log(avatar.useAnimation)
 
   let resultValues;
   const doUpdate = () => {
