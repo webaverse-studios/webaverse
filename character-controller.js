@@ -53,7 +53,7 @@ import overrides from './overrides.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
-// const localQuaternion = new THREE.Quaternion();
+const localQuaternion = new THREE.Quaternion();
 // const localQuaternion2 = new THREE.Quaternion();
 const localMatrix = new THREE.Matrix4();
 const localMatrix2 = new THREE.Matrix4();
@@ -1093,10 +1093,11 @@ class LocalPlayer extends UninterpolatedPlayer {
     const localAvatarEpoch = ++this.avatarEpoch;
     const avatarApp = await this.appManager.addTrackedApp(
       url,
-      new THREE.Vector3(),
-      new THREE.Quaternion(),
-      new THREE.Vector3(1, 1, 1),
-      components);
+      localVector.set(0, 0, 0),
+      localQuaternion.set(0, 0, 0, 1),
+      localVector2.set(1, 1, 1),
+      components,
+    );
     // avatarApp.parent.remove(avatarApp);
     if (this.avatarEpoch !== localAvatarEpoch) {
       this.appManager.removeTrackedApp(avatarApp.instanceId);
