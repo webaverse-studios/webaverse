@@ -125,9 +125,10 @@ export const CharacterSelect = () => {
         loadFn: async (url, targetCharacter, {signal = null} = {}) => {
             // get ai text
             let live = true;
-            signal.addEventListener('abort', () => {
+            const abort = () => {
                 live = false;
-            });
+            };
+            signal.addEventListener('abort', abort);
             const loreAIScene = metaversefile.useLoreAIScene();
             const [
                 characterIntro,
@@ -136,6 +137,7 @@ export const CharacterSelect = () => {
                 loreAIScene.generateCharacterIntroPrompt(targetCharacter.name, targetCharacter.bio),
                 voices.waitForLoad(),
             ]);
+            signal.removeEventListener('abort', abort);
             if (!live) return;
 
             if (!characterIntro) {
