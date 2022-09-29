@@ -585,6 +585,7 @@ export class LodChunkTracker {
       chunkRemove: [],
     };
 
+    this.debug = debug;
     if (debug) {
       const maxChunks = 4096;
       
