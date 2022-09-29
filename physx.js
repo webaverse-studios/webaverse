@@ -17,7 +17,7 @@ const capsuleUpQuaternion = new THREE.Quaternion().setFromAxisAngle(
   Math.PI / 2
 )
 const textEncoder = new TextEncoder();
-// const textDecoder = new TextDecoder();
+const textDecoder = new TextDecoder();
 
 const physx = {};
 
@@ -2339,13 +2339,32 @@ const physxWorker = (() => {
     )
     return ptr;
   }
-  w.initAnimationSystem = (values) => {
-    values.forEach((value, i) => {
-      scratchStack.f32[i] = value;
-    })
-    Module._initAnimationSystem(
+  w.initAnimationSystem = (/* values */) => {
+    // values.forEach((value, i) => {
+    //   scratchStack.f32[i] = value;
+    // })
+
+    const jsonStrByteLength = Module._initAnimationSystem(
       scratchStack.ptr,
     )
+    console.log('jsonStrByteLength', jsonStrByteLength)
+
+    const jsonStr = textDecoder.decode(scratchStack.u8.slice(0, jsonStrByteLength));
+    console.log('jsonStr', jsonStr)
+    const animationGroupDeclarations = JSON.parse(jsonStr);
+
+    const lowerCaseFirstLetter = (string) => {
+      return string.charAt(0).toLowerCase() + string.slice(1);
+    }
+
+    animationGroupDeclarations.forEach(animationGroup => {
+      animationGroup.name = lowerCaseFirstLetter(animationGroup.name);
+      animationGroup.animations.forEach(animation => {
+        animation.keyName = lowerCaseFirstLetter(animation.keyName);
+      })
+    });
+
+    return animationGroupDeclarations;
   }
   w.createAnimationInterpolant = (animationPtr, parameterPositions, sampleValues, valueSize) => { // `valueSize` only support 3 ( Vector ) and 4 ( Quaternion ).
     const allocator = new Allocator(Module);
