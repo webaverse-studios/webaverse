@@ -2352,6 +2352,18 @@ const physxWorker = (() => {
     const jsonStr = textDecoder.decode(scratchStack.u8.slice(0, jsonStrByteLength));
     console.log('jsonStr', jsonStr)
     const animationGroupDeclarations = JSON.parse(jsonStr);
+
+    const lowerCaseFirstLetter = (string) => {
+      return string.charAt(0).toLowerCase() + string.slice(1);
+    }
+
+    animationGroupDeclarations.forEach(animationGroup => {
+      animationGroup.name = lowerCaseFirstLetter(animationGroup.name);
+      animationGroup.animations.forEach(animation => {
+        animation.keyName = lowerCaseFirstLetter(animation.keyName);
+      })
+    });
+
     return animationGroupDeclarations;
   }
   w.createAnimationInterpolant = (animationPtr, parameterPositions, sampleValues, valueSize) => { // `valueSize` only support 3 ( Vector ) and 4 ( Quaternion ).

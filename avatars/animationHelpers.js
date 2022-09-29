@@ -333,29 +333,13 @@ export const _createAnimation = avatar => {
 
     const animationGroupDeclarations = physx.physxWorker.initAnimationSystem();
 
-    console.log('animationGroupDeclarations', animationGroupDeclarations)
-
     // get data back from wasm to js ------------------------------------------------
 
-    animationGroups.emote = { // todo: wasm api
-      alert: animations.find(a => a.isAlert),
-      alertSoft: animations.find(a => a.isAlertSoft),
-      angry: animations.find(a => a.isAngry),
-      angrySoft: animations.find(a => a.isAngrySoft),
-      embarrassed: animations.find(a => a.isEmbarrassed),
-      embarrassedSoft: animations.find(a => a.isEmbarrassedSoft),
-      headNod: animations.find(a => a.isHeadNod),
-      headNodSoft: animations.find(a => a.isHeadNodSingle),
-      headShake: animations.find(a => a.isHeadShake),
-      headShakeSoft: animations.find(a => a.isHeadShakeSingle),
-      sad: animations.find(a => a.isSad),
-      sadSoft: animations.find(a => a.isSadSoft),
-      surprise: animations.find(a => a.isSurprise),
-      surpriseSoft: animations.find(a => a.isSurpriseSoft),
-      victory: animations.find(a => a.isVictory),
-      victorySoft: animations.find(a => a.isVictorySoft),
-    };
-    emoteAnimations = animationGroups.emote;
+    emoteAnimations = {};
+    const emoteAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'emote')[0];
+    emoteAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+      emoteAnimations[animationDeclaration.keyName] = animations.index[animationDeclaration.fileName];
+    });
 
     // end: get data back from wasm to js ------------------------------------------------
 
