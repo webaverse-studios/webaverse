@@ -207,7 +207,7 @@ export function applyCharacterActionsToAvatar(character, rig) {
   // rig.standChargeState = !!standCharge;
   rig.fallLoopTime = character.actionInterpolants.fallLoop.get();
   rig.fallLoopFactor = character.actionInterpolants.fallLoopTransition.getNormalized();
-  rig.fallLoopFrom = fallLoopAction ? fallLoopAction.from : '';
+  rig.fallLoopFromJump = fallLoopAction?.from === 'jump';
   // rig.fallLoopAnimation = fallLoopAnimation;
   rig.fallLoopState = !!fallLoopAction;
   rig.landState = !!landAction;
