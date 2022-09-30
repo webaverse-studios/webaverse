@@ -29,6 +29,7 @@ const _cloneChunkResult = chunkResult => {
       terrainGeometry.biomesWeights.length * terrainGeometry.biomesWeights.constructor.BYTES_PER_ELEMENT +
       terrainGeometry.biomesUvs1.length * terrainGeometry.biomesUvs1.constructor.BYTES_PER_ELEMENT +
       terrainGeometry.biomesUvs2.length * terrainGeometry.biomesUvs2.constructor.BYTES_PER_ELEMENT +
+      terrainGeometry.materials.length * terrainGeometry.materials.constructor.BYTES_PER_ELEMENT +
       terrainGeometry.materialsWeights.length * terrainGeometry.materialsWeights.constructor.BYTES_PER_ELEMENT +
       terrainGeometry.indices.length * terrainGeometry.indices.constructor.BYTES_PER_ELEMENT;
     return size;
@@ -99,6 +100,10 @@ const _cloneChunkResult = chunkResult => {
     biomesUvs2.set(terrainGeometry.biomesUvs2);
     index += terrainGeometry.biomesUvs2.length * terrainGeometry.biomesUvs2.constructor.BYTES_PER_ELEMENT;
 
+    const materials = new terrainGeometry.materials.constructor(arrayBuffer, index, terrainGeometry.materials.length);
+    materials.set(terrainGeometry.materials);
+    index += terrainGeometry.materials.length * terrainGeometry.materials.constructor.BYTES_PER_ELEMENT;
+
     const materialsWeights = new terrainGeometry.materialsWeights.constructor(arrayBuffer, index, terrainGeometry.materialsWeights.length);
     materialsWeights.set(terrainGeometry.materialsWeights);
     index += terrainGeometry.materialsWeights.length * terrainGeometry.materialsWeights.constructor.BYTES_PER_ELEMENT;
@@ -130,6 +135,7 @@ const _cloneChunkResult = chunkResult => {
       biomesWeights,
       biomesUvs1,
       biomesUvs2,
+      materials,
       materialsWeights,
       // seeds,
       indices,
