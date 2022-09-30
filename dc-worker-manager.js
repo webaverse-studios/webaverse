@@ -1,5 +1,5 @@
 // import * as THREE from 'three';
-import {chunkMinForPosition, getLockChunkId} from './util.js';
+// import {chunkMinForPosition, getLockChunkId} from './util.js';
 import {abortError} from './lock-manager.js';
 
 //
