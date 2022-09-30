@@ -464,7 +464,6 @@ class NpcManager extends EventTarget {
         quaternion: app.quaternion,
         scale: app.scale,
         detached: npcDetached,
-        components: app.components,
       });
 
       this.addPlayerApp(app, newNpcPlayer, json);
