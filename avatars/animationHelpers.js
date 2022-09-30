@@ -286,6 +286,7 @@ export const _createAnimation = avatar => {
         spec.isLastBone,
         spec.isTop,
         spec.isArm,
+        spec.boneName,
       );
     }
 
