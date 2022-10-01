@@ -2320,7 +2320,7 @@ const physxWorker = (() => {
 
     return resultValues;
   }
-  w.createAnimationMapping = (isPosition, index, isFirstBone, isLastBone, isTop, isArm, boneName) => {
+  w.createAnimationMapping = (isPosition, index, isTop, isArm, boneName) => {
     const bytes = textEncoder.encode(boneName)
     const nameByteLength = bytes.length;
     for (let i = 0; i < nameByteLength; i++) {
@@ -2328,7 +2328,7 @@ const physxWorker = (() => {
     }
 
     Module._createAnimationMapping(
-      isPosition, index, isFirstBone, isLastBone, isTop, isArm, scratchStack.ptr, nameByteLength,
+      isPosition, index, isTop, isArm, scratchStack.ptr, nameByteLength,
     )
   }
   w.createAnimation = (name, duration) => {

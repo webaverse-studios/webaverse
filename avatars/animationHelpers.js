@@ -1,4 +1,4 @@
-import {Vector3, Quaternion, /* AnimationClip, */ MathUtils} from 'three';
+import {MathUtils} from 'three';
 // import metaversefile from 'metaversefile';
 import {/* VRMSpringBoneImporter, VRMLookAtApplyer, */ VRMCurveMapper} from '@pixiv/three-vrm/lib/three-vrm.module.js';
 // import easing from '../easing.js';
@@ -6,6 +6,7 @@ import {/* VRMSpringBoneImporter, VRMLookAtApplyer, */ VRMCurveMapper} from '@pi
 import loaders from '../loaders.js';
 import {zbdecode} from 'zjs/encoding.mjs';
 import physx from '../physx.js';
+import {animationMappingConfig} from './AnimationMapping.js';
 
 import {
 //   getSkinnedMeshes,
@@ -40,8 +41,6 @@ import {
 let animations;
 let animationStepIndices;
 // let animationsBaseModel;
-
-let initedAnimationSystem = false;
 
 const UseAnimationIndexes = {};
 const EmoteAnimationIndexes = {};
@@ -246,7 +245,7 @@ export const loadPromise = (async () => {
   _normalizeAnimationDurations(crouchingForwardAnimations, crouchingForwardAnimations[0], 0.5);
   _normalizeAnimationDurations(crouchingBackwardAnimations, crouchingBackwardAnimations[0], 0.5);
 
-  function mergeAnimations(a, b) {
+  /* function mergeAnimations(a, b) {
     const o = {};
     for (const k in a) {
       o[k] = a[k];
@@ -255,7 +254,7 @@ export const loadPromise = (async () => {
       o[k] = b[k];
     }
     return o;
-  }
+  } */
   /* jumpAnimationSegments = {
       chargeJump: animations.find(a => a.isChargeJump),
       chargeJumpFall: animations.find(a => a.isChargeJumpFall),
@@ -268,18 +267,12 @@ export const loadPromise = (async () => {
   // fallLoop = animations.find(a => a.isFallLoop);
   // swordSideSlash = animations.find(a => a.isSwordSideSlash);
   // swordTopDownSlash = animations.find(a => a.isSwordTopDownSlash)
-})().catch(err => {
-  console.log('load avatar animations error', err);
-});
 
-export const _createAnimation = avatar => {
-  if (!initedAnimationSystem) { // note: just need to create wasm animations only once globally.
-    for (const spec of avatar.animationMappings) {
+  const initAnimationSystem = () => {
+    for (const spec of animationMappingConfig) {
       physx.physxWorker.createAnimationMapping(
         spec.isPosition,
         spec.index,
-        spec.isFirstBone,
-        spec.isLastBone,
         spec.isTop,
         spec.isArm,
         spec.boneName,
@@ -293,7 +286,7 @@ export const _createAnimation = avatar => {
       const animationPtr = physx.physxWorker.createAnimation(animation.name, animation.duration);
       animation.ptr = animationPtr;
       // for (const k in animation.interpolants) { // maybe wrong interpolant index order
-      for (const spec of avatar.animationMappings) { // correct interpolant index order
+      for (const spec of animationMappingConfig) { // correct interpolant index order
         const {
           animationTrackName: k,
         } = spec;
@@ -366,10 +359,13 @@ export const _createAnimation = avatar => {
     });
 
     // end: get data back from wasm to js ------------------------------------------------
+  };
+  initAnimationSystem();
+})().catch(err => {
+  console.log('load avatar animations error', err);
+});
 
-    initedAnimationSystem = true;
-  }
-
+export const _createAnimation = avatar => {
   avatar.mixerPtr = physx.physxWorker.createAnimationMixer();
   avatar.animationAvatarPtr = physx.physxWorker.createAnimationAvatar(avatar.mixerPtr);
 };
@@ -601,7 +597,7 @@ export const _findArmature = bone => {
   // return null; // can't happen
 };
 
-export const _getLerpFn = isPosition => isPosition ? Vector3.prototype.lerp : Quaternion.prototype.slerp;
+// export const _getLerpFn = isPosition => isPosition ? Vector3.prototype.lerp : Quaternion.prototype.slerp;
 
 export function getFirstPersonCurves(vrmExtension) {
   const DEG2RAD = Math.PI / 180; // MathUtils.DEG2RAD;

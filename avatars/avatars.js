@@ -46,7 +46,7 @@ import {
 import {easing} from '../math-utils.js';
 import metaversefile from 'metaversefile';
 
-import { getFirstPersonCurves, getClosest2AnimationAngles, loadPromise, _findArmature, _getLerpFn, _createAnimation, _updateAnimation } from './animationHelpers.js'
+import { getFirstPersonCurves, getClosest2AnimationAngles, loadPromise, _findArmature, _createAnimation, _updateAnimation } from './animationHelpers.js'
 
 import { animationMappingConfig } from './AnimationMapping.js';
 import Emoter from './Emoter.js'
@@ -854,12 +854,7 @@ class Avatar {
 
     this.animationMappings = animationMappingConfig.map((animationMapping, i) => {
       animationMapping = animationMapping.clone();
-      const isPosition = /\.position$/.test(animationMapping.animationTrackName);
-      animationMapping.dst = this.modelBoneOutputs[animationMapping.boneName][isPosition ? 'position' : 'quaternion'];
-      animationMapping.lerpFn = _getLerpFn(isPosition);
-      animationMapping.index = i;
-      animationMapping.isFirstBone = i === 0;
-      animationMapping.isLastBone = i === animationMappingConfig.length - 1;
+      animationMapping.dst = this.modelBoneOutputs[animationMapping.boneName][animationMapping.isPosition ? 'position' : 'quaternion'];
       return animationMapping;
     });
 
