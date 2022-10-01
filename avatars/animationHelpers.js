@@ -276,6 +276,7 @@ export const loadPromise = (async () => {
   // swordTopDownSlash = animations.find(a => a.isSwordTopDownSlash)
 
   const initAnimationSystem = () => {
+    console.log('--- initAnimationSystem');
     for (const spec of animationMappingConfig) {
       physx.physxWorker.createAnimationMapping(
         spec.isPosition,
