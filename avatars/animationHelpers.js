@@ -134,6 +134,7 @@ const _normalizeAnimationDurations = (animations, baseAnimation, factor = 1) => 
 };
 
 async function loadAnimations() {
+  // console.log('------ loadAnimations')
   const res = await fetch('/animations/animations.z');
   const arrayBuffer = await res.arrayBuffer();
   const uint8Array = new Uint8Array(arrayBuffer);
@@ -167,6 +168,7 @@ async function loadAnimations() {
 }
 
 async function loadSkeleton() {
+  // console.log('------ loadSkeleton')
   const srcUrl = '/animations/animations-skeleton.glb';
 
   let o;
@@ -186,6 +188,7 @@ async function loadSkeleton() {
 }
 
 export const loadPromise = (async () => {
+  console.log('------ loadPromise')
   await Promise.resolve(); // wait for metaversefile to be defined
 
   await Promise.all([
@@ -277,6 +280,7 @@ export const loadPromise = (async () => {
 });
 
 export const _createAnimation = avatar => {
+  console.log('------------ createAnimation')
   if (!initedAnimationSystem) { // note: just need to create wasm animations only once globally.
     for (const spec of avatar.animationMappings) {
       physx.physxWorker.createAnimationMapping(
@@ -317,7 +321,7 @@ export const _createAnimation = avatar => {
     //
 
     const animationGroupDeclarations = physx.physxWorker.initAnimationSystem();
-    console.log('animationGroupDeclarations', animationGroupDeclarations)
+    // console.log('animationGroupDeclarations', animationGroupDeclarations)
 
     // get data back from wasm to js ------------------------------------------------
 
