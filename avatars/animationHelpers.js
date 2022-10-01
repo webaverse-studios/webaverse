@@ -1,4 +1,4 @@
-import {Vector3, Quaternion, /* AnimationClip, */ MathUtils} from 'three';
+import {MathUtils} from 'three';
 // import metaversefile from 'metaversefile';
 import {/* VRMSpringBoneImporter, VRMLookAtApplyer, */ VRMCurveMapper} from '@pixiv/three-vrm/lib/three-vrm.module.js';
 // import easing from '../easing.js';
@@ -6,6 +6,7 @@ import {/* VRMSpringBoneImporter, VRMLookAtApplyer, */ VRMCurveMapper} from '@pi
 import loaders from '../loaders.js';
 import {zbdecode} from 'zjs/encoding.mjs';
 import physx from '../physx.js';
+import {animationMappingConfig} from './AnimationMapping.js';
 
 import {
 //   getSkinnedMeshes,
@@ -40,8 +41,6 @@ import {
 let animations;
 let animationStepIndices;
 // let animationsBaseModel;
-
-let initedAnimationSystem = false;
 
 const animationGroups = {};
 window.animationGroups = animationGroups;
@@ -188,7 +187,7 @@ async function loadSkeleton() {
 }
 
 export const loadPromise = (async () => {
-  console.log('------ loadPromise')
+  console.log('------ loadPromise');
   await Promise.resolve(); // wait for metaversefile to be defined
 
   await Promise.all([
@@ -253,7 +252,7 @@ export const loadPromise = (async () => {
   _normalizeAnimationDurations(crouchingForwardAnimations, crouchingForwardAnimations[0], 0.5);
   _normalizeAnimationDurations(crouchingBackwardAnimations, crouchingBackwardAnimations[0], 0.5);
 
-  function mergeAnimations(a, b) {
+  /* function mergeAnimations(a, b) {
     const o = {};
     for (const k in a) {
       o[k] = a[k];
@@ -262,7 +261,7 @@ export const loadPromise = (async () => {
       o[k] = b[k];
     }
     return o;
-  }
+  } */
   /* jumpAnimationSegments = {
       chargeJump: animations.find(a => a.isChargeJump),
       chargeJumpFall: animations.find(a => a.isChargeJumpFall),
@@ -277,103 +276,97 @@ export const loadPromise = (async () => {
   // swordTopDownSlash = animations.find(a => a.isSwordTopDownSlash)
 
   const initAnimationSystem = () => {
-    if (!initedAnimationSystem) { // note: just need to create wasm animations only once globally.
-      for (const spec of avatar.animationMappings) {
-        physx.physxWorker.createAnimationMapping(
-          spec.isPosition,
-          spec.index,
-          spec.isFirstBone,
-          spec.isLastBone,
-          spec.isTop,
-          spec.isArm,
-          spec.boneName,
+    for (const spec of animationMappingConfig) {
+      physx.physxWorker.createAnimationMapping(
+        spec.isPosition,
+        spec.index,
+        spec.isTop,
+        spec.isArm,
+        spec.boneName,
+      );
+    }
+
+    let animationIndex = 0;
+    for (const fileName in animations.index) {
+      const animation = animations.index[fileName];
+      animation.index = animationIndex;
+      const animationPtr = physx.physxWorker.createAnimation(animation.name, animation.duration);
+      animation.ptr = animationPtr;
+      // for (const k in animation.interpolants) { // maybe wrong interpolant index order
+      for (const spec of animationMappingConfig) { // correct interpolant index order
+        const {
+          animationTrackName: k,
+        } = spec;
+
+        const track = animation.tracks.index[k];
+        const valueSize = track.type === 'vector' ? 3 : 4;
+        physx.physxWorker.createAnimationInterpolant(
+          animationPtr,
+          track.times,
+          track.values,
+          valueSize,
         );
       }
-
-      let animationIndex = 0;
-      for (const fileName in animations.index) {
-        const animation = animations.index[fileName];
-        animation.index = animationIndex;
-        const animationPtr = physx.physxWorker.createAnimation(animation.name, animation.duration);
-        animation.ptr = animationPtr;
-        // for (const k in animation.interpolants) { // maybe wrong interpolant index order
-        for (const spec of avatar.animationMappings) { // correct interpolant index order
-          const {
-            animationTrackName: k,
-          } = spec;
-
-          const track = animation.tracks.index[k];
-          const valueSize = track.type === 'vector' ? 3 : 4;
-          physx.physxWorker.createAnimationInterpolant(
-            animationPtr,
-            track.times,
-            track.values,
-            valueSize,
-          );
-        }
-        animationIndex++;
-      }
-
-      //
-
-      const animationGroupDeclarations = physx.physxWorker.initAnimationSystem();
-      // console.log('animationGroupDeclarations', animationGroupDeclarations)
-
-      // get data back from wasm to js ------------------------------------------------
-
-      // UseAnimationIndexes
-      const useAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'use')[0];
-      useAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-        UseAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-      });
-
-      // EmoteAnimationIndexes
-      const emoteAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'emote')[0];
-      emoteAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-        EmoteAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-      });
-
-      // SitAnimationIndexes
-      const sitAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'sit')[0];
-      sitAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-        SitAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-      });
-
-      // DanceAnimationIndexes
-      const danceAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'dance')[0];
-      danceAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-        DanceAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-      });
-
-      // ActivateAnimationIndexes
-      const activateAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'activate')[0];
-      activateAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-        ActivateAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-      });
-
-      // HurtAnimationIndexes
-      const hurtAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'hurt')[0];
-      hurtAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-        HurtAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-      });
-
-      // EmoteAnimationIndexes
-      const aimAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'aim')[0];
-      aimAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-        AimAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-      });
-
-      // ---
-
-      // emoteAnimations
-      emoteAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-        emoteAnimations[animationDeclaration.keyName] = animations.index[animationDeclaration.fileName];
-      });
-
-      // end: get data back from wasm to js ------------------------------------------------
-
-      initedAnimationSystem = true;
+      animationIndex++;
     }
+
+    //
+
+    const animationGroupDeclarations = physx.physxWorker.initAnimationSystem();
+    // console.log('animationGroupDeclarations', animationGroupDeclarations)
+
+    // get data back from wasm to js ------------------------------------------------
+
+    // UseAnimationIndexes
+    const useAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'use')[0];
+    useAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+      UseAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+    });
+
+    // EmoteAnimationIndexes
+    const emoteAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'emote')[0];
+    emoteAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+      EmoteAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+    });
+
+    // SitAnimationIndexes
+    const sitAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'sit')[0];
+    sitAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+      SitAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+    });
+
+    // DanceAnimationIndexes
+    const danceAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'dance')[0];
+    danceAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+      DanceAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+    });
+
+    // ActivateAnimationIndexes
+    const activateAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'activate')[0];
+    activateAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+      ActivateAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+    });
+
+    // HurtAnimationIndexes
+    const hurtAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'hurt')[0];
+    hurtAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+      HurtAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+    });
+
+    // EmoteAnimationIndexes
+    const aimAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'aim')[0];
+    aimAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+      AimAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+    });
+
+    // ---
+
+    // emoteAnimations
+    emoteAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+      emoteAnimations[animationDeclaration.keyName] = animations.index[animationDeclaration.fileName];
+    });
+
+    // end: get data back from wasm to js ------------------------------------------------
   };
   initAnimationSystem();
 })().catch(err => {
@@ -381,7 +374,7 @@ export const loadPromise = (async () => {
 });
 
 export const _createAnimation = avatar => {
-  console.log('------------ createAnimation')
+  console.log('------------ createAnimation');
 
   avatar.mixerPtr = physx.physxWorker.createAnimationMixer();
   avatar.animationAvatarPtr = physx.physxWorker.createAnimationAvatar(avatar.mixerPtr);
@@ -627,7 +620,7 @@ export const _findArmature = bone => {
   // return null; // can't happen
 };
 
-export const _getLerpFn = isPosition => isPosition ? Vector3.prototype.lerp : Quaternion.prototype.slerp;
+// export const _getLerpFn = isPosition => isPosition ? Vector3.prototype.lerp : Quaternion.prototype.slerp;
 
 export function getFirstPersonCurves(vrmExtension) {
   const DEG2RAD = Math.PI / 180; // MathUtils.DEG2RAD;
