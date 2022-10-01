@@ -280,3 +280,63 @@ export const createTextureAtlas = (meshes, {
     textureNames: textures,
   };
 };
+
+const MAX_TEXTURE_ATLAS_SLOTS = 64;
+export const calculateCanvasAtlasTexturePerRow = (numTextures) => {
+  for (let t = 1; t < MAX_TEXTURE_ATLAS_SLOTS; t *= 2 * 2) {
+    if (numTextures < t) {
+      return Math.sqrt(t);
+    }
+  }
+  console.error(
+    'Texture Atlas Error : Number of textures in atlas exceeded the maximum amount'
+  );
+};
+
+const _adjustAtlasTextureSettings = (
+  texture,
+  encoding = THREE.LinearEncoding
+) => {
+  texture.generateMipmaps = true;
+  texture.minFilter = THREE.NearestMipMapLinearFilter;
+  texture.magFilter = THREE.NearestFilter;
+  texture.encoding = encoding;
+  texture.flipY = false;
+};
+
+export class CanvasTextureAtlas {
+  constructor(textures, textureEncoding, subTextureSize) {
+    this.texturePerRow = calculateCanvasAtlasTexturePerRow(textures.length);
+
+    this.canvas = document.createElement('canvas');
+
+    const width = subTextureSize * this.texturePerRow;
+    const height = subTextureSize * this.texturePerRow;
+
+    this.canvas.width = width;
+    this.canvas.height = height;
+
+    const context = this.canvas.getContext('2d');
+
+    for (let t = 0; t < textures.length; t++) {
+      const texture = textures[t];
+      const image = texture.image;
+
+      const x = t % this.texturePerRow;
+      const y = Math.floor(t / this.texturePerRow);
+
+      image &&
+        context.drawImage(
+          image,
+          x * subTextureSize,
+          y * subTextureSize
+        );
+    }
+
+    const atlasTexture = new THREE.CanvasTexture(this.canvas);
+
+    _adjustAtlasTextureSettings(atlasTexture, textureEncoding);
+
+    this.atlasTexture = atlasTexture;
+  }
+}
