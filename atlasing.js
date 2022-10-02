@@ -281,16 +281,8 @@ export const createTextureAtlas = (meshes, {
   };
 };
 
-const MAX_TEXTURE_ATLAS_SLOTS = 64;
 export const calculateCanvasAtlasTexturePerRow = (numTextures) => {
-  for (let t = 1; t < MAX_TEXTURE_ATLAS_SLOTS; t *= 2 * 2) {
-    if (numTextures < t) {
-      return Math.sqrt(t);
-    }
-  }
-  console.error(
-    'Texture Atlas Error : Number of textures in atlas exceeded the maximum amount'
-  );
+  return Math.pow(2, Math.ceil(Math.log(numTextures) / Math.log(2)));
 };
 
 const _adjustAtlasTextureSettings = (
