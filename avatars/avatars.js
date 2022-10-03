@@ -1920,7 +1920,7 @@ class Avatar {
     if (this.debugMesh) {
       if (debug.enabled) {
         this.debugMesh.setFromAvatar(this);
-        if (this.debugMesh.parent !== this.avatarRenderer.currentMesh) {
+        if (this.avatarRenderer.currentMesh !== this.debugMesh.parent) {
           this.avatarRenderer.currentMesh.add(this.debugMesh);
         }
       }
