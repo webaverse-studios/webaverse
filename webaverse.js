@@ -299,7 +299,7 @@ export default class Webaverse extends EventTarget {
       throw new Error('must bind canvas first');
     }
 
-    initAnimationSystem();
+    // initAnimationSystem();
 
     let lastTimestamp = performance.now();
     const animate = (timestamp, frame) => {
