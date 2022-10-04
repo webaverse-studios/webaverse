@@ -49,6 +49,7 @@ import raycastManager from './raycast-manager.js';
 import universe from './universe.js';
 import npcManager from './npc-manager.js';
 import settingsManager from './settings-manager.js';
+import {initAnimationSystem} from './avatars/animationHelpers.js';
 
 import Stats from 'stats.js';
 var stats = new Stats();
@@ -297,7 +298,9 @@ export default class Webaverse extends EventTarget {
     if (!renderer) {
       throw new Error('must bind canvas first');
     }
-    
+
+    // initAnimationSystem();
+
     let lastTimestamp = performance.now();
     const animate = (timestamp, frame) => {
       stats.begin();
@@ -630,4 +633,6 @@ const _startHacks = webaverse => {
       }
     }
   });
+
+  // initAnimationSystem();
 };
