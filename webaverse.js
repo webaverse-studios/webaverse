@@ -305,7 +305,7 @@ export default class Webaverse extends EventTarget {
 
       // if (window.isDebugger) debugger
       // console.log('-animate');
-      window.domInfo.innerHTML = '';
+      // window.domInfo.innerHTML = '';
       // console.log(window.localPlayer?.getAction('use')?.animationCombo);
 
       if (window.ioManager) {
@@ -412,8 +412,6 @@ const _startHacks = webaverse => {
   window.ioManager = ioManager;
 
   window.isDebugger = false;
-
-  window.updateAnimationLoopCount = 1;
 
   // press R to debug current state in console
   window.addEventListener('keydown', event => {
