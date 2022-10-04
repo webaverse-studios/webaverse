@@ -49,7 +49,6 @@ import raycastManager from './raycast-manager.js';
 import universe from './universe.js';
 import npcManager from './npc-manager.js';
 import settingsManager from './settings-manager.js';
-import {initAnimationSystem} from './avatars/animationHelpers.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -295,8 +294,6 @@ export default class Webaverse extends EventTarget {
       throw new Error('must bind canvas first');
     }
 
-    // initAnimationSystem();
-
     let lastTimestamp = performance.now();
     const animate = (timestamp, frame) => {
       performanceTracker.startFrame();
@@ -380,7 +377,6 @@ export default class Webaverse extends EventTarget {
 
 // import {MMDLoader} from 'three/examples/jsm/loaders/MMDLoader.js';
 const _startHacks = webaverse => {
-  console.log('---_startHacks');
   const localPlayer = metaversefileApi.useLocalPlayer();
   const vpdAnimations = Avatar.getAnimations().filter(animation => animation.name.endsWith('.vpd'));
 
@@ -601,6 +597,4 @@ const _startHacks = webaverse => {
       }
     }
   });
-
-  // initAnimationSystem();
 };
