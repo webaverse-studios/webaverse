@@ -2300,19 +2300,17 @@ const physxWorker = (() => {
       mixerPtr, now, nowS,
     )
     const resultValues = [];
-    const headMain = outputBufferOffsetMain / Float32Array.BYTES_PER_ELEMENT;
+    const head = outputBufferOffsetMain / Float32Array.BYTES_PER_ELEMENT;
     for (let i = 0; i < 53; i++) {
       let value;
-      const outputBufferOffset = Module.HEAPU32[headMain + i];
-      const head = outputBufferOffset / Float32Array.BYTES_PER_ELEMENT;
       const isPosition = i === 0;
-      const x = Module.HEAPF32[head + 0];
-      const y = Module.HEAPF32[head + 1];
-      const z = Module.HEAPF32[head + 2];
+      const x = Module.HEAPF32[head + i * 4 + 0];
+      const y = Module.HEAPF32[head + i * 4 + 1];
+      const z = Module.HEAPF32[head + i * 4 + 2];
       if (isPosition) {
         value = [x, y, z];
       } else {
-        const w = Module.HEAPF32[head + 3];
+        const w = Module.HEAPF32[head + i * 4 + 3];
         value = [x, y, z, w];
       }
       resultValues.push(value);
