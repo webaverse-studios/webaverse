@@ -120,6 +120,7 @@ class CharacterPhysics {
         const t = nowS - this.fallLoopStartTimeS;
         const h = 0.5 * physicsScene.getGravity().y * t * t;
         this.wantMoveDistancePerFrame.y = h - this.lastGravityH;
+        this.wantVelocity.y = t * physicsScene.getGravity().y;
 
         this.lastGravityH = h;
       }
