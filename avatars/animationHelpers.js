@@ -267,103 +267,102 @@ export const loadPromise = (async () => {
   // fallLoop = animations.find(a => a.isFallLoop);
   // swordSideSlash = animations.find(a => a.isSwordSideSlash);
   // swordTopDownSlash = animations.find(a => a.isSwordTopDownSlash)
-
-  const initAnimationSystem = () => {
-    for (const spec of animationMappingConfig) {
-      physx.physxWorker.createAnimationMapping(
-        spec.isPosition,
-        spec.index,
-        spec.isTop,
-        spec.isArm,
-        spec.boneName,
-      );
-    }
-
-    let animationIndex = 0;
-    for (const fileName in animations.index) {
-      const animation = animations.index[fileName];
-      animation.index = animationIndex;
-      const animationPtr = physx.physxWorker.createAnimation(animation.name, animation.duration);
-      animation.ptr = animationPtr;
-      // for (const k in animation.interpolants) { // maybe wrong interpolant index order
-      for (const spec of animationMappingConfig) { // correct interpolant index order
-        const {
-          animationTrackName: k,
-        } = spec;
-
-        const track = animation.tracks.index[k];
-        const valueSize = track.type === 'vector' ? 3 : 4;
-        physx.physxWorker.createAnimationInterpolant(
-          animationPtr,
-          track.times,
-          track.values,
-          valueSize,
-        );
-      }
-      animationIndex++;
-    }
-
-    //
-
-    const animationGroupDeclarations = physx.physxWorker.initAnimationSystem();
-
-    // get data back from wasm to js ------------------------------------------------
-
-    // UseAnimationIndexes
-    const useAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'use')[0];
-    useAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-      UseAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-    });
-
-    // EmoteAnimationIndexes
-    const emoteAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'emote')[0];
-    emoteAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-      EmoteAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-    });
-
-    // SitAnimationIndexes
-    const sitAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'sit')[0];
-    sitAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-      SitAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-    });
-
-    // DanceAnimationIndexes
-    const danceAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'dance')[0];
-    danceAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-      DanceAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-    });
-
-    // ActivateAnimationIndexes
-    const activateAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'activate')[0];
-    activateAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-      ActivateAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-    });
-
-    // HurtAnimationIndexes
-    const hurtAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'hurt')[0];
-    hurtAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-      HurtAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-    });
-
-    // EmoteAnimationIndexes
-    const aimAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'aim')[0];
-    aimAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-      AimAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-    });
-
-    // ---
-
-    // emoteAnimations
-    emoteAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-      emoteAnimations[animationDeclaration.keyName] = animations.index[animationDeclaration.fileName];
-    });
-
-    // end: get data back from wasm to js ------------------------------------------------
-  };
-  initAnimationSystem();
 })().catch(err => {
   console.log('load avatar animations error', err);
 });
+
+export const initAnimationSystem = () => {
+  for (const spec of animationMappingConfig) {
+    physx.physxWorker.createAnimationMapping(
+      spec.isPosition,
+      spec.index,
+      spec.isTop,
+      spec.isArm,
+      spec.boneName,
+    );
+  }
+
+  let animationIndex = 0;
+  for (const fileName in animations.index) {
+    const animation = animations.index[fileName];
+    animation.index = animationIndex;
+    const animationPtr = physx.physxWorker.createAnimation(animation.name, animation.duration);
+    animation.ptr = animationPtr;
+    // for (const k in animation.interpolants) { // maybe wrong interpolant index order
+    for (const spec of animationMappingConfig) { // correct interpolant index order
+      const {
+        animationTrackName: k,
+      } = spec;
+
+      const track = animation.tracks.index[k];
+      const valueSize = track.type === 'vector' ? 3 : 4;
+      physx.physxWorker.createAnimationInterpolant(
+        animationPtr,
+        track.times,
+        track.values,
+        valueSize,
+      );
+    }
+    animationIndex++;
+  }
+
+  //
+
+  const animationGroupDeclarations = physx.physxWorker.initAnimationSystem();
+
+  // get data back from wasm to js ------------------------------------------------
+
+  // UseAnimationIndexes
+  const useAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'use')[0];
+  useAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+    UseAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+  });
+
+  // EmoteAnimationIndexes
+  const emoteAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'emote')[0];
+  emoteAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+    EmoteAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+  });
+
+  // SitAnimationIndexes
+  const sitAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'sit')[0];
+  sitAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+    SitAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+  });
+
+  // DanceAnimationIndexes
+  const danceAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'dance')[0];
+  danceAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+    DanceAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+  });
+
+  // ActivateAnimationIndexes
+  const activateAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'activate')[0];
+  activateAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+    ActivateAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+  });
+
+  // HurtAnimationIndexes
+  const hurtAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'hurt')[0];
+  hurtAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+    HurtAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+  });
+
+  // EmoteAnimationIndexes
+  const aimAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'aim')[0];
+  aimAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+    AimAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+  });
+
+  // ---
+
+  // emoteAnimations
+  emoteAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+    emoteAnimations[animationDeclaration.keyName] = animations.index[animationDeclaration.fileName];
+  });
+
+  // end: get data back from wasm to js ------------------------------------------------
+};
 
 export const _createAnimation = avatar => {
   avatar.mixerPtr = physx.physxWorker.createAnimationMixer();
