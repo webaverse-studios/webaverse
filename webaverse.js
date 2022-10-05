@@ -293,7 +293,7 @@ export default class Webaverse extends EventTarget {
     if (!renderer) {
       throw new Error('must bind canvas first');
     }
-
+    
     let lastTimestamp = performance.now();
     const animate = (timestamp, frame) => {
       performanceTracker.startFrame();
