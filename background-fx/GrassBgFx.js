@@ -321,6 +321,7 @@ class GrassBgFxMesh extends THREE.Mesh {
       alphaToCoverage: true,
     });
     super(fullscreenGeometry, material);
+    material.freeze();
     
     this.frustumCulled = false;
   }

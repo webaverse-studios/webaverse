@@ -15,7 +15,13 @@ const localVector2D = new THREE.Vector2();
 //
 
 const _cloneChunkResult = chunkResult => {
-  const {terrainGeometry, waterGeometry, barrierGeometry} = chunkResult;
+  const {
+    terrainGeometry,
+    waterGeometry,
+    vegetationInstances,
+    grassInstances,
+    poiInstances,
+  } = chunkResult;
 
   const _getTerrainGeometrySize = () => {
     let size = terrainGeometry.positions.length * terrainGeometry.positions.constructor.BYTES_PER_ELEMENT +
@@ -23,6 +29,8 @@ const _cloneChunkResult = chunkResult => {
       terrainGeometry.biomesWeights.length * terrainGeometry.biomesWeights.constructor.BYTES_PER_ELEMENT +
       terrainGeometry.biomesUvs1.length * terrainGeometry.biomesUvs1.constructor.BYTES_PER_ELEMENT +
       terrainGeometry.biomesUvs2.length * terrainGeometry.biomesUvs2.constructor.BYTES_PER_ELEMENT +
+      terrainGeometry.materials.length * terrainGeometry.materials.constructor.BYTES_PER_ELEMENT +
+      terrainGeometry.materialsWeights.length * terrainGeometry.materialsWeights.constructor.BYTES_PER_ELEMENT +
       terrainGeometry.indices.length * terrainGeometry.indices.constructor.BYTES_PER_ELEMENT;
     return size;
   };
@@ -33,22 +41,46 @@ const _cloneChunkResult = chunkResult => {
       waterGeometry.indices.length * waterGeometry.indices.constructor.BYTES_PER_ELEMENT;
     return size;
   };
-  const _getBarrierGeometrySize = () => {
+  /* const _getBarrierGeometrySize = () => {
     let size = barrierGeometry.positions.length * barrierGeometry.positions.constructor.BYTES_PER_ELEMENT +
       barrierGeometry.normals.length * barrierGeometry.normals.constructor.BYTES_PER_ELEMENT +
       barrierGeometry.uvs.length * barrierGeometry.uvs.constructor.BYTES_PER_ELEMENT +
       barrierGeometry.positions2D.length * barrierGeometry.positions2D.constructor.BYTES_PER_ELEMENT +
       barrierGeometry.indices.length * barrierGeometry.indices.constructor.BYTES_PER_ELEMENT;
     return size;
+  }; */
+  const _getPQIInstancesSize = instancesResult => {
+    const {instances} = instancesResult;
+    let size = 0;
+    for (let i = 0; i < instances.length; i++) {
+      const instance = instances[i];
+      const {ps, qs} = instance;
+      size += ps.length * ps.constructor.BYTES_PER_ELEMENT;
+      size += qs.length * qs.constructor.BYTES_PER_ELEMENT;
+    }
+    return size;
+  };
+  const _getPIInstancesSize = instancesResult => {
+    const {ps, instances} = instancesResult;
+    let size =
+      ps.length * ps.constructor.BYTES_PER_ELEMENT +
+      instances.length * instances.constructor.BYTES_PER_ELEMENT;
+    return size;
   };
 
   const terrainGeometrySize = _getTerrainGeometrySize();
   const waterGeometrySize = _getWaterGeometrySize();
-  const barrierGeometrySize = _getBarrierGeometrySize();
+  // const barrierGeometrySize = _getBarrierGeometrySize();
+  const vegetationInstancesSize = _getPQIInstancesSize(vegetationInstances);
+  const grassInstancesSize = _getPQIInstancesSize(grassInstances);
+  const poiInstancesSize = _getPIInstancesSize(poiInstances);
   const arrayBuffer = new ArrayBuffer(
     terrainGeometrySize +
     waterGeometrySize +
-    barrierGeometrySize
+    // barrierGeometrySize +
+    vegetationInstancesSize +
+    grassInstancesSize +
+    poiInstancesSize
   );
   let index = 0;
 
@@ -77,6 +109,14 @@ const _cloneChunkResult = chunkResult => {
     biomesUvs2.set(terrainGeometry.biomesUvs2);
     index += terrainGeometry.biomesUvs2.length * terrainGeometry.biomesUvs2.constructor.BYTES_PER_ELEMENT;
 
+    const materials = new terrainGeometry.materials.constructor(arrayBuffer, index, terrainGeometry.materials.length);
+    materials.set(terrainGeometry.materials);
+    index += terrainGeometry.materials.length * terrainGeometry.materials.constructor.BYTES_PER_ELEMENT;
+
+    const materialsWeights = new terrainGeometry.materialsWeights.constructor(arrayBuffer, index, terrainGeometry.materialsWeights.length);
+    materialsWeights.set(terrainGeometry.materialsWeights);
+    index += terrainGeometry.materialsWeights.length * terrainGeometry.materialsWeights.constructor.BYTES_PER_ELEMENT;
+
     // const seeds = new terrainGeometry.seeds.constructor(arrayBuffer, index, terrainGeometry.seeds.length);
     // seeds.set(terrainGeometry.seeds);
     // index += terrainGeometry.seeds.length * terrainGeometry.seeds.constructor.BYTES_PER_ELEMENT;
@@ -104,6 +144,8 @@ const _cloneChunkResult = chunkResult => {
       biomesWeights,
       biomesUvs1,
       biomesUvs2,
+      materials,
+      materialsWeights,
       // seeds,
       indices,
       // skylights,
@@ -135,6 +177,144 @@ const _cloneChunkResult = chunkResult => {
       indices,
     };
   };
+  /* const _cloneBarrierGeometry = () => {
+    const positions = new barrierGeometry.positions.constructor(arrayBuffer, index, barrierGeometry.positions.length);
+    positions.set(barrierGeometry.positions);
+    index += barrierGeometry.positions.length * barrierGeometry.positions.constructor.BYTES_PER_ELEMENT;
+    
+    const normals = new barrierGeometry.normals.constructor(arrayBuffer, index, barrierGeometry.normals.length);
+    normals.set(barrierGeometry.normals);
+    index += barrierGeometry.normals.length * barrierGeometry.normals.constructor.BYTES_PER_ELEMENT;
+
+    const uvs = new barrierGeometry.uvs.constructor(arrayBuffer, index, barrierGeometry.uvs.length);
+    uvs.set(barrierGeometry.uvs);
+    index += barrierGeometry.uvs.length * barrierGeometry.uvs.constructor.BYTES_PER_ELEMENT;
+
+    const positions2D = new barrierGeometry.positions2D.constructor(arrayBuffer, index, barrierGeometry.positions2D.length);
+    positions2D.set(barrierGeometry.positions2D);
+    index += barrierGeometry.positions2D.length * barrierGeometry.positions2D.constructor.BYTES_PER_ELEMENT;
+
+    const indices = new barrierGeometry.indices.constructor(arrayBuffer, index, barrierGeometry.indices.length);
+    indices.set(barrierGeometry.indices);
+    index += barrierGeometry.indices.length * barrierGeometry.indices.constructor.BYTES_PER_ELEMENT;
+
+    return {
+      positions,
+      normals,
+      uvs,
+      positions2D,
+      indices,
+    };
+  }; */
+  const _clonePQIInstances = instancesResult => {
+    const {instances} = instancesResult;
+    const instances2 = Array(instances.length);
+    for (let i = 0; i < instances.length; i++) {
+      const instance = instances[i];
+      const {instanceId, ps, qs} = instance;
+
+      const ps2 = new ps.constructor(arrayBuffer, index, ps.length);
+      ps2.set(ps);
+      index += ps.length * ps.constructor.BYTES_PER_ELEMENT;
+
+      const qs2 = new qs.constructor(arrayBuffer, index, qs.length);
+      qs2.set(qs);
+      index += qs.length * qs.constructor.BYTES_PER_ELEMENT;
+
+      instances2[i] = {
+        instanceId,
+        ps: ps2,
+        qs: qs2,
+      };
+    }
+    return instances2;
+  };
+  const _clonePIInstances = instancesResult => {
+    const ps = new instancesResult.ps.constructor(arrayBuffer, index, instancesResult.ps.length);
+    ps.set(instancesResult.ps);
+    index += instancesResult.ps.length * instancesResult.ps.constructor.BYTES_PER_ELEMENT;
+    
+    const instances = new instancesResult.instances.constructor(arrayBuffer, index, instancesResult.instances.length);
+    instances.set(instancesResult.instances);
+    index += instancesResult.instances.length * instancesResult.instances.constructor.BYTES_PER_ELEMENT;
+
+    return {
+      ps,
+      instances,
+    };
+  };
+
+  const terrainGeometry2 = _cloneTerrainGeometry();
+  const waterGeometry2 = _cloneWaterGeometry();
+  const vegetationInstances2 = _clonePQIInstances(vegetationInstances);
+  const grassInstances2 = _clonePQIInstances(grassInstances);
+  const poiInstances2 = _clonePIInstances(poiInstances);
+
+  return {
+    arrayBuffer,
+    terrainGeometry: terrainGeometry2,
+    waterGeometry: waterGeometry2,
+    vegetationInstances: vegetationInstances2,
+    grassInstances: grassInstances2,
+    poiInstances: poiInstances2,
+  };
+};
+const _cloneBarrierResult = barrierResult => {
+  const {
+    barrierGeometry,
+    leafNodes,
+    leafNodesMin,
+    leafNodesMax,
+    leafNodesIndex,
+  } = barrierResult;
+
+  const _getBarrierGeometrySize = () => {
+    let size = barrierGeometry.positions.length * barrierGeometry.positions.constructor.BYTES_PER_ELEMENT +
+      barrierGeometry.normals.length * barrierGeometry.normals.constructor.BYTES_PER_ELEMENT +
+      barrierGeometry.uvs.length * barrierGeometry.uvs.constructor.BYTES_PER_ELEMENT +
+      barrierGeometry.positions2D.length * barrierGeometry.positions2D.constructor.BYTES_PER_ELEMENT +
+      barrierGeometry.indices.length * barrierGeometry.indices.constructor.BYTES_PER_ELEMENT;
+    return size;
+  };
+  const _getLeafNodesSize = () => {
+    if (leafNodes.length > 0) {
+      const leafNode0 = leafNodes[0];
+      let size = leafNodes.length * (
+        leafNode0.min.constructor.BYTES_PER_ELEMENT +
+        Int32Array.BYTES_PER_ELEMENT
+      );
+      return size;
+    } else {
+      return 0;
+    }
+  };
+  const _getLeafNodesMinSize = () => {
+    let size = leafNodesMin.length * leafNodesMin.constructor.BYTES_PER_ELEMENT;
+    return size;
+  };
+  const _getLeafNodesMaxSize = () => {
+    let size = leafNodesMax.length * leafNodesMax.constructor.BYTES_PER_ELEMENT;
+    return size;
+  };
+  const _getLeafNodesIndexSize = () => {
+    let size = leafNodesIndex.length * leafNodesIndex.constructor.BYTES_PER_ELEMENT;
+    return size;
+  };
+
+  const barrierGeometrySize = _getBarrierGeometrySize();
+  const leafNodesSize = _getLeafNodesSize();
+  const leafNodesMinSize = _getLeafNodesMinSize();
+  const leafNodesMaxSize = _getLeafNodesMaxSize();
+  const leafNodesIndexSize = _getLeafNodesIndexSize();
+  const arrayBuffer = new ArrayBuffer(
+    barrierGeometrySize +
+    leafNodesSize +
+    leafNodesMinSize +
+    leafNodesMaxSize +
+    leafNodesIndexSize
+  );
+  let index = 0;
+
   const _cloneBarrierGeometry = () => {
     const positions = new barrierGeometry.positions.constructor(arrayBuffer, index, barrierGeometry.positions.length);
     positions.set(barrierGeometry.positions);
@@ -164,59 +344,32 @@ const _cloneChunkResult = chunkResult => {
       indices,
     };
   };
+  const _cloneLeafNodes = () => {
+    
+  };
+  const _cloneLeafNodesMin = () => {
+    
+  };
+  const _cloneLeafNodesMax = () => {
+    
+  };
+  const _cloneLeafNodesIndex = () => {
+    
+  };
 
-  const terrainGeometry2 = _cloneTerrainGeometry();
-  const waterGeometry2 = _cloneWaterGeometry();
   const barrierGeometry2 = _cloneBarrierGeometry();
+  const leafNodes2 = _cloneLeafNodes();
+  const leafNodesMin2 = _cloneLeafNodesMin();
+  const leafNodesMax2 = _cloneLeafNodesMax();
+  const leafNodesIndex2 = _cloneLeafNodesIndex();
 
   return {
     arrayBuffer,
-    terrainGeometry: terrainGeometry2,
-    waterGeometry: waterGeometry2,
     barrierGeometry: barrierGeometry2,
-  };
-};
-const _cloneInstancesResult = vegetationResult => {
-  const {instances} = vegetationResult;
-
-  const _getVegetationGeometrySize = () => {
-    let size = 0;
-    for (let i = 0; i < instances.length; i++) {
-      const instance = instances[i];
-      const {ps, qs} = instance;
-      size += ps.length * ps.constructor.BYTES_PER_ELEMENT;
-      size += qs.length * qs.constructor.BYTES_PER_ELEMENT;
-    }
-    return size;
-  };
-  const size = _getVegetationGeometrySize();
-
-  const arrayBuffer = new ArrayBuffer(size);
-  let index = 0;
-
-  const instances2 = Array(instances.length);
-  for (let i = 0; i < instances.length; i++) {
-    const instance = instances[i];
-    const {instanceId, ps, qs} = instance;
-
-    const ps2 = new ps.constructor(arrayBuffer, index, ps.length);
-    ps2.set(ps);
-    index += ps.length * ps.constructor.BYTES_PER_ELEMENT;
-
-    const qs2 = new qs.constructor(arrayBuffer, index, qs.length);
-    qs2.set(qs);
-    index += qs.length * qs.constructor.BYTES_PER_ELEMENT;
-
-    instances2[i] = {
-      instanceId,
-      ps: ps2,
-      qs: qs2,
-    };
-  }
-
-  return {
-    arrayBuffer,
-    instances: instances2,
+    leafNodes: leafNodes2,
+    leafNodesMin: leafNodesMin2,
+    leafNodesMax: leafNodesMax2,
+    leafNodesIndex: leafNodesIndex2,
   };
 };
 
@@ -235,15 +388,12 @@ const _cloneTrackerUpdate = trackerUpdate => {
     newDataRequests: trackerUpdate.newDataRequests.map(_cloneNode),
     keepDataRequests: trackerUpdate.keepDataRequests.map(_cloneNode),
     cancelDataRequests: trackerUpdate.cancelDataRequests.map(_cloneNode),
-    chunkMin: trackerUpdate.chunkMin,
   };
 };
 
 let loaded = false;
 let queue = [];
 const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
-  // const _chunksToResult = chunks => chunks.map(({ position }) => ({ position }));
-
   switch (method) {
     case 'initialize': {
       const {chunkSize, seed, numThreads} = args;
@@ -310,7 +460,15 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
       return spec;
     }
     case 'generateChunk': {
-      const {chunkPosition, lod, lodArray} = args;
+      const {
+        chunkPosition,
+        lod,
+        lodArray,
+        generateFlagsInt,
+        numVegetationInstances,
+        numGrassInstances,
+        numPoiInstances,
+      } = args;
       const instance = instances.get(instanceKey);
       if (!instance) throw new Error('generateChunk : instance not found');
 
@@ -323,13 +481,18 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
         position.y,
         lod,
         lodArray,
+        generateFlagsInt,
+        numVegetationInstances,
+        numGrassInstances,
+        numPoiInstances,
       );
       const chunkResult2 = _cloneChunkResult(chunkResult);
 
       const _freeChunkResult = chunkResult => {
         pg.free(chunkResult.terrainGeometry.bufferAddress);
         pg.free(chunkResult.waterGeometry.bufferAddress);
-        pg.free(chunkResult.barrierGeometry.bufferAddress);
+        pg.free(chunkResult.grassInstances.bufferAddress);
+        pg.free(chunkResult.poiInstances.bufferAddress);
         pg.free(chunkResult.bufferAddress);
       };
       _freeChunkResult(chunkResult);
@@ -341,137 +504,40 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
         ],
       };
     }
-    case 'generateGrass': {
-      const {chunkPosition, lod, numInstances} = args;
+    case 'generateBarrier': {
+      const {
+        chunkPosition,
+        minLod,
+        maxLod,
+      } = args;
       const instance = instances.get(instanceKey);
-      if (!instance) throw new Error('generateGrass : instance not found');
+      if (!instance) throw new Error('generateBarrier : instance not found');
 
       const position = localVector2D.fromArray(chunkPosition)
         .multiplyScalar(chunkWorldSize);
-      const grassResult = await pg.createChunkGrassAsync(
-        instance,
+      const barrierResult = await pg.createBarrierMeshAsync(
+        inst,
         taskId,
         position.x,
-        position.y,
-        lod,
-        numInstances
+        position.z,
+        minLod,
+        maxLod,
       );
-      const grassResult2 = _cloneInstancesResult(grassResult);
+      const barrierResult2 = _cloneBarrierResult(barrierResult);
 
-      const _freeInstancesResult = grassResult => {
-        pg.free(grassResult.bufferAddress);
+      const _freeBarrierResult = barrierResult => {
+        pg.free(barrierResult.bufferAddress);
       };
-      _freeInstancesResult(grassResult);
+      _freeBarrierResult(barrierResult);
 
-      const spec = {
-        result: grassResult2,
+      return {
+        result: barrierResult2,
         transfers: [
-          grassResult2.arrayBuffer,
+          barrierResult2.arrayBuffer,
         ],
       };
-      return spec;
     }
-    case 'generateVegetation': {
-      const {chunkPosition, lod, numInstances} = args;
-      const instance = instances.get(instanceKey);
-      if (!instance) throw new Error('generateVegetation : instance not found');
-
-      const position = localVector2D.fromArray(chunkPosition)
-        .multiplyScalar(chunkWorldSize);
-      const vegetationResult = await pg.createChunkVegetationAsync(
-        instance,
-        taskId,
-        position.x,
-        position.y,
-        lod,
-        numInstances
-      );
-      const vegetationResult2 = _cloneInstancesResult(vegetationResult);
-
-      const _freeInstancesResult = vegetationResult => {
-        pg.free(vegetationResult.bufferAddress);
-      };
-      _freeInstancesResult(vegetationResult);
-
-      const spec = {
-        result: vegetationResult2,
-        transfers: [
-          vegetationResult2.arrayBuffer,
-        ],
-      };
-      return spec;
-    }
-    /* case 'generateLiquidChunk': {
-      const {chunkPosition, lod, lodArray} = args;
-      const instance = instances.get(instanceKey);
-      if (!instance) throw new Error('generateLiquidChunk : instance not found');
-      
-      const position = localVector2D.fromArray(chunkPosition)
-        .multiplyScalar(chunkWorldSize);
-      const meshData = await pg.createLiquidChunkMeshAsync(
-        instance,
-        taskId,
-        position.x,
-        position.y,
-        lod,
-        lodArray,
-      );
-      const meshData2 = _cloneLiquidMeshData(meshData);
-      meshData && pg.free(meshData.bufferAddress);
-
-      if (meshData2) {
-        const spec = {
-          result: meshData2,
-          transfers: [meshData2.arrayBuffer],
-        };
-        return spec;
-      } else {
-        return null;
-      }
-    } */
-    /* case 'createGrassSplat': {
-      const {x, z, lod, priority} = args;
-      const instance = instances.get(instanceKey);
-      if (!instance) throw new Error('createGrassSplat : instance not found');
-
-      const {
-        ps,
-        qs,
-        instances: instancesResult,
-      } = await pg.createGrassSplatAsync(instance, taskId, x, z, lod, priority);
-
-      const spec = {
-        result: {
-          ps,
-          qs,
-          instances: instancesResult,
-        },
-        transfers: [ps.buffer, qs.buffer, instancesResult.buffer],
-      };
-      return spec;
-    }
-    case 'createVegetationSplat': {
-      const {x, z, lod, priority} = args;
-      const instance = instances.get(instanceKey);
-      if (!instance) throw new Error('createVegetationSplat : instance not found');
-      
-      const {
-        ps,
-        qs,
-        instances: instancesResult,
-      } = await pg.createVegetationSplatAsync(instance, taskId, x, z, lod, priority);
-
-      const spec = {
-        result: {
-          ps,
-          qs,
-          instances: instancesResult,
-        },
-        transfers: [ps.buffer, qs.buffer, instancesResult.buffer],
-      };
-      return spec;
-    }
-    case 'createMobSplat': {
+    /* case 'createMobSplat': {
       const {x, z, lod, priority} = args;
       const instance = instances.get(instanceKey);
       if (!instance) throw new Error('createMobSplat : instance not found');
@@ -491,107 +557,6 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
         transfers: [ps.buffer, qs.buffer, instancesResult.buffer],
       };
       return spec;
-    } */
-    /* case 'drawCubeDamage': {
-      const {position, quaternion, scale} = args;
-      const instance = instances.get(instanceKey);
-      if (!instance) throw new Error('drawCubeDamage : instance not found');
-
-      // console.log('dc worker draw cube damage', {position, quaternion, scale});
-      const chunks = pg.drawCubeDamage(
-        instance,
-        position[0],
-        position[1],
-        position[2],
-        quaternion[0],
-        quaternion[1],
-        quaternion[2],
-        quaternion[3],
-        scale[0],
-        scale[1],
-        scale[2]
-      );
-      // console.log('draw cube damage chunks', chunks);
-
-      if (chunks) {
-        return {
-          result: _chunksToResult(chunks),
-          transfers: [],
-        };
-      } else {
-        return null;
-      }
-    }
-    case 'eraseCubeDamage': {
-      const {position, quaternion, scale} = args;
-      const instance = instances.get(instanceKey);
-      if (!instance) throw new Error('eraseCubeDamage : instance not found');
-
-      const chunks = pg.drawCubeDamage(
-        instance,
-        position[0],
-        position[1],
-        position[2],
-        quaternion[0],
-        quaternion[1],
-        quaternion[2],
-        quaternion[3],
-        scale[0],
-        scale[1],
-        scale[2]
-      );
-
-      if (chunks) {
-        return {
-          result: _chunksToResult(chunks),
-          transfers: [],
-        };
-      } else {
-        return null;
-      }
-    }
-    case 'drawSphereDamage': {
-      const {position, radius} = args;
-      const instance = instances.get(instanceKey);
-      if (!instance) throw new Error('drawSphereDamage : instance not found');
-
-      const chunks = pg.drawSphereDamage(
-        instance,
-        position[0],
-        position[1],
-        position[2],
-        radius
-      );
-
-      if (chunks) {
-        return {
-          result: _chunksToResult(chunks),
-          transfers: [],
-        };
-      } else {
-        return null;
-      }
-    }
-    case 'eraseSphereDamage': {
-      const {position, radius} = args;
-      const instance = instances.get(instanceKey);
-      if (!instance) throw new Error('eraseSphereDamage : instance not found');
-      const chunks = pg.eraseSphereDamage(
-        instance,
-        position[0],
-        position[1],
-        position[2],
-        radius
-      );
-
-      if (chunks) {
-        return {
-          result: _chunksToResult(chunks),
-          transfers: [],
-        };
-      } else {
-        return null;
-      }
     } */
     case 'cancelTask': {
       const {taskId} = args;
