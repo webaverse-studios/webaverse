@@ -1,4 +1,3 @@
-// import * as THREE from 'three';
 import {abortError} from './lock-manager.js';
 
 //
@@ -136,9 +135,6 @@ export class PGWorkerManager {
   }
 
   async createTracker(lod, lod1Range, {signal} = {}) {
-    if (!lod1Range) {
-      debugger;
-    }
     const result = await this.worker.request('createTracker', {
       instance: this.instance,
       lod,
@@ -165,98 +161,49 @@ export class PGWorkerManager {
 
   //
 
-  async generateChunk(chunkPosition, lod, lodArray, {signal} = {}) {
+  async generateChunk(
+    chunkPosition,
+    lod,
+    lodArray,
+    generateFlagsInt,
+    numVegetationInstances,
+    numGrassInstances,
+    numPoiInstances,
+    {
+      signal = null,
+    } = {},
+  ) {
     const result = await this.worker.request('generateChunk', {
       instance: this.instance,
       chunkPosition,
       lod,
       lodArray,
+      generateFlagsInt,
+      numVegetationInstances,
+      numGrassInstances,
+      numPoiInstances,
     }, {signal});
     // signal.throwIfAborted();
     return result;
   }
-  async generateVegetation(chunkPosition, lod, numInstances, {signal} = {}) {
-    const result = await this.worker.request('generateVegetation', {
+  async generateBarrier(
+    chunkPosition,
+    minLod,
+    maxLod,
+  ) {
+    const result = await this.worker.request('generateBarrier', {
       instance: this.instance,
       chunkPosition,
-      lod,
-      numInstances,
+      minLod,
+      maxLod,
     }, {signal});
     // signal.throwIfAborted();
     return result;
   }
-  /* async generateLiquidChunk(chunkPosition, lod, lodArray, {signal} = {}) {
-    const result = await this.worker.request('generateLiquidChunk', {
-      instance: this.instance,
-      chunkPosition,
-      lod,
-      lodArray,
-    }, {signal});
-    // signal.throwIfAborted();
-    return result;
-  } */
 
   //
 
-  /* async getChunkHeightfield(x, z, lod, {signal} = {}) {
-    const worker = this.getNextWorker();
-    const result = await worker.request('getChunkHeightfield', {
-      instance: this.instance,
-      x, z,
-      lod,
-      priority: TASK_PRIORITIES.splat,
-    }, {signal});
-    return result;
-  } */
-
-  //
-
-  /* async getHeightfieldRange(x, z, w, h, lod, {signal} = {}) {
-    const worker = this.getNextWorker();
-    const result = await worker.request('getHeightfieldRange', {
-      instance: this.instance,
-      x, z,
-      w, h,
-      lod,
-      priority: TASK_PRIORITIES.splat,
-    }, {signal});
-    return result;
-  }
-  async getLightRange(x, y, z, w, h, d, lod, {signal} = {}) {
-    const worker = this.getNextWorker();
-    const result = await worker.request('getLightRange', {
-      instance: this.instance,
-      x, y, z,
-      w, h, d,
-      lod,
-      priority: TASK_PRIORITIES.splat,
-    }, {signal});
-    return result;
-  } */
-
-  //
-
-  /* async createGrassSplat(x, z, lod, {signal} = {}) {
-    const result = await this.worker.request('createGrassSplat', {
-      instance: this.instance,
-      x,
-      z,
-      lod,
-      priority: TASK_PRIORITIES.splat,
-    }, {signal});
-    return result;
-  }
-  async createVegetationSplat(x, z, lod, {signal} = {}) {
-    const result = await this.worker.request('createVegetationSplat', {
-      instance: this.instance,
-      x,
-      z,
-      lod,
-      priority: TASK_PRIORITIES.splat,
-    }, {signal});
-    return result;
-  }
-  async createMobSplat(x, z, lod, {signal} = {}) {
+  /* async createMobSplat(x, z, lod, {signal} = {}) {
     const result = await this.worker.request('createMobSplat', {
       instance: this.instance,
       x,

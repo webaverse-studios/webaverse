@@ -14,7 +14,7 @@ import { chatManager } from '../../../../chat-manager.js';
 import musicManager from '../../../../music-manager.js';
 import { CachedLoader } from '../../../CachedLoader.jsx';
 import { RpgText } from '../../../RpgText.jsx';
-import { chatTextSpeed } from '../../../../constants.js';
+import { chatTextSpeed, characterSelectAvatarQuality } from '../../../../constants.js';
 import { VoiceEndpointVoicer } from '../../../../voice-output/voice-endpoint-voicer.js';
 import * as voices from '../../../../voices.js';
 import {getVoiceEndpointUrl} from '../../../../voice-output/voice-endpoint-voicer.js';
@@ -103,8 +103,11 @@ export const CharacterSelect = () => {
             detachedCharacter.detached = true;
             const app = await metaversefile.createAppAsync({
                 start_url: typeContentToUrl('application/npc', detachedCharacter),
+                components: {
+                    quality: characterSelectAvatarQuality,
+                },
             });
-            return npcManager.getNpcByApp(app);
+            return npcManager.getDetachedNpcByApp(app);
         },
     }));
     const [ themeSongLoader, setThemeSongLoader ] = useState(() => new CachedLoader({
@@ -113,7 +116,7 @@ export const CharacterSelect = () => {
             signal.addEventListener('abort', () => {
               live = false;
             });
-            themeSong = await LocalPlayer.fetchThemeSong(targetCharacter.themeSongUrl);
+            const themeSong = await LocalPlayer.fetchThemeSong(targetCharacter.themeSongUrl);
             if (!live) return;
             return themeSong;
         },
@@ -122,9 +125,10 @@ export const CharacterSelect = () => {
         loadFn: async (url, targetCharacter, {signal = null} = {}) => {
             // get ai text
             let live = true;
-            signal.addEventListener('abort', () => {
+            const abort = () => {
                 live = false;
-            });
+            };
+            signal.addEventListener('abort', abort);
             const loreAIScene = metaversefile.useLoreAIScene();
             const [
                 characterIntro,
@@ -133,8 +137,12 @@ export const CharacterSelect = () => {
                 loreAIScene.generateCharacterIntroPrompt(targetCharacter.name, targetCharacter.bio),
                 voices.waitForLoad(),
             ]);
+            signal.removeEventListener('abort', abort);
             if (!live) return;
 
+            if (!characterIntro) {
+                throw new Error('empty character intro response');
+            }
             // preload audio
             const voiceEndpoint = voices.voiceEndpoints.find(voiceEndpoint => voiceEndpoint.name === targetCharacter.voice);
             if (!voiceEndpoint) {
@@ -289,6 +297,8 @@ export const CharacterSelect = () => {
             return () => {
                 clearTimeout(timeout);
             };
+        } else {
+            musicManager.stopCurrentMusic();
         }
     }, [opened, targetCharacter]);
     useEffect(() => {
