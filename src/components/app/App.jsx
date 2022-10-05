@@ -40,7 +40,6 @@ import npcManager from '../../../npc-manager';
 import { AccountContext } from '../../hooks/web3AccountProvider';
 import { ChainContext } from '../../hooks/chainProvider';
 import loadoutManager from '../../../loadout-manager';
-import {initAnimationSystem} from '../../../avatars/animationHelpers';
 
 //
 
@@ -56,7 +55,6 @@ const _startApp = async ( weba, canvas ) => {
     universe.handleUrlUpdate();
     await weba.startLoop();
 
-    initAnimationSystem();
     await npcManager.initDefaultPlayer();
     loadoutManager.initDefault();
 };

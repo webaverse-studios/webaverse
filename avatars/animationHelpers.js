@@ -267,6 +267,8 @@ export const loadPromise = (async () => {
   // fallLoop = animations.find(a => a.isFallLoop);
   // swordSideSlash = animations.find(a => a.isSwordSideSlash);
   // swordTopDownSlash = animations.find(a => a.isSwordTopDownSlash)
+
+  initAnimationSystem();
 })().catch(err => {
   console.log('load avatar animations error', err);
 });
