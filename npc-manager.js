@@ -25,7 +25,8 @@ const localVector2 = new THREE.Vector3();
 
 const updatePhysicsFnMap = new WeakMap();
 const updateAvatarsFnMap = new WeakMap();
-const cancelFnMap = new WeakMap();
+const cancelFnPerPlayer = new WeakMap();
+const cancelFnPerApp = new WeakMap();
 
 class NpcManager extends EventTarget {
   constructor() {
@@ -65,7 +66,7 @@ class NpcManager extends EventTarget {
     const app = createPlayerApp();
 
     const addDefaultPlayer = () => {
-      this.addPlayerApp(app, localPlayer, defaultPlayerSpec);
+      this.addPlayer(app, localPlayer, defaultPlayerSpec);
 
       this.dispatchEvent(new MessageEvent('defaultplayeradd', {
         data: {
@@ -74,7 +75,8 @@ class NpcManager extends EventTarget {
       }));
 
       app.addEventListener('destroy', () => {
-        this.removeNpcApp(app);
+        const player = this.getNpcByApp(app);
+        this.removeNpc(player);
       });
     };
     addDefaultPlayer();
@@ -132,7 +134,6 @@ class NpcManager extends EventTarget {
     const removeIndex = this.npcs.indexOf(npcPlayer);
     if (removeIndex !== -1) {
       this.npcs.splice(removeIndex, 1);
-      this.npcAppMap.delete(npcPlayer);
     }
   }
 
@@ -174,7 +175,32 @@ class NpcManager extends EventTarget {
     }
   }
 
-  async addPlayerApp(app, npcPlayer, json) {
+  async addPlayer(app, npcPlayer, json) {
+    const appchange = e => {
+      // update physics object when vrm app is changed
+      app.setPhysicsObject(npcPlayer.characterPhysics.characterController);
+    };
+    npcPlayer.addEventListener('appchange', appchange);
+
+    const cleanupFn = () => {
+      npcPlayer.removeEventListener('appchange', appchange);
+      this.destroyNpc(npcPlayer);
+    };
+    cancelFnPerPlayer.set(npcPlayer, cleanupFn);
+
+    const mode = app.getComponent('mode') ?? 'attached';
+    if (mode === 'attached') {
+      const npcDetached = !!json.detached;
+      if (!npcDetached) {
+        this.npcs.push(npcPlayer);
+      } else {
+        this.detachedNpcs.push(npcPlayer);
+      }
+    }
+    await this.setPlayerApp(app, npcPlayer, json);
+  }
+
+  async setPlayerApp(app, npcPlayer, json) {
     this.npcAppMap.set(npcPlayer, app);
 
     this.dispatchEvent(new MessageEvent('playeradd', {
@@ -189,15 +215,14 @@ class NpcManager extends EventTarget {
       () => {
         live = false;
 
-        if (npcPlayer) {
-          this.destroyNpc(npcPlayer);
-        }
         if (character) {
           world.loreAIScene.removeCharacter(character);
         }
+
+        this.npcAppMap.delete(npcPlayer);
       },
     ];
-    cancelFnMap.set(app, () => {
+    cancelFnPerApp.set(app, () => {
       for (const cancelFn of cancelFns) {
         cancelFn();
       }
@@ -237,6 +262,9 @@ class NpcManager extends EventTarget {
           });
         };
         app.addEventListener('hittrackeradded', hittrackeradd);
+        cancelFns.push(() => {
+          app.removeEventListener('hittrackeradded', hittrackeradd);
+        });
 
         const activate = () => {
           if (npcPlayer.getControlMode() === 'npc') {
@@ -246,12 +274,17 @@ class NpcManager extends EventTarget {
               }
             }));
           } else {
-            npcPlayer.dispatchEvent({
-              type: 'activate'
-            });
+            this.dispatchEvent(new MessageEvent('playerexpelled', {
+              data: {
+                player: npcPlayer,
+              }
+            }));
           }
         };
         app.addEventListener('activate', activate);
+        cancelFns.push(() => {
+          app.removeEventListener('activate', activate);
+        });
 
         const followTarget = (player, target, timeDiff) => {
           if (target) {
@@ -322,7 +355,6 @@ class NpcManager extends EventTarget {
       const npcName = json.name;
       const npcVoiceName = json.voice;
       const npcBio = json.bio;
-      const npcDetached = !!json.detached;
       let npcWear = json.wear ?? [];
       if (!Array.isArray(npcWear)) {
         npcWear = [npcWear];
@@ -381,12 +413,6 @@ class NpcManager extends EventTarget {
       _addToAiScene();
 
       const newNpcPlayer = npcPlayer;
-
-      if (!npcDetached) {
-        this.npcs.push(npcPlayer);
-      } else {
-        this.detachedNpcs.push(npcPlayer);
-      }
 
       // attach to scene
       const _addPlayerAvatarToApp = () => {
@@ -466,13 +492,20 @@ class NpcManager extends EventTarget {
         detached: npcDetached,
       });
 
-      this.addPlayerApp(app, newNpcPlayer, json);
+      this.addPlayer(app, newNpcPlayer, json);
+    }
+  }
+  removeNpc(player) {
+    const cancelFn = cancelFnPerPlayer.get(player);
+    if (cancelFn) {
+      cancelFnPerPlayer.delete(player);
+      cancelFn();
     }
   }
   removeNpcApp(app) {
-    const cancelFn = cancelFnMap.get(app);
+    const cancelFn = cancelFnPerApp.get(app);
     if (cancelFn) {
-      cancelFnMap.delete(app);
+      cancelFnPerApp.delete(app);
       cancelFn();
     }
   }
