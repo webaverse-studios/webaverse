@@ -437,6 +437,7 @@ class NpcManager extends EventTarget {
     let json = null;
 
     const mode = app.getComponent('mode') ?? 'attached';
+    const quality = app.getComponent('quality');
 
     // load
     if (mode === 'attached') {
@@ -464,6 +465,10 @@ class NpcManager extends EventTarget {
         quaternion: app.quaternion,
         scale: app.scale,
         detached: npcDetached,
+        components: [{
+          key: 'quality',
+          value: quality,
+        }],
       });
 
       this.addPlayerApp(app, newNpcPlayer, json);
