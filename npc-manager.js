@@ -272,21 +272,20 @@ class NpcManager extends EventTarget {
     const hurtAnimationDuration = hurtAnimation.duration;
 
     app.setPhysicsObject(player.characterPhysics.characterController);
-    app.getLoreSpec = () => {
-      return {
-        name: json.name,
-        description: json.bio,
-      }
-    };
-
     const appchange = e => {
-      // update physics object when vrm app is changed
       app.setPhysicsObject(player.characterPhysics.characterController);
     };
     player.addEventListener('appchange', appchange);
     cancelFns.push(() => {
       player.removeEventListener('appchange', appchange);
     });
+
+    app.getLoreSpec = () => {
+      return {
+        name: json.name,
+        description: json.bio,
+      }
+    };
 
     // events
     let targetSpec = null;
