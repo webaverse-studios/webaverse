@@ -49,22 +49,30 @@ class NpcManager extends EventTarget {
   }
 
   async initDefaultPlayer() {
-    const defaultPlayerSpec = await characterSelectManager.getDefaultSpecAsync();
+    const spec = await characterSelectManager.getDefaultSpecAsync();
     const player = metaversefile.useLocalPlayer();
-    // console.log('set player spec', defaultPlayerSpec);
-    await player.setPlayerSpec(defaultPlayerSpec);
+    // console.log('set player spec', spec);
+    await player.setPlayerSpec(spec);
 
     const createPlayerApp = () => {
       const app = metaversefile.createApp();
       app.instanceId = makeId(5);
       app.name = 'player';
-      app.contentId = defaultPlayerSpec.avatarUrl;
+      app.contentId = spec.avatarUrl;
       return app;
     };
     const app = createPlayerApp();
 
-    this.addNpc(player, app, defaultPlayerSpec);
-    await this.#setPlayerApp(player, app, defaultPlayerSpec);
+    this.#addNpc({
+      npc: player,
+      app,
+      detached: false,
+    });
+    await this.#setPlayerApp({
+      player,
+      app,
+      json: spec
+    });
 
     app.addEventListener('destroy', () => {
       const npc = this.getNpcByApp(app);
@@ -76,6 +84,87 @@ class NpcManager extends EventTarget {
         player,
       }
     }));
+  }
+
+  async addNpcApp(app, srcUrl) {
+    const mode = app.getComponent('mode') ?? 'attached';
+
+    // load
+    if (mode === 'attached') {
+      // load json
+      const res = await fetch(srcUrl);
+      const json = await res.json();
+      //if (!live) return;
+
+      // npc pameters
+      const name = json.name;
+      const avatarUrl = createRelativeUrl(json.avatarUrl, srcUrl);
+      const detached = !!json.detached;
+
+      const position = localVector.setFromMatrixPosition(app.matrixWorld)
+        .add(localVector2.set(0, 1, 0));
+      const quaternion = app.quaternion;
+      const scale = app.scale;
+      const components = [{
+        key: 'quality',
+        value: app.getComponent('quality'),
+      }];
+
+      // create npc
+      const npc = await this.#createNpcAsync({
+        name,
+        avatarUrl,
+        position,
+        quaternion,
+        scale,
+        detached,
+        components,
+      });
+
+      this.#addNpc({
+        npc,
+        app,
+        detached,
+      });
+      await this.#setPlayerApp({
+        player: npc,
+        app,
+        json,
+      });
+    }
+  }
+  removeNpcApp(app) {
+    const fn = cancelFnPerApp.get(app);
+    if (fn) {
+      cancelFnPerApp.delete(app);
+      fn();
+    }
+  }
+
+  updatePhysics(timestamp, timeDiff) {
+    const allNpcs = [].concat(this.npcs, this.detachedNpcs);
+    for (const npc of allNpcs) {
+      const fn = updatePhysicsFnMap.get(this.getAppByNpc(npc));
+      if (fn) {
+        fn(timestamp, timeDiff);
+      }
+    }
+  }
+  updateAvatar(timestamp, timeDiff) {
+    const allNpcs = [].concat(this.npcs, this.detachedNpcs);
+    for (const npc of allNpcs) {
+      const fn = updateAvatarsFnMap.get(this.getAppByNpc(npc));
+      if (fn) {
+        fn(timestamp, timeDiff);
+      }
+    }
+  }
+
+  setPartyTarget(player, target) {
+    this.targetMap.set(player, target);
+  }
+  #getPartyTarget(player) {
+    return this.targetMap.get(player);
   }
 
   async #createNpcAsync({
@@ -125,33 +214,11 @@ class NpcManager extends EventTarget {
     }
   }
 
-  setPartyTarget(player, target) {
-    this.targetMap.set(player, target);
-  }
-  #getPartyTarget(player) {
-    return this.targetMap.get(player);
-  }
-
-  updatePhysics(timestamp, timeDiff) {
-    const allNpcs = [].concat(this.npcs, this.detachedNpcs);
-    for (const npc of allNpcs) {
-      const fn = updatePhysicsFnMap.get(this.getAppByNpc(npc));
-      if (fn) {
-        fn(timestamp, timeDiff);
-      }
-    }
-  }
-  updateAvatar(timestamp, timeDiff) {
-    const allNpcs = [].concat(this.npcs, this.detachedNpcs);
-    for (const npc of allNpcs) {
-      const fn = updateAvatarsFnMap.get(this.getAppByNpc(npc));
-      if (fn) {
-        fn(timestamp, timeDiff);
-      }
-    }
-  }
-
-  addNpc(npc, app, json) {
+  #addNpc({
+    npc,
+    app,
+    detached,
+  }) {
     const appchange = e => {
       // update physics object when vrm app is changed
       app.setPhysicsObject(npc.characterPhysics.characterController);
@@ -175,8 +242,7 @@ class NpcManager extends EventTarget {
     };
     cancelFnPerNpc.set(npc, cleanupFn);
 
-    const npcDetached = !!json.detached;
-    if (!npcDetached) {
+    if (!detached) {
       this.npcs.push(npc);
     } else {
       this.detachedNpcs.push(npc);
@@ -189,7 +255,11 @@ class NpcManager extends EventTarget {
     }));
   }
 
-  async #setPlayerApp(player, app, json) {
+  async #setPlayerApp({
+    player,
+    app,
+    json,
+  }) {
     this.npcAppMap.set(player, app);
 
     let live = true;
@@ -432,53 +502,6 @@ class NpcManager extends EventTarget {
       await wearablePromises;
     };
     await _updateWearables();
-  }
-
-  async addNpcApp(app, srcUrl) {
-    const mode = app.getComponent('mode') ?? 'attached';
-
-    // load
-    if (mode === 'attached') {
-      // load json
-      const res = await fetch(srcUrl);
-      const json = await res.json();
-      //if (!live) return;
-
-      // npc pameters
-      const name = json.name;
-      const detached = !!json.detached;
-      const avatarUrl = createRelativeUrl(json.avatarUrl, srcUrl);
-
-      const position = localVector.setFromMatrixPosition(app.matrixWorld)
-        .add(localVector2.set(0, 1, 0));
-      const quaternion = app.quaternion;
-      const scale = app.scale;
-      const components = [{
-        key: 'quality',
-        value: app.getComponent('quality'),
-      }];
-
-      // create npc
-      const npc = await this.#createNpcAsync({
-        name,
-        avatarUrl,
-        position,
-        quaternion,
-        scale,
-        detached,
-        components,
-      });
-
-      this.addNpc(npc, app, json);
-      await this.#setPlayerApp(npc, app, json);
-    }
-  }
-  removeNpcApp(app) {
-    const fn = cancelFnPerApp.get(app);
-    if (fn) {
-      cancelFnPerApp.delete(app);
-      fn();
-    }
   }
 }
 const npcManager = new NpcManager();
