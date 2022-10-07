@@ -33,19 +33,17 @@ class NpcManager extends EventTarget {
     super();
 
     this.npcs = [];
-    this.npcAppMap = new WeakMap();
     this.detachedNpcs = [];
+    this.npcAppMap = new WeakMap();
     this.targetMap = new WeakMap();
   }
 
   getAppByNpc(npc) {
     return this.npcAppMap.get(npc);
   }
-
   getNpcByApp(app) {
     return this.npcs.find(npc => this.getAppByNpc(npc) === app);
   }
-
   getDetachedNpcByApp(app) {
     return this.detachedNpcs.find(npc => this.getAppByNpc(npc) === app);
   }
@@ -66,6 +64,8 @@ class NpcManager extends EventTarget {
     const app = createPlayerApp();
 
     this.addNpc(player, app, defaultPlayerSpec);
+    await this.#setPlayerApp(player, app, defaultPlayerSpec);
+
     app.addEventListener('destroy', () => {
       const npc = this.getNpcByApp(app);
       this.#removeNpc(npc);
@@ -117,53 +117,33 @@ class NpcManager extends EventTarget {
 
     return player;
   }
-
-  destroyNpc(npc) {
-    npc.destroy();
-
-    this.dispatchEvent(new MessageEvent('playerremove', {
-      data: {
-        player: npc,
-      }
-    }));
-
-    const removeIndex = this.npcs.indexOf(npc);
-    if (removeIndex !== -1) {
-      this.npcs.splice(removeIndex, 1);
+  #removeNpc(npc) {
+    const fn = cancelFnPerNpc.get(npc);
+    if (fn) {
+      cancelFnPerNpc.delete(npc);
+      fn();
     }
   }
 
   setPartyTarget(player, target) {
     this.targetMap.set(player, target);
   }
-
   #getPartyTarget(player) {
     return this.targetMap.get(player);
   }
 
   updatePhysics(timestamp, timeDiff) {
-    for (const npc of this.npcs) {
-      const fn = updatePhysicsFnMap.get(this.getAppByNpc(npc));
-      if (fn) {
-        fn(timestamp, timeDiff);
-      }
-    }
-    for (const npc of this.detachedNpcs) {
+    const allNpcs = [].concat(this.npcs, this.detachedNpcs);
+    for (const npc of allNpcs) {
       const fn = updatePhysicsFnMap.get(this.getAppByNpc(npc));
       if (fn) {
         fn(timestamp, timeDiff);
       }
     }
   }
-
   updateAvatar(timestamp, timeDiff) {
-    for (const npc of this.npcs) {
-      const fn = updateAvatarsFnMap.get(this.getAppByNpc(npc));
-      if (fn) {
-        fn(timestamp, timeDiff);
-      }
-    }
-    for (const npc of this.detachedNpcs) {
+    const allNpcs = [].concat(this.npcs, this.detachedNpcs);
+    for (const npc of allNpcs) {
       const fn = updateAvatarsFnMap.get(this.getAppByNpc(npc));
       if (fn) {
         fn(timestamp, timeDiff);
@@ -171,7 +151,7 @@ class NpcManager extends EventTarget {
     }
   }
 
-  async addNpc(npc, app, json) {
+  addNpc(npc, app, json) {
     const appchange = e => {
       // update physics object when vrm app is changed
       app.setPhysicsObject(npc.characterPhysics.characterController);
@@ -179,9 +159,19 @@ class NpcManager extends EventTarget {
     npc.addEventListener('appchange', appchange);
 
     const cleanupFn = () => {
-      npc.removeEventListener('appchange', appchange);
+      npc.destroy();
+      const removeIndex = this.npcs.indexOf(npc);
+      if (removeIndex !== -1) {
+        this.npcs.splice(removeIndex, 1);
+      }
 
-      this.destroyNpc(npc);
+      this.dispatchEvent(new MessageEvent('playerremove', {
+        data: {
+          player: npc,
+        }
+      }));
+
+      npc.removeEventListener('appchange', appchange);
     };
     cancelFnPerNpc.set(npc, cleanupFn);
 
@@ -191,17 +181,16 @@ class NpcManager extends EventTarget {
     } else {
       this.detachedNpcs.push(npc);
     }
-    await this.#setPlayerApp(npc, app, json);
+
+    this.dispatchEvent(new MessageEvent('playeradd', {
+      data: {
+        player: npc,
+      }
+    }));
   }
 
   async #setPlayerApp(player, app, json) {
     this.npcAppMap.set(player, app);
-
-    this.dispatchEvent(new MessageEvent('playeradd', {
-      data: {
-        player,
-      }
-    }));
 
     let live = true;
     let character = null;
@@ -446,58 +435,49 @@ class NpcManager extends EventTarget {
   }
 
   async addNpcApp(app, srcUrl) {
-    let json = null;
-
     const mode = app.getComponent('mode') ?? 'attached';
-    const quality = app.getComponent('quality');
 
     // load
     if (mode === 'attached') {
       // load json
       const res = await fetch(srcUrl);
-      json = await res.json();
+      const json = await res.json();
       //if (!live) return;
 
-      const npcName = json.name;
-
       // npc pameters
-      let avatarUrl = json.avatarUrl;
-      avatarUrl = createRelativeUrl(avatarUrl, srcUrl);
-
-      const npcDetached = !!json.detached;
+      const name = json.name;
+      const detached = !!json.detached;
+      const avatarUrl = createRelativeUrl(json.avatarUrl, srcUrl);
 
       const position = localVector.setFromMatrixPosition(app.matrixWorld)
         .add(localVector2.set(0, 1, 0));
-      
+      const quaternion = app.quaternion;
+      const scale = app.scale;
+      const components = [{
+        key: 'quality',
+        value: app.getComponent('quality'),
+      }];
+
       // create npc
       const npc = await this.#createNpcAsync({
-        name: npcName,
+        name,
         avatarUrl,
         position,
-        quaternion: app.quaternion,
-        scale: app.scale,
-        detached: npcDetached,
-        components: [{
-          key: 'quality',
-          value: quality,
-        }],
+        quaternion,
+        scale,
+        detached,
+        components,
       });
 
       this.addNpc(npc, app, json);
-    }
-  }
-  #removeNpc(npc) {
-    const cancelFn = cancelFnPerNpc.get(npc);
-    if (cancelFn) {
-      cancelFnPerNpc.delete(npc);
-      cancelFn();
+      await this.#setPlayerApp(npc, app, json);
     }
   }
   removeNpcApp(app) {
-    const cancelFn = cancelFnPerApp.get(app);
-    if (cancelFn) {
+    const fn = cancelFnPerApp.get(app);
+    if (fn) {
       cancelFnPerApp.delete(app);
-      cancelFn();
+      fn();
     }
   }
 }
