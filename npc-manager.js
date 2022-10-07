@@ -65,7 +65,6 @@ class NpcManager extends EventTarget {
 
     this.#addNpc({
       npc: player,
-      app,
       detached: false,
     });
     await this.#setPlayerApp({
@@ -118,7 +117,6 @@ class NpcManager extends EventTarget {
 
       this.#addNpc({
         npc,
-        app,
         detached,
       });
       await this.#setPlayerApp({
@@ -204,15 +202,8 @@ class NpcManager extends EventTarget {
 
   #addNpc({
     npc,
-    app,
     detached,
   }) {
-    const appchange = e => {
-      // update physics object when vrm app is changed
-      app.setPhysicsObject(npc.characterPhysics.characterController);
-    };
-    npc.addEventListener('appchange', appchange);
-
     const cleanupFn = () => {
       npc.destroy();
       const removeIndex = this.npcs.indexOf(npc);
@@ -225,8 +216,6 @@ class NpcManager extends EventTarget {
           player: npc,
         }
       }));
-
-      npc.removeEventListener('appchange', appchange);
     };
     cancelFnPerNpc.set(npc, cleanupFn);
 
@@ -289,6 +278,15 @@ class NpcManager extends EventTarget {
         description: json.bio,
       }
     };
+
+    const appchange = e => {
+      // update physics object when vrm app is changed
+      app.setPhysicsObject(player.characterPhysics.characterController);
+    };
+    player.addEventListener('appchange', appchange);
+    cancelFns.push(() => {
+      player.removeEventListener('appchange', appchange);
+    });
 
     // events
     let targetSpec = null;
