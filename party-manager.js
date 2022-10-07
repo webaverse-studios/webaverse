@@ -106,7 +106,7 @@ class PartyManager extends EventTarget {
 
       const expelPlayer = () => {
         const player = newPlayer;
-        // console.log('removeFn', player);
+        // console.log('expelPlayer', player);
         const playerIndex = this.partyPlayers.indexOf(player);
         const app = npcManager.getAppByNpc(player);
         this.transplantPartyAppToWorld(app);
@@ -121,17 +121,20 @@ class PartyManager extends EventTarget {
         this.removeFnMap.delete(player);
       }
 
-      const activate = () => {
-        // console.log('deactivate', newPlayer.name);
-        const playerIndex = this.partyPlayers.indexOf(newPlayer);
-        if (playerIndex > 0) {
-          expelPlayer(newPlayer);
-          removePlayer(newPlayer);
-        } else {
-          console.warn('deactive local player');
+      const playerexpelled = (e) => {
+        const {player} = e.data;
+        if (player === newPlayer) {
+          // console.log('playerexpelled', newPlayer.name);
+          const playerIndex = this.partyPlayers.indexOf(player);
+          if (playerIndex > 0) {
+            expelPlayer(player);
+            removePlayer(player);
+          } else {
+            console.warn('deactive local player');
+          }
         }
       };
-      newPlayer.addEventListener('activate', activate);
+      npcManager.addEventListener('playerexpelled', playerexpelled);
 
       if (this.partyPlayers.length >= 2) {
         const headPlayer = this.partyPlayers[0];
@@ -163,7 +166,7 @@ class PartyManager extends EventTarget {
       playerApp.addEventListener('die', die);
 
       const removeFn = () => {
-        newPlayer.removeEventListener('activate', activate);
+        newPlayer.removeEventListener('playerexpelled', playerexpelled);
         playerApp.removeEventListener('die', die);
       };
 
