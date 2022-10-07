@@ -18,7 +18,22 @@ export const mapWarpedUvs = (src, srcOffset, dst, dstOffset, tx, ty, tw, th, can
     const localDstOffset = dstOffset + i * 2;
 
     localVector2D.fromArray(src.array, srcIndex);
+
+    const minX = Math.min(0, localVector2D.x);
+    const minY = Math.min(0, localVector2D.y);
+
+    const maxX = Math.max(1, localVector2D.x);
+    const maxY = Math.max(1, localVector2D.y);
+
+    const dx = maxX - minX;
+    const dy = maxY - minY;
+
+    // * scaling the UVs to be in the 0-1 range
+    localVector2D.x = (localVector2D.x - minX) / dx;
+    localVector2D.y = (localVector2D.y - minY) / dy;
+
     modUv(localVector2D);
+
     localVector2D
       .multiply(
         localVector2D2.set(tw/canvasSize, th/canvasSize)
@@ -26,6 +41,7 @@ export const mapWarpedUvs = (src, srcOffset, dst, dstOffset, tx, ty, tw, th, can
       .add(
         localVector2D2.set(tx/canvasSize, ty/canvasSize)
       );
+
     localVector2D.toArray(dst.array, localDstOffset);
   }
 };
@@ -280,3 +296,55 @@ export const createTextureAtlas = (meshes, {
     textureNames: textures,
   };
 };
+
+export const calculateCanvasAtlasTexturePerRow = (numTextures) => {
+  return Math.pow(2, Math.ceil(Math.log(numTextures) / Math.log(2)));
+};
+
+const _adjustAtlasTextureSettings = (
+  texture,
+  encoding = THREE.LinearEncoding
+) => {
+  texture.generateMipmaps = true;
+  texture.minFilter = THREE.NearestMipMapLinearFilter;
+  texture.magFilter = THREE.NearestFilter;
+  texture.encoding = encoding;
+  texture.flipY = false;
+};
+
+export class CanvasTextureAtlas {
+  constructor(textures, textureEncoding, subTextureSize) {
+    this.texturePerRow = calculateCanvasAtlasTexturePerRow(textures.length);
+
+    this.canvas = document.createElement('canvas');
+
+    const width = subTextureSize * this.texturePerRow;
+    const height = subTextureSize * this.texturePerRow;
+
+    this.canvas.width = width;
+    this.canvas.height = height;
+
+    const context = this.canvas.getContext('2d');
+
+    for (let t = 0; t < textures.length; t++) {
+      const texture = textures[t];
+      const image = texture.image;
+
+      const x = t % this.texturePerRow;
+      const y = Math.floor(t / this.texturePerRow);
+
+      image &&
+        context.drawImage(
+          image,
+          x * subTextureSize,
+          y * subTextureSize
+        );
+    }
+
+    const atlasTexture = new THREE.CanvasTexture(this.canvas);
+
+    _adjustAtlasTextureSettings(atlasTexture, textureEncoding);
+
+    this.atlasTexture = atlasTexture;
+  }
+}

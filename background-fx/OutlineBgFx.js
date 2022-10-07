@@ -103,6 +103,7 @@ class OutlineBgFxMesh extends THREE.Mesh {
       alphaToCoverage: true,
     });
     super(geometry, material);
+    material.freeze();
     this.frustumCulled = false;
   }
   update(timestamp, timeDiff, width, height, texture) {

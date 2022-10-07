@@ -645,14 +645,14 @@ export function makeId(length) {
   return result;
 }
 
-export function chunkMinForPosition(x, y, z, chunkSize) {
+/* export function chunkMinForPosition(x, y, z, chunkSize) {
   localVector6.set(
     Math.floor(x / chunkSize),
     Math.floor(y / chunkSize),
     Math.floor(z / chunkSize)
   );
   return localVector6;
-}
+} */
 
 export function getLockChunkId(chunkPosition) {
   return `chunk:${chunkPosition.x}, ${chunkPosition.y}, ${chunkPosition.z}}`;

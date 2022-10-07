@@ -13,19 +13,16 @@ const localArray2D = Array(2);
 //
 
 const GenerateFlags = {
-  // none: 0,
   terrain: 1 << 0,
   water: 1 << 1,
-  barrier: 1 << 2,
-  vegetation: 1 << 3,
-  grass: 1 << 4,
-  poi: 1 << 5,
+  vegetation: 1 << 2,
+  grass: 1 << 3,
+  poi: 1 << 4,
 };
 const _generateFlagsToInt = generateFlags => {
   let result = 0;
   generateFlags.terrain && (result |= GenerateFlags.terrain);
   generateFlags.water && (result |= GenerateFlags.water);
-  generateFlags.barrier && (result |= GenerateFlags.barrier);
   generateFlags.vegetation && (result |= GenerateFlags.vegetation);
   generateFlags.grass && (result |= GenerateFlags.grass);
   generateFlags.poi && (result |= GenerateFlags.poi);
@@ -46,9 +43,6 @@ class ProcGenInstance {
       seed,
       instance,
     });
-
-    // this.lightmapper = null;
-    // this.heightfieldMapper = null;
   }
   setCamera(worldPosition, cameraPosition, cameraQuaternion, projectionMatrix) {
     this.pgWorkerManager.setCamera(worldPosition, cameraPosition, cameraQuaternion, projectionMatrix);
@@ -98,50 +92,27 @@ class ProcGenInstance {
     );
     return result;
   }
-  /* async generateGrass(position, lod, numInstances, {signal} = {}) {
+  async generateBarrier(
+    position,
+    minLod,
+    maxLod,
+    {
+      signal = null,
+    } = {},
+  ) {
     await this.pgWorkerManager.waitForLoad();
 
     position.toArray(localArray2D);
-    const result = await this.pgWorkerManager.generateGrass(localArray2D, lod, numInstances, {signal});
+    const result = await this.pgWorkerManager.generateBarrier(
+      localArray2D,
+      minLod,
+      maxLod,
+      {
+        signal,
+      },
+    );
     return result;
-  } */
-  /* async generateVegetation(position, lod, numInstances, {signal} = {}) {
-    await this.pgWorkerManager.waitForLoad();
-
-    position.toArray(localArray2D);
-    const result = await this.pgWorkerManager.generateVegetation(localArray2D, lod, numInstances, {signal});
-    return result;
-  } */
-  /* async getLightMapper({
-    size,
-    debug = false,
-  }) {
-    if (!this.lightmapper) {
-      // const {chunkSize, range} = this;
-      this.lightmapper = new LightMapper({
-        // chunkSize,
-        // terrainSize,
-        // range,
-        procGenInstance: this,
-        size,
-        debug,
-      });
-    }
-    return this.lightmapper;
   }
-  async getHeightfieldMapper({
-    size,
-    debug = false,
-  } = {}) {
-    if (!this.heightfieldMapper) {
-      this.heightfieldMapper = new HeightfieldMapper({
-        procGenInstance: this,
-        size,
-        debug,
-      });
-    }
-    return this.heightfieldMapper;
-  } */
 }
 
 class ProcGenManager {
