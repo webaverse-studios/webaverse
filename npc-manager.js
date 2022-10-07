@@ -74,11 +74,6 @@ class NpcManager extends EventTarget {
       json: spec
     });
 
-    app.addEventListener('destroy', () => {
-      const npc = this.getNpcByApp(app);
-      this.#removeNpc(npc);
-    });
-
     this.dispatchEvent(new MessageEvent('defaultplayeradd', {
       data: {
         player,
@@ -267,6 +262,8 @@ class NpcManager extends EventTarget {
     const cancelFns = [
       () => {
         live = false;
+
+        this.#removeNpc(player);
 
         if (character) {
           world.loreAIScene.removeCharacter(character);
