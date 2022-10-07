@@ -33,8 +33,7 @@ class OffscreenEngineProxy {
         });
   
         iframe.allow = 'cross-origin-isolated';
-        // iframe.src = `${inappPreviewHost}/engine.html`;
-        iframe.src = `https://local.webaverse.com:4000/engine.html`;
+        iframe.src = `${inappPreviewHost}/engine.html`;
         document.body.appendChild(iframe);
         this.iframe = iframe;
   
