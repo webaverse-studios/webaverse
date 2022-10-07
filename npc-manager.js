@@ -206,13 +206,6 @@ class NpcManager extends EventTarget {
 
     return player;
   }
-  #removeNpc(npc) {
-    const fn = cancelFnPerNpc.get(npc);
-    if (fn) {
-      cancelFnPerNpc.delete(npc);
-      fn();
-    }
-  }
 
   #addNpc({
     npc,
@@ -253,6 +246,13 @@ class NpcManager extends EventTarget {
         player: npc,
       }
     }));
+  }
+  #removeNpc(npc) {
+    const fn = cancelFnPerNpc.get(npc);
+    if (fn) {
+      cancelFnPerNpc.delete(npc);
+      fn();
+    }
   }
 
   async #setPlayerApp({
