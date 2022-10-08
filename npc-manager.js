@@ -25,8 +25,7 @@ const localVector2 = new THREE.Vector3();
 
 const updatePhysicsFnMap = new WeakMap();
 const updateAvatarsFnMap = new WeakMap();
-const cancelFnPerNpc = new WeakMap();
-const cancelFnPerApp = new WeakMap();
+const cancelFnsMap = new WeakMap();
 
 const followTarget = (player, target, timeDiff) => {
   if (target) {
@@ -86,12 +85,8 @@ class NpcManager extends EventTarget {
     };
     const app = createPlayerApp();
 
-    this.#addNpc({
+    await this.#setNpcApp({
       npc: player,
-      detached: false,
-    });
-    await this.#setPlayerApp({
-      player,
       app,
       json: spec
     });
@@ -142,21 +137,17 @@ class NpcManager extends EventTarget {
         components,
       });
 
-      this.#addNpc({
+      await this.#setNpcApp({
         npc,
-        detached,
-      });
-      await this.#setPlayerApp({
-        player: npc,
         app,
         json,
       });
     }
   }
   removeNpcApp(app) {
-    const fn = cancelFnPerApp.get(app);
+    const fn = cancelFnsMap.get(app);
     if (fn) {
-      cancelFnPerApp.delete(app);
+      cancelFnsMap.delete(app);
       fn();
     }
   }
@@ -227,73 +218,61 @@ class NpcManager extends EventTarget {
     return player;
   }
 
-  #addNpc({
+  async #setNpcApp({
     npc,
-    detached,
-  }) {
-    const cleanupFn = () => {
-      npc.destroy();
-      const removeIndex = this.npcs.indexOf(npc);
-      if (removeIndex !== -1) {
-        this.npcs.splice(removeIndex, 1);
-      }
-
-      this.dispatchEvent(new MessageEvent('playerremove', {
-        data: {
-          player: npc,
-        }
-      }));
-    };
-    cancelFnPerNpc.set(npc, cleanupFn);
-
-    if (!detached) {
-      this.npcs.push(npc);
-    } else {
-      this.detachedNpcs.push(npc);
-    }
-
-    this.dispatchEvent(new MessageEvent('playeradd', {
-      data: {
-        player: npc,
-      }
-    }));
-  }
-  #removeNpc(npc) {
-    const fn = cancelFnPerNpc.get(npc);
-    if (fn) {
-      cancelFnPerNpc.delete(npc);
-      fn();
-    }
-  }
-
-  async #setPlayerApp({
-    player,
     app,
     json,
   }) {
-    this.npcAppMap.set(player, app);
-
-    let live = true;
-    let character = null;
+    // cleanFns
     const cancelFns = [
       () => {
-        live = false;
-
-        this.#removeNpc(player);
-
-        if (character) {
-          world.loreAIScene.removeCharacter(character);
-        }
-
-        this.npcAppMap.delete(player);
+        npc.destroy();
       },
     ];
-    cancelFnPerApp.set(app, () => {
+    cancelFnsMap.set(app, () => {
       for (const cancelFn of cancelFns) {
         cancelFn();
       }
     });
 
+    // npcs list
+    const detached = !!json.detached;
+    if (!detached) {
+      this.npcs.push(npc);
+      cancelFns.push(() => {
+        const removeIndex = this.npcs.indexOf(npc);
+        this.npcs.splice(removeIndex, 1);
+      });
+    } else {
+      this.detachedNpcs.push(npc);
+      cancelFns.push(() => {
+        const removeIndex = this.detachedNpcs.indexOf(npc);
+        this.detachedNpcs.splice(removeIndex, 1);
+      });
+    }
+
+    // npcApp map
+    this.npcAppMap.set(npc, app);
+    cancelFns.push(() => {
+      this.npcAppMap.delete(npc);
+    });
+
+    // playeradd/playerremove events
+    const player = npc;
+    this.dispatchEvent(new MessageEvent('playeradd', {
+      data: {
+        player,
+      }
+    }));
+    cancelFns.push(() => {
+      this.dispatchEvent(new MessageEvent('playerremove', {
+        data: {
+          player,
+        }
+      }));
+    });
+
+    // physics object tracking
     app.setPhysicsObject(player.characterPhysics.characterController);
     const avatarupdate = e => {
       app.setPhysicsObject(player.characterPhysics.characterController);
@@ -303,6 +282,7 @@ class NpcManager extends EventTarget {
       player.removeEventListener('avatarupdate', avatarupdate);
     });
 
+    // lore spec
     app.getLoreSpec = () => {
       return {
         name: json.name,
@@ -407,9 +387,12 @@ class NpcManager extends EventTarget {
 
     // ai scene
     const _addToAiScene = () => {
-      character = world.loreAIScene.addCharacter({
+      const character = world.loreAIScene.addCharacter({
         name: npcName,
         bio: npcBio,
+      });
+      cancelFns.push(() => {
+        world.loreAIScene.removeCharacter(character);
       });
       character.addEventListener('say', e => {
         const localPlayer = playersManager.getLocalPlayer();
