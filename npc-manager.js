@@ -73,6 +73,10 @@ class NpcManager extends EventTarget {
       json: spec
     });
 
+    app.addEventListener('destroy', () => {
+      this.removeNpcApp(app);
+    });
+
     this.dispatchEvent(new MessageEvent('defaultplayeradd', {
       data: {
         player,
