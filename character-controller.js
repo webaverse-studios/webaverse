@@ -1120,11 +1120,6 @@ class LocalPlayer extends UninterpolatedPlayer {
         self.appManager.removeTrackedAppInternal(oldInstanceId);
       }
       self.syncAvatar();
-
-      self.dispatchEvent({
-        type: 'appchange',
-        app,
-      });
     });
   }
   setMicMediaStream(mediaStream) {

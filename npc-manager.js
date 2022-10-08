@@ -295,12 +295,12 @@ class NpcManager extends EventTarget {
     });
 
     app.setPhysicsObject(player.characterPhysics.characterController);
-    const appchange = e => {
+    const avatarupdate = e => {
       app.setPhysicsObject(player.characterPhysics.characterController);
     };
-    player.addEventListener('appchange', appchange);
+    player.addEventListener('avatarupdate', avatarupdate);
     cancelFns.push(() => {
-      player.removeEventListener('appchange', appchange);
+      player.removeEventListener('avatarupdate', avatarupdate);
     });
 
     app.getLoreSpec = () => {
