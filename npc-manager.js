@@ -28,6 +28,29 @@ const updateAvatarsFnMap = new WeakMap();
 const cancelFnPerNpc = new WeakMap();
 const cancelFnPerApp = new WeakMap();
 
+const followTarget = (player, target, timeDiff) => {
+  if (target) {
+    const v = localVector.setFromMatrixPosition(target.matrixWorld)
+      .sub(player.position);
+    v.y = 0;
+    const distance = v.length();
+
+    const speed = THREE.MathUtils.clamp(
+      THREE.MathUtils.mapLinear(
+        distance,
+        2, 3.5,
+        walkSpeed, runSpeed,
+      ),
+      0, runSpeed,
+    );
+    const velocity = v.normalize().multiplyScalar(speed);
+    player.characterPhysics.applyWasd(velocity, timeDiff);
+
+    return distance;
+  }
+  return 0;
+};
+
 class NpcManager extends EventTarget {
   constructor() {
     super();
@@ -271,10 +294,6 @@ class NpcManager extends EventTarget {
       }
     });
 
-    const animations = Avatar.getAnimations();
-    const hurtAnimation = animations.find(a => a.isHurt);
-    const hurtAnimationDuration = hurtAnimation.duration;
-
     app.setPhysicsObject(player.characterPhysics.characterController);
     const appchange = e => {
       app.setPhysicsObject(player.characterPhysics.characterController);
@@ -294,6 +313,9 @@ class NpcManager extends EventTarget {
     // events
     let targetSpec = null;
     const _listenEvents = () => {
+      const animations = Avatar.getAnimations();
+      const hurtAnimation = animations.find(a => a.isHurt);
+      const hurtAnimationDuration = hurtAnimation.duration;
       const hittrackeradd = e => {
         app.hitTracker.addEventListener('hit', e => {
           if (!player.hasAction('hurt')) {
@@ -334,28 +356,6 @@ class NpcManager extends EventTarget {
         app.removeEventListener('activate', activate);
       });
 
-      const followTarget = (player, target, timeDiff) => {
-        if (target) {
-          const v = localVector.setFromMatrixPosition(target.matrixWorld)
-            .sub(player.position);
-          v.y = 0;
-          const distance = v.length();
-
-          const speed = THREE.MathUtils.clamp(
-            THREE.MathUtils.mapLinear(
-              distance,
-              2, 3.5,
-              walkSpeed, runSpeed,
-            ),
-            0, runSpeed,
-          );
-          const velocity = v.normalize().multiplyScalar(speed);
-          player.characterPhysics.applyWasd(velocity, timeDiff);
-
-          return distance;
-        }
-        return 0;
-      };
       const updatePhysicsFn = (timestamp, timeDiff) => {
         if (player) {
           if (player.getControlMode() !== 'controlled') {
@@ -381,17 +381,16 @@ class NpcManager extends EventTarget {
           player.updatePhysics(timestamp, timeDiff);
         }
       };
+      updatePhysicsFnMap.set(app, updatePhysicsFn);
+      cancelFns.push(() => {
+        updatePhysicsFnMap.delete(app);
+      });
+
       const updateAvatarFn = (timestamp, timeDiff) => {
         player.updateAvatar(timestamp, timeDiff);
       };
-
-      updatePhysicsFnMap.set(app, updatePhysicsFn);
       updateAvatarsFnMap.set(app, updateAvatarFn);
-
       cancelFns.push(() => {
-        app.removeEventListener('hittrackeradded', hittrackeradd);
-        app.removeEventListener('activate', activate);
-        updatePhysicsFnMap.delete(app);
         updateAvatarsFnMap.delete(app);
       });
     };
