@@ -110,7 +110,6 @@ class NpcManager extends EventTarget {
       // load json
       const res = await fetch(srcUrl);
       const json = await res.json();
-      //if (!live) return;
 
       // npc pameters
       const name = json.name;
@@ -475,7 +474,6 @@ class NpcManager extends EventTarget {
         /* const app = await metaversefile.createAppAsync({
           start_url,
         }); */
-        // if (!live) return;
 
         player.wear(app);
       })());
