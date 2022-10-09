@@ -583,10 +583,11 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
       const chunkResult2 = _cloneChunkResult(chunkResult);
 
       const _freeChunkResult = chunkResult => {
-        pg.free(chunkResult.terrainGeometry.bufferAddress);
-        pg.free(chunkResult.waterGeometry.bufferAddress);
-        pg.free(chunkResult.grassInstances.bufferAddress);
-        pg.free(chunkResult.poiInstances.bufferAddress);
+        chunkResult.terrainGeometry && pg.free(chunkResult.terrainGeometry.bufferAddress);
+        chunkResult.waterGeometry && pg.free(chunkResult.waterGeometry.bufferAddress);
+        chunkResult.grassInstances && pg.free(chunkResult.grassInstances.bufferAddress);
+        chunkResult.poiInstances && pg.free(chunkResult.poiInstances.bufferAddress);
+        chunkResult.heightfields && pg.free(chunkResult.heightfields.bufferAddress);
         pg.free(chunkResult.bufferAddress);
       };
       _freeChunkResult(chunkResult);
