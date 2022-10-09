@@ -139,8 +139,9 @@ export class ProcGenManager {
     return instance;
   }
   getNodeHash(node) {
-    return (node.min.x << 16) |
-      (node.min.y & 0xFFFF);
+    return ((node.min.x & 0xFFF) << 20) |
+      ((node.min.y & 0xFFF) << 8) |
+      (node.lod & 0xFF);
   }
 }
 const procGenManager = new ProcGenManager();
