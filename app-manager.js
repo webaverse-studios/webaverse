@@ -532,7 +532,7 @@ class AppManager extends EventTarget {
       });
     app.contentId = 'error-placeholder';
     (async () => {
-      await metaverseModules.waitForLoad();
+      // await metaverseModules.waitForLoad();
       const {modules} = metaversefile.useDefaultModules();
       const m = modules['errorPlaceholder'];
       await app.addModule(m);
