@@ -481,8 +481,7 @@ let queue = [];
 const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
   switch (method) {
     case 'initialize': {
-      const {chunkSize, seed, numThreads} = args;
-      return pg.initialize(chunkSize, seed, numThreads);
+      return pg.initialize();
     }
     case 'ensureInstance': {
       // console.log('ensure instance', args);
@@ -518,9 +517,9 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
       return true;
     }
     case 'createTracker': {
-      const {instance: instanceKey, lod, lod1Range, trackY} = args;
+      const {instance: instanceKey} = args;
       const instance = instances.get(instanceKey);
-      const tracker = pg.createTracker(instance, lod, lod1Range, trackY);
+      const tracker = pg.createTracker(instance);
       const spec = {
         result: tracker,
         transfers: [],

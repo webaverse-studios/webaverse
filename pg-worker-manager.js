@@ -95,10 +95,7 @@ export class PGWorkerManager {
         // initialize
         // note: deliberately don't wait for this; let it start in the background
         await Promise.all([
-          worker.request('initialize', {
-            // chunkSize: this.chunkSize,
-            // seed: this.seed,
-          }),
+          worker.request('initialize'),
           worker.request('ensureInstance', {
             instance: this.instance,
             seed: this.seed,
