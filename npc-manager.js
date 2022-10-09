@@ -11,7 +11,7 @@ import Avatar from './avatars/avatars.js';
 import {LocalPlayer} from './character-controller.js';
 import {playersManager} from './players-manager.js';
 import * as voices from './voices.js';
-// import {world} from './world.js';
+import {world} from './world.js';
 import {chatManager} from './chat-manager.js';
 import {makeId, createRelativeUrl} from './util.js';
 import { triggerEmote } from './src/components/general/character/Poses.jsx';

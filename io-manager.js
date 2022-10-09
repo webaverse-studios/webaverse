@@ -9,7 +9,7 @@ import metaversefile from 'metaversefile';
 import cameraManager from './camera-manager.js';
 // import controlsManager from './controls-manager.js';
 import game from './game.js';
-// import {world} from './world.js';
+import {world} from './world.js';
 import voiceInput from './voice-input/voice-input.js';
 // import * as universe from './universe.js';
 // import {toggle as inventoryToggle} from './inventory.js';

@@ -17,7 +17,7 @@ import physx from './physx.js';
 import {playersManager} from './players-manager.js';
 import sceneNames from './scenes/scenes.json';
 import {parseQuery} from './util.js';
-// import {world} from './world.js';
+import {world} from './world.js';
 
 const physicsScene = physicsManager.getScene();
 

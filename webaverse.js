@@ -9,7 +9,7 @@ import * as sounds from './sounds.js';
 import physx from './physx.js';
 import ioManager from './io-manager.js';
 import physicsManager from './physics-manager.js';
-// import {world} from './world.js';
+import {world} from './world.js';
 // import * as blockchain from './blockchain.js';
 import cameraManager from './camera-manager.js';
 import game from './game.js';
@@ -298,7 +298,7 @@ export default class Webaverse extends EventTarget {
     
     let lastTimestamp = performance.now();
     const animate = (timestamp, frame) => {
-      console.log('animate', physx.loaded);
+      // console.log('animate', physx.loaded);
       performanceTracker.startFrame();
 
       window.domInfo.innerHTML = '';

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useContext, useState } from 'react';
 import classnames from 'classnames';
 
 import { AppContext } from './components/app';
-// import {world} from '../world.js';
+import {world} from '../world.js';
 import {
   hp,
   mp,

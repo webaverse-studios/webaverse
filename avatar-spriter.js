@@ -6,7 +6,7 @@ import {getRenderer, scene, camera} from './renderer.js';
 import Avatar from './avatars/avatars.js';
 import {AvatarRenderer} from './avatars/avatar-renderer.js';
 import {mod, angleDifference, addDefaultLights} from './util.js';
-// import {world} from './world.js';
+import {world} from './world.js';
 import {
   maxAvatarQuality,
   walkSpeed,

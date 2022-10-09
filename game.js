@@ -10,7 +10,7 @@ import physx from './physx.js';
 import cameraManager from './camera-manager.js';
 import ioManager from './io-manager.js';
 import dioramaManager from './diorama.js';
-// import {world} from './world.js';
+import {world} from './world.js';
 import {buildMaterial, highlightMaterial, selectMaterial, hoverMaterial, hoverEquipmentMaterial} from './shaders.js';
 import {getRenderer, sceneLowPriority, camera} from './renderer.js';
 import {downloadFile, snapPosition, getDropUrl, handleDropJsonItem} from './util.js';
