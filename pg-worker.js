@@ -1,5 +1,5 @@
-import * as THREE from 'three';
-import {defaultChunkSize} from './constants.js';
+// import * as THREE from 'three';
+// import {defaultChunkSize} from './constants.js';
 import pg from './pg-binding.js';
 import {makePromise, align, align4} from './util.js';
 
@@ -566,13 +566,13 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
       const instance = instances.get(instanceKey);
       if (!instance) throw new Error('generateChunk : instance not found');
 
-      const position = localVector2D.fromArray(chunkPosition)
-        .multiplyScalar(chunkWorldSize);
+      const positionX = chunkPosition[0] * chunkSize;
+      const positionZ = chunkPosition[1] * chunkSize;
       const chunkResult = await pg.createChunkMeshAsync(
         instance,
         taskId,
-        position.x,
-        position.y,
+        positionX,
+        positionZ,
         lod,
         lodArray,
         generateFlagsInt,
@@ -608,13 +608,13 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
       const instance = instances.get(instanceKey);
       if (!instance) throw new Error('generateBarrier : instance not found');
 
-      const position = localVector2D.fromArray(chunkPosition)
-        .multiplyScalar(chunkWorldSize);
+      const positionX = chunkPosition[0] * chunkSize;
+      const positionZ = chunkPosition[1] * chunkSize;
       const barrierResult = await pg.createBarrierMeshAsync(
-        inst,
+        instance,
         taskId,
-        position.x,
-        position.z,
+        positionX,
+        positionZ,
         minLod,
         maxLod,
       );
