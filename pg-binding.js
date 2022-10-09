@@ -76,7 +76,7 @@ w.createTracker = (inst, lod, lod1Range) => {
   return result;
 };
 w.destroyTracker = (inst, tracker) => Module._destroyTracker(inst, tracker);
-w.trackerUpdateAsync = async (inst, taskId, tracker, position, priority) => {
+w.trackerUpdateAsync = async (inst, taskId, tracker, position, minLod, maxLod, lod1Range, priority) => {
   const allocator = new Allocator(Module);
 
   const positionArray = allocator.alloc(Float32Array, 3);
@@ -87,6 +87,9 @@ w.trackerUpdateAsync = async (inst, taskId, tracker, position, priority) => {
     taskId,
     tracker,
     positionArray.byteOffset,
+    minLod,
+    maxLod,
+    lod1Range,
     priority,
   );
   const p = makePromise();
