@@ -144,5 +144,7 @@ export class ProcGenManager {
       (node.lod & 0xFF);
   }
 }
-const procGenManager = new ProcGenManager();
+const procGenManager = new ProcGenManager({
+  chunkSize: defaultChunkSize,
+});
 export default procGenManager;
