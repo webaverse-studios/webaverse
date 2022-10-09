@@ -1,11 +1,5 @@
-// import * as THREE from 'three';
-// import {defaultChunkSize} from './constants.js';
 import pg from './pg-binding.js';
 import {makePromise, align, align4} from './util.js';
-
-//
-
-// const chunkSize = defaultChunkSize;
 
 //
 
