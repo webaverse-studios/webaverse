@@ -334,8 +334,8 @@ const _cloneBarrierResult = barrierResult => {
     if (leafNodes.length > 0) {
       const leafNode0 = leafNodes[0];
       let size = leafNodes.length * (
-        leafNode0.min.constructor.BYTES_PER_ELEMENT +
-        Int32Array.BYTES_PER_ELEMENT
+        leafNode0.min.constructor.BYTES_PER_ELEMENT + // x, z
+        Int32Array.BYTES_PER_ELEMENT // lod
       );
       return size;
     } else {
