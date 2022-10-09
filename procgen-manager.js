@@ -78,12 +78,15 @@ class ProcGenInstance {
   ) {
     await this.pgWorkerManager.waitForLoad();
 
+    const {chunkSize} = this;
+
     position.toArray(localArray2D);
     const generateFlagsInt = _generateFlagsToInt(generateFlags);
     const result = await this.pgWorkerManager.generateChunk(
       localArray2D,
       lod,
       lodArray,
+      chunkSize,
       generateFlagsInt,
       numVegetationInstances,
       numGrassInstances,
@@ -117,9 +120,9 @@ class ProcGenInstance {
   }
 }
 
-class ProcGenManager {
+export class ProcGenManager {
   constructor({
-    chunkSize = defaultChunkSize,
+    chunkSize,
   } = {}) {
     this.instances = new Map();
     this.chunkSize = chunkSize;
