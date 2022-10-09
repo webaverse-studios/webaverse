@@ -399,16 +399,47 @@ const _cloneBarrierResult = barrierResult => {
     };
   };
   const _cloneLeafNodes = () => {
+    const leafNode0 = leafNodes[0];
+    const leafNodesMins = new leafNode0.min.constructor(
+      arrayBuffer,
+      index,
+      leafNodes.length * leafNode0.min.length
+    );
     
+    const leafNodes2 = Array(leafNodes.length);
+    for (let i = 0; i < leafNodes.length; i++) {
+      const leafNode = leafNodes[i];
+      leafNodesMins[i * 2] = leafNode.min[0];
+      leafNodesMins[i * 2 + 1] = leafNode.min[1];
+      leafNodes2[i] = {
+        min: leafNodesMins.subarray(i * 2, i * 2 + 2),
+        lod: leafNode.lod,
+      };
+    }
+
+    index += leafNodes.length * leafNode0.min.length * leafNode0.min.constructor.BYTES_PER_ELEMENT;
+
+    return leafNodes2;
   };
   const _cloneLeafNodesMin = () => {
-    
+    if (leafNodes.length > 0) {
+      const leafNodesMin2 = new leafNodesMin.constructor(arrayBuffer, index, leafNodesMin.length);
+      leafNodesMin2.set(leafNodesMin);
+      index += leafNodesMin.length * leafNodesMin.constructor.BYTES_PER_ELEMENT;
+      return leafNodesMin2;
+    }
   };
   const _cloneLeafNodesMax = () => {
-    
+    const leafNodesMax2 = new leafNodesMax.constructor(arrayBuffer, index, leafNodesMax.length);
+    leafNodesMax2.set(leafNodesMax);
+    index += leafNodesMax.length * leafNodesMax.constructor.BYTES_PER_ELEMENT;
+    return leafNodesMax2;
   };
   const _cloneLeafNodesIndex = () => {
-    
+    const leafNodesIndex2 = new leafNodesIndex.constructor(arrayBuffer, index, leafNodesIndex.length);
+    leafNodesIndex2.set(leafNodesIndex);
+    index += leafNodesIndex.length * leafNodesIndex.constructor.BYTES_PER_ELEMENT;
+    return leafNodesIndex2;
   };
 
   const barrierGeometry2 = _cloneBarrierGeometry();
