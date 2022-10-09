@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 // import physx from './physx.js';
 // import physicsManager from './physics-manager.js';
-import {world} from './world.js';
+// import {world} from './world.js';
 import {damageMaterial} from './shaders.js';
 import {scene} from './renderer.js';
 import * as metaverseModules from './metaverse-modules.js';

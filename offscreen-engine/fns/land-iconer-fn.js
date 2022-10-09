@@ -4,7 +4,7 @@ import {screenshotLandApp} from '../../land-screenshotter.js';
 import physx from '../../physx.js';
 
 export async function getLandImage(seed, renderPosition, lods, minLodRange, clipRange, width, height) {
-  await physx.waitForLoad();
+  // await physx.waitForLoad();
 
   const start_url = '/metaverse_modules/land/';
   const components = [

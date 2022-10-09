@@ -5,7 +5,7 @@ characters are transplanted between world app manager and local player app manag
 import * as THREE from 'three';
 
 import {AppManager} from './app-manager.js';
-import {world} from './world.js';
+// import {world} from './world.js';
 import {playersManager} from './players-manager.js';
 import npcManager from './npc-manager.js';
 import {appsMapName} from './constants.js'

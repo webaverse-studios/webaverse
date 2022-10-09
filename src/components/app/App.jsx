@@ -8,7 +8,7 @@ import { parseQuery } from '../../../util.js'
 import Webaverse from '../../../webaverse.js';
 import universe from '../../../universe.js';
 import cameraManager from '../../../camera-manager';
-import { world } from '../../../world';
+import { World } from '../../../world';
 
 import { ActionMenu } from '../general/action-menu';
 import { Crosshair } from '../general/crosshair';
@@ -42,6 +42,9 @@ import { ChainContext } from '../../hooks/chainProvider';
 import loadoutManager from '../../../loadout-manager';
 
 //
+// debugger
+let world;
+
 
 const _startApp = async ( weba, canvas ) => {
 
@@ -51,7 +54,11 @@ const _startApp = async ( weba, canvas ) => {
     weba.bindInterface();
     weba.bindCanvas( canvas );
 
+    debugger
     await weba.waitForLoad();
+    debugger
+    world = new World();
+    window.world = world;
     universe.handleUrlUpdate();
     await weba.startLoop();
 
@@ -130,6 +137,7 @@ const Canvas = ({
 };
 
 export const App = () => {
+    debugger
 
     const [ state, setState ] = useState({ openedPanel: null });
     const [ uiMode, setUIMode ] = useState( 'normal' );

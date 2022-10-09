@@ -28,7 +28,7 @@ const localFrameOpts = {
 };
 const frameEvent = new MessageEvent('frame', localFrameOpts);
 
-const physicsScene = physicsManager.getScene();
+let physicsScene;
 
 const appManagers = [];
 class AppManager extends EventTarget {
@@ -36,6 +36,8 @@ class AppManager extends EventTarget {
     appsArray = new Z.Doc().getArray(appsMapName),
   } = {}) {
     super();
+
+    physicsScene = physicsManager.getScene();
     
     this.appsArray = null;
     this.apps = [];

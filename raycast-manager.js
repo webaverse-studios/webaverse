@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {getRenderer, camera} from './renderer.js';
 import cameraManager from './camera-manager.js';
-import {world} from './world.js';
+// import {world} from './world.js';
 // import physx from './physx.js';
 import physicsManager from './physics-manager.js';
 import domRenderer from './dom-renderer.jsx';

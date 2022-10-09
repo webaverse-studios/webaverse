@@ -10,7 +10,7 @@ import {MiniHup} from '../../../MiniHup.jsx';
 // import {RpgText} from '../../../RpgText.jsx';
 import {getRenderer, rootScene, scene, sceneLowPriority} from '../../../../renderer.js';
 import game from '../../../../game.js';
-import {world} from '../../../../world.js';
+// import {world} from '../../../../world.js';
 import universe from '../../../../universe.js';
 import cameraManager from '../../../../camera-manager.js';
 import story from '../../../../story.js';
@@ -71,7 +71,7 @@ const renderY = 60;
 
 const seed = 'lol';
 const physicsInstance = 'map';
-const physicsScene = physicsManager.getScene(physicsInstance);
+let physicsScene;
 
 (physicsInstance);
 const voxelPixelSize = 16;
@@ -663,7 +663,7 @@ export const MapGen = () => {
 
     // mousemove
     useEffect(() => {
-      function mouseMove(e) {
+      async function mouseMove(e) {
         // console.log('mouse move', !!mouseState);
         if (mouseState) {
           const totalX = mouseState.startX - e.clientX;
@@ -765,6 +765,8 @@ export const MapGen = () => {
             setRaycasterFromEvent(localRaycaster, e);
 
             localQuaternion.setFromUnitVectors(forwardDirection, localRaycaster.ray.direction);
+            physicsScene = physicsManager.getScene(physicsInstance);
+
             const raycastResult = physicsScene.raycast(localRaycaster.ray.origin, localQuaternion);
             if (raycastResult) {
               // window.raycastResult = raycastResult;

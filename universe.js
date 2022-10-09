@@ -17,7 +17,7 @@ import physx from './physx.js';
 import {playersManager} from './players-manager.js';
 import sceneNames from './scenes/scenes.json';
 import {parseQuery} from './util.js';
-import {world} from './world.js';
+// import {world} from './world.js';
 
 const physicsScene = physicsManager.getScene();
 
@@ -160,7 +160,7 @@ class Universe extends EventTarget {
     this.state = state;
     // Players cannot be initialized until the physx worker is loaded
     // Otherwise you will receive allocation errors because the module instance is undefined
-    await physx.waitForLoad();
+    // await physx.waitForLoad();
     await physxWorkerManager.waitForLoad();
     const localPlayer = playersManager.getLocalPlayer();
 

@@ -59,4 +59,4 @@ export class World {
   }
 }
 
-export const world = new World();
+// export const world = new World();

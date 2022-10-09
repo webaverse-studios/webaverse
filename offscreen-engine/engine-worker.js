@@ -6,6 +6,7 @@ import {generateObjectUrlCardRemote} from './fns/cards-manager-fn.js';
 import {getLandImage} from './fns/land-iconer-fn.js';
 import {createAppUrlSpriteSheet} from './fns/spriting-fn.js';
 import {getSpriteAnimationForAppUrlInternal} from './fns/sprite-animation-manager-fn.js';
+import physx from '../physx.js';
 
 const functionMap = {
   'createSpriteAvatarMesh': createSpriteAvatarMesh,
@@ -22,6 +23,7 @@ window.addEventListener('message', e => {
   const method = e.data?.method;
   if (method === 'initializeEngine') {
     const {port} = e.data;
+    physx.waitForLoad();
     _bindPort(port);
   }
 });

@@ -5,7 +5,7 @@ import classnames from 'classnames';
 // import game from '../game.js';
 import dioramaManager from '../diorama.js';
 // import {NpcPlayer} from '../character-controller.js';
-import {world} from '../world.js';
+// import {world} from '../world.js';
 import styles from './MegaHup.module.css';
 // import {RpgText} from './RpgText.jsx';
 // import {chatTextSpeed} from '../constants.js';

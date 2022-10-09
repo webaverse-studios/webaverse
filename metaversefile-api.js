@@ -13,7 +13,7 @@ import {getRenderer, scene, sceneHighPriority, sceneLowPriority, sceneLowerPrior
 import cameraManager from './camera-manager.js';
 import physicsManager from './physics-manager.js';
 import Avatar from './avatars/avatars.js';
-import {world} from './world.js';
+// import {world} from './world.js';
 // import ERC721 from './erc721-abi.json';
 // import ERC1155 from './erc1155-abi.json';
 // import {web3} from './blockchain.js';
@@ -248,8 +248,9 @@ const _bindAppManagerToLoreAIScene = (appManager, loreAIScene) => {
     bindings.delete(app);
   });
 };
-_bindAppManagerToLoreAIScene(world.appManager, loreAIScene);
-world.loreAIScene = loreAIScene;
+// debugger
+// _bindAppManagerToLoreAIScene(world.appManager, loreAIScene);
+// world.loreAIScene = loreAIScene;
 
 class ErrorBoundary extends React.Component {
   constructor(props) {

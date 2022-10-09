@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import React, {useState, useEffect, useContext} from 'react';
 import classnames from 'classnames';
 import style from './DragAndDrop.module.css';
-import {world} from '../world.js';
+// import {world} from '../world.js';
 import {getRandomString, handleUpload} from '../util.js';
 import {registerIoEventHandler, unregisterIoEventHandler} from './components/general/io-handler/IoHandler.jsx';
 import {registerLoad} from './LoadingBox.jsx';

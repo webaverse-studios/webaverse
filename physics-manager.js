@@ -76,10 +76,10 @@ class PhysicsScene extends EventTarget {
       this.physicsEnabled = true;
 
       this.loadPromise = (async () => {
-        if (!physx.loaded) {
-          await physx.waitForLoad();
-          this.loadPromise = null;
-        }
+        // if (!physx.loaded) {
+        //   await physx.waitForLoad();
+        //   this.loadPromise = null;
+        // }
         const scene = physx.physxWorker.makeScene();
         this.scene = scene;
         return scene;

@@ -3,7 +3,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import classnames from 'classnames';
 
 import { world2canvas } from '../../../ThreeUtils.js';
-import { world } from '../../../../world.js';
+// import { world } from '../../../../world.js';
 import game from '../../../../game.js';
 
 import { AppContext } from '../../app';
