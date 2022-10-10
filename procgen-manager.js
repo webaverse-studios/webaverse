@@ -18,6 +18,7 @@ const GenerateFlags = {
   vegetation: 1 << 2,
   grass: 1 << 3,
   poi: 1 << 4,
+  heightfield: 1 << 5,
 };
 const _generateFlagsToInt = generateFlags => {
   let result = 0;
@@ -26,6 +27,7 @@ const _generateFlagsToInt = generateFlags => {
   generateFlags.vegetation && (result |= GenerateFlags.vegetation);
   generateFlags.grass && (result |= GenerateFlags.grass);
   generateFlags.poi && (result |= GenerateFlags.poi);
+  generateFlags.heightfield && (result |= GenerateFlags.heightfield);
   return result;
 };
 
@@ -76,12 +78,15 @@ class ProcGenInstance {
   ) {
     await this.pgWorkerManager.waitForLoad();
 
+    const {chunkSize} = this;
+
     position.toArray(localArray2D);
     const generateFlagsInt = _generateFlagsToInt(generateFlags);
     const result = await this.pgWorkerManager.generateChunk(
       localArray2D,
       lod,
       lodArray,
+      chunkSize,
       generateFlagsInt,
       numVegetationInstances,
       numGrassInstances,
@@ -115,9 +120,9 @@ class ProcGenInstance {
   }
 }
 
-class ProcGenManager {
+export class ProcGenManager {
   constructor({
-    chunkSize = defaultChunkSize,
+    chunkSize,
   } = {}) {
     this.instances = new Map();
     this.chunkSize = chunkSize;
@@ -134,9 +139,12 @@ class ProcGenManager {
     return instance;
   }
   getNodeHash(node) {
-    return (node.min.x << 16) |
-      (node.min.y & 0xFFFF);
+    return ((node.min.x & 0xFFF) << 20) |
+      ((node.min.y & 0xFFF) << 8) |
+      (node.lod & 0xFF);
   }
 }
-const procGenManager = new ProcGenManager();
+const procGenManager = new ProcGenManager({
+  chunkSize: defaultChunkSize,
+});
 export default procGenManager;

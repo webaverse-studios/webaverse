@@ -95,10 +95,7 @@ export class PGWorkerManager {
         // initialize
         // note: deliberately don't wait for this; let it start in the background
         await Promise.all([
-          worker.request('initialize', {
-            // chunkSize: this.chunkSize,
-            // seed: this.seed,
-          }),
+          worker.request('initialize'),
           worker.request('ensureInstance', {
             instance: this.instance,
             seed: this.seed,
@@ -134,11 +131,9 @@ export class PGWorkerManager {
     });
   }
 
-  async createTracker(lod, lod1Range, {signal} = {}) {
+  async createTracker({signal} = {}) {
     const result = await this.worker.request('createTracker', {
       instance: this.instance,
-      lod,
-      lod1Range,
     }, {signal});
     return result;
   }
@@ -149,11 +144,14 @@ export class PGWorkerManager {
     }, {signal});
     return result;
   }
-  async trackerUpdate(tracker, position, {signal} = {}) {
+  async trackerUpdate(tracker, position, minLod, maxLod, lod1Range, {signal} = {}) {
     const result = await this.worker.request('trackerUpdate', {
       instance: this.instance,
       tracker,
       position: position.toArray(),
+      minLod,
+      maxLod,
+      lod1Range,
       priority: TASK_PRIORITIES.tracker,
     }, {signal});
     return result;
@@ -165,6 +163,7 @@ export class PGWorkerManager {
     chunkPosition,
     lod,
     lodArray,
+    chunkSize,
     generateFlagsInt,
     numVegetationInstances,
     numGrassInstances,
@@ -178,6 +177,7 @@ export class PGWorkerManager {
       chunkPosition,
       lod,
       lodArray,
+      chunkSize,
       generateFlagsInt,
       numVegetationInstances,
       numGrassInstances,
@@ -190,6 +190,9 @@ export class PGWorkerManager {
     chunkPosition,
     minLod,
     maxLod,
+    {
+      signal = null,
+    } = {},
   ) {
     const result = await this.worker.request('generateBarrier', {
       instance: this.instance,
