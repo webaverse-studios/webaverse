@@ -54,13 +54,13 @@ class OffscreenEngineProxy {
             port1.removeEventListener('message', message);
             resolveFn();
           }
-        }
+        };
         port1.start();
         port1.addEventListener('message', message);
         console.log('--- port1.addEventListener');
         await new Promise((resolve, reject) =>{
           resolveFn = resolve;
-        })
+        });
   
         return port1;
       })();

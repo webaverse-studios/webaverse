@@ -76,7 +76,6 @@ const getTransferables = o => {
 
 const _bindPort = port => {
   port.addEventListener('message', async e => {
-    await physx.waitForLoad();
     const {method, id} = e.data;
     const respond = (error = null, result = null, transfers = []) => {
       port.postMessage({
