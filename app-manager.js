@@ -34,7 +34,6 @@ class AppManager extends EventTarget {
     appsArray = new Z.Doc().getArray(appsMapName),
   } = {}) {
     super();
-    // debugger
     
     this.appsArray = null;
     this.apps = [];

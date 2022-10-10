@@ -42,7 +42,6 @@ import { ChainContext } from '../../hooks/chainProvider';
 import loadoutManager from '../../../loadout-manager';
 
 //
-// debugger
 
 const _startApp = async ( weba, canvas ) => {
 
@@ -52,9 +51,7 @@ const _startApp = async ( weba, canvas ) => {
     weba.bindInterface();
     weba.bindCanvas( canvas );
 
-    // debugger
     await weba.waitForLoad();
-    // debugger
     universe.handleUrlUpdate();
     await weba.startLoop();
 
@@ -133,7 +130,6 @@ const Canvas = ({
 };
 
 export const App = () => {
-    // debugger
 
     const [ state, setState ] = useState({ openedPanel: null });
     const [ uiMode, setUIMode ] = useState( 'normal' );

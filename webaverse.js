@@ -81,10 +81,7 @@ export default class Webaverse extends EventTarget {
     story.listenHack();
 
     this.loadPromise = (async () => {
-      console.log('--- physx waitForLoad webaverse.js 1');
       await physx.waitForLoad();
-      console.log('--- physx waitForLoad webaverse.js 2');
-      debugger
       await Promise.all([
         Avatar.waitForLoad(),
         physxWorkerManager.waitForLoad(),
@@ -299,7 +296,6 @@ export default class Webaverse extends EventTarget {
     
     let lastTimestamp = performance.now();
     const animate = (timestamp, frame) => {
-      // console.log('animate', physx.loaded);
       performanceTracker.startFrame();
 
       const _frame = () => {

@@ -91,7 +91,6 @@ function makeCancelFn() {
     .add(new THREE.Vector3(0, -avatarHeight/2, 0));
   const physicsMaterial = new THREE.Vector3(0, 0, 0);
 
-  const physicsScene = physicsManager.getScene();
   const physicsObject = physicsScene.addCapsuleGeometry(
     position,
     localQuaternion.copy(this.quaternion)

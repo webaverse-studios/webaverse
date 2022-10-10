@@ -248,7 +248,6 @@ const _bindAppManagerToLoreAIScene = (appManager, loreAIScene) => {
     bindings.delete(app);
   });
 };
-// debugger
 _bindAppManagerToLoreAIScene(world.appManager, loreAIScene);
 world.loreAIScene = loreAIScene;
 
