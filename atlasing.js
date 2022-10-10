@@ -18,7 +18,22 @@ export const mapWarpedUvs = (src, srcOffset, dst, dstOffset, tx, ty, tw, th, can
     const localDstOffset = dstOffset + i * 2;
 
     localVector2D.fromArray(src.array, srcIndex);
+
+    const minX = Math.min(0, localVector2D.x);
+    const minY = Math.min(0, localVector2D.y);
+
+    const maxX = Math.max(1, localVector2D.x);
+    const maxY = Math.max(1, localVector2D.y);
+
+    const dx = maxX - minX;
+    const dy = maxY - minY;
+
+    // * scaling the UVs to be in the 0-1 range
+    localVector2D.x = (localVector2D.x - minX) / dx;
+    localVector2D.y = (localVector2D.y - minY) / dy;
+
     modUv(localVector2D);
+
     localVector2D
       .multiply(
         localVector2D2.set(tw/canvasSize, th/canvasSize)
@@ -26,6 +41,7 @@ export const mapWarpedUvs = (src, srcOffset, dst, dstOffset, tx, ty, tw, th, can
       .add(
         localVector2D2.set(tx/canvasSize, ty/canvasSize)
       );
+
     localVector2D.toArray(dst.array, localDstOffset);
   }
 };

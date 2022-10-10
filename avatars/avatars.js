@@ -409,6 +409,7 @@ class Avatar {
     //
 
     avatarRenderer.setControlled(true);
+    this.#ensureAudioRecognizer();
 
     //
 
@@ -1941,7 +1942,6 @@ class Avatar {
 
     // setup
     if (enabled) {
-      this.ensureAudioRecognizer();
       this.volume = 0;
 
       const audioContext = audioManager.getAudioContext();
@@ -1991,7 +1991,6 @@ class Avatar {
 
     // setup
     if (enabled) {
-      this.ensureAudioRecognizer();
       this.volume = 0;
      
       const audioContext = audioManager.getAudioContext();
@@ -2032,7 +2031,7 @@ class Avatar {
   getMicrophoneInput() {
     return this.microphoneWorker.getInput();
   }
-  ensureAudioRecognizer() {
+  #ensureAudioRecognizer() {
     if (!this.audioRecognizer) {
       const audioContext = audioManager.getAudioContext();
       this.audioRecognizer = new AudioRecognizer({
