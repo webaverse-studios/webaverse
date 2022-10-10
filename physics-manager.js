@@ -78,7 +78,7 @@ class PhysicsScene extends EventTarget {
       this.loadPromise = (async () => {
         // if (!physx.loaded) {
         //   await physx.waitForLoad();
-        //   this.loadPromise = null;
+        //   this.loadPromise = null; // todo: need set null? don't need loadPromise any more?
         // }
         const scene = physx.physxWorker.makeScene();
         this.scene = scene;

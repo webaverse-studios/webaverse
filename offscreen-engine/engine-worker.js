@@ -23,7 +23,7 @@ window.addEventListener('message', e => {
   const method = e.data?.method;
   if (method === 'initializeEngine') {
     const {port} = e.data;
-    physx.waitForLoad();
+    physx.waitForLoad(); // todo: unstable?
     _bindPort(port);
   }
 });
