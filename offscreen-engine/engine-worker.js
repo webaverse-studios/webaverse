@@ -22,9 +22,15 @@ const functionMap = {
 window.addEventListener('message', e => {
   const method = e.data?.method;
   if (method === 'initializeEngine') {
+    console.log('--- initializeEngine');
     const {port} = e.data;
-    physx.waitForLoad(); // todo: unstable?
     _bindPort(port);
+    physx.waitForLoad().then(() => {
+      console.log('--- physx waitForLoad engine-worker.js 2');
+      port.postMessage({
+        method: 'inited',
+      });
+    });
   }
 });
 
@@ -68,6 +74,7 @@ const getTransferables = o => {
 
 const _bindPort = port => {
   port.addEventListener('message', async e => {
+    await physx.waitForLoad();
     const {method, id} = e.data;
     const respond = (error = null, result = null, transfers = []) => {
       port.postMessage({

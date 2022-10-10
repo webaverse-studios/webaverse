@@ -43,12 +43,26 @@ class OffscreenEngineProxy {
           method: 'initializeEngine',
           port: port2,
         }, '*', [port2]);
+
+        let resolveFn;
+        const message = e => {
+          console.log('--- message inited:', e.data);
+          resolveFn();
+        }
+        port1.start();
+        port1.addEventListener('message', message);
+        console.log('--- port1.addEventListener');
+        await new Promise((resolve, reject) =>{
+          resolveFn = resolve;
+          // port1.removeEventListener('message', message);
+          // resolve(); // test
+        })
   
         return port1;
       })();
     }
     const port = await this.loadPromise;
-    port.start();
+    // port.start();
     this.port = port;
     return port;
   }
@@ -81,6 +95,7 @@ class OffscreenEngineProxy {
       };
 
       const message = e => {
+        console.log('--- message', e.data);
         const {method, id: localId} = e.data;
         if (method === 'response' && localId === id) {
           const {error, result} = e.data;
