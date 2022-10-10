@@ -39,30 +39,33 @@ class OffscreenEngineProxy {
   
         await iframeLoadPromise;
   
+        const id = getRandomString();
         iframe.contentWindow.postMessage({
           method: 'initializeEngine',
+          id,
           port: port2,
         }, '*', [port2]);
 
         let resolveFn;
         const message = e => {
-          console.log('--- message inited:', e.data);
-          resolveFn();
+          console.log('--- message initialized:', e.data);
+          const {method, id: localId} = e.data;
+          if (method === 'initialized' && localId === id) {
+            port1.removeEventListener('message', message);
+            resolveFn();
+          }
         }
         port1.start();
         port1.addEventListener('message', message);
         console.log('--- port1.addEventListener');
         await new Promise((resolve, reject) =>{
           resolveFn = resolve;
-          // port1.removeEventListener('message', message);
-          // resolve(); // test
         })
   
         return port1;
       })();
     }
     const port = await this.loadPromise;
-    // port.start();
     this.port = port;
     return port;
   }

@@ -21,6 +21,7 @@ const functionMap = {
 
 window.addEventListener('message', e => {
   const method = e.data?.method;
+  const id = e.data?.id;
   if (method === 'initializeEngine') {
     console.log('--- initializeEngine');
     const {port} = e.data;
@@ -28,7 +29,8 @@ window.addEventListener('message', e => {
     physx.waitForLoad().then(() => {
       console.log('--- physx waitForLoad engine-worker.js 2');
       port.postMessage({
-        method: 'inited',
+        method: 'initialized',
+        id,
       });
     });
   }
