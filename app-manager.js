@@ -9,7 +9,7 @@ import * as Z from 'zjs';
 import {makePromise, getRandomString} from './util.js';
 import physicsManager from './physics-manager.js';
 import metaversefile from 'metaversefile';
-import * as metaverseModules from './metaverse-modules.js';
+import * as coreModules from './core-modules.js';
 import {jsonParse} from './util.js';
 import {appsMapName} from './constants.js';
 
@@ -532,9 +532,9 @@ class AppManager extends EventTarget {
       });
     app.contentId = 'error-placeholder';
     (async () => {
-      // await metaverseModules.waitForLoad();
+      // await coreModules.waitForLoad();
       // const {modules} = metaversefile.useDefaultModules();
-      const m = await metaverseModules.importModule('errorPlaceholder');
+      const m = await coreModules.importModule('errorPlaceholder');
       await app.addModule(m);
     })();
     return app;

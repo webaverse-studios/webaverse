@@ -4,7 +4,7 @@ import physics from './physics-manager.js';
 // import physx from './physx.js';
 import Avatar from './avatars/avatars.js';
 import metaversefile from 'metaversefile';
-import * as metaverseModules from './metaverse-modules.js';
+import * as coreModules from './core-modules.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -180,9 +180,9 @@ export class CharacterHitter {
     {
       const damageMeshApp = metaversefile.createApp();
       (async () => {
-        // await metaverseModules.waitForLoad();
+        // await coreModules.waitForLoad();
         // const {modules} = metaversefile.useDefaultModules();
-        const m = await metaverseModules.importModule('damageMesh');
+        const m = await coreModules.importModule('damageMesh');
         await damageMeshApp.addModule(m);
       })();
       damageMeshApp.position.copy(this.character.position);
