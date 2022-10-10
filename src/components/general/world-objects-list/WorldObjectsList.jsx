@@ -20,7 +20,6 @@ import physicsManager from '../../../../physics-manager.js';
 
 
 const APP_TYPES = [ 'glb', 'html', 'gltf', 'gif', 'vrm' ];
-const physicsScene = physicsManager.getScene();
 
 export const WorldObjectsList = () => {
     const { state, setState, setSelectedApp, selectedApp } = useContext( AppContext );
@@ -105,8 +104,8 @@ export const WorldObjectsList = () => {
     const updatePhysics = () => {
         
         const physicsObjects = selectedApp.getPhysicsObjects();
+        const physicsScene = physicsManager.getScene();
         physicsObjects.forEach( ( physicsObject ) => {
-            const physicsScene = physicsManager.getScene();
             physicsScene.setGeometryScale( physicsObject.physicsId, selectedApp.scale );
         });
     };

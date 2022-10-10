@@ -40,10 +40,6 @@ const zeroVector = new THREE.Vector3();
 
 //
 
-const physicsScene = physicsManager.getScene();
-
-//
-
 const ioManager = new EventTarget();
 
 ioManager.lastAxes = [[0, 0, 0, 0], [0, 0, 0, 0]];
@@ -255,6 +251,7 @@ const _updateIo = timeDiff => {
       }
       ioManager.lastCtrlKey = ioManager.keys.ctrl;
     }
+    const physicsScene = physicsManager.getScene();
     if (physicsScene.getPhysicsEnabled() && movementEnabled) {
       const speed = game.getSpeed();
       const velocity = keysDirection.normalize().multiplyScalar(speed);
@@ -619,6 +616,7 @@ ioManager.wheel = e => {
   if (storyManager.handleWheel(e)) {
     // nothing
   } else {
+    const physicsScene = physicsManager.getScene();
     if (physicsScene.getPhysicsEnabled()) {
       const renderer = getRenderer();
       if (renderer && (e.target === renderer.domElement || e.target.id === 'app')) {

@@ -28,16 +28,13 @@ const localFrameOpts = {
 };
 const frameEvent = new MessageEvent('frame', localFrameOpts);
 
-let physicsScene;
-
 const appManagers = [];
 class AppManager extends EventTarget {
   constructor({
     appsArray = new Z.Doc().getArray(appsMapName),
   } = {}) {
     super();
-
-    physicsScene = physicsManager.getScene();
+    // debugger
     
     this.appsArray = null;
     this.apps = [];
@@ -657,6 +654,7 @@ class AppManager extends EventTarget {
                   child.updateMatrixWorld();
                 }
 
+                const physicsScene = physicsManager.getScene();
                 physicsScene.setTransform(physicsObject);
                 physicsScene.getBoundingBoxForPhysicsId(physicsObject.physicsId, physicsObject.physicsMesh.geometry.boundingBox);
               }

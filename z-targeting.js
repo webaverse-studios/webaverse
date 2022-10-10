@@ -11,7 +11,6 @@ import {playersManager} from './players-manager.js';
 
 const localVector = new THREE.Vector3();
 
-const physicsScene = physicsManager.getScene();
 // const maxResults = 16;
 
 //
@@ -44,6 +43,7 @@ const getPyramidConvexGeometry = (() => {
       scene.add(redMesh); */
 
       const fakeMesh = new THREE.Mesh(geometry);
+      const physicsScene = physicsManager.getScene();
       const buffer = physicsScene.cookConvexGeometry(fakeMesh);
       shapeAddress = physicsScene.createConvexShape(buffer);
     }
@@ -63,6 +63,7 @@ class QueryResults {
 
     const pyramidConvexGeometryAddress = getPyramidConvexGeometry();
 
+    const physicsScene = physicsManager.getScene();
     const result = physicsScene.sweepConvexShape(
       pyramidConvexGeometryAddress,
       position,

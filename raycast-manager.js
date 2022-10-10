@@ -12,10 +12,6 @@ const localQuaternion = new THREE.Quaternion();
 
 //
 
-const physicsScene = physicsManager.getScene();
-
-//
-
 class FakeMouseEvent {
   constructor(clientX = 0, clientY = 0, deltaX = 0, deltaY = 0, inside = false) {
     this.clientX = clientX;
@@ -141,6 +137,7 @@ class RaycastManager extends EventTarget {
         raycaster.ray.direction
       );
       
+      const physicsScene = physicsManager.getScene();
       const result = physicsScene.raycast(position, quaternion);
       if (result) {
         // console.log('raycast', result);

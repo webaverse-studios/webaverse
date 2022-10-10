@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import {scene, camera} from './renderer.js';
-import physics from './physics-manager.js';
+import physicsManager from './physics-manager.js';
 // import physx from './physx.js';
 import Avatar from './avatars/avatars.js';
 import metaversefile from 'metaversefile';
@@ -12,9 +12,6 @@ const localQuaternion = new THREE.Quaternion();
 const localEuler = new THREE.Euler();
 const localMatrix = new THREE.Matrix4();
 
-//
-
-const physicsScene = physics.getScene();
 // const y180Quaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
 
 //
@@ -50,6 +47,7 @@ export class CharacterHitter {
           position,
           quaternion,
         } = args;
+        const physicsScene = physicsManager.getScene();
         const collision = physicsScene.getCollisionObject(
           hitRadius,
           hitHalfHeight,
@@ -99,7 +97,7 @@ export class CharacterHitter {
         return null;
       }
       case 'bullet': {
-        const result = physics.raycast(args.position, args.quaternion);
+        const result = physicsManager.raycast(args.position, args.quaternion);
         if (result) {
           const _performHit = () => {
             const targetApp = metaversefile.getAppByPhysicsId(result.objectId);

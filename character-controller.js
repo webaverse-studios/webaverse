@@ -69,8 +69,6 @@ const _getSession = () => {
   return session;
 };
 
-const physicsScene = physicsManager.getScene();
-
 function makeCancelFn() {
   let live = true;
   return {
@@ -93,6 +91,7 @@ function makeCancelFn() {
     .add(new THREE.Vector3(0, -avatarHeight/2, 0));
   const physicsMaterial = new THREE.Vector3(0, 0, 0);
 
+  const physicsScene = physicsManager.getScene();
   const physicsObject = physicsScene.addCapsuleGeometry(
     position,
     localQuaternion.copy(this.quaternion)
@@ -380,6 +379,7 @@ class Character extends THREE.Object3D {
         // don't disable physics if the app is a pet
         if (!app.hasComponent('pet')) {
           const physicsObjects = app.getPhysicsObjects();
+          const physicsScene = physicsManager.getScene();
           for (const physicsObject of physicsObjects) {
             physicsScene.disableGeometryQueries(physicsObject);
             physicsScene.disableGeometry(physicsObject);
@@ -441,6 +441,7 @@ class Character extends THREE.Object3D {
             physicsObject.quaternion.copy(this.quaternion);
             physicsObject.updateMatrixWorld();
 
+            const physicsScene = physicsManager.getScene();
             physicsScene.setTransform(physicsObject, true);
             physicsScene.setVelocity(physicsObject, localVector.copy(dropDirection).multiplyScalar(5)/*.add(this.characterPhysics.velocity)*/, true);
             physicsScene.setAngularVelocity(physicsObject, zeroVector, true);
@@ -479,6 +480,7 @@ class Character extends THREE.Object3D {
       const _enableAppPhysics = () => {
         if (!app.hasComponent('pet')) {
           const physicsObjects = app.getPhysicsObjects();
+          const physicsScene = physicsManager.getScene();
           for (const physicsObject of physicsObjects) {
             physicsScene.enableGeometryQueries(physicsObject);
             physicsScene.enableGeometry(physicsObject);
@@ -793,6 +795,7 @@ class AvatarCharacter extends StateCharacter {
     camera.updateMatrixWorld();
   }
   updatePhysicsStatus() {
+    const physicsScene = physicsManager.getScene();
     if (this.getControlMode() === 'controlled') {
       physicsScene.disableGeometryQueries(this.characterPhysics.characterController);
     } else {
@@ -1234,6 +1237,7 @@ class LocalPlayer extends UninterpolatedPlayer {
     };
     this.addAction(grabAction);
     
+    const physicsScene = physicsManager.getScene();
     physicsScene.disableAppPhysics(app)
 
     app.dispatchEvent({
@@ -1249,6 +1253,7 @@ class LocalPlayer extends UninterpolatedPlayer {
       if (action.type === 'grab') {
         const app = metaversefile.getAppByInstanceId(action.instanceId);
 
+        const physicsScene = physicsManager.getScene();
         physicsScene.enableAppPhysics(app)
 
         this.removeActionIndex(i + removeOffset);
@@ -1451,6 +1456,7 @@ class RemotePlayer extends InterpolatedPlayer {
         if(this.avatar){
           localVector.copy(this.position);
           localVector.y -= this.avatar.height * 0.5;
+          const physicsScene = physicsManager.getScene();
           physicsScene.setCharacterControllerPosition(this.characterPhysics.characterController, localVector);
         }
         this.lastPosition.copy(this.position);

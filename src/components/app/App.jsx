@@ -52,9 +52,9 @@ const _startApp = async ( weba, canvas ) => {
     weba.bindInterface();
     weba.bindCanvas( canvas );
 
-    debugger
+    // debugger
     await weba.waitForLoad();
-    debugger
+    // debugger
     universe.handleUrlUpdate();
     await weba.startLoop();
 

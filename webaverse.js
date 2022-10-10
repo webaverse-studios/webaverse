@@ -84,6 +84,7 @@ export default class Webaverse extends EventTarget {
       console.log('--- physx waitForLoad webaverse.js 1');
       await physx.waitForLoad();
       console.log('--- physx waitForLoad webaverse.js 2');
+      debugger
       await Promise.all([
         Avatar.waitForLoad(),
         physxWorkerManager.waitForLoad(),
