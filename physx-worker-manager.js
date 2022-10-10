@@ -3,7 +3,6 @@ import {makeId} from './util.js';
 // import {defaultChunkSize} from './constants.js';
 // import metaversefile from 'metaversefile';
 // import { terrainVertex, terrainFragment } from './shaders/terrainShader.js';
-// import physics from './physics-manager.js';
 
 // const localVector = new THREE.Vector3();
 
