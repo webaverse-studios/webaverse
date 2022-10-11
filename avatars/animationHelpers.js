@@ -180,7 +180,7 @@ async function loadSkeleton() {
   }
 }
 
-export const loadPromise = (async () => {
+export const waitForLoad = async () => {
   await Promise.resolve(); // wait for metaversefile to be defined
 
   await Promise.all([
@@ -269,9 +269,7 @@ export const loadPromise = (async () => {
   // swordTopDownSlash = animations.find(a => a.isSwordTopDownSlash)
 
   initAnimationSystem();
-})().catch(err => {
-  console.log('load avatar animations error', err);
-});
+};
 
 export const initAnimationSystem = () => {
   for (const spec of animationMappingConfig) {
@@ -539,6 +537,7 @@ export const _updateAnimation = (avatar, now) => {
   let resultValues;
   const doUpdate = () => {
     resultValues = physx.physxWorker.updateAnimationMixer(avatar.mixerPtr, now, nowS);
+    // console.log(resultValues);
     let index = 0;
     for (const spec of avatar.animationMappings) {
       const {

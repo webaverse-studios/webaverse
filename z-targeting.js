@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import metaversefile from './metaversefile-api.js';
-import * as metaverseModules from './metaverse-modules.js';
+import * as coreModules from './core-modules.js';
 import {scene, camera} from './renderer.js';
 import * as sounds from './sounds.js';
 import cameraManager from './camera-manager.js';
@@ -11,7 +11,6 @@ import {playersManager} from './players-manager.js';
 
 const localVector = new THREE.Vector3();
 
-const physicsScene = physicsManager.getScene();
 // const maxResults = 16;
 
 //
@@ -44,6 +43,7 @@ const getPyramidConvexGeometry = (() => {
       scene.add(redMesh); */
 
       const fakeMesh = new THREE.Mesh(geometry);
+      const physicsScene = physicsManager.getScene();
       const buffer = physicsScene.cookConvexGeometry(fakeMesh);
       shapeAddress = physicsScene.createConvexShape(buffer);
     }
@@ -63,6 +63,7 @@ class QueryResults {
 
     const pyramidConvexGeometryAddress = getPyramidConvexGeometry();
 
+    const physicsScene = physicsManager.getScene();
     const result = physicsScene.sweepConvexShape(
       pyramidConvexGeometryAddress,
       position,
@@ -129,7 +130,7 @@ class ZTargeting extends THREE.Object3D {
   waitForLoad() {
     if (!this.loadPromise) {
       this.loadPromise = (async () => {
-        const {importModule} = metaverseModules;
+        const {importModule} = coreModules;
         const m = await importModule('targetReticle');
         
         const targetReticleApp = metaversefile.createApp();

@@ -72,35 +72,17 @@ class PhysicsScene extends EventTarget {
     super();
 
     if (!opts) {
-      this.scene = null;
+      this.scene = physx.physxWorker.makeScene();
       this.physicsEnabled = true;
-
-      this.loadPromise = (async () => {
-        if (!physx.loaded) {
-          await physx.waitForLoad();
-          this.loadPromise = null;
-        }
-        const scene = physx.physxWorker.makeScene();
-        this.scene = scene;
-        return scene;
-      })();
     } else {
       this.scene = opts.scene;
       this.physicsEnabled = opts.physicsEnabled;
-      this.loadPromise = opts.loadPromise;
-      if (!this.scene) {
-        this.loadPromise.then(scene => {
-          this.scene = scene;
-          this.loadPromise = null;
-        });
-      }
     }
   }
   clone() {
     return new PhysicsScene({
       scene: this.scene,
       physicsEnabled: this.physicsEnabled,
-      loadPromise: this.loadPromise,
     });
   }
   addCapsuleGeometry(

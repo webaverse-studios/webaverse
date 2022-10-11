@@ -4,7 +4,7 @@ import url from 'url';
 import path from 'path';
 import fs from 'fs';
 import express from 'express';
-import vite from 'vite';
+import * as vite from 'vite';
 import wsrtc from 'wsrtc/wsrtc-server.mjs';
 
 const SERVER_ADDR = '0.0.0.0';

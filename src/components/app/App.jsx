@@ -57,6 +57,7 @@ const _startApp = async ( weba, canvas ) => {
 
     await npcManager.initDefaultPlayer();
     loadoutManager.initDefault();
+
 };
 
 const _getCurrentSceneSrc = () => {

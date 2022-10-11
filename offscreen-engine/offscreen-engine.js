@@ -43,12 +43,25 @@ class OffscreenEngineProxy {
           method: 'initializeEngine',
           port: port2,
         }, '*', [port2]);
+
+        let resolveFn;
+        const message = e => {
+          const {method} = e.data;
+          if (method === 'initialized') {
+            port1.removeEventListener('message', message);
+            resolveFn();
+          }
+        };
+        port1.start();
+        port1.addEventListener('message', message);
+        await new Promise((resolve, reject) =>{
+          resolveFn = resolve;
+        });
   
         return port1;
       })();
     }
     const port = await this.loadPromise;
-    port.start();
     this.port = port;
     return port;
   }
