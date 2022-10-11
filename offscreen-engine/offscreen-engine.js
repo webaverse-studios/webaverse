@@ -39,18 +39,16 @@ class OffscreenEngineProxy {
   
         await iframeLoadPromise;
   
-        const id = getRandomString();
         iframe.contentWindow.postMessage({
           method: 'initializeEngine',
-          id,
           port: port2,
         }, '*', [port2]);
 
         let resolveFn;
         const message = e => {
           console.log('--- message initialized:', e.data);
-          const {method, id: localId} = e.data;
-          if (method === 'initialized' && localId === id) {
+          const {method} = e.data;
+          if (method === 'initialized') {
             port1.removeEventListener('message', message);
             resolveFn();
           }
