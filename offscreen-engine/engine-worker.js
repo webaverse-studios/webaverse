@@ -7,6 +7,7 @@ import {getLandImage} from './fns/land-iconer-fn.js';
 import {createAppUrlSpriteSheet} from './fns/spriting-fn.js';
 import {getSpriteAnimationForAppUrlInternal} from './fns/sprite-animation-manager-fn.js';
 import physx from '../physx.js';
+import Avatar from '../avatars/avatars.js';
 
 const functionMap = {
   'createSpriteAvatarMesh': createSpriteAvatarMesh,
@@ -19,15 +20,15 @@ const functionMap = {
   'getSpriteAnimationForAppUrlInternal': getSpriteAnimationForAppUrlInternal,
 };
 
-window.addEventListener('message', e => {
+window.addEventListener('message', async e => {
   const method = e.data?.method;
   if (method === 'initializeEngine') {
     const {port} = e.data;
     _bindPort(port);
-    physx.waitForLoad().then(() => {
-      port.postMessage({
-        method: 'initialized',
-      });
+    await physx.waitForLoad();
+    await Avatar.waitForLoad();
+    port.postMessage({
+      method: 'initialized',
     });
   }
 });

@@ -46,7 +46,7 @@ import {
 import {easing} from '../math-utils.js';
 import metaversefile from 'metaversefile';
 
-import { getFirstPersonCurves, getClosest2AnimationAngles, loadPromise, _findArmature, _createAnimation, _updateAnimation } from './animationHelpers.js'
+import { getFirstPersonCurves, getClosest2AnimationAngles, waitForLoad, _findArmature, _createAnimation, _updateAnimation } from './animationHelpers.js'
 
 import { animationMappingConfig } from './AnimationMapping.js';
 import Emoter from './Emoter.js'
@@ -2187,7 +2187,7 @@ class Avatar {
     this.setAudioEnabled(false);
   }
 }
-Avatar.waitForLoad = () => loadPromise;
+Avatar.waitForLoad = waitForLoad;
 Avatar.getAnimations = () => animations;
 Avatar.getAnimationStepIndices = () => animationStepIndices;
 Avatar.getAnimationMappingConfig = () => animationMappingConfig;

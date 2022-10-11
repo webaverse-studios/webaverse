@@ -186,7 +186,7 @@ async function loadSkeleton() {
   }
 }
 
-export const loadPromise = (async () => {
+export const waitForLoad = async () => {
   console.log('------ loadPromise');
   await Promise.resolve(); // wait for metaversefile to be defined
 
@@ -274,9 +274,9 @@ export const loadPromise = (async () => {
   // fallLoop = animations.find(a => a.isFallLoop);
   // swordSideSlash = animations.find(a => a.isSwordSideSlash);
   // swordTopDownSlash = animations.find(a => a.isSwordTopDownSlash)
-})().catch(err => {
-  console.log('load avatar animations error', err);
-});
+
+  initAnimationSystem();
+};
 
 export const initAnimationSystem = () => {
   console.log('--- initAnimationSystem');
