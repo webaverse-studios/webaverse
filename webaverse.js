@@ -80,8 +80,8 @@ export default class Webaverse extends EventTarget {
     story.listenHack();
 
     this.loadPromise = (async () => {
+      await physx.waitForLoad();
       await Promise.all([
-        physx.waitForLoad(),
         Avatar.waitForLoad(),
         physxWorkerManager.waitForLoad(),
         sounds.waitForLoad(),

@@ -19,8 +19,6 @@ import sceneNames from './scenes/scenes.json';
 import {parseQuery} from './util.js';
 import {world} from './world.js';
 
-const physicsScene = physicsManager.getScene();
-
 class Universe extends EventTarget {
   constructor() {
     super();
@@ -45,6 +43,7 @@ class Universe extends EventTarget {
     localPlayer.updateMatrixWorld();
     // physicsManager.setPhysicsEnabled(true);
     // localPlayer.updatePhysics(0, 0);
+    const physicsScene = physicsManager.getScene();
     physicsScene.setPhysicsEnabled(false);
 
     const _doLoad = async () => {
@@ -160,7 +159,6 @@ class Universe extends EventTarget {
     this.state = state;
     // Players cannot be initialized until the physx worker is loaded
     // Otherwise you will receive allocation errors because the module instance is undefined
-    await physx.waitForLoad();
     await physxWorkerManager.waitForLoad();
     const localPlayer = playersManager.getLocalPlayer();
 

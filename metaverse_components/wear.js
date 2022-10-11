@@ -23,10 +23,6 @@ const identityVector = new THREE.Vector3();
 
 //
 
-const physicsScene = physicsManager.getScene();
-
-//
-
 export default (app, component) => {
   const {useActivate} = metaversefile;
   
@@ -51,6 +47,7 @@ export default (app, component) => {
         // console.log('got wear spec', [wearSpec.skinnedMesh, app.glb]);
         
         const physicsObjects = app.getPhysicsObjects();
+        const physicsScene = physicsManager.getScene();
         for (const physicsObject of physicsObjects) {
           physicsScene.disableActor(physicsObject);
         }
@@ -195,6 +192,7 @@ export default (app, component) => {
   const _unwear = () => {
     if (wearSpec) {
       const physicsObjects = app.getPhysicsObjects();
+      const physicsScene = physicsManager.getScene();
       for (const physicsObject of physicsObjects) {
         physicsScene.enableActor(physicsObject);
       }
