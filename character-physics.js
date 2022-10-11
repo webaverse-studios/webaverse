@@ -38,8 +38,6 @@ const rightHandOffset = new THREE.Vector3(-0.2, -0.2, -0.4);
 const z22Quaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), -Math.PI/8);
 const groundStickOffset = 0.03;
 
-const physicsScene = physicsManager.getScene();
-
 class CharacterPhysics {
   constructor(character) {
     this.character = character;
@@ -74,6 +72,7 @@ class CharacterPhysics {
 
     const position = this.character.position.clone();
 
+    const physicsScene = physicsManager.getScene();
     if (this.characterController) {
       physicsScene.destroyCharacterController(this.characterController);
       this.characterController = null;
@@ -90,6 +89,7 @@ class CharacterPhysics {
   setPosition(p) {
     localVector.copy(p);
     localVector.y -= this.characterHeight * 0.5;
+    const physicsScene = physicsManager.getScene();
     physicsScene.setCharacterControllerPosition(
       this.characterController,
       localVector
@@ -106,6 +106,7 @@ class CharacterPhysics {
     // if (this.character) {
       const fallLoopAction = this.character.getAction('fallLoop');
       if (fallLoopAction) {
+        const physicsScene = physicsManager.getScene();
         if (!this.lastFallLoopAction) {
           this.fallLoopStartTimeS = nowS;
           this.lastGravityH = 0;
@@ -176,6 +177,7 @@ class CharacterPhysics {
 
       const positionXZBefore = localVector2D.set(this.characterController.position.x, this.characterController.position.z);
       const positionYBefore = this.characterController.position.y;
+      const physicsScene = physicsManager.getScene();
       const flags = physicsScene.moveCharacterController(
         this.characterController,
         localVector3,
@@ -215,6 +217,7 @@ class CharacterPhysics {
       ) {
         // prevent jump when go down slope
         const oldY = this.characterController.position.y;
+        const physicsScene = physicsManager.getScene();
         const flags = physicsScene.moveCharacterController(
           this.characterController,
           localVector3.set(0, -groundStickOffset, 0),
@@ -347,6 +350,7 @@ class CharacterPhysics {
         localVector.add(this.sitOffset);
         localVector.y += this.characterHeight * 0.5;
 
+        const physicsScene = physicsManager.getScene();
         physicsScene.setCharacterControllerPosition(
           this.characterController,
           localVector
@@ -648,6 +652,7 @@ class CharacterPhysics {
   }
   destroy() {
     if (this.characterController) {
+      const physicsScene = physicsManager.getScene();
       physicsScene.destroyCharacterController(this.characterController);
       this.characterController = null;
     }

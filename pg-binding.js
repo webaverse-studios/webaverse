@@ -76,7 +76,7 @@ w.createTracker = (inst, lod, lod1Range) => {
   return result;
 };
 w.destroyTracker = (inst, tracker) => Module._destroyTracker(inst, tracker);
-w.trackerUpdateAsync = async (inst, taskId, tracker, position, priority) => {
+w.trackerUpdateAsync = async (inst, taskId, tracker, position, minLod, maxLod, lod1Range, priority) => {
   const allocator = new Allocator(Module);
 
   const positionArray = allocator.alloc(Float32Array, 3);
@@ -87,6 +87,9 @@ w.trackerUpdateAsync = async (inst, taskId, tracker, position, priority) => {
     taskId,
     tracker,
     positionArray.byteOffset,
+    minLod,
+    maxLod,
+    lod1Range,
     priority,
   );
   const p = makePromise();
@@ -119,203 +122,256 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
     const bufferAddress = dataView.getUint32(index, true);
     index += Uint32Array.BYTES_PER_ELEMENT;
 
-    const dataView2 = new DataView(arrayBuffer, bufferAddress);
-    let index2 = 0;
+    if (bufferAddress) {
+      const dataView2 = new DataView(arrayBuffer, bufferAddress);
+      let index2 = 0;
 
-    // positions
-    const numPositions = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const positions = new Float32Array(arrayBuffer, bufferAddress + index2, numPositions * 3);
-    index2 += Float32Array.BYTES_PER_ELEMENT * numPositions * 3;
-  
-    // normals
-    const numNormals = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const normals = new Float32Array(arrayBuffer, bufferAddress + index2, numNormals * 3);
-    index2 += Float32Array.BYTES_PER_ELEMENT * numNormals * 3;
-  
-    // biomes
-    const numBiomes = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const biomes = new Int32Array(arrayBuffer, bufferAddress + index2, numBiomes * 4);
-    index2 += Int32Array.BYTES_PER_ELEMENT * numBiomes * 4;
-  
-    // biomes weights
-    const numBiomesWeights = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const biomesWeights = new Float32Array(arrayBuffer, bufferAddress + index2, numBiomesWeights * 4);
-    index2 += Float32Array.BYTES_PER_ELEMENT * numBiomesWeights * 4;
-  
-    // biomes uvs 1
-    const numBiomesUvs1 = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const biomesUvs1 = new Float32Array(arrayBuffer, bufferAddress + index2, numBiomesUvs1 * 4);
-    index2 += Float32Array.BYTES_PER_ELEMENT * numBiomesUvs1 * 4;
-  
-    // biomes uvs 2
-    const numBiomesUvs2 = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const biomesUvs2 = new Float32Array(arrayBuffer, bufferAddress + index2, numBiomesUvs2 * 4);
-    index2 += Float32Array.BYTES_PER_ELEMENT * numBiomesUvs2 * 4;
+      // positions
+      const numPositions = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+      const positions = new Float32Array(arrayBuffer, bufferAddress + index2, numPositions * 3);
+      index2 += Float32Array.BYTES_PER_ELEMENT * numPositions * 3;
+    
+      // normals
+      const numNormals = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+      const normals = new Float32Array(arrayBuffer, bufferAddress + index2, numNormals * 3);
+      index2 += Float32Array.BYTES_PER_ELEMENT * numNormals * 3;
+    
+      // biomes
+      const numBiomes = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+      const biomes = new Int32Array(arrayBuffer, bufferAddress + index2, numBiomes * 4);
+      index2 += Int32Array.BYTES_PER_ELEMENT * numBiomes * 4;
+    
+      // biomes weights
+      const numBiomesWeights = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+      const biomesWeights = new Float32Array(arrayBuffer, bufferAddress + index2, numBiomesWeights * 4);
+      index2 += Float32Array.BYTES_PER_ELEMENT * numBiomesWeights * 4;
+    
+      // biomes uvs 1
+      const numBiomesUvs1 = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+      const biomesUvs1 = new Float32Array(arrayBuffer, bufferAddress + index2, numBiomesUvs1 * 4);
+      index2 += Float32Array.BYTES_PER_ELEMENT * numBiomesUvs1 * 4;
+    
+      // biomes uvs 2
+      const numBiomesUvs2 = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+      const biomesUvs2 = new Float32Array(
+        arrayBuffer,
+        bufferAddress + index2,
+        numBiomesUvs2 * 4
+      );
+      index2 += Float32Array.BYTES_PER_ELEMENT * numBiomesUvs2 * 4;
 
-    // seeds
-    // const numSeeds = dataView2.getUint32(index2, true);
-    // index2 += Uint32Array.BYTES_PER_ELEMENT;
-    // const seeds = new Float32Array(arrayBuffer, bufferAddress + index2, numSeeds);
-    // index2 += Float32Array.BYTES_PER_ELEMENT * numSeeds;
-  
-    // materials
-    const numMaterials = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const materials = new Float32Array(arrayBuffer, bufferAddress + index2, numMaterials * 4);
-    index2 += Int32Array.BYTES_PER_ELEMENT * numMaterials * 4;
+      // materials
+      const numMaterials = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+      const materials = new Float32Array(
+        arrayBuffer,
+        bufferAddress + index2,
+        numMaterials * 4
+      );
+      index2 += Int32Array.BYTES_PER_ELEMENT * numMaterials * 4;
 
-    // materials weights
-    const numMaterialsWeights = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const materialsWeights = new Float32Array(arrayBuffer, bufferAddress + index2, numMaterialsWeights * 4);
-    index2 += Float32Array.BYTES_PER_ELEMENT * numMaterialsWeights * 4;
-
-    // indices
-    const numIndices = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const indices = new Uint32Array(arrayBuffer, bufferAddress + index2, numIndices);
-    index2 += Uint32Array.BYTES_PER_ELEMENT * numIndices;
-  
-    // skylights
-    // const numSkylights = dataView2.getUint32(index2, true);
-    // index2 += Uint32Array.BYTES_PER_ELEMENT;
-    // const skylights = new Uint8Array(arrayBuffer, bufferAddress + index2, numSkylights);
-    // index2 += Uint8Array.BYTES_PER_ELEMENT * numSkylights;
-    // index2 = align4(index2);
-  
-    // // aos
-    // const numAos = dataView2.getUint32(index2, true);
-    // index2 += Uint32Array.BYTES_PER_ELEMENT;
-    // const aos = new Uint8Array(arrayBuffer, bufferAddress + index2, numAos);
-    // index2 += Uint8Array.BYTES_PER_ELEMENT * numAos;
-    // index2 = align4(index2);
-  
-    // const numPeeks = dataView2.getUint32(index2, true);
-    // index2 += Uint32Array.BYTES_PER_ELEMENT;
-    // const peeks = new Uint8Array(arrayBuffer, bufferAddress + index2, numPeeks);
-    // index2 += Uint32Array.BYTES_PER_ELEMENT * numPeeks;
-  
-    return {
-      bufferAddress,
-      positions,
-      normals,
-      biomes,
-      biomesWeights,
-      biomesUvs1,
-      biomesUvs2,
-      materials,
-      materialsWeights,
-      // seeds,
-      indices,
-      // skylights,
-      // aos,
-      // peeks,
-    };
+      // materials weights
+      const numMaterialsWeights = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+      const materialsWeights = new Float32Array(
+        arrayBuffer,
+        bufferAddress + index2,
+        numMaterialsWeights * 4
+      );
+      index2 += Float32Array.BYTES_PER_ELEMENT * numMaterialsWeights * 4;
+      // seeds
+      // const numSeeds = dataView2.getUint32(index2, true);
+      // index2 += Uint32Array.BYTES_PER_ELEMENT;
+      // const seeds = new Float32Array(arrayBuffer, bufferAddress + index2, numSeeds);
+      // index2 += Float32Array.BYTES_PER_ELEMENT * numSeeds;
+    
+      // indices
+      const numIndices = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+      const indices = new Uint32Array(arrayBuffer, bufferAddress + index2, numIndices);
+      index2 += Uint32Array.BYTES_PER_ELEMENT * numIndices;
+    
+      // skylights
+      // const numSkylights = dataView2.getUint32(index2, true);
+      // index2 += Uint32Array.BYTES_PER_ELEMENT;
+      // const skylights = new Uint8Array(arrayBuffer, bufferAddress + index2, numSkylights);
+      // index2 += Uint8Array.BYTES_PER_ELEMENT * numSkylights;
+      // index2 = align4(index2);
+    
+      // // aos
+      // const numAos = dataView2.getUint32(index2, true);
+      // index2 += Uint32Array.BYTES_PER_ELEMENT;
+      // const aos = new Uint8Array(arrayBuffer, bufferAddress + index2, numAos);
+      // index2 += Uint8Array.BYTES_PER_ELEMENT * numAos;
+      // index2 = align4(index2);
+    
+      // const numPeeks = dataView2.getUint32(index2, true);
+      // index2 += Uint32Array.BYTES_PER_ELEMENT;
+      // const peeks = new Uint8Array(arrayBuffer, bufferAddress + index2, numPeeks);
+      // index2 += Uint32Array.BYTES_PER_ELEMENT * numPeeks;
+    
+      return {
+        bufferAddress,
+        positions,
+        normals,
+        biomes,
+        biomesWeights,
+        biomesUvs1,
+        biomesUvs2, 
+        materials,
+        materialsWeights,
+        // seeds,
+        indices,
+        // skylights,
+        // aos,
+        // peeks,
+      };
+    } else {
+      return null;
+    }
   };
   const _parseWaterVertexBuffer = () => {
     const bufferAddress = dataView.getUint32(index, true);
     index += Uint32Array.BYTES_PER_ELEMENT;
 
-    const dataView2 = new DataView(arrayBuffer, bufferAddress);
-    let index2 = 0;
+    if (bufferAddress) {
+      const dataView2 = new DataView(arrayBuffer, bufferAddress);
+      let index2 = 0;
 
-    // positions
-    const numPositions = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const positions = new Float32Array(arrayBuffer, bufferAddress + index2, numPositions * 3);
-    index2 += Float32Array.BYTES_PER_ELEMENT * numPositions * 3;
-  
-    // normals
-    const numNormals = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const normals = new Float32Array(arrayBuffer, bufferAddress + index2, numNormals * 3);
-    index2 += Float32Array.BYTES_PER_ELEMENT * numNormals * 3;
-  
-    // factors
-    const numFactors = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const factors = new Float32Array(arrayBuffer, bufferAddress + index2, numFactors);
-    index2 += Int32Array.BYTES_PER_ELEMENT * numFactors;
-  
-    // indices
-    const numIndices = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const indices = new Uint32Array(arrayBuffer, bufferAddress + index2, numIndices);
-    index2 += Uint32Array.BYTES_PER_ELEMENT * numIndices;
-  
-    return {
-      bufferAddress,
-      positions,
-      normals,
-      factors,
-      indices,
-    };
+      // positions
+      const numPositions = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+      const positions = new Float32Array(arrayBuffer, bufferAddress + index2, numPositions * 3);
+      index2 += Float32Array.BYTES_PER_ELEMENT * numPositions * 3;
+    
+      // normals
+      const numNormals = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+      const normals = new Float32Array(arrayBuffer, bufferAddress + index2, numNormals * 3);
+      index2 += Float32Array.BYTES_PER_ELEMENT * numNormals * 3;
+    
+      // factors
+      const numFactors = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+      const factors = new Float32Array(arrayBuffer, bufferAddress + index2, numFactors);
+      index2 += Int32Array.BYTES_PER_ELEMENT * numFactors;
+    
+      // indices
+      const numIndices = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+      const indices = new Uint32Array(arrayBuffer, bufferAddress + index2, numIndices);
+      index2 += Uint32Array.BYTES_PER_ELEMENT * numIndices;
+    
+      return {
+        bufferAddress,
+        positions,
+        normals,
+        factors,
+        indices,
+      };
+    } else {
+      return null;
+    }
   };
   const _parsePQIInstances = () => {
     const bufferAddress = dataView.getUint32(index, true);
     index += Uint32Array.BYTES_PER_ELEMENT;
 
-    const dataView2 = new DataView(arrayBuffer, bufferAddress);
-    let index2 = 0;
-    
-    const numInstances = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    
-    const instances = Array(numInstances);
-    for (let i = 0; i < numInstances; i++) {
-      const instanceId = dataView2.getInt32(index2, true);
-      index2 += Int32Array.BYTES_PER_ELEMENT;
-  
-      const psSize = dataView2.getUint32(index2, true);
+    if (bufferAddress) {
+      const dataView2 = new DataView(arrayBuffer, bufferAddress);
+      let index2 = 0;
+      
+      const numInstances = dataView2.getUint32(index2, true);
       index2 += Uint32Array.BYTES_PER_ELEMENT;
-      const ps = new Float32Array(dataView2.buffer, dataView2.byteOffset + index2, psSize);
-      index2 += psSize * Float32Array.BYTES_PER_ELEMENT;
+      
+      const instances = Array(numInstances);
+      for (let i = 0; i < numInstances; i++) {
+        const instanceId = dataView2.getInt32(index2, true);
+        index2 += Int32Array.BYTES_PER_ELEMENT;
+    
+        const psSize = dataView2.getUint32(index2, true);
+        index2 += Uint32Array.BYTES_PER_ELEMENT;
+        const ps = new Float32Array(dataView2.buffer, dataView2.byteOffset + index2, psSize);
+        index2 += psSize * Float32Array.BYTES_PER_ELEMENT;
+    
+        const qsSize = dataView2.getUint32(index2, true);
+        index2 += Uint32Array.BYTES_PER_ELEMENT;
+        const qs = new Float32Array(dataView2.buffer, dataView2.byteOffset + index2, qsSize);
+        index2 += qsSize * Float32Array.BYTES_PER_ELEMENT;
+    
+        instances[i] = {
+          instanceId,
+          ps,
+          qs,
+        };
+      }
   
-      const qsSize = dataView2.getUint32(index2, true);
-      index2 += Uint32Array.BYTES_PER_ELEMENT;
-      const qs = new Float32Array(dataView2.buffer, dataView2.byteOffset + index2, qsSize);
-      index2 += qsSize * Float32Array.BYTES_PER_ELEMENT;
-  
-      instances[i] = {
-        instanceId,
-        ps,
-        qs,
+      return {
+        bufferAddress,
+        instances,
       };
+    } else {
+      return null;
     }
-  
-    return {
-      bufferAddress,
-      instances,
-    };
   };
   const _parsePIInstances = () => {
     const bufferAddress = dataView.getUint32(index, true);
     index += Uint32Array.BYTES_PER_ELEMENT;
 
-    const dataView2 = new DataView(arrayBuffer, bufferAddress);
-    let index2 = 0;
-    
-    const psSize = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const ps = new Float32Array(dataView2.buffer, dataView2.byteOffset + index2, psSize);
-    index2 += psSize * Float32Array.BYTES_PER_ELEMENT;
+    if (bufferAddress) {
+      const dataView2 = new DataView(arrayBuffer, bufferAddress);
+      let index2 = 0;
+      
+      const psSize = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+      const ps = new Float32Array(dataView2.buffer, dataView2.byteOffset + index2, psSize);
+      index2 += psSize * Float32Array.BYTES_PER_ELEMENT;
 
-    const instancesSize = dataView2.getUint32(index2, true);
-    index2 += Uint32Array.BYTES_PER_ELEMENT;
-    const instances = new Int32Array(dataView2.buffer, dataView2.byteOffset + index2, instancesSize);
-    index2 += instancesSize * Int32Array.BYTES_PER_ELEMENT;
-  
-    return {
-      bufferAddress,
-      ps,
-      instances,
-    };
+      const instancesSize = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+      const instances = new Int32Array(dataView2.buffer, dataView2.byteOffset + index2, instancesSize);
+      index2 += instancesSize * Int32Array.BYTES_PER_ELEMENT;
+    
+      return {
+        bufferAddress,
+        ps,
+        instances,
+      };
+    } else {
+      return null;
+    }
+  };
+  const _parseHeightfields = () => {
+    const bufferAddress = dataView.getUint32(index, true);
+    index += Uint32Array.BYTES_PER_ELEMENT;
+
+    // console.log('buffer address', bufferAddress);
+
+    if (bufferAddress) {
+      const dataView2 = new DataView(arrayBuffer, bufferAddress);
+      let index2 = 0;
+
+      const numPixels = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+
+      // console.log('num pixels', numPixels);
+
+      const pixels = new Float32Array(dataView2.buffer, dataView2.byteOffset + index2, numPixels * 4);
+      index2 += numPixels * 4 * Float32Array.BYTES_PER_ELEMENT;
+
+      return {
+        bufferAddress,
+        pixels,
+      };
+    } else {
+      return null;
+    }
   };
 
   const terrainGeometry = _parseTerrainVertexBuffer();
@@ -323,6 +379,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
   const vegetationInstances = _parsePQIInstances();
   const grassInstances = _parsePQIInstances();
   const poiInstances = _parsePIInstances();
+  const heightfields = _parseHeightfields();
 
   return {
     bufferAddress,
@@ -331,6 +388,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
     vegetationInstances,
     grassInstances,
     poiInstances,
+    heightfields,
   };
 };
 w.createChunkMeshAsync = async (
@@ -348,7 +406,7 @@ w.createChunkMeshAsync = async (
 
   const lodArray2 = allocator.alloc(Int32Array, 2);
   lodArray2.set(lodArray);
-
+  
   Module._createChunkMeshAsync(
     inst,
     taskId,

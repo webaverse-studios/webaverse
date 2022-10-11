@@ -9,7 +9,7 @@ import * as Z from 'zjs';
 import {makePromise, getRandomString} from './util.js';
 import physicsManager from './physics-manager.js';
 import metaversefile from 'metaversefile';
-import * as metaverseModules from './metaverse-modules.js';
+import * as coreModules from './core-modules.js';
 import {jsonParse} from './util.js';
 import {appsMapName} from './constants.js';
 
@@ -27,8 +27,6 @@ const localFrameOpts = {
   data: localData,
 };
 const frameEvent = new MessageEvent('frame', localFrameOpts);
-
-const physicsScene = physicsManager.getScene();
 
 const appManagers = [];
 class AppManager extends EventTarget {
@@ -532,9 +530,9 @@ class AppManager extends EventTarget {
       });
     app.contentId = 'error-placeholder';
     (async () => {
-      await metaverseModules.waitForLoad();
-      const {modules} = metaversefile.useDefaultModules();
-      const m = modules['errorPlaceholder'];
+      // await coreModules.waitForLoad();
+      // const {modules} = metaversefile.useDefaultModules();
+      const m = await coreModules.importModule('errorPlaceholder');
       await app.addModule(m);
     })();
     return app;
@@ -655,6 +653,7 @@ class AppManager extends EventTarget {
                   child.updateMatrixWorld();
                 }
 
+                const physicsScene = physicsManager.getScene();
                 physicsScene.setTransform(physicsObject);
                 physicsScene.getBoundingBoxForPhysicsId(physicsObject.physicsId, physicsObject.physicsMesh.geometry.boundingBox);
               }

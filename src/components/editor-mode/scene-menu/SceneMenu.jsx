@@ -258,16 +258,16 @@ export const SceneMenu = ({ className, multiplayerConnected, selectedScene, setS
     return (
         <div className={ classnames( className, styles.location ) } onClick={ stopPropagation } >
             <div className={ styles.row }>
-                <div className={ styles.buttonWrap } onClick={ handleSceneMenuOpen.bind( this, null ) } >
+                <div className={ styles.buttonWrap } onClick={ handleSceneMenuOpen.bind( null, null ) } >
                     <button className={ classnames( styles.button, styles.primary, state.openedPanel === 'SceneMenuPanel' ? null : styles.disabled ) } >
                         <img src="images/webarrow.svg" />
                     </button>
                 </div>
                 <div className={ styles.inputWrap } >
-                    <input type="text" className={ styles.input } ref={ sceneNameInputRef } value={ multiplayerConnected ? selectedRoom : sceneInputName } onKeyUp={ handleSceneMenuKeyUp } onFocus={ handleSceneMenuOpen.bind( this, false ) } disabled={ multiplayerConnected } onChange={ handleSceneInputKeyDown } placeholder="Goto..." />
+                    <input type="text" className={ styles.input } ref={ sceneNameInputRef } value={ multiplayerConnected ? selectedRoom : sceneInputName } onKeyUp={ handleSceneMenuKeyUp } onFocus={ handleSceneMenuOpen.bind( null, false ) } disabled={ multiplayerConnected } onChange={ handleSceneInputKeyDown } placeholder="Goto..." />
                     <img src="images/webpencil.svg" className={ classnames( styles.background, styles.green ) } />
                 </div>
-                <div className={ styles.buttonWrap  } onClick={ handleRoomMenuOpen.bind( this, null ) } >
+                <div className={ styles.buttonWrap  } onClick={ handleRoomMenuOpen.bind( null, null ) } >
                     <div className={ classnames( styles.button, ( state.openedPanel === 'RoomsMenuPanel' || multiplayerConnected ) ? null : styles.disabled ) } >
                         <img src="images/wifi.svg" />
                     </div>
@@ -312,7 +312,7 @@ export const SceneMenu = ({ className, multiplayerConnected, selectedScene, setS
                                     <img className={ styles.image } src="images/world.jpg" />
                                     <div className={ styles.name } >{ room.name }</div>
                                     <div className={ styles.delete } >
-                                        <button className={ classnames( styles.button, styles.warning ) } onClick={ handleDeleteRoomBtnClick.bind( this, room ) } >Delete</button>
+                                        <button className={ classnames( styles.button, styles.warning ) } onClick={ handleDeleteRoomBtnClick.bind( null, room ) } >Delete</button>
                                     </div>
                                 </div>
                             ))

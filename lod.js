@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {defaultChunkSize} from './constants.js';
+// import {defaultChunkSize} from './constants.js';
 
 const localVector2D = new THREE.Vector2();
 
@@ -17,14 +17,16 @@ class OctreeNode {
 
 export class LodChunkTracker {
   constructor({
-    chunkSize = defaultChunkSize,
-    lods = 7,
+    chunkSize,
+    minLod = 1,
+    maxLod = 7,
     lod1Range = 2,
     pgWorkerManager = null,
     debug = false,
   } = {}) {
     this.chunkSize = chunkSize;
-    this.lods = lods;
+    this.minLod = minLod;
+    this.maxLod = maxLod;
     this.lod1Range = lod1Range;
     this.pgWorkerManager = pgWorkerManager;
 
@@ -33,6 +35,9 @@ export class LodChunkTracker {
     this.displayChunks = []; // for debug mesh
     this.dataRequests = new Map(); // hash -> DataRequest
     this.lastUpdateCoord = new THREE.Vector2(NaN, NaN);
+    this.lastMinLod = -1;
+    this.lastMaxLod = -1;
+    this.lastLod1Range = -1;
 
     this.isUpdating = false;
     this.queued = false;
@@ -166,18 +171,41 @@ export class LodChunkTracker {
     }
   }
 
+  setOptions({
+    minLod,
+    maxLod,
+    lod1Range,
+  }) {
+    // console.log('update options', [lods, this.lods, lod1Range, this.lod1Range]);
+    if (minLod !== undefined) {
+      this.minLod = minLod;
+    }
+    if (maxLod !== undefined) {
+      this.maxLod = maxLod;
+    }
+    if (lod1Range !== undefined) {
+      this.lod1Range = lod1Range;
+    }
+  }
+
   async waitForLoad() {
     await Promise.all(this.liveTasks.map(task => task.waitForLoad()));
   }
   async ensureTracker() {
     if (!this.tracker) {
-      this.tracker = await this.pgWorkerManager.createTracker(this.lods, this.lod1Range);
+      this.tracker = await this.pgWorkerManager.createTracker();
     }
   }
-  async updateInternal(position) {
+  async updateInternal(position, minLod, maxLod, lod1Range) {
     await this.ensureTracker();
 
-    const trackerUpdateSpec = await this.pgWorkerManager.trackerUpdate(this.tracker, position);
+    const trackerUpdateSpec = await this.pgWorkerManager.trackerUpdate(
+      this.tracker,
+      position,
+      minLod,
+      maxLod,
+      lod1Range
+    );
     let {
       leafNodes,
       newDataRequests,
@@ -214,14 +242,20 @@ export class LodChunkTracker {
     // update coordinate
     if (!this.isUpdating) {
       const currentCoord = this.#getCurrentCoord(position, localVector2D);
+      const {minLod, maxLod, lod1Range} = this;
       
-      if (!this.lastUpdateCoord.equals(currentCoord)) {
+      if (
+        !this.lastUpdateCoord.equals(currentCoord) ||
+        this.lastMinLod !== minLod ||
+        this.lastMaxLod !== maxLod ||
+        this.lastLod1Range !== lod1Range
+      ) {
         (async () => {
           this.isUpdating = true;
 
           const positionClone = position.clone();
           // const currentCoordClone = currentCoord.clone();
-          await this.updateInternal(positionClone);
+          await this.updateInternal(positionClone, minLod, maxLod, lod1Range);
 
           this.isUpdating = false;
 
@@ -232,6 +266,9 @@ export class LodChunkTracker {
         })();
 
         this.lastUpdateCoord.copy(currentCoord);
+        this.lastMinLod = minLod;
+        this.lastMaxLod = maxLod;
+        this.lastLod1Range = lod1Range;
       }
     } else {
       this.queued = true;

@@ -47,7 +47,6 @@ const localRay = new THREE.Ray();
 
 //
 
-const physicsScene = physicsManager.getScene();
 let isMouseUp = false;
 
 // const zeroVector = new THREE.Vector3(0, 0, 0);
@@ -94,6 +93,7 @@ function updateGrabbedObject(
     .multiplyMatrices(grabMatrix, offsetMatrix)
     .decompose(localVector5, localQuaternion3, localVector6);
 
+  const physicsScene = physicsManager.getScene();
   const collision = collisionEnabled && physicsScene.raycast(localVector, localQuaternion);
   localQuaternion2.setFromAxisAngle(localVector2.set(1, 0, 0), -Math.PI * 0.5);
   const downCollision = collisionEnabled && physicsScene.raycast(localVector5, localQuaternion2);
@@ -544,6 +544,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
         
       const radius = 1;
       const halfHeight = 0.1;
+      const physicsScene = physicsManager.getScene();
       const collision = physicsScene.getCollisionObject(radius, halfHeight, localVector, localPlayer.quaternion);
       if (collision) {
         const physicsId = collision.objectId;
@@ -651,6 +652,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
 
     if (gameManager.editMode) {
       const {position, quaternion} = renderer.xr.getSession() ? localPlayer.leftHand : camera;
+      const physicsScene = physicsManager.getScene();
       const collision = physicsScene.raycast(position, quaternion);
       if (collision) {
         const physicsId = collision.objectId;
@@ -1067,9 +1069,8 @@ const rotationSnap = Math.PI/6;
   makeArrowLoader() {
     const app = metaversefileApi.createApp();
     (async () => {
-      await metaverseModules.waitForLoad();
-      const {modules} = metaversefileApi.useDefaultModules();
-      const m = modules['arrowLoader'];
+      await coreModules.waitForLoad();
+      const m = coreModules.importModule('arrowLoader');
       await app.addModule(m);
     })();
     return app;

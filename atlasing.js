@@ -11,21 +11,55 @@ const localVector2D2 = new THREE.Vector2();
 // const localQuaternion = new THREE.Quaternion();
 // const localMatrix = new THREE.Matrix4();
 
-export const mapWarpedUvs = (src, srcOffset, dst, dstOffset, tx, ty, tw, th, canvasSize) => {
+export const mapWarpedUvs = (
+  src,
+  srcOffset,
+  dst,
+  dstOffset,
+  tx,
+  ty,
+  tw,
+  th,
+  canvasSize
+) => {
   const count = src.count;
+
+  let minX = 0;
+  let minY = 0;
+  let maxX = 1;
+  let maxY = 1;
+
+  // * finding the min and max of the UVs for scaling
+  for (let i = 0; i < count; i++) {
+    const srcIndex = srcOffset + i * 2;
+    localVector2D.fromArray(src.array, srcIndex);
+
+    minX = Math.min(minX, localVector2D.x);
+    minY = Math.min(minY, localVector2D.y);
+
+    maxX = Math.max(maxX, localVector2D.x);
+    maxY = Math.max(maxY, localVector2D.y);
+  }
+
+  const dx = maxX - minX;
+  const dy = maxY - minY;
+
   for (let i = 0; i < count; i++) {
     const srcIndex = srcOffset + i * 2;
     const localDstOffset = dstOffset + i * 2;
 
     localVector2D.fromArray(src.array, srcIndex);
+
+    // * scaling the UVs to be in the 0-1 range
+    localVector2D.x = (localVector2D.x - minX) / dx;
+    localVector2D.y = (localVector2D.y - minY) / dy;
+
     modUv(localVector2D);
+
     localVector2D
-      .multiply(
-        localVector2D2.set(tw/canvasSize, th/canvasSize)
-      )
-      .add(
-        localVector2D2.set(tx/canvasSize, ty/canvasSize)
-      );
+      .multiply(localVector2D2.set(tw / canvasSize, th / canvasSize))
+      .add(localVector2D2.set(tx / canvasSize, ty / canvasSize));
+
     localVector2D.toArray(dst.array, localDstOffset);
   }
 };

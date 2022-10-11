@@ -71,7 +71,6 @@ const renderY = 60;
 
 const seed = 'lol';
 const physicsInstance = 'map';
-const physicsScene = physicsManager.getScene(physicsInstance);
 
 (physicsInstance);
 const voxelPixelSize = 16;
@@ -765,6 +764,7 @@ export const MapGen = () => {
             setRaycasterFromEvent(localRaycaster, e);
 
             localQuaternion.setFromUnitVectors(forwardDirection, localRaycaster.ray.direction);
+            const physicsScene = physicsManager.getScene(physicsInstance);
             const raycastResult = physicsScene.raycast(localRaycaster.ray.origin, localQuaternion);
             if (raycastResult) {
               // window.raycastResult = raycastResult;

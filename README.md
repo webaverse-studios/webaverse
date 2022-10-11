@@ -57,6 +57,8 @@ User documentation is <a href="https://webaverse.notion.site/User-Docs-3a36b223e
 
 ## Installation
 
+Running requires `node` version 18+. The recommended way to get node is `nvm`: https://github.com/nvm-sh/nvm
+
 **Important note before you clone this repo:** This repo uses Git submodules.
 You need to install with the `--recurse-submodules` flag or installation will not work. Copy the code below to clone the repository if you aren't sure.
 

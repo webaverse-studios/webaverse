@@ -6,8 +6,6 @@ import physicsManager from './physics-manager.js';
 
 const cubicBezier = easing(0, 1, 0, 1);
 
-const physicsScene = physicsManager.getScene();
-
 class DomItem extends THREE.Object3D {
   constructor(position, quaternion, scale, width, height, worldWidth, render) {
     super();
@@ -58,6 +56,7 @@ class DomItem extends THREE.Object3D {
     const hs = new THREE.Vector3(punchoutMesh.worldWidth, punchoutMesh.worldHeight, 0.01)
       .multiplyScalar(0.5);
     const dynamic = false;
+    const physicsScene = physicsManager.getScene();
     const physicsObject = physicsScene.addBoxGeometry(
       p,
       q,
@@ -111,6 +110,7 @@ class DomItem extends THREE.Object3D {
       this.physicsObject.position.setFromMatrixPosition(this.innerNode.matrixWorld);
       this.physicsObject.quaternion.setFromRotationMatrix(this.innerNode.matrixWorld);
       this.physicsObject.updateMatrixWorld();
+      const physicsScene = physicsManager.getScene();
       physicsScene.setTransform(this.physicsObject);
 
       // this.visible = true;
@@ -120,17 +120,20 @@ class DomItem extends THREE.Object3D {
   }
   onBeforeRaycast() {
     if (this.enabled) {
+      const physicsScene = physicsManager.getScene();
       physicsScene.enableActor(this.physicsObject);
       physicsScene.enableGeometryQueries(this.physicsObject);
     }
   }
   onAfterRaycast() {
     if (this.enabled) {
+      const physicsScene = physicsManager.getScene();
       physicsScene.disableActor(this.physicsObject);
       physicsScene.disableGeometryQueries(this.physicsObject);
     }
   }
   destroy() {
+    const physicsScene = physicsManager.getScene();
     physicsScene.enableActor(this.physicsObject);
     physicsScene.removeGeometry(this.physicsObject);
   }

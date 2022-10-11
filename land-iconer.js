@@ -5,7 +5,7 @@ const useLandScreenshotter = (() => {
     const result = await offscreenEngineManager.request('getLandImage', args);
     return result;
   };
-})();
+});
 
 export const createLandIcon = async ({
   seed,
