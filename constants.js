@@ -80,8 +80,7 @@ switch ( origin ) {
     }
 }
 
-// export const inappPreviewHost = _inappPreviewHost;
-export const inappPreviewHost = 'https://local.webaverse.com';
+export const inappPreviewHost = _inappPreviewHost;
 
 //
 

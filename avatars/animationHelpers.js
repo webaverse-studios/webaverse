@@ -537,7 +537,6 @@ export const _updateAnimation = (avatar, now) => {
   let resultValues;
   const doUpdate = () => {
     resultValues = physx.physxWorker.updateAnimationMixer(avatar.mixerPtr, now, nowS);
-    // console.log(resultValues);
     let index = 0;
     for (const spec of avatar.animationMappings) {
       const {
