@@ -42,9 +42,6 @@ let animations;
 let animationStepIndices;
 // let animationsBaseModel;
 
-const animationGroups = {};
-window.animationGroups = animationGroups;
-
 const UseAnimationIndexes = {};
 const EmoteAnimationIndexes = {};
 const SitAnimationIndexes = {};
@@ -561,6 +558,7 @@ export const _updateAnimation = (avatar, now) => {
   let resultValues;
   const doUpdate = () => {
     resultValues = physx.physxWorker.updateAnimationMixer(avatar.mixerPtr, now, nowS);
+    // console.log(resultValues);
     let index = 0;
     for (const spec of avatar.animationMappings) {
       const {
