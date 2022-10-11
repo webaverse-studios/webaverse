@@ -21,14 +21,12 @@ const functionMap = {
 
 window.addEventListener('message', e => {
   const method = e.data?.method;
-  const id = e.data?.id;
   if (method === 'initializeEngine') {
     const {port} = e.data;
     _bindPort(port);
     physx.waitForLoad().then(() => {
       port.postMessage({
         method: 'initialized',
-        id,
       });
     });
   }
