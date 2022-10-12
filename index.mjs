@@ -15,7 +15,7 @@ const COMPILER_NAME = 'local-compiler.webaverse.com';
 
 Error.stackTraceLimit = 300;
 
-const isProduction = process.argv[2] === '-p';
+const isProduction = process.env.NODE_ENV === 'production';
 
 const _tryReadFile = p => {
   try {
@@ -78,14 +78,18 @@ const _startCompiler = () => new Promise((resolve, reject) => {
   let accepted = false;
   compilerProcess.stdout.setEncoding('utf8');
   compilerProcess.stdout.on('data', data => {
-    // console.log(data.toString());
+    if (!isProduction) {
+      process.stderr.write(data);
+    }
     if (!accepted && /ready/.test(data)) {
       accepted = true;
       resolve();
     }
   });
   compilerProcess.stderr.on('data', data => {
-    // console.warn(data.toString());
+    if (!isProduction) {
+      process.stderr.write(data);
+    }
   });
   compilerProcess.on('close', code => {
     console.log(`compiler process exited with code ${code}`);
@@ -111,7 +115,7 @@ const _startCompiler = () => new Promise((resolve, reject) => {
   });
 
   const isHttps = !process.env.HTTP_ONLY && (!!certs.key && !!certs.cert);
-  const port = parseInt(process.env.PORT, 10) || (isProduction ? 443 : 3000);
+  const port = parseInt(process.env.PORT, 10) || 443;
   const wsPort = port + 1;
 
   const _makeHttpServer = () => isHttps ? https.createServer(certs, app) : http.createServer(app);
