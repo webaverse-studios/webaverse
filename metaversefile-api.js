@@ -62,6 +62,7 @@ import * as generationTaskManager from './generation-task-manager.js';
 import ioManager from './io-manager.js';
 import {lightsManager} from './engine-hooks/lights/lights-manager.js';
 import {skyManager} from './engine-hooks/environment/skybox/sky-manager.js';
+import {compilerBaseUrl} from './constants.js';
 
 const localVector2D = new THREE.Vector2();
 
