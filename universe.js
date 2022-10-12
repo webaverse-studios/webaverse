@@ -88,6 +88,7 @@ class Universe extends EventTarget {
     };
     await _doLoad();
 
+    localPlayer.characterPhysics.setPosition(localPlayer.position);
     localPlayer.characterPhysics.reset();
     physicsScene.setPhysicsEnabled(true);
     localPlayer.updatePhysics(0, 0);
