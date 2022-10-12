@@ -119,8 +119,8 @@ function makeId(length) {
   const httpServer = _makeHttpServer();
   const viteServer = await vite.createServer({
     server: {
-      middlewareMode: 'html',
-      force:true,
+      middlewareMode: true,
+      // force: true,
       hmr: {
         server: httpServer,
         port,
