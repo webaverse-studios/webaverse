@@ -1,6 +1,8 @@
 export const baseUnit = 4;
 export const previewExt = 'jpg';
 export const maxGrabDistance = 1.5;
+
+export const compilerBaseUrl = `https://local-compiler.webaverse.com/`;
 export const defaultRendererUrl = 'https://render.exokit.org/'
 
 export const transparentPngUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
