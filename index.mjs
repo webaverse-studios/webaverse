@@ -1,7 +1,6 @@
 import http from 'http';
 import https from 'https';
 import url from 'url';
-// import path from 'path';
 import fs from 'fs';
 import express from 'express';
 import * as vite from 'vite';
@@ -11,7 +10,6 @@ const SERVER_ADDR = '0.0.0.0';
 const SERVER_NAME = 'local.webaverse.com';
 
 Error.stackTraceLimit = 300;
-// const cwd = process.cwd();
 
 const isProduction = process.argv[2] === '-p';
 
@@ -38,23 +36,6 @@ function makeId(length) {
   }
   return result;
 }
-
-/* const _proxyUrl = (req, res, u) => {
-  const proxyReq = /https/.test(u) ? https.request(u) : http.request(u);
-  proxyReq.on('response', proxyRes => {
-    for (const header in proxyRes.headers) {
-      res.setHeader(header, proxyRes.headers[header]);
-    }
-    res.statusCode = proxyRes.statusCode;
-    proxyRes.pipe(res);
-  });
-  proxyReq.on('error', err => {
-    console.error(err);
-    res.statusCode = 500;
-    res.end();
-  });
-  proxyReq.end();
-}; */
 
 const _proxy = (req, res, u) => {
   const proxyReq = /^https:/.test(u) ? https.request(u) : http.request(u);
