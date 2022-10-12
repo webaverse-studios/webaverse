@@ -64,6 +64,14 @@ import {lightsManager} from './engine-hooks/lights/lights-manager.js';
 import {skyManager} from './engine-hooks/environment/skybox/sky-manager.js';
 import {compilerBaseUrl} from './constants.js';
 
+globalThis.Metaversefile = {
+  exports: {
+    THREE,
+    React,
+    metaversefile,
+  },
+};
+
 const localVector2D = new THREE.Vector2();
 
 class App extends THREE.Object3D {
