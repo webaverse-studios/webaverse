@@ -1,7 +1,7 @@
 import http from 'http';
 import https from 'https';
 import url from 'url';
-import path from 'path';
+// import path from 'path';
 import fs from 'fs';
 import express from 'express';
 import * as vite from 'vite';
@@ -11,7 +11,7 @@ const SERVER_ADDR = '0.0.0.0';
 const SERVER_NAME = 'local.webaverse.com';
 
 Error.stackTraceLimit = 300;
-const cwd = process.cwd();
+// const cwd = process.cwd();
 
 const isProduction = process.argv[2] === '-p';
 
@@ -56,59 +56,82 @@ function makeId(length) {
   proxyReq.end();
 }; */
 
+const _proxy = (req, res, u) => {
+  const proxyReq = /^https:/.test(u) ? https.request(u) : http.request(u);
+  for (const header in req.headers) {
+    proxyReq.setHeader(header, req.headers[header]);
+  }
+  proxyReq.on('response', proxyRes => {
+    for (const header in proxyRes.headers) {
+      res.setHeader(header, proxyRes.headers[header]);
+    }
+    res.statusCode = proxyRes.statusCode;
+    proxyRes.pipe(res);
+  });
+  proxyReq.on('error', err => {
+    console.error(err);
+    res.statusCode = 500;
+    res.end();
+  });
+  proxyReq.end();
+};
+
 (async () => {
   const app = express();
-  app.use('*', async (req, res, next) => {
-    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-    res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
-    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  app.all('*', async (req, res, next) => {
+    // console.log('got headers', req.method, req.url, req.headers);
 
-    const o = url.parse(req.originalUrl, true);
-    if (/^\/(?:@proxy|public)\//.test(o.pathname) && o.query['import'] === undefined) {
-      const u = o.pathname
-        .replace(/^\/@proxy\//, '')
-        .replace(/^\/public/, '')
-        .replace(/^(https?:\/(?!\/))/, '$1/');
-      if (_isMediaType(o.pathname)) {
-        const proxyReq = /https/.test(u) ? https.request(u) : http.request(u);
-        proxyReq.on('response', proxyRes => {
-          for (const header in proxyRes.headers) {
-            res.setHeader(header, proxyRes.headers[header]);
+    if (req.headers['host'] === 'local-compiler.webaverse.com') {
+      const u = `http://localhost:3000${req.url}`;
+      // console.log('proxying to', {url: req.url, u});
+      _proxy(req, res, u);
+      return;
+    } else {
+      res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+      res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+
+      next();
+      // viteServer.middlewares(req, res, next);
+    }
+
+    const _old = () => {
+      const o = url.parse(req.originalUrl, true);
+      // handle subresources of imported pages
+      if (/^\/(?:@proxy|)\//.test(o.pathname) && o.query['import'] === undefined) {
+        const u = o.pathname
+          .replace(/^\/@proxy\//, '')
+          // .replace(/^\/public/, '')
+          // .replace(/^(https?:\/(?!\/))/, '$1/');
+        if (_isMediaType(o.pathname)) {
+          _proxy(req, res, u);
+        } else {
+          req.originalUrl = u;
+          next();
+          // viteServer.middlewares(req, res, next);
+        }
+      /* } else if (o.query['noimport'] !== undefined) {
+        const p = path.join(cwd, path.resolve(o.pathname));
+        const rs = fs.createReadStream(p);
+        rs.on('error', err => {
+          if (err.code === 'ENOENT') {
+            res.statusCode = 404;
+            res.end('not found');
+          } else {
+            console.error(err);
+            res.statusCode = 500;
+            res.end(err.stack);
           }
-          res.statusCode = proxyRes.statusCode;
-          proxyRes.pipe(res);
         });
-        proxyReq.on('error', err => {
-          console.error(err);
-          res.statusCode = 500;
-          res.end();
-        });
-        proxyReq.end();
+        rs.pipe(res);
+        // _proxyUrl(req, res, req.originalUrl);
+      /* } else if (/^\/login/.test(o.pathname)) {
+        req.originalUrl = req.originalUrl.replace(/^\/(login)/,'/');
+        return res.redirect(req.originalUrl); */
       } else {
-        req.originalUrl = u;
         next();
       }
-    } else if (o.query['noimport'] !== undefined) {
-      const p = path.join(cwd, path.resolve(o.pathname));
-      const rs = fs.createReadStream(p);
-      rs.on('error', err => {
-        if (err.code === 'ENOENT') {
-          res.statusCode = 404;
-          res.end('not found');
-        } else {
-          console.error(err);
-          res.statusCode = 500;
-          res.end(err.stack);
-        }
-      });
-      rs.pipe(res);
-      // _proxyUrl(req, res, req.originalUrl);
-    } else if (/^\/login/.test(o.pathname)) {
-      req.originalUrl = req.originalUrl.replace(/^\/(login)/,'/');
-      return res.redirect(req.originalUrl);
-    } else {
-      next();
-    }
+    };
   });
 
   const isHttps = !process.env.HTTP_ONLY && (!!certs.key && !!certs.cert);
