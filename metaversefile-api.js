@@ -905,18 +905,20 @@ metaversefile.setApi({
   getNextInstanceId() {
     return getRandomString();
   },
-  createAppInternal({
-    start_url = '',
-    type = '',
-    content = '',
-    module = null,
-    components = [],
-    position = null,
-    quaternion = null,
-    scale = null,
-    parent = null,
-    in_front = false,
-  } = {}, {onWaitPromise = null} = {}) {
+  createAppInternal(appSpec = {}, {onWaitPromise = null} = {}) {
+    const {
+      start_url = '',
+      type = '',
+      content = '',
+      module = null,
+      components = [],
+      position = null,
+      quaternion = null,
+      scale = null,
+      parent = null,
+      in_front = false,
+    } = appSpec;
+
     const app = new App();
 
     // transform
@@ -978,23 +980,7 @@ metaversefile.setApi({
     _updateComponents();
 
     // load
-    function typeContentToUrl(type, content) {
-      if (typeof content === 'object') {
-        content = JSON.stringify(content);
-      }
-      const dataUrlPrefix = 'data:' + type + ',';
-      return '/@proxy/' + dataUrlPrefix + encodeURIComponent(content).replace(/\%/g, '%25')//.replace(/\\//g, '%2F');
-    }
-    function getObjectUrl(start_url, type, content) {
-      if (start_url) {
-        return start_url;
-      } else if (type && content) {
-        return typeContentToUrl(type, content);
-      } else {
-        return null;
-      }
-    }
-    const u = getObjectUrl(start_url, type, content);
+    const u = metaversefile.getObjectUrl(appSpec);
     if (u || module) {
       const p = (async () => {
         let m;
