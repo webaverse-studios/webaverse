@@ -370,19 +370,17 @@ let currentAppRender = null;
 let iframeContainer = null;
 let recursion = 0;
 let wasDecapitated = false;
-// const apps = [];
 const mirrors = [];
 metaversefile.setApi({
-  // apps,
   async import(s) {
-    if (/^(?:ipfs:\/\/|https?:\/\/|weba:\/\/|data:)/.test(s)) {
-      const prefix = location.protocol + '//' + location.host + '/@proxy/';
-      if (s.startsWith(prefix)) {
-        s = s.slice(prefix.length);
-      }
-      s = `/@proxy/${s}`;
+    if (/^[a-zA-Z0-9]+:/.test(s)) {
+      s = `${compilerBaseUrl}${s.replace(/^([a-zA-Z0-9]+:\/)\//, '$1')}`;
+    } else {
+      s = new URL(s, compilerBaseUrl).href;
     }
-    // console.log('js import', s);
+
+    // console.log('metaversefile import', {s, oldS});
+
     try {
       const m = await import(s);
       return m;
