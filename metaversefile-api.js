@@ -63,14 +63,7 @@ import ioManager from './io-manager.js';
 import {lightsManager} from './engine-hooks/lights/lights-manager.js';
 import {skyManager} from './engine-hooks/environment/skybox/sky-manager.js';
 import {compilerBaseUrl} from './constants.js';
-
-globalThis.Metaversefile = {
-  exports: {
-    THREE,
-    React,
-    metaversefile,
-  },
-};
+import './metaversefile-binding.js';
 
 const localVector2D = new THREE.Vector2();
 
