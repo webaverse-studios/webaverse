@@ -389,6 +389,35 @@ metaversefile.setApi({
       return null;
     }
   },
+  getObjectUrl(object, baseUrl = '') {
+    const {start_url, type, content} = object;
+
+    function typeContentToUrl(type, content) {
+      if (typeof content === 'object') {
+        content = JSON.stringify(content);
+      }
+      const dataUrlPrefix = 'data:' + type + ',';
+      return dataUrlPrefix + encodeURIComponent(content) + '.data'; //.replace(/\\//g, '%2F');
+    }
+
+    if (start_url) {
+      if (baseUrl) {
+        let u = new URL(start_url, baseUrl).href;
+        const baseUrlObj = new URL(baseUrl);
+        const baseUrlHost = baseUrlObj.protocol + '//' + baseUrlObj.host + '/';
+        if (u.startsWith(baseUrlHost)) {
+          u = u.slice(baseUrlHost.length);
+        }
+        return u;
+      } else {
+        return start_url;
+      }
+    } else if (type && content) {
+      return typeContentToUrl(type, content);
+    } else {
+      return null;
+    }
+  },
   useApp() {
     const app = currentAppRender;
     if (app) {
