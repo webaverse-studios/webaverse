@@ -17,8 +17,6 @@ Error.stackTraceLimit = 300;
 
 const isProduction = process.argv[2] === '-p';
 
-const _isMediaType = p => /\.(?:png|jpe?g|gif|svg|glb|mp3|wav|webm|mp4|mov)$/.test(p);
-
 const _tryReadFile = p => {
   try {
     return fs.readFileSync(p);
@@ -109,46 +107,7 @@ const _startCompiler = () => new Promise((resolve, reject) => {
       res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
 
       next();
-      // viteServer.middlewares(req, res, next);
     }
-
-    const _old = () => {
-      const o = url.parse(req.originalUrl, true);
-      // handle subresources of imported pages
-      if (/^\/(?:@proxy|)\//.test(o.pathname) && o.query['import'] === undefined) {
-        const u = o.pathname
-          .replace(/^\/@proxy\//, '')
-          // .replace(/^\/public/, '')
-          // .replace(/^(https?:\/(?!\/))/, '$1/');
-        if (_isMediaType(o.pathname)) {
-          _proxy(req, res, u);
-        } else {
-          req.originalUrl = u;
-          next();
-          // viteServer.middlewares(req, res, next);
-        }
-      /* } else if (o.query['noimport'] !== undefined) {
-        const p = path.join(cwd, path.resolve(o.pathname));
-        const rs = fs.createReadStream(p);
-        rs.on('error', err => {
-          if (err.code === 'ENOENT') {
-            res.statusCode = 404;
-            res.end('not found');
-          } else {
-            console.error(err);
-            res.statusCode = 500;
-            res.end(err.stack);
-          }
-        });
-        rs.pipe(res);
-        // _proxyUrl(req, res, req.originalUrl);
-      /* } else if (/^\/login/.test(o.pathname)) {
-        req.originalUrl = req.originalUrl.replace(/^\/(login)/,'/');
-        return res.redirect(req.originalUrl); */
-      } else {
-        next();
-      }
-    };
   });
 
   const isHttps = !process.env.HTTP_ONLY && (!!certs.key && !!certs.cert);
