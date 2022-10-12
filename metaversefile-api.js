@@ -1242,8 +1242,10 @@ export default () => {
   useGeometries() {
     return geometries;
   },
-  useGeometryUtils() {
-    return BufferGeometryUtils;
+  useThreeUtils() {
+    return {
+      BufferGeometryUtils,
+    };
   },
   useGeometryBuffering() {
     return geometryBuffering;
