@@ -1,13 +1,17 @@
+import path from 'path';
 import http from 'http';
 import https from 'https';
-import url from 'url';
 import fs from 'fs';
+import child_process from 'child_process';
 import express from 'express';
 import * as vite from 'vite';
 import wsrtc from 'wsrtc/wsrtc-server.mjs';
 
 const SERVER_ADDR = '0.0.0.0';
 const SERVER_NAME = 'local.webaverse.com';
+
+const COMPILER_PORT = 3333;
+const COMPILER_NAME = 'local-compiler.webaverse.com';
 
 Error.stackTraceLimit = 300;
 
@@ -57,14 +61,46 @@ const _proxy = (req, res, u) => {
   proxyReq.end();
 };
 
+const _startCompiler = () => new Promise((resolve, reject) => {
+  // start the compiler at ./packages/compiler
+  const dirname = path.dirname(import.meta.url.replace(/^file:\/\//, ''));
+  const compilerPath = path.join(dirname, 'packages', 'compiler');
+  const nextPath = path.join(compilerPath, 'node_modules', '.bin', 'next');
+  const compilerProcess = child_process.spawn(process.argv[0], [nextPath, 'dev'], {
+    cwd: compilerPath,
+    env: {
+      // ...process.env,
+      PORT: COMPILER_PORT,
+      BASE_CWD: dirname,
+    },
+  });
+  compilerProcess.on('error', err => {
+    console.warn(err);
+  });
+  let accepted = false;
+  compilerProcess.stdout.setEncoding('utf8');
+  compilerProcess.stdout.on('data', data => {
+    // console.log(data.toString());
+    if (!accepted && /ready/.test(data)) {
+      accepted = true;
+      resolve();
+    }
+  });
+  compilerProcess.stderr.on('data', data => {
+    // console.warn(data.toString());
+  });
+  compilerProcess.on('close', code => {
+    console.log(`compiler process exited with code ${code}`);
+  });
+});
+
 (async () => {
   const app = express();
   app.all('*', async (req, res, next) => {
     // console.log('got headers', req.method, req.url, req.headers);
 
-    if (req.headers['host'] === 'local-compiler.webaverse.com') {
-      const u = `http://localhost:3000${req.url}`;
-      // console.log('proxying to', {url: req.url, u});
+    if (req.headers['host'] === COMPILER_NAME) {
+      const u = `http://localhost:${COMPILER_PORT}${req.url}`;
       _proxy(req, res, u);
       return;
     } else {
@@ -134,6 +170,7 @@ const _proxy = (req, res, u) => {
   });
   app.use(viteServer.middlewares);
   
+  await _startCompiler();
   await new Promise((accept, reject) => {
     httpServer.listen(port, SERVER_ADDR, () => {
       accept();
