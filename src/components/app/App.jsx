@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef, useContext, createContext } from 'r
 import classnames from 'classnames';
 
 import game from '../../../game';
-import sceneNames from '../../../scenes/scenes.json';
 import { parseQuery } from '../../../util.js'
 import Webaverse from '../../../webaverse.js';
 import universe from '../../../universe.js';
@@ -31,6 +30,7 @@ import {ClaimsNotification} from '../../ClaimsNotification.jsx';
 import {DomRenderer} from '../../DomRenderer.jsx';
 import {BuildVersion} from '../general/build-version/BuildVersion.jsx';
 import {handleStoryKeyControls} from '../../../story';
+import {scenesBaseUrl, defaultSceneName} from '../../../endpoints.js';
 
 import styles from './App.module.css';
 import '../../fonts.css';
@@ -67,7 +67,7 @@ const _getCurrentSceneSrc = () => {
 
     if ( src === undefined ) {
 
-        src = './scenes/' + sceneNames[0];
+        src = scenesBaseUrl + defaultSceneName;
 
     }
 
