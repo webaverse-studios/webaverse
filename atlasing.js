@@ -316,7 +316,9 @@ export const createTextureAtlas = (meshes, {
 };
 
 export const calculateCanvasAtlasTexturePerRow = (numTextures) => {
-  return Math.pow(2, Math.ceil(Math.log(numTextures) / Math.log(2)));
+  const minNumTexturesPerRow = Math.sqrt(numTextures);
+  // ? rounding the minNumTexturesPerRow to the next power of 2
+  return Math.pow(2, Math.ceil(Math.log(minNumTexturesPerRow) / Math.log(2)));
 };
 
 const _adjustAtlasTextureSettings = (
@@ -324,14 +326,14 @@ const _adjustAtlasTextureSettings = (
   encoding = THREE.LinearEncoding
 ) => {
   texture.generateMipmaps = true;
-  texture.minFilter = THREE.NearestMipMapLinearFilter;
+  texture.minFilter = THREE.NearestFilter;
   texture.magFilter = THREE.NearestFilter;
   texture.encoding = encoding;
   texture.flipY = false;
 };
 
 export class CanvasTextureAtlas {
-  constructor(textures, textureEncoding, subTextureSize) {
+  constructor(textures, subTextureSize, textureEncoding) {
     this.texturePerRow = calculateCanvasAtlasTexturePerRow(textures.length);
 
     this.canvas = document.createElement('canvas');
