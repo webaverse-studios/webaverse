@@ -39,6 +39,7 @@ class Universe extends EventTarget {
       relation: 'float',
     }); */
     localPlayer.position.set(0, initialPosY, 0);
+    localPlayer.characterPhysics.setPosition(localPlayer.position);
     localPlayer.characterPhysics.reset();
     localPlayer.updateMatrixWorld();
     // physicsManager.setPhysicsEnabled(true);
@@ -88,7 +89,6 @@ class Universe extends EventTarget {
     };
     await _doLoad();
 
-    localPlayer.characterPhysics.setPosition(localPlayer.position);
     localPlayer.characterPhysics.reset();
     physicsScene.setPhysicsEnabled(true);
     localPlayer.updatePhysics(0, 0);
