@@ -1,4 +1,4 @@
-import {packs, defaultCharacter} from './characters/characters.js';
+import {packs, defaultCharacter} from './public/characters/characters.js';
 
 const loadNpc = async (srcUrl) => {
   const res = await fetch(srcUrl);
@@ -6,7 +6,7 @@ const loadNpc = async (srcUrl) => {
   return j;
 };
 
-const charactersDir = '../characters/';
+const charactersDir = '/characters/';
 
 const getCharacterFullPath = (filename) => {
   return charactersDir + filename;
