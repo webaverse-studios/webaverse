@@ -237,7 +237,6 @@ class AppManager extends EventTarget {
 
         // set components
         app.instanceId = instanceId;
-        app.setComponent('physics', true);
         for (const {key, value} of components) {
           app.setComponent(key, value);
         }
