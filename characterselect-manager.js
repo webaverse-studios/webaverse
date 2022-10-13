@@ -1,4 +1,4 @@
-import {packs, defaultCharacter} from './characters/characters.json';
+import {packs, defaultCharacter} from './characters/characters.js';
 
 const loadNpc = async (srcUrl) => {
   const res = await fetch(srcUrl);
@@ -37,22 +37,22 @@ class CharacterSelectManager {
         return objects;
       };
   
-      const extractPackName = (filename) => {
-        return filename.replace(/\.[^/.]+$/, "")
-      }
+      // const extractPackName = (filename) => {
+      //   return filename.replace(/\.[^/.]+$/, "")
+      // }
 
       // list npc file names
-      for (const packFilename of packs) {
-        const packName = extractPackName(packFilename);
-        const pack = await loadPack(getCharacterFullPath(packFilename));
-        
+      for (const pack of packs) {
+        // const packName = extractPackName(packFilename);
+        // const pack = await loadPack(getCharacterFullPath(packFilename));
+
         const characters = [];
-        for (const characterObj of pack) {
+        for (const characterObj of pack.characters) {
           const characterName = characterObj.name;
           const character = await loadNpc(getCharacterFullPath(characterName));
           characters.push(character);
         }
-        this.charactersMap[packName] = characters;
+        this.charactersMap[pack.name] = characters;
       }
     }
     return this.charactersMap;
