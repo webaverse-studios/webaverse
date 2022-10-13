@@ -8,8 +8,6 @@ class CharacterSelectManager {
 
   async getDefaultSpecAsync() {
     if (!this.defaultCharacterSpec) {
-      // const characterName = defaultCharacter;
-      // this.defaultCharacterSpec = await loadNpc(getCharacterFullPath(characterName));
       this.defaultCharacterSpec = defaultCharacter;
     }
     return this.defaultCharacterSpec;
@@ -28,5 +26,5 @@ class CharacterSelectManager {
 
 const characterSelectManager = new CharacterSelectManager();
 export {
-  characterSelectManager
+  characterSelectManager,
 };
