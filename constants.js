@@ -1,4 +1,5 @@
-export const isProd = import.meta.env.MODE === 'production';
+// export const isProd = import.meta.env.MODE === 'production';
+export const isProd = true;
 
 export const baseUnit = 4;
 export const previewExt = 'jpg';

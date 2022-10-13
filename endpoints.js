@@ -1,10 +1,10 @@
 
 import {isProd} from './constants.js';
 
-export const compilerBaseUrl = // isProd ?
+export const compilerBaseUrl = isProd ?
   `https://compiler.webaverse.com/`
-// :
-//   `https://local-compiler.webaverse.com/`;
+:
+  `https://local-compiler.webaverse.com/`;
 
 // scenes
 export const scenesBaseUrl = isProd ?
