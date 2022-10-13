@@ -1,10 +1,4 @@
-// import * as THREE from 'three';
 import {makeId} from './util.js';
-// import {defaultChunkSize} from './constants.js';
-// import metaversefile from 'metaversefile';
-// import { terrainVertex, terrainFragment } from './shaders/terrainShader.js';
-
-// const localVector = new THREE.Vector3();
 
 const defaultNumPhysicsWorkers = 2;
 
