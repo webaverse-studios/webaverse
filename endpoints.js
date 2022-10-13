@@ -8,14 +8,14 @@ export const compilerBaseUrl = isProd ?
 
 // scenes
 export const scenesBaseUrl = isProd ?
-  `https://scenes.webaverse.com/`
+  `https://webaverse.github.io/scenes/`
 :
   `/packages/scenes/`;
 export const defaultSceneName = 'street.scn';
 
 // characters
 export const charactersBaseUrl = isProd ?
-  `https://characters.webaverse.com/`
+  `https://webaverse.github.io/characters/`
 :
   `/packages/characters/`;
 export const defaultCharacterName = 'scillia.npc';
