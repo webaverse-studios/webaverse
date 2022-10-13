@@ -1,11 +1,13 @@
 import path from 'path';
+import fs from 'fs';
 import http from 'http';
 import https from 'https';
-import fs from 'fs';
 import child_process from 'child_process';
 import express from 'express';
 import * as vite from 'vite';
 import wsrtc from 'wsrtc/wsrtc-server.mjs';
+
+const vercelJson = JSON.parse(fs.readFileSync('./vercel.json', 'utf8'));
 
 //
 
@@ -48,11 +50,13 @@ function makeId(length) {
 
 //
 
+const {headers: headerSpecs} = vercelJson;
+const headerSpec0 = headerSpecs[0];
+const {headers} = headerSpec0;
 const _setHeaders = res => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
-  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  for (const {key, value} of headers) {
+    res.setHeader(key, value);
+  }
 };
 
 //
