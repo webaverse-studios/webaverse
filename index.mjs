@@ -132,11 +132,11 @@ const _startCompiler = () => new Promise((resolve, reject) => {
 
     _setHeaders(res);
 
-    if (proxyDirectories.some(d => req.url.startsWith(d))) {
-      _proxyFile(req, res, req.url);
-    } else if (req.headers['host'] === COMPILER_NAME) {
+    if (req.headers['host'] === COMPILER_NAME) {
       const u = `http://localhost:${COMPILER_PORT}${req.url}`;
       _proxyUrl(req, res, u);
+    } else if (proxyDirectories.some(d => req.url.startsWith(d))) {
+      _proxyFile(req, res, req.url);
     } else {
       next();
     }
