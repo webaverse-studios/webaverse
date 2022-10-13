@@ -13,3 +13,9 @@
 [submodule "packages/three"]
 	path = packages/three
 	url = https://github.com/webaverse/three
+[submodule "packages/characters"]
+	path = packages/characters
+	url = https://github.com/webaverse/characters.git
+[submodule "packages/scenes"]
+	path = packages/scenes
+	url = https://github.com/webaverse/scenes.git
