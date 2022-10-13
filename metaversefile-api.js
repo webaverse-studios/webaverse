@@ -5,6 +5,7 @@ metaversfile can load many file types, including javascript.
 */
 
 import * as THREE from 'three';
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {Text} from 'troika-three-text';
 import React from 'react';
 import * as ReactThreeFiber from '@react-three/fiber';
@@ -14,9 +15,6 @@ import cameraManager from './camera-manager.js';
 import physicsManager from './physics-manager.js';
 import Avatar from './avatars/avatars.js';
 import {world} from './world.js';
-// import ERC721 from './erc721-abi.json';
-// import ERC1155 from './erc1155-abi.json';
-// import {web3} from './blockchain.js';
 import {moduleUrls, importModule} from './core-modules.js';
 import {componentTemplates} from './metaverse-components.js';
 import postProcessing from './post-processing.js';
@@ -25,7 +23,6 @@ import * as mathUtils from './math-utils.js';
 import JSON6 from 'json-6';
 import * as geometries from './geometries.js';
 import * as materials from './materials.js';
-// import meshLodManager from './mesh-lodder.js';
 import {AvatarRenderer} from './avatars/avatar-renderer.js';
 import {chatManager} from './chat-manager.js';
 import loreAI from './ai/lore/lore-ai.js';
@@ -48,7 +45,6 @@ import {murmurhash3} from './procgen/murmurhash3.js';
 import debug from './debug.js';
 import * as scenePreviewer from './scene-previewer.js';
 import * as sounds from './sounds.js';
-// import * as lodder from './lod.js';
 import hpManager from './hp-manager.js';
 import particleSystemManager from './particle-system.js';
 import domRenderEngine from './dom-renderer.jsx';
@@ -1245,6 +1241,11 @@ export default () => {
   },
   useGeometries() {
     return geometries;
+  },
+  useThreeUtils() {
+    return {
+      BufferGeometryUtils,
+    };
   },
   useGeometryBuffering() {
     return geometryBuffering;
