@@ -121,6 +121,7 @@ const _startCompiler = () => new Promise((resolve, reject) => {
   const _makeHttpServer = () => isHttps ? https.createServer(certs, app) : http.createServer(app);
   const httpServer = _makeHttpServer();
   const viteServer = await vite.createServer({
+    mode: isProduction ? 'production' : 'development',
     server: {
       middlewareMode: true,
       // force: true,
