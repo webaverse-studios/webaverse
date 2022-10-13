@@ -1,26 +1,49 @@
-import {packs, defaultCharacter} from './characters/characters.js';
+import {loadJson} from './util.js';
+import {charactersBaseUrl, defaultCharacterName} from './endpoints.js';
+
+const getCharacterFullPath = filename => charactersBaseUrl + filename;
 
 class CharacterSelectManager {
   constructor() {
-    this.charactersMap = null;
-    this.defaultCharacterSpec = null;
+    this.charactersLoadPromise = null;
+    this.charactersMapPromise = null;
+    this.defaultCharacterSpecPromise = null;
   }
 
-  async getDefaultSpecAsync() {
-    if (!this.defaultCharacterSpec) {
-      this.defaultCharacterSpec = defaultCharacter;
+  getCharactersAsync() {
+    if (!this.charactersLoadPromise) {
+      this.charactersLoadPromise = loadJson(charactersBaseUrl + 'characters.json');
     }
-    return this.defaultCharacterSpec;
+    return this.charactersLoadPromise;
   }
 
-  async loadCharactersMap() {
-    if (!this.charactersMap) {
-      this.charactersMap = {};
-      for (const pack of packs) {
-        this.charactersMap[pack.name] = pack.characters;
-      }
+  getDefaultSpecAsync() {
+    if (!this.defaultCharacterSpecPromise) {
+      this.defaultCharacterSpecPromise = (async () => {
+        return await loadJson(getCharacterFullPath(defaultCharacterName));
+      })();
     }
-    return this.charactersMap;
+    return this.defaultCharacterSpecPromise;
+  }
+
+  loadCharactersMap() {
+    if (!this.charactersMapPromise) {
+      this.charactersMapPromise = (async () => {
+        const characters = await this.getCharactersAsync();
+        const {packs} = characters;
+
+        // list npc file names
+        const charactersMap = {};
+        await Promise.all(packs.map(async pack => {
+          const characters = await Promise.all(pack.characters.map(characterName =>
+            loadJson(getCharacterFullPath(characterName))
+          ));
+          charactersMap[pack.name] = characters;
+        }));
+        return charactersMap;
+      })();
+    }
+    return this.charactersMapPromise;
   }
 }
 
