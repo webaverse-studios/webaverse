@@ -8,6 +8,9 @@ export default defineConfig(({command, mode, ssrBuild}) => {
     plugins: [
       pluginReact(),
     ],
+    build: {
+      minify: false,
+    },
     /* optimizeDeps: {
       entries: [
         'src/*.js',
