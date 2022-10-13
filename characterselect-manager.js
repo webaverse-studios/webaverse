@@ -1,16 +1,4 @@
-import {packs, defaultCharacter} from './public/characters/characters.js';
-
-const loadNpc = async (srcUrl) => {
-  const res = await fetch(srcUrl);
-  const j = await res.json();
-  return j;
-};
-
-const charactersDir = '/characters/';
-
-const getCharacterFullPath = (filename) => {
-  return charactersDir + filename;
-}
+import {packs, defaultCharacter} from './characters/characters.js';
 
 class CharacterSelectManager {
   constructor() {
@@ -20,8 +8,9 @@ class CharacterSelectManager {
 
   async getDefaultSpecAsync() {
     if (!this.defaultCharacterSpec) {
-      const characterName = defaultCharacter;
-      this.defaultCharacterSpec = await loadNpc(getCharacterFullPath(characterName));
+      // const characterName = defaultCharacter;
+      // this.defaultCharacterSpec = await loadNpc(getCharacterFullPath(characterName));
+      this.defaultCharacterSpec = defaultCharacter;
     }
     return this.defaultCharacterSpec;
   }
@@ -29,30 +18,8 @@ class CharacterSelectManager {
   async loadCharactersMap() {
     if (!this.charactersMap) {
       this.charactersMap = {};
-
-      const loadPack = async (srcUrl) => {
-        const res = await fetch(srcUrl);
-        const j = await res.json();
-        const {objects} = j;
-        return objects;
-      };
-  
-      // const extractPackName = (filename) => {
-      //   return filename.replace(/\.[^/.]+$/, "")
-      // }
-
-      // list npc file names
       for (const pack of packs) {
-        // const packName = extractPackName(packFilename);
-        // const pack = await loadPack(getCharacterFullPath(packFilename));
-
-        const characters = [];
-        for (const characterObj of pack.characters) {
-          const characterName = characterObj.name;
-          const character = await loadNpc(getCharacterFullPath(characterName));
-          characters.push(character);
-        }
-        this.charactersMap[pack.name] = characters;
+        this.charactersMap[pack.name] = pack.characters;
       }
     }
     return this.charactersMap;

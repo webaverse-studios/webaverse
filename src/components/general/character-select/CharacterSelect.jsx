@@ -18,17 +18,7 @@ import { chatTextSpeed, characterSelectAvatarQuality } from '../../../../constan
 import { VoiceEndpointVoicer } from '../../../../voice-output/voice-endpoint-voicer.js';
 import * as voices from '../../../../voices.js';
 import {getVoiceEndpointUrl} from '../../../../voice-output/voice-endpoint-voicer.js';
-import npcManager from '../../../../npc-manager.js'
-
-//
-
-function typeContentToUrl(type, content) {
-if (typeof content === 'object') {
-    content = JSON.stringify(content);
-}
-const dataUrlPrefix = 'data:' + type + ',';
-return '/@proxy/' + dataUrlPrefix + encodeURIComponent(content).replace(/\%/g, '%25')//.replace(/\\//g, '%2F');
-}
+import npcManager from '../../../../npc-manager.js';
 
 //
 
@@ -102,7 +92,8 @@ export const CharacterSelect = () => {
             let detachedCharacter = JSON.parse(JSON.stringify(targetCharacter));
             detachedCharacter.detached = true;
             const app = await metaversefile.createAppAsync({
-                start_url: typeContentToUrl('application/npc', detachedCharacter),
+                type: 'application/npc',
+                content: detachedCharacter,
                 components: {
                     quality: characterSelectAvatarQuality,
                 },
