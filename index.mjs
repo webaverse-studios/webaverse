@@ -7,13 +7,20 @@ import express from 'express';
 import * as vite from 'vite';
 import wsrtc from 'wsrtc/wsrtc-server.mjs';
 
+//
+
+const dirname = path.dirname(import.meta.url.replace(/^file:\/\//, ''));
+Error.stackTraceLimit = 300;
+
+//
+
 const SERVER_ADDR = '0.0.0.0';
 const SERVER_NAME = 'local.webaverse.com';
 
 const COMPILER_PORT = 3333;
 const COMPILER_NAME = 'local-compiler.webaverse.com';
 
-Error.stackTraceLimit = 300;
+//
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -39,7 +46,29 @@ function makeId(length) {
   return result;
 }
 
-const _proxy = (req, res, u) => {
+const _setHeaders = res => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+};
+
+const proxyDirectories = [
+  '/packages/scenes/',
+  '/packages/characters/',
+];
+const _proxyFile = (req, res, u) => {
+  u = path.join(dirname, u);
+  // console.log('proxy file', u);
+  const rs = fs.createReadStream(u);
+  rs.on('error', err => {
+    console.warn(err);
+    res.statusCode = 404;
+    res.end(err.stack);
+  });
+  rs.pipe(res);
+};
+const _proxyUrl = (req, res, u) => {
   const proxyReq = /^https:/.test(u) ? https.request(u) : http.request(u);
   for (const header in req.headers) {
     proxyReq.setHeader(header, req.headers[header]);
@@ -101,15 +130,14 @@ const _startCompiler = () => new Promise((resolve, reject) => {
   app.all('*', async (req, res, next) => {
     // console.log('got headers', req.method, req.url, req.headers);
 
-    if (req.headers['host'] === COMPILER_NAME) {
-      const u = `http://localhost:${COMPILER_PORT}${req.url}`;
-      _proxy(req, res, u);
-      return;
-    } else {
-      res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-      res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
-      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    _setHeaders(res);
 
+    if (proxyDirectories.some(d => req.url.startsWith(d))) {
+      _proxyFile(req, res, req.url);
+    } else if (req.headers['host'] === COMPILER_NAME) {
+      const u = `http://localhost:${COMPILER_PORT}${req.url}`;
+      _proxyUrl(req, res, u);
+    } else {
       next();
     }
   });
@@ -151,7 +179,7 @@ const _startCompiler = () => new Promise((resolve, reject) => {
     }
   })();
   const initialRoomState = (() => {
-    const s = fs.readFileSync('./scenes/gunroom.scn', 'utf8');
+    const s = fs.readFileSync('./packages/scenes/gunroom.scn', 'utf8');
     const j = JSON.parse(s);
     const {objects} = j;
     
