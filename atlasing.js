@@ -316,7 +316,9 @@ export const createTextureAtlas = (meshes, {
 };
 
 export const calculateCanvasAtlasTexturePerRow = (numTextures) => {
-  return Math.pow(2, Math.ceil(Math.log(numTextures) / Math.log(2)));
+  const minNumTexturesPerRow = Math.sqrt(numTextures);
+  // ? rounding the minNumTexturesPerRow to the next power of 2
+  return Math.pow(2, Math.ceil(Math.log(minNumTexturesPerRow) / Math.log(2)));
 };
 
 const _adjustAtlasTextureSettings = (
