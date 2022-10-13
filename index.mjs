@@ -46,6 +46,8 @@ function makeId(length) {
   return result;
 }
 
+//
+
 const _setHeaders = res => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
@@ -53,21 +55,8 @@ const _setHeaders = res => {
   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
 };
 
-const proxyDirectories = [
-  '/packages/scenes/',
-  '/packages/characters/',
-];
-const _proxyFile = (req, res, u) => {
-  u = path.join(dirname, u);
-  // console.log('proxy file', u);
-  const rs = fs.createReadStream(u);
-  rs.on('error', err => {
-    console.warn(err);
-    res.statusCode = 404;
-    res.end(err.stack);
-  });
-  rs.pipe(res);
-};
+//
+
 const _proxyUrl = (req, res, u) => {
   const proxyReq = /^https:/.test(u) ? https.request(u) : http.request(u);
   for (const header in req.headers) {
@@ -87,6 +76,26 @@ const _proxyUrl = (req, res, u) => {
   });
   proxyReq.end();
 };
+
+//
+
+const serveDirectories = [
+  '/packages/scenes/',
+  '/packages/characters/',
+];
+const _proxyFile = (req, res, u) => {
+  u = path.join(dirname, u);
+  // console.log('proxy file', u);
+  const rs = fs.createReadStream(u);
+  rs.on('error', err => {
+    console.warn(err);
+    res.statusCode = 404;
+    res.end(err.stack);
+  });
+  rs.pipe(res);
+};
+
+//
 
 const _startCompiler = () => new Promise((resolve, reject) => {
   // start the compiler at ./packages/compiler
@@ -125,6 +134,8 @@ const _startCompiler = () => new Promise((resolve, reject) => {
   });
 });
 
+//
+
 (async () => {
   const app = express();
   app.all('*', async (req, res, next) => {
@@ -135,7 +146,7 @@ const _startCompiler = () => new Promise((resolve, reject) => {
     if (req.headers['host'] === COMPILER_NAME) {
       const u = `http://localhost:${COMPILER_PORT}${req.url}`;
       _proxyUrl(req, res, u);
-    } else if (proxyDirectories.some(d => req.url.startsWith(d))) {
+    } else if (serveDirectories.some(d => req.url.startsWith(d))) {
       _proxyFile(req, res, req.url);
     } else {
       next();
