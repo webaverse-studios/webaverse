@@ -8,7 +8,7 @@
     "start": "npm run prod",
     "dev": "NODE_ENV=development sudo --preserve-env=NODE_ENV $(which node) index.mjs",
     "prod": "NODE_ENV=production sudo --preserve-env=NODE_ENV $(which node) index.mjs",
-    "build": "vite build",
+    "build": "vite build --mode development",
     "serve": "vite preview",
     "setup:test": "cd test && npm i",
     "test": "cd test && npm run test",
