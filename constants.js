@@ -3,10 +3,10 @@ export const previewExt = 'jpg';
 export const maxGrabDistance = 1.5;
 
 export const isProd = import.meta.env.MODE === 'production';
-export const compilerBaseUrl = isProd ?
+export const compilerBaseUrl = // isProd ?
   `https://compiler.webaverse.com/`
-:
-  `https://local-compiler.webaverse.com/`;
+// :
+//   `https://local-compiler.webaverse.com/`;
 export const defaultRendererUrl = 'https://render.exokit.org/'
 
 export const transparentPngUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
