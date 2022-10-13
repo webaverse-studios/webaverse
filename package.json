@@ -26,6 +26,7 @@
     "gpt-3-encoder": "^1.1.3",
     "json-6": "^1.1.4",
     "maxrects-packer": "^2.7.3",
+    "compiler": "./packages/compiler",
     "metaversefile": "./packages/metaversefile",
     "openai-api": "^1.3.1",
     "react": "17.0.2",
