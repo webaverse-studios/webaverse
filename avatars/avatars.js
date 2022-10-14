@@ -393,6 +393,7 @@ const _makeDebugMesh = (avatar) => {
 // scene.add(testMesh);
 
 class Avatar {
+  #audioRecognizer = null;
 	constructor(avatarRenderer, options = {}) {
     this.avatarRenderer = avatarRenderer;
     const object = avatarRenderer.controlObject;
@@ -409,7 +410,6 @@ class Avatar {
     //
 
     avatarRenderer.setControlled(true);
-    this.#ensureAudioRecognizer();
 
     //
 
@@ -1949,19 +1949,9 @@ class Avatar {
           await audioContext.resume();
         })();
       }
-      const _volume = e => {
-        // the mouth is manually overridden by the CharacterBehavior class which is attached to all players
-        // this happens when a player is eating fruit or yelling while making an attack
-        if (!this.manuallySetMouth) {
-          this.volume = e.data;
-        }
-      }
 
-      const _buffer = e => {
-        this.audioRecognizer.send(e.data);
-      }
-
-      this.audioRecognizer.addEventListener('result', e => {
+      const audioRecognizer = this.getAudioRecognizer();
+      audioRecognizer.addEventListener('result', e => {
         this.vowels.set(e.data);
       });
 
@@ -1972,6 +1962,16 @@ class Avatar {
         emitBuffer: true,
       });
 
+      const _volume = e => {
+        // the mouth is manually overridden by the CharacterBehavior class which is attached to all players
+        // this happens when a player is eating fruit or yelling while making an attack
+        if (!this.manuallySetMouth) {
+          this.volume = e.data;
+        }
+      }
+      const _buffer = e => {
+        audioRecognizer.send(e.data);
+      }
       this.audioWorker.addEventListener('volume', _volume);
       this.audioWorker.addEventListener('buffer', _buffer);
     } else {
@@ -1999,7 +1999,8 @@ class Avatar {
         })();
       }
 
-      this.audioRecognizer.addEventListener('result', e => {
+      const audioRecognizer = this.getAudioRecognizer();
+      audioRecognizer.addEventListener('result', e => {
         this.vowels.set(e.data);
       });
 
@@ -2012,12 +2013,10 @@ class Avatar {
 
       const _volume = e => {
         this.volume = this.volume * 0.8 + e.data * 0.2;
-      }
-
+      };
       const _buffer = e => {
-        this.audioRecognizer.send(e.data);
-      }
-
+        audioRecognizer.send(e.data);
+      };
       this.microphoneWorker.addEventListener('volume', _volume);
       this.microphoneWorker.addEventListener('buffer', _buffer);
     } else {
@@ -2030,10 +2029,10 @@ class Avatar {
   getMicrophoneInput() {
     return this.microphoneWorker.getInput();
   }
-  #ensureAudioRecognizer() {
-    if (!this.audioRecognizer) {
+  getAudioRecognizer() {
+    if (!this.#audioRecognizer) {
       const audioContext = audioManager.getAudioContext();
-      this.audioRecognizer = new AudioRecognizer({
+      this.#audioRecognizer = new AudioRecognizer({
         sampleRate: audioContext.sampleRate,
       });
     }
