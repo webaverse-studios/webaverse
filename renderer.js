@@ -40,8 +40,10 @@ function bindCanvas(c) {
     height,
     pixelRatio,
   } = _getCanvasDimensions();
-  renderer.setSize(width, height);
-  renderer.setPixelRatio(pixelRatio);
+  renderer.setSize(width, height, false);
+  if (pixelRatio !== 1) {
+    renderer.setPixelRatio(pixelRatio);
+  }
 
   renderer.autoClear = false;
   renderer.sortObjects = false;
@@ -165,7 +167,7 @@ const _setRendererSize = (width, height, pixelRatio) => {
       height,
       pixelRatio,
     } = _getCanvasDimensions(); */
-    renderer.setSize(width, height);
+    renderer.setSize(width, height, false);
     renderer.setPixelRatio(pixelRatio);
 
     // resume XR
