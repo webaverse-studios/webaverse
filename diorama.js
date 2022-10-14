@@ -1,10 +1,7 @@
 import * as THREE from 'three';
 import {getRenderer} from './renderer.js';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-// import {world} from './world.js';
-// import {fitCameraToBoundingBox} from './util.js';
 import {Text} from 'troika-three-text';
-// import {defaultDioramaSize} from './constants.js';
 import {fullscreenGeometry} from './background-fx/common.js';
 import {OutlineBgFxMesh} from './background-fx/OutlineBgFx.js';
 import {NoiseBgFxMesh} from './background-fx/NoiseBgFx.js';
@@ -18,6 +15,8 @@ import {GrassBgFxMesh} from './background-fx/GrassBgFx.js';
 import {WebaverseScene} from './webaverse-scene.js';
 import {lightsManager} from './engine-hooks/lights/lights-manager.js';
 
+//
+
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
 const localVector3 = new THREE.Vector3();
@@ -27,6 +26,8 @@ const localVector4D = new THREE.Vector4();
 const localQuaternion = new THREE.Quaternion();
 const localMatrix = new THREE.Matrix4();
 const localColor = new THREE.Color();
+
+//
 
 // this function maps the speed histogram to a position, integrated up to the given timestamp
 const mapTime = (speedHistogram = new SpeedHistogram, time = 0) => {
@@ -101,6 +102,9 @@ const histogram = new SpeedHistogram().fromArray([
   {speed: 0.05, duration: 2000},
   {speed: 10, duration: 100},
 ]).toArray(60);
+
+//
+
 const labelAnimationRate = 3;
 const labelVertexShader = `\
   uniform float iTime;
@@ -425,10 +429,14 @@ const skinnedRedMaterial = (() => {
   return material;
 })();
 
+//
+
 const outlineRenderScene = new THREE.Scene();
 outlineRenderScene.name = 'outlineRenderScene';
 outlineRenderScene.autoUpdate = false;
 outlineRenderScene.overrideMaterial = skinnedRedMaterial;
+
+//
 
 const sideScene = new WebaverseScene();
 sideScene.name = 'sideScene';
@@ -890,6 +898,8 @@ const createPlayerDiorama = ({
   }
   return diorama;
 };
+
+//
 
 const dioramas = [];
 const dioramaManager = {
