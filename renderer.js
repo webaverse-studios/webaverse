@@ -41,9 +41,7 @@ function bindCanvas(c) {
     pixelRatio,
   } = _getCanvasDimensions();
   renderer.setSize(width, height, false);
-  if (pixelRatio !== 1) {
-    renderer.setPixelRatio(pixelRatio);
-  }
+  renderer.setPixelRatio(pixelRatio);
 
   renderer.autoClear = false;
   renderer.sortObjects = false;
