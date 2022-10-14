@@ -1724,37 +1724,38 @@ class GameManager extends EventTarget {
       applySettingToApp(app);
     }
   }
-  playerDiorama = null;
-  bindDioramaCanvas() {
-    // await rendererWaitForLoad();
+  #playerDiorama = null;
+  getPlayerDiorama() {
+    if (!this.#playerDiorama) {
+      this.#playerDiorama = dioramaManager.createPlayerDiorama({
+        // label: true,
+        outline: true,
+        grassBackground: true,
+        // glyphBackground: true,
+      });
 
-    this.playerDiorama = dioramaManager.createPlayerDiorama({
-      // label: true,
-      outline: true,
-      grassBackground: true,
-      // glyphBackground: true,
-    });
+      const playerSelectedFn = e => {
+        const {
+          player,
+        } = e.data;
 
-    const playerSelectedFn = e => {
-      const {
-        player,
-      } = e.data;
+        const localPlayer = player;
+        this.#playerDiorama.setTarget(localPlayer);
+        this.#playerDiorama.setObjects([
+          localPlayer.avatar.avatarRenderer.scene,
+        ]);
+      };
+      playersManager.addEventListener('playerchange', playerSelectedFn);
 
-      const localPlayer = player;
-      this.playerDiorama.setTarget(localPlayer);
-      this.playerDiorama.setObjects([
-        localPlayer.avatar.avatarRenderer.scene,
-      ]);
-    };
-    playersManager.addEventListener('playerchange', playerSelectedFn);
-
-    avatarManager.addEventListener('avatarchange', e => {
-      const localPlayer = playersManager.getLocalPlayer();
-      this.playerDiorama.setTarget(localPlayer);
-      this.playerDiorama.setObjects([
-        e.data.avatar.avatarRenderer.scene,
-      ]);
-    })
+      avatarManager.addEventListener('avatarchange', e => {
+        const localPlayer = playersManager.getLocalPlayer();
+        this.#playerDiorama.setTarget(localPlayer);
+        this.#playerDiorama.setObjects([
+          e.data.avatar.avatarRenderer.scene,
+        ]);
+      });
+    }
+    return this.#playerDiorama;
   }
   async setVoicePack(voicePack) {
     const localPlayer = metaversefileApi.useLocalPlayer();

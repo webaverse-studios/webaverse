@@ -130,8 +130,6 @@ export default class Webaverse extends EventTarget {
   }
   bindCanvas(c) {
     bindCanvas(c);
-    game.bindDioramaCanvas();
-    
     postProcessing.bindCanvas();
   }
   async isXrSupported() {
