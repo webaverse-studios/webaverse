@@ -34,6 +34,8 @@ const localVector3 = new THREE.Vector3();
 const localVector4 = new THREE.Vector3();
 const localVector5 = new THREE.Vector3();
 const localVector6 = new THREE.Vector3();
+const localVector7 = new THREE.Vector3();
+const localVector8 = new THREE.Vector3();
 // const localVector2D = new THREE.Vector2();
 const localQuaternion = new THREE.Quaternion();
 const localQuaternion2 = new THREE.Quaternion();
@@ -42,7 +44,7 @@ const localEuler = new THREE.Euler();
 const localMatrix = new THREE.Matrix4();
 const localMatrix2 = new THREE.Matrix4();
 const localMatrix3 = new THREE.Matrix4();
-// const localBox = new THREE.Box3();
+const localBox = new THREE.Box3();
 const localRay = new THREE.Ray();
 
 //
@@ -79,12 +81,20 @@ const _unwearAppIfHasSitComponent = (player) => {
   }
 }
 
+const getPhysicalPosition = box => {
+  return localVector7.set(
+    (box.min.x + box.max.x) / 2,
+    box.min.y,
+    (box.min.z + box.max.z) / 2
+  );
+}
+
 // returns whether we actually snapped
 function updateGrabbedObject(
   o,
   grabMatrix,
   offsetMatrix,
-  { collisionEnabled, handSnapEnabled, physx, gridSnap }
+  {collisionEnabled, handSnapEnabled, physx, gridSnap},
 ) {
   grabMatrix.decompose(localVector, localQuaternion, localVector2);
   offsetMatrix.decompose(localVector3, localQuaternion2, localVector4);
@@ -93,35 +103,52 @@ function updateGrabbedObject(
     .multiplyMatrices(grabMatrix, offsetMatrix)
     .decompose(localVector5, localQuaternion3, localVector6);
 
+  let physicalOffset = null;
+  const physicsObjects = o.getPhysicsObjects();
+
+  // Compute physical local bounding box and it's position offset from app.position.
+  // THREE.Box3.getCenter() has a console error, so I calculate manually.
+  if(physicsObjects) {
+    localBox.makeEmpty();
+    for(const physicsObject of physicsObjects) {
+      const geometry = physicsObject.physicsMesh.geometry;
+      geometry.computeBoundingBox();
+      localBox.union(geometry.boundingBox);
+    }
+    physicalOffset = getPhysicalPosition(localBox);
+  }
+
   const physicsScene = physicsManager.getScene();
+
+  // raycast from localPlayer in direction of camera angle
   const collision = collisionEnabled && physicsScene.raycast(localVector, localQuaternion);
+
+  // raycast from grabbed object down perpendicularly
   localQuaternion2.setFromAxisAngle(localVector2.set(1, 0, 0), -Math.PI * 0.5);
   const downCollision = collisionEnabled && physicsScene.raycast(localVector5, localQuaternion2);
 
   if (!!collision) {
-    const { point } = collision;
+    const {point} = collision;
     localVector6.fromArray(point);
   }
 
   if (!!downCollision) {
-    const { point } = downCollision;
+    const {point} = downCollision;
     localVector4.fromArray(point);
-    if (ioManager.keys.shift) {
-      o.position.copy(localVector5.setY(localVector4.y));
-    } else {
-      // if collision point is closer to the player than the grab offset and collisionDown point
-      // is below collision point then place the object at collision point
-      if (
-        localVector.distanceTo(localVector6) < offset &&
-        localVector4.y < localVector6.y
-      )
-        localVector5.copy(localVector6);
-
-      // if grabbed object would go below another object then place object at downCollision point
-      if (localVector5.y < localVector4.y) localVector5.setY(localVector4.y);
-      o.position.copy(localVector5);
-    }
   }
+
+  // if collision point is closer to the player than the grab offset and collisionDown point
+  // is below collision point then place the object at collision point
+  if (!!downCollision && localVector.distanceTo(localVector6) < offset && localVector4.y < localVector6.y) {
+    localVector5.copy(localVector6).sub(physicalOffset);
+  }
+
+  // if grabbed object would go below another object then place object at downCollision point
+  if (!!downCollision && localVector8.copy(localVector5).add(physicalOffset).y < localVector4.y) {
+    localVector5.setY(localVector4.sub(physicalOffset).y);
+  }
+
+  o.position.copy(localVector5);
 
   const handSnap =
     !handSnapEnabled ||
