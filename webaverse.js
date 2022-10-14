@@ -33,7 +33,7 @@ import {
   getComposer,
 } from './renderer.js';
 import transformControls from './transform-controls.js';
-import dioramaManager from './diorama.js';
+import dioramaManager from './diorama-manager.js';
 import * as voices from './voices.js';
 import performanceTracker from './performance-tracker.js';
 import renderSettingsManager from './rendersettings-manager.js';
