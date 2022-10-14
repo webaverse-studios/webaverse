@@ -14,6 +14,7 @@ import {RadialBgFxMesh} from '../background-fx/RadialBgFx.js';
 import {GrassBgFxMesh} from '../background-fx/GrassBgFx.js';
 import {WebaverseScene} from '../webaverse-scene.js';
 import {lightsManager} from '../engine-hooks/lights/lights-manager.js';
+import {DioramaRenderer} from './diorama-renderer.js';
 import {SpeedHistogram} from './speed-histogram.js';
 
 //
@@ -678,107 +679,109 @@ const createPlayerDiorama = ({
         _addObjectsToScene(sideScene);
         const restoreRootLightsFn = _addRootLightsToScene(sideScene);
         // sideScene.add(world.lights);
-    
-        const _renderGrass = () => {
-          if (grassBackground) {
-            grassMesh.update(timeOffset, timeDiff, this.width, this.height);
-            grassMesh.visible = true;
-          } else {
-            grassMesh.visible = false;
-          }
-        };
-        _renderGrass();
-        const _renderPoison = () => {
-          if (poisonBackground) {
-            poisonMesh.update(timeOffset, timeDiff, this.width, this.height);
-            poisonMesh.visible = true;
-          } else {
-            poisonMesh.visible = false;
-          }
-        };
-        _renderPoison();
-        const _renderNoise = () => {
-          if (noiseBackground) {
-            noiseMesh.update(timeOffset, timeDiff, this.width, this.height);
-            noiseMesh.visible = true;
-          } else {
-            noiseMesh.visible = false;
-          }
-        };
-        _renderNoise();
-        const _renderSmoke = () => {
-          if (smokeBackground) {
-            smokeMesh.update(timeOffset, timeDiff, this.width, this.height);
-            smokeMesh.visible = true;
-          } else {
-            smokeMesh.visible = false;
-          }
-        };
-        _renderSmoke();
-        const _renderLightning = () => {
-          if (lightningBackground) {
-            lightningMesh.update(timeOffset, timeDiff, this.width, this.height);
-            lightningMesh.visible = true;
-          } else {
-            lightningMesh.visible = false;
-          }
-        };
-        _renderLightning();
-        const _renderRadial = () => {
-          if (radialBackground) {
-            radialMesh.update(timeOffset, timeDiff, this.width, this.height);
-            radialMesh.visible = true;
-          } else {
-            radialMesh.visible = false;
-          }
-        };
-        _renderRadial();
-        const _renderGlyph = () => {
-          if (glyphBackground) {
-            glyphMesh.update(timeOffset, timeDiff, this.width, this.height);
-            glyphMesh.visible = true;
-          } else {
-            glyphMesh.visible = false;
-          }
-        };
-        _renderGlyph();
-        const _renderDots = () => {
-          if (dotsBackground) {
-            dotsMesh.update(timeOffset, timeDiff, this.width, this.height);
-            dotsMesh.visible = true;
-          } else {
-            dotsMesh.visible = false;
-          }
-        };
-        _renderDots();
-        const _renderOutline = () => {
-          if (outline) {
-            outlineMesh.update(timeOffset, timeDiff, this.width, this.height, outlineRenderTarget.texture);
-            outlineMesh.visible = true;
-          } else {
-            outlineMesh.visible = false;
-          }
-        };
-        _renderOutline();
-        const _renderLabel = () => {
-          if (label) {
-            labelMesh.material.uniforms.iTime.value = timeOffset / 1000;
-            labelMesh.material.uniforms.iTime.needsUpdate = true;
-            labelMesh.visible = true;
-            for (const child of textObject.children) {
-              child.material.uniforms.uTroikaOutlineOpacity.value = timeOffset / 1000;
-              child.material.uniforms.uTroikaOutlineOpacity.needsUpdate = true;
+
+        const _setupBackground = () => {
+          const _renderGrass = () => {
+            if (grassBackground) {
+              grassMesh.update(timeOffset, timeDiff, this.width, this.height);
+              grassMesh.visible = true;
+            } else {
+              grassMesh.visible = false;
             }
-            textObject.visible = true;
-          } else {
-            labelMesh.visible = false;
-            textObject.visible = false;
-          }
+          };
+          _renderGrass();
+          const _renderPoison = () => {
+            if (poisonBackground) {
+              poisonMesh.update(timeOffset, timeDiff, this.width, this.height);
+              poisonMesh.visible = true;
+            } else {
+              poisonMesh.visible = false;
+            }
+          };
+          _renderPoison();
+          const _renderNoise = () => {
+            if (noiseBackground) {
+              noiseMesh.update(timeOffset, timeDiff, this.width, this.height);
+              noiseMesh.visible = true;
+            } else {
+              noiseMesh.visible = false;
+            }
+          };
+          _renderNoise();
+          const _renderSmoke = () => {
+            if (smokeBackground) {
+              smokeMesh.update(timeOffset, timeDiff, this.width, this.height);
+              smokeMesh.visible = true;
+            } else {
+              smokeMesh.visible = false;
+            }
+          };
+          _renderSmoke();
+          const _renderLightning = () => {
+            if (lightningBackground) {
+              lightningMesh.update(timeOffset, timeDiff, this.width, this.height);
+              lightningMesh.visible = true;
+            } else {
+              lightningMesh.visible = false;
+            }
+          };
+          _renderLightning();
+          const _renderRadial = () => {
+            if (radialBackground) {
+              radialMesh.update(timeOffset, timeDiff, this.width, this.height);
+              radialMesh.visible = true;
+            } else {
+              radialMesh.visible = false;
+            }
+          };
+          _renderRadial();
+          const _renderGlyph = () => {
+            if (glyphBackground) {
+              glyphMesh.update(timeOffset, timeDiff, this.width, this.height);
+              glyphMesh.visible = true;
+            } else {
+              glyphMesh.visible = false;
+            }
+          };
+          _renderGlyph();
+          const _renderDots = () => {
+            if (dotsBackground) {
+              dotsMesh.update(timeOffset, timeDiff, this.width, this.height);
+              dotsMesh.visible = true;
+            } else {
+              dotsMesh.visible = false;
+            }
+          };
+          _renderDots();
+          const _renderOutline = () => {
+            if (outline) {
+              outlineMesh.update(timeOffset, timeDiff, this.width, this.height, outlineRenderTarget.texture);
+              outlineMesh.visible = true;
+            } else {
+              outlineMesh.visible = false;
+            }
+          };
+          _renderOutline();
+          const _renderLabel = () => {
+            if (label) {
+              labelMesh.material.uniforms.iTime.value = timeOffset / 1000;
+              labelMesh.material.uniforms.iTime.needsUpdate = true;
+              labelMesh.visible = true;
+              for (const child of textObject.children) {
+                child.material.uniforms.uTroikaOutlineOpacity.value = timeOffset / 1000;
+                child.material.uniforms.uTroikaOutlineOpacity.needsUpdate = true;
+              }
+              textObject.visible = true;
+            } else {
+              labelMesh.visible = false;
+              textObject.visible = false;
+            }
+          };
+          _renderLabel();
         };
-        _renderLabel();
+        _setupBackground();
         
-        // render side scene
-        const _render = () => {
+        const _renderSceneCamera = () => {
           renderer.setRenderTarget(oldRenderTarget);
           renderer.setViewport(0, 0, this.width, this.height);
           if (clearColor !== null) {
@@ -787,7 +790,8 @@ const createPlayerDiorama = ({
           renderer.clear();
           renderer.render(sideScene, sideCamera);
         };
-        _render();
+        _renderSceneCamera();
+
         const _copyFrame = () => {
           for (const canvas of canvases) {
             const {width, height, ctx} = canvas;
