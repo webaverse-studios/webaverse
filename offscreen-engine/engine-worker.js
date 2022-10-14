@@ -20,7 +20,7 @@ const functionMap = {
   'getSpriteAnimationForAppUrlInternal': getSpriteAnimationForAppUrlInternal,
 };
 
-window.addEventListener('message', e => {
+globalThis.addEventListener('message', e => {
   const method = e.data?.method;
   if (method === 'initializeEngine') {
     const {port} = e.data;
