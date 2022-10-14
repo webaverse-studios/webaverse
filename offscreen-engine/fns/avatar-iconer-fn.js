@@ -2,9 +2,9 @@ import {fetchArrayBuffer} from '../../util.js';
 import {AvatarRenderer} from '../../avatars/avatar-renderer.js';
 import {createAvatarForScreenshot, screenshotAvatar} from '../../avatar-screenshotter.js';
 import {maxAvatarQuality} from '../../constants.js';
-import {emotions} from '../../src/components/general/character/Emotions.jsx';
+import {emotes} from '../../emotes/emote-manager.js';
 
-const allEmotions = [''].concat(emotions);
+const allEmotions = [''].concat(emotes.map(emote => emote.name));
 
 export async function getEmotionCanvases(start_url, width, height) {
   // const cameraOffset = new THREE.Vector3(0, 0.05, -0.35);
