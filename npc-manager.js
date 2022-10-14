@@ -407,15 +407,15 @@ class NpcManager extends EventTarget {
           message,
         };
 
-        chatManager.addPlayerMessage(npcPlayer, m);
+        chatManager.addPlayerMessage(player, m);
         if (emote !== 'none' && validEmotionMapping[emote]!== undefined) {
-          triggerEmote(validEmotionMapping[emote], npcPlayer);
+          triggerEmote(validEmotionMapping[emote], player);
         }
         if (emote === 'supersaiyan' || action === 'supersaiyan' || /supersaiyan/i.test(object) || /supersaiyan/i.test(target)) {
           const newSssAction = {
             type: 'sss',
           };
-          npcPlayer.addAction(newSssAction);  
+          player.addAction(newSssAction);  
         } else if (action === 'follow' || (object === 'none' && target === localPlayer.name)) { // follow player
           targetSpec = {
             type: 'follow',
