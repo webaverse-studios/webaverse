@@ -142,11 +142,13 @@ class MusicManager {
   }
   waitForLoad() {
     if (!this.loadPromise) {
-      this.musics = Promise.all(musicSpecs.map(async musicSpec => {
-        const music = new Music(musicSpec);
-        await music.waitForLoad();
-        return music;
-      }));
+      this.loadPromise = (async () => {
+        this.musics = await Promise.all(musicSpecs.map(async musicSpec => {
+          const music = new Music(musicSpec);
+          await music.waitForLoad();
+          return music;
+        }));
+      })();
     }
     return this.loadPromise;
   }
