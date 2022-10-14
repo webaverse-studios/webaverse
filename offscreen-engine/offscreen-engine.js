@@ -41,7 +41,7 @@ class OffscreenEngineProxy {
   
         // await iframeLoadPromise;
   
-        port1.postMessage({
+        worker.postMessage({
           method: 'initializeEngine',
           port: port2,
         }, [port2]);
