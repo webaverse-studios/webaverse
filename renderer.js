@@ -130,9 +130,9 @@ scene.add(camera);
 
 const _getCanvasDimensions = () => {
   let width, height, pixelRatio;
-  width = window.innerWidth;
-  height = window.innerHeight;
-  pixelRatio = window.devicePixelRatio;
+  width = globalThis.innerWidth;
+  height = globalThis.innerHeight;
+  pixelRatio = globalThis.devicePixelRatio;
   
   return {
     width,
@@ -187,7 +187,7 @@ const _setCameraSize = (width, height, pixelRatio) => {
   camera.updateProjectionMatrix();
 };
 
-window.addEventListener('resize', e => {
+globalThis.addEventListener('resize', e => {
   _setSizes();
 });
 
