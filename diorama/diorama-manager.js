@@ -607,35 +607,44 @@ const createPlayerDiorama = ({
         };
       };
 
-      // push old state
-      const oldParents = (() => {
-        const parents = new WeakMap();
-        for (const object of objects) {
-          parents.set(object, object.parent);
-        }
-        return parents;
-      })();
-      const _restoreParents = () => {
-        for (const object of objects) {
-          const parent = oldParents.get(object);
-          if (parent) {
-            parent.add(object);
-          } else {
-            if (object.parent) {
-              object.parent.remove(object);
+      const _pushState = () => {
+        const oldParents = (() => {
+          const parents = new WeakMap();
+          for (const object of objects) {
+            parents.set(object, object.parent);
+          }
+          return parents;
+        })();
+        const _restoreParents = () => {
+          for (const object of objects) {
+            const parent = oldParents.get(object);
+            if (parent) {
+              parent.add(object);
+            } else {
+              if (object.parent) {
+                object.parent.remove(object);
+              }
             }
           }
-        }
-        if (lights) {
-          for (const autoLight of autoLights) {
-            autoLight.parent.remove(autoLight);
+          if (lights) {
+            for (const autoLight of autoLights) {
+              autoLight.parent.remove(autoLight);
+            }
           }
-        }
+        };
+        const oldRenderTarget = renderer.getRenderTarget();
+        const oldViewport = renderer.getViewport(localVector4D);
+        const oldClearColor = renderer.getClearColor(localColor);
+        const oldClearAlpha = renderer.getClearAlpha();
+
+        return () => {
+          _restoreParents();
+          renderer.setRenderTarget(oldRenderTarget);
+          renderer.setViewport(oldViewport);
+          renderer.setClearColor(oldClearColor, oldClearAlpha);
+        };
       };
-      const oldRenderTarget = renderer.getRenderTarget();
-      const oldViewport = renderer.getViewport(localVector4D);
-      const oldClearColor = renderer.getClearColor(localColor);
-      const oldClearAlpha = renderer.getClearAlpha();
+      const _popState = _pushState();
 
       const _render = () => {
         if (autoCamera) {
@@ -816,11 +825,7 @@ const createPlayerDiorama = ({
       };
       _render();
 
-      // pop old state
-      _restoreParents();
-      renderer.setRenderTarget(oldRenderTarget);
-      renderer.setViewport(oldViewport);
-      renderer.setClearColor(oldClearColor, oldClearAlpha);
+      _popState();
     },
     destroy() {
       const index = dioramas.indexOf(diorama);
