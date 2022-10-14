@@ -189,11 +189,18 @@ class Universe extends EventTarget {
       // Called by WSRTC when the connection is initialized
       const init = e => {
         this.wsrtc.removeEventListener('init', init);
+
+        const partyMap = state.get(partyMapName, Z.Map);
+        partyManager.bindState(partyMap);
         localPlayer.bindState(state.getArray(playersMapName));
 
         this.wsrtc.addEventListener('audio', e => {
           const player = playersManager.remotePlayersByInteger.get(e.data.playerId);
           player.processAudioData(e.data);
+        });
+
+        world.appManager.loadApps().then(() => {
+          this.dispatchEvent(new MessageEvent('roomconnect'))
         });
       };
 
@@ -201,6 +208,12 @@ class Universe extends EventTarget {
     };
 
     this.wsrtc.addEventListener('open', open);
+
+    await new Promise((accept, reject) => {
+      this.addEventListener('roomconnect', e => {
+        accept();
+      }, {once: true});
+    });
 
     return this.wsrtc;
   }
