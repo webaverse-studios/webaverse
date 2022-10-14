@@ -1,5 +1,3 @@
-export const isProd = import.meta.env.MODE === 'production';
-
 export const baseUnit = 4;
 export const previewExt = 'jpg';
 export const maxGrabDistance = 1.5;
