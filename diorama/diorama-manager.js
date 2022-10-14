@@ -1,19 +1,19 @@
 import * as THREE from 'three';
-import {getRenderer} from './renderer.js';
+import {getRenderer} from '../renderer.js';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {Text} from 'troika-three-text';
-import {fullscreenGeometry} from './background-fx/common.js';
-import {OutlineBgFxMesh} from './background-fx/OutlineBgFx.js';
-import {NoiseBgFxMesh} from './background-fx/NoiseBgFx.js';
-import {PoisonBgFxMesh} from './background-fx/PoisonBgFx.js';
-import {SmokeBgFxMesh} from './background-fx/SmokeBgFx.js';
-import {GlyphBgFxMesh} from './background-fx/GlyphBgFx.js';
-import {DotsBgFxMesh} from './background-fx/DotsBgFx.js';
-import {LightningBgFxMesh} from './background-fx/LightningBgFx.js';
-import {RadialBgFxMesh} from './background-fx/RadialBgFx.js';
-import {GrassBgFxMesh} from './background-fx/GrassBgFx.js';
-import {WebaverseScene} from './webaverse-scene.js';
-import {lightsManager} from './engine-hooks/lights/lights-manager.js';
+import {fullscreenGeometry} from '../background-fx/common.js';
+import {OutlineBgFxMesh} from '../background-fx/OutlineBgFx.js';
+import {NoiseBgFxMesh} from '../background-fx/NoiseBgFx.js';
+import {PoisonBgFxMesh} from '../background-fx/PoisonBgFx.js';
+import {SmokeBgFxMesh} from '../background-fx/SmokeBgFx.js';
+import {GlyphBgFxMesh} from '../background-fx/GlyphBgFx.js';
+import {DotsBgFxMesh} from '../background-fx/DotsBgFx.js';
+import {LightningBgFxMesh} from '../background-fx/LightningBgFx.js';
+import {RadialBgFxMesh} from '../background-fx/RadialBgFx.js';
+import {GrassBgFxMesh} from '../background-fx/GrassBgFx.js';
+import {WebaverseScene} from '../webaverse-scene.js';
+import {lightsManager} from '../engine-hooks/lights/lights-manager.js';
 
 //
 
