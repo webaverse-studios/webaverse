@@ -1,8 +1,5 @@
 import {makePromise} from './util.js';
 
-const tempCanvas = document.createElement('canvas');
-const tempCtx = tempCanvas.getContext('2d');
-
 const cbs = {};
 let nextId = 0;
 class GIFLoader {
