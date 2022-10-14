@@ -535,18 +535,6 @@ const createPlayerDiorama = ({
         grassBackground = true;
       }
     },
-    /* triggerLoad() {
-      Promise.all([
-        (async () => {
-          await renderer.compileAsync(player.avatar.model, outlineRenderScene);
-        })(),
-        (async () => {
-          await renderer.compileAsync(player.avatar.model, sideScene);
-        })(),
-      ]).then(() => {
-        this.loaded = true;
-      });
-    }, */
     setCameraOffset(newCameraOffset) {
       cameraOffset.copy(newCameraOffset);
     },
@@ -563,11 +551,6 @@ const createPlayerDiorama = ({
 
       const renderer = getRenderer();
       const size = renderer.getSize(localVector2D);
-      /* // a Vector2 representing the largest power of two less than or equal to the current canvas size
-      const sizePowerOfTwo = localVector2D2.set(
-        Math.pow(2, Math.floor(Math.log(size.x) / Math.log(2))),
-        Math.pow(2, Math.floor(Math.log(size.y) / Math.log(2))),
-      ); */
       if (size.x < this.width || size.y < this.height) {
         console.warn('renderer is too small');
         return;
