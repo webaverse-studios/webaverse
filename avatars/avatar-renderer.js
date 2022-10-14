@@ -30,13 +30,14 @@ const localFrustum = new THREE.Frustum();
 const greenColor = new THREE.Color(0x43a047);
 
 const avatarPlaceholderImagePromise = (async () => {
-  const avatarPlaceholderImage = new Image();
-  avatarPlaceholderImage.src = '/images/user.png';
-  await new Promise((accept, reject) => {
-    avatarPlaceholderImage.onload = accept;
-    avatarPlaceholderImage.onerror = reject;
-  });
-  return avatarPlaceholderImage;
+  const res = await fetch('/images/user.png');
+  if (res.ok) {
+    const blob = await res.blob();
+    const avatarPlaceholderImage = await createImageBitmap(blob);
+    return avatarPlaceholderImage;
+  } else {
+    throw new Error('failed to load image: ' + res.status);
+  }
 })();
 const waitForAvatarPlaceholderImage = () => avatarPlaceholderImagePromise;
 const avatarPlaceholderTexture = new THREE.Texture();
