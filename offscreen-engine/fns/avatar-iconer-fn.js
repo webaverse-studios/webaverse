@@ -7,8 +7,6 @@ import {emotes} from '../../emotes/emote-manager.js';
 const allEmotions = [''].concat(emotes.map(emote => emote.name));
 
 export async function getEmotionCanvases(start_url, width, height) {
-  // const cameraOffset = new THREE.Vector3(0, 0.05, -0.35);
-
   const arrayBuffer = await fetchArrayBuffer(start_url);
 
   const avatarRenderer = new AvatarRenderer({
