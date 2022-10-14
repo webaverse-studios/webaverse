@@ -63,6 +63,7 @@ import ioManager from './io-manager.js';
 import {lightsManager} from './engine-hooks/lights/lights-manager.js';
 import {skyManager} from './engine-hooks/environment/skybox/sky-manager.js';
 import {compilerBaseUrl} from './endpoints.js';
+import {isWorker} from './env.js';
 import './metaversefile-binding.js';
 
 const localVector2D = new THREE.Vector2();
@@ -892,11 +893,11 @@ metaversefile.setApi({
   useResize(fn) {
     const app = currentAppRender;
     if (app) {
-      window.addEventListener('resize', e => {
+      globalThis.addEventListener('resize', e => {
         fn(e);
       });
       app.addEventListener('destroy', () => {
-        window.removeEventListener('resize', fn);
+        globalThis.removeEventListener('resize', fn);
       });
     } else {
       throw new Error('useResize cannot be called outside of render()');
