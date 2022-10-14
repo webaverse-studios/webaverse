@@ -1211,18 +1211,18 @@ export default () => {
     return null;
   },
   useInternals() {
-    if (!iframeContainer) {
+    if (!iframeContainer && !isWorker) {
       iframeContainer = document.getElementById('iframe-container');
       
-      iframeContainer.getFov = () => camera.projectionMatrix.elements[ 5 ] * (window.innerHeight / 2);
+      iframeContainer.getFov = () => camera.projectionMatrix.elements[ 5 ] * (globalThis.innerHeight / 2);
       iframeContainer.updateSize = function updateSize() {
         const fov = iframeContainer.getFov();
         iframeContainer.style.cssText = `
           position: fixed;
           left: 0;
           top: 0;
-          width: ${window.innerWidth}px;
-          height: ${window.innerHeight}px;
+          width: ${globalThis.innerWidth}px;
+          height: ${globalThis.innerHeight}px;
           perspective: ${fov}px;
           pointer-events: none;
           user-select: none;
