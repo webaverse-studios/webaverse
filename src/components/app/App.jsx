@@ -40,6 +40,7 @@ import npcManager from '../../../npc-manager';
 import { AccountContext } from '../../hooks/web3AccountProvider';
 import { ChainContext } from '../../hooks/chainProvider';
 import loadoutManager from '../../../loadout-manager';
+import { partyManager } from '../../../party-manager';
 
 //
 
@@ -52,11 +53,13 @@ const _startApp = async ( weba, canvas ) => {
     weba.bindCanvas( canvas );
 
     await weba.waitForLoad();
-    universe.handleUrlUpdate();
-    await weba.startLoop();
 
     await npcManager.initDefaultPlayer();
     loadoutManager.initDefault();
+    await universe.handleUrlUpdate();
+    partyManager.inviteDefaultPlayer();
+
+    await weba.startLoop();
 
 };
 
