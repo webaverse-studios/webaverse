@@ -1,7 +1,7 @@
 // import * as THREE from 'three';
 import React, {useState, useEffect, useRef} from 'react';
 import classnames from 'classnames';
-import dioramaManager from '../diorama-manager.js';
+import dioramaManager from '../diorama/diorama-manager.js';
 import {RpgText} from './RpgText.jsx';
 import styles from './CharacterHups.module.css';
 // import metaversefile from 'metaversefile';
