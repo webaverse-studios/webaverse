@@ -2386,7 +2386,7 @@ const physxWorker = (() => {
       valueSize, // only support 3 (vector) and 4 (quaternion)
     )
 
-    // allocator.freeAll(); // can't free sampleValuesTypedArray, need persist in wasm for later use.
+    allocator.freeAll();
   }
 
   // End AnimationSystem

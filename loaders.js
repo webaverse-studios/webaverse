@@ -11,6 +11,7 @@ import {getRenderer} from './renderer.js';
 import {ShadertoyLoader} from './shadertoy.js';
 import {GIFLoader} from './GIFLoader.js';
 import {VOXLoader} from './VOXLoader.js';
+import {EXRLoader} from 'three/examples/jsm/loaders/EXRLoader.js';
 import {memoize} from './util.js';
 
 class MozLightMapExtension {
@@ -97,6 +98,7 @@ const _gifLoader = memoize(() => new GIFLoader());
 const _voxLoader = memoize(() => new VOXLoader({
   scale: 0.01,
 }));
+const _exrLoader = memoize(() => new EXRLoader());
 
 const loaders = {
   get dracoLoader() {
@@ -119,6 +121,9 @@ const loaders = {
   },
   get voxLoader() {
     return _voxLoader();
+  },
+  get exrLoader() {
+    return _exrLoader();
   },
 };
 export default loaders;
