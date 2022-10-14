@@ -743,6 +743,12 @@ export async function loadJson(u) {
   const res = await fetch(u);
   return await res.json();
 }
+export async function loadImageBitmap(u) {
+  const res = await fetch(u);
+  const blob = await res.blob();
+  const imageBitmap = await createImageBitmap(blob);
+  return imageBitmap;
+}
 export async function loadAudio(u) {
   const audio = new Audio();
   const p = new Promise((accept, reject) => {
