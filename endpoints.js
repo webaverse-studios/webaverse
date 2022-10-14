@@ -1,5 +1,4 @@
-
-import {isProd} from './constants.js';
+import {isProd} from './env.js';
 
 export const compilerBaseUrl = isProd ?
   `https://compiler.webaverse.com/`
