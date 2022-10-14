@@ -59,7 +59,7 @@ export const polygonVigilKey = `0937c004ab133135c86586b55ca212a6c9ecd224`;
 
 const origin = globalThis.location.protocol + '//' + globalThis.location.hostname;
 
-let _inappPreviewHost = '';
+/* let _inappPreviewHost = '';
 
 switch ( origin ) {
     case 'https://local.webaverse.com': {
@@ -79,7 +79,7 @@ switch ( origin ) {
     }
 }
 
-export const inappPreviewHost = _inappPreviewHost;
+export const inappPreviewHost = _inappPreviewHost; */
 
 //
 
