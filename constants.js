@@ -185,4 +185,5 @@ export const maxAvatarQuality = 4;
 export const defaultAvatarQuality = 3;
 export const characterSelectAvatarQuality = 4;
 
+export const minCanvasSize = 512;
 export const offscreenCanvasSize = 2048;
