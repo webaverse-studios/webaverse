@@ -2036,6 +2036,7 @@ class Avatar {
         sampleRate: audioContext.sampleRate,
       });
     }
+    return this.#audioRecognizer;
   }
   decapitate() {
     if (!this.decapitated) {
