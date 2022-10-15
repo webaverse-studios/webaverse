@@ -168,7 +168,7 @@ export const screenshotAvatar = async ({
       const oldViewport = renderer.getViewport(localVector4D);
       const oldClearAlpha = renderer.getClearAlpha();
       
-      renderer.setViewport(0, 0, width/pixelRatio, height/pixelRatio);
+      renderer.setViewport(0, 0, width, height);
       renderer.setClearAlpha(0);
       renderer.clear();
       renderer.render(scene2, camera2);
