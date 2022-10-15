@@ -4,7 +4,7 @@ import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUti
 import {VRMMaterialImporter/*, MToonMaterial*/} from '@pixiv/three-vrm/lib/three-vrm.module.js';
 import * as avatarSpriter from '../avatar-spriter.js';
 import {getAvatarHeight, getAvatarWidth, getModelBones} from './util.mjs';
-import offscreenEngineManager from '../offscreen-engine/offscreen-engine-manager.js';
+// import offscreenEngineManager from '../offscreen-engine/offscreen-engine-manager.js';
 import loaders from '../loaders.js';
 // import {camera} from '../renderer.js';
 import {WebaverseShaderMaterial} from '../materials.js';
@@ -473,7 +473,7 @@ export class AvatarRenderer /* extends EventTarget */ {
     const width = getAvatarWidth(modelBones);
     return {height, width};
   }
-  createSpriteAvatarMesh(args, options) {
+  /* createSpriteAvatarMesh(args, options) {
     return offscreenEngineManager.request('createSpriteAvatarMesh', args, options);
   }
   crunchAvatarModel(args, options) {
@@ -481,7 +481,7 @@ export class AvatarRenderer /* extends EventTarget */ {
   }
   optimizeAvatarModel(args, options) {
     return offscreenEngineManager.request('optimizeAvatarModel', args, options);
-  }
+  } */
   #getCurrentMesh() {
     switch (this.quality) {
       case 1: {
