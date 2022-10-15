@@ -1,4 +1,5 @@
 {
+  "installCommand": "npm install --production",
   "headers": [
     {
       "source": "/(.*)",
