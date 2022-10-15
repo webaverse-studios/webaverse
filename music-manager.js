@@ -26,11 +26,11 @@ class Music {
     source.loop = repeat;
     source.start(0);
 
-    const gain = this.audioContext.createGain();
+    const gain = audioContext.createGain();
     gain.gain.value = defaultMusicVolume;
 
     source.connect(gain);
-    gain.connect(this.audioContext.gain);
+    gain.connect(audioContext.gain);
 
     return {
       source,
