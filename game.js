@@ -1725,6 +1725,32 @@ class GameManager extends EventTarget {
     }
   }
   #playerDiorama = null;
+  bindEvents() {
+    const playerSelectedFn = e => {
+      const {
+        player,
+      } = e.data;
+
+      const playerDiorama = this.getPlayerDiorama();
+      // console.log('playerSelectedFn', player);
+      // debugger;
+      const localPlayer = player;
+      playerDiorama.setTarget(localPlayer);
+      playerDiorama.setObjects([
+        localPlayer.avatar.avatarRenderer.scene,
+      ]);
+    };
+    playersManager.addEventListener('playerchange', playerSelectedFn);
+
+    avatarManager.addEventListener('avatarchange', e => {
+      const playerDiorama = this.getPlayerDiorama();
+      const localPlayer = playersManager.getLocalPlayer();
+      playerDiorama.setTarget(localPlayer);
+      playerDiorama.setObjects([
+        e.data.avatar.avatarRenderer.scene,
+      ]);
+    });
+  }
   getPlayerDiorama() {
     if (!this.#playerDiorama) {
       this.#playerDiorama = dioramaManager.createPlayerDiorama({
@@ -1732,27 +1758,6 @@ class GameManager extends EventTarget {
         outline: true,
         grassBackground: true,
         // glyphBackground: true,
-      });
-
-      const playerSelectedFn = e => {
-        const {
-          player,
-        } = e.data;
-
-        const localPlayer = player;
-        this.#playerDiorama.setTarget(localPlayer);
-        this.#playerDiorama.setObjects([
-          localPlayer.avatar.avatarRenderer.scene,
-        ]);
-      };
-      playersManager.addEventListener('playerchange', playerSelectedFn);
-
-      avatarManager.addEventListener('avatarchange', e => {
-        const localPlayer = playersManager.getLocalPlayer();
-        this.#playerDiorama.setTarget(localPlayer);
-        this.#playerDiorama.setObjects([
-          e.data.avatar.avatarRenderer.scene,
-        ]);
       });
     }
     return this.#playerDiorama;
@@ -1779,4 +1784,5 @@ class GameManager extends EventTarget {
   pushPlayerUpdates = _pushPlayerUpdates;
 }
 const gameManager = new GameManager();
+gameManager.bindEvents();
 export default gameManager;
