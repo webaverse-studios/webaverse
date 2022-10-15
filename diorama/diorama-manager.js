@@ -461,8 +461,8 @@ class DioramaRenderer {
       return;
     }
 
-    if (!this.outlineRenderTarget || (this.outlineRenderTarget.width !== width * pixelRatio) || (this.outlineRenderTarget.height !== height * this.pixelRatio)) {
-      this.outlineRenderTarget = this.#makeOutlineRenderTarget(width * pixelRatio, height * pixelRatio);
+    if (!this.outlineRenderTarget || (this.outlineRenderTarget.width !== width * pixelRatio) || (this.outlineRenderTarget.height !== height * pixelRatio)) {
+      this.outlineRenderTarget = this.#makeOutlineRenderTarget(width * 1, height * pixelRatio);
     }
 
     const _addObjectsToScene = scene => {
