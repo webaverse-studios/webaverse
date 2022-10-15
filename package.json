@@ -8,7 +8,7 @@
     "start": "npm run prod",
     "dev": "NODE_ENV=development sudo --preserve-env=NODE_ENV $(which node) index.mjs",
     "prod": "NODE_ENV=production sudo --preserve-env=NODE_ENV $(which node) index.mjs",
-    "build": "vite build",
+    "build": "node --max_old_space_size=16384 ./node_modules/vite/bin/vite.js build",
     "serve": "vite preview",
     "setup:test": "cd test && npm i",
     "test": "cd test && npm run test",
