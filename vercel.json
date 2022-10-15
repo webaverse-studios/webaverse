@@ -1,5 +1,5 @@
 {
-  "installCommand": "npm install --production",
+  "installCommand": "npm install --omit=dev",
   "headers": [
     {
       "source": "/(.*)",
