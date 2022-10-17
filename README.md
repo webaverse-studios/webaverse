@@ -18,6 +18,21 @@ An open source web3 metaverse game engine that anyone can host. Easy to use, run
 Everything you need to get started with building in the Webaverse is contained in this repository.
 </p>
 
+## WSL Notes
+
+### Use WSL2
+
+Upgrade from WSL1. It's needed for working puppeteer.
+
+### Port Mapping
+
+This will route all of the needed ports for 127.0.0.1 -> WSL to work locally.
+
+(from powershell)
+```
+powershell.exe .\scripts\wsl-port-forwarding.ps1
+```
+
 ## Key Features
 
 - 🎮 A full-featured game engine running in your browser
