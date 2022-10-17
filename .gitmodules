@@ -4,7 +4,7 @@
 [submodule "packages/zjs"]
 	path = packages/zjs
 	url = https://github.com/webaverse/zjs.git
-[submodule "packages/totum"]
+[submodule "packages/compiler"]
 	path = packages/compiler
 	url = https://github.com/webaverse/compiler.git
 [submodule "packages/three-vrm"]
