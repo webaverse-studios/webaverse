@@ -284,6 +284,7 @@ class Grabmanager extends EventTarget {
             grabbedObject,
             localMatrix,
             localMatrix3.fromArray(grabAction.matrix),
+            physicsScene,
             {
               collisionEnabled: true,
               handSnapEnabled: true,
