@@ -3,7 +3,6 @@ import ioManager from './io-manager.js';
 import { playersManager } from './players-manager.js';
 import physicsManager from './physics-manager.js';
 import metaversefileApi from './metaversefile-api.js';
-import * as metaverseModules from './metaverse-modules.js';
 import { maxGrabDistance } from './constants.js';
 import { getRenderer, sceneLowPriority, camera } from './renderer.js';
 import cameraManager from './camera-manager.js';
@@ -11,8 +10,6 @@ import gameManager from './game.js';
 import { world } from './world.js';
 import { snapPosition } from './util.js';
 import { buildMaterial } from './shaders.js';
-
-const physicsScene = physicsManager.getScene();
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -45,13 +42,14 @@ const _updateGrabbedObject = (
   o,
   grabMatrix,
   offsetMatrix,
+  physicsScene,
   { collisionEnabled, handSnapEnabled, gridSnap }
 ) => {
   grabMatrix.decompose(localVector, localQuaternion, localVector2);
   offsetMatrix.decompose(localVector3, localQuaternion2, localVector4);
 
   const offset = localVector3.length();
-  
+
   localMatrix
     .multiplyMatrices(grabMatrix, offsetMatrix)
     .decompose(localVector5, localQuaternion3, localVector6);
@@ -70,8 +68,6 @@ const _updateGrabbedObject = (
     }
     physicalOffset = getPhysicalPosition(localBox);
   }
-
-  const physicsScene = physicsManager.getScene();
 
   // raycast from localPlayer in direction of camera angle
   const collision = collisionEnabled && physicsScene.raycast(localVector, localQuaternion);
@@ -261,6 +257,7 @@ class Grabmanager extends EventTarget {
   update(timestamp, timeDiff) {
     const renderer = getRenderer();
     const localPlayer = playersManager.getLocalPlayer();
+    const physicsScene = physicsManager.getScene();
 
     const _updateGrab = () => {
       const _isWear = (o) =>
@@ -309,7 +306,7 @@ class Grabmanager extends EventTarget {
     };
     _handlePush();
 
-    const _handlePhysicsHighlight = () => {
+    const _handlePhysicsHighlight = physicsScene => {
       highlightedPhysicsObject = null;
 
       if (this.editMode) {
@@ -324,7 +321,7 @@ class Grabmanager extends EventTarget {
         }
       }
     };
-    _handlePhysicsHighlight();
+    _handlePhysicsHighlight(physicsScene);
 
     const _updatePhysicsHighlight = () => {
       this.highlightPhysicsMesh.visible = false;
