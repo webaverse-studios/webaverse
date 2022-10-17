@@ -104,13 +104,13 @@ function updateGrabbedObject(
     .decompose(localVector5, localQuaternion3, localVector6);
 
   let physicalOffset = null;
-  const physicsObjects = o.getPhysicsObjects();
+  const grabbedPhysicsObjects = o.getPhysicsObjects();
 
   // Compute physical local bounding box and it's position offset from app.position.
   // THREE.Box3.getCenter() has a console error, so I calculate manually.
-  if(physicsObjects) {
+  if(grabbedPhysicsObjects) {
     localBox.makeEmpty();
-    for(const physicsObject of physicsObjects) {
+    for(const physicsObject of grabbedPhysicsObjects) {
       const geometry = physicsObject.physicsMesh.geometry;
       geometry.computeBoundingBox();
       localBox.union(geometry.boundingBox);
@@ -137,18 +137,23 @@ function updateGrabbedObject(
     localVector4.fromArray(point);
   }
 
+  const collisionIsWithinOffset = localVector.distanceTo(localVector6) < offset;
+  const collisionIsAboveGround = localVector4.y < localVector6.y;
+
   // Did the ray collide with any other object than the grabbed object? Need this check because on the first frame
   // it collides with the grabbed object, although physical actors are being disabled. This caused teleport issue.
   const collNonGrabbedObj = !!collision && !o.physicsObjects.some(obj => obj.physicsId === collision.objectId);
 
   // if collision point is closer to the player than the grab offset and collisionDown point
   // is below collision point then place the object at collision point
-  if (collNonGrabbedObj && !!downCollision && localVector.distanceTo(localVector6) < offset && localVector4.y < localVector6.y) {
+  if (collNonGrabbedObj && !!downCollision && collisionIsWithinOffset && collisionIsAboveGround) {
     localVector5.copy(localVector6).sub(physicalOffset);
   }
 
-  // if grabbed object would go below another object then place object at downCollision point
-  if (!!downCollision && localVector8.copy(localVector5).add(physicalOffset).y < localVector4.y) {
+  const objectOverlapsVertically = localVector8.copy(localVector5).add(physicalOffset).y < localVector4.y;
+
+  // if grabbed object would overlap vertically then place object at downCollision point
+  if (!!downCollision && objectOverlapsVertically) {
     localVector5.setY(localVector4.sub(physicalOffset).y);
   }
 
