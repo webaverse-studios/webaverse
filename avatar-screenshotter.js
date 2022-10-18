@@ -75,7 +75,7 @@ export const createAvatarForScreenshot = avatarRenderer => {
   return avatar;
 }
 
-export const screenshotAvatar = async ({
+export const screenshotAvatar = ({
   avatar,
   width = 300,
   height = 300,
