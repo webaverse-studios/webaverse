@@ -25,6 +25,7 @@ import { DragAndDrop } from '../../DragAndDrop.jsx';
 import { Stats } from '../../Stats.jsx';
 import { PlayMode } from '../play-mode';
 import { EditorMode } from '../editor-mode';
+import { GrabKeyIndicators } from '../../GrabKeyIndicators.jsx'
 import Header from '../../Header.jsx';
 import QuickMenu from '../../QuickMenu.jsx';
 import {ClaimsNotification} from '../../ClaimsNotification.jsx';
@@ -348,6 +349,7 @@ export const App = () => {
                 <LoadingBox />
                 <FocusBar />
                 <DragAndDrop />
+                <GrabKeyIndicators />
                 <BuildVersion />
                 <Stats app={ app } />
             </AppContext.Provider>
