@@ -22,6 +22,11 @@ const SERVER_NAME = 'local.webaverse.com';
 const COMPILER_PORT = 3333;
 const COMPILER_NAME = 'local-compiler.webaverse.com';
 
+const PREVIEWER_PORT = 4444;
+const PREVIEWER_NAME = 'local-previewer.webaverse.com';
+
+const oldUid = parseInt(process.env.OLDNAME, 10) || process.getuid();
+
 //
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -101,32 +106,43 @@ const _proxyFile = (req, res, u) => {
 
 //
 
-const _startCompiler = () => new Promise((resolve, reject) => {
+const _waitForReady = compilerProcess => {
+  return new Promise((resolve, reject) => {
+    const onerror = err => {
+      reject(err);
+      cleanup();
+    };
+    compilerProcess.on('error', onerror);
+    
+    compilerProcess.stdout.setEncoding('utf8');
+    const ondata = data => {
+      if (/ready/i.test(data)) {
+        resolve();
+        cleanup();
+      }
+    };
+    compilerProcess.stdout.on('data', ondata);
+    
+    const cleanup = () => {
+      compilerProcess.removeListener('error', onerror);
+      compilerProcess.stdout.removeListener('data', ondata);
+    };
+  });
+};
+
+const _startCompiler = async () => {
   // start the compiler at ./packages/compiler
   const compilerPath = path.join(dirname, 'packages', 'compiler');
   const nextPath = path.join(compilerPath, 'node_modules', '.bin', 'next');
   const compilerProcess = child_process.spawn(process.argv[0], [nextPath, 'dev'], {
     cwd: compilerPath,
     env: {
-      // ...process.env,
       PORT: COMPILER_PORT,
       BASE_CWD: dirname,
     },
+    uid: oldUid,
   });
   
-  const error = err => {
-    reject(err);
-    cleanup();
-  };
-  compilerProcess.on('error', error);
-  
-  compilerProcess.stdout.setEncoding('utf8');
-  compilerProcess.stdout.on('data', data => {
-    if (/ready/.test(data)) {
-      resolve();
-      cleanup();
-    }
-  });
   if (!isProduction) {
     compilerProcess.stderr.pipe(process.stderr);
     compilerProcess.stdout.pipe(process.stdout);
@@ -135,10 +151,30 @@ const _startCompiler = () => new Promise((resolve, reject) => {
     console.log(`compiler process exited with code ${code}`);
   });
 
-  const cleanup = () => {
-    compilerProcess.removeListener('error', error);
+  await _waitForReady(compilerProcess);
+};
+const _startRenderer = async () => {
+  // start the compiler at ./packages/compiler
+  const previewerPath = path.join(dirname, 'packages', 'previewer');
+  const previewerProcess = child_process.spawn(process.argv[0], ['server.js', 'https://local.webaverse.com/'], {
+    cwd: previewerPath,
+    env: {
+      ...process.env,
+      PORT: PREVIEWER_PORT,
+    },
+    uid: oldUid,
+  });
+  
+  if (!isProduction) {
+    previewerProcess.stderr.pipe(process.stderr);
+    previewerProcess.stdout.pipe(process.stdout);
   }
-});
+  previewerProcess.on('close', code => {
+    console.log(`previewer process exited with code ${code}`);
+  });
+
+  await _waitForReady(previewerProcess);
+};
 
 //
 
@@ -180,6 +216,7 @@ const _startCompiler = () => new Promise((resolve, reject) => {
   app.use(viteServer.middlewares);
   
   await _startCompiler();
+  await _startRenderer();
   await new Promise((accept, reject) => {
     httpServer.listen(port, SERVER_ADDR, () => {
       accept();
