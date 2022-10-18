@@ -113,28 +113,31 @@ const _startCompiler = () => new Promise((resolve, reject) => {
       BASE_CWD: dirname,
     },
   });
-  compilerProcess.on('error', err => {
-    console.warn(err);
-  });
-  let accepted = false;
+  
+  const error = err => {
+    reject(err);
+    cleanup();
+  };
+  compilerProcess.on('error', error);
+  
   compilerProcess.stdout.setEncoding('utf8');
   compilerProcess.stdout.on('data', data => {
-    if (!isProduction) {
-      process.stderr.write(data);
-    }
-    if (!accepted && /ready/.test(data)) {
-      accepted = true;
+    if (/ready/.test(data)) {
       resolve();
+      cleanup();
     }
   });
-  compilerProcess.stderr.on('data', data => {
-    if (!isProduction) {
-      process.stderr.write(data);
-    }
-  });
+  if (!isProduction) {
+    compilerProcess.stderr.pipe(process.stderr);
+    compilerProcess.stdout.pipe(process.stdout);
+  }
   compilerProcess.on('close', code => {
     console.log(`compiler process exited with code ${code}`);
   });
+
+  const cleanup = () => {
+    compilerProcess.removeListener('error', error);
+  }
 });
 
 //
