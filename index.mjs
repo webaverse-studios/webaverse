@@ -215,8 +215,10 @@ const _startRenderer = async () => {
   });
   app.use(viteServer.middlewares);
   
-  await _startCompiler();
-  await _startRenderer();
+  await Promise.all([
+    _startCompiler(),
+    _startRenderer(),
+  ]);
   await new Promise((accept, reject) => {
     httpServer.listen(port, SERVER_ADDR, () => {
       accept();
