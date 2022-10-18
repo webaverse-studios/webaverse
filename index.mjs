@@ -25,7 +25,10 @@ const MULTIPLAYER_NAME = 'local-multiplayer.webaverse.com';
 const COMPILER_PORT = 3333;
 const COMPILER_NAME = 'local-compiler.webaverse.com';
 
-const PREVIEWER_PORT = 4444;
+const WIKI_PORT = 4444;
+const WIKI_NAME = 'local-previewer.webaverse.com';
+
+const PREVIEWER_PORT = 5555;
 const PREVIEWER_NAME = 'local-previewer.webaverse.com';
 
 
@@ -135,12 +138,12 @@ const _waitForRegex = (compilerProcess, regex) => {
 };
 
 const _startCompiler = async () => {
-  // start the compiler at ./packages/compiler
   const compilerPath = path.join(dirname, 'packages', 'compiler');
   const nextPath = path.join(compilerPath, 'node_modules', '.bin', 'next');
   const compilerProcess = child_process.spawn(process.argv[0], [nextPath, 'dev'], {
     cwd: compilerPath,
     env: {
+      ...process.env,
       PORT: COMPILER_PORT,
       BASE_CWD: dirname,
     },
@@ -157,30 +160,7 @@ const _startCompiler = async () => {
 
   await _waitForRegex(compilerProcess, /ready/i);
 };
-const _startRenderer = async () => {
-  // start the compiler at ./packages/compiler
-  const previewerPath = path.join(dirname, 'packages', 'previewer');
-  const previewerProcess = child_process.spawn(process.argv[0], ['server.js', 'https://local.webaverse.com/'], {
-    cwd: previewerPath,
-    env: {
-      ...process.env,
-      PORT: PREVIEWER_PORT,
-    },
-    uid: oldUid,
-  });
-  
-  if (!isProduction) {
-    previewerProcess.stderr.pipe(process.stderr);
-    previewerProcess.stdout.pipe(process.stdout);
-  }
-  previewerProcess.on('close', code => {
-    console.log(`previewer process exited with code ${code}`);
-  });
-
-  await _waitForRegex(previewerProcess, /ready/i);
-};
 const _startMultiplayer = async () => {
-  // start the compiler at ./packages/compiler
   const multiplayerPath = path.join(dirname, 'packages', 'multiplayer-do');
   const multiplayerProcess = child_process.spawn(process.argv[0], ['./node_modules/wrangler/', 'dev', '-l', '--port', MULTIPLAYER_PORT + ''], {
     cwd: multiplayerPath,
@@ -200,6 +180,48 @@ const _startMultiplayer = async () => {
   });
 
   await _waitForRegex(multiplayerProcess, /starting/i);
+};
+const _startWiki = async () => {
+  const wikiPath = path.join(dirname, 'packages', 'wiki');
+  const wikiProcess = child_process.spawn(process.argv[0], ['./server.js'], {
+    cwd: wikiPath,
+    env: {
+      ...process.env,
+      PORT: WIKI_PORT,
+    },
+    uid: oldUid,
+  });
+  
+  if (!isProduction) {
+    wikiProcess.stderr.pipe(process.stderr);
+    wikiProcess.stdout.pipe(process.stdout);
+  }
+  wikiProcess.on('close', code => {
+    console.log(`wiki process exited with code ${code}`);
+  });
+
+  await _waitForRegex(wikiProcess, /ready/i);
+};
+const _startPreviewer = async () => {
+  const previewerPath = path.join(dirname, 'packages', 'previewer');
+  const previewerProcess = child_process.spawn(process.argv[0], ['server.js', 'https://local.webaverse.com/'], {
+    cwd: previewerPath,
+    env: {
+      ...process.env,
+      PORT: PREVIEWER_PORT,
+    },
+    uid: oldUid,
+  });
+  
+  if (!isProduction) {
+    previewerProcess.stderr.pipe(process.stderr);
+    previewerProcess.stdout.pipe(process.stdout);
+  }
+  previewerProcess.on('close', code => {
+    console.log(`previewer process exited with code ${code}`);
+  });
+
+  await _waitForRegex(previewerProcess, /ready/i);
 };
 
 //
@@ -243,8 +265,9 @@ const _startMultiplayer = async () => {
   
   await Promise.all([
     _startCompiler(),
-    _startRenderer(),
     _startMultiplayer(),
+    _startWiki(),
+    _startPreviewer(),
   ]);
   await new Promise((accept, reject) => {
     httpServer.listen(port, SERVER_ADDR, () => {
