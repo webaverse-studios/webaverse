@@ -63,6 +63,7 @@ import ioManager from './io-manager.js';
 import {lightsManager} from './engine-hooks/lights/lights-manager.js';
 import {skyManager} from './engine-hooks/environment/skybox/sky-manager.js';
 import {compilerBaseUrl} from './endpoints.js';
+import {getDefaultCanvas} from './offscreen-engine/fns/avatar-iconer-fn.js';
 import {isWorker} from './env.js';
 import './metaversefile-binding.js';
 
@@ -510,6 +511,11 @@ metaversefile.setApi({
   },
   useAvatarRenderer() {
     return AvatarRenderer;
+  },
+  useAvatarIconer() {
+    return {
+      getDefaultCanvas,
+    };
   },
   /* useAvatarOptimizer() {
     return avatarOptimizer;
