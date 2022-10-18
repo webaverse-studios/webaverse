@@ -25,3 +25,6 @@
 [submodule "packages/multiplayer-do"]
 	path = packages/multiplayer-do
 	url = https://github.com/webaverse/multiplayer-do.git
+[submodule "packages/wiki"]
+	path = packages/wiki
+	url = https://github.com/webaverse/wiki.git
