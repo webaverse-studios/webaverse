@@ -24,6 +24,27 @@ Everything you need to get started with building in the Webaverse is contained i
 
 Upgrade from WSL1. It's needed for working puppeteer.
 
+### Dependencies
+
+Install following libraries.
+
+```
+libatk1.0-0
+libatk-bridge2.0-0
+libxcomposite-dev
+libxdamage1
+libxrandr2
+libgbm-dev
+libxkbcommon-x11-0
+libpangocairo-1.0-0
+libasound2
+libwayland-client0
+```
+
+### sudo permission
+
+Downgrade user from root
+
 ### Port Mapping
 
 This will route all of the needed ports for 127.0.0.1 -> WSL to work locally.
