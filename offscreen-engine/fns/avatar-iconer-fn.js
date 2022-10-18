@@ -7,7 +7,9 @@ import {createCanvas} from '../../renderer.js';
 
 const allEmotions = [''].concat(emotes.map(emote => emote.name));
 
-export async function getEmotionCanvases(start_url, width, height) {
+//
+
+const makeAvatarIconRenderer = async (start_url) => {
   const arrayBuffer = await fetchArrayBuffer(start_url);
 
   const avatarRenderer = new AvatarRenderer({
@@ -20,20 +22,46 @@ export async function getEmotionCanvases(start_url, width, height) {
 
   const avatar = createAvatarForScreenshot(avatarRenderer);
 
+  return {
+    render(width, height, emotion) {
+      const canvas = createCanvas(width, height);
+
+      screenshotAvatar({
+        avatar,
+        canvas,
+        emotion,
+      });
+
+      return canvas;
+    },
+    destroy() {
+      avatar.destroy();
+    },
+  };
+};
+
+//
+
+export async function getDefaultCanvas(start_url, width, height) {
+  const avatarIconRenderer = await makeAvatarIconRenderer(start_url);
+
+  const emotion = '';
+  const canvas = avatarIconRenderer.render(width, height, emotion);
+
+  avatarIconRenderer.destroy();
+
+  return canvas;
+}
+export async function getEmotionCanvases(start_url, width, height) {
+  const avatarIconRenderer = await makeAvatarIconRenderer(start_url);
+
   const emotionCanvases = await Promise.all(allEmotions.map(async emotion => {
-    const canvas = createCanvas(width, height);
-
-    await screenshotAvatar({
-      avatar,
-      canvas,
-      emotion,
-    });
-
+    const canvas = avatarIconRenderer.render(width, height, emotion);
     const imageBitmap = await createImageBitmap(canvas);
     return imageBitmap;
   }));
 
-  avatar.destroy();
+  avatarIconRenderer.destroy();
 
   return emotionCanvases;
 }
