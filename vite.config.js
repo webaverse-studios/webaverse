@@ -9,7 +9,7 @@ export default defineConfig(({command, mode, ssrBuild}) => {
       pluginReact(),
     ],
     build: {
-      minify: false,
+      minify: process.env.NODE_ENV === 'production',
     },
     /* optimizeDeps: {
       entries: [
