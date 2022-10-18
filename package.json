@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "npm run prod",
-    "dev": "NODE_ENV=development sudo --preserve-env=NODE_ENV $(which node) index.mjs",
-    "prod": "NODE_ENV=production sudo --preserve-env=NODE_ENV $(which node) index.mjs",
+    "dev": "bash scripts/start-dev.sh",
+    "prod": "bash scripts/start-prod.sh",
     "build": "vite build",
     "serve": "vite preview",
     "setup:test": "cd test && npm i",
