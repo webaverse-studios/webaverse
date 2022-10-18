@@ -31,14 +31,16 @@ const _waitForLoad = async () => {
   const url = new URL(location.href);
   const {searchParams} = url;
   const u = searchParams.get('u');
+  const mimeType = searchParams.get('type');
   const cbUrl = searchParams.get('cbUrl');
 
-  const _respond = async body => {
+  const _respond = async (statusCode, body) => {
     const res = await fetch(cbUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         // 'woot': 'toot',
+        'X-Proxy-Status-Code': statusCode,
       },
       body,
     });
@@ -55,23 +57,39 @@ const _waitForLoad = async () => {
 
   if (u && cbUrl) {
     try {
-      console.log('respond 0', {u, cbUrl});
+      console.log('respond 0', JSON.stringify({u, cbUrl, mimeType}));
       
       await _waitForLoad();
       
-      console.log('respond 1', {u, cbUrl});
+      console.log('respond 1', JSON.stringify({u, cbUrl, mimeType}));
 
       const app = await metaversefile.createAppAsync({
         start_url: u,
       });
 
-      console.log('respond 2', {u, cbUrl, app});
+      console.log('respond 2', JSON.stringify({u, cbUrl, mimeType}), app.exports);
+      if (!app.exports) {
+        debugger;
+      }
 
-      const body = JSON.stringify({
-        u,
-        cbUrl,
-      });
-      await _respond(body);
+      if (app.exports.length > 0) {
+        for (const ex of app.exports) {
+          const result = await exFn({mimeType});
+          if (result) {
+            _respond(200, result);
+            return;
+          }
+        }
+        _respond(404, 'no exports found');
+      } else {
+        _respond(404, 'no exports found');
+      }
+
+      // const body = JSON.stringify({
+      //   u,
+      //   cbUrl,
+      // });
+      // await _respond(body);
     } catch(err) {
       console.warn(err.stack);
     }
