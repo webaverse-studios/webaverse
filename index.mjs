@@ -19,11 +19,15 @@ Error.stackTraceLimit = 300;
 const SERVER_ADDR = '0.0.0.0';
 const SERVER_NAME = 'local.webaverse.com';
 
+const MULTIPLAYER_PORT = 2222;
+const MULTIPLAYER_NAME = 'local-multiplayer.webaverse.com';
+
 const COMPILER_PORT = 3333;
 const COMPILER_NAME = 'local-compiler.webaverse.com';
 
 const PREVIEWER_PORT = 4444;
 const PREVIEWER_NAME = 'local-previewer.webaverse.com';
+
 
 const oldUid = parseInt(process.env.OLDNAME, 10) || process.getuid();
 
@@ -106,7 +110,7 @@ const _proxyFile = (req, res, u) => {
 
 //
 
-const _waitForReady = compilerProcess => {
+const _waitForRegex = (compilerProcess, regex) => {
   return new Promise((resolve, reject) => {
     const onerror = err => {
       reject(err);
@@ -116,7 +120,7 @@ const _waitForReady = compilerProcess => {
     
     compilerProcess.stdout.setEncoding('utf8');
     const ondata = data => {
-      if (/ready/i.test(data)) {
+      if (regex.test(data)) {
         resolve();
         cleanup();
       }
@@ -151,7 +155,7 @@ const _startCompiler = async () => {
     console.log(`compiler process exited with code ${code}`);
   });
 
-  await _waitForReady(compilerProcess);
+  await _waitForRegex(compilerProcess, /ready/i);
 };
 const _startRenderer = async () => {
   // start the compiler at ./packages/compiler
@@ -173,7 +177,29 @@ const _startRenderer = async () => {
     console.log(`previewer process exited with code ${code}`);
   });
 
-  await _waitForReady(previewerProcess);
+  await _waitForRegex(previewerProcess, /ready/i);
+};
+const _startMultiplayer = async () => {
+  // start the compiler at ./packages/compiler
+  const multiplayerPath = path.join(dirname, 'packages', 'multiplayer-do');
+  const multiplayerProcess = child_process.spawn(process.argv[0], ['./node_modules/wrangler/', 'dev', '-l', '--port', MULTIPLAYER_PORT + ''], {
+    cwd: multiplayerPath,
+    env: {
+      ...process.env,
+      PORT: MULTIPLAYER_PORT,
+    },
+    uid: oldUid,
+  });
+  
+  if (!isProduction) {
+    multiplayerProcess.stderr.pipe(process.stderr);
+    multiplayerProcess.stdout.pipe(process.stdout);
+  }
+  multiplayerProcess.on('close', code => {
+    console.log(`multiplayer process exited with code ${code}`);
+  });
+
+  await _waitForRegex(multiplayerProcess, /starting/i);
 };
 
 //
@@ -218,6 +244,7 @@ const _startRenderer = async () => {
   await Promise.all([
     _startCompiler(),
     _startRenderer(),
+    _startMultiplayer(),
   ]);
   await new Promise((accept, reject) => {
     httpServer.listen(port, SERVER_ADDR, () => {
