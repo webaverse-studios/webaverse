@@ -80,6 +80,7 @@ class App extends THREE.Object3D {
     this.modulesHash = 0;
     // cleanup tracking
     this.physicsObjects = [];
+    this.exports = [];
     this.hitTracker = null;
     this.hasSubApps = false;
     this.lastMatrix = new THREE.Matrix4();
@@ -560,6 +561,14 @@ metaversefile.setApi({
       };
     } else {
       throw new Error('useFrame cannot be called outside of render()');
+    }
+  },
+  useExport(fn) {
+    const app = currentAppRender;
+    if (app) {
+      app.exports.push(fn);
+    } else {
+      throw new Error('useExport cannot be called outside of render()');
     }
   },
   clearFrame(frame) {
