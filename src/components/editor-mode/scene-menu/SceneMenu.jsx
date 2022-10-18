@@ -7,6 +7,7 @@ import voiceInput from '../../../../voice-input/voice-input';
 import {sceneManager} from '../../../../scene-manager';
 
 import { AppContext } from '../../app';
+import {scenesBaseUrl} from '../../../../endpoints';
 import {makeId} from '../../../../util.js';
 
 import styles from './scene-menu.module.css';
@@ -31,8 +32,12 @@ export const SceneMenu = ({ className, multiplayerConnected, selectedScene, setS
         (async () => {
             const scenes = await sceneManager.getSceneNamesAsync();
             if (!live) return;
-            setOrigSceneList(scenes);
-            setScenesList(scenes);
+            const origScenes = [];
+            scenes.forEach( ( name ) => {
+                origScenes.push( `${scenesBaseUrl}${name}`);
+            });
+            setOrigSceneList(origScenes);
+            setScenesList(origScenes);
         })();
         return () => {
             live = false;
