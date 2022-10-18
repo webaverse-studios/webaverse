@@ -13,6 +13,7 @@ import {abortError} from '../lock-manager.js';
 import {minAvatarQuality, maxAvatarQuality} from '../constants.js';
 import settingsManager from '../settings-manager.js';
 // import {downloadFile} from '../util.js';
+import {optimizeAvatarModel} from '../offscreen-engine/fns/avatar-renderer-fns.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -651,14 +652,11 @@ export class AvatarRenderer /* extends EventTarget */ {
                 (async () => {
                   const {
                     glbData,
-                  } = await this.optimizeAvatarModel([
-                    {
-                      arrayBuffer: this.arrayBuffer,
-                      srcUrl: this.srcUrl,
-                    },
-                  ], {
-                    signal,
+                  } = await optimizeAvatarModel({
+                    arrayBuffer: this.arrayBuffer,
+                    srcUrl: this.srcUrl,
                   });
+                  
                   const object = await _loadGlbObject(glbData, this.srcUrl, {signal});
                   const glb = object.scene;
                   _forAllMeshes(glb, o => {
