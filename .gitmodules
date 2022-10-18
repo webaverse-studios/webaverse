@@ -22,3 +22,6 @@
 [submodule "packages/previewer"]
 	path = packages/previewer
 	url = https://github.com/webaverse/previewer
+[submodule "packages/multiplayer-do"]
+	path = packages/multiplayer-do
+	url = https://github.com/webaverse/multiplayer-do.git
