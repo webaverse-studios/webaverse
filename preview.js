@@ -73,7 +73,7 @@ const _waitForLoad = async () => {
       }
 
       if (app.exports.length > 0) {
-        for (const ex of app.exports) {
+        for (const exFn of app.exports) {
           const result = await exFn({mimeType});
           if (result) {
             _respond(200, result);
