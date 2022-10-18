@@ -76,7 +76,8 @@ const _waitForLoad = async () => {
         for (const exFn of app.exports) {
           const result = await exFn({mimeType});
           if (result) {
-            _respond(200, mimeType, result);
+            const type = (result instanceof Blob) ? result.type : mimeType;
+            _respond(200, type, result);
             return;
           }
         }
