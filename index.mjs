@@ -103,7 +103,6 @@ const _proxyFile = (req, res, u) => {
 
 const _startCompiler = () => new Promise((resolve, reject) => {
   // start the compiler at ./packages/compiler
-  const dirname = path.dirname(import.meta.url.replace(/^file:\/\//, ''));
   const compilerPath = path.join(dirname, 'packages', 'compiler');
   const nextPath = path.join(compilerPath, 'node_modules', '.bin', 'next');
   const compilerProcess = child_process.spawn(process.argv[0], [nextPath, 'dev'], {
