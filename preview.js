@@ -81,9 +81,9 @@ const _waitForLoad = async () => {
             return;
           }
         }
-        _respond(404, 'text/plain', 'no exports found');
+        _respond(404, 'text/plain', 'no exports found at ' + JSON.stringify(u) + ' for mime type ' + JSON.stringify(mimeType));
       } else {
-        _respond(404, 'text/plain', 'no exports found');
+        _respond(404, 'text/plain', 'no exports found at ' + JSON.stringify(u) + ' for mime type ' + JSON.stringify(mimeType));
       }
 
       // const body = JSON.stringify({
