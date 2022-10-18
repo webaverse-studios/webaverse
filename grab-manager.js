@@ -29,6 +29,7 @@ const localBox = new THREE.Box3();
 const rotationSnap = Math.PI / 6;
 let highlightedPhysicsObject = null;
 let highlightedPhysicsId = 0;
+let transformIndicators = null;
 
 const getPhysicalPosition = box => {
   return localVector7.set(
@@ -66,6 +67,7 @@ const _updateGrabbedObject = (
       geometry.computeBoundingBox();
       localBox.union(geometry.boundingBox);
     }
+    transformIndicators.bb = localBox;
     physicalOffset = getPhysicalPosition(localBox);
   }
 
@@ -150,6 +152,7 @@ const _click = (e) => {
   if (grabManager.getGrabbedObject(0)) {
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.ungrab();
+    transformIndicators.targetApp = null;
     grabManager.hideUi();
   } else {
     if (highlightedPhysicsObject) {
@@ -158,15 +161,29 @@ const _click = (e) => {
   }
 };
 
+const _createTransformIndicators = () => {
+  transformIndicators = metaversefileApi.createApp();
+  (async () => {
+    const {importModule} = metaversefileApi.useDefaultModules();
+    const m = await importModule('transformIndicators');
+    await transformIndicators.addModule(m);
+  })();
+  transformIndicators.targetApp = null;
+  sceneLowPriority.add(transformIndicators);
+}
+
 class Grabmanager extends EventTarget {
   constructor() {
     super();
     this.gridSnap = 0;
     this.editMode = false;
+    Promise.resolve()
+      .then(_createTransformIndicators);
   }
   grab(object) {
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.grab(object);
+    transformIndicators.targetApp = object;
     this.gridSnap = 0;
     this.editMode = false;
   }
