@@ -7,6 +7,7 @@
   "scripts": {
     "start": "npm run prod",
     "dev": "bash scripts/start-dev.sh",
+    "stop": "sudo killall node",
     "prod": "bash scripts/start-prod.sh",
     "build": "vite build",
     "serve": "vite preview",
