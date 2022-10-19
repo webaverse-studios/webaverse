@@ -359,6 +359,9 @@ class RainBgFxMesh extends THREE.Mesh {
     this.material.uniforms.iTime.value = timestampS;
     this.material.uniforms.iTime.needsUpdate = true;
   }
+  static async waitForLoad() {
+    // nothing
+  }
 }
 
 export {

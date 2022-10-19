@@ -100,43 +100,10 @@ export const smokeFragmentShader = `\
 `;
 
 class SmokeBgFxMesh extends THREE.Mesh {
+  static iChannel0 = null;
   constructor() {
     const geometry = fullscreenGeometry;
 
-    const noise3DTexture = new THREE.Data3DTexture(null, 0, 0, 0);
-    (async () => {
-      const res = await fetch('textures/noise3d.bin');
-      const arrayBuffer = await res.arrayBuffer();
-      const file = new DataView(arrayBuffer);
-
-      let index = 0;
-      const signature = file.getUint32(index, true);
-      index += Uint32Array.BYTES_PER_ELEMENT;
-      const width = file.getUint32(index, true);
-      index += Uint32Array.BYTES_PER_ELEMENT;
-      const height = file.getUint32(index, true);
-      index += Uint32Array.BYTES_PER_ELEMENT;
-      const depth = file.getUint32(index, true);
-      index += Uint32Array.BYTES_PER_ELEMENT;
-      const binNumChannels = file.getUint8(index, true);
-      index++;
-      const binLayout = file.getUint8(index, true);
-      index++;
-      const binFormat = file.getUint16(index, true);
-      index += Uint16Array.BYTES_PER_ELEMENT;
-      
-      const data = new Uint8Array(arrayBuffer, 20);
-      const noise3DTexture = new THREE.Data3DTexture(data, width, height, depth);
-      noise3DTexture.minFilter = THREE.LinearFilter;
-      noise3DTexture.magFilter = THREE.LinearFilter;
-      noise3DTexture.wrapS = THREE.RepeatWrapping;
-      noise3DTexture.wrapT = THREE.RepeatWrapping;
-      noise3DTexture.wrapR = THREE.RepeatWrapping;
-      noise3DTexture.needsUpdate = true;
-      
-      material.uniforms.iChannel0.value = noise3DTexture;
-      material.uniforms.iChannel0.needsUpdate = true;
-    })();
     const material = new THREE.ShaderMaterial({
       uniforms: {
         iTime: {
@@ -152,7 +119,7 @@ class SmokeBgFxMesh extends THREE.Mesh {
           needsUpdate: false,
         },
         iChannel0: {
-          value: noise3DTexture,
+          value: SmokeBgFxMesh.iChannel0,
           needsUpdate: true,
         },
       },
@@ -177,6 +144,37 @@ class SmokeBgFxMesh extends THREE.Mesh {
     const pixelRatio = renderer.getPixelRatio();
     this.material.uniforms.iResolution.value.set(width, height, pixelRatio);
     this.material.uniforms.iResolution.needsUpdate = true;
+  }
+  static async waitForLoad() {
+    const res = await fetch('textures/noise3d.bin');
+    const arrayBuffer = await res.arrayBuffer();
+    const file = new DataView(arrayBuffer);
+
+    let index = 0;
+    const signature = file.getUint32(index, true);
+    index += Uint32Array.BYTES_PER_ELEMENT;
+    const width = file.getUint32(index, true);
+    index += Uint32Array.BYTES_PER_ELEMENT;
+    const height = file.getUint32(index, true);
+    index += Uint32Array.BYTES_PER_ELEMENT;
+    const depth = file.getUint32(index, true);
+    index += Uint32Array.BYTES_PER_ELEMENT;
+    const binNumChannels = file.getUint8(index, true);
+    index++;
+    const binLayout = file.getUint8(index, true);
+    index++;
+    const binFormat = file.getUint16(index, true);
+    index += Uint16Array.BYTES_PER_ELEMENT;
+    
+    const data = new Uint8Array(arrayBuffer, 20);
+    const noise3DTexture = new THREE.Data3DTexture(data, width, height, depth);
+    noise3DTexture.minFilter = THREE.LinearFilter;
+    noise3DTexture.magFilter = THREE.LinearFilter;
+    noise3DTexture.wrapS = THREE.RepeatWrapping;
+    noise3DTexture.wrapT = THREE.RepeatWrapping;
+    noise3DTexture.wrapR = THREE.RepeatWrapping;
+    noise3DTexture.needsUpdate = true;
+    SmokeBgFxMesh.iChannel0 = noise3DTexture;
   }
 }
 

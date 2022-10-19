@@ -62,6 +62,10 @@ import * as generationTaskManager from './generation-task-manager.js';
 import ioManager from './io-manager.js';
 import {lightsManager} from './engine-hooks/lights/lights-manager.js';
 import {skyManager} from './engine-hooks/environment/skybox/sky-manager.js';
+import {compilerBaseUrl} from './endpoints.js';
+import {getDefaultCanvas} from './offscreen-engine/fns/avatar-iconer-fn.js';
+import {isWorker} from './env.js';
+import './metaversefile-binding.js';
 
 const localVector2D = new THREE.Vector2();
 
@@ -77,6 +81,7 @@ class App extends THREE.Object3D {
     this.modulesHash = 0;
     // cleanup tracking
     this.physicsObjects = [];
+    this.exports = [];
     this.hitTracker = null;
     this.hasSubApps = false;
     this.lastMatrix = new THREE.Matrix4();
@@ -368,24 +373,51 @@ let currentAppRender = null;
 let iframeContainer = null;
 let recursion = 0;
 let wasDecapitated = false;
-// const apps = [];
 const mirrors = [];
 metaversefile.setApi({
-  // apps,
   async import(s) {
-    if (/^(?:ipfs:\/\/|https?:\/\/|weba:\/\/|data:)/.test(s)) {
-      const prefix = location.protocol + '//' + location.host + '/@proxy/';
-      if (s.startsWith(prefix)) {
-        s = s.slice(prefix.length);
-      }
-      s = `/@proxy/${s}`;
+    if (/^[a-zA-Z0-9]+:/.test(s)) {
+      s = `${compilerBaseUrl}${s.replace(/^([a-zA-Z0-9]+:\/)\//, '$1')}`;
+    } else {
+      s = new URL(s, compilerBaseUrl).href;
     }
-    // console.log('js import', s);
+
+    // console.log('metaversefile import', {s, oldS});
+
     try {
       const m = await import(s);
       return m;
     } catch(err) {
       console.warn('error loading', JSON.stringify(s), err.stack);
+      return null;
+    }
+  },
+  getObjectUrl(object, baseUrl = '') {
+    const {start_url, type, content} = object;
+
+    function typeContentToUrl(type, content) {
+      if (typeof content === 'object') {
+        content = JSON.stringify(content);
+      }
+      const dataUrlPrefix = 'data:' + type + ',';
+      return dataUrlPrefix + encodeURIComponent(content) + '.data'; //.replace(/\\//g, '%2F');
+    }
+
+    if (start_url) {
+      if (baseUrl) {
+        let u = new URL(start_url, baseUrl).href;
+        const baseUrlObj = new URL(baseUrl);
+        const baseUrlHost = baseUrlObj.protocol + '//' + baseUrlObj.host + '/';
+        if (u.startsWith(baseUrlHost)) {
+          u = u.slice(baseUrlHost.length);
+        }
+        return u;
+      } else {
+        return start_url;
+      }
+    } else if (type && content) {
+      return typeContentToUrl(type, content);
+    } else {
       return null;
     }
   },
@@ -480,6 +512,11 @@ metaversefile.setApi({
   useAvatarRenderer() {
     return AvatarRenderer;
   },
+  useAvatarIconer() {
+    return {
+      getDefaultCanvas,
+    };
+  },
   /* useAvatarOptimizer() {
     return avatarOptimizer;
   },
@@ -530,6 +567,14 @@ metaversefile.setApi({
       };
     } else {
       throw new Error('useFrame cannot be called outside of render()');
+    }
+  },
+  useExport(fn) {
+    const app = currentAppRender;
+    if (app) {
+      app.exports.push(fn);
+    } else {
+      throw new Error('useExport cannot be called outside of render()');
     }
   },
   clearFrame(frame) {
@@ -863,11 +908,11 @@ metaversefile.setApi({
   useResize(fn) {
     const app = currentAppRender;
     if (app) {
-      window.addEventListener('resize', e => {
+      globalThis.addEventListener('resize', e => {
         fn(e);
       });
       app.addEventListener('destroy', () => {
-        window.removeEventListener('resize', fn);
+        globalThis.removeEventListener('resize', fn);
       });
     } else {
       throw new Error('useResize cannot be called outside of render()');
@@ -876,18 +921,20 @@ metaversefile.setApi({
   getNextInstanceId() {
     return getRandomString();
   },
-  createAppInternal({
-    start_url = '',
-    type = '',
-    content = '',
-    module = null,
-    components = [],
-    position = null,
-    quaternion = null,
-    scale = null,
-    parent = null,
-    in_front = false,
-  } = {}, {onWaitPromise = null} = {}) {
+  createAppInternal(appSpec = {}, {onWaitPromise = null} = {}) {
+    const {
+      start_url = '',
+      type = '',
+      content = '',
+      module = null,
+      components = [],
+      position = null,
+      quaternion = null,
+      scale = null,
+      parent = null,
+      in_front = false,
+    } = appSpec;
+
     const app = new App();
 
     // transform
@@ -949,23 +996,7 @@ metaversefile.setApi({
     _updateComponents();
 
     // load
-    function typeContentToUrl(type, content) {
-      if (typeof content === 'object') {
-        content = JSON.stringify(content);
-      }
-      const dataUrlPrefix = 'data:' + type + ',';
-      return '/@proxy/' + dataUrlPrefix + encodeURIComponent(content).replace(/\%/g, '%25')//.replace(/\\//g, '%2F');
-    }
-    function getObjectUrl(start_url, type, content) {
-      if (start_url) {
-        return start_url;
-      } else if (type && content) {
-        return typeContentToUrl(type, content);
-      } else {
-        return null;
-      }
-    }
-    const u = getObjectUrl(start_url, type, content);
+    const u = metaversefile.getObjectUrl(appSpec);
     if (u || module) {
       const p = (async () => {
         let m;
@@ -1195,18 +1226,18 @@ export default () => {
     return null;
   },
   useInternals() {
-    if (!iframeContainer) {
+    if (!iframeContainer && !isWorker) {
       iframeContainer = document.getElementById('iframe-container');
       
-      iframeContainer.getFov = () => camera.projectionMatrix.elements[ 5 ] * (window.innerHeight / 2);
+      iframeContainer.getFov = () => camera.projectionMatrix.elements[ 5 ] * (globalThis.innerHeight / 2);
       iframeContainer.updateSize = function updateSize() {
         const fov = iframeContainer.getFov();
         iframeContainer.style.cssText = `
           position: fixed;
           left: 0;
           top: 0;
-          width: ${window.innerWidth}px;
-          height: ${window.innerHeight}px;
+          width: ${globalThis.innerWidth}px;
+          height: ${globalThis.innerHeight}px;
           perspective: ${fov}px;
           pointer-events: none;
           user-select: none;

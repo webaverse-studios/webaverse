@@ -13,11 +13,10 @@ import {loadOverworld} from './overworld.js';
 import {partyManager} from './party-manager.js';
 import physicsManager from './physics-manager.js';
 import physxWorkerManager from './physx-worker-manager.js';
-import physx from './physx.js';
 import {playersManager} from './players-manager.js';
-import sceneNames from './scenes/scenes.json';
 import {parseQuery} from './util.js';
 import {world} from './world.js';
+import {sceneManager} from './scene-manager.js';
 
 class Universe extends EventTarget {
   constructor() {
@@ -58,8 +57,9 @@ class Universe extends EventTarget {
         
         let match;
         if (src === undefined) {
+          const sceneNames = await sceneManager.getSceneNamesAsync();
           promises.push(metaversefile.createAppAsync({
-            start_url: './scenes/' + sceneNames[0],
+            start_url: sceneManager.getSceneUrl(sceneNames[0]),
           }));
         } else if (src === '') {
           // nothing

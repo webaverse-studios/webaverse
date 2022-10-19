@@ -1,65 +1,53 @@
-import {packs, defaultCharacter} from './characters/characters.json';
+import {loadJson} from './util.js';
+import {charactersBaseUrl, defaultCharacterName} from './endpoints.js';
 
-const loadNpc = async (srcUrl) => {
-  const res = await fetch(srcUrl);
-  const j = await res.json();
-  return j;
-};
-
-const charactersDir = '../characters/';
-
-const getCharacterFullPath = (filename) => {
-  return charactersDir + filename;
-}
+const getCharacterFullPath = filename => charactersBaseUrl + filename;
 
 class CharacterSelectManager {
   constructor() {
-    this.charactersMap = null;
-    this.defaultCharacterSpec = null;
+    this.charactersLoadPromise = null;
+    this.charactersMapPromise = null;
+    this.defaultCharacterSpecPromise = null;
   }
 
-  async getDefaultSpecAsync() {
-    if (!this.defaultCharacterSpec) {
-      const characterName = defaultCharacter;
-      this.defaultCharacterSpec = await loadNpc(getCharacterFullPath(characterName));
+  getCharactersAsync() {
+    if (!this.charactersLoadPromise) {
+      this.charactersLoadPromise = loadJson(charactersBaseUrl + 'characters.json');
     }
-    return this.defaultCharacterSpec;
+    return this.charactersLoadPromise;
   }
 
-  async loadCharactersMap() {
-    if (!this.charactersMap) {
-      this.charactersMap = {};
-
-      const loadPack = async (srcUrl) => {
-        const res = await fetch(srcUrl);
-        const j = await res.json();
-        const {objects} = j;
-        return objects;
-      };
-  
-      const extractPackName = (filename) => {
-        return filename.replace(/\.[^/.]+$/, "")
-      }
-
-      // list npc file names
-      for (const packFilename of packs) {
-        const packName = extractPackName(packFilename);
-        const pack = await loadPack(getCharacterFullPath(packFilename));
-        
-        const characters = [];
-        for (const characterObj of pack) {
-          const characterName = characterObj.name;
-          const character = await loadNpc(getCharacterFullPath(characterName));
-          characters.push(character);
-        }
-        this.charactersMap[packName] = characters;
-      }
+  getDefaultSpecAsync() {
+    if (!this.defaultCharacterSpecPromise) {
+      this.defaultCharacterSpecPromise = (async () => {
+        return await loadJson(getCharacterFullPath(defaultCharacterName));
+      })();
     }
-    return this.charactersMap;
+    return this.defaultCharacterSpecPromise;
+  }
+
+  loadCharactersMap() {
+    if (!this.charactersMapPromise) {
+      this.charactersMapPromise = (async () => {
+        const characters = await this.getCharactersAsync();
+        const {packs} = characters;
+
+        // list npc file names
+        const charactersMap = {};
+        await Promise.all(packs.map(async pack => {
+          const characters = await Promise.all(pack.characters.map(characterName =>
+            loadJson(getCharacterFullPath(characterName))
+          ));
+          charactersMap[pack.name] = characters;
+        }));
+        return charactersMap;
+      })();
+    }
+    return this.charactersMapPromise;
   }
 }
 
 const characterSelectManager = new CharacterSelectManager();
 export {
-  characterSelectManager
+  characterSelectManager,
 };

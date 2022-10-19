@@ -8,6 +8,7 @@ import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer.j
 import {makePromise} from './util.js';
 import {minFov} from './constants.js';
 import {WebaverseScene} from './webaverse-scene.js';
+import {isWorker} from './env.js';
 
 // XXX enable this when the code is stable; then, we will have many more places to add missing matrix updates
 // THREE.Object3D.DefaultMatrixAutoUpdate = false;
@@ -40,7 +41,7 @@ function bindCanvas(c) {
     height,
     pixelRatio,
   } = _getCanvasDimensions();
-  renderer.setSize(width, height);
+  renderer.setSize(width, height, false);
   renderer.setPixelRatio(pixelRatio);
 
   renderer.autoClear = false;
@@ -130,9 +131,9 @@ scene.add(camera);
 
 const _getCanvasDimensions = () => {
   let width, height, pixelRatio;
-  width = window.innerWidth;
-  height = window.innerHeight;
-  pixelRatio = window.devicePixelRatio;
+  width = globalThis.innerWidth;
+  height = globalThis.innerHeight;
+  pixelRatio = globalThis.devicePixelRatio;
   
   return {
     width,
@@ -165,7 +166,7 @@ const _setRendererSize = (width, height, pixelRatio) => {
       height,
       pixelRatio,
     } = _getCanvasDimensions(); */
-    renderer.setSize(width, height);
+    renderer.setSize(width, height, false);
     renderer.setPixelRatio(pixelRatio);
 
     // resume XR
@@ -187,7 +188,7 @@ const _setCameraSize = (width, height, pixelRatio) => {
   camera.updateProjectionMatrix();
 };
 
-window.addEventListener('resize', e => {
+globalThis.addEventListener('resize', e => {
   _setSizes();
 });
 
@@ -211,6 +212,17 @@ renderer2.domElement.style.top = 0;
 if (canvas.parentNode) {
   document.body.insertBefore(renderer2.domElement, canvas);
 } */
+
+export function createCanvas(width, height) {
+  if (isWorker) {
+    return new OffscreenCanvas(width, height);
+  } else {
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    return canvas;
+  }
+}
 
 export {
   waitForLoad,

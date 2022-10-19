@@ -344,9 +344,9 @@ class AppManager extends EventTarget {
     const resize = e => {
       this.resize(e);
     };
-    window.addEventListener('resize', resize);
+    globalThis.addEventListener('resize', resize);
     this.cleanup = () => {
-      window.removeEventListener('resize', resize);
+      globalThis.removeEventListener('resize', resize);
     };
   }
   getApps() {

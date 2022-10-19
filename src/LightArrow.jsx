@@ -3,6 +3,7 @@ import React, {useState, useEffect, useRef} from 'react';
 import classnames from 'classnames';
 // import dioramaManager from '../diorama.js';
 import styles from './LightArrow.module.css';
+import {createCanvas} from '../renderer.js';
 
 const frameSize = 64;
 const numFrames = 64;
@@ -160,9 +161,7 @@ const _renderArrowSpritesheet = async () => {
   return renderedCanvas;
 };
 const _renderCanvasFromFrames = frames => {
-  const canvas = document.createElement('canvas');
-  canvas.width = canvasSize;
-  canvas.height = canvasSize;
+  const canvas = createCanvas(canvasSize);
   const ctx = canvas.getContext('2d');
   for (let i = 0; i < frames.length; i++) {
     const frame = frames[i];

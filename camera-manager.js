@@ -10,6 +10,7 @@ import {playersManager} from './players-manager.js';
 import {minFov, maxFov, midFov} from './constants.js';
 // import { updateRaycasterFromMouseEvent } from './util.js';
 import easing from './easing.js';
+import {isWorker} from './env.js';
 
 const cubicBezier = easing(0, 1, 0, 1);
 const cubicBezier2 = easing(0.5, 0, 0.5, 1);
@@ -192,20 +193,25 @@ class CameraManager extends EventTarget {
     this.cinematicScript = null;
     this.cinematicScriptStartTime = -1;
 
-    document.addEventListener('pointerlockchange', e => {
-      let pointerLockElement = document.pointerLockElement;
-      const renderer = getRenderer();
-      if (pointerLockElement !== null && pointerLockElement !== renderer.domElement) {
-        pointerLockElement = null;
-      }
+    this.bindEvents();
+  }
+  bindEvents() {
+    if (!isWorker) {
+      document.addEventListener('pointerlockchange', e => {
+        let pointerLockElement = document.pointerLockElement;
+        const renderer = getRenderer();
+        if (pointerLockElement !== null && pointerLockElement !== renderer.domElement) {
+          pointerLockElement = null;
+        }
 
-      this.pointerLockElement = pointerLockElement;
-      this.dispatchEvent(new MessageEvent('pointerlockchange', {
-        data: {
-          pointerLockElement,
-        },
-      }));
-    });
+        this.pointerLockElement = pointerLockElement;
+        this.dispatchEvent(new MessageEvent('pointerlockchange', {
+          data: {
+            pointerLockElement,
+          },
+        }));
+      });
+    }
   }
   focusCamera(position) {
     camera.lookAt(position);

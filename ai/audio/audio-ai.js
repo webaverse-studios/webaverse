@@ -1,5 +1,5 @@
 // import audioManager from '../../audio-manager.js';
-import {audioAIEndpointUrl} from '../../constants.js';
+import {audioAIEndpointUrl} from '../../endpoints.js';
 
 class AudioAI {
   async txt2sound(prompt) {

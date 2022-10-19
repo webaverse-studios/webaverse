@@ -4,12 +4,27 @@
 [submodule "packages/zjs"]
 	path = packages/zjs
 	url = https://github.com/webaverse/zjs.git
-[submodule "packages/totum"]
-	path = packages/totum
-	url = https://github.com/webaverse/totum.git
 [submodule "packages/three-vrm"]
 	path = packages/three-vrm
 	url = https://github.com/webaverse/three-vrm
 [submodule "packages/three"]
 	path = packages/three
 	url = https://github.com/webaverse/three
+[submodule "packages/characters"]
+	path = packages/characters
+	url = https://github.com/webaverse/characters.git
+[submodule "packages/scenes"]
+	path = packages/scenes
+	url = https://github.com/webaverse/scenes.git
+[submodule "packages/previewer"]
+	path = packages/previewer
+	url = https://github.com/webaverse/previewer
+[submodule "packages/multiplayer-do"]
+	path = packages/multiplayer-do
+	url = https://github.com/webaverse/multiplayer-do.git
+[submodule "packages/wiki"]
+	path = packages/wiki
+	url = https://github.com/webaverse/wiki.git
+[submodule "packages/compiler"]
+	path = packages/compiler
+	url = https://github.com/webaverse/compiler.git

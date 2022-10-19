@@ -26,29 +26,10 @@ export const Spritesheet = ({
         if (startUrl) {
             let live = true;
             (async () => {
-                // console.log('got spritesheet 1', {startUrl, frameSize, numFramesPerRow, size, numFrames});
                 const spritesheet = await spriteAnimationManager.getSpriteAnimationForAppUrlAsync(startUrl, {
                     size,
                     numFrames,
                 });
-                
-                /* {
-                    const imageBitmap = spritesheet.result;
-                    const canvas = document.createElement('canvas');
-                    canvas.width = imageBitmap.width;
-                    canvas.height = imageBitmap.height;
-                    canvas.style.cssText = `\
-                        position: fixed;
-                        top: 100px;
-                        left: 100px;
-                        width: ${600}px;
-                        height: ${600}px;
-                        background-color: #F00;
-                    `;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(imageBitmap, 0, 0);
-                    document.body.appendChild(canvas);
-                } */
 
                 if (!live) {
                     return;

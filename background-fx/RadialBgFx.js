@@ -126,6 +126,9 @@ class RadialBgFxMesh extends THREE.Mesh {
     this.material.uniforms.iFrame.value = Math.floor(timestampS * 60);
     this.material.uniforms.iFrame.needsUpdate = true;
   }
+  static async waitForLoad() {
+    // nothing
+  }
 }
 
 export {

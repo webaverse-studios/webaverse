@@ -9,6 +9,7 @@ import * as sounds from './sounds.js';
 import physx from './physx.js';
 import ioManager from './io-manager.js';
 import physicsManager from './physics-manager.js';
+import physxWorkerManager from './physx-worker-manager.js';
 import {world} from './world.js';
 // import * as blockchain from './blockchain.js';
 import cameraManager from './camera-manager.js';
@@ -33,7 +34,7 @@ import {
   getComposer,
 } from './renderer.js';
 import transformControls from './transform-controls.js';
-import dioramaManager from './diorama.js';
+import dioramaManager from './diorama/diorama-manager.js';
 import * as voices from './voices.js';
 import performanceTracker from './performance-tracker.js';
 import renderSettingsManager from './rendersettings-manager.js';
@@ -41,13 +42,13 @@ import metaversefileApi from 'metaversefile';
 import WebaWallet from './src/components/wallet.js';
 // import domRenderEngine from './dom-renderer.jsx';
 import musicManager from './music-manager.js';
-import physxWorkerManager from './physx-worker-manager.js';
 import story from './story.js';
 import zTargeting from './z-targeting.js';
 import raycastManager from './raycast-manager.js';
 import universe from './universe.js';
 import npcManager from './npc-manager.js';
 import settingsManager from './settings-manager.js';
+import backgroundFx from './background-fx/background-fx.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -88,6 +89,7 @@ export default class Webaverse extends EventTarget {
         zTargeting.waitForLoad(),
         particleSystemManager.waitForLoad(),
         transformControls.waitForLoad(),
+        backgroundFx.waitForLoad(),
         voices.waitForLoad(),
         musicManager.waitForLoad(),
         WebaWallet.waitForLoad(),
@@ -128,8 +130,6 @@ export default class Webaverse extends EventTarget {
   }
   bindCanvas(c) {
     bindCanvas(c);
-    game.bindDioramaCanvas();
-    
     postProcessing.bindCanvas();
   }
   async isXrSupported() {
