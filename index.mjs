@@ -9,6 +9,7 @@ import child_process from 'child_process';
 
 //
 
+const SERVER_NAME = 'local.webaverse.com';
 const DEVSERVER_PORT = 443;
 const MULTIPLAYER_PORT = 2222;
 const COMPILER_PORT = 3333;
@@ -167,13 +168,13 @@ const _logProcess = childProcess => {
   const data = (key) => {
     if (key === 'a') {
       open(`http://local.webaverse.com/`);
-    } else if (key === 'p') {
+    } else if (key === 'm') {
       open(`http://127.0.0.1:${MULTIPLAYER_PORT}/`);
     } else if (key === 'w') {
       open(`https://local.webaverse.com:${WIKI_PORT}/`);
-    } else if (key === 'm') {
+    } else if (key === 'u') {
       open(`https://local.webaverse.com:${WIKI_PORT}/map`);
-    } else if (key === 'g') {
+    } else if (key === 'p') {
       open(`http://127.0.0.1:${PREVIEWER_PORT}/`);
     } else if (key === 'd') {
       logging = !logging;
@@ -299,6 +300,11 @@ const _startPreviewer = async () => {
     _startWiki(),
     _startPreviewer(),
   ]);
+
+  console.log(`Welcome to the Webaverse!`);
+  console.log(`  > Local: https://${SERVER_NAME}:${DEVSERVER_PORT}/`);
+  console.log('You have some options...');
+  console.log(`[A] App  [W] Wiki  [M] Multiplayer  [P] Previewer  [U] Map  [D] Debug logging  [Q] Quit`);
   
   /* const wsServer = (() => {
     if (isHttps) {
