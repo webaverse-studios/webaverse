@@ -15,10 +15,6 @@ const COMPILER_PORT = 3333;
 const WIKI_PORT = 4444;
 const PREVIEWER_PORT = 5555;
 
-
-// const oldUid = parseInt(process.env.OLDNAME, 10) || process.getuid();
-// const oldCmdExe = process.env.CMDEXE || 'cmd.exe';
-
 //
 
 const dirname = path.dirname(import.meta.url.replace(/^file:\/\//, ''));
@@ -30,40 +26,13 @@ const open = url => {
   const s = fs.readFileSync('/proc/version', 'utf8');
   const isWsl = /microsoft/i.test(s);
 
-  // process.setuid(oldUid);
-  // console.log('set uid', process.getuid(), oldUid);
-
-  // console.log('open', url);
-
   if (process.platform === 'win32' || isWsl) {
     // console.log('spawn', 'cmd.exe', ['/C', 'start ' + url]);
     // console.log('got old path', process.env.PATH, process.env.OLDPATH);
-    const cp = child_process.spawn('cmd.exe', ['/C', 'start ' + url], {
-      /* env: {
-        ...process.env,
-        // PATH: process.env.OLDPATH,
-      }, */
-      // shell: true,
-      // windowsVerbatimArguments: true,
-      // uid: oldUid,
-      // cwd: "/mnt/c/Windows/System32",
-    });
+    const cp = child_process.spawn('cmd.exe', ['/C', 'start ' + url]);
     cp.on('error', err => {
       console.warn(err);
     });
-    /* // pipe
-    cp.stdout.on('data', data => {
-      console.log(`stdout: ${data}`);
-    });
-    cp.stderr.on('data', data => {
-      console.error(`stderr: ${data}`);
-    });
-    cp.on('error', err => {
-      console.warn(err);
-    });
-    cp.on('close', code => {
-      console.log(`child process exited with code ${code}`);
-    }); */
   } else if (process.platform === 'linux') {
     const cp = child_process.spawn('xdg-open', [url]);
     cp.on('error', err => {
