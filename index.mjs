@@ -1,13 +1,23 @@
 import path from 'path';
 import fs from 'fs';
-import http from 'http';
-import https from 'https';
-import child_process from 'child_process';
-import express from 'express';
-import * as vite from 'vite';
-import wsrtc from 'wsrtc/wsrtc-server.mjs';
 
-const vercelJson = JSON.parse(fs.readFileSync('./vercel.json', 'utf8'));
+import child_process from 'child_process';
+// import open from 'open';
+// import express from 'express';
+// import * as vite from 'vite';
+// import wsrtc from 'wsrtc/wsrtc-server.mjs';
+
+//
+
+const DEVSERVER_PORT = 443;
+const MULTIPLAYER_PORT = 2222;
+const COMPILER_PORT = 3333;
+const WIKI_PORT = 4444;
+const PREVIEWER_PORT = 5555;
+
+
+// const oldUid = parseInt(process.env.OLDNAME, 10) || process.getuid();
+// const oldCmdExe = process.env.CMDEXE || 'cmd.exe';
 
 //
 
@@ -16,100 +26,56 @@ Error.stackTraceLimit = 300;
 
 //
 
-const SERVER_ADDR = '0.0.0.0';
-const SERVER_NAME = 'local.webaverse.com';
+const open = url => {
+  const s = fs.readFileSync('/proc/version', 'utf8');
+  const isWsl = /microsoft/i.test(s);
 
-const MULTIPLAYER_PORT = 2222;
-const MULTIPLAYER_NAME = 'local-multiplayer.webaverse.com';
+  // process.setuid(oldUid);
+  // console.log('set uid', process.getuid(), oldUid);
 
-const COMPILER_PORT = 3333;
-const COMPILER_NAME = 'local-compiler.webaverse.com';
+  // console.log('open', url);
 
-const WIKI_PORT = 4444;
-const WIKI_NAME = 'local-previewer.webaverse.com';
-
-const PREVIEWER_PORT = 5555;
-const PREVIEWER_NAME = 'local-previewer.webaverse.com';
-
-
-const oldUid = parseInt(process.env.OLDNAME, 10) || process.getuid();
-
-//
-
-const isProduction = process.env.NODE_ENV === 'production';
-
-const _tryReadFile = p => {
-  try {
-    return fs.readFileSync(p);
-  } catch(err) {
-    // console.warn(err);
-    return null;
+  if (process.platform === 'win32' || isWsl) {
+    // console.log('spawn', 'cmd.exe', ['/C', 'start ' + url]);
+    // console.log('got old path', process.env.PATH, process.env.OLDPATH);
+    const cp = child_process.spawn('cmd.exe', ['/C', 'start ' + url], {
+      /* env: {
+        ...process.env,
+        // PATH: process.env.OLDPATH,
+      }, */
+      // shell: true,
+      // windowsVerbatimArguments: true,
+      // uid: oldUid,
+      // cwd: "/mnt/c/Windows/System32",
+    });
+    cp.on('error', err => {
+      console.warn(err);
+    });
+    /* // pipe
+    cp.stdout.on('data', data => {
+      console.log(`stdout: ${data}`);
+    });
+    cp.stderr.on('data', data => {
+      console.error(`stderr: ${data}`);
+    });
+    cp.on('error', err => {
+      console.warn(err);
+    });
+    cp.on('close', code => {
+      console.log(`child process exited with code ${code}`);
+    }); */
+  } else if (process.platform === 'linux') {
+    const cp = child_process.spawn('xdg-open', [url]);
+    cp.on('error', err => {
+      console.warn(err);
+    });
+  } else /* if (process.platform === 'darwin') */ {
+    const cp = child_process.spawn('open', [url]);
+    cp.on('error', err => {
+      console.warn(err);
+    });
   }
-};
-const certs = {
-  key: _tryReadFile('./certs/privkey.pem') || _tryReadFile('./certs-local/privkey.pem'),
-  cert: _tryReadFile('./certs/fullchain.pem') || _tryReadFile('./certs-local/fullchain.pem'),
-};
-
-function makeId(length) {
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return result;
 }
-
-//
-
-const {headers: headerSpecs} = vercelJson;
-const headerSpec0 = headerSpecs[0];
-const {headers} = headerSpec0;
-const _setHeaders = res => {
-  for (const {key, value} of headers) {
-    res.setHeader(key, value);
-  }
-};
-
-//
-
-const _proxyUrl = (req, res, u) => {
-  const proxyReq = /^https:/.test(u) ? https.request(u) : http.request(u);
-  for (const header in req.headers) {
-    proxyReq.setHeader(header, req.headers[header]);
-  }
-  proxyReq.on('response', proxyRes => {
-    for (const header in proxyRes.headers) {
-      res.setHeader(header, proxyRes.headers[header]);
-    }
-    res.statusCode = proxyRes.statusCode;
-    proxyRes.pipe(res);
-  });
-  proxyReq.on('error', err => {
-    console.error(err);
-    res.statusCode = 500;
-    res.end();
-  });
-  proxyReq.end();
-};
-
-//
-
-const serveDirectories = [
-  '/packages/scenes/',
-  '/packages/characters/',
-];
-const _proxyFile = (req, res, u) => {
-  u = path.join(dirname, u);
-  // console.log('proxy file', u);
-  const rs = fs.createReadStream(u);
-  rs.on('error', err => {
-    console.warn(err);
-    res.statusCode = 404;
-    res.end(err.stack);
-  });
-  rs.pipe(res);
-};
 
 //
 
@@ -136,7 +102,145 @@ const _waitForRegex = (compilerProcess, regex) => {
     };
   });
 };
+const makeWaitForExit = cp => {
+  let exited = false;
+  cp.on('close', (code, signal) => {
+    exited = true;
+  });
+  
+  return to => {
+    if (!exited) {
+      return new Promise((accept, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error('timeout in process: ' + cp));
+        }, to);
+          
+        const close = (code, signal) => {
+          accept(code);
+          cleanup();
+        };
+        cp.on('close', close);
+        cp.on('error', err => {
+          reject(err);
+          cleanup();
+        });
+        const cleanup = () => {
+          cp.removeListener('close', close);
+          cp.removeListener('error', reject);
+          clearTimeout(timeout);
+        };
+      });
+    } else {
+      return Promise.resolve();
+    }
+  };
+};
 
+// let httpServer = null;
+let logging = false;
+let quitted = false;
+const loggedProcesses = [];
+const _logProcess = childProcess => {
+  const tombstoneLogs = {
+    stdout: [],
+    stderr: [],
+  };
+  childProcess.stdout.on('data', data => {
+    if (logging && !quitted) {
+      process.stdout.write(data);
+    }
+    tombstoneLogs.stderr.push(data);
+    while (tombstoneLogs.stderr.length > 1000) {
+      tombstoneLogs.stderr.shift();
+    }
+  });
+  childProcess.stderr.on('data', data => {
+    if (logging && !quitted) {
+      process.stderr.write(data);
+    }
+    tombstoneLogs.stderr.push(data);
+    while (tombstoneLogs.stderr.length > 1000) {
+      tombstoneLogs.stderr.shift();
+    }
+  });
+  loggedProcesses.push(childProcess);
+
+  childProcess.on('close', (exitCode, signal) => {
+    if (!quitted) {
+      console.log(`${childProcess.name} process exited with code ${exitCode} and signal ${signal}`);
+      if (exitCode !== 0) {
+        console.log('stdout:\n', tombstoneLogs.stdout.join(''));
+        console.log('stderr:\n', tombstoneLogs.stderr.join(''));
+      }
+    }
+  });
+};
+{
+  process.stdin.setRawMode(true);
+  process.stdin.resume();
+  process.stdin.setEncoding('utf8');
+  const killall = async () => {
+    quitted = true;
+    // console.log('quit 2');
+    for (const cp of loggedProcesses) {
+      console.log('kill pid', cp.name, cp.pid);
+      // treeKill(cp.pid, 9);
+      try {
+        process.kill(cp.pid, 'SIGTERM');
+      } catch(err) {
+        if (err.code !== 'ESRCH') {
+          console.warn(err.stack);
+        }
+      }
+    }
+    await Promise.all(loggedProcesses.map(cp => cp.waitForExit(10 * 1000)));
+  };
+  const data = (key) => {
+    if (key === 'a') {
+      open(`http://local.webaverse.com/`);
+    } else if (key === 'p') {
+      open(`http://127.0.0.1:${MULTIPLAYER_PORT}/`);
+    } else if (key === 'w') {
+      open(`https://local.webaverse.com:${WIKI_PORT}/`);
+    } else if (key === 'm') {
+      open(`https://local.webaverse.com:${WIKI_PORT}/map`);
+    } else if (key === 'g') {
+      open(`http://127.0.0.1:${PREVIEWER_PORT}/`);
+    } else if (key === 'd') {
+      logging = !logging;
+      console.log('logging', logging);
+    } else if (key === '\x03') { // ctrl-c
+      killall();
+      process.exit();
+    } else if (key === 'q') {
+      (async () => {
+        await killall();
+        process.exit();
+      })();
+    }
+  };
+  process.stdin.on('data', data);
+}
+
+const _startDevServer = async () => {
+  const devServerProcess = child_process.spawn(process.argv[0], ['./dev-server.js'], {
+    cwd: dirname,
+    env: {
+      ...process.env,
+      PORT: DEVSERVER_PORT,
+      COMPILER_PORT,
+    },
+    // uid: oldUid,
+  });
+  devServerProcess.name = 'dev-server';
+  devServerProcess.waitForExit = makeWaitForExit(devServerProcess);
+  
+  _logProcess(devServerProcess);
+
+  await _waitForRegex(devServerProcess, /local/i);
+
+  return devServerProcess;
+};
 const _startCompiler = async () => {
   const compilerPath = path.join(dirname, 'packages', 'compiler');
   const nextPath = path.join(compilerPath, 'node_modules', '.bin', 'next');
@@ -147,18 +251,16 @@ const _startCompiler = async () => {
       PORT: COMPILER_PORT,
       BASE_CWD: dirname,
     },
-    uid: oldUid,
+    // uid: oldUid,
   });
+  compilerProcess.name = 'compiler';
+  compilerProcess.waitForExit = makeWaitForExit(compilerProcess);
   
-  if (!isProduction) {
-    compilerProcess.stderr.pipe(process.stderr);
-    compilerProcess.stdout.pipe(process.stdout);
-  }
-  compilerProcess.on('close', code => {
-    console.log(`compiler process exited with code ${code}`);
-  });
+  _logProcess(compilerProcess);
 
   await _waitForRegex(compilerProcess, /ready/i);
+
+  return compilerProcess;
 };
 const _startMultiplayer = async () => {
   const multiplayerPath = path.join(dirname, 'packages', 'multiplayer-do');
@@ -168,18 +270,16 @@ const _startMultiplayer = async () => {
       ...process.env,
       PORT: MULTIPLAYER_PORT,
     },
-    uid: oldUid,
+    // uid: oldUid,
   });
+  multiplayerProcess.name = 'multiplayer';
+  multiplayerProcess.waitForExit = makeWaitForExit(multiplayerProcess);
   
-  if (!isProduction) {
-    multiplayerProcess.stderr.pipe(process.stderr);
-    multiplayerProcess.stdout.pipe(process.stdout);
-  }
-  multiplayerProcess.on('close', code => {
-    console.log(`multiplayer process exited with code ${code}`);
-  });
+  _logProcess(multiplayerProcess);
 
   await _waitForRegex(multiplayerProcess, /starting/i);
+
+  return multiplayerProcess;
 };
 const _startWiki = async () => {
   const wikiPath = path.join(dirname, 'packages', 'wiki');
@@ -189,18 +289,16 @@ const _startWiki = async () => {
       ...process.env,
       PORT: WIKI_PORT,
     },
-    uid: oldUid,
+    // uid: oldUid,
   });
+  wikiProcess.name = 'wiki';
+  wikiProcess.waitForExit = makeWaitForExit(wikiProcess);
   
-  if (!isProduction) {
-    wikiProcess.stderr.pipe(process.stderr);
-    wikiProcess.stdout.pipe(process.stdout);
-  }
-  wikiProcess.on('close', code => {
-    console.log(`wiki process exited with code ${code}`);
-  });
+  _logProcess(wikiProcess);
 
   await _waitForRegex(wikiProcess, /ready/i);
+
+  return wikiProcess;
 };
 const _startPreviewer = async () => {
   const previewerPath = path.join(dirname, 'packages', 'previewer');
@@ -210,74 +308,30 @@ const _startPreviewer = async () => {
       ...process.env,
       PORT: PREVIEWER_PORT,
     },
-    uid: oldUid,
+    // uid: oldUid,
   });
+  previewerProcess.name = 'previewer';
+  previewerProcess.waitForExit = makeWaitForExit(previewerProcess);
   
-  if (!isProduction) {
-    previewerProcess.stderr.pipe(process.stderr);
-    previewerProcess.stdout.pipe(process.stdout);
-  }
-  previewerProcess.on('close', code => {
-    console.log(`previewer process exited with code ${code}`);
-  });
+  _logProcess(previewerProcess);
 
   await _waitForRegex(previewerProcess, /ready/i);
+
+  return previewerProcess;
 };
 
 //
 
 (async () => {
-  const app = express();
-  app.all('*', async (req, res, next) => {
-    // console.log('got headers', req.method, req.url, req.headers);
-
-    _setHeaders(res);
-
-    if (req.headers['host'] === COMPILER_NAME) {
-      const u = `http://localhost:${COMPILER_PORT}${req.url}`;
-      _proxyUrl(req, res, u);
-    } else if (serveDirectories.some(d => req.url.startsWith(d))) {
-      _proxyFile(req, res, req.url);
-    } else {
-      next();
-    }
-  });
-
-  const isHttps = !process.env.HTTP_ONLY && (!!certs.key && !!certs.cert);
-  const port = parseInt(process.env.PORT, 10) || 443;
-  const wsPort = port + 1;
-
-  const _makeHttpServer = () => isHttps ? https.createServer(certs, app) : http.createServer(app);
-  const httpServer = _makeHttpServer();
-  const viteServer = await vite.createServer({
-    mode: isProduction ? 'production' : 'development',
-    server: {
-      middlewareMode: true,
-      // force: true,
-      hmr: {
-        server: httpServer,
-        port,
-        overlay: false,
-      },
-    }
-  });
-  app.use(viteServer.middlewares);
-  
   await Promise.all([
+    _startDevServer(),
     _startCompiler(),
     _startMultiplayer(),
     _startWiki(),
     _startPreviewer(),
   ]);
-  await new Promise((accept, reject) => {
-    httpServer.listen(port, SERVER_ADDR, () => {
-      accept();
-    });
-    httpServer.on('error', reject);
-  });
-  console.log(`  > Local: http${isHttps ? 's' : ''}://${SERVER_NAME}:${port}/`);
   
-  const wsServer = (() => {
+  /* const wsServer = (() => {
     if (isHttps) {
       return https.createServer(certs);
     } else {
@@ -321,6 +375,6 @@ const _startPreviewer = async () => {
       accept();
     });
     wsServer.on('error', reject);
-  });
-  console.log(`  > World: ws${isHttps ? 's' : ''}://${SERVER_NAME}:${wsPort}/`);
+  }); */
+  // console.log(`  > World: ws${isHttps ? 's' : ''}://${SERVER_NAME}:${wsPort}/`);
 })();
