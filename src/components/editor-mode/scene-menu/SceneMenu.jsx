@@ -48,6 +48,8 @@ export const SceneMenu = ({ className, multiplayerConnected, selectedScene, setS
 
     const refreshRooms = async () => {
 
+        return; // XXX
+
         const res = await fetch( universe.getWorldsHost() );
 
         if ( res.ok ) {
