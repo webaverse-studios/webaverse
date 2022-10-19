@@ -1,3 +1,6 @@
 export NODE_ENV=development
-export OLDNAME=$UID
-sudo --preserve-env=NODE_ENV --preserve-env=HOME --preserve-env=OLDNAME $(which node) index.mjs
+# export OLDNAME=$UID
+# export CMDEXE=$(which cmd.exe)
+# export OLDPATH=$PATH
+sudo setcap 'cap_net_bind_service=+ep' `which node`
+node index.mjs
