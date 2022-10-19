@@ -25,3 +25,6 @@
 [submodule "packages/wiki"]
 	path = packages/wiki
 	url = https://github.com/webaverse/wiki.git
+[submodule "packages/compiler"]
+	path = packages/compiler
+	url = https://github.com/webaverse/compiler.git
