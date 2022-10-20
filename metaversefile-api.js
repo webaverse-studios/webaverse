@@ -36,6 +36,7 @@ import {avatarManager} from './avatar-manager.js';
 import {partyManager} from './party-manager.js';
 import {playersManager} from './players-manager.js';
 import loaders from './loaders.js';
+import writers from './writers.js';
 import * as voices from './voices.js';
 import * as procgen from './procgen/procgen.js';
 import performanceTracker from './performance-tracker.js';
@@ -642,6 +643,9 @@ metaversefile.setApi({
   },
   useLoaders() {
     return loaders;
+  },
+  useWriters() {
+    return writers;
   },
   /* useLodder() {
     return lodder;
