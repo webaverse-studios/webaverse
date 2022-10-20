@@ -6,7 +6,7 @@ the purpose of this file is to hold these objects and to make sure they are corr
 import * as THREE from 'three';
 import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import {makePromise} from './util.js';
-import {minFov} from './constants.js';
+import {minFov, minCanvasSize} from './constants.js';
 import {WebaverseScene} from './webaverse-scene.js';
 import {isWorker} from './env.js';
 
@@ -130,10 +130,12 @@ scene.add(camera);
 // scene.add(orthographicCamera);
 
 const _getCanvasDimensions = () => {
-  let width, height, pixelRatio;
-  width = globalThis.innerWidth;
-  height = globalThis.innerHeight;
-  pixelRatio = globalThis.devicePixelRatio;
+  let width = globalThis.innerWidth;
+  let height = globalThis.innerHeight;
+  let pixelRatio = globalThis.devicePixelRatio;
+
+  width = Math.max(width, minCanvasSize);
+  height = Math.max(height, minCanvasSize);
   
   return {
     width,
