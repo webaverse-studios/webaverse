@@ -1,95 +1,110 @@
-/* eslint-disable no-useless-escape */
-import {storageHost, inappPreviewHost} from './constants';
+import {bindCanvas, waitForLoad} from './renderer.js';
 
-const queue = [];
-let running = false;
-let f;
+// import {getEmotionCanvases} from './offscreen-engine/fns/avatar-iconer-fn.js';
+// import {createSpriteAvatarMesh, crunchAvatarModel, optimizeAvatarModel} from './offscreen-engine/fns/avatar-renderer-fns.js';
+// import {generateObjectUrlCardRemote} from './offscreen-engine/fns/cards-manager-fn.js';
+// import {getLandImage} from './offscreen-engine/fns/land-iconer-fn.js';
+// import {createAppUrlSpriteSheet} from './offscreen-engine/fns/spriting-fn.js';
+// import {getSpriteAnimationForAppUrlInternal} from './offscreen-engine/fns/sprite-animation-manager-fn.js';
+import physx from './physx.js';
+// import {offscreenCanvasSize} from './constants.js';
+import metaversefile from 'metaversefile';
+import metaversefileApi from './metaversefile-api';
 
-const next = () => {
-  /** Unshift the queue to generate the next preview */
-  const {url, ext, type, width, height, resolve, reject} = queue.shift();
-  generatePreview(url, ext, type, width, height, resolve, reject);
+// import physicsManager from './physics-manager.js';
+import physxWorkerManager from './physx-worker-manager.js';
+import Avatar from './avatars/avatars.js';
+
+const _waitForLoad = async () => {
+  const canvas = document.getElementById('canvas');
+  bindCanvas(canvas);
+
+  // await bindCanvas();
+  // await metaversefile.waitForLoad();
+  // await physx.waitForLoad();
+  await Avatar.waitForLoad();
+  await physx.waitForLoad();
+  await physxWorkerManager.waitForLoad();
 };
 
-export const generatePreview = async (url, ext, type, width, height, resolve, reject) => {
-  const previewHost = inappPreviewHost;
-  running = true;
-  // check for existing iframe
-  var iframe = document.querySelector(`iframe[src^="${previewHost}/screenshot.html"]`);
-
-  // else create new iframe
-  if (!iframe) {
-    iframe = document.createElement('iframe');
-    iframe.width = '0px';
-    iframe.height = '0px';
-    document.body.appendChild(iframe);
-  }
-
-  // check either first param is url or hash
-  if (!isValidURL(url)) {
-    url = `${storageHost}/${url}/preview.${ext}`;
-  }
-
-  // create URL
-  var ssUrl = `${previewHost}/screenshot.html?url=${url}&ext=${ext}&type=${type}&width=${width}&height=${height}`;
-
-  // set src attr for iframe
-  iframe.src = ssUrl;
-  console.log('Preview generation in progress for ', ssUrl);
-  // event listener for postMessage from screenshot.js
-  const rejection = setTimeout(() => {
-    reject('Preview Server Timed Out');
-    running = false;
-    /** discard old function */
-    window.removeEventListener('message', f, false);
-    if (queue.length > 0) {
-      next();
+(async () => {
+  const url = new URL(location.href);
+  const {searchParams} = url;
+  const u = searchParams.get('u');
+  const mimeType = searchParams.get('type');
+  const cbUrl = searchParams.get('cbUrl');
+  let args = searchParams.get('args');
+  if (args) {
+    try {
+      args = JSON.parse(args);
+    } catch(err) {
+      console.warn('invalid args', err);
     }
-  }, 30 * 1000);
+  }
+  if (!args) {
+    args = {};
+  }
 
-  f = event => {
-    if (event.data.method === 'result') {
-      window.removeEventListener('message', f, false);
-      let blob;
-      if (type === 'webm') {
-        blob = new Blob([event.data.result], {
-          type: `video/${type}`,
-        });
-      } else {
-        blob = new Blob([event.data.result], {
-          type: `image/${type}`,
-        });
-      }
-      clearTimeout(rejection);
-      resolve({
-        blob: blob,
-        url: URL.createObjectURL(blob),
-      });
-      running = false;
-      if (queue.length > 0) {
-        next();
-      }
+  const _respond = async (statusCode, contentType, body) => {
+    const res = await fetch(cbUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': contentType,
+        // 'woot': 'toot',
+        'X-Proxy-Status-Code': statusCode,
+      },
+      body,
+    });
+  
+    // console.log('respond 2', res.ok);
+    
+    if (res.ok) {
+      await res.blob();
+      // console.log('got response');
+    } else {
+      throw new Error('failed to respond: ' + res.status);
     }
   };
-  window.addEventListener('message', f);
-};
 
-// URL validate function
-function isValidURL(string) {
-  var res = string.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
-  return (res !== null);
-}
+  if (u && cbUrl) {
+    try {
+      // console.log('respond 0', JSON.stringify({u, cbUrl, mimeType}));
+      
+      await _waitForLoad();
+      
+      // console.log('respond 1', JSON.stringify({u, cbUrl, mimeType}));
 
-export const preview = async (url, ext, type, width, height, priority=10) => {
-  return new Promise((resolve, reject) => {
-    if (!['png', 'jpg', 'jpeg', 'vox', 'vrm', 'glb', 'webm', 'gif'].includes(ext)) {
-      return reject('Undefined Extension');
+      const app = await metaversefile.createAppAsync({
+        start_url: u,
+      });
+
+      /* console.log('respond 2', JSON.stringify({u, cbUrl, mimeType}), app.exports.length);
+      if (!app.exports) {
+        debugger;
+      } */
+
+      if (app.exports.length > 0) {
+        for (const exFn of app.exports) {
+          const result = await exFn({mimeType, args});
+          if (result) {
+            const type = (result instanceof Blob) ? result.type : mimeType;
+            _respond(200, type, result);
+            return;
+          }
+        }
+        _respond(404, 'text/plain', 'no exports found at ' + JSON.stringify(u) + ' for mime type ' + JSON.stringify(mimeType) + ' ' + JSON.stringify(args));
+      } else {
+        _respond(404, 'text/plain', 'no exports found at ' + JSON.stringify(u) + ' for mime type ' + JSON.stringify(mimeType) + ' ' + JSON.stringify(args));
+      }
+
+      // const body = JSON.stringify({
+      //   u,
+      //   cbUrl,
+      // });
+      // await _respond(body);
+    } catch(err) {
+      console.warn(err.stack);
+      _respond(500, 'text/plain', err.stack);
     }
-    if (!running) {
-      generatePreview(url, ext, type, width, height, resolve, reject);
-    } else {
-      queue.push({url, ext, type, width, height, resolve, reject, priority});
-      queue.sort((a, b) => a.priority - b.priority)
-    }
-  });
-};
+  }
+})();

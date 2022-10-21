@@ -55,21 +55,6 @@ export const Quest = ({
 
             const ctx = canvas.getContext('2d');
 
-            /* const canvas2 = document.createElement('canvas');
-            canvas2.style.cssText = `\
-                position: fixed;
-                top: 100px;
-                left: 100px;
-                width: ${300}px;
-                height: ${300}px;
-                background-color: #F00;
-            `;
-            canvas2.width = screenshotSize;
-            canvas2.height = screenshotSize;
-            const ctx2 = canvas2.getContext('2d');
-            // ctx2.drawImage(imageBitmap, 0, 0);
-            document.body.appendChild(canvas2); */
-
             let live = true;
             let timeout = null;
             (async () => {

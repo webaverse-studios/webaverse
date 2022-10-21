@@ -1,52 +1,10 @@
 import React, { useState, useRef } from 'react';
 import classnames from 'classnames';
 
-import { setFacePoseValue } from './Emotions';
+import {setFacePoseValue} from './Emotions';
 import styles from './poses.module.css';
 
-import metaversefile from 'metaversefile';
-import { emoteAnimations } from '../../../../avatars/animationHelpers.js';
-import emotes from './emotes.json';
-import fallbackEmotes from "./fallback_emotes.json";
-
-
-let emoteTimeout = null;
-export const triggerEmote = (emoteName, player = null) => {
-    const emoteHardName = emoteName.replace(/Soft$/, '');
-    const emote = emotes.find(emote => emote.name === emoteHardName);
-    if (emote === undefined){
-        return;
-    }
-    const { emotion } = emote;
-    player = !player ? metaversefile.useLocalPlayer() : player;
-
-    // clear old emote
-    player.removeAction('emote');
-    if (emoteTimeout) {
-        clearTimeout(emoteTimeout);
-        emoteTimeout = null;
-    }
-
-    // add new emote
-    const newAction = {
-        type: 'emote',
-        animation: emoteHardName,
-    };
-    player.addAction(newAction);
-
-    setFacePoseValue(emotion, 1);
-
-    const emoteAnimation = emoteAnimations[emoteHardName];
-    const emoteAnimationDuration = emoteAnimation.duration;
-    emoteTimeout = setTimeout(() => {
-        const actionIndex = player.findActionIndex(action => action.type === 'emote' && action.animation === emoteHardName);
-        player.removeActionIndex(actionIndex);
-
-        setFacePoseValue(emotion, 0);
-
-        emoteTimeout = null;
-    }, emoteAnimationDuration * 1000);
-};
+import emoteManager, {emotes} from '../../../../emotes/emote-manager.js';
 
 //
 
@@ -56,8 +14,14 @@ export const Poses = ({
     const [posesOpen, setPosesOpen] = useState(false);
     const posesRef = useRef();
 
-    const poseClick = emote => e => {
-        triggerEmote(emote);
+    const poseClick = emoteName => async e => {
+        const emoteSpec = emoteManager.getEmoteSpec(emoteName);
+        const {emotion} = emoteSpec;
+        setFacePoseValue(emotion, 1);
+
+        await emoteManager.triggerEmote(emoteName);
+        
+        setFacePoseValue(emotion, 0);
     };
 
     return (

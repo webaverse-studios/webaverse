@@ -9,7 +9,7 @@ import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUti
 import physx from './physx.js';
 import cameraManager from './camera-manager.js';
 import ioManager from './io-manager.js';
-import dioramaManager from './diorama.js';
+import dioramaManager from './diorama/diorama-manager.js';
 import {world} from './world.js';
 import {buildMaterial, highlightMaterial, selectMaterial, hoverMaterial, hoverEquipmentMaterial} from './shaders.js';
 import {getRenderer, sceneLowPriority, camera} from './renderer.js';
@@ -1724,37 +1724,43 @@ class GameManager extends EventTarget {
       applySettingToApp(app);
     }
   }
-  playerDiorama = null;
-  bindDioramaCanvas() {
-    // await rendererWaitForLoad();
-
-    this.playerDiorama = dioramaManager.createPlayerDiorama({
-      // label: true,
-      outline: true,
-      grassBackground: true,
-      // glyphBackground: true,
-    });
-
+  #playerDiorama = null;
+  bindEvents() {
     const playerSelectedFn = e => {
       const {
         player,
       } = e.data;
 
+      const playerDiorama = this.getPlayerDiorama();
+      // console.log('playerSelectedFn', player);
+      // debugger;
       const localPlayer = player;
-      this.playerDiorama.setTarget(localPlayer);
-      this.playerDiorama.setObjects([
+      playerDiorama.setTarget(localPlayer);
+      playerDiorama.setObjects([
         localPlayer.avatar.avatarRenderer.scene,
       ]);
     };
     playersManager.addEventListener('playerchange', playerSelectedFn);
 
     avatarManager.addEventListener('avatarchange', e => {
+      const playerDiorama = this.getPlayerDiorama();
       const localPlayer = playersManager.getLocalPlayer();
-      this.playerDiorama.setTarget(localPlayer);
-      this.playerDiorama.setObjects([
+      playerDiorama.setTarget(localPlayer);
+      playerDiorama.setObjects([
         e.data.avatar.avatarRenderer.scene,
       ]);
-    })
+    });
+  }
+  getPlayerDiorama() {
+    if (!this.#playerDiorama) {
+      this.#playerDiorama = dioramaManager.createPlayerDiorama({
+        // label: true,
+        outline: true,
+        grassBackground: true,
+        // glyphBackground: true,
+      });
+    }
+    return this.#playerDiorama;
   }
   async setVoicePack(voicePack) {
     const localPlayer = metaversefileApi.useLocalPlayer();
@@ -1778,4 +1784,5 @@ class GameManager extends EventTarget {
   pushPlayerUpdates = _pushPlayerUpdates;
 }
 const gameManager = new GameManager();
+gameManager.bindEvents();
 export default gameManager;

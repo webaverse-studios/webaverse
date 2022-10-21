@@ -3,7 +3,7 @@ import React, {useState, useEffect, useRef} from 'react';
 import classnames from 'classnames';
 // import dioramaManager from '../diorama.js';
 // import game from '../game.js';
-import dioramaManager from '../diorama.js';
+import dioramaManager from '../diorama/diorama-manager.js';
 // import {NpcPlayer} from '../character-controller.js';
 import {world} from '../world.js';
 import styles from './MegaHup.module.css';

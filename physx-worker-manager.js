@@ -1,10 +1,5 @@
-// import * as THREE from 'three';
 import {makeId} from './util.js';
-// import {defaultChunkSize} from './constants.js';
-// import metaversefile from 'metaversefile';
-// import { terrainVertex, terrainFragment } from './shaders/terrainShader.js';
-
-// const localVector = new THREE.Vector3();
+import PhysxWorker from './physx-worker.js?worker';
 
 const defaultNumPhysicsWorkers = 2;
 
@@ -24,9 +19,10 @@ class PhysicsWorkerManager {
         // create workers
         const workers = Array(this.numWorkers);
         for (let i = 0; i < this.numWorkers; i++) {
-          const worker = new Worker('./physx-worker.js?import', {
+          /* const worker = new Worker('./physx-worker.js?import', {
             type: 'module',
-          });
+          }); */
+          const worker = new PhysxWorker();
           const cbs = new Map();
           worker.onmessage = e => {
             const {requestId} = e.data;

@@ -4,6 +4,7 @@ import {
   gradients,
   fullscreenVertexShader,
 } from './common.js';
+import {loadImageBitmap} from '../util.js';
 // import {getRenderer} from '../renderer.js';
 
 const glyphFragmentShader = `\
@@ -313,13 +314,9 @@ void main() {
 }
 `;
 
-let iChannel0 = null;
 class GlyphBgFxMesh extends THREE.Mesh {
+  static iChannel0 = new THREE.Texture();
   constructor() {
-    if (!iChannel0) {
-      const textureLoader = new THREE.TextureLoader();
-      iChannel0 = textureLoader.load('/textures/lichen.jpg');
-    }
     const material = new THREE.ShaderMaterial({
       uniforms: {
         iTime: {
@@ -327,7 +324,7 @@ class GlyphBgFxMesh extends THREE.Mesh {
           // needsUpdate: true,
         },
         iChannel0: {
-          value: iChannel0,
+          value: GlyphBgFxMesh.iChannel0,
           // needsUpdate: true,
         },
         /* outline_thickness: {
@@ -354,7 +351,7 @@ class GlyphBgFxMesh extends THREE.Mesh {
       alphaToCoverage: true,
     });
     super(fullscreenGeometry, material);
-    
+
     this.frustumCulled = false;
   }
   update(timestamp, timeDiff, width, height) {
@@ -370,6 +367,11 @@ class GlyphBgFxMesh extends THREE.Mesh {
 
     this.material.uniforms.uColor2.value.set(colors[colors.length - 1]);
     this.material.uniforms.uColor2.needsUpdate = true;
+  }
+  static async waitForLoad() {
+    const imageBitmap = await loadImageBitmap('/textures/lichen.jpg');
+    GlyphBgFxMesh.iChannel0.image = imageBitmap;
+    GlyphBgFxMesh.iChannel0.needsUpdate = true;
   }
 }
 

@@ -136,7 +136,7 @@ class LoadoutManager extends EventTarget {
   }
   ensureRenderers() {
     if (this.hotbarRenderers.length === 0) {
-      const size = hotbarSize * window.devicePixelRatio;
+      const size = hotbarSize * globalThis.devicePixelRatio;
 
       for (let i = 0; i < numSlots; i++) {
         const selected = i === this.selectedIndex;

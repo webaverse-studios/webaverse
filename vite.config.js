@@ -1,19 +1,17 @@
 import {defineConfig} from 'vite'
 import pluginReact from '@vitejs/plugin-react'
-import metaversefilePlugin from 'metaversefile/plugins/rollup.js'
+// import metaversefilePlugin from 'metaversefile/plugins/rollup.js'
 
 // https://vitejs.dev/config/
 export default defineConfig(({command, mode, ssrBuild}) => {
-  // console.log('define config', {
-  //   command,
-  //   mode,
-  //   ssrBuild,
-  // });
   return {
-    plugins: (command === 'build' ? [] : [metaversefilePlugin()]).concat([
+    plugins: [
       pluginReact(),
-    ]),
-    optimizeDeps:{
+    ],
+    build: {
+      minify: process.env.NODE_ENV === 'production',
+    },
+    /* optimizeDeps: {
       entries: [
         'src/*.js',
         'src/*.jsx',
@@ -24,7 +22,7 @@ export default defineConfig(({command, mode, ssrBuild}) => {
         'src/tabs/*.jsx',
         '*.js'
       ],
-    },
+    }, */
     server: {
       fs: {
         strict: true,

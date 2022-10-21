@@ -6,8 +6,7 @@ import {LightArrow} from './LightArrow';
 
 import styles from './QuickMenu.module.css';
 
-import emotes from './components/general/character/emotes.json';
-import {triggerEmote} from './components/general/character/Poses';
+import emoteManager, {emotes} from '../emotes/emote-manager.js';
 
 import game from '../game.js';
 import cameraManager from '../camera-manager.js';
@@ -117,7 +116,7 @@ export default function QuickMenu() {
         if (e.keyCode === 81) { // Q
           if (open) {
             /* const emote = _getSelectedEmote();
-            emote && triggerEmote(emote); */
+            emote && emoteManager.triggerEmote(emote); */
             
             setOpen(false);
             setDown(false);
@@ -151,7 +150,7 @@ export default function QuickMenu() {
       function mouseup(e) {
         setDown(false);
         const emote = _getSelectedEmote();
-        emote && triggerEmote(emote);
+        emote && emoteManager.triggerEmote(emote);
         setOpen(false);
         
         sounds.playSoundName('menuNext');

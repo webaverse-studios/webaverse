@@ -121,6 +121,7 @@ class CharacterPhysics {
         const t = nowS - this.fallLoopStartTimeS;
         const h = 0.5 * physicsScene.getGravity().y * t * t;
         this.wantMoveDistancePerFrame.y = h - this.lastGravityH;
+        this.wantVelocity.y = t * physicsScene.getGravity().y;
 
         this.lastGravityH = h;
       }
@@ -170,7 +171,7 @@ class CharacterPhysics {
         this.character.getAction('swim').onSurface &&
         !this.character.hasAction('fly')
       ) {
-        if (this.character.characterPhysics.velocity.y > 0) {
+        if (this.character.characterPhysics.velocity.y >= 0) {
           localVector3.y = 0;
         }
       }

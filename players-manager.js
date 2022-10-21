@@ -32,7 +32,7 @@ class PlayersManager extends EventTarget {
 
     return localPlayer;
   }
-  getLocalPlayer () {
+  getLocalPlayer() {
     return this.localPlayer;
   }
   setLocalPlayer(newLocalPlayer) {

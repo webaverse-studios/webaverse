@@ -1,3 +1,4 @@
+import PgWorker from './pg-worker.js?worker';
 import {abortError} from './lock-manager.js';
 
 //
@@ -9,7 +10,6 @@ const localArray16D = Array(16);
 
 //
 
-const workerUrl = `./pg-worker.js?import`;
 const TASK_PRIORITIES = {
   tracker: -10,
   splat: -1,
@@ -40,9 +40,10 @@ export class PGWorkerManager {
   waitForLoad() {
     if (!this.loadPromise) {
       this.loadPromise = (async () => {
-        const worker = new Worker(workerUrl, {
+        /* const worker = new Worker(workerUrl, {
           type: 'module',
-        });
+        }); */
+        const worker = new PgWorker();
         const cbs = new Map();
         worker.onmessage = (e) => {
           const {taskId} = e.data;

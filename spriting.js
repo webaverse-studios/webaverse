@@ -1,10 +1,18 @@
-import offscreenEngineManager from './offscreen-engine/offscreen-engine-manager.js';
+import {createObjectSpriteSheet} from './object-spriter.js';
+import metaversefile from './metaversefile-api.js';
+// import physx from './physx.js';
 
-const createAppUrlSpriteSheet = async (appUrl, opts) => {
-  const result = await offscreenEngineManager.request('createAppUrlSpriteSheet', [appUrl, opts]);
-  return result;
-};
-
-export {
-  createAppUrlSpriteSheet,
-};
+export async function createAppUrlSpriteSheet(appUrl, opts) {
+  const app = await metaversefile.createAppAsync({
+    start_url: appUrl,
+    components: [
+      {
+        key: 'physics',
+        value: true,
+      },
+    ],
+  });
+  const spritesheet = await createObjectSpriteSheet(app, opts);
+  app.destroy();
+  return spritesheet;
+}

@@ -260,10 +260,6 @@ void main() {
 // let iChannel0 = null;
 class DotsBgFxMesh extends THREE.Mesh {
   constructor() {
-    /* if (!iChannel0) {
-      const textureLoader = new THREE.TextureLoader();
-      iChannel0 = textureLoader.load('/textures/lichen.jpg');
-    } */
     const material = new THREE.ShaderMaterial({
       uniforms: {
         iTime: {
@@ -321,6 +317,9 @@ class DotsBgFxMesh extends THREE.Mesh {
 
     this.material.uniforms.uColor2.value.set(colors[colors.length - 1]);
     this.material.uniforms.uColor2.needsUpdate = true;
+  }
+  static async waitForLoad() {
+    // nothing
   }
 }
 
