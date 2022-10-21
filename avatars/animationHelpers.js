@@ -573,10 +573,7 @@ export const _updateAnimation = (avatar, now) => {
 
       // ignore all animation position except y
       if (isPosition) {
-        if (avatar.swimState) {
-          // animations position is height-relative
-          dst.y *= avatar.height; // XXX avatar could be made perfect by measuring from foot to hips instead
-        } else if (avatar.jumpState || avatar.doubleJumpState || avatar.fallLoopState) {
+        if (avatar.flyState || avatar.jumpState || avatar.doubleJumpState || avatar.fallLoopState) { // in air
           // force height in the jump case to overide the animation
           dst.y = avatar.height * 0.55;
         } else {
