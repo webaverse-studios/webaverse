@@ -537,6 +537,9 @@ class PoisonBgFxMesh extends THREE.Mesh {
 
     // console.log('got frame', this.material.uniforms.iFrame.value);
   }
+  static async waitForLoad() {
+    // nothing
+  }
 }
 
 export {

@@ -1,5 +1,6 @@
 import {loadImage, makeSquareImage, blob2img, img2canvas, canvas2blob} from '../../util.js';
-import {imageAIEndpointUrl, imageCaptionAIEndpointUrl, defaultImageAICanvasSize} from '../../constants.js';
+// import {defaultImageAICanvasSize} from '../../constants.js';
+import {imageAIEndpointUrl, imageCaptionAIEndpointUrl} from '../../endpoints.js';
 import materialColors from '../../material-colors.json';
 import ColorScheme from '../../color-scheme.js';
 

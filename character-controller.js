@@ -27,9 +27,11 @@ import {
   avatarInterpolationTimeDelay,
   avatarInterpolationNumFrames,
   // groundFriction,
-  voiceEndpointBaseUrl,
   numLoadoutSlots,
 } from './constants.js';
+import {
+  voiceEndpointBaseUrl,
+} from './endpoints.js';
 import {AppManager} from './app-manager.js';
 import {CharacterPhysics} from './character-physics.js';
 import {CharacterHups} from './character-hups.js';

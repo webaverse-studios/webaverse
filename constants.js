@@ -1,7 +1,6 @@
 export const baseUnit = 4;
 export const previewExt = 'jpg';
 export const maxGrabDistance = 1.5;
-export const defaultRendererUrl = 'https://render.exokit.org/'
 
 export const transparentPngUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
@@ -13,7 +12,7 @@ export const rarityColors = {
   legendary: [0xAD00EA, 0x32002D],
 };
 
-const PEEK_FACE_INDICES = [];
+/* const PEEK_FACE_INDICES = [];
 (function initPeekFaceIndices(){
    for (let i = 0; i < 8 * 8; i++)
     {
@@ -35,7 +34,7 @@ const PEEK_FACE_INDICES = [];
     // console.log("INVOKED");
 })();
 
-export {PEEK_FACE_INDICES};
+export {PEEK_FACE_INDICES}; */
 
 const chainName = (() => {
   if (typeof globalThis !== 'undefined' && /^test\./.test(location.hostname)) {
@@ -60,7 +59,7 @@ export const polygonVigilKey = `0937c004ab133135c86586b55ca212a6c9ecd224`;
 
 const origin = globalThis.location.protocol + '//' + globalThis.location.hostname;
 
-let _inappPreviewHost = '';
+/* let _inappPreviewHost = '';
 
 switch ( origin ) {
     case 'https://local.webaverse.com': {
@@ -80,8 +79,7 @@ switch ( origin ) {
     }
 }
 
-// export const inappPreviewHost = _inappPreviewHost;
-export const inappPreviewHost = 'https://local.webaverse.com:3000';
+export const inappPreviewHost = _inappPreviewHost; */
 
 //
 
@@ -163,17 +161,7 @@ export const defaultMaxId = 8192;
 
 export const defaultMusicVolume = 0.35;
 
-export const voicePacksUrl = `https://webaverse.github.io/voicepacks/all_packs.json`;
-
-export const voiceEndpointBaseUrl = `https://voice-cw.webaverse.com/tts`;
-export const voiceEndpointsUrl = `https://raw.githubusercontent.com/webaverse/tiktalknet/main/model_lists/all_models.json`;
-
-export const imageAIEndpointUrl = `https://stable-diffusion.webaverse.com`;
-export const imageCaptionAIEndpointUrl = `https://clip.webaverse.com`;
-
 export const defaultImageAICanvasSize = 512;
-
-export const audioAIEndpointUrl = `https://diffsound.webaverse.com`;
 
 export const W3S_API_KEY = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDYyODg4RUNjQzFkQTYxZDUzZjEyYTI4MDQwRjllQzViNGJFRTMzNmMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2NjMzMTk1MjI2OTAsIm5hbWUiOiJ3ZWJhdmVyc2UifQ.WlpTfnrw0B6Z1Cs28Cawwx5PU04op6FLvHSxdh5j-hE`;
 
@@ -196,3 +184,6 @@ export const minAvatarQuality = 1;
 export const maxAvatarQuality = 4;
 export const defaultAvatarQuality = 3;
 export const characterSelectAvatarQuality = 4;
+
+export const minCanvasSize = 512;
+export const offscreenCanvasSize = 2048;

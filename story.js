@@ -25,12 +25,15 @@ import {playersManager} from './players-manager.js';
 import {alea} from './procgen/procgen.js';
 import renderSettingsManager from './rendersettings-manager.js';
 
-import {triggerEmote} from './src/components/general/character/Poses.jsx';
-import validEmotionMapping from './validEmotionMapping.json';
+import emoteManager from './emotes/emote-manager.js';
+
+//
 
 const localVector2D = new THREE.Vector2();
 
 const upVector = new THREE.Vector3(0, 1, 0);
+
+//
 
 function makeSwirlPass() {
   const renderer = getRenderer();
@@ -61,6 +64,25 @@ const _stopSwirl = () => {
     return false;
   }
 };
+
+//
+
+const fuzzyEmotionMappings = {
+  "alert": "alert",
+  "angry": "angry",
+  "embarrassed": "embarrassed",
+  "headNod": "headNod",
+  "headShake": "headShake",
+  "sad": "sad",
+  "surprise": "surprise",
+  "victory": "victory",
+  "surprised": "surprise",
+  "happy": "victory",
+  "sorrow": "sad",
+  "joy": "victory",
+  "confused": "alert",
+};
+export const getFuzzyEmotionMapping = emotionName => fuzzyEmotionMappings[emotionName];
 
 //
 
@@ -138,8 +160,9 @@ class Conversation extends EventTarget {
 
     cameraManager.setDynamicTarget(this.remotePlayer.avatar.modelBones.Head, this.localPlayer.avatar.modelBones.Head);
 
-    if (emote !== 'none' && validEmotionMapping[emote]!== undefined) {
-      triggerEmote(validEmotionMapping[emote], this.remotePlayer);
+    const fuzzyEmotionName = _getFuzzyEmotionMapping(emote);
+    if (fuzzyEmotionName) {
+      emoteManager.triggerEmote(fuzzyEmotionName, this.remotePlayer);
     }
   }
   async wrapProgress(fn) {
@@ -223,8 +246,9 @@ class Conversation extends EventTarget {
     // say the option
     this.addLocalPlayerMessage(option.message, 'option');
 
-    if (option.emote !== 'none' && validEmotionMapping[option.emote]!== undefined) {
-      triggerEmote(validEmotionMapping[option.emote], this.localPlayer);
+    const fuzzyEmotionName = _getFuzzyEmotionMapping(emote);
+    if (fuzzyEmotionName) {
+      emoteManager.triggerEmote(fuzzyEmotionName, this.localPlayer);
     }
     
     // clear options

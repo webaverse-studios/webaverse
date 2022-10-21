@@ -1,11 +1,6 @@
 import * as THREE from 'three';
 import physxLite from './physx-lite.js';
 import {makePromise} from './util.js'
-import {defaultChunkSize} from './constants.js';
-
-const chunkWorldSize = defaultChunkSize;
-
-const localVector = new THREE.Vector3();
 
 const fakeMaterial = new THREE.MeshBasicMaterial({
   color: 0xffffff,

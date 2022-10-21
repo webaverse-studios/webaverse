@@ -4,6 +4,7 @@ import {
   gradients,
   fullscreenVertexShader,
 } from './common.js';
+import {loadImageBitmap} from '../util.js';
 // import {getRenderer} from '../renderer.js';
 
 const animeLightningFragmentShader = `\
@@ -181,15 +182,17 @@ const animeLightningFragmentShader = `\
   }
 `;
 
-let iChannel0 = null;
-let iChannel1 = null;
+// let iChannel0 = null;
+// let iChannel1 = null;
 class LightningBgFxMesh extends THREE.Mesh {
+  static iChannel0 = new THREE.Texture();
+  static iChannel1 = new THREE.Texture();
   constructor() {
-    if (!iChannel0 || !iChannel1) {
-      const textureLoader = new THREE.TextureLoader();
-      iChannel0 = textureLoader.load('/textures/pebbles.png');
-      iChannel1 = textureLoader.load('/textures/noise.png');
-    }
+    // if (!iChannel0 || !iChannel1) {
+    //   const textureLoader = new THREE.TextureLoader();
+    //   iChannel0 = textureLoader.load('/textures/pebbles.png');
+    //   iChannel1 = textureLoader.load('/textures/noise.png');
+    // }
     const material = new THREE.ShaderMaterial({
       uniforms: {
         iTime: {
@@ -201,11 +204,11 @@ class LightningBgFxMesh extends THREE.Mesh {
           needsUpdate: false,
         },
         iChannel0: {
-          value: iChannel0,
+          value: LightningBgFxMesh.iChannel0,
           needsUpdate: true,
         },
         iChannel1: {
-          value: iChannel1,
+          value: LightningBgFxMesh.iChannel1,
           needsUpdate: true,
         },
         uColor1: {
@@ -249,6 +252,19 @@ class LightningBgFxMesh extends THREE.Mesh {
 
     this.material.uniforms.uColor2.value.set(colors[colors.length - 1]);
     this.material.uniforms.uColor2.needsUpdate = true;
+  }
+  static async waitForLoad() {
+    const [
+      pebblesIB,
+      noiseIB,
+    ] = await Promise.all([
+      loadImageBitmap('/textures/pebbles.png'),
+      loadImageBitmap('/textures/noise.png'),
+    ]);
+    LightningBgFxMesh.iChannel0.image = pebblesIB;
+    LightningBgFxMesh.iChannel0.needsUpdate = true;
+    LightningBgFxMesh.iChannel1.image = noiseIB;
+    LightningBgFxMesh.iChannel1.needsUpdate = true;
   }
 }
 

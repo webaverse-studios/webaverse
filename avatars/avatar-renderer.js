@@ -1,12 +1,10 @@
 /* this file implements avatar optimization and THREE.js Object management + rendering */
 import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import {VRMMaterialImporter/*, MToonMaterial*/} from '@pixiv/three-vrm/lib/three-vrm.module';
-import * as avatarOptimizer from '../avatar-optimizer.js';
-import * as avatarCruncher from '../avatar-cruncher.js';
+import {VRMMaterialImporter/*, MToonMaterial*/} from '@pixiv/three-vrm/lib/three-vrm.module.js';
 import * as avatarSpriter from '../avatar-spriter.js';
 import {getAvatarHeight, getAvatarWidth, getModelBones} from './util.mjs';
-import offscreenEngineManager from '../offscreen-engine/offscreen-engine-manager.js';
+// import offscreenEngineManager from '../offscreen-engine/offscreen-engine-manager.js';
 import loaders from '../loaders.js';
 // import {camera} from '../renderer.js';
 import {WebaverseShaderMaterial} from '../materials.js';
@@ -15,6 +13,7 @@ import {abortError} from '../lock-manager.js';
 import {minAvatarQuality, maxAvatarQuality} from '../constants.js';
 import settingsManager from '../settings-manager.js';
 // import {downloadFile} from '../util.js';
+import {createSpriteAvatarMesh, crunchAvatarModel, optimizeAvatarModel} from '../offscreen-engine/fns/avatar-renderer-fns.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -30,13 +29,14 @@ const localFrustum = new THREE.Frustum();
 const greenColor = new THREE.Color(0x43a047);
 
 const avatarPlaceholderImagePromise = (async () => {
-  const avatarPlaceholderImage = new Image();
-  avatarPlaceholderImage.src = '/images/user.png';
-  await new Promise((accept, reject) => {
-    avatarPlaceholderImage.onload = accept;
-    avatarPlaceholderImage.onerror = reject;
-  });
-  return avatarPlaceholderImage;
+  const res = await fetch('/images/user.png');
+  if (res.ok) {
+    const blob = await res.blob();
+    const avatarPlaceholderImage = await createImageBitmap(blob);
+    return avatarPlaceholderImage;
+  } else {
+    throw new Error('failed to load image: ' + res.status);
+  }
 })();
 const waitForAvatarPlaceholderImage = () => avatarPlaceholderImagePromise;
 const avatarPlaceholderTexture = new THREE.Texture();
@@ -474,15 +474,6 @@ export class AvatarRenderer /* extends EventTarget */ {
     const width = getAvatarWidth(modelBones);
     return {height, width};
   }
-  createSpriteAvatarMesh(args, options) {
-    return offscreenEngineManager.request('createSpriteAvatarMesh', args, options);
-  }
-  crunchAvatarModel(args, options) {
-    return offscreenEngineManager.request('crunchAvatarModel', args, options);
-  }
-  optimizeAvatarModel(args, options) {
-    return offscreenEngineManager.request('optimizeAvatarModel', args, options);
-  }
   #getCurrentMesh() {
     switch (this.quality) {
       case 1: {
@@ -575,13 +566,9 @@ export class AvatarRenderer /* extends EventTarget */ {
                 (async () => {
                   const {
                     textureImages,
-                  } = await this.createSpriteAvatarMesh([
-                    {
-                      arrayBuffer: this.arrayBuffer,
-                      srcUrl: this.srcUrl,
-                    }
-                  ], {
-                    signal,
+                  } = await createSpriteAvatarMesh({
+                    arrayBuffer: this.arrayBuffer,
+                    srcUrl: this.srcUrl,
                   });
                   const glb = avatarSpriter.createSpriteAvatarMeshFromTextures(textureImages);
                   _forAllMeshes(glb, _unfrustumCull);
@@ -611,13 +598,9 @@ export class AvatarRenderer /* extends EventTarget */ {
                 (async () => {
                   const {
                     glbData,
-                  } = await this.crunchAvatarModel([
-                    {
-                      arrayBuffer: this.arrayBuffer,
-                      srcUrl: this.srcUrl,
-                    },
-                  ], {
-                    signal,
+                  } = await crunchAvatarModel({
+                    arrayBuffer: this.arrayBuffer,
+                    srcUrl: this.srcUrl,
                   });
                   const object = await _loadGlbObject(glbData, this.srcUrl, {signal});
                   // downloadFile(new Blob([glbData], {type: 'application/octet-stream'}), 'avatar.glb');
@@ -652,13 +635,9 @@ export class AvatarRenderer /* extends EventTarget */ {
                 (async () => {
                   const {
                     glbData,
-                  } = await this.optimizeAvatarModel([
-                    {
-                      arrayBuffer: this.arrayBuffer,
-                      srcUrl: this.srcUrl,
-                    },
-                  ], {
-                    signal,
+                  } = await optimizeAvatarModel({
+                    arrayBuffer: this.arrayBuffer,
+                    srcUrl: this.srcUrl,
                   });
                   const object = await _loadGlbObject(glbData, this.srcUrl, {signal});
                   const glb = object.scene;

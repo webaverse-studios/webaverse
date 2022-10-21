@@ -2,7 +2,7 @@
 
 import audioManager from '../audio-manager.js';
 import {makePromise} from '../util.js';
-import {voiceEndpointBaseUrl} from '../constants.js';
+import {voiceEndpointBaseUrl} from '../endpoints.js';
 
 class VoiceEndpoint {
   constructor(url) {

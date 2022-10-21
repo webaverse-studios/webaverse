@@ -120,6 +120,9 @@ class OutlineBgFxMesh extends THREE.Mesh {
     this.material.uniforms.uColor2.value.set(colors[colors.length - 1]);
     this.material.uniforms.uColor2.needsUpdate = true;
   }
+  static async waitForLoad() {
+    // nothing
+  }
 }
 
 export {

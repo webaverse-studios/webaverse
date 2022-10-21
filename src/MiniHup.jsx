@@ -32,7 +32,7 @@ const MiniHup = function({
     const canvas = canvasRef.current;
     if (canvas) {
       // const localPlayer = metaversefile.useLocalPlayer();
-      const diorama = game.playerDiorama;
+      const diorama = game.getPlayerDiorama();
 
       diorama.addCanvas(canvas);
       diorama.enabled = true;

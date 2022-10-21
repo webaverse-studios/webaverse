@@ -4,22 +4,13 @@ import classnames from 'classnames';
 
 import universe from '../../../../universe'
 import voiceInput from '../../../../voice-input/voice-input';
-import sceneNames from '../../../../scenes/scenes.json';
+import {sceneManager} from '../../../../scene-manager';
 
 import { AppContext } from '../../app';
+import {scenesBaseUrl} from '../../../../endpoints';
 import {makeId} from '../../../../util.js';
 
 import styles from './scene-menu.module.css';
-
-//
-
-const origSceneList = [];
-
-sceneNames.forEach( ( name ) => {
-
-    origSceneList.push( `./scenes/${ name }`);
-
-});
 
 //
 
@@ -31,11 +22,33 @@ export const SceneMenu = ({ className, multiplayerConnected, selectedScene, setS
     const [ micEnabled, setMicEnabled ] = useState( false );
     const [ speechEnabled, setSpeechEnabled ] = useState( false );
     const [ sceneInputName, setSceneInputName ] = useState( selectedScene );
-    const [ scenesList, setScenesList ] = useState( origSceneList );
+    const [ origSceneList, setOrigSceneList ] = useState( [] );
+    const [ scenesList, setScenesList ] = useState( [] );
+
+    //
+
+    useEffect(() => {
+        let live = true;
+        (async () => {
+            const scenes = await sceneManager.getSceneNamesAsync();
+            if (!live) return;
+            const origScenes = [];
+            scenes.forEach( ( name ) => {
+                origScenes.push( `${scenesBaseUrl}${name}`);
+            });
+            setOrigSceneList(origScenes);
+            setScenesList(origScenes);
+        })();
+        return () => {
+            live = false;
+        };
+    }, []);
 
     //
 
     const refreshRooms = async () => {
+
+        return; // XXX
 
         const res = await fetch( universe.getWorldsHost() );
 

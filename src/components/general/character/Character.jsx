@@ -131,21 +131,19 @@ export const Character = ({ game, /* wearActions,*/ dioramaCanvasRef }) => {
 
     useEffect( () => {
 
-        if ( game.playerDiorama ) {
+        const canvas = dioramaCanvasRef.current;
 
-            const canvas = dioramaCanvasRef.current;
+        if ( canvas && state.openedPanel === 'CharacterPanel' ) {
 
-            if ( canvas && state.openedPanel === 'CharacterPanel' ) {
+            const playerDiorama = game.getPlayerDiorama();
 
-                game.playerDiorama.addCanvas( canvas );
+            playerDiorama.addCanvas( canvas );
 
-                return () => {
+            return () => {
 
-                    game.playerDiorama.removeCanvas( canvas );
+                playerDiorama.removeCanvas( canvas );
 
-                };
-
-            }
+            };
 
         }
 
@@ -177,7 +175,8 @@ export const Character = ({ game, /* wearActions,*/ dioramaCanvasRef }) => {
 
     function onCanvasClick () {
 
-        game.playerDiorama.toggleShader();
+        const playerDiorama = game.getPlayerDiorama();
+        playerDiorama.toggleShader();
 
         const soundFiles = sounds.getSoundFiles();
         const audioSpec = soundFiles.menuNext[Math.floor(Math.random() * soundFiles.menuNext.length)];

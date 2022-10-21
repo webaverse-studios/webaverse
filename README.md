@@ -18,6 +18,42 @@ An open source web3 metaverse game engine that anyone can host. Easy to use, run
 Everything you need to get started with building in the Webaverse is contained in this repository.
 </p>
 
+## WSL Notes
+
+### Use WSL2
+
+Upgrade from WSL1. It's needed for working puppeteer.
+
+### Dependencies
+
+Install following libraries.
+
+```
+libatk1.0-0
+libatk-bridge2.0-0
+libxcomposite-dev
+libxdamage1
+libxrandr2
+libgbm-dev
+libxkbcommon-x11-0
+libpangocairo-1.0-0
+libasound2
+libwayland-client0
+```
+
+### sudo permission
+
+Downgrade user from root
+
+### Port Mapping
+
+This will route all of the needed ports for 127.0.0.1 -> WSL to work locally.
+
+(from powershell)
+```
+powershell.exe .\scripts\wsl-port-forwarding.ps1
+```
+
 ## Key Features
 
 - 🎮 A full-featured game engine running in your browser
@@ -70,7 +106,7 @@ npm install # Install dependencies
 ```
 
 ##### Note for Windows Users
-We recommend that you use Windows Subsystem for Linux to run Webaverse. This [video](https://www.youtube.com/watch?v=5RTSlby-l9w) shows you how you can set up WSL. Once you've installed it, run `wsl` in your terminal to enter Ubuntu, and then run Webaverse from there.
+We recommend that you use Windows Subsystem for Linux to run Webaverse. This [video](https://www.youtube.com/watch?v=5RTSlby-l9w) shows you how you can set up WSL. Once you've installed it, run `wsl` in your terminal to enter Ubuntu 20+, and then run Webaverse from there.
 
 ## Quickstart
 
