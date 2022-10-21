@@ -296,8 +296,8 @@ const _startPreviewer = async () => {
   await Promise.all([
     _startDevServer(),
     _startCompiler(),
-    _startMultiplayer(),
-    _startWiki(),
+    // _startMultiplayer(),
+    // _startWiki(),
     _startPreviewer(),
   ]);
 
