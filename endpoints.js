@@ -3,7 +3,7 @@ import {isProd} from './env.js';
 export const compilerBaseUrl = isProd ?
   `https://compiler.webaverse.com/`
 :
-  `https://compiler.webaverse.com/`;
+  `https://local-compiler.webaverse.com/`;
 
 // scenes
 export const scenesBaseUrl = isProd ?
