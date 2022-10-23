@@ -5,6 +5,7 @@
   "main": "index.mjs",
   "type": "module",
   "scripts": {
+    "preinstall": "bash scripts/npm-preinstall.sh && bash scripts/npm-install-all.sh",
     "start": "npm run prod",
     "dev": "bash scripts/start-dev.sh",
     "stop": "sudo killall node",
