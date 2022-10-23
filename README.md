@@ -18,6 +18,43 @@ An open source web3 metaverse game engine that anyone can host. Easy to use, run
 Everything you need to get started with building in the Webaverse is contained in this repository.
 </p>
 
+## Key Features
+
+- 🎮 A full-featured game engine running in your browser
+- ♾️ Infinite procedurally generated world
+- 🧑‍🤝‍🧑 Multiplayer with voice and chat
+- 🤖 AI-powered non-player characters
+- 👓 Supports desktop and VR (mobile coming soon)
+- 😊 Expressive, vocal and emotive avatars
+- 🔮 Runtime support for user uploads and custom apps
+- 🖥️ Completely self-hostable
+
+<p align="center">
+<img src="docs/combat.gif" width=30% padding="0" margin="0" align="center" />
+<img src="docs/asteroids.gif" width=30% align="center" />
+<img src="docs/rug_radio.gif" width=30% align="center" />
+</p>
+<p align="center">
+<img src="docs/rotation.gif" width=91% align="center" />
+</p>
+<p align="center">
+<img src="docs/Uncanny_alley.gif" width=30% align="center" />
+<img src="docs/monster_truck.gif" width=30% align="center" />
+<img src="docs/plane.gif" width=30% align="center" />
+</p>
+
+<h1 align="center">Documentation</h1>
+<p align="center">
+Developer documentation is <a href="https://docs.webaverse.com/docs/index">here</a><br />
+User documentation is <a href="https://webaverse.notion.site/User-Docs-3a36b223e39b4f94b3d1f6921a4c297a">here</a>
+</p>
+
+## Minimum Requirements
+
+- 10 GB Disk Space
+- 8 GB RAM
+- 4 Core CPU / vCPUs
+
 ## WSL Notes
 
 ### Use WSL2
@@ -55,43 +92,6 @@ This will route all of the needed ports for 127.0.0.1 -> WSL to work locally.
 ```
 powershell.exe .\scripts\wsl-port-forwarding.ps1
 ```
-
-## Key Features
-
-- 🎮 A full-featured game engine running in your browser
-- ♾️ Infinite procedurally generated world
-- 🧑‍🤝‍🧑 Multiplayer with voice and chat
-- 🤖 AI-powered non-player characters
-- 👓 Supports desktop and VR (mobile coming soon)
-- 😊 Expressive, vocal and emotive avatars
-- 🔮 Runtime support for user uploads and custom apps
-- 🖥️ Completely self-hostable
-
-<p align="center">
-<img src="docs/combat.gif" width=30% padding="0" margin="0" align="center" />
-<img src="docs/asteroids.gif" width=30% align="center" />
-<img src="docs/rug_radio.gif" width=30% align="center" />
-</p>
-<p align="center">
-<img src="docs/rotation.gif" width=91% align="center" />
-</p>
-<p align="center">
-<img src="docs/Uncanny_alley.gif" width=30% align="center" />
-<img src="docs/monster_truck.gif" width=30% align="center" />
-<img src="docs/plane.gif" width=30% align="center" />
-</p>
-
-<h1 align="center">Documentation</h1>
-<p align="center">
-Developer documentation is <a href="https://docs.webaverse.com/docs/index">here</a><br />
-User documentation is <a href="https://webaverse.notion.site/User-Docs-3a36b223e39b4f94b3d1f6921a4c297a">here</a>
-</p>
-
-## Minimum Requirements
-
-- 10 GB Disk Space
-- 8 GB RAM
-- 4 Core CPU / vCPUs
 
 ## Installation
 
