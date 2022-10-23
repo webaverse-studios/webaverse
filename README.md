@@ -26,24 +26,26 @@ Upgrade from WSL1. It's needed for working puppeteer.
 
 ### Dependencies
 
-Install following libraries.
+Run the following command to install dependencies:
 
 ```
-libatk1.0-0
-libatk-bridge2.0-0
-libxcomposite-dev
-libxdamage1
-libxrandr2
-libgbm-dev
-libxkbcommon-x11-0
-libpangocairo-1.0-0
-libasound2
-libwayland-client0
+npm run install-libs
 ```
+<details>
+<summary>List of libraries that'll get installed with this command ( you can install manually )</summary>
 
-### sudo permission
+- libatk1.0-0
+- libatk-bridge2.0-0
+- libxcomposite-dev
+- libxdamage1
+- libxrandr2
+- libgbm-dev
+- libxkbcommon-x11-0
+- libpangocairo-1.0-0
+- libasound2
+- libwayland-client0
 
-Downgrade user from root
+</details>
 
 ### Port Mapping
 
