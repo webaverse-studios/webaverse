@@ -38,7 +38,7 @@ export const mapWarpedUvs = (
     localVector2D.x = clampUv(localVector2D.x, 0, 1);
     localVector2D.y = clampUv(localVector2D.y, 0, 1);
 
-    modUv(localVector2D);
+    // modUv(localVector2D);
 
     localVector2D
       .multiply(localVector2D2.set(tw / canvasSize, th / canvasSize))
