@@ -148,11 +148,8 @@ const generateTextureAtlas = textureSpecs => {
         const canvasScale = canvasSize / atlas.width;
 
         const canvas = document.createElement('canvas');
-        console.log(canvas);
-        canvas.style.top = '0';
         canvas.width = canvasSize;
         canvas.height = canvasSize;
-        // document.appendChild(canvas);
 
         const initializer = textureInitializers[textureName];
         if (initializer) {
