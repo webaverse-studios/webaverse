@@ -100,9 +100,9 @@ Do these steps in WSL ( clone the project inside WSL )
 OR 
 
 <details>
-<summary>Alternatively you can clone the repo in your operating system file system</summary>
+<summary>Alternatively you can clone the repo in your operating system file system But...</summary>
 
-In this case consider [using WSL as your dev environement](https://code.visualstudio.com/docs/remote/wsl) ( for features like hot reload )
+In this case consider [using WSL as your dev environement](https://code.visualstudio.com/docs/remote/wsl). ( for features like hot reload )
 </details>
 
 <br />
