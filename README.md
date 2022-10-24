@@ -55,7 +55,7 @@ User documentation is <a href="https://webaverse.notion.site/User-Docs-3a36b223e
 - 8 GB RAM
 - 4 Core CPU / vCPUs
 
-## WSL Notes
+## WSL Setup
 
 ### Use WSL2
 
@@ -94,6 +94,18 @@ powershell.exe .\scripts\wsl-port-forwarding.ps1
 ```
 
 ## Installation
+
+Do these steps in WSL ( clone the project inside WSL )
+
+OR 
+
+<details>
+<summary>Alternatively you can clone the repo in your operating system file system</summary>
+
+In this case consider [using WSL as your dev environement](https://code.visualstudio.com/docs/remote/wsl) ( for features like hot reload )
+</details>
+
+<br />
 
 Running requires `node` version 18+. The recommended way to get node is `nvm`: https://github.com/nvm-sh/nvm
 
