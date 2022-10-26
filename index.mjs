@@ -213,7 +213,7 @@ const _startDevServer = async () => {
 };
 const _startCompiler = async () => {
   const compilerPath = path.join(dirname, 'packages', 'compiler');
-  const nextPath = path.join(compilerPath, 'node_modules', '.bin', 'next');
+  const nextPath = path.join(dirname, 'node_modules', '.bin', 'next');
   const compilerProcess = child_process.spawn(process.argv[0], [nextPath, 'dev'], {
     cwd: compilerPath,
     env: {
@@ -234,7 +234,8 @@ const _startCompiler = async () => {
 };
 const _startMultiplayer = async () => {
   const multiplayerPath = path.join(dirname, 'packages', 'multiplayer-do');
-  const multiplayerProcess = child_process.spawn(process.argv[0], ['./node_modules/wrangler/', 'dev', '-l', '--port', MULTIPLAYER_PORT + ''], {
+  const wranglerPath = path.join(dirname, 'node_modules', 'wrangler');
+  const multiplayerProcess = child_process.spawn(process.argv[0], [wranglerPath, 'dev', '-l', '--port', MULTIPLAYER_PORT + ''], {
     cwd: multiplayerPath,
     env: {
       ...process.env,
