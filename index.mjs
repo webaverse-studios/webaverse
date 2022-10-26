@@ -49,26 +49,26 @@ const open = url => {
 
 //
 
-const _waitForRegex = (compilerProcess, regex) => {
+const _waitForRegex = (process, regex) => {
   return new Promise((resolve, reject) => {
     const onerror = err => {
       reject(err);
       cleanup();
     };
-    compilerProcess.on('error', onerror);
+    process.on('error', onerror);
     
-    compilerProcess.stdout.setEncoding('utf8');
+    process.stdout.setEncoding('utf8');
     const ondata = data => {
       if (regex.test(data)) {
         resolve();
         cleanup();
       }
     };
-    compilerProcess.stdout.on('data', ondata);
+    process.stdout.on('data', ondata);
     
     const cleanup = () => {
-      compilerProcess.removeListener('error', onerror);
-      compilerProcess.stdout.removeListener('data', ondata);
+      process.removeListener('error', onerror);
+      process.stdout.removeListener('data', ondata);
     };
   });
 };
