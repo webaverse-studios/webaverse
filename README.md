@@ -95,7 +95,7 @@ powershell.exe .\scripts\wsl-port-forwarding.ps1
 
 ## Installation
 
-Do these steps in WSL ( clone the project inside WSL )
+Do these steps in WSL file system ( clone the project inside WSL file system i.e. `~` )
 
 OR 
 
