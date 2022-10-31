@@ -197,7 +197,8 @@ export function applyCharacterActionsToAvatar(character, rig) {
   rig.emoteAnimation = emoteAnimation;
   // rig.throwState = !!throwAction;
   // rig.throwTime = character.actionInterpolants.throw.get();
-  rig.crouchTime = character.actionInterpolants.crouch.getInverse();
+  rig.crouchState = !!crouchAction;
+  // rig.crouchTime = character.actionInterpolants.crouch.getInverse();
   // rig.chargeJumpTime = character.actionInterpolants.chargeJump.get();
   // rig.chargeAnimation = chargeJumpAnimation;
   // rig.chargeJumpState = !!chargeJump;
