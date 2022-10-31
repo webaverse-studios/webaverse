@@ -377,7 +377,7 @@ export const _createAnimation = avatar => {
   avatar.animationAvatarPtr = physx.physxWorker.createAnimationAvatar(avatar.mixerPtr);
 };
 
-export const _updateAnimation = (avatar, now) => {
+export const _updateAnimation = (avatar, now, timeDiff) => {
   const nowS = now / 1000;
   const landTimeS = nowS - avatar.lastLandStartTime / 1000 + 0.8; // in order to align landing 2.fbx with walk/run
   const timeSinceLastMove = now - avatar.lastMoveTime;
@@ -549,7 +549,7 @@ export const _updateAnimation = (avatar, now) => {
     avatar.useAnimationEnvelope.forEach(useAnimationEnvelopeName => {
       values.push(UseAnimationIndexes[useAnimationEnvelopeName] || 0);
     });
-    physx.physxWorker.updateAnimationAvatar(avatar.animationAvatarPtr, values);
+    physx.physxWorker.updateAnimationAvatar(avatar.animationAvatarPtr, values, timeDiff);
   };
   updateValues();
 

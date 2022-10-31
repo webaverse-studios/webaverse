@@ -2282,12 +2282,12 @@ const physxWorker = (() => {
     )
     return ptr;
   }
-  w.updateAnimationAvatar = (animationAvatarPtr, values) => {
+  w.updateAnimationAvatar = (animationAvatarPtr, values, timeDiff) => {
     values.forEach((value, i) => {
       scratchStack.f32[i] = value;
     })
     Module._updateAnimationAvatar(
-      animationAvatarPtr, scratchStack.ptr,
+      animationAvatarPtr, scratchStack.ptr, timeDiff,
     )
   }
   w.createAnimationMixer = () => {

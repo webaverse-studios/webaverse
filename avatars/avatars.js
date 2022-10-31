@@ -1958,7 +1958,7 @@ class Avatar {
       // globalThis.domInfo.innerHTML += `<div s  tyle="display:;">blendList: --- ${this.blendList?.map(applyFn=>applyFn.name.slice('applyFn'.length))}</div>`;
     }
     // for (let i = 0; i < 1000; i++) { // test
-      _updateAnimation(this, now);
+      _updateAnimation(this, now, timeDiff);
     // } // test
 
     if (this.poseAnimation) {
