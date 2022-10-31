@@ -121,7 +121,6 @@ export function applyCharacterActionsToAvatar(character, rig) {
   rig.lastLandStartTime = landAction ? landAction.time : 0;
   rig.landWithMoving = landAction?.isMoving;
   rig.flyState = !!flyAction;
-  rig.flyTime = flyAction ? character.actionInterpolants.fly.get() : -1;
   rig.activateTime = character.actionInterpolants.activate.get();
   rig.activateAnimation = activateAction?.animationName;
   rig.swimState = !!swimAction;

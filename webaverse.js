@@ -302,6 +302,8 @@ export default class Webaverse extends EventTarget {
       stats.begin();
       performanceTracker.startFrame();
 
+      globalThis.domInfo.innerHTML = '';
+
       // if (window.isDebugger) debugger
       // console.log('-animate');
       // window.domInfo.innerHTML = '';

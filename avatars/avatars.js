@@ -56,6 +56,8 @@ import Looker from './Looker.js'
 
 import * as wind from './simulation/wind.js';
 
+import { InfiniteActionInterpolant } from '../interpolants.js';
+
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
 const localVector3 = new THREE.Vector3();
@@ -955,9 +957,19 @@ class Avatar {
 
     this.manuallySetMouth=false;
 
+    this.actionInterpolants = {
+      fly: new InfiniteActionInterpolant(() => this.flyState, 0),
+    }
+    this.actionInterpolantsArray = Object.keys(this.actionInterpolants).map(k => this.actionInterpolants[k]);
+
     //
 
     _createAnimation(this);
+  }
+  updateInterpolation(timeDiff) {
+    for (const actionInterpolant of this.actionInterpolantsArray) {
+      actionInterpolant.update(timeDiff);
+    }
   }
   static bindAvatar(object) {
     const model = object.scene;
@@ -1457,6 +1469,9 @@ class Avatar {
     const now = timestamp;
     const timeDiffS = timeDiff / 1000;
 
+    this.updateInterpolation(timeDiff);
+    this.flyTime = this.flyState ? this.actionInterpolants.fly.get() : -1;
+
     this.setDirection(timestamp);
 
     const currentSpeed = localVector.set(this.velocity.x, 0, this.velocity.z).length();
@@ -1856,89 +1871,89 @@ class Avatar {
       _motionControls.call(this)
     }
     
-    if (false && this === window.localPlayer?.avatar) {
-      window.avatar = this;
-      window.mixer = this.mixer;
-      // window.motiono = this.motiono;
+    if (false && this === globalThis.localPlayer?.avatar) {
+      globalThis.avatar = this;
+      globalThis.mixer = this.mixer;
+      // globalThis.motiono = this.motiono;
     }
-    if (false && this === window.localPlayer?.avatar) {
-      // console.log(window.logNum(this.getAngle()));
+    if (true && this === globalThis.localPlayer?.avatar) {
+      // console.log(globalThis.logNum(this.getAngle()));
 
       /*
-        <div style="display:;">keysDirection: --- ${false&&window.logVector3(window.ioManager?.keysDirection)}</div>
+        <div style="display:;">keysDirection: --- ${false&&globalThis.logVector3(globalThis.ioManager?.keysDirection)}</div>
       */
-      window.domInfo.innerHTML += `<div style="display:;">actions: --- ${window.localPlayer?.getActionsArray().map(n=>n.type)}</div>`;
-      window.domInfo.innerHTML += `<div style="display:;">unuseAnimation: --- ${this.unuseAnimation || ''}</div>`;
-      window.domInfo.innerHTML += `<div style="display:;">unuseTime: --- ${window.logNum(this.unuseTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">angle: --- ${window.logNum(this.getAngle())}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">mirrorFactor:  --- ${this.mirrorFactor?.toFixed(2)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">mirrorFactor2: --- ${this.mirrorFactor2?.toFixed(2)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">forwardFactor:            --- ${this.forwardFactor?.toFixed(2)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">backwardFactor:           --- ${this.backwardFactor?.toFixed(2)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">leftFactor:               --- ${this.leftFactor?.toFixed(2)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">rightFactor:              --- ${this.rightFactor?.toFixed(2)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">mirrorLeftFactorReverse:  --- ${this.mirrorLeftFactorReverse?.toFixed(2)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">mirrorLeftFactor:         --- ${this.mirrorLeftFactor?.toFixed(2)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">mirrorRightFactorReverse: --- ${this.mirrorRightFactorReverse?.toFixed(2)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">mirrorRightFactor:        --- ${this.mirrorRightFactor?.toFixed(2)}</div>`;
-      window.domInfo.innerHTML += `<div style="display:;">idleWalkFactor: --- ${this.idleWalkFactor.toFixed(2)}</div>`;
-      window.domInfo.innerHTML += `<div style="display:;">walkRunFactor: --- ${this.walkRunFactor.toFixed(2)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">landWithMoving: --- ${this.landWithMoving}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">currentSpeed: --- ${this.currentSpeed.toFixed(2)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">avatar.direction: --- ${window.logVector3(this.direction)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">velocity: --- ${window.logVector3(localPlayer?.characterPhysics.velocity)} - ${window.logNum(localPlayer?.characterPhysics.velocity.length())}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">velocity: --- ${window.logVector3(localPlayer?.characterPhysics.velocity)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">useEnvelopeFactor: --- ${this.useEnvelopeFactor.toFixed(2)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">crouchFactor: --- ${this.crouchFactor.toFixed(2)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">jumpState: --- ${this.jumpState}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">jumpTime: --- ${Math.floor(this.jumpTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">idleFactor: --- ${this.idleFactor?.toFixed(2)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">flyState: --- ${this.flyState}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">flyTime: --- ${Math.floor(this.flyTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">flyFactor: --- ${this.flyFactor?.toFixed(2)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:none;">flyTransitionTime: --- ${Math.floor(this.flyTransitionTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">flyDashFactor: --- ${this.flyDashFactor?.toFixed(2)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">landState: --- ${this.landState}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">landFactor: --- ${this.landFactor?.toFixed(2)}</div>`;
-      window.domInfo.innerHTML += `<div style="display:;">landFactor: --- ${this.landFactor}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:none;">landTime: --- ${Math.floor(this.landTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:none;">landTransitionTime: --- ${Math.floor(this.landTransitionTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">sitState: --- ${this.sitState}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">sitFactor: --- ${this.sitFactor?.toFixed(2)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:none;">sitTime: --- ${Math.floor(this.sitTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">chargeJumpState: --- ${this.chargeJumpState}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">danceState: --- ${this.danceState}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">fallLoopState: --- ${this.fallLoopState}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">narutoRunState: --- ${this.narutoRunState}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">sitState: --- ${this.sitState}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">aimAnimation: --- ${this.aimAnimation}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">danceAnimation: --- ${this.danceAnimation}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">hurtAnimation: --- ${this.hurtAnimation}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">poseAnimation: --- ${this.poseAnimation}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">sitAnimation: --- ${this.sitAnimation}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">useFactor: --- ${this.useFactor?.toFixed(2)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">useTransitionTime: --- ${Math.floor(this.useTransitionTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">useTime: --- ${Math.floor(this.useTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">useAnimation: --- ${this.useAnimation}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">useAnimationCombo: --- </div>  `;
-      // window.domInfo.innerHTML += `<div style="display:;">${this.useAnimationCombo}&nbsp;</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">useAnimationEnvelope: --- ${this.useAnimationEnvelope}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">useAnimationIndex: --- ${this.useAnimationIndex}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">unuseFactor: --- ${this.unuseFactor?.toFixed(2)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">unuseAnimation: --- ${this.unuseAnimation}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">activateTime: --- ${Math.floor(this.activateTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">aimTime: --- ${Math.floor(this.aimTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:none;">chargeJumpTime: --- ${Math.floor(this.chargeJumpTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:none;">crouchTime: --- ${Math.floor(this.crouchTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">danceTime: --- ${Math.floor(this.danceTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:none;">fallLoopTime: --- ${Math.floor(this.fallLoopTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">hurtTime: --- ${Math.floor(this.hurtTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">unjumpTime: --- ${Math.floor(this.unjumpTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">lastEyeTargetTime: --- ${Math.floor(this.lastEyeTargetTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">lastMoveTime: --- ${Math.floor(this.lastMoveTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">narutoRunTime: --- ${Math.floor(this.narutoRunTime)}</div>`;
-      // window.domInfo.innerHTML += `<div style="display:;">blendList.length: --- ${this.blendList?.length}</div>`;
-      // window.domInfo.innerHTML += `<div s  tyle="display:;">blendList: --- ${this.blendList?.map(applyFn=>applyFn.name.slice('applyFn'.length))}</div>`;
+      globalThis.domInfo.innerHTML += `<div style="display:;">actions: --- ${globalThis.localPlayer?.getActionsArray().map(n=>n.type)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">unuseAnimation: --- ${this.unuseAnimation || ''}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">unuseTime: --- ${globalThis.logNum(this.unuseTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">angle: --- ${globalThis.logNum(this.getAngle())}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">mirrorFactor:  --- ${this.mirrorFactor?.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">mirrorFactor2: --- ${this.mirrorFactor2?.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">forwardFactor:            --- ${this.forwardFactor?.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">backwardFactor:           --- ${this.backwardFactor?.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">leftFactor:               --- ${this.leftFactor?.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">rightFactor:              --- ${this.rightFactor?.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">mirrorLeftFactorReverse:  --- ${this.mirrorLeftFactorReverse?.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">mirrorLeftFactor:         --- ${this.mirrorLeftFactor?.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">mirrorRightFactorReverse: --- ${this.mirrorRightFactorReverse?.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">mirrorRightFactor:        --- ${this.mirrorRightFactor?.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">idleWalkFactor: --- ${this.idleWalkFactor.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">walkRunFactor: --- ${this.walkRunFactor.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">landWithMoving: --- ${this.landWithMoving}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">currentSpeed: --- ${this.currentSpeed.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">avatar.direction: --- ${globalThis.logVector3(this.direction)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">velocity: --- ${globalThis.logVector3(localPlayer?.characterPhysics.velocity)} - ${globalThis.logNum(localPlayer?.characterPhysics.velocity.length())}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">velocity: --- ${globalThis.logVector3(localPlayer?.characterPhysics.velocity)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">useEnvelopeFactor: --- ${this.useEnvelopeFactor.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">crouchFactor: --- ${this.crouchFactor.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">jumpState: --- ${this.jumpState}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">jumpTime: --- ${Math.floor(this.jumpTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">idleFactor: --- ${this.idleFactor?.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">flyState: --- ${this.flyState}</div>`;
+      globalThis.domInfo.innerHTML += `<div style="display:;">flyTime: --- ${Math.floor(this.flyTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">flyFactor: --- ${this.flyFactor?.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:none;">flyTransitionTime: --- ${Math.floor(this.flyTransitionTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">flyDashFactor: --- ${this.flyDashFactor?.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">landState: --- ${this.landState}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">landFactor: --- ${this.landFactor?.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">landFactor: --- ${this.landFactor}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:none;">landTime: --- ${Math.floor(this.landTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:none;">landTransitionTime: --- ${Math.floor(this.landTransitionTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">sitState: --- ${this.sitState}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">sitFactor: --- ${this.sitFactor?.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:none;">sitTime: --- ${Math.floor(this.sitTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">chargeJumpState: --- ${this.chargeJumpState}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">danceState: --- ${this.danceState}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">fallLoopState: --- ${this.fallLoopState}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">narutoRunState: --- ${this.narutoRunState}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">sitState: --- ${this.sitState}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">aimAnimation: --- ${this.aimAnimation}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">danceAnimation: --- ${this.danceAnimation}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">hurtAnimation: --- ${this.hurtAnimation}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">poseAnimation: --- ${this.poseAnimation}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">sitAnimation: --- ${this.sitAnimation}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">useFactor: --- ${this.useFactor?.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">useTransitionTime: --- ${Math.floor(this.useTransitionTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">useTime: --- ${Math.floor(this.useTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">useAnimation: --- ${this.useAnimation}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">useAnimationCombo: --- </div>  `;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">${this.useAnimationCombo}&nbsp;</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">useAnimationEnvelope: --- ${this.useAnimationEnvelope}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">useAnimationIndex: --- ${this.useAnimationIndex}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">unuseFactor: --- ${this.unuseFactor?.toFixed(2)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">unuseAnimation: --- ${this.unuseAnimation}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">activateTime: --- ${Math.floor(this.activateTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">aimTime: --- ${Math.floor(this.aimTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:none;">chargeJumpTime: --- ${Math.floor(this.chargeJumpTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:none;">crouchTime: --- ${Math.floor(this.crouchTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">danceTime: --- ${Math.floor(this.danceTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:none;">fallLoopTime: --- ${Math.floor(this.fallLoopTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">hurtTime: --- ${Math.floor(this.hurtTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">unjumpTime: --- ${Math.floor(this.unjumpTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">lastEyeTargetTime: --- ${Math.floor(this.lastEyeTargetTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">lastMoveTime: --- ${Math.floor(this.lastMoveTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">narutoRunTime: --- ${Math.floor(this.narutoRunTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">blendList.length: --- ${this.blendList?.length}</div>`;
+      // globalThis.domInfo.innerHTML += `<div s  tyle="display:;">blendList: --- ${this.blendList?.map(applyFn=>applyFn.name.slice('applyFn'.length))}</div>`;
     }
     // for (let i = 0; i < 1000; i++) { // test
       _updateAnimation(this, now);
