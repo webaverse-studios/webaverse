@@ -890,7 +890,7 @@ class Avatar {
     
     this.idleWalkFactor = NaN;
     this.walkRunFactor = NaN;
-    this.crouchFactor = NaN;
+    // this.crouchFactor = NaN;
     this.sitState = false;
     this.sitAnimation = null;
     // this.activateState = false;
@@ -1480,7 +1480,7 @@ class Avatar {
 
     this.idleWalkFactor = Math.min(Math.max((currentSpeed - idleSpeed) / (walkSpeed - idleSpeed), 0), 1);
     this.walkRunFactor = Math.min(Math.max((currentSpeed - walkSpeed) / (runSpeed - walkSpeed), 0), 1);
-    this.crouchFactor = Math.min(Math.max(1 - (this.crouchTime / crouchMaxTime), 0), 1);
+    // this.crouchFactor = Math.min(Math.max(1 - (this.crouchTime / crouchMaxTime), 0), 1);
     // console.log('current speed', currentSpeed, idleWalkFactor, walkRunFactor);
     this.aimRightFactor = this.aimRightTransitionTime / aimTransitionMaxTime;
     this.aimRightFactorReverse = 1 - this.aimRightFactor;
