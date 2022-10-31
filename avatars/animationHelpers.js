@@ -494,7 +494,7 @@ export const _updateAnimation = (avatar, now, timeDiff) => {
 
       avatar.idleWalkFactor,
       avatar.walkRunFactor,
-      avatar.crouchFactor,
+      // avatar.crouchFactor,
       avatar.sprintFactor,
       avatar.movementsTransitionFactor,
 
@@ -506,6 +506,7 @@ export const _updateAnimation = (avatar, now, timeDiff) => {
       avatar.jumpState,
       avatar.doubleJumpState,
       avatar.flyState,
+      avatar.crouchState,
       avatar.narutoRunState,
       avatar.sitState,
       avatar.holdState,
