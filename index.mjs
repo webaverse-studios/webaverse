@@ -167,7 +167,7 @@ const _logProcess = childProcess => {
   };
   const data = (key) => {
     if (key === 'a') {
-      open(`http://local.webaverse.com/`);
+      open(`https://local.webaverse.com/`);
     } else if (key === 'm') {
       open(`http://127.0.0.1:${MULTIPLAYER_PORT}/`);
     } else if (key === 'w') {
