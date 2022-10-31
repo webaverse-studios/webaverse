@@ -498,7 +498,7 @@ export const _updateAnimation = (avatar, now, timeDiff) => {
       avatar.sprintFactor,
       avatar.movementsTransitionFactor,
 
-      avatar.activateTime,
+      // avatar.activateTime,
       avatar.swimTime,
       avatar.movementsTime,
 
@@ -512,6 +512,7 @@ export const _updateAnimation = (avatar, now, timeDiff) => {
       avatar.holdState,
       avatar.pickUpState,
       avatar.swimState,
+      avatar.activateState,
 
       // todo: re-order
       avatar.landWithMoving,
