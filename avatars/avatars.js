@@ -876,7 +876,7 @@ class Avatar {
     this.lastLandStartTime = 0;
     this.landWithMoving = false;
     this.flyState = false;
-    this.flyTime = NaN;
+    // this.flyTime = NaN;
     this.swimState = false;
     this.swimTime = NaN;
     this.swimAnimTime = 0;
@@ -957,21 +957,21 @@ class Avatar {
 
     this.manuallySetMouth=false;
 
-    this.actionInterpolants = {
-      crouch: new BiActionInterpolant(() => this.crouchState, 0, crouchMaxTime),
-      fly: new InfiniteActionInterpolant(() => this.flyState, 0),
-    }
-    this.actionInterpolantsArray = Object.keys(this.actionInterpolants).map(k => this.actionInterpolants[k]);
+    // this.actionInterpolants = {
+    //   crouch: new BiActionInterpolant(() => this.crouchState, 0, crouchMaxTime),
+    //   fly: new InfiniteActionInterpolant(() => this.flyState, 0),
+    // }
+    // this.actionInterpolantsArray = Object.keys(this.actionInterpolants).map(k => this.actionInterpolants[k]);
 
     //
 
     _createAnimation(this);
   }
-  updateInterpolation(timeDiff) {
-    for (const actionInterpolant of this.actionInterpolantsArray) {
-      actionInterpolant.update(timeDiff);
-    }
-  }
+  // updateInterpolation(timeDiff) {
+  //   for (const actionInterpolant of this.actionInterpolantsArray) {
+  //     actionInterpolant.update(timeDiff);
+  //   }
+  // }
   static bindAvatar(object) {
     const model = object.scene;
     model.updateMatrixWorld(true);
@@ -1470,9 +1470,9 @@ class Avatar {
     const now = timestamp;
     const timeDiffS = timeDiff / 1000;
 
-    this.updateInterpolation(timeDiff);
-    this.flyTime = this.flyState ? this.actionInterpolants.fly.get() : -1;
-    this.crouchTime = this.actionInterpolants.crouch.getInverse();
+    // this.updateInterpolation(timeDiff);
+    // this.flyTime = this.flyState ? this.actionInterpolants.fly.get() : -1;
+    // this.crouchTime = this.actionInterpolants.crouch.getInverse();
 
     this.setDirection(timestamp);
 
@@ -1911,7 +1911,7 @@ class Avatar {
       // globalThis.domInfo.innerHTML += `<div style="display:;">jumpTime: --- ${Math.floor(this.jumpTime)}</div>`;
       // globalThis.domInfo.innerHTML += `<div style="display:;">idleFactor: --- ${this.idleFactor?.toFixed(2)}</div>`;
       // globalThis.domInfo.innerHTML += `<div style="display:;">flyState: --- ${this.flyState}</div>`;
-      globalThis.domInfo.innerHTML += `<div style="display:;">flyTime: --- ${Math.floor(this.flyTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">flyTime: --- ${Math.floor(this.flyTime)}</div>`;
       // globalThis.domInfo.innerHTML += `<div style="display:;">flyFactor: --- ${this.flyFactor?.toFixed(2)}</div>`;
       // globalThis.domInfo.innerHTML += `<div style="display:none;">flyTransitionTime: --- ${Math.floor(this.flyTransitionTime)}</div>`;
       // globalThis.domInfo.innerHTML += `<div style="display:;">flyDashFactor: --- ${this.flyDashFactor?.toFixed(2)}</div>`;
