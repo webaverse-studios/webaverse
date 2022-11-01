@@ -2290,6 +2290,19 @@ const physxWorker = (() => {
       animationAvatarPtr, scratchStack.ptr, timeDiff,
     )
   }
+  w.addActionAnimationAvatar = (animationAvatarPtr, action) => {
+    const bytes = textEncoder.encode(JSON.stringify(action))
+    const stringByteLength = bytes.length;
+    for (let i = 0; i < stringByteLength; i++) {
+      scratchStack.u8[i] = bytes[i];
+    }
+
+    Module._addActionAnimationAvatar(
+      animationAvatarPtr,
+      scratchStack.ptr,
+      stringByteLength,
+    )
+  }
   w.createAnimationMixer = () => {
     const ptr = Module._createAnimationMixer(
     )
