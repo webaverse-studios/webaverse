@@ -196,6 +196,13 @@ export class LodChunkTracker {
       this.tracker = await this.pgWorkerManager.createTracker();
     }
   }
+  async destroyTracker() {
+    if(this.tracker) {
+      await this.pgWorkerManager.destroyTracker(this.tracker);
+      // console.log('Destroying Lod Tracker');
+      this.tracker = null;
+    }
+  }
   async updateInternal(position, minLod, maxLod, lod1Range) {
     await this.ensureTracker();
 
@@ -274,8 +281,5 @@ export class LodChunkTracker {
       this.queued = true;
       this.queuePosition.copy(position);
     }
-  }
-  destroy() {
-    throw new Error('not implemented');
   }
 }
