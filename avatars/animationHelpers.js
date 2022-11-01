@@ -29,13 +29,13 @@ import {
 } from '../util.js';
 
 import {
-  crouchMaxTime,
+  crouchMaxTime, // todo: move to wasm side.
   // useMaxTime,
-  aimMaxTime,
+  // aimMaxTime,
   // avatarInterpolationFrameRate,
   // avatarInterpolationTimeDelay,
   // avatarInterpolationNumFrames,
-  narutoRunTimeFactor,
+  // narutoRunTimeFactor,
 } from '../constants.js';
 
 let animations;
@@ -499,7 +499,7 @@ export const _updateAnimation = (avatar, now, timeDiff) => {
       avatar.movementsTransitionFactor,
 
       // avatar.activateTime,
-      avatar.swimTime,
+      // avatar.swimTime,
       avatar.movementsTime,
 
       // action states ---
@@ -513,28 +513,34 @@ export const _updateAnimation = (avatar, now, timeDiff) => {
       avatar.pickUpState,
       avatar.swimState,
       avatar.activateState,
+      avatar.useState,
+      avatar.aimState,
+      avatar.fallLoopState,
+      avatar.danceState,
+      avatar.emoteState,
+      avatar.hurtState,
 
       // todo: re-order
       avatar.landWithMoving,
-      avatar.landTime,
-      avatar.fallLoopFactor,
-      avatar.fallLoopTime,
+      // avatar.landTime,
+      // avatar.fallLoopFactor,
+      // avatar.fallLoopTime,
       // avatar.flyTime,
-      avatar.doubleJumpTime,
+      // avatar.doubleJumpTime,
       // avatar.jumpTime,
-      avatar.narutoRunTime,
-      narutoRunTimeFactor,
-      avatar.danceFactor,
-      crouchMaxTime,
-      avatar.emoteFactor,
+      // avatar.narutoRunTime,
+      // narutoRunTimeFactor,
+      // avatar.danceFactor,
+      // crouchMaxTime,
+      // avatar.emoteFactor,
       avatar.lastEmoteTime,
-      avatar.useTime,
+      // avatar.useTime,
       avatar.useAnimationEnvelope.length,
-      avatar.hurtTime, // todo: why only get hurt once ? js side regression ?
-      avatar.unuseTime,
-      avatar.aimTime,
-      aimMaxTime,
-      avatar.pickUpTime,
+      // avatar.hurtTime, // todo: why only get hurt once ? js side regression ?
+      // avatar.unuseTime,
+      // avatar.aimTime,
+      // aimMaxTime,
+      // avatar.pickUpTime,
       UseAnimationIndexes[avatar.useAnimation] ?? -1,
       EmoteAnimationIndexes[avatar.emoteAnimation] ?? -1,
       SitAnimationIndexes[avatar.sitAnimation] ?? -1,
