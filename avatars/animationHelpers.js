@@ -521,7 +521,7 @@ export const _updateAnimation = (avatar, now, timeDiff) => {
       avatar.fallLoopTime,
       // avatar.flyTime,
       avatar.doubleJumpTime,
-      avatar.jumpTime,
+      // avatar.jumpTime,
       avatar.narutoRunTime,
       narutoRunTimeFactor,
       avatar.danceFactor,

@@ -114,7 +114,7 @@ export function applyCharacterActionsToAvatar(character, rig) {
   // const swordTopDownSlashAnimation = swordTopDownSlash ? swordTopDownSlash.animation : '';
 
   rig.jumpState = !!jumpAction;
-  rig.jumpTime = character.actionInterpolants.jump.get();
+  // rig.jumpTime = character.actionInterpolants.jump.get();
   rig.doubleJumpState = !!doubleJumpAction;
   rig.doubleJumpTime = character.actionInterpolants.doubleJump.get();
   rig.landTime = character.actionInterpolants.land.get();

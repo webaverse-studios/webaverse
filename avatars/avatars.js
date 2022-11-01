@@ -869,7 +869,7 @@ class Avatar {
     // shared state
     this.direction = new THREE.Vector3();
     this.jumpState = false;
-    this.jumpTime = NaN;
+    // this.jumpTime = NaN;
     this.doubleJumpState = false;
     this.doubleJumpTime = NaN;
     this.landTime = Infinity;
