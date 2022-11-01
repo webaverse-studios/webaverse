@@ -517,11 +517,12 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
       }
       return true;
     }
-    case 'deleteInstance': {
+    case 'destroyInstance': {
       const {instance: instanceKey} = args;
       const instance = instances.get(instanceKey);
       if (instance) {
-        pg.deleteInstance(instance);
+        // console.log(instance);
+        pg.destroyInstance(instance);
         instances.delete(instanceKey);
         return true;
       } else {

@@ -118,6 +118,9 @@ class ProcGenInstance {
     );
     return result;
   }
+  async destroy() {
+    await this.pgWorkerManager.destroy();
+  }
 }
 
 export class ProcGenManager {
@@ -137,6 +140,13 @@ export class ProcGenManager {
       this.instances.set(key, instance);
     }
     return instance;
+  }
+  deleteInstance(key) {
+    let instance = this.instances.get(key);
+    if (instance) {
+      instance.destroy();
+      this.instances.delete(key);
+    }
   }
   getNodeHash(node) {
     return ((node.min.x & 0xFFF) << 20) |

@@ -204,6 +204,9 @@ export class PGWorkerManager {
     // signal.throwIfAborted();
     return result;
   }
+  async destroy() {
+    await this.worker.request('destroyInstance', {instance: this.instance})
+  }
 
   //
 
