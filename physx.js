@@ -2303,6 +2303,19 @@ const physxWorker = (() => {
       stringByteLength,
     )
   }
+  w.removeActionAnimationAvatar = (animationAvatarPtr, action) => {
+    const bytes = textEncoder.encode(action.actionId)
+    const stringByteLength = bytes.length;
+    for (let i = 0; i < stringByteLength; i++) {
+      scratchStack.u8[i] = bytes[i];
+    }
+
+    Module._removeActionAnimationAvatar(
+      animationAvatarPtr,
+      scratchStack.ptr,
+      stringByteLength,
+    )
+  }
   w.testLogActionsAnimationAvatar = (animationAvatarPtr) => {
     Module._testLogActionsAnimationAvatar(
       animationAvatarPtr,
