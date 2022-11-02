@@ -335,6 +335,7 @@ export const initAnimationSystem = () => {
   sitAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
     SitAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
   });
+  // console.log('SitAnimationIndexes', SitAnimationIndexes)
 
   // DanceAnimationIndexes
   const danceAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'dance')[0];
