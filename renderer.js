@@ -24,7 +24,6 @@ function bindCanvas(c) {
   context = canvas && canvas.getContext('webgl2', {
     antialias: true,
     alpha: true,
-    // preserveDrawingBuffer: false,
     xrCompatible: true,
   });
   renderer = new THREE.WebGLRenderer({
@@ -33,7 +32,6 @@ function bindCanvas(c) {
     antialias: true,
     alpha: true,
     rendererExtensionFragDepth: true,
-    // logarithmicDepthBuffer: true,
   });
   
   const {
@@ -56,7 +54,6 @@ function bindCanvas(c) {
   const renderTarget = new THREE.WebGLRenderTarget(width * pixelRatio, height * pixelRatio, {
     minFilter: THREE.LinearFilter,
     magFilter: THREE.LinearFilter,
-    // format: THREE.RGBAFormat,
     encoding: THREE.sRGBEncoding,
   });
   renderTarget.name = 'effectComposerRenderTarget';
@@ -97,37 +94,18 @@ sceneLowestPriority.name = 'lowestPriorioty';
 const rootScene = new WebaverseScene();
 rootScene.name = 'root';
 rootScene.autoUpdate = false;
-// const postSceneOrthographic = new THREE.Scene();
-// postSceneOrthographic.name = 'postOrthographic';
-// const postScenePerspective = new THREE.Scene();
-// postScenePerspective.name = 'postPerspective';
 rootScene.add(sceneHighPriority);
 rootScene.add(scene);
 rootScene.add(sceneLowPriority);
 rootScene.add(sceneLowerPriority);
 rootScene.add(sceneLowestPriority);
 
-// const orthographicScene = new THREE.Scene();
-// const avatarScene = new THREE.Scene();
-
 const camera = new THREE.PerspectiveCamera(minFov, 1, 0.1, 10000);
 camera.position.set(0, 1.6, 0);
 camera.rotation.order = 'YXZ';
 camera.name = 'sceneCamera';
-/* const avatarCamera = camera.clone();
-avatarCamera.near = 0.2;
-avatarCamera.updateProjectionMatrix(); */
 
-/* const dolly = new THREE.Object3D();
-// fixes a bug: avatar glitching when dropped exactly at an axis
-const epsilon = 0.000001;
-dolly.position.set(epsilon, epsilon, epsilon);
-dolly.add(camera); */
-// dolly.add(avatarCamera);
 scene.add(camera);
-
-// const orthographicCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, 100);
-// scene.add(orthographicCamera);
 
 const _getCanvasDimensions = () => {
   let width = globalThis.innerWidth;
