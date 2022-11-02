@@ -127,12 +127,11 @@ export function applyCharacterActionsToAvatar(character, rig) {
   rig.swimState = !!swimAction;
   // rig.swimTime = swimAction ? character.actionInterpolants.swim.get() : -1;
   
-  rig.useState = !!useAction;
-  rig.aimState = !!aimAction;
-  rig.fallLoopState = !!fallLoopAction;
-  rig.danceState = !!danceAction;
-  rig.emoteState = !!emoteAction;
-  rig.hurtState = !!hurtAction;
+  // rig.useState = !!useAction;
+  // rig.fallLoopState = !!fallLoopAction;
+  // rig.danceState = !!danceAction;
+  // rig.emoteState = !!emoteAction;
+  // rig.hurtState = !!hurtAction;
   
   const _handleUse = () => {
     if (useAction?.animation) {

@@ -881,12 +881,12 @@ class Avatar {
     // this.swimTime = NaN;
     this.swimAnimTime = 0;
 
-    this.useState = false;
-    this.aimState = false;
-    this.fallLoopState = false;
-    this.danceState = false;
-    this.emoteState = false;
-    this.hurtState = false;
+    // this.useState = false;
+    // this.aimState = false;
+    // this.fallLoopState = false;
+    // this.danceState = false;
+    // this.emoteState = false;
+    // this.hurtState = false;
 
     // this.useTime = NaN;
     this.useAnimation = null;
