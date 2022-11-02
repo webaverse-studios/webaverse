@@ -108,13 +108,13 @@ const CharacterIcon = () => {
 };
 
 export const AvatarIcon = ({ className }) => {
-    const { state, setState } = useContext( AppContext );
+    const { state, setState } = useContext(AppContext);
 
     const handleCharacterBtnClick = () => {
 
-        setState({ openedPanel: ( state.openedPanel === 'CharacterPanel' ? null : 'CharacterPanel' ) });
+        setState({ openedPanel: (state.openedPanel === 'CharacterPanel' ? null : 'CharacterPanel') });
 
-        if ( state.openedPanel === 'CharacterPanel' ) {
+        if (state.openedPanel === 'CharacterPanel') {
 
             cameraManager.requestPointerLock();
 
@@ -124,7 +124,7 @@ export const AvatarIcon = ({ className }) => {
 
     return (
         <div
-            className={ classnames( className, styles.avatarIcon ) }
+            className={ classnames(className, styles.avatarIcon) }
             onClick={handleCharacterBtnClick}
         >
             {/* <a href="/" className={styles.logo}>

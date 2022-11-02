@@ -18,10 +18,10 @@ const logoImages = [
 
 export const ZoneTitleCard = () => {
 
-    const { app } = useContext( AppContext );
-    const [ open, setOpen ] = useState( false );
-    const [ logoImage, setLogoImage ] = useState( logoImages[Math.floor(Math.random() * logoImages.length)] );
-    const [ loadProgress, setLoadProgress ] = useState( false );
+    const { app } = useContext(AppContext);
+    const [ open, setOpen ] = useState(false);
+    const [ logoImage, setLogoImage ] = useState(logoImages[Math.floor(Math.random() * logoImages.length)]);
+    const [ loadProgress, setLoadProgress ] = useState(false);
 
     useEffect(() => {
         function titlecardhackchange(e) {

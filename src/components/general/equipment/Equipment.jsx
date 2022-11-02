@@ -295,7 +295,7 @@ const EquipmentItems = ({
 };
 
 export const Equipment = () => {
-    const { state, setState } = useContext( AppContext );
+    const { state, setState } = useContext(AppContext);
     const [ hoverObject, setHoverObject ] = useState(null);
     const [ selectObject, setSelectObject ] = useState(null);
     // const [ spritesheet, setSpritesheet ] = useState(null);

@@ -16,12 +16,12 @@ import styles from './settings.module.css';
 
 export const Settings = () => {
 
-    const { state, setState } = useContext( AppContext );
+    const { state, setState } = useContext(AppContext);
     const [ activeTab, setActiveTab ] = useState('general');
 
     //
 
-    const stopPropagation = ( event ) => {
+    const stopPropagation = (event) => {
 
         event.stopPropagation();
 
@@ -33,20 +33,20 @@ export const Settings = () => {
 
     };
 
-    const handleTabClick = ( event ) => {
+    const handleTabClick = (event) => {
 
         const tabName = event.currentTarget.getAttribute('data-tab-name');
-        setActiveTab( tabName );
+        setActiveTab(tabName);
 
     };
 
     //
 
-    useEffect( () => {
+    useEffect(() => {
 
-        const handleKeyUp = ( event ) => {
+        const handleKeyUp = (event) => {
 
-            if ( state.openedPanel === 'SettingsPanel' && event.which === 27 ) { // esc key
+            if (state.openedPanel === 'SettingsPanel' && event.which === 27) { // esc key
 
                 setState({ openedPanel: null });
 
@@ -54,21 +54,21 @@ export const Settings = () => {
 
         };
 
-        registerIoEventHandler( 'keyup', handleKeyUp );
+        registerIoEventHandler('keyup', handleKeyUp);
 
         return () => {
 
-            unregisterIoEventHandler( 'keyup', handleKeyUp );
+            unregisterIoEventHandler('keyup', handleKeyUp);
 
         };
 
-    }, [ state.openedPanel ] );
+    }, [ state.openedPanel ]);
 
     //
 
     return (
 
-        <div className={ classNames( styles.settings, state.openedPanel === 'SettingsPanel' ? styles.open : null ) } onClick={ stopPropagation } >
+        <div className={ classNames(styles.settings, state.openedPanel === 'SettingsPanel' ? styles.open : null) } onClick={ stopPropagation } >
 
             <div className={ styles.closeBtn } onClick={ handleCloseBtnClick } >X</div>
 
@@ -76,11 +76,11 @@ export const Settings = () => {
                 <div className={ styles.title } >SETTINGS</div>
 
                 <div className={ styles.tabs } >
-                    <div className={ classNames( styles.tab, activeTab === 'general' ? styles.active : null ) } onClick={ handleTabClick } data-tab-name='general' >GENERAL</div>
-                    <div className={ classNames( styles.tab, activeTab === 'controls' ? styles.active : null ) } onClick={ handleTabClick } data-tab-name='controls' >CONTROLS</div>
-                    <div className={ classNames( styles.tab, activeTab === 'audio' ? styles.active : null ) } onClick={ handleTabClick } data-tab-name='audio' >AUDIO</div>
-                    <div className={ classNames( styles.tab, activeTab === 'graphics' ? styles.active : null ) } onClick={ handleTabClick } data-tab-name='graphics' >GRAPHICS</div>
-                    <div className={ classNames( styles.tab, activeTab === 'ai' ? styles.active : null ) } onClick={ handleTabClick } data-tab-name='ai' >AI</div>
+                    <div className={ classNames(styles.tab, activeTab === 'general' ? styles.active : null) } onClick={ handleTabClick } data-tab-name='general' >GENERAL</div>
+                    <div className={ classNames(styles.tab, activeTab === 'controls' ? styles.active : null) } onClick={ handleTabClick } data-tab-name='controls' >CONTROLS</div>
+                    <div className={ classNames(styles.tab, activeTab === 'audio' ? styles.active : null) } onClick={ handleTabClick } data-tab-name='audio' >AUDIO</div>
+                    <div className={ classNames(styles.tab, activeTab === 'graphics' ? styles.active : null) } onClick={ handleTabClick } data-tab-name='graphics' >GRAPHICS</div>
+                    <div className={ classNames(styles.tab, activeTab === 'ai' ? styles.active : null) } onClick={ handleTabClick } data-tab-name='ai' >AI</div>
                     <div className={ styles.clearfix } />
                 </div>
 

@@ -36,7 +36,7 @@ const _makeNormalRenderTarget = (width, height) => {
 };
 class DepthPass extends Pass {
 
-	constructor( scenes, camera, {width, height, onBeforeRenderScene} ) {
+	constructor(scenes, camera, {width, height, onBeforeRenderScene}) {
 
 		super();
 
@@ -75,26 +75,26 @@ class DepthPass extends Pass {
 		this.normalRenderTarget.dispose();
 		this.normalRenderTarget.depthTexture.dispose();
 
-		this.normalRenderTarget.setSize( width, height );
+		this.normalRenderTarget.setSize(width, height);
 		this.normalRenderTarget.depthTexture.image.width = width;
 		this.normalRenderTarget.depthTexture.image.height = height;
 	}
 
-  renderOverride( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
-    renderer.getClearColor( this.originalClearColor );
+  renderOverride(renderer, overrideMaterial, renderTarget, clearColor, clearAlpha) {
+    renderer.getClearColor(this.originalClearColor);
     const originalClearAlpha = renderer.getClearAlpha();
     const originalAutoClear = renderer.autoClear;
 
-    renderer.setRenderTarget( renderTarget );
+    renderer.setRenderTarget(renderTarget);
     renderer.autoClear = false;
 
     clearColor = overrideMaterial.clearColor || clearColor;
     clearAlpha = overrideMaterial.clearAlpha || clearAlpha;
 
-    if ( ( clearColor !== undefined ) && ( clearColor !== null ) ) {
+    if ((clearColor !== undefined) && (clearColor !== null)) {
 
-      renderer.setClearColor( clearColor );
-      renderer.setClearAlpha( clearAlpha || 0.0 );
+      renderer.setClearColor(clearColor);
+      renderer.setClearAlpha(clearAlpha || 0.0);
       renderer.clear();
 
     }
@@ -123,7 +123,7 @@ class DepthPass extends Pass {
 			{
 				const pop = this.onBeforeRenderScene(scene);
 			  
-				renderer.render( this.customScene, this.camera );
+				renderer.render(this.customScene, this.camera);
 				
 				pop();
 			}
@@ -132,7 +132,7 @@ class DepthPass extends Pass {
 				const pop = this.onBeforeRenderScene(scene);
 				
 				scene.overrideMaterial = overrideMaterial;
-				renderer.render( scene, this.camera );
+				renderer.render(scene, this.camera);
 				scene.overrideMaterial = null;
 				
 				pop();
@@ -150,11 +150,11 @@ class DepthPass extends Pass {
     // restore original state
 
     renderer.autoClear = originalAutoClear;
-    renderer.setClearColor( this.originalClearColor );
-    renderer.setClearAlpha( originalClearAlpha );
+    renderer.setClearColor(this.originalClearColor);
+    renderer.setClearAlpha(originalClearAlpha);
   }
 
-	render( renderer, writeBuffer /*, readBuffer, deltaTime, maskActive */ ) {
+	render(renderer, writeBuffer /*, readBuffer, deltaTime, maskActive */) {
 		// render beauty
 
 		// renderer.setRenderTarget( this.normalRenderTarget );
@@ -164,7 +164,7 @@ class DepthPass extends Pass {
 		// render normals and depth (honor only meshes, points and lines do not contribute to SSAO)
 
 		// this.overrideVisibility();
-		this.renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0xffffff, 1.0 );
+		this.renderOverride(renderer, this.normalMaterial, this.normalRenderTarget, 0xffffff, 1.0);
 		// this.restoreVisibility();
   }
 

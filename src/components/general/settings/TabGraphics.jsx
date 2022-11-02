@@ -30,20 +30,20 @@ const DefaultSettings = {
 
 export const TabGraphics = ({ active }) => {
 
-    const [ appyingChanges, setAppyingChanges ] = useState( false );
-    const [ changesNotSaved, setChangesNotSaved ] = useState( false );
-    const [ settingsLoaded, setSettingsLoaded ] = useState( false );
+    const [ appyingChanges, setAppyingChanges ] = useState(false);
+    const [ changesNotSaved, setChangesNotSaved ] = useState(false);
+    const [ settingsLoaded, setSettingsLoaded ] = useState(false);
 
-    const [ resolution, setResolution ] = useState( null );
-    const [ antialias, setAntialias ] = useState( null );
-    const [ viewRange, setViewRange ] = useState( null );
-    const [ shadowQuality, setShadowQuality ] = useState( null );
-    const [ postprocessing, setPostprocessing ] = useState( null );
-    const [ depthOfField, setDepthOfField ] = useState( null );
-    const [ hdr, setHdr ] = useState( null );
-    const [ bloom, setBloom ] = useState( null );
-    const [ characterDetails, setCharacterDetails ] = useState( null );
-    const [ hairPhysics, setHairPhysics ] = useState( null );
+    const [ resolution, setResolution ] = useState(null);
+    const [ antialias, setAntialias ] = useState(null);
+    const [ viewRange, setViewRange ] = useState(null);
+    const [ shadowQuality, setShadowQuality ] = useState(null);
+    const [ postprocessing, setPostprocessing ] = useState(null);
+    const [ depthOfField, setDepthOfField ] = useState(null);
+    const [ hdr, setHdr ] = useState(null);
+    const [ bloom, setBloom ] = useState(null);
+    const [ characterDetails, setCharacterDetails ] = useState(null);
+    const [ hairPhysics, setHairPhysics ] = useState(null);
 
     //
 
@@ -74,16 +74,16 @@ export const TabGraphics = ({ active }) => {
 
         const settings = settingsManager.getSettings();
 
-        setResolution( settings.resolution ?? DefaultSettings.resolution );
-        setAntialias( settings.antialias ?? DefaultSettings.antialias );
-        setViewRange( settings.viewRange ?? DefaultSettings.viewRange );
-        setShadowQuality( settings.shadowQuality ?? DefaultSettings.shadowQuality );
-        setPostprocessing( settings.postprocessing.enabled ?? DefaultSettings.postprocessing.enabled );
-        setDepthOfField( settings.postprocessing.depthOfField ?? DefaultSettings.postprocessing.depthOfField );
-        setHdr( settings.postprocessing.hdr ?? DefaultSettings.postprocessing.hdr );
-        setBloom( settings.postprocessing.bloom ?? DefaultSettings.postprocessing.bloom );
-        setCharacterDetails( settings.character.details ?? DefaultSettings.character.details );
-        setHairPhysics( settings.character.hairPhysics ?? DefaultSettings.character.hairPhysics );
+        setResolution(settings.resolution ?? DefaultSettings.resolution);
+        setAntialias(settings.antialias ?? DefaultSettings.antialias);
+        setViewRange(settings.viewRange ?? DefaultSettings.viewRange);
+        setShadowQuality(settings.shadowQuality ?? DefaultSettings.shadowQuality);
+        setPostprocessing(settings.postprocessing.enabled ?? DefaultSettings.postprocessing.enabled);
+        setDepthOfField(settings.postprocessing.depthOfField ?? DefaultSettings.postprocessing.depthOfField);
+        setHdr(settings.postprocessing.hdr ?? DefaultSettings.postprocessing.hdr);
+        setBloom(settings.postprocessing.bloom ?? DefaultSettings.postprocessing.bloom);
+        setCharacterDetails(settings.character.details ?? DefaultSettings.character.details);
+        setHairPhysics(settings.character.hairPhysics ?? DefaultSettings.character.hairPhysics);
 
     };
 
@@ -95,11 +95,11 @@ export const TabGraphics = ({ active }) => {
 
         function setAvatarQuality () {
 
-            game.setAvatarQuality( avatarStyle );
+            game.setAvatarQuality(avatarStyle);
 
         };
 
-        if ( avatarStyle !== settingsManager.getCharacterQuality() ) {
+        if (avatarStyle !== settingsManager.getCharacterQuality()) {
 
             setAvatarQuality();
 
@@ -108,40 +108,40 @@ export const TabGraphics = ({ active }) => {
         //
 
         saveSettings();
-        setChangesNotSaved( false );
-        setTimeout( () => { setAppyingChanges( false ) }, 1000 );
+        setChangesNotSaved(false);
+        setTimeout(() => { setAppyingChanges(false) }, 1000);
 
     };
 
     function handleApplySettingsBtnClick () {
 
-        setAppyingChanges( true );
-        setTimeout( applySettings, 100 );
+        setAppyingChanges(true);
+        setTimeout(applySettings, 100);
 
     };
 
     //
 
-    useEffect( () => {
+    useEffect(() => {
 
-        if ( resolution && antialias && viewRange && shadowQuality && postprocessing && depthOfField && hdr && bloom && characterDetails && hairPhysics ) {
+        if (resolution && antialias && viewRange && shadowQuality && postprocessing && depthOfField && hdr && bloom && characterDetails && hairPhysics) {
 
-            if ( settingsLoaded ) {
+            if (settingsLoaded) {
 
-                setChangesNotSaved( true );
+                setChangesNotSaved(true);
 
             } else {
 
-                setSettingsLoaded( true );
+                setSettingsLoaded(true);
                 applySettings();
 
             }
 
         }
 
-    }, [ resolution, antialias, viewRange, shadowQuality, postprocessing, depthOfField, hdr, bloom, characterDetails, hairPhysics ] );
+    }, [ resolution, antialias, viewRange, shadowQuality, postprocessing, depthOfField, hdr, bloom, characterDetails, hairPhysics ]);
 
-    useEffect( () => {
+    useEffect(() => {
 
         settingsManager.addEventListener('change', e => {
 
@@ -151,12 +151,12 @@ export const TabGraphics = ({ active }) => {
 
         loadSettings();
 
-    }, [] );
+    }, []);
 
     //
 
     return (
-        <div className={ classNames( styles.tabContent, active ? styles.active : null ) }>
+        <div className={ classNames(styles.tabContent, active ? styles.active : null) }>
             <div className={ styles.blockTitle }>Display</div>
             <div className={ styles.row }>
                 <div className={ styles.paramName }>Resolution</div>
@@ -217,7 +217,7 @@ export const TabGraphics = ({ active }) => {
                 <div className={ styles.clearfix } />
             </div>
 
-            <div className={ classNames( styles.applyBtn, changesNotSaved ? styles.active : null ) } onClick={ handleApplySettingsBtnClick } >
+            <div className={ classNames(styles.applyBtn, changesNotSaved ? styles.active : null) } onClick={ handleApplySettingsBtnClick } >
                 { appyingChanges ? 'APPLYING' : 'APPLY' }
             </div>
         </div>

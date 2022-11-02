@@ -23,20 +23,20 @@ const DefaultSettings = {
 
 export const TabControls = ({ active }) => {
 
-    const [ appyingChanges, setAppyingChanges ] = useState( false );
-    const [ changesNotSaved, setChangesNotSaved ] = useState( false );
-    const [ settingsLoaded, setSettingsLoaded ] = useState( false );
+    const [ appyingChanges, setAppyingChanges ] = useState(false);
+    const [ changesNotSaved, setChangesNotSaved ] = useState(false);
+    const [ settingsLoaded, setSettingsLoaded ] = useState(false);
 
-    const [ moveForward, setMoveForward ] = useState( null );
-    const [ moveLeft, setMoveLeft ] = useState( null );
-    const [ moveRight, setMoveRight ] = useState( null );
-    const [ moveBack, setMoveBack ] = useState( null );
-    const [ jump, setJump ] = useState( null );
-    const [ run, setRun ] = useState( null );
-    const [ narutoRun, setNarutoRun ] = useState( null );
-    const [ action, setAction ] = useState( null );
-    const [ chat, setChat ] = useState( null );
-    const [ inventory, setInventory ] = useState( null );
+    const [ moveForward, setMoveForward ] = useState(null);
+    const [ moveLeft, setMoveLeft ] = useState(null);
+    const [ moveRight, setMoveRight ] = useState(null);
+    const [ moveBack, setMoveBack ] = useState(null);
+    const [ jump, setJump ] = useState(null);
+    const [ run, setRun ] = useState(null);
+    const [ narutoRun, setNarutoRun ] = useState(null);
+    const [ action, setAction ] = useState(null);
+    const [ chat, setChat ] = useState(null);
+    const [ inventory, setInventory ] = useState(null);
 
     //
 
@@ -55,20 +55,20 @@ export const TabControls = ({ active }) => {
             inventory
         };
 
-        localStorage.setItem( 'ControlsSettings', JSON.stringify( settings ) );
+        localStorage.setItem('ControlsSettings', JSON.stringify(settings));
 
     };
 
     function loadSettings () {
 
-        const settingsString = localStorage.getItem( 'ControlsSettings' );
+        const settingsString = localStorage.getItem('ControlsSettings');
         let settings;
 
         try {
 
-            settings = JSON.parse( settingsString );
+            settings = JSON.parse(settingsString);
 
-        } catch ( err ) {
+        } catch (err) {
 
             settings = DefaultSettings;
 
@@ -76,16 +76,16 @@ export const TabControls = ({ active }) => {
 
         settings = settings ?? DefaultSettings;
 
-        setMoveForward( settings.moveForward ?? DefaultSettings.moveForward );
-        setMoveLeft( settings.moveLeft ?? DefaultSettings.moveLeft );
-        setMoveRight( settings.moveRight ?? DefaultSettings.moveRight );
-        setMoveBack( settings.moveBack ?? DefaultSettings.moveBack );
-        setJump( settings.jump ?? DefaultSettings.jump );
-        setRun( settings.run ?? DefaultSettings.run );
-        setNarutoRun( settings.narutoRun ?? DefaultSettings.narutoRun );
-        setAction( settings.action ?? DefaultSettings.action );
-        setChat( settings.chat ?? DefaultSettings.chat );
-        setInventory( settings.inventory ?? DefaultSettings.inventory );
+        setMoveForward(settings.moveForward ?? DefaultSettings.moveForward);
+        setMoveLeft(settings.moveLeft ?? DefaultSettings.moveLeft);
+        setMoveRight(settings.moveRight ?? DefaultSettings.moveRight);
+        setMoveBack(settings.moveBack ?? DefaultSettings.moveBack);
+        setJump(settings.jump ?? DefaultSettings.jump);
+        setRun(settings.run ?? DefaultSettings.run);
+        setNarutoRun(settings.narutoRun ?? DefaultSettings.narutoRun);
+        setAction(settings.action ?? DefaultSettings.action);
+        setChat(settings.chat ?? DefaultSettings.chat);
+        setInventory(settings.inventory ?? DefaultSettings.inventory);
 
     };
 
@@ -96,49 +96,49 @@ export const TabControls = ({ active }) => {
         //
 
         saveSettings();
-        setChangesNotSaved( false );
-        setTimeout( () => { setAppyingChanges( false ) }, 1000 );
+        setChangesNotSaved(false);
+        setTimeout(() => { setAppyingChanges(false) }, 1000);
 
     };
 
     function handleApplySettingsBtnClick () {
 
-        setAppyingChanges( true );
-        setTimeout( applySettings, 100 );
+        setAppyingChanges(true);
+        setTimeout(applySettings, 100);
 
     };
 
     //
 
-    useEffect( () => {
+    useEffect(() => {
 
-        if ( moveForward && moveLeft && moveRight && moveBack && jump && run && narutoRun && action && chat && inventory ) {
+        if (moveForward && moveLeft && moveRight && moveBack && jump && run && narutoRun && action && chat && inventory) {
 
-            if ( settingsLoaded ) {
+            if (settingsLoaded) {
 
-                setChangesNotSaved( true );
+                setChangesNotSaved(true);
 
             } else {
 
-                setSettingsLoaded( true );
+                setSettingsLoaded(true);
                 applySettings();
 
             }
 
         }
 
-    }, [ moveForward, moveLeft, moveRight, moveBack, jump, run, narutoRun, action, chat, inventory ] );
+    }, [ moveForward, moveLeft, moveRight, moveBack, jump, run, narutoRun, action, chat, inventory ]);
 
-    useEffect( () => {
+    useEffect(() => {
 
         loadSettings();
 
-    }, [] );
+    }, []);
 
     //
 
     return (
-        <div className={ classNames( styles.controlsTab, styles.tabContent, active ? styles.active : null ) }>
+        <div className={ classNames(styles.controlsTab, styles.tabContent, active ? styles.active : null) }>
             <div className={ styles.row }>
                 <div className={ styles.paramName }>Move forward</div>
                 <KeyInput className={ styles.keyInput } value={ moveForward } setValue={ setMoveForward } />
@@ -190,7 +190,7 @@ export const TabControls = ({ active }) => {
                 <div className={ styles.clearfix } />
             </div>
 
-            <div className={ classNames( styles.applyBtn, changesNotSaved ? styles.active : null ) } onClick={ handleApplySettingsBtnClick } >
+            <div className={ classNames(styles.applyBtn, changesNotSaved ? styles.active : null) } onClick={ handleApplySettingsBtnClick } >
                 { appyingChanges ? 'APPLYING' : 'APPLY' }
             </div>
         </div>

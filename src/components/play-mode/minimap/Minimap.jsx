@@ -36,7 +36,7 @@ export const Minimap = ({ className }) => {
       }, [canvasRef.current]);
 
     return (
-        <div className={ classNames( className, styles.locationMenu ) } >
+        <div className={ classNames(className, styles.locationMenu) } >
 
             <canvas width={canvasSize} height={canvasSize} className={ styles.map } ref={canvasRef} />
 

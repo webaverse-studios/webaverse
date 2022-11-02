@@ -18,7 +18,7 @@ export const TabGeneral = ({ active }) => {
     };
 
     return (
-        <div className={ classNames( styles.tabContent, active ? styles.active : null ) }>
+        <div className={ classNames(styles.tabContent, active ? styles.active : null) }>
             <div className={ styles.blockTitle }>Account</div>
             <div className={ styles.row }>
                 <Button className={ styles.logoutBtn } label="Logout" onClick={ handleLogoutBtnClick } />

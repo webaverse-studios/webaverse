@@ -12,7 +12,7 @@ import styles from './chains.module.css';
 } */
 
 export default function Chains() {
-  const { state, setState } = useContext( AppContext );
+  const { state, setState } = useContext(AppContext);
   const {chains, selectedChain, selectChain} = useContext(ChainContext);
   // const {brandColor} = selectedChain;
   // const [open, setOpen] = useState(false);
