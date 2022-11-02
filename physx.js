@@ -2282,12 +2282,44 @@ const physxWorker = (() => {
     )
     return ptr;
   }
-  w.updateAnimationAvatar = (animationAvatarPtr, values) => {
+  w.updateAnimationAvatar = (animationAvatarPtr, values, timeDiff) => {
     values.forEach((value, i) => {
       scratchStack.f32[i] = value;
     })
     Module._updateAnimationAvatar(
-      animationAvatarPtr, scratchStack.ptr,
+      animationAvatarPtr, scratchStack.ptr, timeDiff,
+    )
+  }
+  w.addActionAnimationAvatar = (animationAvatarPtr, action) => {
+    // console.log(JSON.stringify(action))
+    const bytes = textEncoder.encode(JSON.stringify(action))
+    const stringByteLength = bytes.length;
+    for (let i = 0; i < stringByteLength; i++) {
+      scratchStack.u8[i] = bytes[i];
+    }
+
+    Module._addActionAnimationAvatar(
+      animationAvatarPtr,
+      scratchStack.ptr,
+      stringByteLength,
+    )
+  }
+  w.removeActionAnimationAvatar = (animationAvatarPtr, action) => {
+    const bytes = textEncoder.encode(JSON.stringify(action))
+    const stringByteLength = bytes.length;
+    for (let i = 0; i < stringByteLength; i++) {
+      scratchStack.u8[i] = bytes[i];
+    }
+
+    Module._removeActionAnimationAvatar(
+      animationAvatarPtr,
+      scratchStack.ptr,
+      stringByteLength,
+    )
+  }
+  w.testLogActionsAnimationAvatar = (animationAvatarPtr) => {
+    Module._testLogActionsAnimationAvatar(
+      animationAvatarPtr,
     )
   }
   w.createAnimationMixer = () => {

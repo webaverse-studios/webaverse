@@ -114,18 +114,24 @@ export function applyCharacterActionsToAvatar(character, rig) {
   // const swordTopDownSlashAnimation = swordTopDownSlash ? swordTopDownSlash.animation : '';
 
   rig.jumpState = !!jumpAction;
-  rig.jumpTime = character.actionInterpolants.jump.get();
+  // rig.jumpTime = character.actionInterpolants.jump.get();
   rig.doubleJumpState = !!doubleJumpAction;
-  rig.doubleJumpTime = character.actionInterpolants.doubleJump.get();
-  rig.landTime = character.actionInterpolants.land.get();
+  // rig.doubleJumpTime = character.actionInterpolants.doubleJump.get();
+  // rig.landTime = character.actionInterpolants.land.get();
   rig.lastLandStartTime = landAction ? landAction.time : 0;
   rig.landWithMoving = landAction?.isMoving;
   rig.flyState = !!flyAction;
-  rig.flyTime = flyAction ? character.actionInterpolants.fly.get() : -1;
-  rig.activateTime = character.actionInterpolants.activate.get();
+  rig.activateState = !!activateAction;
+  // rig.activateTime = character.actionInterpolants.activate.get();
   rig.activateAnimation = activateAction?.animationName;
   rig.swimState = !!swimAction;
-  rig.swimTime = swimAction ? character.actionInterpolants.swim.get() : -1;
+  // rig.swimTime = swimAction ? character.actionInterpolants.swim.get() : -1;
+  
+  // rig.useState = !!useAction;
+  // rig.fallLoopState = !!fallLoopAction;
+  // rig.danceState = !!danceAction;
+  // rig.emoteState = !!emoteAction;
+  // rig.hurtState = !!hurtAction;
   
   const _handleUse = () => {
     if (useAction?.animation) {
@@ -150,8 +156,8 @@ export function applyCharacterActionsToAvatar(character, rig) {
       }
     }
     rig.useAnimationIndex = useAction?.index;
-    rig.useTime = character.actionInterpolants.use.get();
-    rig.unuseTime = character.actionInterpolants.unuse.get();
+    // rig.useTime = character.actionInterpolants.use.get();
+    rig.unuseTime = character.actionInterpolants.unuse.get(); // todo: don't clac on js side.
     if (rig.unuseTime === 0) { // this means use is active
       if (useAction?.animationEnvelope) {
         rig.unuseAnimation = rig.useAnimationEnvelope[2]; // the last animation in the triplet is the unuse animation
@@ -164,7 +170,7 @@ export function applyCharacterActionsToAvatar(character, rig) {
 
   const _handlePickUp = () => {
     rig.pickUpState = !!pickUpAction;
-    rig.pickUpTime = character.actionInterpolants.pickUp.get();
+    // rig.pickUpTime = character.actionInterpolants.pickUp.get();
   };
   _handlePickUp();
 
@@ -175,9 +181,9 @@ export function applyCharacterActionsToAvatar(character, rig) {
   rig.vowels[4] = character.avatarFace.manuallySetMouth ? 0 : rig.vowels[4];
 
   rig.narutoRunState = !!narutoRunAction && !crouchAction;
-  rig.narutoRunTime = character.actionInterpolants.narutoRun.get();
+  // rig.narutoRunTime = character.actionInterpolants.narutoRun.get();
   rig.aimState = !!aimAction;
-  rig.aimTime = character.actionInterpolants.aim.get();
+  // rig.aimTime = character.actionInterpolants.aim.get();
   rig.aimRightTransitionTime = character.actionInterpolants.aimRightTransition.get();
   rig.aimLeftTransitionTime = character.actionInterpolants.aimLeftTransition.get();
   rig.aimAnimation = (aimAction?.playerAnimation) || '';
@@ -190,23 +196,24 @@ export function applyCharacterActionsToAvatar(character, rig) {
   rig.holdState = wearAction?.holdAnimation === 'pick_up_idle';
   if (rig.holdState) rig.unuseAnimation = null;
   // rig.danceState = !!danceAction;
-  rig.danceFactor = character.actionInterpolants.dance.get();
+  // rig.danceFactor = character.actionInterpolants.dance.get();
   if (danceAction) {
     rig.danceAnimation = danceAnimation;
   }
-  rig.emoteFactor = character.actionInterpolants.emote.get();
+  // rig.emoteFactor = character.actionInterpolants.emote.get();
   rig.emoteAnimation = emoteAnimation;
   // rig.throwState = !!throwAction;
   // rig.throwTime = character.actionInterpolants.throw.get();
-  rig.crouchTime = character.actionInterpolants.crouch.getInverse();
+  rig.crouchState = !!crouchAction;
+  // rig.crouchTime = character.actionInterpolants.crouch.getInverse();
   // rig.chargeJumpTime = character.actionInterpolants.chargeJump.get();
   // rig.chargeAnimation = chargeJumpAnimation;
   // rig.chargeJumpState = !!chargeJump;
   // rig.standChargeTime = character.actionInterpolants.standCharge.get();
   // rig.standChargeAnimation = standChargeAnimation;
   // rig.standChargeState = !!standCharge;
-  rig.fallLoopTime = character.actionInterpolants.fallLoop.get();
-  rig.fallLoopFactor = character.actionInterpolants.fallLoopTransition.getNormalized();
+  // rig.fallLoopTime = character.actionInterpolants.fallLoop.get();
+  // rig.fallLoopFactor = character.actionInterpolants.fallLoopTransition.getNormalized();
   rig.fallLoopFromJump = fallLoopAction?.from === 'jump';
   // rig.fallLoopAnimation = fallLoopAnimation;
   rig.fallLoopState = !!fallLoopAction;
@@ -218,7 +225,7 @@ export function applyCharacterActionsToAvatar(character, rig) {
   // rig.swordTopDownSlashAnimation = swordTopDownSlashAnimation;
   // rig.swordTopDownSlashState = !!swordTopDownSlash;
   rig.hurtAnimation = (hurtAction?.animation) || '';
-  rig.hurtTime = character.actionInterpolants.hurt.get();
+  // rig.hurtTime = character.actionInterpolants.hurt.get();
   rig.movementsTime = character.actionInterpolants.movements.get();
   rig.movementsTransitionTime = character.actionInterpolants.movementsTransition.get();
   rig.sprintTime = character.actionInterpolants.sprint.get();

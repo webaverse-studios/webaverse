@@ -29,13 +29,13 @@ import {
 } from '../util.js';
 
 import {
-  crouchMaxTime,
+  crouchMaxTime, // todo: move to wasm side.
   // useMaxTime,
-  aimMaxTime,
+  // aimMaxTime,
   // avatarInterpolationFrameRate,
   // avatarInterpolationTimeDelay,
   // avatarInterpolationNumFrames,
-  narutoRunTimeFactor,
+  // narutoRunTimeFactor,
 } from '../constants.js';
 
 let animations;
@@ -329,6 +329,7 @@ export const initAnimationSystem = () => {
   sitAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
     SitAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
   });
+  // console.log('SitAnimationIndexes', SitAnimationIndexes)
 
   // DanceAnimationIndexes
   const danceAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'dance')[0];
@@ -369,7 +370,7 @@ export const _createAnimation = avatar => {
   avatar.animationAvatarPtr = physx.physxWorker.createAnimationAvatar(avatar.mixerPtr);
 };
 
-export const _updateAnimation = (avatar, now) => {
+export const _updateAnimation = (avatar, now, timeDiff) => {
   const nowS = now / 1000;
   const landTimeS = nowS - avatar.lastLandStartTime / 1000 + 0.8; // in order to align landing 2.fbx with walk/run
   const timeSinceLastMove = now - avatar.lastMoveTime;
@@ -476,44 +477,52 @@ export const _updateAnimation = (avatar, now) => {
 
       avatar.idleWalkFactor,
       avatar.walkRunFactor,
-      avatar.crouchFactor,
+      // avatar.crouchFactor,
       avatar.sprintFactor,
       avatar.movementsTransitionFactor,
 
-      avatar.activateTime,
-      avatar.swimTime,
+      // avatar.activateTime,
+      // avatar.swimTime,
       avatar.movementsTime,
 
-      // action states ---
-      avatar.jumpState,
-      avatar.doubleJumpState,
-      avatar.flyState,
-      avatar.narutoRunState,
-      avatar.sitState,
-      avatar.holdState,
-      avatar.pickUpState,
-      avatar.swimState,
+      // // action states ---
+      // avatar.jumpState,
+      // avatar.doubleJumpState,
+      // avatar.flyState,
+      // avatar.crouchState,
+      // avatar.narutoRunState,
+      // avatar.sitState,
+      // avatar.holdState,
+      // avatar.pickUpState,
+      // avatar.swimState,
+      // avatar.activateState,
+      // avatar.useState,
+      // avatar.aimState,
+      // avatar.fallLoopState,
+      // avatar.danceState,
+      // avatar.emoteState,
+      // avatar.hurtState,
 
       avatar.landWithMoving,
-      avatar.landTime,
-      avatar.fallLoopFactor,
-      avatar.fallLoopTime,
-      avatar.flyTime,
-      avatar.doubleJumpTime,
-      avatar.jumpTime,
-      avatar.narutoRunTime,
-      narutoRunTimeFactor,
-      avatar.danceFactor,
-      crouchMaxTime,
-      avatar.emoteFactor,
+      // avatar.landTime,
+      // avatar.fallLoopFactor,
+      // avatar.fallLoopTime,
+      // avatar.flyTime,
+      // avatar.doubleJumpTime,
+      // avatar.jumpTime,
+      // avatar.narutoRunTime,
+      // narutoRunTimeFactor,
+      // avatar.danceFactor,
+      // crouchMaxTime,
+      // avatar.emoteFactor,
       avatar.lastEmoteTime,
-      avatar.useTime,
+      // avatar.useTime,
       avatar.useAnimationEnvelope.length,
-      avatar.hurtTime,
-      avatar.unuseTime,
-      avatar.aimTime,
-      aimMaxTime,
-      avatar.pickUpTime,
+      // avatar.hurtTime,
+      // avatar.unuseTime,
+      // avatar.aimTime,
+      // aimMaxTime,
+      // avatar.pickUpTime,
       UseAnimationIndexes[avatar.useAnimation] ?? -1,
       EmoteAnimationIndexes[avatar.emoteAnimation] ?? -1,
       SitAnimationIndexes[avatar.sitAnimation] ?? -1,
@@ -530,7 +539,7 @@ export const _updateAnimation = (avatar, now) => {
     avatar.useAnimationEnvelope.forEach(useAnimationEnvelopeName => {
       values.push(UseAnimationIndexes[useAnimationEnvelopeName] || 0);
     });
-    physx.physxWorker.updateAnimationAvatar(avatar.animationAvatarPtr, values);
+    physx.physxWorker.updateAnimationAvatar(avatar.animationAvatarPtr, values, timeDiff);
   };
   updateValues();
 

@@ -56,6 +56,8 @@ import Looker from './Looker.js'
 
 import * as wind from './simulation/wind.js';
 
+import { BiActionInterpolant, InfiniteActionInterpolant } from '../interpolants.js';
+
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
 const localVector3 = new THREE.Vector3();
@@ -867,39 +869,46 @@ class Avatar {
     // shared state
     this.direction = new THREE.Vector3();
     this.jumpState = false;
-    this.jumpTime = NaN;
+    // this.jumpTime = NaN;
     this.doubleJumpState = false;
-    this.doubleJumpTime = NaN;
-    this.landTime = Infinity;
+    // this.doubleJumpTime = NaN;
+    // this.landTime = Infinity;
     this.lastLandStartTime = 0;
     this.landWithMoving = false;
     this.flyState = false;
-    this.flyTime = NaN;
+    // this.flyTime = NaN;
     this.swimState = false;
-    this.swimTime = NaN;
+    // this.swimTime = NaN;
     this.swimAnimTime = 0;
 
-    this.useTime = NaN;
+    // this.useState = false;
+    // this.aimState = false;
+    // this.fallLoopState = false;
+    // this.danceState = false;
+    // this.emoteState = false;
+    // this.hurtState = false;
+
+    // this.useTime = NaN;
     this.useAnimation = null;
     this.useAnimationCombo = [];
     this.useAnimationEnvelope = [];
     this.unuseAnimation = null;
-    this.unuseTime = -1;
+    // this.unuseTime = -1;
     
     this.idleWalkFactor = NaN;
     this.walkRunFactor = NaN;
-    this.crouchFactor = NaN;
+    // this.crouchFactor = NaN;
     this.sitState = false;
     this.sitAnimation = null;
     // this.activateState = false;
     this.activateTime = 0;
     this.holdState = false;
     this.pickUpState = false;
-    this.pickUpTime = 0;
+    // this.pickUpTime = 0;
     // this.danceState = false;
-    this.danceFactor = 0;
+    // this.danceFactor = 0;
     this.danceAnimation = null;
-    this.emoteFactor = 0;
+    // this.emoteFactor = 0;
     this.emoteAnimation = null;
     this.poseFactor = 0;
     this.poseAnimation = null;
@@ -919,20 +928,20 @@ class Avatar {
     this.narutoRunState = false;
     this.chargeJumpState = false;
     this.chargeJumpTime = 0;
-    this.narutoRunTime = 0;
+    // this.narutoRunTime = 0;
     // this.standChargeState = false;
     // this.standChargeTime = 0;
     this.fallLoopState = false;
-    this.fallLoopTime = 0;
-    this.fallLoopFactor = 0;
+    // this.fallLoopTime = 0;
+    // this.fallLoopFactor = 0;
     // this.swordSideSlashState = false;
     // this.swordSideSlashTime = 0;
     // this.swordTopDownSlashState = false;
     // this.swordTopDownSlashTime = 0;
-    this.aimTime = NaN;
+    // this.aimTime = NaN;
     this.aimAnimation = null;
     // this.aimDirection = new THREE.Vector3();
-    this.hurtTime = NaN;
+    // this.hurtTime = NaN;
     this.hurtAnimation = null;
     this.activateAnimation = null;
 
@@ -955,10 +964,21 @@ class Avatar {
 
     this.manuallySetMouth=false;
 
+    // this.actionInterpolants = {
+    //   crouch: new BiActionInterpolant(() => this.crouchState, 0, crouchMaxTime),
+    //   fly: new InfiniteActionInterpolant(() => this.flyState, 0),
+    // }
+    // this.actionInterpolantsArray = Object.keys(this.actionInterpolants).map(k => this.actionInterpolants[k]);
+
     //
 
     _createAnimation(this);
   }
+  // updateInterpolation(timeDiff) {
+  //   for (const actionInterpolant of this.actionInterpolantsArray) {
+  //     actionInterpolant.update(timeDiff);
+  //   }
+  // }
   static bindAvatar(object) {
     const model = object.scene;
     model.updateMatrixWorld(true);
@@ -1457,13 +1477,17 @@ class Avatar {
     const now = timestamp;
     const timeDiffS = timeDiff / 1000;
 
+    // this.updateInterpolation(timeDiff);
+    // this.flyTime = this.flyState ? this.actionInterpolants.fly.get() : -1;
+    // this.crouchTime = this.actionInterpolants.crouch.getInverse();
+
     this.setDirection(timestamp);
 
     const currentSpeed = localVector.set(this.velocity.x, 0, this.velocity.z).length();
 
     this.idleWalkFactor = Math.min(Math.max((currentSpeed - idleSpeed) / (walkSpeed - idleSpeed), 0), 1);
     this.walkRunFactor = Math.min(Math.max((currentSpeed - walkSpeed) / (runSpeed - walkSpeed), 0), 1);
-    this.crouchFactor = Math.min(Math.max(1 - (this.crouchTime / crouchMaxTime), 0), 1);
+    // this.crouchFactor = Math.min(Math.max(1 - (this.crouchTime / crouchMaxTime), 0), 1);
     // console.log('current speed', currentSpeed, idleWalkFactor, walkRunFactor);
     this.aimRightFactor = this.aimRightTransitionTime / aimTransitionMaxTime;
     this.aimRightFactorReverse = 1 - this.aimRightFactor;
