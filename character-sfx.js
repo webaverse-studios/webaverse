@@ -330,7 +330,7 @@ export class AvatarCharacterSfx {
         }
 
       }
-      if(!this.character.avatar.narutoRunState && this.narutoRunStartTime!=0 ){
+      if(!this.character.avatar.narutoRunState && this.narutoRunStartTime!=0){
         this.narutoRunStartTime=0;
         this.narutoRunFinishTime=timeSeconds;
         this.narutoRunTrailSoundStartTime=0;

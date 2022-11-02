@@ -86,4 +86,3 @@ export async function getVoucherFromUser(tokenId, signer, WebaversecontractAddre
         })
     });
 }
-

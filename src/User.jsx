@@ -40,7 +40,7 @@ const UserPopover = ({
 
 export const User = ({ className, setLoginFrom }) => {
 
-    const { state, setState, account, chain } = useContext( AppContext );
+    const { state, setState, account, chain } = useContext(AppContext);
     const [ensName, setEnsName] = useState('');
     const [avatarUrl, setAvatarUrl] = useState('');
     const [ loggingIn, setLoggingIn ] = useState(false);
@@ -107,7 +107,7 @@ export const User = ({ className, setLoginFrom }) => {
         }
     }, [currentAddress, selectedChain])
     
-    const metaMaskLogin = async ( event ) => {
+    const metaMaskLogin = async (event) => {
 
         event.preventDefault();
         event.stopPropagation();
@@ -118,9 +118,9 @@ export const User = ({ className, setLoginFrom }) => {
 
         } else { */
 
-            if ( ! loggingIn ) {
+            if (! loggingIn) {
 
-                setLoggingIn( true );
+                setLoggingIn(true);
 
                 try {
 
@@ -148,9 +148,9 @@ export const User = ({ className, setLoginFrom }) => {
 
     };
 
-    useEffect( () => {
+    useEffect(() => {
 
-        const { error, code, id, play, realmId } = parseQuery( window.location.search );
+        const { error, code, id, play, realmId } = parseQuery(window.location.search);
 
         //
 
@@ -230,7 +230,7 @@ export const User = ({ className, setLoginFrom }) => {
 
         } */
 
-    }, [ currentAddress ] );
+    }, [ currentAddress ]);
 
     //
 
@@ -263,7 +263,7 @@ export const User = ({ className, setLoginFrom }) => {
                     e.preventDefault();
                     e.stopPropagation();
 
-                        if ( !loginOpen ) {
+                        if (!loginOpen) {
 
                             setState({ openedPanel: 'LoginPanel' });
 

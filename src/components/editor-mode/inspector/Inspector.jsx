@@ -14,7 +14,7 @@ import styles from './inspector.module.css';
 
 export const Inspector = () => {
 
-    const { state, setState, setSelectedApp, selectedApp } = useContext( AppContext );
+    const { state, setState, setSelectedApp, selectedApp } = useContext(AppContext);
     const [hoverPosition, setHoverPosition] = useState(null);
     const [selectPosition, setSelectPosition] = useState(null);
     const [epoch, setEpoch] = useState(0);
@@ -25,11 +25,11 @@ export const Inspector = () => {
 
     useEffect(() => {
 
-        const hoverchange = ( event ) => {
+        const hoverchange = (event) => {
 
             const worldOpen = state.openedPanel === 'WorldPanel';
 
-            if ( worldOpen && ! selectedApp && ! dragging ) {
+            if (worldOpen && ! selectedApp && ! dragging) {
 
                 const {position} = event.data;
 
@@ -60,15 +60,15 @@ export const Inspector = () => {
 
         };
 
-    }, [ state.openedPanel, selectedApp, dragging, hoverPosition ] );
+    }, [ state.openedPanel, selectedApp, dragging, hoverPosition ]);
 
-    useEffect( () => {
+    useEffect(() => {
 
         const dragchange = e => {
 
             const { dragging } = e.data;
-            setDragging( dragging );
-            setHoverPosition( null );
+            setDragging(dragging);
+            setHoverPosition(null);
 
         };
 
@@ -76,7 +76,7 @@ export const Inspector = () => {
 
         const selectchange = e => {
 
-            setSelectedApp( e.data.app );
+            setSelectedApp(e.data.app);
 
         };
 
@@ -89,39 +89,39 @@ export const Inspector = () => {
 
         };
 
-    }, [ dragging ] );
+    }, [ dragging ]);
 
     useEffect(() => {
 
         const worldOpen = state.openedPanel === 'WorldPanel';
         game.setHoverEnabled(worldOpen);
 
-        if ( ! worldOpen ) {
+        if (! worldOpen) {
 
             game.setMouseSelectedObject(null);
 
         }
 
-    }, [ state.openedPanel ] );
+    }, [ state.openedPanel ]);
 
     let localEpoch = epoch;
 
     useEffect(() => {
 
-        const frame = ( event ) => {
+        const frame = (event) => {
 
-            if ( selectedApp ) {
+            if (selectedApp) {
 
                 const position = game.getMouseSelectedPosition();
 
-                if ( position ) {
+                if (position) {
 
-                    const worldPoint = world2canvas( position, selectPosition );
+                    const worldPoint = world2canvas(position, selectPosition);
 
-                    if ( worldPoint.z > 0 ) {
+                    if (worldPoint.z > 0) {
 
-                        setSelectPosition( worldPoint );
-                        setEpoch( ++ localEpoch );
+                        setSelectPosition(worldPoint);
+                        setEpoch(++ localEpoch);
 
                     } else {
 
@@ -151,14 +151,14 @@ export const Inspector = () => {
 
         };
 
-    }, [ selectedApp, selectPosition ] );
+    }, [ selectedApp, selectPosition ]);
 
     const bindPosition = selectPosition || hoverPosition || null;
 
     //
 
     return (
-        <div className={ classnames( styles.inspector, bindPosition ? styles.open : null ) } style={ bindPosition ? {
+        <div className={ classnames(styles.inspector, bindPosition ? styles.open : null) } style={ bindPosition ? {
             transform: `translateX(${bindPosition.x*100}vw) translateY(${bindPosition.y*100}vh)`,
         } : null}>
             <img src="/images/popup.svg" style={bindPosition ? {

@@ -16,38 +16,38 @@ import styles from './chat.module.css';
 
 function ChatInput () {
 
-    const { state, setState } = useContext( AppContext );
+    const { state, setState } = useContext(AppContext);
     const [ value, setValue ] = useState('');
     const inputRef = useRef();
 
     //
 
-    const stopPropagation = ( event ) => {
+    const stopPropagation = (event) => {
 
         event.stopPropagation();
 
     };
 
-    const handleMessageChange = ( event ) => {
+    const handleMessageChange = (event) => {
 
-        setValue( event.target.value );
+        setValue(event.target.value);
 
     };
 
     //
 
-    useEffect( () => {
+    useEffect(() => {
 
-        const handleActiveKey = ( event ) => {
+        const handleActiveKey = (event) => {
 
-            if ( game.inputFocused() && document.activeElement !== inputRef.current ) {
+            if (game.inputFocused() && document.activeElement !== inputRef.current) {
                 
                 return true;
 
             
             } else {
 
-                switch ( event.which ) {
+                switch (event.which) {
 
                     case 13: { // enter
 
@@ -55,18 +55,18 @@ function ChatInput () {
 
                             // nothing; handled in StoryTime
 
-                        } else if ( state.openedPanel !== 'ChatPanel' ) {
+                        } else if (state.openedPanel !== 'ChatPanel') {
 
                             setState({ openedPanel: 'ChatPanel' });
 
                         } else {
 
-                            if ( document.activeElement !== inputRef.current ) return true;
+                            if (document.activeElement !== inputRef.current) return true;
 
-                            if ( value ) {
+                            if (value) {
 
-                                const text = checkText( value );
-                                chatManager.addMessage( text, { timeout: 3000 });
+                                const text = checkText(value);
+                                chatManager.addMessage(text, { timeout: 3000 });
 
                             }
 
@@ -87,15 +87,15 @@ function ChatInput () {
 
         };
 
-        const handleAnytimeKey = ( event ) => {
+        const handleAnytimeKey = (event) => {
 
-            switch ( event.which ) {
+            switch (event.which) {
 
                 case 186: { // semicolon
 
-                    if ( event.shiftKey ) {
+                    if (event.shiftKey) {
 
-                        if ( state.openedPanel !== 'ChatPanel' ) {
+                        if (state.openedPanel !== 'ChatPanel') {
 
                             setValue(':');
                             setState({ openedPanel: 'ChatPanel' });
@@ -114,17 +114,17 @@ function ChatInput () {
 
         };
 
-        const handleKeyUp = ( event ) => {
+        const handleKeyUp = (event) => {
 
-            let handled = handleActiveKey( event );
+            let handled = handleActiveKey(event);
 
-            if ( ! handled ) {
+            if (! handled) {
 
-                handled = handleAnytimeKey( event );
+                handled = handleAnytimeKey(event);
 
             }
 
-            if ( handled ) {
+            if (handled) {
 
                 return false;
 
@@ -136,21 +136,21 @@ function ChatInput () {
 
         };
 
-        registerIoEventHandler( 'keyup', handleKeyUp );
+        registerIoEventHandler('keyup', handleKeyUp);
 
         return () => {
 
-            unregisterIoEventHandler( 'keyup', handleKeyUp );
+            unregisterIoEventHandler('keyup', handleKeyUp);
 
         };
 
-    }, [ value, state.openedPanel ] );
+    }, [ value, state.openedPanel ]);
 
     useEffect(() => {
 
-        if ( inputRef.current ) {
+        if (inputRef.current) {
 
-            if ( state.openedPanel === 'ChatPanel' ) {
+            if (state.openedPanel === 'ChatPanel') {
 
                 inputRef.current.focus();
 
@@ -162,12 +162,12 @@ function ChatInput () {
 
         }
 
-    }, [ state.openedPanel, inputRef.current ] );
+    }, [ state.openedPanel, inputRef.current ]);
 
     //
 
 	return (
-        <div className={ classnames( styles.chat, state.openedPanel === 'ChatPanel' ? styles.open : null ) } onClick={ stopPropagation } >
+        <div className={ classnames(styles.chat, state.openedPanel === 'ChatPanel' ? styles.open : null) } onClick={ stopPropagation } >
             <img src="images/webpencil.svg" className={ styles.background } />
             <input
                 type="text"

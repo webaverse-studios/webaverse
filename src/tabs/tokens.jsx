@@ -13,16 +13,16 @@ import styles from '../Header.module.css';
 
 export const Tokens = ({userOpen, loginFrom, hacks, address}) => {
 
-    const { state } = useContext( AppContext );
+    const { state } = useContext(AppContext);
     const [nftPreviews, setNftPreviews] = useState({});
     const [nfts, setNfts] = useState(null);
     const [fetchPromises, setFetchPromises] = useState([]);
 
     //
 
-    useEffect( () => {
+    useEffect(() => {
 
-        if ( address && !nfts && loginFrom ) {
+        if (address && !nfts && loginFrom) {
 
             setNfts([]);
 
@@ -56,9 +56,9 @@ export const Tokens = ({userOpen, loginFrom, hacks, address}) => {
 
         }
 
-    }, [ address, nfts, loginFrom ] );
+    }, [ address, nfts, loginFrom ]);
 
-    useEffect( () => {
+    useEffect(() => {
 
         if (nfts) {
 

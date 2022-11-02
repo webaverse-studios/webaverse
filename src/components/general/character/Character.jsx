@@ -107,7 +107,7 @@ const Stat = ({
 
 export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
 
-    const { state, setState } = useContext( AppContext );
+    const { state, setState } = useContext(AppContext);
     const [ open, setOpen ] = useState(false);
     const [ characterSelectOpen, setCharacterSelectOpen ] = useState(false);
 
@@ -129,28 +129,28 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
 
     //
 
-    useEffect( () => {
+    useEffect(() => {
 
         const canvas = dioramaCanvasRef.current;
 
-        if ( canvas && state.openedPanel === 'CharacterPanel' ) {
+        if (canvas && state.openedPanel === 'CharacterPanel') {
 
             const playerDiorama = game.getPlayerDiorama();
 
-            playerDiorama.addCanvas( canvas );
+            playerDiorama.addCanvas(canvas);
 
             return () => {
 
-                playerDiorama.removeCanvas( canvas );
+                playerDiorama.removeCanvas(canvas);
 
             };
 
         }
 
-    }, [ dioramaCanvasRef, state.openedPanel ] );
+    }, [ dioramaCanvasRef, state.openedPanel ]);
 
 
-    useEffect( () => {
+    useEffect(() => {
 
         const lastOpen = open;
         const lastCharacterSelectOpen = characterSelectOpen;
@@ -171,7 +171,7 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
         setOpen(newOpen);
         setCharacterSelectOpen(newCharacterSelectOpen);
 
-    }, [ state.openedPanel ] );
+    }, [ state.openedPanel ]);
 
     function onCanvasClick () {
 
@@ -186,7 +186,7 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
 
     function onCharacterSelectClick(e) {
 
-        setState({ openedPanel: ( state.openedPanel === 'CharacterSelect' ? null : 'CharacterSelect' ) });
+        setState({ openedPanel: (state.openedPanel === 'CharacterSelect' ? null : 'CharacterSelect') });
 
         /* if ( state.openedPanel === 'CharacterSelect' ) {
 
@@ -205,7 +205,7 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
 
     return (
         <div
-            className={ classnames( styles.characterWrapper, open ? styles.opened : null ) }
+            className={ classnames(styles.characterWrapper, open ? styles.opened : null) }
             onDrop={onDrop}
         >
             <div className={ styles.characterPanel } >

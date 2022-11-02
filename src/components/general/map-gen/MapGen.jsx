@@ -208,7 +208,7 @@ const _makeChunkMesh = (x, y) => {
 
 export const MapGen = () => {
 
-    const { state, setState } = useContext( AppContext );
+    const { state, setState } = useContext(AppContext);
     const [width, setWidth] = useState(window.innerWidth);
     const [height, setHeight] = useState(window.innerHeight); 
     // const [position, setPosition] = useState(() => new THREE.Vector3(0, 100, 0));
@@ -272,7 +272,7 @@ export const MapGen = () => {
 
     //
 
-    const stopPropagation = ( event ) => {
+    const stopPropagation = (event) => {
 
         event.stopPropagation();
 
@@ -391,13 +391,13 @@ export const MapGen = () => {
 
     const _addHacks = () => {
       // open
-      useEffect( () => {
+      useEffect(() => {
 
-          function handleKeyUp ( event ) {
+          function handleKeyUp (event) {
 
               if (game.inputFocused()) return true;
 
-                switch ( event.which ) {
+                switch (event.which) {
 
                   case 74: { // J
 
@@ -597,11 +597,11 @@ export const MapGen = () => {
 
                       break; // XXX
 
-                      if ( state.openedPanel === 'MapGenPanel' ) {
+                      if (state.openedPanel === 'MapGenPanel') {
 
                           setState({ openedPanel: null });
 
-                          if ( ! cameraManager.pointerLockElement ) {
+                          if (! cameraManager.pointerLockElement) {
 
                               cameraManager.requestPointerLock();
 
@@ -609,7 +609,7 @@ export const MapGen = () => {
 
                       } else {
 
-                          if ( cameraManager.pointerLockElement ) {
+                          if (cameraManager.pointerLockElement) {
 
                               cameraManager.exitPointerLock();
 
@@ -636,11 +636,11 @@ export const MapGen = () => {
 
           }
 
-          registerIoEventHandler( 'keyup', handleKeyUp );
+          registerIoEventHandler('keyup', handleKeyUp);
 
           return () => {
 
-              unregisterIoEventHandler( 'keyup', handleKeyUp );
+              unregisterIoEventHandler('keyup', handleKeyUp);
 
           };
 
@@ -857,7 +857,7 @@ export const MapGen = () => {
 
     // wheel
     useEffect(() => {
-      if ( state.openedPanel === 'MapGenPanel' ) {
+      if (state.openedPanel === 'MapGenPanel') {
         function wheel(e) {
           if (!mouseState) {
             setRaycasterFromEvent(localRaycaster, e);
@@ -922,7 +922,7 @@ export const MapGen = () => {
       } */
       function dblclick(e) {
         // console.log('dbl click', e);
-        if ( state.openedPanel === 'MapGenPanel' ) {
+        if (state.openedPanel === 'MapGenPanel') {
           setSelectedPhysicsObject(hoveredPhysicsObject);
 
           if (hoveredPhysicsObject) {
@@ -975,7 +975,7 @@ export const MapGen = () => {
         }
       }
       function mouseUp(e) {
-        if ( state.openedPanel === 'MapGenPanel') {
+        if (state.openedPanel === 'MapGenPanel') {
           if (mouseState && !mouseState.moved) {
             const chunk = terrainApp?.getChunkForPhysicsObject(hoveredPhysicsObject);
             if (chunk) {
@@ -1000,7 +1000,7 @@ export const MapGen = () => {
         unregisterIoEventHandler('dblclick', dblclick);
         unregisterIoEventHandler('mouseup', mouseUp);
       };
-    }, [ state.openedPanel, terrainApp, mouseState, /* hoveredObject, */ hoveredPhysicsObject, selectedPhysicsObject ] );
+    }, [ state.openedPanel, terrainApp, mouseState, /* hoveredObject, */ hoveredPhysicsObject, selectedPhysicsObject ]);
 
     // initialize terrain
     useEffect(async () => {
@@ -1189,7 +1189,7 @@ export const MapGen = () => {
       return; // XXX
       if (selectedChunk) {
         const webaUrl = `weba://${selectedChunk.x},${selectedChunk.y}`;
-        universe.pushUrl( `/?src=${ encodeURIComponent( webaUrl ) }` );
+        universe.pushUrl(`/?src=${ encodeURIComponent(webaUrl) }`);
 
         setOpen(false);
       }

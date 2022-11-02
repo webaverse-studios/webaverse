@@ -10,17 +10,17 @@ import styles from './ui-mode.module.css';
 
 export const UIMode = ({ hideDirection = 'left', children }) => {
 
-    const { uiMode } = useContext( AppContext );
+    const { uiMode } = useContext(AppContext);
     let modeClassName = styles.normal;
 
-    if ( uiMode === 'none' ) modeClassName = styles.hide;
+    if (uiMode === 'none') modeClassName = styles.hide;
 
     //
 
     return (
-        Children.map( children, child =>
-            cloneElement( child, {
-                className: classNames( child.props.className, styles.uiBlock, modeClassName, styles[ hideDirection + 'HideDirection' ] )
+        Children.map(children, child =>
+            cloneElement(child, {
+                className: classNames(child.props.className, styles.uiBlock, modeClassName, styles[ hideDirection + 'HideDirection' ])
             })
         )
     );

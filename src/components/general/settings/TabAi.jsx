@@ -20,16 +20,16 @@ const authenticatedApiName = 'ai';
 
 export const TabAi = ({ active }) => {
 
-    const [ appyingChanges, setAppyingChanges ] = useState( false );
-    const [ changesNotSaved, setChangesNotSaved ] = useState( false );
-    const [ settingsLoaded, setSettingsLoaded ] = useState( false );
-    const [ debugEnabled, setDebugEnabled ] = useState( debug.enabled );
-    const [ testText, setTestText ] = useState( '' );
+    const [ appyingChanges, setAppyingChanges ] = useState(false);
+    const [ changesNotSaved, setChangesNotSaved ] = useState(false);
+    const [ settingsLoaded, setSettingsLoaded ] = useState(false);
+    const [ debugEnabled, setDebugEnabled ] = useState(debug.enabled);
+    const [ testText, setTestText ] = useState('');
 
-    const [ apiType, setApiType ] = useState( null );
-    const [ apiKey, setApiKey ] = useState( null );
-    const [ apiKeyEnabled, setApiKeyEnabled ] = useState( false );
-    const [ testRunning, setTestRunning ] = useState( false );
+    const [ apiType, setApiType ] = useState(null);
+    const [ apiKey, setApiKey ] = useState(null);
+    const [ apiKeyEnabled, setApiKeyEnabled ] = useState(false);
+    const [ testRunning, setTestRunning ] = useState(false);
 
     //
 
@@ -113,7 +113,7 @@ export const TabAi = ({ active }) => {
             }
         }
 
-        localStorage.setItem( 'AiSettings', JSON.stringify( settings ) );
+        localStorage.setItem('AiSettings', JSON.stringify(settings));
 
         updateLoreEndpoint(apiType);
 
@@ -122,14 +122,14 @@ export const TabAi = ({ active }) => {
     async function loadSettings () {
 
         // load local storage
-        const settingsString = localStorage.getItem( 'AiSettings' );
+        const settingsString = localStorage.getItem('AiSettings');
         let settings;
 
         try {
 
-            settings = JSON.parse( settingsString );
+            settings = JSON.parse(settingsString);
 
-        } catch ( err ) {
+        } catch (err) {
 
             settings = DefaultSettings;
 
@@ -143,12 +143,12 @@ export const TabAi = ({ active }) => {
         updateLoreEndpoint(apiType);
 
         // set react state
-        setApiType( apiType );
-        setApiKey( apiKey );
+        setApiType(apiType);
+        setApiKey(apiKey);
 
         // console.log('set api', settings.apiType ?? DefaultSettings.apiType, keyString ?? DefaultSettings.apiKey);
 
-        setSettingsLoaded( true );
+        setSettingsLoaded(true);
 
     };
 
@@ -156,49 +156,49 @@ export const TabAi = ({ active }) => {
 
         saveSettings();
 
-        setChangesNotSaved( false );
+        setChangesNotSaved(false);
 
-        setTimeout( () => { setAppyingChanges( false ) }, 1000 );
+        setTimeout(() => { setAppyingChanges(false) }, 1000);
 
     };
 
-    function handleApplySettingsBtnClick ( event ) {
+    function handleApplySettingsBtnClick (event) {
 
         event.stopPropagation();
 
-        setAppyingChanges( true );
+        setAppyingChanges(true);
 
-        setTimeout( applySettings, 100 );
+        setTimeout(applySettings, 100);
         applySettings();
 
     };
 
     //
 
-    useEffect( () => {
+    useEffect(() => {
 
-        if ( apiType !== null && apiKey !== null ) {
+        if (apiType !== null && apiKey !== null) {
 
-            if ( settingsLoaded ) {
+            if (settingsLoaded) {
 
-                setChangesNotSaved( true );
+                setChangesNotSaved(true);
 
             } else {
 
-                setSettingsLoaded( true );
+                setSettingsLoaded(true);
                 applySettings();
 
             }
 
         }
 
-    }, [ apiType, apiKey ] );
+    }, [ apiType, apiKey ]);
 
-    useEffect( () => {
+    useEffect(() => {
 
         loadSettings();
 
-    }, [] );
+    }, []);
 
     async function testAi(e) {
         setTestRunning(true);
@@ -215,7 +215,7 @@ export const TabAi = ({ active }) => {
     //
 
     return (
-        <div className={ classNames( styles.apiKeysTab, styles.tabContent, active ? styles.active : null ) }>
+        <div className={ classNames(styles.apiKeysTab, styles.tabContent, active ? styles.active : null) }>
             <div className={ styles.blockTitle }>MODEL</div>
             <div className={ styles.row }>
                 <div className={ styles.paramName }>Provider</div>
@@ -249,7 +249,7 @@ export const TabAi = ({ active }) => {
                 </div>
             </>) : null}
 
-            <div className={ classNames( styles.applyBtn, changesNotSaved ? styles.active : null ) } onClick={ handleApplySettingsBtnClick } >
+            <div className={ classNames(styles.applyBtn, changesNotSaved ? styles.active : null) } onClick={ handleApplySettingsBtnClick } >
                 { appyingChanges ? 'APPLYING' : 'APPLY' }
             </div>
         </div>

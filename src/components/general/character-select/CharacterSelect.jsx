@@ -71,7 +71,7 @@ const Character = forwardRef(({
 });
 
 export const CharacterSelect = () => {
-    const { state, setState } = useContext( AppContext );
+    const { state, setState } = useContext(AppContext);
     const [ highlightCharacter, setHighlightCharacter ] = useState(null);
     const [ selectCharacter, setSelectCharacter ] = useState(null);
     const [ highlightPack, setHighlightPack ] = useState(null);

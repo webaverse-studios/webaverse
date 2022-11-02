@@ -44,13 +44,13 @@ import { partyManager } from '../../../party-manager';
 
 //
 
-const _startApp = async ( weba, canvas ) => {
+const _startApp = async (weba, canvas) => {
 
     weba.setContentLoaded();
 
     weba.bindInput();
     weba.bindInterface();
-    weba.bindCanvas( canvas );
+    weba.bindCanvas(canvas);
 
     await weba.waitForLoad();
 
@@ -65,10 +65,10 @@ const _startApp = async ( weba, canvas ) => {
 
 const _getCurrentSceneSrc = () => {
 
-    const q = parseQuery( window.location.search );
+    const q = parseQuery(window.location.search);
     let { src } = q;
 
-    if ( src === undefined ) {
+    if (src === undefined) {
 
         src = scenesBaseUrl + defaultSceneName;
 
@@ -80,7 +80,7 @@ const _getCurrentSceneSrc = () => {
 
 const _getCurrentRoom = () => {
 
-    const q = parseQuery( window.location.search );
+    const q = parseQuery(window.location.search);
     const { room } = q;
     return room || '';
 
@@ -91,7 +91,7 @@ export const AppContext = createContext();
 const useWebaverseApp = (() => {
   let webaverse = null;
   return () => {
-        if ( webaverse === null ) {
+        if (webaverse === null) {
             webaverse = new Webaverse();
         }
         return webaverse;
@@ -101,24 +101,24 @@ const useWebaverseApp = (() => {
 const Canvas = ({
     app,
 }) => {
-    const canvasRef = useRef( null );
-    const [domHover, setDomHover] = useState( null );
+    const canvasRef = useRef(null);
+    const [domHover, setDomHover] = useState(null);
 
-    useEffect( () => {
+    useEffect(() => {
 
-        if ( canvasRef.current ) {
+        if (canvasRef.current) {
 
-            _startApp( app, canvasRef.current );
+            _startApp(app, canvasRef.current);
 
         }
 
-    }, [ app, canvasRef ] );
+    }, [ app, canvasRef ]);
 
-    useEffect( () => {
+    useEffect(() => {
         const domhoverchange = e => {
             const {domHover} = e.data;
             // console.log('dom hover change', domHover);
-            setDomHover( domHover );
+            setDomHover(domHover);
         };
         raycastManager.addEventListener('domhoverchange', domhoverchange);
 
@@ -128,90 +128,90 @@ const Canvas = ({
     }, []);
 
     return (
-        <canvas className={ classnames( styles.canvas, domHover ? styles.domHover : null ) } ref={ canvasRef } />
+        <canvas className={ classnames(styles.canvas, domHover ? styles.domHover : null) } ref={ canvasRef } />
     );
 };
 
 export const App = () => {
 
     const [ state, setState ] = useState({ openedPanel: null });
-    const [ uiMode, setUIMode ] = useState( 'normal' );
+    const [ uiMode, setUIMode ] = useState('normal');
 
-    const canvasRef = useRef( null );
+    const canvasRef = useRef(null);
     const app = useWebaverseApp();
-    const [ selectedApp, setSelectedApp ] = useState( null );
-    const [ selectedScene, setSelectedScene ] = useState( _getCurrentSceneSrc() );
-    const [ selectedRoom, setSelectedRoom ] = useState( _getCurrentRoom() );
-    const [ apps, setApps ] = useState( world.appManager.getApps().slice() );
+    const [ selectedApp, setSelectedApp ] = useState(null);
+    const [ selectedScene, setSelectedScene ] = useState(_getCurrentSceneSrc());
+    const [ selectedRoom, setSelectedRoom ] = useState(_getCurrentRoom());
+    const [ apps, setApps ] = useState(world.appManager.getApps().slice());
     const account = useContext(AccountContext);
     const chain = useContext(ChainContext);
 
     //
 
-    const selectApp = ( app, physicsId, position ) => {
+    const selectApp = (app, physicsId, position) => {
 
-        game.setMouseSelectedObject( app, physicsId, position );
+        game.setMouseSelectedObject(app, physicsId, position);
 
     };
 
     const _loadUrlState = () => {
 
         const src = _getCurrentSceneSrc();
-        setSelectedScene( src );
+        setSelectedScene(src);
 
         const roomName = _getCurrentRoom();
-        setSelectedRoom( roomName );
+        setSelectedRoom(roomName);
 
     };
 
-    useEffect( () => {
+    useEffect(() => {
 
-        if ( state.openedPanel && state.openedPanel !== 'ChatPanel' && cameraManager.pointerLockElement ) {
+        if (state.openedPanel && state.openedPanel !== 'ChatPanel' && cameraManager.pointerLockElement) {
 
             cameraManager.exitPointerLock();
 
         }
 
-        if ( state.openedPanel ) {
+        if (state.openedPanel) {
 
-            setUIMode( 'normal' );
+            setUIMode('normal');
 
         }
 
-    }, [ state.openedPanel ] );
+    }, [ state.openedPanel ]);
 
-    useEffect( () => {
+    useEffect(() => {
 
-        const handleStoryKeyUp = ( event ) => {
+        const handleStoryKeyUp = (event) => {
 
-            if ( game.inputFocused() ) return;
-            handleStoryKeyControls( event );
+            if (game.inputFocused()) return;
+            handleStoryKeyControls(event);
 
         };
 
-        registerIoEventHandler( 'keyup', handleStoryKeyUp );
+        registerIoEventHandler('keyup', handleStoryKeyUp);
 
         return () => {
 
-            unregisterIoEventHandler( 'keyup', handleStoryKeyUp );
+            unregisterIoEventHandler('keyup', handleStoryKeyUp);
 
         };
 
-    }, [] );
+    }, []);
 
-    useEffect( () => {
+    useEffect(() => {
 
-        if ( uiMode === 'none' ) {
+        if (uiMode === 'none') {
 
             setState({ openedPanel: null });
 
         }
 
-        const handleKeyDown = ( event ) => {
+        const handleKeyDown = (event) => {
 
-            if ( event.ctrlKey && event.code === 'KeyH' ) {
+            if (event.ctrlKey && event.code === 'KeyH') {
 
-                setUIMode( uiMode === 'normal' ? 'none' : 'normal' );
+                setUIMode(uiMode === 'normal' ? 'none' : 'normal');
                 return false;
 
             }
@@ -220,27 +220,27 @@ export const App = () => {
 
         };
 
-        registerIoEventHandler( 'keydown', handleKeyDown );
+        registerIoEventHandler('keydown', handleKeyDown);
 
         return () => {
 
-            unregisterIoEventHandler( 'keydown', handleKeyDown );
+            unregisterIoEventHandler('keydown', handleKeyDown);
 
         };
 
-    }, [ uiMode ] );
+    }, [ uiMode ]);
 
-    useEffect( () => {
+    useEffect(() => {
 
         const handleClick = () => {
 
             const hoverObject = game.getMouseHoverObject();
 
-            if ( hoverObject ) {
+            if (hoverObject) {
 
                 const physicsId = game.getMouseHoverPhysicsId();
                 const position = game.getMouseHoverPosition();
-                selectApp( hoverObject, physicsId, position );
+                selectApp(hoverObject, physicsId, position);
                 return false;
 
             }
@@ -249,30 +249,30 @@ export const App = () => {
 
         };
 
-        registerIoEventHandler( 'click', handleClick );
+        registerIoEventHandler('click', handleClick);
 
         return () => {
 
-            unregisterIoEventHandler( 'click', handleClick );
+            unregisterIoEventHandler('click', handleClick);
 
         };
 
-    }, [] );
+    }, []);
 
-    useEffect( () => {
+    useEffect(() => {
 
         const update = e => {
 
-            setApps( world.appManager.getApps().slice() );
+            setApps(world.appManager.getApps().slice());
 
         };
 
-        world.appManager.addEventListener( 'appadd', update );
-        world.appManager.addEventListener( 'appremove', update );
+        world.appManager.addEventListener('appadd', update);
+        world.appManager.addEventListener('appremove', update);
 
-    }, [] );
+    }, []);
 
-    useEffect( () => {
+    useEffect(() => {
 
         const pushstate = e => {
 
@@ -287,19 +287,19 @@ export const App = () => {
 
         };
 
-        window.addEventListener( 'pushstate', pushstate );
-        window.addEventListener( 'popstate', popstate );
+        window.addEventListener('pushstate', pushstate);
+        window.addEventListener('popstate', popstate);
 
         return () => {
 
-            window.removeEventListener( 'pushstate', pushstate );
-            window.removeEventListener( 'popstate', popstate );
+            window.removeEventListener('pushstate', pushstate);
+            window.removeEventListener('popstate', popstate);
 
         };
 
-    }, [] );
+    }, []);
 
-    useEffect( _loadUrlState, [] );
+    useEffect(_loadUrlState, []);
 
     //
 
