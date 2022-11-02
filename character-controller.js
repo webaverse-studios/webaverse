@@ -51,6 +51,7 @@ import {
 import musicManager from './music-manager.js';
 import {makeId, clone} from './util.js';
 import overrides from './overrides.js';
+import physx from './physx.js';
 // import * as voices from './voices.js';
 
 const localVector = new THREE.Vector3();
@@ -674,21 +675,32 @@ class StateCharacter extends Character {
     action = clone(action);
     action.actionId = makeId(5);
     this.getActionsState().push([action]);
+    if (this.avatar) {
+      physx.physxWorker.addActionAnimationAvatar(this.avatar.animationAvatarPtr, action);
+    }
     return action;
   }
   removeAction(type) {
     const actions = this.getActionsState();
+    const actionsArray = this.getActionsArray();
     let i = 0;
     for (const action of actions) {
       if (action.type === type) {
         actions.delete(i);
+        if (this.avatar) {
+          physx.physxWorker.removeActionAnimationAvatar(this.avatar.animationAvatarPtr, actionsArray[i]);
+        }
         break;
       }
       i++;
     }
   }
   removeActionIndex(index) {
+    const actionsArray = this.getActionsArray();
     this.getActionsState().delete(index);
+    if (this.avatar) {
+      physx.physxWorker.removeActionAnimationAvatar(this.avatar.animationAvatarPtr, actionsArray[index]);
+    }
   }
   clearActions() {
     const actionsState = this.getActionsState();
@@ -699,15 +711,22 @@ class StateCharacter extends Character {
   }
   setControlAction(action) {
     const actions = this.getActionsState();
+    const actionsArray = this.getActionsArray();
     for (let i = 0; i < actions.length; i++) {
       const action = actions.get(i);
       const isControlAction = controlActionTypes.includes(action.type);
       if (isControlAction) {
         actions.delete(i);
+        if (this.avatar) {
+          physx.physxWorker.removeActionAnimationAvatar(this.avatar.animationAvatarPtr, actionsArray[i]);
+        }
         i--;
       }
     }
     actions.push([action]);
+    if (this.avatar) {
+      physx.physxWorker.addActionAnimationAvatar(this.avatar.animationAvatarPtr, action);
+    }
   }
   new() {
     const self = this;
@@ -1171,6 +1190,9 @@ class LocalPlayer extends UninterpolatedPlayer {
       const actions = self.getActionsState();
       for (const oldAction of oldActions) {
         actions.push([oldAction]);
+        if (self.avatar) {
+          physx.physxWorker.addActionAnimationAvatar(self.avatar.animationAvatarPtr, oldAction);
+        }
       }
       
       const apps = self.getAppsState();
