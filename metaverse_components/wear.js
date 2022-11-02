@@ -62,8 +62,8 @@ export default (app, component) => {
             });
             if (skinnedMesh && player.avatar) {
               app.position.set(0, 0, 0);
-              app.quaternion.identity(); //.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
-              app.scale.copy(initialScale)//.multiplyScalar(wearableScale);
+              app.quaternion.identity(); // .setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
+              app.scale.copy(initialScale)// .multiplyScalar(wearableScale);
               app.updateMatrix();
               app.matrixWorld.copy(app.matrix);
               

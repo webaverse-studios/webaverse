@@ -256,7 +256,7 @@ export const ComponentEditor = () => {
                             {
                                 {
                                     'number': <input type="number" className={ classNames( styles.itemValue, ( isEditable && component._componentEditorError ? styles.valueError : null ) ) } disabled={ ! isEditable }  value={ component.value } onChange={ handleValueInputChange.bind( null, component.key ) } />,
-                                    'bool': <input type="checkbox" defaultChecked={!!component.value} className={ classNames( styles.itemValue, ( isEditable && component._componentEditorError ? styles.valueError : null ) ) } disabled={ ! isEditable } onChange={ (e)=>handleCheckboxChange(component.key, e.target.checked ? true : false) } />,
+                                    'bool': <input type="checkbox" defaultChecked={!!component.value} className={ classNames( styles.itemValue, ( isEditable && component._componentEditorError ? styles.valueError : null ) ) } disabled={ ! isEditable } onChange={ (e)=>handleCheckboxChange(component.key, !!e.target.checked) } />,
                                     'string': <input type="text" className={ classNames( styles.itemValue, ( isEditable && component._componentEditorError ? styles.valueError : null ) ) } disabled={ ! isEditable }  value={ component.value } onChange={ handleValueInputChange.bind( null, component.key ) } />,
                                     'json': <input type="text" className={ classNames( styles.itemValue, ( isEditable && component._componentEditorError ? styles.valueError : null ) ) } disabled={ ! isEditable }  value={ component.value } onChange={ handleValueInputChange.bind( null, component.key ) } />
                                 }[component.type]

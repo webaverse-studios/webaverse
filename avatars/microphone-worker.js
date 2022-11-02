@@ -35,9 +35,11 @@ class MicrophoneWorker extends EventTarget {
     gainNode.connect(audioWorkletNode);
     audioWorkletNode.connect(options.audioContext.gain);
   }
+
   getInput() {
     return this.gainNode;
   }
+
   close() {
     if (this.audioWorkletNode) {
       this.audioWorkletNode.disconnect();

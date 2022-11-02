@@ -265,7 +265,7 @@ const DomRenderer = props => {
       setFov(_getFov());
     };
     window.addEventListener('resize', resize);
-    const fovchange = (/*e*/) => {
+    const fovchange = (/* e */) => {
       // const {fov} = e.data;
       setFov(_getFov());
     };

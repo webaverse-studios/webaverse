@@ -30,6 +30,7 @@ class VolumeProcessor extends AudioWorkletProcessor {
     });
     this.port.start();
   }
+
   process(inputs, outputs) {
     const _emitVolume = () => {
       {

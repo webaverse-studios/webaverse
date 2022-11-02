@@ -262,6 +262,7 @@ export class HeightfieldMapper /* extends EventTarget */ {
       })();
     }
   }
+
   update(position) {
     if (!this.updating) {
       (async () => {
@@ -304,6 +305,7 @@ export class HeightfieldMapper /* extends EventTarget */ {
       this.queuedPosition.copy(position);
     }
   }
+
   renderHeightfieldUpdate(worldModPosition, heightfield) {
     const renderer = getRenderer();
 

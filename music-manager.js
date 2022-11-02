@@ -14,6 +14,7 @@ class Music {
 
     this.loadPromise = null;
   }
+
   play({
     repeat = false,
   } = {}) {
@@ -37,6 +38,7 @@ class Music {
       gain,
     };
   }
+
   waitForLoad() {
     if (!this.loadPromise) {
       this.loadPromise = (async () => {
@@ -103,6 +105,7 @@ class MusicManager {
     this.loadPromise = null;
     this.currentMusic = null;
   }
+
   async fetchMusic(url, name = url) {
     const music = new Music({
       name,
@@ -111,6 +114,7 @@ class MusicManager {
     await music.waitForLoad();
     return music;
   }
+
   playCurrentMusic(newMusic, {
     repeat = false,
   } = {}) {
@@ -127,12 +131,14 @@ class MusicManager {
       }
     });
   }
+
   playCurrentMusicName(name, opts) {
     const newMusic = this.musics.find(music => music.name === name);
     if (newMusic) {
       this.playCurrentMusic(newMusic, opts);
     }
   }
+
   stopCurrentMusic() {
     if (this.currentMusic) {
       this.currentMusic.source.stop();
@@ -140,6 +146,7 @@ class MusicManager {
       this.currentMusic = null;
     }
   }
+
   waitForLoad() {
     if (!this.loadPromise) {
       this.loadPromise = (async () => {

@@ -1,13 +1,13 @@
 import Web3 from './web3.min.js';
 import bip39 from './bip39.js';
 import hdkeySpec from './hdkey.js';
-const hdkey = hdkeySpec.default;
 import ethereumJsTx from './ethereumjs-tx.js';
 import { makePromise } from './util.js';
 import { chainName, web3MainnetSidechainEndpoint, web3TestnetSidechainEndpoint, polygonVigilKey } from './constants.js';
-const { Transaction, Common } = ethereumJsTx;
 import addresses from 'https://contracts.webaverse.com/config/addresses.js';
 import abis from 'https://contracts.webaverse.com/config/abi.js';
+const hdkey = hdkeySpec.default;
+const { Transaction, Common } = ethereumJsTx;
 
 export const Networks = {
   mainnet: {
@@ -137,31 +137,31 @@ const runSidechainTransaction = mnemonic => async (contractName, method, ...args
   const wallet = hdkey.fromMasterSeed(bip39.mnemonicToSeedSync(mnemonic)).derivePath(`m/44'/60'/0'/0/0`).getWallet();
   const address = wallet.getAddressString();
   const privateKey = wallet.getPrivateKeyString();
-  const privateKeyBytes = Uint8Array.from(web3['mainnetsidechain'].utils.hexToBytes(privateKey));
+  const privateKeyBytes = Uint8Array.from(web3.mainnetsidechain.utils.hexToBytes(privateKey));
 
-  const txData = contracts['mainnetsidechain'][contractName].methods[method](...args);
+  const txData = contracts.mainnetsidechain[contractName].methods[method](...args);
   const data = txData.encodeABI();
   const gas = await txData.estimateGas({
     from: address,
   });
-  let gasPrice = await web3['mainnetsidechain'].eth.getGasPrice();
+  let gasPrice = await web3.mainnetsidechain.eth.getGasPrice();
   gasPrice = parseInt(gasPrice, 10);
 
   await transactionQueue.lock();
-  const nonce = await web3['mainnetsidechain'].eth.getTransactionCount(address);
+  const nonce = await web3.mainnetsidechain.eth.getTransactionCount(address);
   let tx = Transaction.fromTxData({
-    to: contracts['mainnetsidechain'][contractName]._address,
-    nonce: '0x' + new web3['mainnetsidechain'].utils.BN(nonce).toString(16),
-    gas: '0x' + new web3['mainnetsidechain'].utils.BN(gas).toString(16),
-    gasPrice: '0x' + new web3['mainnetsidechain'].utils.BN(gasPrice).toString(16),
-    gasLimit: '0x' + new web3['mainnetsidechain'].utils.BN(8000000).toString(16),
+    to: contracts.mainnetsidechain[contractName]._address,
+    nonce: '0x' + new web3.mainnetsidechain.utils.BN(nonce).toString(16),
+    gas: '0x' + new web3.mainnetsidechain.utils.BN(gas).toString(16),
+    gasPrice: '0x' + new web3.mainnetsidechain.utils.BN(gasPrice).toString(16),
+    gasLimit: '0x' + new web3.mainnetsidechain.utils.BN(8000000).toString(16),
     data,
   }, {
     common,
   }).sign(privateKeyBytes);
   const rawTx = '0x' + tx.serialize().toString('hex');
   // console.log('signed tx', tx, rawTx);
-  const receipt = await web3['mainnetsidechain'].eth.sendSignedTransaction(rawTx);
+  const receipt = await web3.mainnetsidechain.eth.sendSignedTransaction(rawTx);
   transactionQueue.unlock();
   return receipt;
 };

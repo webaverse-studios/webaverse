@@ -17,6 +17,7 @@ class PreloadMessage {
     this.isPreloadMessage = true;
     this.loadPromise = VoiceEndpointVoicer.loadAudioBuffer(this.voiceEndpointUrl, this.text);
   }
+
   waitForLoad() {
     return this.loadPromise;
   }
@@ -32,12 +33,15 @@ class VoiceEndpointVoicer {
     this.cancel = null;
     this.endPromise = null;
   }
+
   static preloadMessage(voiceEndpointUrl, text) {
     return new PreloadMessage(voiceEndpointUrl, text);
   }
+
   preloadMessage(text) {
     return VoiceEndpointVoicer.preloadMessage(this.voiceEndpoint.url.toString(), text);
   }
+
   static async loadAudioBuffer(voiceEndpointUrl, text) {
     // console.log('load audio buffer', voiceEndpointUrl, text);
     try {
@@ -56,6 +60,7 @@ class VoiceEndpointVoicer {
       debugger;
     }
   }
+
   /* async loadAudioBuffer(text) {
     return VoiceEndpointVoicer.loadAudioBuffer(this.voiceEndpoint.url, text);
   } */
@@ -132,6 +137,7 @@ class VoiceEndpointVoicer {
     }
     return this.endPromise;
   }
+
   stop() {
     // this.live = false;
     this.queue.length = 0;

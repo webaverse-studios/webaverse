@@ -105,6 +105,7 @@ export class AvatarCharacterSfx {
 
     this.lastDoubleJump = false;
   }
+
   update(timestamp, timeDiffS) {
     /* if (!this.character.avatar) {
       return;
@@ -136,9 +137,9 @@ export class AvatarCharacterSfx {
         if(this.character.hasAction('jump') && this.character.getAction('jump').trigger === 'jump'){
           this.playGrunt('jump'); 
         }
-      } /*else if (this.lastJumpState && !this.player.avatar.jumpState) {
+      } /* else if (this.lastJumpState && !this.player.avatar.jumpState) {
         sounds.playSoundName('land');
-      }*/
+      } */
       if(this.character.avatar.landState && !this.lastLandState){
         sounds.playSoundName('land');
       }
@@ -200,7 +201,7 @@ export class AvatarCharacterSfx {
           i = i % leftStepIndices.length;
           if (i !== endIndex) {
             if (leftStepIndices[i] && !this.lastStepped[0] && !this.character.avatar.narutoRunState && timeSeconds-this.narutoRunFinishTime>0.5) {
-              const candidateAudios = localSoundFiles//.filter(a => a.paused);
+              const candidateAudios = localSoundFiles// .filter(a => a.paused);
               if (candidateAudios.length > 0) {
                 /* for (const a of candidateAudios) {
                   !a.paused && a.pause();
@@ -448,6 +449,7 @@ export class AvatarCharacterSfx {
     };
     _handleUse();
   }
+
   playGrunt(type) {
     if (this.character.voicePack) { // ensure voice pack loaded
       const voiceFiles = this.character.voicePack.voiceFiles.actionVoices[type];
@@ -488,6 +490,7 @@ export class AvatarCharacterSfx {
       audioBufferSourceNode.start(0, offset, duration);
     }
   }
+
   playEmote(type, index){
     if (this.character.voicePack) { // ensure voice pack loaded
       const voiceFiles = this.character.voicePack.voiceFiles.emoteVoices[type];
@@ -528,6 +531,7 @@ export class AvatarCharacterSfx {
       audioBufferSourceNode.start(0, offset, duration);
     }
   }
+
   destroy() {
     this.cleanup();
   }

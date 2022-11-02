@@ -39,7 +39,7 @@ const _handleMethod = ({
       };
     }
     case 'meshoptSimplify': {
-      const {positions, /*uvs,*/ indices, targetRatio, targetError} = args;
+      const {positions, /* uvs, */ indices, targetRatio, targetError} = args;
       const geometry = new THREE.BufferGeometry();
       geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
       // geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
@@ -52,7 +52,7 @@ const _handleMethod = ({
       };
     }
     case 'meshoptSimplifySloppy': {
-      const {positions, /*uvs,*/ indices, targetRatio, targetError} = args;
+      const {positions, /* uvs, */ indices, targetRatio, targetError} = args;
       const geometry = new THREE.BufferGeometry();
       geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
       // geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));

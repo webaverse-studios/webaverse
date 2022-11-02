@@ -63,7 +63,7 @@ export const Emotions = ({
 
             if ( document.pointerLockElement === emotionsEl ) {
 
-                const { /*movementX, */movementY } = e;
+                const { /* movementX, */movementY } = e;
 
                 if ( dragEmotionIndex !== -1 ) {
 

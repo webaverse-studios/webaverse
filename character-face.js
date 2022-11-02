@@ -13,7 +13,7 @@ export class AvatarCharacterFace {
         if (!this.character.avatar) {
             return;
         }
-        //#################################### manually set mouth movement ##########################################
+        // #################################### manually set mouth movement ##########################################
         const _handleMouthMovementAttack=()=>{
             this.character.avatar.volume = ((timestamp/1000 - this.mouthMovementStartTime) / this.mouthMovementAttackTime)/12;
             if(timestamp/1000 - this.mouthMovementStartTime >= this.mouthMovementAttackTime){
@@ -69,6 +69,7 @@ export class AvatarCharacterFace {
             }
         }
     }
+
     setMouthMoving(attack, decay, sustain, release){
         this.mouthMovementState=null;
         this.manuallySetMouth=true;
@@ -77,6 +78,7 @@ export class AvatarCharacterFace {
         this.mouthMovementSustainTime=sustain;
         this.mouthMovementReleaseTime=release;
     }
+
     destroy() {
         // nothing
     }

@@ -57,6 +57,7 @@ class OverworldApp {
     this.loadPromise = previewer.loadScene(start_url)
       .then(() => {});
   }
+
   waitForLoad() {
     return this.loadPromise;
   }

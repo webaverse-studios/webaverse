@@ -13,7 +13,7 @@ import {isWorker} from './env.js';
 // XXX enable this when the code is stable; then, we will have many more places to add missing matrix updates
 // THREE.Object3D.DefaultMatrixAutoUpdate = false;
 
-let canvas = null, context = null, renderer = null, composer = null;
+let canvas = null; let context = null; let renderer = null; let composer = null;
 
 let waitPromise = makePromise();
 const waitForLoad = () => waitPromise;

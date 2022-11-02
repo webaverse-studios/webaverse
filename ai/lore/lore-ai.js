@@ -183,28 +183,35 @@ class AIScene {
       });
     });
   }
+
   addSetting(setting) {
     this.settings.push(setting);
   }
+
   removeSetting(setting) {
     this.settings.splice(this.settings.indexOf(setting), 1);
   }
+
   addCharacter(opts) {
     const character = new AICharacter(opts);
     this.characters.push(character);
     return character;
   }
+
   removeCharacter(character) {
     this.characters.splice(this.characters.indexOf(character), 1);
   }
+
   addObject(opts) {
     const object = new AIObject(opts);
     this.objects.push(object);
     return object;
   }
+
   removeObject(object) {
     this.objects.splice(this.objects.indexOf(object), 1);
   }
+
   async generate(dstCharacter = null) {
     const prompt = makeLorePrompt({
       settings: this.settings,
@@ -219,6 +226,7 @@ class AIScene {
     response = postProcessResponse(response, this.characters, dstCharacter);
     return response;
   }
+
   async generateLocationComment(name, dstCharacter = null) {
     const prompt = makeCommentPrompt({
       settings: this.settings,
@@ -246,6 +254,7 @@ class AIScene {
     // console.log('got comment', {prompt, response});
     return response;
   }
+
   async generateSelectCharacterComment(name, description) {
     const prompt = makeSelectCharacterPrompt({
       name,
@@ -259,6 +268,7 @@ class AIScene {
     console.log('select character parsed', {response2});
     return response2;
   }
+
   async generateChatMessage(messages, nextCharacter) {
     const prompt = makeChatPrompt({
       messages,
@@ -272,6 +282,7 @@ class AIScene {
     console.log('chat parsed', {response2});
     return response2;
   }
+
   async generateDialogueOptions(messages, nextCharacter) {
     const prompt = makeOptionsPrompt({
       messages,
@@ -285,6 +296,7 @@ class AIScene {
     console.log('dialogue options parsed', {response2});
     return response2;
   }
+
   async generateCharacterIntroPrompt(name, bio) {
     const prompt = makeCharacterIntroPrompt({
       name,
@@ -304,6 +316,7 @@ class LoreAI {
   constructor() {
     this.endpointFn = null;
   }
+
   async generate(prompt, {
     stop,
     max_tokens = 100,
@@ -348,6 +361,7 @@ class LoreAI {
       reject(new Error('prompt is required'));
     }
   }
+
   async endpoint(query) {
     if (this.endpointFn) {
       return await this.endpointFn(query);
@@ -359,9 +373,11 @@ class LoreAI {
       };
     }
   }
+
   setEndpoint(endpointFn) {
     this.endpointFn = endpointFn;
   }
+
   async setEndpointUrl(url) {
     if (url) {
       const endpointFn = async query => {
@@ -380,6 +396,7 @@ class LoreAI {
       this.setEndpoint(null);
     }
   }
+
   createScene(localPlayer) {
     return new AIScene({
       localPlayer,

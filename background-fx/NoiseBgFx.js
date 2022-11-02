@@ -165,6 +165,7 @@ class NoiseBgFxMesh extends THREE.Mesh {
     super(geometry, material);
     this.frustumCulled = false;
   }
+
   update(timestamp, timeDiff, width, height) {
     const timestampS = timestamp / 1000;
     this.material.uniforms.iTime.value = timestampS;
@@ -183,6 +184,7 @@ class NoiseBgFxMesh extends THREE.Mesh {
 
     // console.log('got frame', this.material.uniforms.iFrame.value);
   }
+
   static async waitForLoad() {
     // nothing
   }

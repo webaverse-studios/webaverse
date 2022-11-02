@@ -15,9 +15,8 @@ import musicManager from '../../../../music-manager.js';
 import { CachedLoader } from '../../../CachedLoader.jsx';
 import { RpgText } from '../../../RpgText.jsx';
 import { chatTextSpeed, characterSelectAvatarQuality } from '../../../../constants.js';
-import { VoiceEndpointVoicer } from '../../../../voice-output/voice-endpoint-voicer.js';
+import { VoiceEndpointVoicer ,getVoiceEndpointUrl} from '../../../../voice-output/voice-endpoint-voicer.js';
 import * as voices from '../../../../voices.js';
-import {getVoiceEndpointUrl} from '../../../../voice-output/voice-endpoint-voicer.js';
 import npcManager from '../../../../npc-manager.js';
 
 //

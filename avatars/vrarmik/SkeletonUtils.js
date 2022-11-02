@@ -64,7 +64,7 @@ function calculateAverages(parentBone, worldPos, averagedDirs) {
   var averagedDir = new THREE.Vector3();
   const childBones = parentBone.children.filter(c => c.isBone);
   childBones.forEach((childBone) => {
-    //average the child bone world pos
+    // average the child bone world pos
     var childBonePosWorld = worldPos[childBone.id][0];
     averagedDir.add(childBonePosWorld);
   });
@@ -82,15 +82,15 @@ function updateTransformations(parentBone, worldPos, averagedDirs, preRotations)
       var averagedDir = averagedDirs[parentBone.id];
       if (averagedDir) {
 
-        //set quaternion
+        // set quaternion
         parentBone.quaternion.copy(RESETQUAT);
         // parentBone.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI*2));
         parentBone.updateMatrixWorld();
 
-        //get the child bone position in local coordinates
+        // get the child bone position in local coordinates
         // var childBoneDir = parentBone.worldToLocal(averagedDir.clone()).normalize();
 
-        //set direction to face child
+        // set direction to face child
         // setQuaternionFromDirection(childBoneDir, Y_AXIS, parentBone.quaternion)
         // console.log('new quaternion', parentBone.quaternion.toArray().join(','));
     }
@@ -99,7 +99,7 @@ function updateTransformations(parentBone, worldPos, averagedDirs, preRotations)
     // parentBone.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI));
     parentBone.updateMatrixWorld();
 
-    //set child bone position relative to the new parent matrix.
+    // set child bone position relative to the new parent matrix.
     const childBones = parentBone.children.filter(c => c.isBone);
     childBones.forEach((childBone) => {
       var childBonePosWorld = worldPos[childBone.id][0].clone();
@@ -112,7 +112,7 @@ function updateTransformations(parentBone, worldPos, averagedDirs, preRotations)
     });
 }
 
-//borrowing this from utils.js , not sure how to import it
+// borrowing this from utils.js , not sure how to import it
 const t1 = new THREE.Vector3();
 const t2 = new THREE.Vector3();
 const t3 = new THREE.Vector3();

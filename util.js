@@ -5,7 +5,7 @@ import {
   playersMapName,
   tokensHost,
   storageHost,
-  /*accountsHost, loginEndpoint,*/ audioTimeoutTime,
+  /* accountsHost, loginEndpoint, */ audioTimeoutTime,
 } from './constants.js';
 // import { getRenderer } from './renderer.js';
 import {IdAllocator} from './id-allocator.js';
@@ -793,8 +793,8 @@ export const memoize = (fn) => {
   };
 };
 export function shuffle(array, rng = Math.random) {
-  let currentIndex = array.length,
-    randomIndex;
+  let currentIndex = array.length;
+    let randomIndex;
 
   // While there remain elements to shuffle...
   while (currentIndex != 0) {

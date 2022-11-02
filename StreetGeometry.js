@@ -4,7 +4,7 @@ import * as Curves from 'three/src/extras/curves/Curves.js';
 
 class StreetLineGeometry extends BufferGeometry {
 
-	constructor( path = new Curves[ 'QuadraticBezierCurve3' ]( new Vector3( - 1, - 1, 0 ), new Vector3( - 1, 1, 0 ), new Vector3( 1, 1, 0 ) ), tubularSegments = 64, radiusX = 1, radiusY = 1, radialSegments = 2, closed = false ) {
+	constructor( path = new Curves.QuadraticBezierCurve3( new Vector3( - 1, - 1, 0 ), new Vector3( - 1, 1, 0 ), new Vector3( 1, 1, 0 ) ), tubularSegments = 64, radiusX = 1, radiusY = 1, radialSegments = 2, closed = false ) {
 
 		super();
 		this.type = 'StreetLineGeometry';
@@ -231,7 +231,7 @@ class StreetLineGeometry extends BufferGeometry {
 
 class StreetFlatGeometry extends BufferGeometry {
 
-	constructor( path = new Curves[ 'QuadraticBezierCurve3' ]( new Vector3( - 1, - 1, 0 ), new Vector3( - 1, 1, 0 ), new Vector3( 1, 1, 0 ) ), tubularSegments = 64, radiusX = 1, radiusY = 1, radialSegments = 8, closed = false ) {
+	constructor( path = new Curves.QuadraticBezierCurve3( new Vector3( - 1, - 1, 0 ), new Vector3( - 1, 1, 0 ), new Vector3( 1, 1, 0 ) ), tubularSegments = 64, radiusX = 1, radiusY = 1, radialSegments = 8, closed = false ) {
 
 		super();
 		this.type = 'StreetFlatGeometry';
@@ -471,7 +471,7 @@ class StreetFlatGeometry extends BufferGeometry {
 
 class StreetOctagonGeometry extends BufferGeometry {
 
-	constructor( path = new Curves[ 'QuadraticBezierCurve3' ]( new Vector3( - 1, - 1, 0 ), new Vector3( - 1, 1, 0 ), new Vector3( 1, 1, 0 ) ), tubularSegments = 64, radiusX = 1, radiusY = 1, radialSegments = 8, closed = false ) {
+	constructor( path = new Curves.QuadraticBezierCurve3( new Vector3( - 1, - 1, 0 ), new Vector3( - 1, 1, 0 ), new Vector3( 1, 1, 0 ) ), tubularSegments = 64, radiusX = 1, radiusY = 1, radialSegments = 8, closed = false ) {
 
 		super();
 		this.type = 'StreetOctagonGeometry';
@@ -724,7 +724,7 @@ class StreetOctagonGeometry extends BufferGeometry {
 
 class StreetHalfpipeGeometry extends BufferGeometry {
 
-	constructor( path = new Curves[ 'QuadraticBezierCurve3' ]( new Vector3( - 1, - 1, 0 ), new Vector3( - 1, 1, 0 ), new Vector3( 1, 1, 0 ) ), tubularSegments = 64, radiusX = 1, radiusY = 1, radialSegments = 8, closed = false ) {
+	constructor( path = new Curves.QuadraticBezierCurve3( new Vector3( - 1, - 1, 0 ), new Vector3( - 1, 1, 0 ), new Vector3( 1, 1, 0 ) ), tubularSegments = 64, radiusX = 1, radiusY = 1, radialSegments = 8, closed = false ) {
 
 		super();
 		this.type = 'StreetHalfpipeGeometry';
