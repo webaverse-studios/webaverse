@@ -1880,7 +1880,7 @@ class Avatar {
       _motionControls.call(this)
     }
     
-    _updateAnimation(this, now);
+    _updateAnimation(this, now, timeDiff);
 
     if (this.poseAnimation) {
       _overwritePose(this.poseAnimation);
