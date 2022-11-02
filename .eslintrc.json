@@ -47,7 +47,6 @@
       "react/display-name": "off",
       "no-lone-blocks": "off",
       "eol-last": ["error", "never"],
-      "space-in-parens": ["error", "always"],
       "no-unused-vars": ["warn"],
       "comma-dangle": ["warn", "always-multiline"],
       "object-curly-spacing": ["warn", "never"],
@@ -57,14 +56,7 @@
       "no-cond-assign": ["off"],
       "no-useless-escape": ["off"],
       "react/no-unescaped-entities": ["off"],
-      "space-before-function-paren": [
-        "never",
-        {
-          "anonymous": "never",
-          "named": "never",
-          "asyncArrow": "always"
-        }
-      ],
+      "space-in-parens": ["error", "never"],
       "arrow-parens": ["warn", "as-needed"],
       "number-literal-case": "off"
     },
