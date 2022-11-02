@@ -24,9 +24,11 @@ class Hup extends EventTarget {
     this.live = false;
     this.deadTimeout = null;
   }
+
   static isHupAction(action) {
     return action.type === 'chat';
   }
+
   mergeAction(action) {
     const {characterName, message, emote} = action;
     if (characterName) {
@@ -39,6 +41,7 @@ class Hup extends EventTarget {
 
     // this.dispatchEvent(new MessageEvent('update'));
   }
+
   async updateVoicer(message, emote) {
     // this.parent.player === metaversefile.useLocalPlayer() && console.log('emit voice start');
     this.dispatchEvent(new MessageEvent('voicequeue', {
@@ -71,24 +74,28 @@ class Hup extends EventTarget {
       },
     }));
   }
+
   unmergeAction(action) {
     const index = this.actionIds.indexOf(action.actionId);
     if (index !== -1) {
       this.actionIds.splice(index, 1);
     }
   }
+
   clearDeadTimeout() {
     if (this.deadTimeout) {
       clearTimeout(this.deadTimeout);
       this.deadTimeout = null;
     }
   }
+
   startDeadTimeout() {
     this.clearDeadTimeout();
     this.deadTimeout = setTimeout(() => {
       this.dispatchEvent(new MessageEvent('deadtimeout'));
     }, deadTimeoutTime);
   }
+
   destroy() {
     this.dispatchEvent(new MessageEvent('destroy'));
   }
@@ -158,15 +165,18 @@ export class CharacterHups extends EventTarget {
       }
     });
   }
+
   addChatHupAction(text) {
     this.character.addAction({
       type: 'chat',
       text,
     });
   }
+
   update(timestamp) {
     // nothing
   }
+
   destroy() {
     // nothing
   }

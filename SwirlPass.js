@@ -282,31 +282,31 @@ class SwirlPass extends Pass {
 
 		const openStartTime = 3;
 		if (uTime < openStartTime) {
-			this.swirlMaterial.uniforms[ 'tDiffuse' ].value = this.first ?
+			this.swirlMaterial.uniforms.tDiffuse.value = this.first ?
 				readBuffer.texture // screen
 			:
 				this.ssaoRenderTargets[0].texture; // feedback
-			this.swirlMaterial.uniforms[ 'tDiffuse' ].needsUpdate = true;
+			this.swirlMaterial.uniforms.tDiffuse.needsUpdate = true;
 
-			this.swirlMaterial.uniforms[ 'uTime' ].value = uTime;
-			this.swirlMaterial.uniforms[ 'uTime' ].needsUpdate = true;
+			this.swirlMaterial.uniforms.uTime.value = uTime;
+			this.swirlMaterial.uniforms.uTime.needsUpdate = true;
 			
 			this.swirlMaterial.blending = NoBlending;
 			this.renderPass( renderer, this.swirlMaterial, this.ssaoRenderTargets[1] );
 		} else {
-			this.openMaterial.uniforms[ 'tDiffuse' ].value = readBuffer.texture; // screen
-			this.openMaterial.uniforms[ 'tDiffuse' ].needsUpdate = true;
+			this.openMaterial.uniforms.tDiffuse.value = readBuffer.texture; // screen
+			this.openMaterial.uniforms.tDiffuse.needsUpdate = true;
 
-			this.openMaterial.uniforms[ 'uTime' ].value = uTime - openStartTime;
-			this.openMaterial.uniforms[ 'uTime' ].needsUpdate = true;
+			this.openMaterial.uniforms.uTime.value = uTime - openStartTime;
+			this.openMaterial.uniforms.uTime.needsUpdate = true;
 			
 			this.openMaterial.blending = NoBlending;
 			this.renderPass( renderer, this.openMaterial, this.ssaoRenderTargets[1] );
 		}
 
 		// render swirl
-		this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssaoRenderTargets[1].texture;
-		this.copyMaterial.uniforms[ 'tDiffuse' ].needsUpdate = true;
+		this.copyMaterial.uniforms.tDiffuse.value = this.ssaoRenderTargets[1].texture;
+		this.copyMaterial.uniforms.tDiffuse.needsUpdate = true;
 		this.copyMaterial.blending = NoBlending;
 		this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 	  

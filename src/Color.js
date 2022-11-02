@@ -388,7 +388,7 @@ class Color {
 
 		// h,s,l ranges are in 0.0 - 1.0
 
-		const r = this.r, g = this.g, b = this.b;
+		const r = this.r; const g = this.g; const b = this.b;
 
 		const max = Math.max( r, g, b );
 		const min = Math.min( r, g, b );

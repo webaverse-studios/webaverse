@@ -24,6 +24,7 @@ class AttributeLayout {
 
     this.count = 0;
   }
+
   makeDefault(g) {
     return new THREE.BufferAttribute(
       new this.TypedArrayConstructor(g.attributes.position.count * this.itemSize),
@@ -36,6 +37,7 @@ class MorphAttributeLayout extends AttributeLayout {
     super(name, TypedArrayConstructor, itemSize);
     this.arraySize = arraySize;
   }
+
   makeDefault(g) {
     return Array(this.arraySize).fill(super.makeDefault(g));
   }

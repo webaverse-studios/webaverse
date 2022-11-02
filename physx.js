@@ -2012,7 +2012,7 @@ const physxWorker = (() => {
     const scales = scratchStack.f32.subarray(index, index + maxNumUpdates * 3)
     index += maxNumUpdates * 3
 
-    //console.log(updates);
+    // console.log(updates);
 
     for (let i = 0; i < updates.length; i++) {
       const update = updates[i]
@@ -2031,7 +2031,7 @@ const physxWorker = (() => {
     )
 
     const newUpdates = Array(numNewUpdates)
-    //console.log(numNewUpdates);
+    // console.log(numNewUpdates);
     for (let i = 0; i < numNewUpdates; i++) {
       newUpdates[i] = {
         id: ids[i],
@@ -2043,7 +2043,7 @@ const physxWorker = (() => {
 
     // console.log(newUpdates, "new ID");
 
-    //console.log(newUpdates);
+    // console.log(newUpdates);
     return newUpdates
   }
   w.addCapsuleGeometryPhysics = (

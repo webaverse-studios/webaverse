@@ -8,12 +8,15 @@ export class ScalarInterpolant {
     this.minValue = minValue;
     this.maxValue = maxValue;
   }
+
   get() {
     return this.value;
   }
+
   getNormalized() {
     return this.value / (this.maxValue - this.minValue);
   }
+
   getInverse() {
     return this.maxValue - this.value;
   }
@@ -24,6 +27,7 @@ export class BiActionInterpolant extends ScalarInterpolant {
   constructor(fn, minValue, maxValue) {
     super(fn, minValue, maxValue);
   }
+
   update(timeDiff) {
     this.value += (this.fn() ? 1 : -1) * timeDiff;
     this.value = Math.min(Math.max(this.value, this.minValue), this.maxValue);
@@ -35,6 +39,7 @@ export class UniActionInterpolant extends ScalarInterpolant {
   constructor(fn, minValue, maxValue) {
     super(fn, minValue, maxValue);
   }
+
   update(timeDiff) {
     if (this.fn()) {
       this.value += timeDiff;
@@ -50,6 +55,7 @@ export class InfiniteActionInterpolant extends ScalarInterpolant {
   constructor(fn, minValue) {
     super(fn, minValue, Infinity);
   }
+
   update(timeDiff) {
     if (this.fn()) {
       this.value += timeDiff;
@@ -88,6 +94,7 @@ export class SnapshotInterpolant {
 
     this.value = constructor();
   }
+
   update(timeDiff) {
     this.readTime += timeDiff;
     
@@ -116,6 +123,7 @@ export class SnapshotInterpolant {
       this.seekTo(effectiveReadTime);
     }
   }
+
   seekTo(t) {
     for (let i = -(this.numFrames - 1); i < 0; i++) {
       const index = this.snapshotWriteIndex + i;
@@ -136,6 +144,7 @@ export class SnapshotInterpolant {
     }
     console.warn('could not seek to time', t, JSON.parse(JSON.stringify(this.snapshots)));
   }
+
   snapshot(timeDiff) {
     const value = this.fn();
     // console.log('got value', value.join(','), timeDiff);
@@ -149,6 +158,7 @@ export class SnapshotInterpolant {
     
     this.snapshotWriteIndex = mod(this.snapshotWriteIndex + 1, this.numFrames);
   }
+
   get() {
     return this.value;
   }

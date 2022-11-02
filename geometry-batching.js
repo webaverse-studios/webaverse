@@ -17,26 +17,33 @@ export class DrawCallBinding {
     this.freeListEntry = freeListEntry;
     this.allocator = allocator;
   }
+
   getTexture(name) {
     return this.allocator.getTexture(name);
   }
+
   getTextureOffset(name) {
     const texture = this.getTexture(name);
     const {itemSize} = texture;
     return this.freeListEntry * this.allocator.maxInstancesPerGeometryPerDrawCall * itemSize;
   }
+
   getInstanceCount() {
     return this.allocator.getInstanceCount(this);
   }
+
   setInstanceCount(instanceCount) {
     this.allocator.setInstanceCount(this, instanceCount);
   }
+
   incrementInstanceCount() {
     return this.allocator.incrementInstanceCount(this);
   }
+
   decrementInstanceCount() {
     return this.allocator.decrementInstanceCount(this);
   }
+
   updateTexture(name, dataIndex, dataLength) {
     const texture = this.getTexture(name);
 
@@ -297,7 +304,7 @@ export class InstancedGeometryAllocator {
             return THREE.RGFormat;
           } else if (itemSize === 3) {
             return THREE.RGBFormat;
-          } else /*if (itemSize >= 4)*/ {
+          } else /* if (itemSize >= 4) */ {
             return THREE.RGBAFormat;
           }
         })();
@@ -347,6 +354,7 @@ export class InstancedGeometryAllocator {
       this.freeList = new FreeList(maxNumGeometries * maxDrawCallsPerGeometry);
     }
   }
+
   setGeometries(geometries) {
     const geometry = new THREE.BufferGeometry();
 
@@ -435,6 +443,7 @@ export class InstancedGeometryAllocator {
 
     // console.log('set geometries', geometry, Array.from(this.geometryRegistry.values()));
   }
+
   allocDrawCall(geometryIndex, lodIndex, instanceCount, boundingObject) {
     const freeListEntry = this.freeList.alloc(1);
     const drawCall = new DrawCallBinding(geometryIndex, freeListEntry, this);
@@ -460,6 +469,7 @@ export class InstancedGeometryAllocator {
     
     return drawCall;
   }
+
   freeDrawCall(drawCall) {
     const {freeListEntry} = drawCall;
 
@@ -482,6 +492,7 @@ export class InstancedGeometryAllocator {
 
     this.freeList.free(freeListEntry);
   }
+
   /* getInstanceCount(drawCall) {
     return this.drawInstanceCounts[drawCall.freeListEntry];
   }
@@ -497,6 +508,7 @@ export class InstancedGeometryAllocator {
   getTexture(name) {
     return this.textures[name];
   }
+
   getDrawSpec(camera, multiDrawStarts, multiDrawCounts, multiDrawInstanceCounts) {
     multiDrawStarts.length = this.drawStarts.length;
     multiDrawCounts.length = this.drawCounts.length;
@@ -555,6 +567,7 @@ export class InstancedBatchedMesh extends THREE.InstancedMesh {
     this.isBatchedMesh = true;
     this.allocator = allocator;
   }
+
 	getDrawSpec(camera, multiDrawStarts, multiDrawCounts, multiDrawInstanceCounts) {
     this.allocator.getDrawSpec(camera, multiDrawStarts, multiDrawCounts, multiDrawInstanceCounts);
   }

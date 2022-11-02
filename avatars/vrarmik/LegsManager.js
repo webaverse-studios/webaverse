@@ -104,7 +104,7 @@ class Leg {
     const flatFootRotation = localQuaternion.setFromEuler(localEuler); */
 
     const hypotenuseDistance = this.upperLegLength;
-    const verticalDistance = ((this.legsManager.rig.shoulderTransforms.prone /*|| !this.standing*/) ?
+    const verticalDistance = ((this.legsManager.rig.shoulderTransforms.prone /* || !this.standing */) ?
     	upperLegPosition.distanceTo(this.foot.stickTransform.position)
     :
       Math.abs(upperLegPosition.y - this.foot.stickTransform.position.y)
@@ -293,7 +293,7 @@ class LegsManager {
       // rotation
 
       const maxTiltAngleFactor = 0.1;
-      if (/*this.leftLeg.standing && */!this.rig.shoulderTransforms.prone) {
+      if (/* this.leftLeg.standing && */!this.rig.shoulderTransforms.prone) {
         const leftFootEuler = localEuler.setFromQuaternion(leftFootRotation, 'YXZ');
         leftFootEuler.x = 0;
   	    leftFootEuler.z = 0;
@@ -313,7 +313,7 @@ class LegsManager {
       	Helpers.getWorldQuaternion(this.leftLeg.foot, this.leftLeg.foot.stickTransform.quaternion)
       	  .multiply(upHalfRotation);
       }
-      if (/*this.rightLeg.standing && */!this.rig.shoulderTransforms.prone) {
+      if (/* this.rightLeg.standing && */!this.rig.shoulderTransforms.prone) {
   	    const rightFootEuler = localEuler.setFromQuaternion(rightFootRotation, 'YXZ');
   	    rightFootEuler.x = 0;
   	    rightFootEuler.z = 0;
@@ -356,8 +356,8 @@ class LegsManager {
       this.leftLeg.stepFactor = _getLegStepFactor(this.leftLeg);
       this.rightLeg.stepFactor = _getLegStepFactor(this.rightLeg);
 
-      const leftCanStep = /*this.leftLeg.standing && */!this.leftLeg.stepping && (!this.rightLeg.stepping || this.rightLeg.stepFactor >= crossStepFactor);
-      const rightCanStep = /*this.rightLeg.standing && */!this.rightLeg.stepping && (!this.leftLeg.stepping || this.leftLeg.stepFactor >= crossStepFactor);
+      const leftCanStep = /* this.leftLeg.standing && */!this.leftLeg.stepping && (!this.rightLeg.stepping || this.rightLeg.stepFactor >= crossStepFactor);
+      const rightCanStep = /* this.rightLeg.standing && */!this.rightLeg.stepping && (!this.leftLeg.stepping || this.leftLeg.stepFactor >= crossStepFactor);
       const maxStepAngleFactor = 0;
       if (leftCanStep || rightCanStep) {
       	let leftStepDistance = 0;
@@ -394,7 +394,7 @@ class LegsManager {
   			}
 
         const _stepLeg = leg => {
-          const footDistance = this.legSeparation*stepRestitutionDistance;//Math.min(Math.max(leftStepDistance, this.legSeparation*0.7), this.legSeparation*1.4);
+          const footDistance = this.legSeparation*stepRestitutionDistance;// Math.min(Math.max(leftStepDistance, this.legSeparation*0.7), this.legSeparation*1.4);
 
   				leg.foot.startTransform.position.copy(leg.foot.stickTransform.position);
           // leg.foot.startTransform.quaternion.copy(leg.foot.stickTransform.quaternion);

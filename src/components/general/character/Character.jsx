@@ -105,7 +105,7 @@ const Stat = ({
 
 //
 
-export const Character = ({ game, /* wearActions,*/ dioramaCanvasRef }) => {
+export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
 
     const { state, setState } = useContext( AppContext );
     const [ open, setOpen ] = useState(false);

@@ -16,9 +16,11 @@ export class GeometryPositionIndexBinding {
     this.indexFreeListEntry = indexFreeListEntry;
     this.geometry = geometry;
   }
+
   getAttributeOffset(name = 'position') {
     return this.positionFreeListEntry / 3 * this.geometry.attributes[name].itemSize;
   }
+
   getIndexOffset() {
     return this.indexFreeListEntry;
   }
@@ -77,6 +79,7 @@ export class GeometryAllocator {
     this.boundingData = new Float32Array(maxNumDraws * boundingSize);
     this.numDraws = 0;
   }
+
   alloc(
     numPositions,
     numIndices,
@@ -106,6 +109,7 @@ export class GeometryAllocator {
 
     return geometryBinding;
   }
+
   free(geometryBinding) {
     const slot = geometryBinding.indexFreeListEntry;
     const expectedStartValue =
@@ -147,7 +151,8 @@ export class GeometryAllocator {
     this.positionFreeList.free(geometryBinding.positionFreeListEntry);
     this.indexFreeList.free(geometryBinding.indexFreeListEntry);
   }
-  getDrawSpec(camera, drawStarts, drawCounts/*, distanceArray*/) {
+
+  getDrawSpec(camera, drawStarts, drawCounts/*, distanceArray */) {
     drawStarts.length = 0;
     drawCounts.length = 0;
     // distanceArray.length = 0;
@@ -180,7 +185,8 @@ export class BufferedMesh extends THREE.Mesh {
     this.allocator = allocator;
     // this.distanceArray = [];
   }
+
 	getDrawSpec(camera, drawStarts, drawCounts) {
-    this.allocator.getDrawSpec(camera, drawStarts, drawCounts/*, this.distanceArray*/);
+    this.allocator.getDrawSpec(camera, drawStarts, drawCounts/*, this.distanceArray */);
   }
 }

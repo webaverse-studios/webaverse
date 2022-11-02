@@ -4,6 +4,7 @@ class AudioManager {
   constructor() {
     this.audioContext = null;
   }
+
   getAudioContext() {
     if (!this.audioContext) {
       this.audioContext = getAudioContext();
@@ -13,10 +14,12 @@ class AudioManager {
     }
     return this.audioContext;
   }
+
   setVolume(volume) {
     const audioContext = this.getAudioContext();
     audioContext.gain.gain.value = volume;
   }
+
   playBuffer(audioBuffer) {
     const audioContext = this.getAudioContext();
     const sourceNode = audioContext.createBufferSource();

@@ -231,9 +231,11 @@ class PostProcessing extends EventTarget {
     ];
     this.defaultInternalPasses = [];
   }
+
   bindCanvas() {
     this.setPasses(this.defaultPasses, this.defaultInternalPasses);
   }
+
   makePasses(rendersettings) {
     const passes = [];
     const internalPasses = [];
@@ -287,6 +289,7 @@ class PostProcessing extends EventTarget {
       internalPasses,
     };
   }
+
   setPasses(passes, internalPasses) {
     const composer = getComposer();
 

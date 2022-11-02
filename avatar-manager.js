@@ -79,6 +79,7 @@ class AvatarManager extends EventTarget {
       this.cleanup = null;
     }
   }
+
   destroy() {
     if (this.cleanup) {
       this.cleanup();

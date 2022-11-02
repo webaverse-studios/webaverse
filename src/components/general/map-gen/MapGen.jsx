@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import classnames from 'classnames';
 import metaversefile from 'metaversefile';
-const {useLocalPlayer, useLoreAIScene} = metaversefile;
 // import {world} from '../../../../world.js';
 // import webaverse from '../../../../webaverse.js';
 import {registerIoEventHandler, unregisterIoEventHandler} from '../io-handler';
@@ -35,6 +34,7 @@ import {
 } from '../../../../procgen/procgen.js';
 import styles from './map-gen.module.css';
 import { AppContext } from '../../app';
+const {useLocalPlayer, useLoreAIScene} = metaversefile;
 
 //
 
@@ -1000,7 +1000,7 @@ export const MapGen = () => {
         unregisterIoEventHandler('dblclick', dblclick);
         unregisterIoEventHandler('mouseup', mouseUp);
       };
-    }, [ state.openedPanel, terrainApp, mouseState, /*hoveredObject, */ hoveredPhysicsObject, selectedPhysicsObject ] );
+    }, [ state.openedPanel, terrainApp, mouseState, /* hoveredObject, */ hoveredPhysicsObject, selectedPhysicsObject ] );
 
     // initialize terrain
     useEffect(async () => {

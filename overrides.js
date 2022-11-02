@@ -3,9 +3,11 @@ class Override extends EventTarget {
     super();
     this.value = value;
   }
+
   get() {
     return this.value;
   }
+
   set(value) {
     if (value !== this.value) {
       this.value = value;

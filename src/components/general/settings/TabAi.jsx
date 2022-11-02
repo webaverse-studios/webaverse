@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 import { Switch } from './switch';
 import loreAI from '../../../../ai/lore/lore-ai';
-import preauthenticator from '../../../../preauthenticator';
+// import preauthenticator from '../../../../preauthenticator';
 import debug from '../../../../debug';
 
 import styles from './settings.module.css';
@@ -43,7 +43,7 @@ export const TabAi = ({ active }) => {
         };
     }, []);
 
-    useEffect(() => {
+    /* useEffect(() => {
         let live = true;
         (async () => {
             const hasApiKey = await preauthenticator.hasAuthenticatedApi(authenticatedApiName);
@@ -54,7 +54,7 @@ export const TabAi = ({ active }) => {
         return () => {
             live = false;
         }
-    }, []);
+    }, []); */
 
     //
 
