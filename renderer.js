@@ -194,27 +194,6 @@ globalThis.addEventListener('resize', e => {
   _setSizes();
 });
 
-/* addDefaultLights(scene, {
-  shadowMap: true,
-});
-addDefaultLights(sceneHighPriority, {
-  shadowMap: false,
-});
-addDefaultLights(sceneLowPriority, {
-  shadowMap: false,
-});
-addDefaultLights(avatarScene, {
-  shadowMap: false,
-}); */
-
-/* const renderer2 = new CSS3DRenderer();
-renderer2.setSize(window.innerWidth, window.innerHeight);
-renderer2.domElement.style.position = 'absolute';
-renderer2.domElement.style.top = 0;
-if (canvas.parentNode) {
-  document.body.insertBefore(renderer2.domElement, canvas);
-} */
-
 export function createCanvas(width, height) {
   if (isWorker) {
     return new OffscreenCanvas(width, height);
@@ -228,26 +207,15 @@ export function createCanvas(width, height) {
 
 export {
   waitForLoad,
-  // AppManager,
   bindCanvas,
   getRenderer,
   getContainerElement,
   getComposer,
   scene,
   rootScene,
-  // postSceneOrthographic,
-  // postScenePerspective,
-  // avatarScene,
   camera,
-  // orthographicCamera,
-  // avatarCamera,
-  // dolly,
-  /*orbitControls, renderer2,*/
   sceneHighPriority,
   sceneLowPriority,
   sceneLowerPriority,
   sceneLowestPriority,
-  // iframeContainer,
-  // iframeContainer2,
-  // appManager,
 };
