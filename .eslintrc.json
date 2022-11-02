@@ -46,7 +46,8 @@
       "no-prototype-builtins": "off",
       "react/display-name": "off",
       "no-lone-blocks": "off",
-      "eol-last": ["error", "always"],
+      "eol-last": ["error", "never"],
+      "space-in-parens": ["error", "always"],
       "no-unused-vars": ["warn"],
       "comma-dangle": ["warn", "always-multiline"],
       "object-curly-spacing": ["warn", "never"],
@@ -57,7 +58,7 @@
       "no-useless-escape": ["off"],
       "react/no-unescaped-entities": ["off"],
       "space-before-function-paren": [
-        "warn",
+        "never",
         {
           "anonymous": "never",
           "named": "never",
