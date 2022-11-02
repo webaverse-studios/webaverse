@@ -1,16 +1,16 @@
 
-import React, { useEffect, useContext, useState } from 'react';
+import React, {useEffect, useContext, useState} from 'react';
 import classnames from 'classnames';
 import cameraManager from '../../../../camera-manager.js';
-import { AppContext } from '../../app';
+import {AppContext} from '../../app';
 
 import styles from './action-menu.module.css';
 
 //
 
-export const ActionMenu = ({ setUIMode, className }) => {
+export const ActionMenu = ({setUIMode, className}) => {
 
-    const { state, setState, app, uiMode } = useContext(AppContext);
+    const {state, setState, app, uiMode} = useContext(AppContext);
     const [ xrSupported, setXrSupported ] = useState(false);
 
     //
@@ -30,7 +30,7 @@ export const ActionMenu = ({ setUIMode, className }) => {
 
             }
     
-            setState({ openedPanel: null });
+            setState({openedPanel: null});
 
         } else if (state.openedPanel !== 'SettingsPanel') {
 
@@ -40,7 +40,7 @@ export const ActionMenu = ({ setUIMode, className }) => {
 
             }
 
-            setState({ openedPanel: 'WorldPanel' });
+            setState({openedPanel: 'WorldPanel'});
 
         }
 
@@ -48,7 +48,7 @@ export const ActionMenu = ({ setUIMode, className }) => {
 
     const handleSettingsBtnClick = () => {
 
-        setState({ openedPanel: 'SettingsPanel' });
+        setState({openedPanel: 'SettingsPanel'});
 
     };
 

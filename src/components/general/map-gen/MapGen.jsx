@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
 import classnames from 'classnames';
 import metaversefile from 'metaversefile';
 // import {world} from '../../../../world.js';
@@ -33,7 +33,7 @@ import {
   createMapChunkMesh,
 } from '../../../../procgen/procgen.js';
 import styles from './map-gen.module.css';
-import { AppContext } from '../../app';
+import {AppContext} from '../../app';
 const {useLocalPlayer, useLoreAIScene} = metaversefile;
 
 //
@@ -208,7 +208,7 @@ const _makeChunkMesh = (x, y) => {
 
 export const MapGen = () => {
 
-    const { state, setState } = useContext(AppContext);
+    const {state, setState} = useContext(AppContext);
     const [width, setWidth] = useState(window.innerWidth);
     const [height, setHeight] = useState(window.innerHeight); 
     // const [position, setPosition] = useState(() => new THREE.Vector3(0, 100, 0));
@@ -599,7 +599,7 @@ export const MapGen = () => {
 
                       if (state.openedPanel === 'MapGenPanel') {
 
-                          setState({ openedPanel: null });
+                          setState({openedPanel: null});
 
                           if (! cameraManager.pointerLockElement) {
 
@@ -615,7 +615,7 @@ export const MapGen = () => {
 
                           }
 
-                          setState({ openedPanel: 'MapGenPanel' });
+                          setState({openedPanel: 'MapGenPanel'});
 
                       }
 

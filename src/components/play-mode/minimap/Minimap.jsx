@@ -14,7 +14,7 @@ const minimapWorldSize = 400;
 const minimapMinZoom = 0.1;
 const minimapBaseSpeed = 30;
 
-export const Minimap = ({ className }) => {
+export const Minimap = ({className}) => {
 
     const canvasRef = useRef();
 

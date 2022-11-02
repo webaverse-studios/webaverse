@@ -10,10 +10,10 @@ import physx from './physx.js'
 // import ioManager from './io-manager.js';
 // import {getPlayerCrouchFactor} from './character-controller.js';
 import metaversefileApi from 'metaversefile'
-import { getNextPhysicsId, freePhysicsId, convertMeshToPhysicsMesh } from './util.js'
+import {getNextPhysicsId, freePhysicsId, convertMeshToPhysicsMesh} from './util.js'
 // import {applyVelocity} from './util.js';
 // import {groundFriction} from './constants.js';
-import { CapsuleGeometry } from './geometries.js'
+import {CapsuleGeometry} from './geometries.js'
 import physxWorkerManager from './physx-worker-manager.js';
 
 // const localVector = new THREE.Vector3()
@@ -48,7 +48,7 @@ const _makePhysicsObject = (physicsId, position, quaternion, scale) => {
 };
 const _updatePhysicsObjects = updatesOut => {
   for (const updateOut of updatesOut) {
-    const { id, position, quaternion, collided, grounded } = updateOut
+    const {id, position, quaternion, collided, grounded} = updateOut
     const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(id)
     if (physicsObject) {
       // console.log('update physics object', id);
@@ -122,7 +122,7 @@ class PhysicsScene extends EventTarget {
     physicsMesh.visible = false
     physicsObject.add(physicsMesh)
     physicsMesh.updateMatrixWorld()
-    const { bounds } = this.getGeometryForPhysicsId(physicsId)
+    const {bounds} = this.getGeometryForPhysicsId(physicsId)
     physicsMesh.geometry.boundingBox = new THREE.Box3(
       new THREE.Vector3().fromArray(bounds, 0),
       new THREE.Vector3().fromArray(bounds, 3)
@@ -180,7 +180,7 @@ class PhysicsScene extends EventTarget {
     physicsMesh.visible = false
     physicsObject.add(physicsMesh)
     physicsObject.updateMatrixWorld()
-    const { bounds } = this.getGeometryForPhysicsId(physicsId)
+    const {bounds} = this.getGeometryForPhysicsId(physicsId)
     physicsMesh.geometry.boundingBox = new THREE.Box3(
       new THREE.Vector3().fromArray(bounds, 0),
       new THREE.Vector3().fromArray(bounds, 3)
@@ -191,7 +191,7 @@ class PhysicsScene extends EventTarget {
 
   extractPhysicsGeometryForId(physicsId) {
     const physicsGeometry = this.getGeometryForPhysicsId(physicsId)
-    const { positions, indices, bounds } = physicsGeometry
+    const {positions, indices, bounds} = physicsGeometry
     let geometry = new THREE.BufferGeometry()
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
     geometry.setIndex(new THREE.BufferAttribute(indices, 1))
@@ -750,7 +750,7 @@ class PhysicsScene extends EventTarget {
     physicsMesh.visible = false
     physicsObject.add(physicsMesh)
     physicsMesh.updateMatrixWorld()
-    const { bounds } = this.getGeometryForPhysicsId(physicsId)
+    const {bounds} = this.getGeometryForPhysicsId(physicsId)
     physicsMesh.geometry.boundingBox = new THREE.Box3(
       new THREE.Vector3().fromArray(bounds, 0),
       new THREE.Vector3().fromArray(bounds, 3)

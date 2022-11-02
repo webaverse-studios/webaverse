@@ -6,7 +6,7 @@ import styles from './switch.module.css';
 
 //
 
-export const Switch = ({ value, setValue, values, className }) => {
+export const Switch = ({value, setValue, values, className}) => {
 
     const handleLeftArrowClick = () => {
 

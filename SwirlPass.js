@@ -24,12 +24,12 @@ import {
 	// Scene,
 } from 'three';
 import * as THREE from 'three';
-import { Pass, FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
+import {Pass, FullScreenQuad} from 'three/examples/jsm/postprocessing/Pass.js';
 // import { SimplexNoise } from 'three/examples/jsm/math/SimplexNoise.js';
 // import { SSAOShader } from 'three/examples/jsm/shaders/SSAOShader.js';
 // import { SSAOBlurShader } from 'three/examples/jsm/shaders/SSAOShader.js';
 // import { SSAODepthShader } from 'three/examples/jsm/shaders/SSAOShader.js';
-import { CopyShader } from 'three/examples/jsm/shaders/CopyShader.js';
+import {CopyShader} from 'three/examples/jsm/shaders/CopyShader.js';
 
 // const oldParentCache = new WeakMap();
 // const oldMaterialCache = new WeakMap();
@@ -409,4 +409,4 @@ class SwirlPass extends Pass {
 
 }
 
-export { SwirlPass };
+export {SwirlPass};

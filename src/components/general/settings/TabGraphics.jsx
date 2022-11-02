@@ -1,11 +1,11 @@
 
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import classNames from 'classnames';
 
 import game from '../../../../game.js';
 import metaversefileApi from '../../../../metaversefile-api'
 import settingsManager from '../../../../settings-manager.js';
-import { Switch } from './switch';
+import {Switch} from './switch';
 
 import styles from './settings.module.css';
 
@@ -28,7 +28,7 @@ const DefaultSettings = {
     }
 };
 
-export const TabGraphics = ({ active }) => {
+export const TabGraphics = ({active}) => {
 
     const [ appyingChanges, setAppyingChanges ] = useState(false);
     const [ changesNotSaved, setChangesNotSaved ] = useState(false);

@@ -1,8 +1,8 @@
 
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import classNames from 'classnames';
 
-import { Switch } from './switch';
+import {Switch} from './switch';
 import loreAI from '../../../../ai/lore/lore-ai';
 // import preauthenticator from '../../../../preauthenticator';
 import debug from '../../../../debug';
@@ -18,7 +18,7 @@ const DefaultSettings = {
 };
 const authenticatedApiName = 'ai';
 
-export const TabAi = ({ active }) => {
+export const TabAi = ({active}) => {
 
     const [ appyingChanges, setAppyingChanges ] = useState(false);
     const [ changesNotSaved, setChangesNotSaved ] = useState(false);

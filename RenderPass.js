@@ -1,7 +1,7 @@
 import {
 	Color
 } from 'three';
-import { Pass } from 'three/examples/jsm/postprocessing/Pass.js';
+import {Pass} from 'three/examples/jsm/postprocessing/Pass.js';
 
 class RenderPass extends Pass {
 
@@ -78,4 +78,4 @@ class RenderPass extends Pass {
 
 }
 
-export { RenderPass };
+export {RenderPass};

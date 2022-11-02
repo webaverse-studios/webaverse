@@ -159,7 +159,7 @@ export class DcWorkerManager {
   }
 
   getNextWorker() {
-    const { workers } = this;
+    const {workers} = this;
     const worker = workers[this.nextWorker];
     this.nextWorker = (this.nextWorker + 1) % workers.length;
     return worker;

@@ -1,29 +1,29 @@
 
-import React, { useState, useEffect, useRef, useContext, createContext } from 'react';
+import React, {useState, useEffect, useRef, useContext, createContext} from 'react';
 import classnames from 'classnames';
 
 import game from '../../../game';
-import { parseQuery } from '../../../util.js'
+import {parseQuery} from '../../../util.js'
 import Webaverse from '../../../webaverse.js';
 import universe from '../../../universe.js';
 import cameraManager from '../../../camera-manager';
-import { world } from '../../../world';
+import {world} from '../../../world';
 
-import { ActionMenu } from '../general/action-menu';
-import { Crosshair } from '../general/crosshair';
-import { Settings } from '../general/settings';
-import { WorldObjectsList } from '../general/world-objects-list';
-import { IoHandler, registerIoEventHandler, unregisterIoEventHandler } from '../general/io-handler';
-import { ZoneTitleCard } from '../general/zone-title-card';
-import { Quests } from '../play-mode/quests';
-import { MapGen } from '../general/map-gen/MapGen.jsx';
-import { UIMode } from '../general/ui-mode';
-import { LoadingBox } from '../../LoadingBox.jsx';
-import { FocusBar } from '../../FocusBar.jsx';
-import { DragAndDrop } from '../../DragAndDrop.jsx';
-import { Stats } from '../../Stats.jsx';
-import { PlayMode } from '../play-mode';
-import { EditorMode } from '../editor-mode';
+import {ActionMenu} from '../general/action-menu';
+import {Crosshair} from '../general/crosshair';
+import {Settings} from '../general/settings';
+import {WorldObjectsList} from '../general/world-objects-list';
+import {IoHandler, registerIoEventHandler, unregisterIoEventHandler} from '../general/io-handler';
+import {ZoneTitleCard} from '../general/zone-title-card';
+import {Quests} from '../play-mode/quests';
+import {MapGen} from '../general/map-gen/MapGen.jsx';
+import {UIMode} from '../general/ui-mode';
+import {LoadingBox} from '../../LoadingBox.jsx';
+import {FocusBar} from '../../FocusBar.jsx';
+import {DragAndDrop} from '../../DragAndDrop.jsx';
+import {Stats} from '../../Stats.jsx';
+import {PlayMode} from '../play-mode';
+import {EditorMode} from '../editor-mode';
 import Header from '../../Header.jsx';
 import QuickMenu from '../../QuickMenu.jsx';
 import {ClaimsNotification} from '../../ClaimsNotification.jsx';
@@ -37,10 +37,10 @@ import '../../fonts.css';
 import raycastManager from '../../../raycast-manager';
 import npcManager from '../../../npc-manager';
 
-import { AccountContext } from '../../hooks/web3AccountProvider';
-import { ChainContext } from '../../hooks/chainProvider';
+import {AccountContext} from '../../hooks/web3AccountProvider';
+import {ChainContext} from '../../hooks/chainProvider';
 import loadoutManager from '../../../loadout-manager';
-import { partyManager } from '../../../party-manager';
+import {partyManager} from '../../../party-manager';
 
 //
 
@@ -66,7 +66,7 @@ const _startApp = async (weba, canvas) => {
 const _getCurrentSceneSrc = () => {
 
     const q = parseQuery(window.location.search);
-    let { src } = q;
+    let {src} = q;
 
     if (src === undefined) {
 
@@ -81,7 +81,7 @@ const _getCurrentSceneSrc = () => {
 const _getCurrentRoom = () => {
 
     const q = parseQuery(window.location.search);
-    const { room } = q;
+    const {room} = q;
     return room || '';
 
 };
@@ -134,7 +134,7 @@ const Canvas = ({
 
 export const App = () => {
 
-    const [ state, setState ] = useState({ openedPanel: null });
+    const [ state, setState ] = useState({openedPanel: null});
     const [ uiMode, setUIMode ] = useState('normal');
 
     const canvasRef = useRef(null);
@@ -203,7 +203,7 @@ export const App = () => {
 
         if (uiMode === 'none') {
 
-            setState({ openedPanel: null });
+            setState({openedPanel: null});
 
         }
 
@@ -322,7 +322,7 @@ export const App = () => {
             onDragEnd={onDragEnd}
             onDragOver={onDragOver}
         >
-            <AppContext.Provider value={{ state, setState, app, setSelectedApp, selectedApp, uiMode, account, chain }}>
+            <AppContext.Provider value={{state, setState, app, setSelectedApp, selectedApp, uiMode, account, chain}}>
                 <Header setSelectedApp={ setSelectedApp } selectedApp={ selectedApp } />
                 <DomRenderer />
                 <Canvas app={app} />

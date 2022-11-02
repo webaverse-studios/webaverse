@@ -1,8 +1,8 @@
 
 import classNames from 'classnames';
-import React, { useContext, useEffect, useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
-import { AppContext } from '../../app';
+import {AppContext} from '../../app';
 
 import styles from './component-editor.module.css';
 
@@ -10,7 +10,7 @@ const PROTECTED_PROPS = ['contentId', 'instanceId']
 
 export const ComponentEditor = () => {
 
-    const { selectedApp } = useContext(AppContext);
+    const {selectedApp} = useContext(AppContext);
     const [ components, setComponents ] = useState([]);
     const [ editComponentKey, setEditComponentKey ] = useState(null);
     const [ editComponentKeyNewValue, setEditComponentKeyNewValue ] = useState(null);
@@ -29,7 +29,7 @@ export const ComponentEditor = () => {
             if (typeof component.value === 'number') type = 'number';
             if (typeof component.value === 'boolean') type = 'bool';
 
-            newComponents.push({ key: component.key, value: (type === 'json' ? JSON.stringify(component.value) : component.value), type: component.type ?? type, _componentEditorError: component._componentEditorError });
+            newComponents.push({key: component.key, value: (type === 'json' ? JSON.stringify(component.value) : component.value), type: component.type ?? type, _componentEditorError: component._componentEditorError});
 
         });
 
@@ -91,7 +91,7 @@ export const ComponentEditor = () => {
 
     const handleAddNewBtnClick = () => {
 
-        selectedApp.components.push({ key: `New item ${selectedApp.components.length}`, value: '', type: 'string' });
+        selectedApp.components.push({key: `New item ${selectedApp.components.length}`, value: '', type: 'string'});
         // components.push({ key: 'New item', value: '', type: 'string', error: false });
 
         syncComponentsList();

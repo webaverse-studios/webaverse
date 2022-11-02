@@ -1,15 +1,15 @@
 
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import classNames from 'classnames';
 
 // import WebaWallet from '../../wallet';
-import { Button } from './button';
+import {Button} from './button';
 
 import styles from './settings.module.css';
 
 //
 
-export const TabGeneral = ({ active }) => {
+export const TabGeneral = ({active}) => {
 
     const handleLogoutBtnClick = () => {
 

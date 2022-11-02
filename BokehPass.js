@@ -14,8 +14,8 @@ import {
 	FloatType,
 	RGBAFormat,
 } from 'three';
-import { Pass, FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
-import { BokehShader } from './BokehShader.js';
+import {Pass, FullScreenQuad} from 'three/examples/jsm/postprocessing/Pass.js';
+import {BokehShader} from './BokehShader.js';
 
 const oldParentCache = new WeakMap();
 const oldMaterialCache = new WeakMap();
@@ -125,4 +125,4 @@ class BokehPass extends Pass {
 
 }
 
-export { BokehPass };
+export {BokehPass};

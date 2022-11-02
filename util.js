@@ -215,7 +215,7 @@ export function mergeMeshes(meshes, geometries, textures) {
   const colorsImageCtx = colorsImage.getContext('2d');
   colorsImageCtx.fillStyle = '#FFF';
   colorsImageCtx.fillRect(0, 0, colorsImage.width, colorsImage.height);
-  const { atlasCanvas, rects } = _makeAtlas(size, images.concat(colorsImage));
+  const {atlasCanvas, rects} = _makeAtlas(size, images.concat(colorsImage));
   const colorsImageRect = rects[rects.length - 1];
   let colorsImageColorIndex = 0;
   const atlasCanvasCtx = atlasCanvas.getContext('2d');
@@ -240,7 +240,7 @@ export function mergeMeshes(meshes, geometries, textures) {
     for (let i = 0; i < meshes.length; i++) {
       const mesh = meshes[i];
       const geometry = geometries[i];
-      const { material } = mesh;
+      const {material} = mesh;
       const rect = rects[i];
 
       geometry.applyMatrix4(mesh.matrixWorld);
@@ -381,7 +381,7 @@ export function convertMeshToPhysicsMesh(topMesh) {
     }
   });
   const newGeometries = meshes.map((mesh) => {
-    const { geometry } = mesh;
+    const {geometry} = mesh;
     const newGeometry = new THREE.BufferGeometry();
     if (mesh.isSkinnedMesh) {
       localMatrix2.identity();
@@ -514,7 +514,7 @@ export async function contentIdToFile(contentId) {
   if (typeof contentId === 'number') {
     const res = await fetch(`${tokensHost}/${contentId}`);
     token = await res.json();
-    const { hash, name, ext } = token.properties;
+    const {hash, name, ext} = token.properties;
 
     const res2 = await fetch(`${storageHost}/${hash}`);
     const file = await res2.blob();
@@ -818,7 +818,7 @@ export const waitForFrame = () =>
     });
   });
 
-const doUpload = async (u, f, { onProgress = null } = {}) => {
+const doUpload = async (u, f, {onProgress = null} = {}) => {
   var xhr = new XMLHttpRequest();
   xhr.open('POST', u, true);
   // xhr.setRequestHeader('Content-Type', 'application/json');
@@ -896,7 +896,7 @@ export const handleDropJsonItem = async (item) => {
   }
   return null;
 };
-export const handleUpload = async (item, { onProgress = null } = {}) => {
+export const handleUpload = async (item, {onProgress = null} = {}) => {
   console.log('uploading...', item);
 
   const _handleFileList = async (item) => {
@@ -986,8 +986,8 @@ export const handleUpload = async (item, { onProgress = null } = {}) => {
     const j = await doUpload(`https://ipfs.webaverse.com/`, file, {
       onProgress,
     });
-    const { hash } = j;
-    const { name } = file;
+    const {hash} = j;
+    const {name} = file;
 
     return `${storageHost}/${hash}/${name}`;
   };
@@ -1168,7 +1168,7 @@ export const selectVoice = (voicer) => {
   };
   // the weight of each voice is proportional to the inverse of the number of times it has been used
   const maxNonce = voicer.reduce((max, voice) => Math.max(max, voice.nonce), 0);
-  const weights = voicer.map(({ nonce }) => {
+  const weights = voicer.map(({nonce}) => {
     return 1 - nonce / (maxNonce + 1);
   });
   const selectionIndex = weightedRandom(weights);

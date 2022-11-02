@@ -1,4 +1,4 @@
-import { BufferGeometry, Vector2, Vector3, Float32BufferAttribute } from 'three';
+import {BufferGeometry, Vector2, Vector3, Float32BufferAttribute} from 'three';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import * as Curves from 'three/src/extras/curves/Curves.js';
 

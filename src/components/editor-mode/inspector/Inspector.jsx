@@ -1,12 +1,12 @@
 
-import React, { useState, useEffect, useContext } from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import classnames from 'classnames';
 
-import { world2canvas } from '../../../ThreeUtils.js';
-import { world } from '../../../../world.js';
+import {world2canvas} from '../../../ThreeUtils.js';
+import {world} from '../../../../world.js';
 import game from '../../../../game.js';
 
-import { AppContext } from '../../app';
+import {AppContext} from '../../app';
 
 import styles from './inspector.module.css';
 
@@ -14,7 +14,7 @@ import styles from './inspector.module.css';
 
 export const Inspector = () => {
 
-    const { state, setState, setSelectedApp, selectedApp } = useContext(AppContext);
+    const {state, setState, setSelectedApp, selectedApp} = useContext(AppContext);
     const [hoverPosition, setHoverPosition] = useState(null);
     const [selectPosition, setSelectPosition] = useState(null);
     const [epoch, setEpoch] = useState(0);
@@ -66,7 +66,7 @@ export const Inspector = () => {
 
         const dragchange = e => {
 
-            const { dragging } = e.data;
+            const {dragging} = e.data;
             setDragging(dragging);
             setHoverPosition(null);
 

@@ -1,12 +1,12 @@
 
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, {useState, useEffect, useContext, useRef} from 'react';
 import classnames from 'classnames';
 
 import universe from '../../../../universe'
 import voiceInput from '../../../../voice-input/voice-input';
 import {sceneManager} from '../../../../scene-manager';
 
-import { AppContext } from '../../app';
+import {AppContext} from '../../app';
 import {scenesBaseUrl} from '../../../../endpoints';
 import {makeId} from '../../../../util.js';
 
@@ -14,9 +14,9 @@ import styles from './scene-menu.module.css';
 
 //
 
-export const SceneMenu = ({ className, multiplayerConnected, selectedScene, setSelectedScene, selectedRoom, setSelectedRoom }) => {
+export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSelectedScene, selectedRoom, setSelectedRoom}) => {
 
-    const { state, setState } = useContext(AppContext);
+    const {state, setState} = useContext(AppContext);
     const sceneNameInputRef = useRef(null);
     const [ rooms, setRooms ] = useState([]);
     const [ micEnabled, setMicEnabled ] = useState(false);
@@ -77,13 +77,13 @@ export const SceneMenu = ({ className, multiplayerConnected, selectedScene, setS
     const handleSceneMenuOpen = (value) => {
 
         value = (typeof value === 'boolean' ? value : (state.openedPanel === 'SceneMenuPanel'));
-        setState({ openedPanel: value ? null : 'SceneMenuPanel' });
+        setState({openedPanel: value ? null : 'SceneMenuPanel'});
 
     };
 
     const handleSceneSelect = (event, sceneName) => {
 
-        setState({ openedPanel: null });
+        setState({openedPanel: null});
 
         sceneName = sceneName ?? event.target.value;
         setSelectedScene(sceneName);
@@ -98,7 +98,7 @@ export const SceneMenu = ({ className, multiplayerConnected, selectedScene, setS
 
         if (! multiplayerConnected) {
 
-            setState({ openedPanel: value ? null : 'RoomMenuPanel' });
+            setState({openedPanel: value ? null : 'RoomMenuPanel'});
 
         } else {
 
@@ -133,7 +133,7 @@ export const SceneMenu = ({ className, multiplayerConnected, selectedScene, setS
 
     const handleRoomSelect = (room) => {
 
-        setState({ openedPanel: null });
+        setState({openedPanel: null});
 
         if (! universe.isConnected()) {
 
@@ -154,7 +154,7 @@ export const SceneMenu = ({ className, multiplayerConnected, selectedScene, setS
 
         event.stopPropagation();
 
-        const res = await fetch(universe.getWorldsHost() + room.name, { method: 'DELETE' });
+        const res = await fetch(universe.getWorldsHost() + room.name, {method: 'DELETE'});
 
         if (res.ok) {
 
@@ -185,7 +185,7 @@ export const SceneMenu = ({ className, multiplayerConnected, selectedScene, setS
 
                 event.preventDefault();
                 event.stopPropagation();
-                setState({ openedPanel: null });
+                setState({openedPanel: null});
                 sceneNameInputRef.current.blur();
                 break;
 
@@ -196,7 +196,7 @@ export const SceneMenu = ({ className, multiplayerConnected, selectedScene, setS
                 event.preventDefault();
                 event.stopPropagation();
                 universe.pushUrl(`/?src=${ encodeURIComponent(sceneInputName) }`);
-                setState({ openedPanel: null });
+                setState({openedPanel: null});
                 sceneNameInputRef.current.blur();
                 break;
 
@@ -208,7 +208,7 @@ export const SceneMenu = ({ className, multiplayerConnected, selectedScene, setS
 
     const handleMicBtnClick = async () => {
 
-        setState({ openedPanel: null });
+        setState({openedPanel: null});
 
         if (! voiceInput.micEnabled()) {
 
@@ -224,7 +224,7 @@ export const SceneMenu = ({ className, multiplayerConnected, selectedScene, setS
 
     const handleSpeakBtnClick = async () => {
 
-        setState({ openedPanel: null });
+        setState({openedPanel: null});
 
         if (! voiceInput.speechEnabled()) {
 

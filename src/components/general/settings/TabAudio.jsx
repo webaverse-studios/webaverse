@@ -1,8 +1,8 @@
 
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import classNames from 'classnames';
 // import game from '../../../../game';
-import { Slider } from './slider';
+import {Slider} from './slider';
 import * as voices from '../../../../voices';
 // import {localPlayer} from '../../../../players';
 import overrides from '../../../../overrides';
@@ -31,7 +31,7 @@ const DefaultSettings = {
     voiceEndpoint:  noneVoiceEndpoint.name,
 };
 
-export const TabAudio = ({ active }) => {
+export const TabAudio = ({active}) => {
 
     const [ appyingChanges, setAppyingChanges ] = useState(false);
     const [ changesNotSaved, setChangesNotSaved ] = useState(false);

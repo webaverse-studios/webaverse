@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
 import classnames from 'classnames';
-import { AppContext } from '../../../app';
+import {AppContext} from '../../../app';
 
-import { registerIoEventHandler, unregisterIoEventHandler } from '../../../general/io-handler';
+import {registerIoEventHandler, unregisterIoEventHandler} from '../../../general/io-handler';
 
 import styles from './code-ai-panel.module.css';
 
 // import game from '../../../../../game';
 
 export function CodeAiPanel() {
-    const { state, setState } = useContext(AppContext);
+    const {state, setState} = useContext(AppContext);
     const [page, setPage] = useState('input');
     const [input, setInput] = useState('');
     const [output, setOutput] = useState('');
@@ -100,7 +100,7 @@ export function CodeAiPanel() {
 
         })();
 
-        setState({ openedPanel: null });
+        setState({openedPanel: null});
 
     };
 

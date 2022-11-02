@@ -1,17 +1,17 @@
 
-import React, { useContext, useEffect, useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import classnames from 'classnames';
 
-import { world } from '../../../../world.js'
+import {world} from '../../../../world.js'
 import game from '../../../../game.js'
 import metaversefile from '../../../../metaversefile-api.js';
 import cameraManager from '../../../../camera-manager.js';
 
-import { NumberInput } from '../number-input';
-import { AppContext } from '../../app';
-import { ObjectScreenshot } from '../object-screenshot';
-import { registerIoEventHandler, unregisterIoEventHandler } from '../../general/io-handler';
-import { ComponentEditor } from './ComponentEditor.jsx';
+import {NumberInput} from '../number-input';
+import {AppContext} from '../../app';
+import {ObjectScreenshot} from '../object-screenshot';
+import {registerIoEventHandler, unregisterIoEventHandler} from '../../general/io-handler';
+import {ComponentEditor} from './ComponentEditor.jsx';
 
 import styles from './world-objects-list.module.css';
 import physicsManager from '../../../../physics-manager.js';
@@ -22,7 +22,7 @@ import physicsManager from '../../../../physics-manager.js';
 const APP_TYPES = [ 'glb', 'html', 'gltf', 'gif', 'vrm' ];
 
 export const WorldObjectsList = () => {
-    const { state, setState, setSelectedApp, selectedApp } = useContext(AppContext);
+    const {state, setState, setSelectedApp, selectedApp} = useContext(AppContext);
     const [ apps, setApps ] = useState(world.appManager.getApps().slice());
     const [ sortedApps, setSortedApps ] = useState([]);
     const [ rotationMode, setRotationMode ] = useState('euler');
@@ -179,7 +179,7 @@ export const WorldObjectsList = () => {
 
     const closePanel = () => {
 
-        setState({ openedPanel: null });
+        setState({openedPanel: null});
 
     };
 
@@ -248,7 +248,7 @@ export const WorldObjectsList = () => {
 
                         }
                 
-                        setState({ openedPanel: null });
+                        setState({openedPanel: null});
 
                     } else if (state.openedPanel !== 'SettingsPanel') {
 
@@ -258,7 +258,7 @@ export const WorldObjectsList = () => {
 
                         }
 
-                        setState({ openedPanel: 'WorldPanel' });
+                        setState({openedPanel: 'WorldPanel'});
 
                     }
 
@@ -292,7 +292,7 @@ export const WorldObjectsList = () => {
 
         if (! selectedApp) return;
 
-        const { position, quaternion, scale, rotation } = selectedApp;
+        const {position, quaternion, scale, rotation} = selectedApp;
 
         setPx(position.x);
         setPy(position.y);
@@ -345,7 +345,7 @@ export const WorldObjectsList = () => {
 
     //
 
-    const appTypeIcons = { 'js': 'script', 'light': 'light' };
+    const appTypeIcons = {'js': 'script', 'light': 'light'};
 
     //
 

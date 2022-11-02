@@ -710,7 +710,7 @@ const _handleMessage = async m => {
   if (taskId) {
     p.then(
       (spec) => {
-        const { result = null, transfers = [] } = spec ?? {};
+        const {result = null, transfers = []} = spec ?? {};
         port.postMessage(
           {
             method: 'response',

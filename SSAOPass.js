@@ -23,10 +23,10 @@ import {
 	ZeroFactor,
 	Scene,
 } from 'three';
-import { Pass, FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
-import { SimplexNoise } from 'three/examples/jsm/math/SimplexNoise.js';
-import { SSAOShader, SSAOBlurShader, SSAODepthShader } from './SSAOShader.js';
-import { CopyShader } from 'three/examples/jsm/shaders/CopyShader.js';
+import {Pass, FullScreenQuad} from 'three/examples/jsm/postprocessing/Pass.js';
+import {SimplexNoise} from 'three/examples/jsm/math/SimplexNoise.js';
+import {SSAOShader, SSAOBlurShader, SSAODepthShader} from './SSAOShader.js';
+import {CopyShader} from 'three/examples/jsm/shaders/CopyShader.js';
 
 // const oldParentCache = new WeakMap();
 // const oldMaterialCache = new WeakMap();
@@ -511,4 +511,4 @@ SSAOPass.OUTPUT = {
 	'Normal': 5
 };
 
-export { SSAOPass };
+export {SSAOPass};

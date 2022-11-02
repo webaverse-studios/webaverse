@@ -1357,7 +1357,7 @@ const physxWorker = (() => {
   }
 
   w.addGeometryPhysics = (physics, mesh, id) => {
-    const { geometry } = mesh
+    const {geometry} = mesh
 
     const allocator = new Allocator(Module)
     const positions = allocator.alloc(
@@ -1419,7 +1419,7 @@ const physxWorker = (() => {
   }
   w.cookGeometryPhysics = (mesh) => {
     mesh.updateMatrixWorld()
-    const { geometry } = mesh
+    const {geometry} = mesh
 
     const allocator = new Allocator(Module)
     const positions = allocator.alloc(
@@ -1494,7 +1494,7 @@ const physxWorker = (() => {
 
   w.addConvexGeometryPhysics = (physics, mesh, dynamic, external, id) => {
     mesh.updateMatrixWorld()
-    const { geometry } = mesh
+    const {geometry} = mesh
 
     const allocator = new Allocator(Module)
     const positions = allocator.alloc(
@@ -1556,7 +1556,7 @@ const physxWorker = (() => {
   }
   w.cookConvexGeometryPhysics = (physics, mesh) => {
     mesh.updateMatrixWorld()
-    const { geometry } = mesh
+    const {geometry} = mesh
 
     const allocator = new Allocator(Module)
     const positions = allocator.alloc(

@@ -1,12 +1,12 @@
 
 import classNames from 'classnames';
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 
 import styles from './key-input.module.css';
 
 //
 
-export const KeyInput = ({ value, setValue, className }) => {
+export const KeyInput = ({value, setValue, className}) => {
 
     const [ active, setActive ] = useState(false);
     const keysList = new Map();

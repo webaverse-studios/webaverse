@@ -156,7 +156,7 @@ class CharacterPhysics {
             doubleJumpAction.startPositionY -
             this.lastCharacterControllerY;
           if (doubleJumpTime >= flatGroundJumpAirTime) {
-            this.character.setControlAction({ type: 'fallLoop', from: 'jump' });
+            this.character.setControlAction({type: 'fallLoop', from: 'jump'});
           }
         } else {
           const jumpTime = this.character.actionInterpolants.jump.get();
@@ -166,7 +166,7 @@ class CharacterPhysics {
             jumpAction.startPositionY -
             this.lastCharacterControllerY;
           if (jumpTime >= flatGroundJumpAirTime) {
-            this.character.setControlAction({ type: 'fallLoop', from: 'jump' });
+            this.character.setControlAction({type: 'fallLoop', from: 'jump'});
           }
         }
       }
@@ -297,7 +297,7 @@ class CharacterPhysics {
               !this.character.hasAction('fly') &&
               !this.character.hasAction('swim')
             ) {
-              this.character.setControlAction({ type: 'fallLoop' });
+              this.character.setControlAction({type: 'fallLoop'});
               this.velocity.y = 0;
             }
           }
@@ -467,7 +467,7 @@ class CharacterPhysics {
           if (!app) {
             return null;
           }
-          for (const { key, value } of app.components) {
+          for (const {key, value} of app.components) {
             if (key === 'aim') {
               return value;
             }

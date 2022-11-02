@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef, useContext } from 'react';
+import React, {useEffect, useState, useRef, useContext} from 'react';
 import classnames from 'classnames';
 
-import { defaultPlayerName } from '../../../../ai/lore/lore-model.js';
+import {defaultPlayerName} from '../../../../ai/lore/lore-model.js';
 import * as sounds from '../../../../sounds.js';
 // import cameraManager from '../../../../camera-manager.js';
 import {
@@ -15,11 +15,11 @@ import {
     lck,
 } from '../../../../player-stats.js';
 
-import { AppContext } from '../../app';
+import {AppContext} from '../../app';
 
-import { Emotions } from './Emotions';
-import { Poses } from './Poses';
-import { BigButton } from '../../../BigButton';
+import {Emotions} from './Emotions';
+import {Poses} from './Poses';
+import {BigButton} from '../../../BigButton';
 
 import styles from './character.module.css';
 
@@ -105,9 +105,9 @@ const Stat = ({
 
 //
 
-export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
+export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
 
-    const { state, setState } = useContext(AppContext);
+    const {state, setState} = useContext(AppContext);
     const [ open, setOpen ] = useState(false);
     const [ characterSelectOpen, setCharacterSelectOpen ] = useState(false);
 
@@ -186,7 +186,7 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
 
     function onCharacterSelectClick(e) {
 
-        setState({ openedPanel: (state.openedPanel === 'CharacterSelect' ? null : 'CharacterSelect') });
+        setState({openedPanel: (state.openedPanel === 'CharacterSelect' ? null : 'CharacterSelect')});
 
         /* if ( state.openedPanel === 'CharacterSelect' ) {
 
