@@ -2317,11 +2317,6 @@ const physxWorker = (() => {
       stringByteLength,
     )
   }
-  w.testLogActionsAnimationAvatar = (animationAvatarPtr) => {
-    Module._testLogActionsAnimationAvatar(
-      animationAvatarPtr,
-    )
-  }
   w.createAnimationMixer = () => {
     const ptr = Module._createAnimationMixer(
     )

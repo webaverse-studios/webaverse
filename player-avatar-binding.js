@@ -121,17 +121,11 @@ export function applyCharacterActionsToAvatar(character, rig) {
   rig.lastLandStartTime = landAction ? landAction.time : 0;
   rig.landWithMoving = landAction?.isMoving;
   rig.flyState = !!flyAction;
-  rig.activateState = !!activateAction;
+  // rig.flyTime = flyAction ? character.actionInterpolants.fly.get() : -1;
   // rig.activateTime = character.actionInterpolants.activate.get();
   rig.activateAnimation = activateAction?.animationName;
   rig.swimState = !!swimAction;
   // rig.swimTime = swimAction ? character.actionInterpolants.swim.get() : -1;
-  
-  // rig.useState = !!useAction;
-  // rig.fallLoopState = !!fallLoopAction;
-  // rig.danceState = !!danceAction;
-  // rig.emoteState = !!emoteAction;
-  // rig.hurtState = !!hurtAction;
   
   const _handleUse = () => {
     if (useAction?.animation) {
@@ -157,7 +151,7 @@ export function applyCharacterActionsToAvatar(character, rig) {
     }
     rig.useAnimationIndex = useAction?.index;
     // rig.useTime = character.actionInterpolants.use.get();
-    rig.unuseTime = character.actionInterpolants.unuse.get(); // todo: don't clac on js side.
+    rig.unuseTime = character.actionInterpolants.unuse.get();
     if (rig.unuseTime === 0) { // this means use is active
       if (useAction?.animationEnvelope) {
         rig.unuseAnimation = rig.useAnimationEnvelope[2]; // the last animation in the triplet is the unuse animation
@@ -169,7 +163,7 @@ export function applyCharacterActionsToAvatar(character, rig) {
   _handleUse();
 
   const _handlePickUp = () => {
-    rig.pickUpState = !!pickUpAction;
+    // rig.pickUpState = !!pickUpAction;
     // rig.pickUpTime = character.actionInterpolants.pickUp.get();
   };
   _handlePickUp();
@@ -189,7 +183,7 @@ export function applyCharacterActionsToAvatar(character, rig) {
   rig.aimAnimation = (aimAction?.playerAnimation) || '';
   // rig.aimDirection.set(0, 0, -1);
   // aimAction && rig.aimDirection.applyQuaternion(rig.inputs.hmd.quaternion);
-  rig.sitState = !!sitAction;
+  // rig.sitState = !!sitAction;
   rig.sitAnimation = sitAnimation;
 
   // XXX this needs to be based on the current loadout index
@@ -204,7 +198,6 @@ export function applyCharacterActionsToAvatar(character, rig) {
   rig.emoteAnimation = emoteAnimation;
   // rig.throwState = !!throwAction;
   // rig.throwTime = character.actionInterpolants.throw.get();
-  rig.crouchState = !!crouchAction;
   // rig.crouchTime = character.actionInterpolants.crouch.getInverse();
   // rig.chargeJumpTime = character.actionInterpolants.chargeJump.get();
   // rig.chargeAnimation = chargeJumpAnimation;

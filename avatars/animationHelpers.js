@@ -28,16 +28,6 @@ import {
   // getNextPhysicsId,
 } from '../util.js';
 
-import {
-  crouchMaxTime, // todo: move to wasm side.
-  // useMaxTime,
-  // aimMaxTime,
-  // avatarInterpolationFrameRate,
-  // avatarInterpolationTimeDelay,
-  // avatarInterpolationNumFrames,
-  // narutoRunTimeFactor,
-} from '../constants.js';
-
 let animations;
 let animationStepIndices;
 // let animationsBaseModel;
@@ -329,7 +319,6 @@ export const initAnimationSystem = () => {
   sitAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
     SitAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
   });
-  // console.log('SitAnimationIndexes', SitAnimationIndexes)
 
   // DanceAnimationIndexes
   const danceAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'dance')[0];
@@ -465,7 +454,6 @@ export const _updateAnimation = (avatar, now, timeDiff) => {
     const useAnimationComboName = avatar.useAnimationCombo[avatar.useAnimationIndex];
 
     const values = [
-      // values ---
       forwardFactor,
       backwardFactor,
       leftFactor,
@@ -477,52 +465,15 @@ export const _updateAnimation = (avatar, now, timeDiff) => {
 
       avatar.idleWalkFactor,
       avatar.walkRunFactor,
-      // avatar.crouchFactor,
       avatar.sprintFactor,
       avatar.movementsTransitionFactor,
 
-      // avatar.activateTime,
-      // avatar.swimTime,
       avatar.movementsTime,
 
-      // // action states ---
-      // avatar.jumpState,
-      // avatar.doubleJumpState,
-      // avatar.flyState,
-      // avatar.crouchState,
-      // avatar.narutoRunState,
-      // avatar.sitState,
-      // avatar.holdState,
-      // avatar.pickUpState,
-      // avatar.swimState,
-      // avatar.activateState,
-      // avatar.useState,
-      // avatar.aimState,
-      // avatar.fallLoopState,
-      // avatar.danceState,
-      // avatar.emoteState,
-      // avatar.hurtState,
-
       avatar.landWithMoving,
-      // avatar.landTime,
-      // avatar.fallLoopFactor,
-      // avatar.fallLoopTime,
-      // avatar.flyTime,
-      // avatar.doubleJumpTime,
-      // avatar.jumpTime,
-      // avatar.narutoRunTime,
-      // narutoRunTimeFactor,
-      // avatar.danceFactor,
-      // crouchMaxTime,
-      // avatar.emoteFactor,
       avatar.lastEmoteTime,
-      // avatar.useTime,
       avatar.useAnimationEnvelope.length,
-      // avatar.hurtTime,
-      // avatar.unuseTime,
-      // avatar.aimTime,
-      // aimMaxTime,
-      // avatar.pickUpTime,
+
       UseAnimationIndexes[avatar.useAnimation] ?? -1,
       EmoteAnimationIndexes[avatar.emoteAnimation] ?? -1,
       SitAnimationIndexes[avatar.sitAnimation] ?? -1,

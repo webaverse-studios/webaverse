@@ -185,12 +185,6 @@ class NpcManager extends EventTarget {
       detached,
     });
     player.name = name;
-    
-    if (!globalThis.npcPlayers) {
-      globalThis.npcPlayers = [];
-      globalThis.npcPlayer = player;
-    }
-    globalThis.npcPlayers.push(player);
 
     let matrixNeedsUpdate = false;
     if (position) {
