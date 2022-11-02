@@ -39,7 +39,6 @@ import * as voices from './voices.js';
 import performanceTracker from './performance-tracker.js';
 import renderSettingsManager from './rendersettings-manager.js';
 import metaversefileApi from 'metaversefile';
-import WebaWallet from './src/components/wallet.js';
 // import domRenderEngine from './dom-renderer.jsx';
 import musicManager from './music-manager.js';
 import story from './story.js';
@@ -92,7 +91,6 @@ export default class Webaverse extends EventTarget {
         backgroundFx.waitForLoad(),
         voices.waitForLoad(),
         musicManager.waitForLoad(),
-        WebaWallet.waitForLoad(),
       ]);
     })();
     this.contentLoaded = false;

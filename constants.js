@@ -71,7 +71,7 @@ export const landHost = `https://${chainName}sidechain-land.webaverse.com`;
 export const codeAiHost = `https://ai.webaverse.com/code`;
 export const web3MainnetSidechainEndpoint = 'https://mainnetsidechain.exokit.org';
 export const web3TestnetSidechainEndpoint = 'https://testnetsidechain.exokit.org';
-export const worldUrl = 'worlds.webaverse.com';
+// export const worldUrl = 'worlds.webaverse.com';
 export const discordClientId = '684141574808272937';
 
 export const worldMapName = 'world';
