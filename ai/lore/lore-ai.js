@@ -358,7 +358,7 @@ class LoreAI {
       const {text} = choices[0];
       return text;
     } else {
-      reject(new Error('prompt is required'));
+      throw new Error('prompt is required');
     }
   }
 

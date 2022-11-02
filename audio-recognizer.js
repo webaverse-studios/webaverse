@@ -56,7 +56,7 @@ class AudioRecognizer extends EventTarget {
           }));
         }
         // This is the case when we have an error
-        if (e.data.hasOwnProperty('status') && (e.data.status == "error")) {
+        if (e.data.hasOwnProperty('status') && (e.data.status === "error")) {
           // updateStatus("Error in " + e.data.command + " with code " + e.data.code);
           this.dispatchEvent(new MessageEvent('error', {
             data: e.data,

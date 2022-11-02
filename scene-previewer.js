@@ -163,6 +163,7 @@ class ScenePreviewer extends THREE.Object3D {
     this.focused = false;
     this.rendered = false;
   }
+
   async loadScene(sceneUrl) {
     /* if (this.scene) {
       this.detachScene();
@@ -188,6 +189,7 @@ class ScenePreviewer extends THREE.Object3D {
       this.render();
     }
   }
+
   /* attachScene(scene) {
     this.scene = scene;
     this.previewContainer.add(scene);
@@ -227,11 +229,13 @@ class ScenePreviewer extends THREE.Object3D {
       this.render();
     }
   }
+
   #makeLodMesh() {
     const mesh = new THREE.Mesh();
     mesh.visible = false;
     return mesh;
   }
+
   #makeSkyboxMeshes(size, normals) {
     const result = [];
     for (const normal of normals) {
@@ -252,6 +256,7 @@ class ScenePreviewer extends THREE.Object3D {
     }
     return result;
   }
+
   #pushPreviewContainerTransform() {
     const oldPosition = localVector.copy(this.position);
     const oldQuaternion = localQuaternion.copy(this.quaternion);
@@ -274,9 +279,11 @@ class ScenePreviewer extends THREE.Object3D {
       this.previewContainer.matrixWorld.copy(oldMatrixWorld);
     };
   }
+
   #canRender() {
     return !!this.scene && !this.rendered;
   }
+
   render() {
     {
       const renderer = getRenderer();

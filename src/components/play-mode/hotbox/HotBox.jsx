@@ -27,10 +27,11 @@ export const HotBox = ({
       }
     }, [canvasRef]);
     useEffect(() => {
+      const idx = index;
       function selectedchange(e) {
         const {index, app} = e.data;
         if (index === -1 || app) {
-          setSelected(index === index);
+          setSelected(index === idx);
         }
       }
 

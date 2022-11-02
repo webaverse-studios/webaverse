@@ -2,12 +2,11 @@ import * as THREE from 'three';
 import {getRenderer, camera, scene} from './renderer.js';
 // import * as notifications from './notifications.js';
 import physicsManager from './physics-manager.js';
-import {shakeAnimationSpeed} from './constants.js';
+import {shakeAnimationSpeed, minFov, maxFov, midFov} from './constants.js';
 import Simplex from './simplex-noise.js';
 import {playersManager} from './players-manager.js';
 // import alea from './alea.js';
 // import * as sounds from './sounds.js';
-import {minFov, maxFov, midFov} from './constants.js';
 // import { updateRaycasterFromMouseEvent } from './util.js';
 import easing from './easing.js';
 import {isWorker} from './env.js';
@@ -676,7 +675,7 @@ class CameraManager extends EventTarget {
             break;
           }
           default: {
-            throw new Error('invalid camera mode: ' + cameraMode);
+            throw new Error('invalid camera mode: ' + this.getMode());
           }
         }
 

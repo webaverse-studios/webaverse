@@ -352,9 +352,9 @@ class DioramaRenderer {
     })();
     this.textObject = textObject;
     const skinnedRedMaterial = (() => {
-      let wVertex = THREE.ShaderLib["standard"].vertexShader;
-      let wFragment = THREE.ShaderLib["standard"].fragmentShader;
-      let wUniforms = THREE.UniformsUtils.clone(THREE.ShaderLib["standard"].uniforms);
+      let wVertex = THREE.ShaderLib.standard.vertexShader;
+      let wFragment = THREE.ShaderLib.standard.fragmentShader;
+      let wUniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.standard.uniforms);
       wUniforms.iTime = {
         value: 0,
         needsUpdate: false,
@@ -424,6 +424,7 @@ class DioramaRenderer {
     this.outlineRenderTarget = null;
 
   }
+
   #makeOutlineRenderTarget(w, h) {
     return new THREE.WebGLRenderTarget(w, h, {
       minFilter: THREE.LinearFilter,
@@ -431,6 +432,7 @@ class DioramaRenderer {
       format: THREE.RGBAFormat,
     });
   }
+
   render(timeOffset, timeDiff, width, height, objects, target, cameraOffset, canvases, opts) {
     const {
       // objects = [],
@@ -723,6 +725,7 @@ class DioramaRenderer {
 
     _popState();
   }
+
   async waitForLoad() {
 
   }

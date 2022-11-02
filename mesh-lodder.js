@@ -205,6 +205,7 @@ class LodChunkGenerator {
     this.mesh.frustumCulled = false;
     this.mesh.visible = false;
   }
+
   /* getItemIdByPhysicsId(physicsId) {
     return this.physicsObjects.findIndex(o => o.physicsId === physicsId);
   } */
@@ -213,6 +214,7 @@ class LodChunkGenerator {
     q.fromArray(this.itemQuaternions, itemId * 4);
     s.set(1, 1, 1);
   }
+
   deleteItem(itemId) {
     _eraseVertices(
       this.allocator.geometry,
@@ -225,21 +227,27 @@ class LodChunkGenerator {
     physicsManager.removeGeometry(physicsObject);      
     this.physicsObjects.splice(index, 1);
   }
+
   #getContentIndexNames() {
     return Object.keys(this.parent.contentIndex).sort();
   }
+
   #getAtlas() {
     return this.parent.atlas;
   }
+
   #getContent(name) {
     return this.parent.contentIndex[name];
   }
+
   #getShapeAddress(name) {
     return this.parent.shapeAddresses[name];
   }
+
   #getContentMeshIndex(mesh) {
     return this.parent.meshes.indexOf(mesh);
   }
+
   #addPhysicsShape(shapeAddress, contentMesh, positionX, positionZ, rotationY) {
     const matrixWorld = _getMatrixWorld(this.mesh, contentMesh, localMatrix, positionX, positionZ, rotationY);
     matrixWorld.decompose(localVector, localQuaternion, localVector2);
@@ -254,6 +262,7 @@ class LodChunkGenerator {
 
     return physicsObject;
   }
+
   cloneItemDiceMesh(itemId) {
     localVector4D.fromArray(this.itemRects, itemId * 4);
     const tx = localVector4D.x;
@@ -276,6 +285,7 @@ class LodChunkGenerator {
     const itemMesh = _makeItemMesh(this.mesh, contentMesh, geometry, this.parent.material, positionX, positionZ, rotationY);
     return itemMesh;
   }
+
   cloneItemMesh(itemId) {
     localVector4D.fromArray(this.itemRects, itemId * 4);
     const tx = localVector4D.x;
@@ -297,6 +307,7 @@ class LodChunkGenerator {
     const itemMesh = _makeItemMesh(this.mesh, contentMesh, geometry, this.parent.material, positionX, positionZ, rotationY);
     return itemMesh;
   }
+
   clonePhysicsObject(itemId) {
     const positionX = this.itemPositionsXZY[itemId * 3];
     const positionZ = this.itemPositionsXZY[itemId * 3 + 1];
@@ -315,6 +326,7 @@ class LodChunkGenerator {
     const physicsObject = physicsManager.addConvexShape(shapeAddress, position, quaternion, scale, dynamic, external);
     return physicsObject;
   }
+
   #addItemToRegistry(contentName, contentMesh, physicsId, positionOffset, positionCount, positionX, positionZ, rotationY, tx, ty, tw, th) {
     this.itemContentMeshes[physicsId] = contentMesh;
     localVector.set(positionX, 0, positionZ)
@@ -331,6 +343,7 @@ class LodChunkGenerator {
     this.itemPositionsXZY[physicsId * 3 + 1] = positionZ;
     this.itemPositionsXZY[physicsId * 3 + 2] = rotationY;
   }
+
   generateChunk(chunk) {
     const _collectContentsRenderList = () => {
       const contentNames = [];
@@ -462,6 +475,7 @@ class LodChunkGenerator {
     this.allocator.geometry.groups = this.allocator.indexFreeList.getGeometryGroups(); // XXX memory for this can be optimized
     this.mesh.visible = true;
   }
+
   disposeChunk(chunk) {
     this.allocator.free(chunk.binding);
     chunk.binding = null;
@@ -474,6 +488,7 @@ class LodChunkGenerator {
     }
     chunk.physicsObjects.length = 0;
   }
+
   destroy() {
     // nothing; the owning lod tracker disposes of our contents
   }
@@ -515,6 +530,7 @@ class MeshLodManager {
       chunkWorldSize,
     });
   }
+
   registerLodMesh(name, shapeSpec) {
     const {
       type = 'object',
@@ -530,9 +546,11 @@ class MeshLodManager {
 
     this.shapeSpecs[name] = shapeSpec;
   }
+
   getPhysicsObjects() {
     return this.generator.physicsObjects;
   }
+
   #getContentMergeable()  {
     const getObjectKey = () => '';
 
@@ -601,6 +619,7 @@ class MeshLodManager {
 
     return Array.from(mergeables.values())[0];
   }
+
   compile() {
     const mergeable = this.#getContentMergeable();
     const {
@@ -648,33 +667,41 @@ class MeshLodManager {
 
     this.compiled = true;
   }
+
   getChunks() {
     return this.generator.mesh;
   }
+
   /* getItemIdByPhysicsId(physicsId) {
     return this.generator.getItemIdByPhysicsId(physicsId); 
   } */
   getItemTransformByItemId() {
     return this.generator.getItemTransformByItemId.apply(this.generator, arguments);
   }
+
   cloneItemDiceMesh() {
     return this.generator.cloneItemDiceMesh.apply(this.generator, arguments);
   }
+
   cloneItemMesh() {
     return this.generator.cloneItemMesh.apply(this.generator, arguments);
   }
+
   clonePhysicsObject() {
     return this.generator.clonePhysicsObject.apply(this.generator, arguments);
   }
+
   deleteItem(itemId) {
     return this.generator.deleteItem(itemId);
   }
+
   update() {
     const localPlayer = playersManager.getLocalPlayer();
     if (this.compiled) {
       this.tracker.update(localPlayer.position);
     }
   }
+
   destroy() {
     meshLodders.splice(meshLodders.indexOf(this), 1);
   }

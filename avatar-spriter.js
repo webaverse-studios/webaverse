@@ -567,6 +567,7 @@ class SpriteAvatarMesh extends THREE.Mesh {
       return false;
     }
   }
+
   #getAvatarRootPosition(avatar) {
     if (avatar) {
       // get avatar root position
@@ -578,6 +579,7 @@ class SpriteAvatarMesh extends THREE.Mesh {
     }
     return localVector;
   }
+
   update(timestamp, timeDiff, avatar, camera) {
     const rootPosition = this.#getAvatarRootPosition(avatar);
     localMatrix.copy(this.parent.matrixWorld).invert();
@@ -1660,6 +1662,7 @@ class PlaneSpriteDepthMaterial extends THREE.MeshNormalMaterial {
     this.uniforms = null;
     this.options2 = options2;
   }
+
   onBeforeCompile(parameters) {
     parameters.uniforms = _addPlaneSpriteMaterialUniforms(
       parameters.uniforms,
@@ -1734,6 +1737,7 @@ class AvatarSpriteDepthMaterial extends THREE.MeshNormalMaterial {
     this.uniforms = null;
     this.options2 = options2;
   }
+
   onBeforeCompile(parameters) {
     parameters.uniforms = _addAvatarSpriteMaterialUniforms(parameters.uniforms, this.options2.tex);
     this.uniforms = parameters.uniforms;
