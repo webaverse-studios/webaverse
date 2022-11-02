@@ -44,7 +44,7 @@ ${THREE.ShaderChunk.logdepthbuf_pars_fragment}
 ${appendMain(fragmentShader, THREE.ShaderChunk.logdepthbuf_fragment)}
 `);
 
-class WebaverseShaderMaterial extends THREE.ShaderMaterial {
+/* class WebaverseShaderMaterial extends THREE.ShaderMaterial {
   constructor(opts = {}) {
     if (opts.vertexShader !== undefined) {
       opts.vertexShader = formatVertexShader(opts.vertexShader);
@@ -74,7 +74,9 @@ class WebaverseRawShaderMaterial extends THREE.RawShaderMaterial {
     opts.fragmentShader = formatFragmentShader(opts.fragmentShader);
     super(opts);
   }
-}
+} */
+const WebaverseShaderMaterial = THREE.ShaderMaterial;
+const WebaverseRawShaderMaterial = THREE.RawShaderMaterial;
 export {
   WebaverseShaderMaterial,
   WebaverseRawShaderMaterial,
