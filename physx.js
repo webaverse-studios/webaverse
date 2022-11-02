@@ -2291,6 +2291,7 @@ const physxWorker = (() => {
     )
   }
   w.addActionAnimationAvatar = (animationAvatarPtr, action) => {
+    // console.log(JSON.stringify(action))
     const bytes = textEncoder.encode(JSON.stringify(action))
     const stringByteLength = bytes.length;
     for (let i = 0; i < stringByteLength; i++) {
@@ -2304,7 +2305,7 @@ const physxWorker = (() => {
     )
   }
   w.removeActionAnimationAvatar = (animationAvatarPtr, action) => {
-    const bytes = textEncoder.encode(action.actionId)
+    const bytes = textEncoder.encode(JSON.stringify(action))
     const stringByteLength = bytes.length;
     for (let i = 0; i < stringByteLength; i++) {
       scratchStack.u8[i] = bytes[i];
