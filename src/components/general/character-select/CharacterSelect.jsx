@@ -1,21 +1,21 @@
 
-import React, { forwardRef, useEffect, useState, createRef, useContext } from 'react';
+import React, {forwardRef, useEffect, useState, createRef, useContext} from 'react';
 import classnames from 'classnames';
 import metaversefile from 'metaversefile';
 import styles from './character-select.module.css';
-import { AppContext } from '../../app';
-import { MegaHup } from '../../../MegaHup.jsx';
-import { LightArrow } from '../../../LightArrow.jsx';
+import {AppContext} from '../../app';
+import {MegaHup} from '../../../MegaHup.jsx';
+import {LightArrow} from '../../../LightArrow.jsx';
 // import { world } from '../../../../world.js';
-import { LocalPlayer } from '../../../../character-controller.js';
-import { characterSelectManager } from '../../../../characterselect-manager.js';
+import {LocalPlayer} from '../../../../character-controller.js';
+import {characterSelectManager} from '../../../../characterselect-manager.js';
 import * as sounds from '../../../../sounds.js';
-import { chatManager } from '../../../../chat-manager.js';
+import {chatManager} from '../../../../chat-manager.js';
 import musicManager from '../../../../music-manager.js';
-import { CachedLoader } from '../../../CachedLoader.jsx';
-import { RpgText } from '../../../RpgText.jsx';
-import { chatTextSpeed, characterSelectAvatarQuality } from '../../../../constants.js';
-import { VoiceEndpointVoicer ,getVoiceEndpointUrl} from '../../../../voice-output/voice-endpoint-voicer.js';
+import {CachedLoader} from '../../../CachedLoader.jsx';
+import {RpgText} from '../../../RpgText.jsx';
+import {chatTextSpeed, characterSelectAvatarQuality} from '../../../../constants.js';
+import {VoiceEndpointVoicer ,getVoiceEndpointUrl} from '../../../../voice-output/voice-endpoint-voicer.js';
 import * as voices from '../../../../voices.js';
 import npcManager from '../../../../npc-manager.js';
 
@@ -71,7 +71,7 @@ const Character = forwardRef(({
 });
 
 export const CharacterSelect = () => {
-    const { state, setState } = useContext(AppContext);
+    const {state, setState} = useContext(AppContext);
     const [ highlightCharacter, setHighlightCharacter ] = useState(null);
     const [ selectCharacter, setSelectCharacter ] = useState(null);
     const [ highlightPack, setHighlightPack ] = useState(null);
@@ -333,7 +333,7 @@ export const CharacterSelect = () => {
             sounds.playSoundName('menuBoop');
 
             setTimeout(() => {
-                setState({ openedPanel: null });
+                setState({openedPanel: null});
             }, 1000);
 
             (async () => {

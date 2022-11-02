@@ -1,12 +1,12 @@
 
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
 import classnames from 'classnames';
-import { checkText } from 'smile2emoji';
+import {checkText} from 'smile2emoji';
 
 import game from '../../../../game';
-import { chatManager } from '../../../../chat-manager.js';
-import { registerIoEventHandler, unregisterIoEventHandler } from '../../general/io-handler';
-import { AppContext } from '../../app';
+import {chatManager} from '../../../../chat-manager.js';
+import {registerIoEventHandler, unregisterIoEventHandler} from '../../general/io-handler';
+import {AppContext} from '../../app';
 
 import storyManager from '../../../../story.js';
 
@@ -16,7 +16,7 @@ import styles from './chat.module.css';
 
 function ChatInput () {
 
-    const { state, setState } = useContext(AppContext);
+    const {state, setState} = useContext(AppContext);
     const [ value, setValue ] = useState('');
     const inputRef = useRef();
 
@@ -57,7 +57,7 @@ function ChatInput () {
 
                         } else if (state.openedPanel !== 'ChatPanel') {
 
-                            setState({ openedPanel: 'ChatPanel' });
+                            setState({openedPanel: 'ChatPanel'});
 
                         } else {
 
@@ -66,12 +66,12 @@ function ChatInput () {
                             if (value) {
 
                                 const text = checkText(value);
-                                chatManager.addMessage(text, { timeout: 3000 });
+                                chatManager.addMessage(text, {timeout: 3000});
 
                             }
 
                             setValue('');
-                            setState({ openedPanel: null });
+                            setState({openedPanel: null});
 
                         }
 
@@ -98,7 +98,7 @@ function ChatInput () {
                         if (state.openedPanel !== 'ChatPanel') {
 
                             setValue(':');
-                            setState({ openedPanel: 'ChatPanel' });
+                            setState({openedPanel: 'ChatPanel'});
 
                         }
 

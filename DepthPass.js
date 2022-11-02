@@ -16,7 +16,7 @@ import {
 	FloatType,
 	RGBAFormat,
 } from 'three';
-import { Pass, FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
+import {Pass, FullScreenQuad} from 'three/examples/jsm/postprocessing/Pass.js';
 // import { BokehShader } from './BokehShader.js';
 
 const oldParentCache = new WeakMap();
@@ -206,4 +206,4 @@ class DepthPass extends Pass {
 
 }
 
-export { DepthPass };
+export {DepthPass};

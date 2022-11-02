@@ -1,14 +1,14 @@
 
-import React, { useContext, useEffect, useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import classNames from 'classnames';
 
-import { TabGeneral } from './TabGeneral';
-import { TabControls } from './TabControls';
-import { TabAudio } from './TabAudio';
-import { TabGraphics } from './TabGraphics';
-import { TabAi } from './TabAi';
-import { AppContext } from '../../app';
-import { registerIoEventHandler, unregisterIoEventHandler } from '../io-handler';
+import {TabGeneral} from './TabGeneral';
+import {TabControls} from './TabControls';
+import {TabAudio} from './TabAudio';
+import {TabGraphics} from './TabGraphics';
+import {TabAi} from './TabAi';
+import {AppContext} from '../../app';
+import {registerIoEventHandler, unregisterIoEventHandler} from '../io-handler';
 
 import styles from './settings.module.css';
 
@@ -16,7 +16,7 @@ import styles from './settings.module.css';
 
 export const Settings = () => {
 
-    const { state, setState } = useContext(AppContext);
+    const {state, setState} = useContext(AppContext);
     const [ activeTab, setActiveTab ] = useState('general');
 
     //
@@ -29,7 +29,7 @@ export const Settings = () => {
 
     const handleCloseBtnClick = () => {
 
-        setState({ openedPanel: null });
+        setState({openedPanel: null});
 
     };
 
@@ -48,7 +48,7 @@ export const Settings = () => {
 
             if (state.openedPanel === 'SettingsPanel' && event.which === 27) { // esc key
 
-                setState({ openedPanel: null });
+                setState({openedPanel: null});
 
             }
 

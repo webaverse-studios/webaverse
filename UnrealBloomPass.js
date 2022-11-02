@@ -9,9 +9,9 @@ import {
 	Vector3,
 	WebGLRenderTarget
 } from 'three';
-import { Pass, FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
-import { CopyShader } from 'three/examples/jsm/shaders/CopyShader.js';
-import { LuminosityHighPassShader } from 'three/examples/jsm/shaders/LuminosityHighPassShader.js';
+import {Pass, FullScreenQuad} from 'three/examples/jsm/postprocessing/Pass.js';
+import {CopyShader} from 'three/examples/jsm/shaders/CopyShader.js';
+import {LuminosityHighPassShader} from 'three/examples/jsm/shaders/LuminosityHighPassShader.js';
 
 /**
  * UnrealBloomPass is inspired by the bloom pass of Unreal Engine. It creates a
@@ -332,9 +332,9 @@ class UnrealBloomPass extends Pass {
 			},
 
 			uniforms: {
-				'colorTexture': { value: null },
-				'texSize': { value: new Vector2(0.5, 0.5) },
-				'direction': { value: new Vector2(0.5, 0.5) }
+				'colorTexture': {value: null},
+				'texSize': {value: new Vector2(0.5, 0.5)},
+				'direction': {value: new Vector2(0.5, 0.5)}
 			},
 
 			vertexShader:
@@ -383,15 +383,15 @@ class UnrealBloomPass extends Pass {
 			},
 
 			uniforms: {
-				'blurTexture1': { value: null },
-				'blurTexture2': { value: null },
-				'blurTexture3': { value: null },
-				'blurTexture4': { value: null },
-				'blurTexture5': { value: null },
-				'bloomStrength': { value: 1.0 },
-				'bloomFactors': { value: null },
-				'bloomTintColors': { value: null },
-				'bloomRadius': { value: 0.0 }
+				'blurTexture1': {value: null},
+				'blurTexture2': {value: null},
+				'blurTexture3': {value: null},
+				'blurTexture4': {value: null},
+				'blurTexture5': {value: null},
+				'bloomStrength': {value: 1.0},
+				'bloomFactors': {value: null},
+				'bloomTintColors': {value: null},
+				'bloomRadius': {value: 0.0}
 			},
 
 			vertexShader:
@@ -434,4 +434,4 @@ class UnrealBloomPass extends Pass {
 UnrealBloomPass.BlurDirectionX = new Vector2(1.0, 0.0);
 UnrealBloomPass.BlurDirectionY = new Vector2(0.0, 1.0);
 
-export { UnrealBloomPass };
+export {UnrealBloomPass};

@@ -1,6 +1,6 @@
 import React, {useState, useContext, useRef, useEffect} from 'react';
 import classnames from 'classnames';
-import { AppContext } from '../../app';
+import {AppContext} from '../../app';
 import styles from './hotbar.module.css';
 import {HotBox} from '../hotbox/HotBox.jsx';
 
@@ -9,8 +9,8 @@ import loadoutManager from '../../../../loadout-manager.js';
 import {registerIoEventHandler, unregisterIoEventHandler} from '../../general/io-handler/IoHandler.jsx';
 import {hotbarSize, numLoadoutSlots} from '../../../../constants.js';
 
-export const Hotbar = ({ className }) => {
-    const { state, setState } = useContext(AppContext);
+export const Hotbar = ({className}) => {
+    const {state, setState} = useContext(AppContext);
     const open =  state.openedPanel === 'CharacterPanel';
 
     useEffect(() => {

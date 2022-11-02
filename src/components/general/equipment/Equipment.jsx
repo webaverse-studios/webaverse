@@ -1,15 +1,15 @@
-import React, { forwardRef, useEffect, useState, useRef, useContext } from 'react';
+import React, {forwardRef, useEffect, useState, useRef, useContext} from 'react';
 import classnames from 'classnames';
 import styles from './equipment.module.css';
-import { AppContext } from '../../app';
-import { MegaHotBox } from '../../play-mode/mega-hotbox';
-import { CachedLoader } from '../../../CachedLoader.jsx';
-import { Spritesheet } from '../spritesheet/';
-import { createLandIcon } from '../../../../land-iconer.js';
+import {AppContext} from '../../app';
+import {MegaHotBox} from '../../play-mode/mega-hotbox';
+import {CachedLoader} from '../../../CachedLoader.jsx';
+import {Spritesheet} from '../spritesheet/';
+import {createLandIcon} from '../../../../land-iconer.js';
 import game from '../../../../game.js';
-import { transparentPngUrl } from '../../../../constants.js';
+import {transparentPngUrl} from '../../../../constants.js';
 import * as sounds from '../../../../sounds.js';
-import { mod } from '../../../../util.js';
+import {mod} from '../../../../util.js';
 import dropManager from '../../../../drop-manager';
 import cardsManager from '../../../../cards-manager.js';
 
@@ -295,7 +295,7 @@ const EquipmentItems = ({
 };
 
 export const Equipment = () => {
-    const { state, setState } = useContext(AppContext);
+    const {state, setState} = useContext(AppContext);
     const [ hoverObject, setHoverObject ] = useState(null);
     const [ selectObject, setSelectObject ] = useState(null);
     // const [ spritesheet, setSpritesheet ] = useState(null);

@@ -1,11 +1,11 @@
 
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 
 import styles from './number-input.module.css';
 
 //
 
-export const NumberInput = ({ title = '', initalValue = 0, zeroValue = true, maxPrecision = 3, step = 0.1, onChange = null }) => {
+export const NumberInput = ({title = '', initalValue = 0, zeroValue = true, maxPrecision = 3, step = 0.1, onChange = null}) => {
 
     const [ value, setValue ] = useState(initalValue);
     const [ finalValue, setFinalValue ] = useState(initalValue);

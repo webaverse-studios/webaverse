@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useContext, useState } from 'react';
+import React, {useEffect, useRef, useContext, useState} from 'react';
 
 import CharacterHups from './CharacterHups.jsx';
 import game from '../game.js'
@@ -7,24 +7,24 @@ import cameraManager from '../camera-manager.js'
 import metaversefile from '../metaversefile-api.js'
 import ioManager from '../io-manager.js'
 
-import { Character } from './components/general/character';
-import { CharacterSelect } from './components/general/character-select';
-import { Equipment } from './components/general/equipment';
+import {Character} from './components/general/character';
+import {CharacterSelect} from './components/general/character-select';
+import {Equipment} from './components/general/equipment';
 // import { Tokens } from './tabs/tokens';
-import { registerIoEventHandler, unregisterIoEventHandler } from './components/general/io-handler';
-import { AppContext } from './components/app';
-import { AvatarIcon } from './AvatarIcon';
-import { StoryTime } from './StoryTime';
-import { User } from './User';
+import {registerIoEventHandler, unregisterIoEventHandler} from './components/general/io-handler';
+import {AppContext} from './components/app';
+import {AvatarIcon} from './AvatarIcon';
+import {StoryTime} from './StoryTime';
+import {User} from './User';
 
 import styles from './Header.module.css';
-import { UIMode } from './components/general/ui-mode/index.jsx';
+import {UIMode} from './components/general/ui-mode/index.jsx';
 
 //
 
 export default function Header() {
 
-    const { state, setState, selectedApp } = useContext(AppContext);
+    const {state, setState, selectedApp} = useContext(AppContext);
     const localPlayer = metaversefile.useLocalPlayer();
     const _getWearActions = () => localPlayer.getActionsArray().filter(action => action.type === 'wear');
 
@@ -72,11 +72,11 @@ export default function Header() {
 
         const pointerlockchange = e => {
 
-            const { pointerLockElement } = e.data;
+            const {pointerLockElement} = e.data;
 
             if (pointerLockElement && state.openedPanel !== null) {
 
-                setState({ openedPanel: null });
+                setState({openedPanel: null});
 
             }
 
@@ -135,7 +135,7 @@ export default function Header() {
 
                     if (! state.openedPanel === 'MagicPanel' && ! ioManager.inputFocused()) {
 
-                        setState({ openedPanel: 'MagicPanel' });
+                        setState({openedPanel: 'MagicPanel'});
 
                     }
 
@@ -157,7 +157,7 @@ export default function Header() {
 
                     if (!event.repeat) {
 
-                        setState({ openedPanel: (state.openedPanel === 'CharacterPanel' ? null : 'CharacterPanel') });
+                        setState({openedPanel: (state.openedPanel === 'CharacterPanel' ? null : 'CharacterPanel')});
 
                         if (state.openedPanel === 'CharacterPanel' && !cameraManager.pointerLockElement) {
 
@@ -245,11 +245,11 @@ export default function Header() {
 
         if (claimsOpen) {
 
-            setState({ openedPanel: null });
+            setState({openedPanel: null});
 
         } else {
 
-            setState({ openedPanel: 'ClaimsPanel' });
+            setState({openedPanel: 'ClaimsPanel'});
 
         }
 

@@ -1,8 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import classNames from 'classnames';
 
-import { KeyInput } from './key-input';
+import {KeyInput} from './key-input';
 
 import styles from './settings.module.css';
 
@@ -21,7 +21,7 @@ const DefaultSettings = {
     inventory:          'i'
 };
 
-export const TabControls = ({ active }) => {
+export const TabControls = ({active}) => {
 
     const [ appyingChanges, setAppyingChanges ] = useState(false);
     const [ changesNotSaved, setChangesNotSaved ] = useState(false);

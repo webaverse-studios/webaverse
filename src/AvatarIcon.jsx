@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useContext, useState } from 'react';
+import React, {useEffect, useRef, useContext, useState} from 'react';
 import classnames from 'classnames';
 
-import { AppContext } from './components/app';
+import {AppContext} from './components/app';
 import {world} from '../world.js';
 import {
   hp,
@@ -12,7 +12,7 @@ import {
 
 import styles from './AvatarIcon.module.css';
 import {PlaceholderImg} from './PlaceholderImg.jsx';
-import { AvatarIconer } from '../avatar-iconer.js';
+import {AvatarIconer} from '../avatar-iconer.js';
 import cameraManager from '../camera-manager.js'
 import * as sounds from '../sounds.js'
 
@@ -107,12 +107,12 @@ const CharacterIcon = () => {
   );
 };
 
-export const AvatarIcon = ({ className }) => {
-    const { state, setState } = useContext(AppContext);
+export const AvatarIcon = ({className}) => {
+    const {state, setState} = useContext(AppContext);
 
     const handleCharacterBtnClick = () => {
 
-        setState({ openedPanel: (state.openedPanel === 'CharacterPanel' ? null : 'CharacterPanel') });
+        setState({openedPanel: (state.openedPanel === 'CharacterPanel' ? null : 'CharacterPanel')});
 
         if (state.openedPanel === 'CharacterPanel') {
 

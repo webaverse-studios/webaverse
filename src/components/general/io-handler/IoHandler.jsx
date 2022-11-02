@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react'
+import React, {useEffect} from 'react'
 
 import ioManager from '../../../../io-manager.js';
 
@@ -96,7 +96,7 @@ function IoHandler () {
 
             };
 
-            window.addEventListener(type, fn, { passive: type === 'wheel' });
+            window.addEventListener(type, fn, {passive: type === 'wheel'});
 
             return () => {
 

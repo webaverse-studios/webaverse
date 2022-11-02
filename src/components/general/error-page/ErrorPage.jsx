@@ -3,7 +3,7 @@ import React from 'react';
 
 //
 
-export const ErrorPage = ({ errors }) => {
+export const ErrorPage = ({errors}) => {
 
     return (
         <div>

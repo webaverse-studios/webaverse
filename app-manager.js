@@ -732,7 +732,7 @@ class AppManager extends EventTarget {
       objects.push(object);
     }
 
-    return { objects };
+    return {objects};
   }
 
   destroy() {

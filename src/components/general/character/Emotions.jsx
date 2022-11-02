@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import classnames from 'classnames';
 
 import metaversefile from '../../../../metaversefile-api.js';
@@ -63,7 +63,7 @@ export const Emotions = ({
 
             if (document.pointerLockElement === emotionsEl) {
 
-                const { /* movementX, */movementY } = e;
+                const {/* movementX, */movementY} = e;
 
                 if (dragEmotionIndex !== -1) {
 
