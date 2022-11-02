@@ -1186,12 +1186,12 @@ class GameManager extends EventTarget {
       const wearAimComponent = wearAimApp?.getComponent('aim');
 
       const {instanceId} = wearAimApp ?? {};
-      const {appAnimation, playerAnimation, boneAttachment, position, quaternion, scale} = wearAimComponent ?? {};
+      const {appAnimation, characterAnimation, boneAttachment, position, quaternion, scale} = wearAimComponent ?? {};
       const aimAction = {
         type: 'aim',
         instanceId,
         appAnimation,
-        playerAnimation,
+        characterAnimation,
         boneAttachment,
         position,
         quaternion,
