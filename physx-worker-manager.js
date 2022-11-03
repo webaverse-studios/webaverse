@@ -13,6 +13,7 @@ class PhysicsWorkerManager {
     this.nextWorker = 0;
     this.loadPromise = null;
   }
+
   waitForLoad() {
     if (!this.loadPromise) {
       this.loadPromise = (async () => {
@@ -62,6 +63,7 @@ class PhysicsWorkerManager {
     }
     return this.loadPromise;
   }
+
   async cookGeometry(mesh) {
     await this.waitForLoad();
 
@@ -75,6 +77,7 @@ class PhysicsWorkerManager {
     });
     return result;
   }
+
   async cookConvexGeometry(mesh) {
     await this.waitForLoad();
     
@@ -88,6 +91,7 @@ class PhysicsWorkerManager {
     });
     return result;
   }
+
   async meshoptSimplify(mesh, targetRatio, targetError) {
     await this.waitForLoad();
     
@@ -104,6 +108,7 @@ class PhysicsWorkerManager {
     });
     return result;
   }
+
   async meshoptSimplifySloppy(mesh, targetRatio, targetError) {
     await this.waitForLoad();
     

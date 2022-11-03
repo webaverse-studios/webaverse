@@ -13,7 +13,7 @@ import {isWorker} from './env.js';
 // XXX enable this when the code is stable; then, we will have many more places to add missing matrix updates
 // THREE.Object3D.DefaultMatrixAutoUpdate = false;
 
-let canvas = null, context = null, renderer = null, composer = null;
+let canvas = null; let context = null; let renderer = null; let composer = null;
 
 let waitPromise = makePromise();
 const waitForLoad = () => waitPromise;
@@ -24,7 +24,6 @@ function bindCanvas(c) {
   context = canvas && canvas.getContext('webgl2', {
     antialias: true,
     alpha: true,
-    // preserveDrawingBuffer: false,
     xrCompatible: true,
   });
   renderer = new THREE.WebGLRenderer({
@@ -33,7 +32,6 @@ function bindCanvas(c) {
     antialias: true,
     alpha: true,
     rendererExtensionFragDepth: true,
-    // logarithmicDepthBuffer: true,
   });
   
   const {
@@ -56,7 +54,6 @@ function bindCanvas(c) {
   const renderTarget = new THREE.WebGLRenderTarget(width * pixelRatio, height * pixelRatio, {
     minFilter: THREE.LinearFilter,
     magFilter: THREE.LinearFilter,
-    // format: THREE.RGBAFormat,
     encoding: THREE.sRGBEncoding,
   });
   renderTarget.name = 'effectComposerRenderTarget';
@@ -97,37 +94,18 @@ sceneLowestPriority.name = 'lowestPriorioty';
 const rootScene = new WebaverseScene();
 rootScene.name = 'root';
 rootScene.autoUpdate = false;
-// const postSceneOrthographic = new THREE.Scene();
-// postSceneOrthographic.name = 'postOrthographic';
-// const postScenePerspective = new THREE.Scene();
-// postScenePerspective.name = 'postPerspective';
 rootScene.add(sceneHighPriority);
 rootScene.add(scene);
 rootScene.add(sceneLowPriority);
 rootScene.add(sceneLowerPriority);
 rootScene.add(sceneLowestPriority);
 
-// const orthographicScene = new THREE.Scene();
-// const avatarScene = new THREE.Scene();
-
 const camera = new THREE.PerspectiveCamera(minFov, 1, 0.1, 10000);
 camera.position.set(0, 1.6, 0);
 camera.rotation.order = 'YXZ';
 camera.name = 'sceneCamera';
-/* const avatarCamera = camera.clone();
-avatarCamera.near = 0.2;
-avatarCamera.updateProjectionMatrix(); */
 
-/* const dolly = new THREE.Object3D();
-// fixes a bug: avatar glitching when dropped exactly at an axis
-const epsilon = 0.000001;
-dolly.position.set(epsilon, epsilon, epsilon);
-dolly.add(camera); */
-// dolly.add(avatarCamera);
 scene.add(camera);
-
-// const orthographicCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, 100);
-// scene.add(orthographicCamera);
 
 const _getCanvasDimensions = () => {
   let width = globalThis.innerWidth;
@@ -157,7 +135,7 @@ const _setSizes = () => {
 
 const _setRendererSize = (width, height, pixelRatio) => {
   const renderer = getRenderer();
-  // if (renderer) {
+  if (renderer) {
     // pause XR since it gets in the way of resize
     if (renderer.xr.getSession()) {
       renderer.xr.isPresenting = false;
@@ -175,7 +153,7 @@ const _setRendererSize = (width, height, pixelRatio) => {
     if (renderer.xr.getSession()) {
       renderer.xr.isPresenting = true;
     }
-  // }
+  }
 };
 const _setComposerSize = (width, height, pixelRatio) => {
   const composer = getComposer();
@@ -194,27 +172,6 @@ globalThis.addEventListener('resize', e => {
   _setSizes();
 });
 
-/* addDefaultLights(scene, {
-  shadowMap: true,
-});
-addDefaultLights(sceneHighPriority, {
-  shadowMap: false,
-});
-addDefaultLights(sceneLowPriority, {
-  shadowMap: false,
-});
-addDefaultLights(avatarScene, {
-  shadowMap: false,
-}); */
-
-/* const renderer2 = new CSS3DRenderer();
-renderer2.setSize(window.innerWidth, window.innerHeight);
-renderer2.domElement.style.position = 'absolute';
-renderer2.domElement.style.top = 0;
-if (canvas.parentNode) {
-  document.body.insertBefore(renderer2.domElement, canvas);
-} */
-
 export function createCanvas(width, height) {
   if (isWorker) {
     return new OffscreenCanvas(width, height);
@@ -228,26 +185,15 @@ export function createCanvas(width, height) {
 
 export {
   waitForLoad,
-  // AppManager,
   bindCanvas,
   getRenderer,
   getContainerElement,
   getComposer,
   scene,
   rootScene,
-  // postSceneOrthographic,
-  // postScenePerspective,
-  // avatarScene,
   camera,
-  // orthographicCamera,
-  // avatarCamera,
-  // dolly,
-  /*orbitControls, renderer2,*/
   sceneHighPriority,
   sceneLowPriority,
   sceneLowerPriority,
   sceneLowestPriority,
-  // iframeContainer,
-  // iframeContainer2,
-  // appManager,
 };

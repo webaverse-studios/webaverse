@@ -1,17 +1,17 @@
 
-import React, { useContext, useEffect, useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import classnames from 'classnames';
 
-import { world } from '../../../../world.js'
+import {world} from '../../../../world.js'
 import game from '../../../../game.js'
 import metaversefile from '../../../../metaversefile-api.js';
 import cameraManager from '../../../../camera-manager.js';
 
-import { NumberInput } from '../number-input';
-import { AppContext } from '../../app';
-import { ObjectScreenshot } from '../object-screenshot';
-import { registerIoEventHandler, unregisterIoEventHandler } from '../../general/io-handler';
-import { ComponentEditor } from './ComponentEditor.jsx';
+import {NumberInput} from '../number-input';
+import {AppContext} from '../../app';
+import {ObjectScreenshot} from '../object-screenshot';
+import {registerIoEventHandler, unregisterIoEventHandler} from '../../general/io-handler';
+import {ComponentEditor} from './ComponentEditor.jsx';
 
 import styles from './world-objects-list.module.css';
 import physicsManager from '../../../../physics-manager.js';
@@ -22,82 +22,82 @@ import physicsManager from '../../../../physics-manager.js';
 const APP_TYPES = [ 'glb', 'html', 'gltf', 'gif', 'vrm' ];
 
 export const WorldObjectsList = () => {
-    const { state, setState, setSelectedApp, selectedApp } = useContext( AppContext );
-    const [ apps, setApps ] = useState( world.appManager.getApps().slice() );
-    const [ sortedApps, setSortedApps ] = useState( [] );
-    const [ rotationMode, setRotationMode ] = useState( 'euler' );
-    const [ rotationEulerOrder, setRotationEulerOrder ] = useState( 'YXZ' );
-    const [ needsUpdate, setNeedsUpdate ] = useState( false );
+    const {state, setState, setSelectedApp, selectedApp} = useContext(AppContext);
+    const [ apps, setApps ] = useState(world.appManager.getApps().slice());
+    const [ sortedApps, setSortedApps ] = useState([]);
+    const [ rotationMode, setRotationMode ] = useState('euler');
+    const [ rotationEulerOrder, setRotationEulerOrder ] = useState('YXZ');
+    const [ needsUpdate, setNeedsUpdate ] = useState(false);
 
-    let [ px, setPx ] = useState( 0 );
-    let [ py, setPy ] = useState( 0 );
-    let [ pz, setPz ] = useState( 0 );
-    let [ rex, setREx ] = useState( 0 );
-    let [ rey, setREy ] = useState( 0 );
-    let [ rez, setREz ] = useState( 0 );
-    let [ rqx, setRQx ] = useState( 0 );
-    let [ rqy, setRQy ] = useState( 0 );
-    let [ rqz, setRQz ] = useState( 0 );
-    let [ rqw, setRQw ] = useState( 0 );
-    let [ sx, setSx ] = useState( 1 );
-    let [ sy, setSy ] = useState( 1 );
-    let [ sz, setSz ] = useState( 1 );
+    let [ px, setPx ] = useState(0);
+    let [ py, setPy ] = useState(0);
+    let [ pz, setPz ] = useState(0);
+    let [ rex, setREx ] = useState(0);
+    let [ rey, setREy ] = useState(0);
+    let [ rez, setREz ] = useState(0);
+    let [ rqx, setRQx ] = useState(0);
+    let [ rqy, setRQy ] = useState(0);
+    let [ rqz, setRQz ] = useState(0);
+    let [ rqw, setRQw ] = useState(0);
+    let [ sx, setSx ] = useState(1);
+    let [ sy, setSy ] = useState(1);
+    let [ sz, setSz ] = useState(1);
 
     //
 
-    const handleAppTransformChange = ( paramName, value ) => {
+    const handleAppTransformChange = (paramName, value) => {
 
-        switch ( paramName ) {
+        switch (paramName) {
 
             case 'px':
-                setPx( value );
+                setPx(value);
                 break;
             case 'py':
-                setPy( value );
+                setPy(value);
                 break;
             case 'pz':
-                setPz( value );
+                setPz(value);
                 break;
 
             case 'rex':
-                setREx( value );
+                setREx(value);
                 break;
             case 'rey':
-                setREy( value );
+                setREy(value);
                 break;
             case 'rez':
-                setREz( value );
+                setREz(value);
                 break;
 
             case 'rqx':
-                setRQx( value );
+                setRQx(value);
                 break;
             case 'rqy':
-                setRQy( value );
+                setRQy(value);
                 break;
             case 'rqz':
-                setRQz( value );
+                setRQz(value);
                 break;
             case 'rqw':
-                setRQw( value );
+                setRQw(value);
                 break;
 
             case 'sx':
-                setSx( value );
+                setSx(value);
                 updatePhysics();
                 break;
             case 'sy':
-                setSy( value );
+                setSy(value);
                 updatePhysics();
                 break;
             case 'sz':
-                setSz( value );
+                setSz(value);
                 updatePhysics();
                 break;
 
         }
 
-        setNeedsUpdate( true );
+        setNeedsUpdate(true);
 
     };
 
@@ -105,100 +105,100 @@ export const WorldObjectsList = () => {
         
         const physicsObjects = selectedApp.getPhysicsObjects();
         const physicsScene = physicsManager.getScene();
-        physicsObjects.forEach( ( physicsObject ) => {
-            physicsScene.setGeometryScale( physicsObject.physicsId, selectedApp.scale );
+        physicsObjects.forEach((physicsObject) => {
+            physicsScene.setGeometryScale(physicsObject.physicsId, selectedApp.scale);
         });
     };
 
-    const stopPropagation = ( event ) => {
+    const stopPropagation = (event) => {
         
         event.stopPropagation();
 
     };
     
 
-    const handleSetRotationMode = ( event ) => {
+    const handleSetRotationMode = (event) => {
 
-        setRotationMode( event.target.value );
-
-    };
-
-    const handleSetRotationEulerOrder = ( event ) => {
-
-        setRotationEulerOrder( event.target.value );
-
-        selectedApp.rotation.reorder( rotationEulerOrder );
-
-        setREx( selectedApp.rotation.x );
-        setREy( selectedApp.rotation.y );
-        setREz( selectedApp.rotation.z );
+        setRotationMode(event.target.value);
 
     };
 
-    const selectApp = ( targetApp, physicsId, position ) => {
+    const handleSetRotationEulerOrder = (event) => {
 
-        setSelectedApp( targetApp );
-        game.setMouseSelectedObject( targetApp, physicsId, position );
+        setRotationEulerOrder(event.target.value);
+
+        selectedApp.rotation.reorder(rotationEulerOrder);
+
+        setREx(selectedApp.rotation.x);
+        setREy(selectedApp.rotation.y);
+        setREz(selectedApp.rotation.z);
 
     };
 
-    const handleItemClick = ( targetApp ) => {
+    const selectApp = (targetApp, physicsId, position) => {
+
+        setSelectedApp(targetApp);
+        game.setMouseSelectedObject(targetApp, physicsId, position);
+
+    };
+
+    const handleItemClick = (targetApp) => {
 
         const physicsObjects = targetApp.getPhysicsObjects();
         const physicsObject = physicsObjects[0] || null;
         const physicsId = physicsObject ? physicsObject.physicsId : 0;
-        selectApp( targetApp, physicsId );
+        selectApp(targetApp, physicsId);
 
         const localPlayer = metaversefile.useLocalPlayer();
-        localPlayer.lookAt( targetApp.position );
+        localPlayer.lookAt(targetApp.position);
 
     };
 
-    const handleItemMouseEnter = ( targetApp ) => {
+    const handleItemMouseEnter = (targetApp) => {
 
         const physicsObjects = targetApp.getPhysicsObjects();
         const physicsObject = physicsObjects[0] || null;
         const physicsId = physicsObject ? physicsObject.physicsId : 0;
 
-        game.setMouseHoverObject( null );
-        game.setMouseDomHoverObject( targetApp, physicsId );
+        game.setMouseHoverObject(null);
+        game.setMouseDomHoverObject(targetApp, physicsId);
 
     };
 
     const handleItemMouseLeave = () => {
 
-        game.setMouseDomHoverObject( null );
+        game.setMouseDomHoverObject(null);
 
     };
 
     const handleBackBtn = () => {
 
-        setSelectedApp( null );
+        setSelectedApp(null);
 
     };
 
     const closePanel = () => {
 
-        setState({ openedPanel: null });
+        setState({openedPanel: null});
 
     };
 
     //
 
-    useEffect( () => {
+    useEffect(() => {
 
-        if ( ! selectedApp ) return;
+        if (! selectedApp) return;
 
-        selectedApp.position.set( px, py, pz );
-        selectedApp.scale.set( sx, sy, sz );
+        selectedApp.position.set(px, py, pz);
+        selectedApp.scale.set(sx, sy, sz);
 
-        if ( rotationMode === 'euler' ) {
+        if (rotationMode === 'euler') {
 
-            selectedApp.rotation.set( rex, rey, rez, rotationEulerOrder );
+            selectedApp.rotation.set(rex, rey, rez, rotationEulerOrder);
 
         } else {
 
-            selectedApp.quaternion.set( rqx, rqy, rqz, rqw );
+            selectedApp.quaternion.set(rqx, rqy, rqz, rqw);
             selectedApp.quaternion.normalize();
 
         }
@@ -207,58 +207,58 @@ export const WorldObjectsList = () => {
 
         //
 
-        setREx( selectedApp.rotation.x );
-        setREy( selectedApp.rotation.y );
-        setREz( selectedApp.rotation.z );
+        setREx(selectedApp.rotation.x);
+        setREy(selectedApp.rotation.y);
+        setREz(selectedApp.rotation.z);
 
-        setRQx( selectedApp.quaternion.x );
-        setRQy( selectedApp.quaternion.y );
-        setRQz( selectedApp.quaternion.z );
-        setRQw( selectedApp.quaternion.w );
+        setRQx(selectedApp.quaternion.x);
+        setRQy(selectedApp.quaternion.y);
+        setRQz(selectedApp.quaternion.z);
+        setRQw(selectedApp.quaternion.w);
 
-        setNeedsUpdate( false );
+        setNeedsUpdate(false);
 
-    }, [ needsUpdate ] );
+    }, [ needsUpdate ]);
 
-    useEffect( () => {
+    useEffect(() => {
 
         const update = () => {
 
-            setApps( world.appManager.getApps().slice() );
+            setApps(world.appManager.getApps().slice());
 
         };
 
-        const handleKeyUp = ( event ) => {
+        const handleKeyUp = (event) => {
 
-            if ( game.inputFocused() ) {
+            if (game.inputFocused()) {
 
                 return true;
 
             }
 
-            switch ( event.which ) {
+            switch (event.which) {
 
                 case 90: {   // Z
 
-                    if ( state.openedPanel === 'WorldPanel' ) {
+                    if (state.openedPanel === 'WorldPanel') {
 
-                        if ( ! cameraManager.pointerLockElement ) {
+                        if (! cameraManager.pointerLockElement) {
 
                             cameraManager.requestPointerLock();
 
                         }
                 
-                        setState({ openedPanel: null });
+                        setState({openedPanel: null});
 
-                    } else if ( state.openedPanel !== 'SettingsPanel' ) {
+                    } else if (state.openedPanel !== 'SettingsPanel') {
 
-                        if ( cameraManager.pointerLockElement ) {
+                        if (cameraManager.pointerLockElement) {
 
                             cameraManager.exitPointerLock();
 
                         }
 
-                        setState({ openedPanel: 'WorldPanel' });
+                        setState({openedPanel: 'WorldPanel'});
 
                     }
 
@@ -272,97 +272,97 @@ export const WorldObjectsList = () => {
 
         };
 
-        world.appManager.addEventListener( 'appadd', update );
-        world.appManager.addEventListener( 'appremove', update );
-        registerIoEventHandler( 'click', closePanel );
-        registerIoEventHandler( 'keyup', handleKeyUp );
+        world.appManager.addEventListener('appadd', update);
+        world.appManager.addEventListener('appremove', update);
+        registerIoEventHandler('click', closePanel);
+        registerIoEventHandler('keyup', handleKeyUp);
 
         return () => {
 
-            world.appManager.removeEventListener( 'appadd', update );
-            world.appManager.removeEventListener( 'appremove', update );
-            unregisterIoEventHandler( 'click', closePanel );
-            unregisterIoEventHandler( 'keyup', handleKeyUp );
+            world.appManager.removeEventListener('appadd', update);
+            world.appManager.removeEventListener('appremove', update);
+            unregisterIoEventHandler('click', closePanel);
+            unregisterIoEventHandler('keyup', handleKeyUp);
 
         };
 
-    }, [ state.openedPanel ] );
+    }, [ state.openedPanel ]);
 
-    useEffect( () => {
+    useEffect(() => {
 
-        if ( ! selectedApp ) return;
+        if (! selectedApp) return;
 
-        const { position, quaternion, scale, rotation } = selectedApp;
+        const {position, quaternion, scale, rotation} = selectedApp;
 
-        setPx( position.x );
-        setPy( position.y );
-        setPz( position.z );
+        setPx(position.x);
+        setPy(position.y);
+        setPz(position.z);
 
-        setREx( rotation.x );
-        setREy( rotation.y );
-        setREz( rotation.z );
+        setREx(rotation.x);
+        setREy(rotation.y);
+        setREz(rotation.z);
 
-        setRQx( quaternion.x );
-        setRQy( quaternion.y );
-        setRQz( quaternion.z );
-        setRQw( quaternion.w );
+        setRQx(quaternion.x);
+        setRQy(quaternion.y);
+        setRQz(quaternion.z);
+        setRQw(quaternion.w);
 
-        setSx( scale.x );
-        setSy( scale.y );
-        setSz( scale.z );
+        setSx(scale.x);
+        setSy(scale.y);
+        setSz(scale.z);
 
-    }, [ selectedApp ] );
+    }, [ selectedApp ]);
 
-    useEffect( () => {
+    useEffect(() => {
 
-        if ( ! apps ) return;
+        if (! apps) return;
 
         const sortedApps = [];
 
-        apps.forEach( ( app ) => {
+        apps.forEach((app) => {
 
-            if ( APP_TYPES.indexOf( app.appType ) !== -1 ) {
+            if (APP_TYPES.indexOf(app.appType) !== -1) {
 
-                sortedApps.push( app );
-
-            }
-
-        });
-
-        apps.forEach( ( app ) => {
-
-            if ( APP_TYPES.indexOf( app.appType ) === -1 ) {
-
-                sortedApps.push( app );
+                sortedApps.push(app);
 
             }
 
         });
 
-        setSortedApps( sortedApps );
+        apps.forEach((app) => {
 
-    }, [ apps ] );
+            if (APP_TYPES.indexOf(app.appType) === -1) {
+
+                sortedApps.push(app);
+
+            }
+
+        });
+
+        setSortedApps(sortedApps);
+
+    }, [ apps ]);
 
     //
 
-    const appTypeIcons = { 'js': 'script', 'light': 'light' };
+    const appTypeIcons = {'js': 'script', 'light': 'light'};
 
     //
 
     return (
-        <div className={ classnames( styles.worldObjectListWrapper, state.openedPanel === 'WorldPanel' ? styles.opened : null ) } onClick={ stopPropagation } onMouseMove={ stopPropagation } >
-            <div className={ classnames( styles.panel, ( ! selectedApp && state.openedPanel === 'WorldPanel' ) ? styles.opened : null ) } >
+        <div className={ classnames(styles.worldObjectListWrapper, state.openedPanel === 'WorldPanel' ? styles.opened : null) } onClick={ stopPropagation } onMouseMove={ stopPropagation } >
+            <div className={ classnames(styles.panel, (! selectedApp && state.openedPanel === 'WorldPanel') ? styles.opened : null) } >
                 <div className={ styles.header } >
                     World Tokens ({ apps.length })
                 </div>
                 {
                     <div className={ styles.objects } >
                     {
-                        sortedApps.map( ( app, i ) => (
-                            <div className={ classnames( styles.object, app === selectedApp ? styles.selected : null ) } key={ i } onClick={ handleItemClick.bind( null, app ) } onMouseEnter={ handleItemMouseEnter.bind( null, app ) } onMouseLeave={ handleItemMouseLeave.bind( null, app ) } >
-                                <img src="images/webpencil.svg" className={ classnames( styles.backgroundInner, styles.lime ) } />
+                        sortedApps.map((app, i) => (
+                            <div className={ classnames(styles.object, app === selectedApp ? styles.selected : null) } key={ i } onClick={ handleItemClick.bind(null, app) } onMouseEnter={ handleItemMouseEnter.bind(null, app) } onMouseLeave={ handleItemMouseLeave.bind(null, app) } >
+                                <img src="images/webpencil.svg" className={ classnames(styles.backgroundInner, styles.lime) } />
                                 {
-                                    ( APP_TYPES.indexOf( app.appType ) !== -1 ) ? (
+                                    (APP_TYPES.indexOf(app.appType) !== -1) ? (
                                         <ObjectScreenshot
                                             className={ styles.img }
                                             width={ 80 }
@@ -383,22 +383,22 @@ export const WorldObjectsList = () => {
                     </div>
                 }
             </div>
-                <div className={ classnames( styles.objectProperties, styles.panel, selectedApp ? styles.opened : null ) } >
+                <div className={ classnames(styles.objectProperties, styles.panel, selectedApp ? styles.opened : null) } >
                     {
                         selectedApp ? (
                             <>
                                 <div className={ styles.header } >
-                                    <div className={ classnames( styles.button, styles.back ) } onClick={ handleBackBtn } >
+                                    <div className={ classnames(styles.button, styles.back) } onClick={ handleBackBtn } >
                                         <img src="images/webchevron.svg" className={ styles.img } />
                                     </div>
                                     <div className={ styles.title } >{ selectedApp ? selectedApp.name : null } </div>
                                 </div>
                                 <div className={ styles.settingsBlock } >
                                     <div className={ styles.subheader } >Position</div>
-                                    <div className={ classnames( styles.inputs, styles.pos ) } >
-                                        <NumberInput title="X" initalValue={ px } onChange={ handleAppTransformChange.bind( null, 'px' ) } step={ 1 } />
-                                        <NumberInput title="Y" initalValue={ py } onChange={ handleAppTransformChange.bind( null, 'py' ) } step={ 1 } />
-                                        <NumberInput title="Z" initalValue={ pz } onChange={ handleAppTransformChange.bind( null, 'pz' ) } step={ 1 } />
+                                    <div className={ classnames(styles.inputs, styles.pos) } >
+                                        <NumberInput title="X" initalValue={ px } onChange={ handleAppTransformChange.bind(null, 'px') } step={ 1 } />
+                                        <NumberInput title="Y" initalValue={ py } onChange={ handleAppTransformChange.bind(null, 'py') } step={ 1 } />
+                                        <NumberInput title="Z" initalValue={ pz } onChange={ handleAppTransformChange.bind(null, 'pz') } step={ 1 } />
                                     </div>
                                     <div className={ styles.subheader } >Rotation</div>
                                     <div className={ styles.selectWrapper } >
@@ -410,7 +410,7 @@ export const WorldObjectsList = () => {
                                     </div>
                                     {
                                         rotationMode === 'euler' ? (
-                                            <div className={ classnames( styles.inputs ) } >
+                                            <div className={ classnames(styles.inputs) } >
                                                 <div className={ styles.selectWrapper } >
                                                     <div className={ styles.selectWrapperTitle } >Euler order</div>
                                                     <select value={ rotationEulerOrder } onChange={ handleSetRotationEulerOrder } className={ styles.rotationEulerOrderSelect } >
@@ -423,52 +423,52 @@ export const WorldObjectsList = () => {
                                                     </select>
                                                 </div>
                                                 {
-                                                    ( rotationEulerOrder[0] === 'X' ) ? (
-                                                        <NumberInput title="X" initalValue={ rex } onChange={ handleAppTransformChange.bind( null, 'rex' ) } step={ Math.PI / 2 } />
-                                                    ) : ( rotationEulerOrder[0] === 'Y' ) ? (
-                                                        <NumberInput title="Y" initalValue={ rey } onChange={ handleAppTransformChange.bind( null, 'rey' ) } step={ Math.PI / 2 } />
+                                                    (rotationEulerOrder[0] === 'X') ? (
+                                                        <NumberInput title="X" initalValue={ rex } onChange={ handleAppTransformChange.bind(null, 'rex') } step={ Math.PI / 2 } />
+                                                    ) : (rotationEulerOrder[0] === 'Y') ? (
+                                                        <NumberInput title="Y" initalValue={ rey } onChange={ handleAppTransformChange.bind(null, 'rey') } step={ Math.PI / 2 } />
                                                     ) : (
-                                                        <NumberInput title="Z" initalValue={ rez } onChange={ handleAppTransformChange.bind( null, 'rez' ) } step={ Math.PI / 2 } />
+                                                        <NumberInput title="Z" initalValue={ rez } onChange={ handleAppTransformChange.bind(null, 'rez') } step={ Math.PI / 2 } />
                                                     )
                                                 }
                                                 {
-                                                    ( rotationEulerOrder[1] === 'X' ) ? (
-                                                        <NumberInput title="X" initalValue={ rex } onChange={ handleAppTransformChange.bind( null, 'rex' ) } step={ Math.PI / 2 } />
-                                                    ) : ( rotationEulerOrder[1] === 'Y' ) ? (
-                                                        <NumberInput title="Y" initalValue={ rey } onChange={ handleAppTransformChange.bind( null, 'rey' ) } step={ Math.PI / 2 } />
+                                                    (rotationEulerOrder[1] === 'X') ? (
+                                                        <NumberInput title="X" initalValue={ rex } onChange={ handleAppTransformChange.bind(null, 'rex') } step={ Math.PI / 2 } />
+                                                    ) : (rotationEulerOrder[1] === 'Y') ? (
+                                                        <NumberInput title="Y" initalValue={ rey } onChange={ handleAppTransformChange.bind(null, 'rey') } step={ Math.PI / 2 } />
                                                     ) : (
-                                                        <NumberInput title="Z" initalValue={ rez } onChange={ handleAppTransformChange.bind( null, 'rez' ) } step={ Math.PI / 2 } />
+                                                        <NumberInput title="Z" initalValue={ rez } onChange={ handleAppTransformChange.bind(null, 'rez') } step={ Math.PI / 2 } />
                                                     )
                                                 }
                                                 {
-                                                    ( rotationEulerOrder[2] === 'X' ) ? (
-                                                        <NumberInput title="X" initalValue={ rex } onChange={ handleAppTransformChange.bind( null, 'rex' ) } step={ Math.PI / 2 } />
-                                                    ) : ( rotationEulerOrder[2] === 'Y' ) ? (
-                                                        <NumberInput title="Y" initalValue={ rey } onChange={ handleAppTransformChange.bind( null, 'rey' ) } step={ Math.PI / 2 } />
+                                                    (rotationEulerOrder[2] === 'X') ? (
+                                                        <NumberInput title="X" initalValue={ rex } onChange={ handleAppTransformChange.bind(null, 'rex') } step={ Math.PI / 2 } />
+                                                    ) : (rotationEulerOrder[2] === 'Y') ? (
+                                                        <NumberInput title="Y" initalValue={ rey } onChange={ handleAppTransformChange.bind(null, 'rey') } step={ Math.PI / 2 } />
                                                     ) : (
-                                                        <NumberInput title="Z" initalValue={ rez } onChange={ handleAppTransformChange.bind( null, 'rez' ) } step={ Math.PI / 2 } />
+                                                        <NumberInput title="Z" initalValue={ rez } onChange={ handleAppTransformChange.bind(null, 'rez') } step={ Math.PI / 2 } />
                                                     )
                                                 }
                                             </div>
                                         ) : (
-                                            <div className={ classnames( styles.inputs ) } >
-                                                <NumberInput title="X" initalValue={ rqx } onChange={ handleAppTransformChange.bind( null, 'rqx' ) } step={ 0.02 } />
-                                                <NumberInput title="Y" initalValue={ rqy } onChange={ handleAppTransformChange.bind( null, 'rqy' ) } step={ 0.02 } />
-                                                <NumberInput title="Z" initalValue={ rqz } onChange={ handleAppTransformChange.bind( null, 'rqz' ) } step={ 0.02 } />
-                                                <NumberInput title="W" initalValue={ rqw } onChange={ handleAppTransformChange.bind( null, 'rqw' ) } step={ 0.02 } />
+                                            <div className={ classnames(styles.inputs) } >
+                                                <NumberInput title="X" initalValue={ rqx } onChange={ handleAppTransformChange.bind(null, 'rqx') } step={ 0.02 } />
+                                                <NumberInput title="Y" initalValue={ rqy } onChange={ handleAppTransformChange.bind(null, 'rqy') } step={ 0.02 } />
+                                                <NumberInput title="Z" initalValue={ rqz } onChange={ handleAppTransformChange.bind(null, 'rqz') } step={ 0.02 } />
+                                                <NumberInput title="W" initalValue={ rqw } onChange={ handleAppTransformChange.bind(null, 'rqw') } step={ 0.02 } />
                                             </div>
                                         )
                                     }
                                     <div className={ styles.subheader } >Scale</div>
-                                    <div className={ classnames( styles.inputs, styles.scale ) } >
-                                        <NumberInput title="X" zeroValue={ false } initalValue={ sx } onChange={ handleAppTransformChange.bind( null, 'sx' ) } step={ 0.1 } />
-                                        <NumberInput title="Y" zeroValue={ false } initalValue={ sy } onChange={ handleAppTransformChange.bind( null, 'sy' ) } step={ 0.1 } />
-                                        <NumberInput title="Z" zeroValue={ false } initalValue={ sz } onChange={ handleAppTransformChange.bind( null, 'sz' ) } step={ 0.1 } />
+                                    <div className={ classnames(styles.inputs, styles.scale) } >
+                                        <NumberInput title="X" zeroValue={ false } initalValue={ sx } onChange={ handleAppTransformChange.bind(null, 'sx') } step={ 0.1 } />
+                                        <NumberInput title="Y" zeroValue={ false } initalValue={ sy } onChange={ handleAppTransformChange.bind(null, 'sy') } step={ 0.1 } />
+                                        <NumberInput title="Z" zeroValue={ false } initalValue={ sz } onChange={ handleAppTransformChange.bind(null, 'sz') } step={ 0.1 } />
                                     </div>
                                     <ComponentEditor />
                                 </div>
                                 {
-                                    ( APP_TYPES.indexOf( selectedApp.appType ) !== -1 ) ? (
+                                    (APP_TYPES.indexOf(selectedApp.appType) !== -1) ? (
                                         // <Spritesheet
                                         //     className={ styles.objectPreview }
                                         //     startUrl={ selectedApp?.start_url }

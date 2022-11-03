@@ -115,7 +115,7 @@ const CharacterHup = function(props) {
 
   return (
     <div
-      className={classnames(styles['character-hup'], localOpen ? styles['open'] : null)}
+      className={classnames(styles['character-hup'], localOpen ? styles.open : null)}
       style={{
         top: `${index * defaultHupSize}px`,
       }}

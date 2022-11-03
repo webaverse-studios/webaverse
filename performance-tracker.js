@@ -35,6 +35,7 @@ class PerformanceTracker extends EventTarget {
       this.enabled = e.data.enabled;
     });
   }
+
   startCpuObject(id, name) {
     if (!this.enabled) return;
 
@@ -65,12 +66,14 @@ class PerformanceTracker extends EventTarget {
       this.currentCpuObject = currentCpuObject;
     }
   }
+
   endCpuObject() {
     if (!this.enabled) return;
 
     this.currentCpuObject.endTime = performance.now();
     this.currentCpuObject = null;
   }
+
   startGpuObject(id, name) {
     if (!this.enabled) return;
 
@@ -112,6 +115,7 @@ class PerformanceTracker extends EventTarget {
       qs.push(query);
     }
   }
+
   endGpuObject() {
     if (!this.enabled) return;
 
@@ -119,21 +123,25 @@ class PerformanceTracker extends EventTarget {
     gl.endQuery(ext.TIME_ELAPSED_EXT);
     this.currentGpuObject = null;
   }
+
   startFrame() {
     if (!this.enabled) return;
 
     this.dispatchEvent(new MessageEvent('startframe'));
   }
+
   setCpuPrefix(cpuPrefix) {
     if (!this.enabled) return;
 
     this.cpuPrefix = cpuPrefix;
   }
+
   setGpuPrefix(gpuPrefix) {
     if (!this.enabled) return;
 
     this.gpuPrefix = gpuPrefix;
   }
+
   decorateApp(app) {
     const self = this;
     const _makeOnBeforeRender = fn => {
@@ -176,6 +184,7 @@ class PerformanceTracker extends EventTarget {
     }
     _traverse(app);
   }
+
   async waitForGpuResults(gpuResults) {
     const renderer = getRenderer();
     const gl = renderer.getContext();
@@ -204,6 +213,7 @@ class PerformanceTracker extends EventTarget {
       this.gpuQueries.delete(object);
     }
   }
+
   getSmoothedSnapshot() {
     const cpu = new Map();
     const gpu = new Map();
@@ -257,6 +267,7 @@ class PerformanceTracker extends EventTarget {
       gpuResults,
     };
   }
+
   scheduleSnapshot() {
     if (!this.enabled) return;
 
@@ -283,6 +294,7 @@ class PerformanceTracker extends EventTarget {
       }
     })();
   }
+
   endFrame() {
     if (!this.enabled) return;
 

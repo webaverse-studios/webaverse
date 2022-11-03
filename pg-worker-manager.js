@@ -37,6 +37,7 @@ export class PGWorkerManager {
     // trigger load
     this.waitForLoad();
   }
+
   waitForLoad() {
     if (!this.loadPromise) {
       this.loadPromise = (async () => {
@@ -109,6 +110,7 @@ export class PGWorkerManager {
     }
     return this.loadPromise;
   }
+
   setCamera(worldPosition, cameraPosition, cameraQuaternion, projectionMatrix) {
     const worldPositionArray = worldPosition.toArray(localArray3D);
     const cameraPositionArray = cameraPosition.toArray(localArray3D2);
@@ -123,6 +125,7 @@ export class PGWorkerManager {
       projectionMatrix: projectionMatrixArray,
     });
   }
+
   setClipRange(range) {
     const rangeArray = [range.min.toArray(), range.max.toArray()];
     
@@ -138,6 +141,7 @@ export class PGWorkerManager {
     }, {signal});
     return result;
   }
+
   async destroyTracker(tracker, {signal} = {}) {
     const result = await this.worker.request('destroyTracker', {
       instance: this.instance,
@@ -145,6 +149,7 @@ export class PGWorkerManager {
     }, {signal});
     return result;
   }
+
   async trackerUpdate(tracker, position, minLod, maxLod, lod1Range, {signal} = {}) {
     const result = await this.worker.request('trackerUpdate', {
       instance: this.instance,
@@ -187,6 +192,7 @@ export class PGWorkerManager {
     // signal.throwIfAborted();
     return result;
   }
+
   async generateBarrier(
     chunkPosition,
     minLod,
@@ -203,6 +209,10 @@ export class PGWorkerManager {
     }, {signal});
     // signal.throwIfAborted();
     return result;
+  }
+
+  async destroy() {
+    await this.worker.request('destroyInstance', {instance: this.instance})
   }
 
   //

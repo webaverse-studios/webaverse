@@ -60,6 +60,7 @@ class CharacterPhysics {
     this.lastPistolUse = false;
     this.lastPistolUseStartTime = -Infinity;
   }
+
   loadCharacterController(characterWidth, characterHeight) {
     this.characterWidth = characterWidth;
     this.characterHeight = characterHeight;
@@ -86,6 +87,7 @@ class CharacterPhysics {
       position
     );
   }
+
   setPosition(p) {
     localVector.copy(p);
     localVector.y -= this.characterHeight * 0.5;
@@ -95,6 +97,7 @@ class CharacterPhysics {
       localVector
     );
   }
+
   /* apply the currently held keys to the character */
   applyWasd(velocity, timeDiff) {
     if (this.character.avatar) {
@@ -102,6 +105,7 @@ class CharacterPhysics {
       this.targetMoveDistancePerFrame.copy(this.targetVelocity).multiplyScalar(timeDiff / 1000);
     }
   }
+
   applyGravity(nowS, timeDiffS) {
     // if (this.character) {
       const fallLoopAction = this.character.getAction('fallLoop');
@@ -128,9 +132,11 @@ class CharacterPhysics {
       this.lastFallLoopAction = fallLoopAction;
     // }
   }
+
   updateVelocity(timeDiffS) {
     this.applyVelocityDamping(this.velocity, timeDiffS);
   }
+
   applyCharacterPhysicsDetail(velocityAvatarDirection, updateRig, now, timeDiffS) {
     if (this.character.avatar) {
       // move character controller
@@ -150,7 +156,7 @@ class CharacterPhysics {
             doubleJumpAction.startPositionY -
             this.lastCharacterControllerY;
           if (doubleJumpTime >= flatGroundJumpAirTime) {
-            this.character.setControlAction({ type: 'fallLoop', from: 'jump' });
+            this.character.setControlAction({type: 'fallLoop', from: 'jump'});
           }
         } else {
           const jumpTime = this.character.actionInterpolants.jump.get();
@@ -160,7 +166,7 @@ class CharacterPhysics {
             jumpAction.startPositionY -
             this.lastCharacterControllerY;
           if (jumpTime >= flatGroundJumpAirTime) {
-            this.character.setControlAction({ type: 'fallLoop', from: 'jump' });
+            this.character.setControlAction({type: 'fallLoop', from: 'jump'});
           }
         }
       }
@@ -291,13 +297,13 @@ class CharacterPhysics {
               !this.character.hasAction('fly') &&
               !this.character.hasAction('swim')
             ) {
-              this.character.setControlAction({ type: 'fallLoop' });
+              this.character.setControlAction({type: 'fallLoop'});
               this.velocity.y = 0;
             }
           }
         }
       } else {
-        //Outdated vehicle code
+        // Outdated vehicle code
         this.velocity.y = 0;
 
         const sitAction = this.character.getAction('sit');
@@ -395,6 +401,7 @@ class CharacterPhysics {
         this.characterController.position.y;
     }
   }
+
   /* dampen the velocity to make physical sense for the current avatar state */
   applyVelocityDamping(velocity, timeDiffS) {
     const doDamping = (factor) => {
@@ -418,6 +425,7 @@ class CharacterPhysics {
       doDamping(groundFriction);
     }
   }
+
   applyCharacterPhysics(now, timeDiffS) {
     // const renderer = getRenderer();
     // const session = renderer.xr.getSession();
@@ -445,6 +453,7 @@ class CharacterPhysics {
     }
     // }
   }
+
   applyCharacterActionKinematics(now, timeDiffS) {
     const renderer = getRenderer();
     const session = renderer.xr.getSession();
@@ -458,7 +467,7 @@ class CharacterPhysics {
           if (!app) {
             return null;
           }
-          for (const { key, value } of app.components) {
+          for (const {key, value} of app.components) {
             if (key === 'aim') {
               return value;
             }
@@ -636,6 +645,7 @@ class CharacterPhysics {
     };
     _updateBowIkAnimation();
   }
+
   update(now, timeDiffS) {
     const nowS = now / 1000;
     this.updateVelocity(timeDiffS);
@@ -646,11 +656,13 @@ class CharacterPhysics {
     this.lastTargetVelocity.copy(this.targetVelocity);
     this.lastTargetMoveDistancePerFrame.copy(this.targetMoveDistancePerFrame);
   }
+
   reset() {
     if (this.character.avatar) {
       this.velocity.set(0, 0, 0);
     }
   }
+
   destroy() {
     if (this.characterController) {
       const physicsScene = physicsManager.getScene();

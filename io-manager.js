@@ -14,7 +14,7 @@ import voiceInput from './voice-input/voice-input.js';
 // import * as universe from './universe.js';
 // import {toggle as inventoryToggle} from './inventory.js';
 import {isInIframe, getVelocityDampingFactor} from './util.js';
-import {getRenderer, /*renderer2,*/ scene, camera, getContainerElement} from './renderer.js';
+import {getRenderer, /* renderer2, */ scene, camera, getContainerElement} from './renderer.js';
 import physicsManager from './physics-manager.js';
 /* import {menuActions} from './mithril-ui/store/actions.js';
 import {menuState} from './mithril-ui/store/state.js'; */

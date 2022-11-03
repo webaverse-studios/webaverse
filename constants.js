@@ -12,30 +12,6 @@ export const rarityColors = {
   legendary: [0xAD00EA, 0x32002D],
 };
 
-/* const PEEK_FACE_INDICES = [];
-(function initPeekFaceIndices(){
-   for (let i = 0; i < 8 * 8; i++)
-    {
-      PEEK_FACE_INDICES[i] = 0xFF;
-    }
-
-    let peekIndex = 0;
-    for (let startFace = 0; startFace < 6; startFace++)
-    {
-      for (let endFace = 0; endFace < 6; endFace++)
-      {
-        if (startFace != endFace)
-        {
-          const otherEntry = PEEK_FACE_INDICES[endFace << 3 | startFace];
-          PEEK_FACE_INDICES[startFace << 3 | endFace] = otherEntry != 0xFF ? otherEntry : peekIndex++;
-        }
-      }
-    }
-    // console.log("INVOKED");
-})();
-
-export {PEEK_FACE_INDICES}; */
-
 const chainName = (() => {
   if (typeof globalThis !== 'undefined' && /^test\./.test(location.hostname)) {
     return 'testnet';
@@ -95,9 +71,8 @@ export const landHost = `https://${chainName}sidechain-land.webaverse.com`;
 export const codeAiHost = `https://ai.webaverse.com/code`;
 export const web3MainnetSidechainEndpoint = 'https://mainnetsidechain.exokit.org';
 export const web3TestnetSidechainEndpoint = 'https://testnetsidechain.exokit.org';
-export const worldUrl = 'worlds.webaverse.com';
+// export const worldUrl = 'worlds.webaverse.com';
 export const discordClientId = '684141574808272937';
-export const walletHost = 'https://wallet.webaverse.com';
 
 export const worldMapName = 'world';
 export const actionsMapName = 'actions';

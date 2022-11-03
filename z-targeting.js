@@ -54,6 +54,7 @@ class QueryResults {
   constructor() {
     this.results = [];
   }
+
   snapshot(object) {
     const {position, quaternion} = object;
     const direction = new THREE.Vector3(0, 0, -1)
@@ -127,6 +128,7 @@ class ZTargeting extends THREE.Object3D {
 
     this.loadPromise = null;
   }
+
   waitForLoad() {
     if (!this.loadPromise) {
       this.loadPromise = (async () => {
@@ -141,6 +143,7 @@ class ZTargeting extends THREE.Object3D {
     }
     return this.loadPromise;
   }
+
   setQueryResult(timestamp) {
     let reticles;
     const localPlayer = playersManager.getLocalPlayer();
@@ -173,16 +176,18 @@ class ZTargeting extends THREE.Object3D {
     const targetReticleMesh = this.targetReticleApp.children[0];
     targetReticleMesh.setReticles(reticles);
   }
+
   update(timestamp) {
     this.setQueryResult(timestamp);
   }
+
   handleDown(object = camera) {
     if (!cameraManager.focus) {
       this.queryResults.snapshot(object);
 
       if (this.queryResults.results.length > 0) {
         this.focusTargetReticle = this.queryResults.results[0];
-        sounds.playSoundName(this.focusTargetReticle.type == 'enemy' ? 'zTargetEnemy' : 'zTargetObject');
+        sounds.playSoundName(this.focusTargetReticle.type === 'enemy' ? 'zTargetEnemy' : 'zTargetObject');
       
         const naviSoundNames = [
           'naviHey',
@@ -203,6 +208,7 @@ class ZTargeting extends THREE.Object3D {
       cameraManager.setStaticTarget(localPlayer.avatar.modelBones.Head, remoteApp);
     }
   }
+
   handleUp() {
     if (cameraManager.focus) {
       cameraManager.setFocus(false);
@@ -213,6 +219,7 @@ class ZTargeting extends THREE.Object3D {
       }
     }
   }
+
   toggle() {
     if (cameraManager.focus) {
       this.handleUp();

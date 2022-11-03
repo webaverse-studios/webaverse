@@ -8,6 +8,7 @@ import * as THREE from 'three';
 import Module from './public/bin/geometry.js';
 import {Allocator, ScratchStack} from './geometry-util.js';
 
+const maxNumUpdates = 256;
 const localVector = new THREE.Vector3()
 const localVector2 = new THREE.Vector3()
 const localQuaternion = new THREE.Quaternion()
@@ -513,7 +514,6 @@ const physxWorker = (() => {
   w.initialize = () => Module._initialize()
   w.makeScene = () => Module._makePhysics()
   w.simulatePhysics = (physics, updates, elapsedTime) => {
-    const maxNumUpdates = 256;
     /* if (updates.length > maxNumUpdates) {
       throw new Error('too many updates to simulate step: ' + updates.length + ' (max: ' + maxNumUpdates + ')');
     } */
@@ -1357,7 +1357,7 @@ const physxWorker = (() => {
   }
 
   w.addGeometryPhysics = (physics, mesh, id) => {
-    const { geometry } = mesh
+    const {geometry} = mesh
 
     const allocator = new Allocator(Module)
     const positions = allocator.alloc(
@@ -1419,7 +1419,7 @@ const physxWorker = (() => {
   }
   w.cookGeometryPhysics = (mesh) => {
     mesh.updateMatrixWorld()
-    const { geometry } = mesh
+    const {geometry} = mesh
 
     const allocator = new Allocator(Module)
     const positions = allocator.alloc(
@@ -1494,7 +1494,7 @@ const physxWorker = (() => {
 
   w.addConvexGeometryPhysics = (physics, mesh, dynamic, external, id) => {
     mesh.updateMatrixWorld()
-    const { geometry } = mesh
+    const {geometry} = mesh
 
     const allocator = new Allocator(Module)
     const positions = allocator.alloc(
@@ -1556,7 +1556,7 @@ const physxWorker = (() => {
   }
   w.cookConvexGeometryPhysics = (physics, mesh) => {
     mesh.updateMatrixWorld()
-    const { geometry } = mesh
+    const {geometry} = mesh
 
     const allocator = new Allocator(Module)
     const positions = allocator.alloc(
@@ -2012,7 +2012,7 @@ const physxWorker = (() => {
     const scales = scratchStack.f32.subarray(index, index + maxNumUpdates * 3)
     index += maxNumUpdates * 3
 
-    //console.log(updates);
+    // console.log(updates);
 
     for (let i = 0; i < updates.length; i++) {
       const update = updates[i]
@@ -2031,7 +2031,7 @@ const physxWorker = (() => {
     )
 
     const newUpdates = Array(numNewUpdates)
-    //console.log(numNewUpdates);
+    // console.log(numNewUpdates);
     for (let i = 0; i < numNewUpdates; i++) {
       newUpdates[i] = {
         id: ids[i],
@@ -2043,7 +2043,7 @@ const physxWorker = (() => {
 
     // console.log(newUpdates, "new ID");
 
-    //console.log(newUpdates);
+    // console.log(newUpdates);
     return newUpdates
   }
   w.addCapsuleGeometryPhysics = (

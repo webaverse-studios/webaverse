@@ -314,9 +314,11 @@ class MiniMap {
 
     this.smoothSpeed = 0;
   }
+
   resetCanvases() {
     this.canvases.length = 0;
   }
+
   addCanvas(canvas) {
     const {width, height} = canvas;
     this.canvasWidth = Math.max(this.canvasWidth, width);
@@ -327,6 +329,7 @@ class MiniMap {
 
     this.canvases.push(canvas);
   }
+
   update(timestamp, timeDiff) {
     const localPlayer = metaversefileApi.useLocalPlayer();
 
@@ -545,8 +548,9 @@ class MiniMap {
     renderer.setRenderTarget(oldRenderTarget);
     renderer.setViewport(oldViewport);
   }
+
   destroy() {
-    for (const canvas of canvases) {
+    for (const canvas of this.canvases) {
       canvas.parentNode.removeChild(canvas);
     }
     minimaps.splice(minimaps.indexOf(this), 1);

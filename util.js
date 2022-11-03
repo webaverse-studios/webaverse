@@ -5,7 +5,7 @@ import {
   playersMapName,
   tokensHost,
   storageHost,
-  /*accountsHost, loginEndpoint,*/ audioTimeoutTime,
+  /* accountsHost, loginEndpoint, */ audioTimeoutTime,
 } from './constants.js';
 // import { getRenderer } from './renderer.js';
 import {IdAllocator} from './id-allocator.js';
@@ -205,160 +205,160 @@ export class WaitQueue {
     rects,
   };
 }; */
-export function mergeMeshes(meshes, geometries, textures) {
-  const size = 512;
-  const images = textures.map((texture) => texture && texture.image);
-  const colorsImage = document.createElement('canvas');
-  colorsImage.width = size / 2;
-  colorsImage.height = 1;
-  colorsImage.rigid = true;
-  const colorsImageCtx = colorsImage.getContext('2d');
-  colorsImageCtx.fillStyle = '#FFF';
-  colorsImageCtx.fillRect(0, 0, colorsImage.width, colorsImage.height);
-  const { atlasCanvas, rects } = _makeAtlas(size, images.concat(colorsImage));
-  const colorsImageRect = rects[rects.length - 1];
-  let colorsImageColorIndex = 0;
-  const atlasCanvasCtx = atlasCanvas.getContext('2d');
+// export function mergeMeshes(meshes, geometries, textures) {
+//   const size = 512;
+//   const images = textures.map((texture) => texture && texture.image);
+//   const colorsImage = document.createElement('canvas');
+//   colorsImage.width = size / 2;
+//   colorsImage.height = 1;
+//   colorsImage.rigid = true;
+//   const colorsImageCtx = colorsImage.getContext('2d');
+//   colorsImageCtx.fillStyle = '#FFF';
+//   colorsImageCtx.fillRect(0, 0, colorsImage.width, colorsImage.height);
+//   const {atlasCanvas, rects} = _makeAtlas(size, images.concat(colorsImage));
+//   const colorsImageRect = rects[rects.length - 1];
+//   let colorsImageColorIndex = 0;
+//   const atlasCanvasCtx = atlasCanvas.getContext('2d');
 
-  const geometry = new THREE.BufferGeometry();
-  {
-    let numPositions = 0;
-    let numIndices = 0;
-    for (const geometry of geometries) {
-      numPositions += geometry.attributes.position.array.length;
-      numIndices += geometry.index.array.length;
-    }
+//   const geometry = new THREE.BufferGeometry();
+//   {
+//     let numPositions = 0;
+//     let numIndices = 0;
+//     for (const geometry of geometries) {
+//       numPositions += geometry.attributes.position.array.length;
+//       numIndices += geometry.index.array.length;
+//     }
 
-    const positions = new Float32Array(numPositions);
-    const uvs = new Float32Array((numPositions / 3) * 2);
-    const colors = new Float32Array(numPositions);
-    const indices = new Uint32Array(numIndices);
-    let positionIndex = 0;
-    let uvIndex = 0;
-    let colorIndex = 0;
-    let indicesIndex = 0;
-    for (let i = 0; i < meshes.length; i++) {
-      const mesh = meshes[i];
-      const geometry = geometries[i];
-      const { material } = mesh;
-      const rect = rects[i];
+//     const positions = new Float32Array(numPositions);
+//     const uvs = new Float32Array((numPositions / 3) * 2);
+//     const colors = new Float32Array(numPositions);
+//     const indices = new Uint32Array(numIndices);
+//     let positionIndex = 0;
+//     let uvIndex = 0;
+//     let colorIndex = 0;
+//     let indicesIndex = 0;
+//     for (let i = 0; i < meshes.length; i++) {
+//       const mesh = meshes[i];
+//       const geometry = geometries[i];
+//       const {material} = mesh;
+//       const rect = rects[i];
 
-      geometry.applyMatrix4(mesh.matrixWorld);
+//       geometry.applyMatrix4(mesh.matrixWorld);
 
-      const indexOffset = positionIndex / 3;
-      if (geometry.index) {
-        for (let i = 0; i < geometry.index.array.length; i++) {
-          indices[indicesIndex++] = geometry.index.array[i] + indexOffset;
-        }
-      } else {
-        for (
-          let i = 0;
-          i < geometry.attributes.position.array.length / 3;
-          i++
-        ) {
-          indices[indicesIndex++] = i + indexOffset;
-        }
-      }
+//       const indexOffset = positionIndex / 3;
+//       if (geometry.index) {
+//         for (let i = 0; i < geometry.index.array.length; i++) {
+//           indices[indicesIndex++] = geometry.index.array[i] + indexOffset;
+//         }
+//       } else {
+//         for (
+//           let i = 0;
+//           i < geometry.attributes.position.array.length / 3;
+//           i++
+//         ) {
+//           indices[indicesIndex++] = i + indexOffset;
+//         }
+//       }
 
-      positions.set(geometry.attributes.position.array, positionIndex);
-      positionIndex += geometry.attributes.position.array.length;
-      if (geometry.attributes.uv && rect) {
-        for (let i = 0; i < geometry.attributes.uv.array.length; i += 2) {
-          uvs[uvIndex + i] =
-            rect.x / size + (geometry.attributes.uv.array[i] * rect.w) / size;
-          uvs[uvIndex + i + 1] =
-            rect.y / size +
-            (geometry.attributes.uv.array[i + 1] * rect.h) / size;
-        }
-      } else {
-        if (material.color) {
-          const color = material.color.clone();
-          if (material.emissive && material.emissiveIntensity > 0) {
-            color.lerp(material.emissive, material.emissiveIntensity);
-          }
-          atlasCanvasCtx.fillStyle = color.getStyle();
-          const uv = new THREE.Vector2(
-            colorsImageRect.x + colorsImageColorIndex,
-            colorsImageRect.y
-          );
-          atlasCanvasCtx.fillRect(uv.x, uv.y, uv.x + 1, uv.y + 1);
-          colorsImageColorIndex++;
-          uv.x += 0.5;
-          uv.y += 0.5;
+//       positions.set(geometry.attributes.position.array, positionIndex);
+//       positionIndex += geometry.attributes.position.array.length;
+//       if (geometry.attributes.uv && rect) {
+//         for (let i = 0; i < geometry.attributes.uv.array.length; i += 2) {
+//           uvs[uvIndex + i] =
+//             rect.x / size + (geometry.attributes.uv.array[i] * rect.w) / size;
+//           uvs[uvIndex + i + 1] =
+//             rect.y / size +
+//             (geometry.attributes.uv.array[i + 1] * rect.h) / size;
+//         }
+//       } else {
+//         if (material.color) {
+//           const color = material.color.clone();
+//           if (material.emissive && material.emissiveIntensity > 0) {
+//             color.lerp(material.emissive, material.emissiveIntensity);
+//           }
+//           atlasCanvasCtx.fillStyle = color.getStyle();
+//           const uv = new THREE.Vector2(
+//             colorsImageRect.x + colorsImageColorIndex,
+//             colorsImageRect.y
+//           );
+//           atlasCanvasCtx.fillRect(uv.x, uv.y, uv.x + 1, uv.y + 1);
+//           colorsImageColorIndex++;
+//           uv.x += 0.5;
+//           uv.y += 0.5;
 
-          for (let i = 0; i < geometry.attributes.uv.array.length; i += 2) {
-            uvs[uvIndex + i] = uv.x / size;
-            uvs[uvIndex + i + 1] = uv.y / size;
-          }
-        } else if (
-          material.uniforms &&
-          material.uniforms.color1 &&
-          material.uniforms.color2
-        ) {
-          atlasCanvasCtx.fillStyle = material.uniforms.color1.value.getStyle();
-          const uv1 = new THREE.Vector2(
-            colorsImageRect.x + colorsImageColorIndex,
-            colorsImageRect.y
-          );
-          atlasCanvasCtx.fillRect(uv1.x, uv1.y, uv1.x + 1, uv1.y + 1);
-          colorsImageColorIndex++;
-          uv1.x += 0.5;
-          uv1.y += 0.5;
+//           for (let i = 0; i < geometry.attributes.uv.array.length; i += 2) {
+//             uvs[uvIndex + i] = uv.x / size;
+//             uvs[uvIndex + i + 1] = uv.y / size;
+//           }
+//         } else if (
+//           material.uniforms &&
+//           material.uniforms.color1 &&
+//           material.uniforms.color2
+//         ) {
+//           atlasCanvasCtx.fillStyle = material.uniforms.color1.value.getStyle();
+//           const uv1 = new THREE.Vector2(
+//             colorsImageRect.x + colorsImageColorIndex,
+//             colorsImageRect.y
+//           );
+//           atlasCanvasCtx.fillRect(uv1.x, uv1.y, uv1.x + 1, uv1.y + 1);
+//           colorsImageColorIndex++;
+//           uv1.x += 0.5;
+//           uv1.y += 0.5;
 
-          atlasCanvasCtx.fillStyle = material.uniforms.color2.value.getStyle();
-          const uv2 = new THREE.Vector2(
-            colorsImageRect.x + colorsImageColorIndex,
-            colorsImageRect.y
-          );
-          atlasCanvasCtx.fillRect(uv2.x, uv2.y, uv2.x + 1, uv2.y + 1);
-          colorsImageColorIndex++;
-          uv2.x += 0.5;
-          uv2.y += 0.5;
+//           atlasCanvasCtx.fillStyle = material.uniforms.color2.value.getStyle();
+//           const uv2 = new THREE.Vector2(
+//             colorsImageRect.x + colorsImageColorIndex,
+//             colorsImageRect.y
+//           );
+//           atlasCanvasCtx.fillRect(uv2.x, uv2.y, uv2.x + 1, uv2.y + 1);
+//           colorsImageColorIndex++;
+//           uv2.x += 0.5;
+//           uv2.y += 0.5;
 
-          for (let i = 0; i < geometry.attributes.uv.array.length; i += 2) {
-            const y = geometry.attributes.uv.array[i];
-            const uv = uv1.clone().lerp(uv2, y);
+//           for (let i = 0; i < geometry.attributes.uv.array.length; i += 2) {
+//             const y = geometry.attributes.uv.array[i];
+//             const uv = uv1.clone().lerp(uv2, y);
 
-            uvs[uvIndex + i] = uv.x / size;
-            uvs[uvIndex + i + 1] = uv.y / size;
-          }
-        } else {
-          throw new Error('failed to uv mesh colors');
-        }
-      }
-      uvIndex += (geometry.attributes.position.array.length / 3) * 2;
-      if (geometry.attributes.color) {
-        colors.set(geometry.attributes.color.array, colorIndex);
-      } else {
-        colors.fill(1, colorIndex, geometry.attributes.position.array.length);
-      }
-      colorIndex += geometry.attributes.position.array.length;
-    }
-    if (textures.some((texture) => !!texture)) {
-      colors.fill(1);
-    }
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    geometry.setIndex(new THREE.BufferAttribute(indices, 1));
-  }
-  geometry.boundingBox = new THREE.Box3().setFromBufferAttribute(
-    geometry.attributes.position
-  );
+//             uvs[uvIndex + i] = uv.x / size;
+//             uvs[uvIndex + i + 1] = uv.y / size;
+//           }
+//         } else {
+//           throw new Error('failed to uv mesh colors');
+//         }
+//       }
+//       uvIndex += (geometry.attributes.position.array.length / 3) * 2;
+//       if (geometry.attributes.color) {
+//         colors.set(geometry.attributes.color.array, colorIndex);
+//       } else {
+//         colors.fill(1, colorIndex, geometry.attributes.position.array.length);
+//       }
+//       colorIndex += geometry.attributes.position.array.length;
+//     }
+//     if (textures.some((texture) => !!texture)) {
+//       colors.fill(1);
+//     }
+//     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+//     geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+//     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+//     geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+//   }
+//   geometry.boundingBox = new THREE.Box3().setFromBufferAttribute(
+//     geometry.attributes.position
+//   );
 
-  const texture = new THREE.Texture(atlasCanvas);
-  texture.flipY = false;
-  texture.needsUpdate = true;
-  const material = new THREE.MeshBasicMaterial({
-    map: texture,
-    side: THREE.DoubleSide,
-    vertexColors: true,
-    transparent: true,
-  });
+//   const texture = new THREE.Texture(atlasCanvas);
+//   texture.flipY = false;
+//   texture.needsUpdate = true;
+//   const material = new THREE.MeshBasicMaterial({
+//     map: texture,
+//     side: THREE.DoubleSide,
+//     vertexColors: true,
+//     transparent: true,
+//   });
 
-  const mesh = new THREE.Mesh(geometry, material);
-  return mesh;
-}
+//   const mesh = new THREE.Mesh(geometry, material);
+//   return mesh;
+// }
 
 /* let nextPhysicsId = 0;
 export function getNextPhysicsId() {
@@ -381,7 +381,7 @@ export function convertMeshToPhysicsMesh(topMesh) {
     }
   });
   const newGeometries = meshes.map((mesh) => {
-    const { geometry } = mesh;
+    const {geometry} = mesh;
     const newGeometry = new THREE.BufferGeometry();
     if (mesh.isSkinnedMesh) {
       localMatrix2.identity();
@@ -514,7 +514,7 @@ export async function contentIdToFile(contentId) {
   if (typeof contentId === 'number') {
     const res = await fetch(`${tokensHost}/${contentId}`);
     token = await res.json();
-    const { hash, name, ext } = token.properties;
+    const {hash, name, ext} = token.properties;
 
     const res2 = await fetch(`${storageHost}/${hash}`);
     const file = await res2.blob();
@@ -793,11 +793,11 @@ export const memoize = (fn) => {
   };
 };
 export function shuffle(array, rng = Math.random) {
-  let currentIndex = array.length,
-    randomIndex;
+  let currentIndex = array.length;
+    let randomIndex;
 
   // While there remain elements to shuffle...
-  while (currentIndex != 0) {
+  while (currentIndex !== 0) {
     // Pick a remaining element...
     randomIndex = Math.floor(rng() * currentIndex);
     currentIndex--;
@@ -818,7 +818,7 @@ export const waitForFrame = () =>
     });
   });
 
-const doUpload = async (u, f, { onProgress = null } = {}) => {
+const doUpload = async (u, f, {onProgress = null} = {}) => {
   var xhr = new XMLHttpRequest();
   xhr.open('POST', u, true);
   // xhr.setRequestHeader('Content-Type', 'application/json');
@@ -896,7 +896,7 @@ export const handleDropJsonItem = async (item) => {
   }
   return null;
 };
-export const handleUpload = async (item, { onProgress = null } = {}) => {
+export const handleUpload = async (item, {onProgress = null} = {}) => {
   console.log('uploading...', item);
 
   const _handleFileList = async (item) => {
@@ -986,8 +986,8 @@ export const handleUpload = async (item, { onProgress = null } = {}) => {
     const j = await doUpload(`https://ipfs.webaverse.com/`, file, {
       onProgress,
     });
-    const { hash } = j;
-    const { name } = file;
+    const {hash} = j;
+    const {name} = file;
 
     return `${storageHost}/${hash}/${name}`;
   };
@@ -1168,7 +1168,7 @@ export const selectVoice = (voicer) => {
   };
   // the weight of each voice is proportional to the inverse of the number of times it has been used
   const maxNonce = voicer.reduce((max, voice) => Math.max(max, voice.nonce), 0);
-  const weights = voicer.map(({ nonce }) => {
+  const weights = voicer.map(({nonce}) => {
     return 1 - nonce / (maxNonce + 1);
   });
   const selectionIndex = weightedRandom(weights);

@@ -49,6 +49,7 @@ class VoicePack {
       }
     };
   }
+
   static async load({
     audioUrl,
     indexUrl,
@@ -90,20 +91,24 @@ class VoicePackVoicer {
     this.audioTimeout = null;
     this.endTimeout = null;
   }
+
   clearTimeouts() {
     clearTimeout(this.audioTimeout);
     this.audioTimeout = null;
     clearTimeout(this.endTimeout);
     this.endTimeout = null;
   }
+
   resetStart() {
     this.startTime = -1;
     this.charactersSinceStart = 0;
   }
+
   preloadMessage(text) {
     // voice pack does not need loading
     return text;
   }
+
   start(text) {
     this.clearTimeouts();
 
@@ -146,6 +151,7 @@ class VoicePackVoicer {
 
     return p;
   }
+
   stop() {
     this.clearTimeouts();
   }
