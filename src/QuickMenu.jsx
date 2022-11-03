@@ -73,18 +73,22 @@ export default function QuickMenu() {
     }
   };
 
-  useEffect(async () => {
+  useEffect(() => {
+    (async () => {
     const emoteIconImages = await Promise.all(emotes.map(async ({icon}) => {
       const img = await loadImage(`./images/poses/${icon}`);
       const canvas = imageToCanvas(img, iconSize, iconSize);
       return canvas;
     }));
     setEmoteIconImages(emoteIconImages);
+    })();
   }, []);
-  useEffect(async () => {
-    const img = await loadImage(chevronImgSrc);
-    const canvas = imageToCanvas(img, chevronSize, chevronSize);
-    setChevronImage(canvas);
+  useEffect(() => {
+    (async () => {
+      const img = await loadImage(chevronImgSrc);
+      const canvas = imageToCanvas(img, chevronSize, chevronSize);
+      setChevronImage(canvas);
+    })();
   }, []);
 
   useEffect(() => {

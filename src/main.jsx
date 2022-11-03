@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 
 import {App} from './components/app';
 import {ErrorPage} from './components/general/error-page';
@@ -21,7 +21,9 @@ const Providers = ({children}) => {
 
 //
 
-ReactDOM.render(
+const root = ReactDOM.createRoot(document.getElementById('root'));
+
+root.render(
   <React.StrictMode>
     {
         WebWorkerSupport ? (
@@ -33,5 +35,4 @@ ReactDOM.render(
         )
     }
     </React.StrictMode>,
-    document.getElementById('root'),
 );

@@ -98,39 +98,7 @@ const useWebaverseApp = (() => {
   };
 })();
 
-const Canvas = ({
-    app,
-}) => {
-    const canvasRef = useRef(null);
-    const [domHover, setDomHover] = useState(null);
-
-    useEffect(() => {
-
-        if (canvasRef.current) {
-
-            _startApp(app, canvasRef.current);
-
-        }
-
-    }, [ app, canvasRef ]);
-
-    useEffect(() => {
-        const domhoverchange = e => {
-            const {domHover} = e.data;
-            // console.log('dom hover change', domHover);
-            setDomHover(domHover);
-        };
-        raycastManager.addEventListener('domhoverchange', domhoverchange);
-
-        return () => {
-            raycastManager.removeEventListener('domhoverchange', domhoverchange);
-        };
-    }, []);
-
-    return (
-        <canvas className={ classnames(styles.canvas, domHover ? styles.domHover : null) } ref={ canvasRef } />
-    );
-};
+let appStarted = false;
 
 export const App = () => {
 
@@ -147,6 +115,33 @@ export const App = () => {
     const chain = useContext(ChainContext);
 
     //
+    
+    useEffect(() => {
+        console.log('app started', appStarted);
+        console.log('app && canvasRef.current', app, canvasRef.current);
+        if(canvasRef.current && !appStarted) {
+
+            _startApp(app, canvasRef.current);
+
+            appStarted = true;
+        }
+    }, [ canvasRef ]);
+
+    const [domHover, setDomHover] = useState(null)
+
+    useEffect(() => {
+        const domhoverchange = e => {
+            const {domHover} = e.data;
+            // console.log('dom hover change', domHover);
+            setDomHover(domHover);
+        };
+        raycastManager.addEventListener('domhoverchange', domhoverchange);
+
+        return () => {
+            raycastManager.removeEventListener('domhoverchange', domhoverchange);
+        };
+    }, []);
+
 
     const selectApp = (app, physicsId, position) => {
 
@@ -325,7 +320,7 @@ export const App = () => {
             <AppContext.Provider value={{state, setState, app, setSelectedApp, selectedApp, uiMode, account, chain}}>
                 <Header setSelectedApp={ setSelectedApp } selectedApp={ selectedApp } />
                 <DomRenderer />
-                <Canvas app={app} />
+                <canvas className={ classnames(styles.canvas, domHover ? styles.domHover : null) } ref={ canvasRef } />
                 <Crosshair />
                 <UIMode hideDirection='right'>
                     <ActionMenu setUIMode={ setUIMode } />

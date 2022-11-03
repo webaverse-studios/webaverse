@@ -1000,64 +1000,66 @@ export const MapGen = () => {
   }, [state.openedPanel, terrainApp, mouseState, /* hoveredObject, */ hoveredPhysicsObject, selectedPhysicsObject]);
 
   // initialize terrain
-  useEffect(async () => {
-    if (state.openedPanel === 'MapGenPanel' && !loaded) {
-      setLoaded(true);
+  useEffect(() => {
+    (async () => {
+      if (state.openedPanel === 'MapGenPanel' && !loaded) {
+        setLoaded(true);
 
-      // lights
-      const ambientLight = new THREE.AmbientLight(0xffffff, 2);
-      mapScene.add(ambientLight);
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
-      directionalLight.position.set(1, 2, 3);
-      mapScene.add(directionalLight);
+        // lights
+        const ambientLight = new THREE.AmbientLight(0xffffff, 2);
+        mapScene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+        directionalLight.position.set(1, 2, 3);
+        mapScene.add(directionalLight);
 
-      // highlight physics meshes
-      const hoveredPhysicsMesh = new THREE.Mesh(
-        fakeGeometry,
-        buildMaterial.clone(),
-      );
-      hoveredPhysicsMesh.frustumCulled = false;
-      mapScene.add(hoveredPhysicsMesh);
-      setHighlightPhysicsMesh(hoveredPhysicsMesh);
+        // highlight physics meshes
+        const hoveredPhysicsMesh = new THREE.Mesh(
+          fakeGeometry,
+          buildMaterial.clone(),
+        );
+        hoveredPhysicsMesh.frustumCulled = false;
+        mapScene.add(hoveredPhysicsMesh);
+        setHighlightPhysicsMesh(hoveredPhysicsMesh);
 
-      const selectedPhysicsMesh = new THREE.Mesh(
-        fakeGeometry,
-        buildMaterial.clone(),
-      );
-      selectedPhysicsMesh.frustumCulled = false;
-      mapScene.add(selectedPhysicsMesh);
-      setSelectedPhysicsMesh(selectedPhysicsMesh);
+        const selectedPhysicsMesh = new THREE.Mesh(
+          fakeGeometry,
+          buildMaterial.clone(),
+        );
+        selectedPhysicsMesh.frustumCulled = false;
+        mapScene.add(selectedPhysicsMesh);
+        setSelectedPhysicsMesh(selectedPhysicsMesh);
 
-      // apps
-      await Promise.all([
-        (async () => {
-          // street base
-          const streetBaseApp = await metaversefile.createAppAsync({
-            start_url: '../street-base/',
-            components: {
-              seed: 'lol',
-            },
-          });
-          mapScene.add(streetBaseApp);
-          // setStreetBaseApp(streetBaseApp);
-        })(),
-        (async () => {
-          // terrain app
-          const terrainApp = await metaversefile.createAppAsync({
-            start_url: '../metaverse_modules/land/',
-            components: {
-              seed,
-              physicsInstance,
-              renderPosition: getRenderPosition(),
-              minLodRange: 3,
-              lods: 3,
-            },
-          });
-          mapScene.add(terrainApp);
-          setTerrainApp(terrainApp);
-        })(),
-      ]);
-    }
+        // apps
+        await Promise.all([
+          (async () => {
+            // street base
+            const streetBaseApp = await metaversefile.createAppAsync({
+              start_url: '../street-base/',
+              components: {
+                seed: 'lol',
+              },
+            });
+            mapScene.add(streetBaseApp);
+            // setStreetBaseApp(streetBaseApp);
+          })(),
+          (async () => {
+            // terrain app
+            const terrainApp = await metaversefile.createAppAsync({
+              start_url: '../metaverse_modules/land/',
+              components: {
+                seed,
+                physicsInstance,
+                renderPosition: getRenderPosition(),
+                minLodRange: 3,
+                lods: 3,
+              },
+            });
+            mapScene.add(terrainApp);
+            setTerrainApp(terrainApp);
+          })(),
+        ]);
+      }
+    })();
   }, [state.openedPanel, loaded]);
 
   // update camera
