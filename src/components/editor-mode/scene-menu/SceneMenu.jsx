@@ -47,23 +47,19 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
     //
 
     const refreshRooms = async () => {
+        // const res = await fetch(universe.getWorldsHost());
 
-        return; // XXX
+        // if (res.ok) {
 
-        const res = await fetch(universe.getWorldsHost());
+        //     const rooms = await res.json();
+        //     setRooms(rooms);
 
-        if (res.ok) {
+        // } else {
 
-            const rooms = await res.json();
-            setRooms(rooms);
+        //     const text = await res.text();
+        //     console.warn('failed to fetch', res.status, text);
 
-        } else {
-
-            const text = await res.text();
-            console.warn('failed to fetch', res.status, text);
-
-        }
-
+        // }
     };
 
     //

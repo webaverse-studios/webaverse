@@ -1488,11 +1488,6 @@ class GameManager extends EventTarget {
     return localPlayer.hasAction('swim');
   }
 
-  isFlying() {
-    const localPlayer = playersManager.getLocalPlayer();
-    return localPlayer.hasAction('fly');
-  }
-
   toggleCrouch() {
     const localPlayer = playersManager.getLocalPlayer();
     let crouchAction = localPlayer.getAction('crouch');

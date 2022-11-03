@@ -94,8 +94,8 @@ function aleaPRNG() {
             
             s0 = s1;
             s1 = s2;
-
-            return s2 = t - (c = t | 0);
+            s2 = t - (c = t | 0);
+            return s2;
         };
 
         /* public: return a 53-bit fraction in the range [0, 1] */

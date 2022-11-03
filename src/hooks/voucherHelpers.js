@@ -76,7 +76,7 @@ export async function getVoucherFromUser(tokenId, signer, WebaversecontractAddre
             from: signer
         }, (err, {result}) => {
             if(err != null) {
-                reject();
+                reject(new Error(err));
             } else {
                 const voucher = {
                     tokenId, metadataurl, balance, nonce, expiry, signature: result
