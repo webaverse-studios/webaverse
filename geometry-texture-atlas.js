@@ -3,7 +3,6 @@ import {MaxRectsPacker} from 'maxrects-packer';
 import {getRenderer} from './renderer.js';
 import {modUv} from './util.js';
 
-const defaultTextureSize = 4096;
 const startAtlasSize = 512;
 
 const localVector2D = new THREE.Vector2();

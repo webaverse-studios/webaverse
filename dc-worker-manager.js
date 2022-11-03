@@ -395,7 +395,7 @@ export class DcWorkerManager {
     return result;
   }
 
-  async eraseCubeDamage(position, quaterion, scale, {signal} = {}) {
+  async eraseCubeDamage(position, quaternion, scale, {signal} = {}) {
     const worker = this.getNextWorker();
     const result = await worker.request('eraseCubeDamage', {
       instance: this.instance,
@@ -425,22 +425,22 @@ export class DcWorkerManager {
     // });
   }
 
-  async eraseSphereDamage(position, radius, {signal} = {}) {
-    const chunkPosition = chunkMinForPosition(
-      position.x,
-      position.y,
-      position.z,
-      this.chunkSize
-    );
-    const chunkId = getLockChunkId(chunkPosition);
-    // return await this.locks.request(chunkId, async lock => {
-      const worker = this.getNextWorker();
-      const result = await worker.request('eraseSphereDamage', {
-        instance: this.instance,
-        position: position.toArray(),
-        radius,
-      }, {signal});
-      return result;
-    // });
-  }
+  // async eraseSphereDamage(position, radius, {signal} = {}) {
+  //   const chunkPosition = chunkMinForPosition(
+  //     position.x,
+  //     position.y,
+  //     position.z,
+  //     this.chunkSize
+  //   );
+  //   const chunkId = getLockChunkId(chunkPosition);
+  //   // return await this.locks.request(chunkId, async lock => {
+  //     const worker = this.getNextWorker();
+  //     const result = await worker.request('eraseSphereDamage', {
+  //       instance: this.instance,
+  //       position: position.toArray(),
+  //       radius,
+  //     }, {signal});
+  //     return result;
+  //   // });
+  // }
 }

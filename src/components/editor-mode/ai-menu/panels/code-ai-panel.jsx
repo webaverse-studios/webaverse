@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useRef, useContext} from 'react';
 import classnames from 'classnames';
 import {AppContext} from '../../../app';
+import metaversefile from 'metaversefile';
 
 import {registerIoEventHandler, unregisterIoEventHandler} from '../../../general/io-handler';
 

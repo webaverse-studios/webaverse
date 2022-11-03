@@ -19,6 +19,7 @@ const localMatrix = new THREE.Matrix4();
 const localMatrix2 = new THREE.Matrix4();
 const localPlane = new THREE.Plane();
 const zeroVector = new THREE.Vector3(0, 0, 0);
+const upVector = new THREE.Vector3(0, 1, 0);
 
 const _planeToVector4 = (plane, target) => {
   target.copy(plane.normal);
@@ -86,41 +87,6 @@ const fragmentShader = `\
   }
 `;
 
-const _makeSkyboxMesh = () => {
-  const skyboxGeometry = new THREE.SphereGeometry(worldSize, 64, 32, 0, Math.PI);
-  const skyboxMaterial = new WebaverseShaderMaterial({
-    uniforms: {
-      envMap: {
-        value: cubeRenderTarget.texture,
-        needsUpdate: true,
-      },
-      plane: {
-        value: new THREE.Vector4(0, 0, 0, 0),
-        needsUpdate: false,
-      },
-    },
-    vertexShader,
-    fragmentShader,
-    side: THREE.BackSide,
-    transparent: true,
-  });
-  const skyboxMesh = new THREE.Mesh(skyboxGeometry, skyboxMaterial);
-  skyboxMesh.onBeforeRender = () => {
-    const position = localVector;
-    const quaternion = localQuaternion;
-    const scale = localVector2;
-    skyboxMesh.matrixWorld.decompose(position, quaternion, scale);
-
-    const normal = localVector3.set(0, 0, -1)
-      .applyQuaternion(quaternion);
-    localPlane.setFromNormalAndCoplanarPoint(normal, position);
-    
-    _planeToVector4(localPlane, skyboxMesh.material.uniforms.plane.value);
-    skyboxMesh.material.uniforms.plane.needsUpdate = true;
-  };
-  return skyboxMesh;
-};
-
 class ScenePreviewer extends THREE.Object3D {
   constructor({
     size = new THREE.Vector3(100, 100, 100),
@@ -135,7 +101,7 @@ class ScenePreviewer extends THREE.Object3D {
     previewScene.name = 'previewScene';
     previewScene.autoUpdate = false;
     this.previewScene = previewScene;
-    
+
     const previewContainer = new THREE.Object3D();
     previewContainer.name = 'previewContainer';
     this.previewContainer = previewContainer;
@@ -168,7 +134,7 @@ class ScenePreviewer extends THREE.Object3D {
     /* if (this.scene) {
       this.detachScene();
     } */
-    
+
     const popPreviewContainerTransform = !this.focused ? this.#pushPreviewContainerTransform() : null;
     this.scene = await metaversefile.createAppAsync({
       start_url: sceneUrl,
@@ -237,6 +203,42 @@ class ScenePreviewer extends THREE.Object3D {
   }
 
   #makeSkyboxMeshes(size, normals) {
+
+    const _makeSkyboxMesh = () => {
+      const skyboxGeometry = new THREE.SphereGeometry(worldSize, 64, 32, 0, Math.PI);
+      const skyboxMaterial = new WebaverseShaderMaterial({
+        uniforms: {
+          envMap: {
+            value: this.cubeRenderTarget.texture,
+            needsUpdate: true,
+          },
+          plane: {
+            value: new THREE.Vector4(0, 0, 0, 0),
+            needsUpdate: false,
+          },
+        },
+        vertexShader,
+        fragmentShader,
+        side: THREE.BackSide,
+        transparent: true,
+      });
+      const skyboxMesh = new THREE.Mesh(skyboxGeometry, skyboxMaterial);
+      skyboxMesh.onBeforeRender = () => {
+        const position = localVector;
+        const quaternion = localQuaternion;
+        const scale = localVector2;
+        skyboxMesh.matrixWorld.decompose(position, quaternion, scale);
+
+        const normal = localVector3.set(0, 0, -1)
+          .applyQuaternion(quaternion);
+        localPlane.setFromNormalAndCoplanarPoint(normal, position);
+
+        _planeToVector4(localPlane, skyboxMesh.material.uniforms.plane.value);
+        skyboxMesh.material.uniforms.plane.needsUpdate = true;
+      };
+      return skyboxMesh;
+    };
+
     const result = [];
     for (const normal of normals) {
       const skyboxMesh = _makeSkyboxMesh();

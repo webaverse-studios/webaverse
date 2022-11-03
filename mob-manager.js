@@ -386,8 +386,8 @@ class Mob {
 
                 mesh.matrixWorld.compose(meshPosition, meshQuaternion, meshScale);
                 mesh.matrix.copy(mesh.matrixWorld);
-                if (app.parent) {
-                  mesh.matrix.premultiply(localMatrix.copy(app.parent.matrixWorld).invert());
+                if (this.app.parent) {
+                  mesh.matrix.premultiply(localMatrix.copy(this.app.parent.matrixWorld).invert());
                 }
                 mesh.matrix.decompose(mesh.position, mesh.quaternion, mesh.scale);
               }
@@ -929,7 +929,7 @@ gl_Position = projectionMatrix * mvPosition;
       const rootBone2 = _findBone(glb2Scene);
       const skeleton2 = mesh2.skeleton;
       if (skeleton2.bones.length > maxBonesPerInstance) {
-        throw new Error('too many bones in base mesh skeleton: ' + bones.length);
+        throw new Error('too many bones in base mesh skeleton: ' + skeleton2.bones.length);
       }
 
       this.getDrawCall(i);

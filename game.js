@@ -342,44 +342,44 @@ let mouseDomEquipmentHoverPhysicsId = 0;
 
 // let selectedLoadoutIndex = -1;
 
-const _use = () => {
-  if (gameManager.getMenu() === 3) {
-    const itemSpec = itemSpecs3[selectedItemIndex];
-    let {start_url, filename, content} = itemSpec;
+// const _use = () => {
+//   if (gameManager.getMenu() === 3) {
+//     const itemSpec = itemSpecs3[selectedItemIndex];
+//     let {start_url, filename, content} = itemSpec;
 
-    if (start_url) {
-      // start_url = new URL(start_url, srcUrl).href;
-      // filename = start_url;
-    } else if (filename && content) {
-      const blob = new Blob([content], {
-        type: 'application/octet-stream',
-      });
-      start_url = URL.createObjectURL(blob);
-      start_url += '/' + filename;
-    }
-    world.appManager.addTrackedApp(start_url, null, deployMesh.position, deployMesh.quaternion, deployMesh.scale);
+//     if (start_url) {
+//       // start_url = new URL(start_url, srcUrl).href;
+//       // filename = start_url;
+//     } else if (filename && content) {
+//       const blob = new Blob([content], {
+//         type: 'application/octet-stream',
+//       });
+//       start_url = URL.createObjectURL(blob);
+//       start_url += '/' + filename;
+//     }
+//     world.appManager.addTrackedApp(start_url, null, deployMesh.position, deployMesh.quaternion, deployMesh.scale);
 
-    gameManager.setMenu(0);
-    cameraManager.requestPointerLock();
-  } else if (highlightedObject /* && !editedObject */) {
-    _grab(highlightedObject);
-    highlightedObject = null;
+//     gameManager.setMenu(0);
+//     cameraManager.requestPointerLock();
+//   } else if (highlightedObject /* && !editedObject */) {
+//     _grab(highlightedObject);
+//     highlightedObject = null;
     
-    gameManager.setMenu(0);
-    cameraManager.requestPointerLock();
-  } else if (gameManager.getMenu() === 1) {
-    const itemSpec = itemSpecs1[selectedItemIndex];
-    itemSpec.cb();
-  } else if (gameManager.getMenu() === 2) {
-    const inventory = loginManager.getInventory();
-    const itemSpec = inventory[selectedItemIndex];
+//     gameManager.setMenu(0);
+//     cameraManager.requestPointerLock();
+//   } else if (gameManager.getMenu() === 1) {
+//     const itemSpec = itemSpecs1[selectedItemIndex];
+//     itemSpec.cb();
+//   } else if (gameManager.getMenu() === 2) {
+//     const inventory = loginManager.getInventory();
+//     const itemSpec = inventory[selectedItemIndex];
 
-    world.appManager.addTrackedApp(itemSpec.id, null, deployMesh.position, deployMesh.quaternion, deployMesh.scale);
+//     world.appManager.addTrackedApp(itemSpec.id, null, deployMesh.position, deployMesh.quaternion, deployMesh.scale);
 
-    gameManager.setMenu(0);
-    cameraManager.requestPointerLock();
-  }
-};
+//     gameManager.setMenu(0);
+//     cameraManager.requestPointerLock();
+//   }
+// };
 const _delete = () => {
   const grabbedObject = _getGrabbedObject(0);
   if (grabbedObject) {
@@ -570,7 +570,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
         let position = null;
           let quaternion = null;
         if (renderer.xr.getSession()) {
-          const h = localPlayer[hand === "left" ? "leftHand" : "rightHand"];
+          const h = localPlayer[grabAction.hand === "left" ? "leftHand" : "rightHand"];
           position = h.position;
           quaternion = h.quaternion;
         } else {
@@ -1131,24 +1131,24 @@ class GameManager extends EventTarget {
     return this.menuOpen;
   }
 
-  setMenu(newOpen) {
-    this.menuOpen = newOpen;
-    if (newOpen) {
-      _selectItem(0);
-    }
-  }
+  // setMenu(newOpen) {
+  //   this.menuOpen = newOpen;
+  //   if (newOpen) {
+  //     _selectItem(0);
+  //   }
+  // }
 
-  menuVertical(offset) {
-    if (this.menuOpen) {
-      _selectItemDelta(offset);
-    }
-  }
+  // menuVertical(offset) {
+  //   if (this.menuOpen) {
+  //     _selectItemDelta(offset);
+  //   }
+  // }
 
-  menuHorizontal(offset) {
-    if (this.menuOpen) {
-      _selectTabDelta(offset);
-    }
-  }
+  // menuHorizontal(offset) {
+  //   if (this.menuOpen) {
+  //     _selectTabDelta(offset);
+  //   }
+  // }
 
   setContextMenu(contextMenu) {
     this.contextMenu = contextMenu;
@@ -1163,7 +1163,8 @@ class GameManager extends EventTarget {
   }
 
   menuUse() {
-    _use();
+    throw new Error('not implemented - code has been commented out because it has errors');
+    // _use();
   }
 
   menuDelete() {
@@ -1274,25 +1275,25 @@ class GameManager extends EventTarget {
     // this.draggingRight = false;
   }
 
-  menuKey(c) {
-    menuMesh.key(c);
-  }
+  // menuKey(c) {
+  //   menuMesh.key(c);
+  // }
 
-  menuSelectAll() {
-    menuMesh.selectAll();
-  }
+  // menuSelectAll() {
+  //   menuMesh.selectAll();
+  // }
 
-  menuPaste(s) {
-    menuMesh.paste(s);
-  }
+  // menuPaste(s) {
+  //   menuMesh.paste(s);
+  // }
 
   inputFocused() {
     return !!document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.nodeName);
   }
 
-  canGrab() {
-    return !!highlightedObject /* && !editedObject */;
-  }
+  // canGrab() {
+  //   return !!highlightedObject /* && !editedObject */;
+  // }
 
   canRotate() {
     return !!_getGrabbedObject(0);
@@ -1747,9 +1748,9 @@ class GameManager extends EventTarget {
     return gameManager.usableObject;
   }
 
-  getDragRightSpec() {
-    return dragRightSpec;
-  }
+  // getDragRightSpec() {
+  //   return dragRightSpec;
+  // }
 
   menuActivateDown() {
     if (grabUseMesh.visible) {

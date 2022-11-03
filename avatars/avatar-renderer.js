@@ -200,13 +200,6 @@ const parseVrm = (arrayBuffer, srcUrl) => new Promise((accept, reject) => {
   const {gltfLoader} = loaders;
   gltfLoader.parse(arrayBuffer, srcUrl, accept, reject);
 });
-const _cloneVrm = async () => {
-  const vrm = await parseVrm(arrayBuffer, srcUrl);
-  vrm.cloneVrm = _cloneVrm;
-  vrm.arrayBuffer = arrayBuffer;
-  vrm.srcUrl = srcUrl;
-  return vrm;
-};
 const _unfrustumCull = o => {
   o.frustumCulled = false;
 };

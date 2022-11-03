@@ -8,6 +8,7 @@ import * as THREE from 'three';
 import Module from './public/bin/geometry.js';
 import {Allocator, ScratchStack} from './geometry-util.js';
 
+const maxNumUpdates = 256;
 const localVector = new THREE.Vector3()
 const localVector2 = new THREE.Vector3()
 const localQuaternion = new THREE.Quaternion()
@@ -513,7 +514,6 @@ const physxWorker = (() => {
   w.initialize = () => Module._initialize()
   w.makeScene = () => Module._makePhysics()
   w.simulatePhysics = (physics, updates, elapsedTime) => {
-    const maxNumUpdates = 256;
     /* if (updates.length > maxNumUpdates) {
       throw new Error('too many updates to simulate step: ' + updates.length + ' (max: ' + maxNumUpdates + ')');
     } */

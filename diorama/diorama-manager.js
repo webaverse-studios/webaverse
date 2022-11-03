@@ -670,7 +670,7 @@ class DioramaRenderer {
             this.labelMesh.material.uniforms.iTime.value = timeOffset / 1000;
             this.labelMesh.material.uniforms.iTime.needsUpdate = true;
             this.labelMesh.visible = true;
-            for (const child of textObject.children) {
+            for (const child of this.textObject.children) {
               child.material.uniforms.uTroikaOutlineOpacity.value = timeOffset / 1000;
               child.material.uniforms.uTroikaOutlineOpacity.needsUpdate = true;
             }

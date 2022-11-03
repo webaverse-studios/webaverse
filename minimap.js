@@ -550,7 +550,7 @@ class MiniMap {
   }
 
   destroy() {
-    for (const canvas of canvases) {
+    for (const canvas of this.canvases) {
       canvas.parentNode.removeChild(canvas);
     }
     minimaps.splice(minimaps.indexOf(this), 1);
