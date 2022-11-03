@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import React from 'react';
 
 // import {sceneLowerPriority} from './renderer.js';
 import easing from './easing.js';

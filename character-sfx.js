@@ -22,9 +22,9 @@ import {
 
 const localVector = new THREE.Vector3();
 
-const freestyleDuration = 1466.6666666666666 / 2;
+const freestyleDuration = 1466.666666666666 / 2;
 const freestyleOffset = 900 / 2;
-const breaststrokeDuration = 1066.6666666666666;
+const breaststrokeDuration = 1066.666666666666;
 const breaststrokeOffset = 433.3333333333333;
 
 
@@ -303,14 +303,14 @@ export class AvatarCharacterSfx {
           if(this.arr.reduce((a,b)=>a+b) >= Math.PI/3){
 
             this.arr.fill(0)
-            if(timeSeconds - this.narutoRunTurnSoundStartTime>soundFiles.sonicBoom[3].duration-0.9 || this.narutoRunTurnSoundStartTime==0){
+            if(timeSeconds - this.narutoRunTurnSoundStartTime>soundFiles.sonicBoom[3].duration-0.9 || this.narutoRunTurnSoundStartTime===0){
               sounds.playSound(soundFiles.sonicBoom[3]);
               this.narutoRunTurnSoundStartTime = timeSeconds;
             }
               
           }
          
-          if(timeSeconds - this.narutoRunTrailSoundStartTime>soundFiles.sonicBoom[2].duration-0.2 || this.narutoRunTrailSoundStartTime==0){
+          if(timeSeconds - this.narutoRunTrailSoundStartTime>soundFiles.sonicBoom[2].duration-0.2 || this.narutoRunTrailSoundStartTime===0){
             
             const localSound = sounds.playSound(soundFiles.sonicBoom[2]);
             this.oldNarutoRunSound = localSound;
@@ -330,7 +330,7 @@ export class AvatarCharacterSfx {
         }
 
       }
-      if(!this.character.avatar.narutoRunState && this.narutoRunStartTime!=0){
+      if(!this.character.avatar.narutoRunState && this.narutoRunStartTime!==0){
         this.narutoRunStartTime=0;
         this.narutoRunFinishTime=timeSeconds;
         this.narutoRunTrailSoundStartTime=0;

@@ -27,7 +27,7 @@ export class CachedLoader extends EventTarget {
         if (!promise) {
             promise = this.loadFn(url, value, {signal})
                 .catch(err => {
-                    // console.warn(err);
+                    console.warn('cached load error:', err);
                     this.promiseCache.delete(url);
                     return null;
                 })
