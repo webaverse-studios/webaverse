@@ -2282,12 +2282,17 @@ const physxWorker = (() => {
     )
     return ptr;
   }
-  w.updateAnimationAvatar = (animationAvatarPtr, values, timeDiff) => {
+  w.updateInterpolationAnimationAvatar = (animationAvatarPtr, timeDiff) => {
+    Module._updateInterpolationAnimationAvatar(
+      animationAvatarPtr, timeDiff,
+    )
+  }
+  w.updateAnimationAvatar = (animationAvatarPtr, values) => {
     values.forEach((value, i) => {
       scratchStack.f32[i] = value;
     })
     Module._updateAnimationAvatar(
-      animationAvatarPtr, scratchStack.ptr, timeDiff,
+      animationAvatarPtr, scratchStack.ptr,
     )
   }
   w.addActionAnimationAvatar = (animationAvatarPtr, action) => {

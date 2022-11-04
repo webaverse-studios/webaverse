@@ -1057,7 +1057,7 @@ class UninterpolatedPlayer extends AvatarCharacter {
       quaternion: this.quaternion,
     };
   }
-  updateInterpolation(timeDiff) {
+  updateInterpolation(timeDiff) { // todo: del
     for (const actionInterpolant of this.actionInterpolantsArray) {
       actionInterpolant.update(timeDiff);
     }
@@ -1307,7 +1307,8 @@ class LocalPlayer extends UninterpolatedPlayer {
       this.characterHitter.update(timestamp, timeDiffS);
       this.avatarFace.update(timestamp, timeDiffS);
 
-      this.updateInterpolation(timeDiff);
+      this.updateInterpolation(timeDiff); // todo: del
+      physx.physxWorker.updateInterpolationAnimationAvatar(this.avatar.animationAvatarPtr, timeDiff);
 
       const session = _getSession();
       const mirrors = metaversefile.getMirrors();

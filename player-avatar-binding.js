@@ -183,6 +183,7 @@ export function applyCharacterActionsToAvatar(character, rig) {
   rig.narutoRunState = !!narutoRunAction && !crouchAction;
   // rig.narutoRunTime = character.actionInterpolants.narutoRun.get();
   rig.aimState = !!aimAction;
+  // if (rig.aimState) debugger
   // rig.aimTime = character.actionInterpolants.aim.get();
   rig.aimRightTransitionTime = physx.physxWorker.getActionInterpolantAnimationAvatar(rig.animationAvatarPtr, 'aimRightTransition', 0);
   rig.aimLeftTransitionTime = physx.physxWorker.getActionInterpolantAnimationAvatar(rig.animationAvatarPtr, 'aimLeftTransition', 0);
