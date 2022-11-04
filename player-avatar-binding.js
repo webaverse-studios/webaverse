@@ -157,7 +157,7 @@ export function applyCharacterActionsToAvatar(character, rig) {
     }
     rig.useAnimationIndex = useAction?.index;
     // rig.useTime = character.actionInterpolants.use.get();
-    rig.unuseTime = character.actionInterpolants.unuse.get(); // todo: don't clac on js side.
+    rig.unuseTime = physx.physxWorker.getActionInterpolantAnimationAvatar(character.avatar.animationAvatarPtr, 'unuse', 0); // todo: don't clac on js side. // todo: don't get in here?
     if (rig.unuseTime === 0) { // this means use is active
       if (useAction?.animationEnvelope) {
         rig.unuseAnimation = rig.useAnimationEnvelope[2]; // the last animation in the triplet is the unuse animation

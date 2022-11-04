@@ -371,7 +371,7 @@ export class AvatarCharacterSfx {
       const useAction = this.character.getAction('use');
       if (useAction) {
         const _handleEat = () => {
-          const v = this.character.actionInterpolants.use.get();
+          const v = physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'use', 0);
           const eatFrameIndex = _getActionFrameIndex(v, eatFrameIndices);
 
           // console.log('chomp', v, eatFrameIndex, this.lastEatFrameIndex);
@@ -386,7 +386,7 @@ export class AvatarCharacterSfx {
         const _handleDrink = () => {
           // console.log('drink action', useAction);
 
-          const v = this.character.actionInterpolants.use.get();
+          const v = physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'use', 0);
           const drinkFrameIndex = _getActionFrameIndex(v, drinkFrameIndices);
 
           // console.log('gulp', v, drinkFrameIndex, this.lastDrinkFrameIndex);
@@ -432,7 +432,7 @@ export class AvatarCharacterSfx {
         if (Array.isArray(animationCombo) && index !== undefined) {
           const useAnimationName = animationCombo[index];
           const localUseFrameIndices = useFrameIndices[useAnimationName];
-          const useFrameIndex = _getActionFrameIndex(this.character.actionInterpolants.use.get(), localUseFrameIndices);
+          const useFrameIndex = _getActionFrameIndex(physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'use', 0), localUseFrameIndices);
 
           if (useFrameIndex !== 0 && useFrameIndex !== this.lastUseFrameIndex) {
             sounds.playSoundName('swordSlash');

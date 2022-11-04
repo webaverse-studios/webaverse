@@ -143,7 +143,7 @@ class CharacterPhysics {
         const doubleJumpAction = this.character.getAction('doubleJump');
         if (doubleJumpAction) {
           const doubleJumpTime =
-            this.character.actionInterpolants.doubleJump.get();
+            physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'doubleJump', 0);
           localVector3.y =
             Math.sin(doubleJumpTime * (Math.PI / flatGroundJumpAirTime)) *
               jumpHeight +
@@ -153,7 +153,7 @@ class CharacterPhysics {
             this.character.setControlAction({ type: 'fallLoop', from: 'jump' });
           }
         } else {
-          const jumpTime = this.character.actionInterpolants.jump.get();
+          const jumpTime = physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'jump', 0);
           localVector3.y =
             Math.sin(jumpTime * (Math.PI / flatGroundJumpAirTime)) *
               jumpHeight +

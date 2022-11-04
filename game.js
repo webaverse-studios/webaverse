@@ -616,7 +616,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
 
       const animations = Avatar.getAnimations();
       const pickUpZeldaAnimation = animations.find(a => a.name === 'pick_up_zelda.fbx');
-      const pickUpTime = localPlayer.actionInterpolants.pickUp.get();
+      const pickUpTime = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'pickUp', 0);
       const pickUpTimeS = pickUpTime / 1000;
       if (pickUpTimeS < pickUpZeldaAnimation.duration) {
         // still playing the pick up animation
@@ -952,7 +952,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
   const _updateThrow = () => {
     const useAction = localPlayer.getAction('use');
     if (useAction && useAction.behavior === 'throw') {
-      const v = localPlayer.actionInterpolants.use.get() / throwReleaseTime;
+      const v = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'use', 0) / throwReleaseTime;
       const currentThrowing = v >= 1;
 
       if (currentThrowing && !lastThrowing) {
@@ -1038,7 +1038,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
     const useAction = localPlayer.getAction('use');
     if (useAction) {
       if (useAction.animation === 'pickUpThrow') {
-        const useTime = localPlayer.actionInterpolants.use.get();
+        const useTime = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'use', 0);
         if (useTime / 1000 >= throwAnimationDuration) {
           _endUse();
         }

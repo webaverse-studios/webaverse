@@ -319,7 +319,7 @@ class Character extends THREE.Object3D {
     }
   }
   getCrouchFactor() {
-    return 1 - 0.4 * this.actionInterpolants.crouch.getNormalized();
+    return 1 - 0.4 *physx.physxWorker.getActionInterpolantAnimationAvatar(this.avatar.animationAvatarPtr, 'crouch', 1);
     /* let factor = 1;
     factor *= 1 - 0.4 * this.actionInterpolants.crouch.getNormalized();
     return factor; */
@@ -1030,24 +1030,10 @@ class UninterpolatedPlayer extends AvatarCharacter {
     UninterpolatedPlayer.init.apply(this, arguments)
   }
   static init() {
+    // todo: put all infos such as `hands`/`keys` into actions.
     this.actionInterpolants = {
-      crouch: new BiActionInterpolant(() => this.hasAction('crouch'), 0, crouchMaxTime),
-      // activate: new UniActionInterpolant(() => this.hasAction('activate'), 0, activateMaxTime),
-      // activate: {getNormalized() {return 0}, update() {}}, // test
-      use: new InfiniteActionInterpolant(() => this.hasAction('use'), 0),
-      pickUp: new InfiniteActionInterpolant(() => this.hasAction('pickUp'), 0),
-      unuse: new InfiniteActionInterpolant(() => !this.hasAction('use'), 0),
-      aim: new InfiniteActionInterpolant(() => this.hasAction('aim'), 0),
       aimRightTransition: new BiActionInterpolant(() => this.hasAction('aim') && this.hands[0].enabled, 0, aimTransitionMaxTime),
       aimLeftTransition: new BiActionInterpolant(() => this.hasAction('aim') && this.hands[1].enabled, 0, aimTransitionMaxTime),
-      narutoRun: new InfiniteActionInterpolant(() => this.hasAction('narutoRun'), 0),
-      fly: new InfiniteActionInterpolant(() => this.hasAction('fly'), 0),
-      swim: new InfiniteActionInterpolant(() => this.hasAction('swim'), 0),
-      jump: new InfiniteActionInterpolant(() => this.hasAction('jump'), 0),
-      doubleJump: new InfiniteActionInterpolant(() => this.hasAction('doubleJump'), 0),
-      land: new InfiniteActionInterpolant(() => !this.hasAction('jump') && !this.hasAction('fallLoop') && !this.hasAction('fly'), 0),
-      dance: new BiActionInterpolant(() => this.hasAction('dance'), 0, crouchMaxTime),
-      emote: new BiActionInterpolant(() => this.hasAction('emote'), 0, crouchMaxTime),
       movements: new InfiniteActionInterpolant(() => {
         const ioManager = metaversefile.useIoManager();
         return  ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right;
@@ -1063,11 +1049,8 @@ class UninterpolatedPlayer extends AvatarCharacter {
       // throw: new UniActionInterpolant(() => this.hasAction('throw'), 0, throwMaxTime),
       // chargeJump: new InfiniteActionInterpolant(() => this.hasAction('chargeJump'), 0),
       // standCharge: new InfiniteActionInterpolant(() => this.hasAction('standCharge'), 0),
-      fallLoop: new InfiniteActionInterpolant(() => this.hasAction('fallLoop'), 0),
-      fallLoopTransition: new BiActionInterpolant(() => this.hasAction('fallLoop'), 0, 300),
       // swordSideSlash: new InfiniteActionInterpolant(() => this.hasAction('swordSideSlash'), 0),
       // swordTopDownSlash: new InfiniteActionInterpolant(() => this.hasAction('swordTopDownSlash'), 0),
-      hurt: new InfiniteActionInterpolant(() => this.hasAction('hurt'), 0),
     };
     this.actionInterpolantsArray = Object.keys(this.actionInterpolants).map(k => this.actionInterpolants[k]);
 
