@@ -54,22 +54,55 @@ User documentation is <a href="https://webaverse.notion.site/User-Docs-3a36b223e
 - 10 GB Disk Space
 - 8 GB RAM
 - 4 Core CPU / vCPUs
+- Node version 18+. The recommended way to get node is `nvm`: https://github.com/nvm-sh/nvm
 
-## WSL Setup
+## Installation
 
-### Use WSL2
+**Important note before you clone this repo:** This repo uses Git submodules.
+You need to install with the `--recurse-submodules` flag or installation will not work. Copy the code below to clone the repository if you aren't sure.
 
-Upgrade from WSL1. It's needed for working puppeteer.
-
-### Dependencies
-
-Run the following command to install dependencies:
-
+```sh
+git clone --recurse-submodules https://github.com/webaverse/app.git
+cd app/ # Go into the repository
+git pull --recurse-submodules # Pull recursively
+npm install # Install dependencies
 ```
+
+## Running
+
+Starting the application is as easy as:
+
+```sh
+npm run dev
+```
+
+Once the server has started up, you can press the "A" key to visit `https://local.webaverse.com`.
+
+
+## Installation and Running on Windows
+
+#### WSL
+
+You need to use Windows Subsystem for Linux to install and run Webaverse. [This video](https://www.youtube.com/watch?v=5RTSlby-l9w) shows you how you can set up WSL and Ubuntu.
+
+Requirements:
+- WSL2. If you have WSL1 installed you need to upgrade to WSL2.
+- Ubuntu 20+. Install Ubuntu 20+.
+
+Once you have WSL and Ubuntu set up, run `wsl` in a Windows command window to get a WSL Ubuntu command prompt. Run `exit` at the WSL command prompt to return to the Windows command prompt.
+
+#### Node
+
+At a WSL command prompt, use `nvm` to install Node 18+.
+
+#### Dependencies
+
+Run the following command at the WSL command prompt to install dependencies:
+```sh
 npm run install-libs
 ```
 <details>
-<summary>List of libraries that'll get installed with this command ( you can install manually )</summary>
+<summary>The following libraries get installed with this command (you can also install manually):</summary>
 
 - libatk1.0-0
 - libatk-bridge2.0-0
@@ -84,53 +117,25 @@ npm run install-libs
 
 </details>
 
-### Port Mapping
+#### Port Mapping
 
-This will route all of the needed ports for 127.0.0.1 -> WSL to work locally.
-
-(from powershell)
+To route all of the needed ports for 127.0.0.1 -> WSL to work locally, run the following command in a Powershell window:
 ```
 powershell.exe .\scripts\wsl-port-forwarding.ps1
 ```
 
-## Installation
+#### Installation
 
-Do these steps in WSL file system ( clone the project inside WSL file system i.e. `~` )
+You can host the source files on either your Windows file system or on the Ubuntu file system in WSL's virtual drive.
 
-OR 
+**Windows File System:** Run the Git commands to clone and pull source files from a Windows command prompt. You may find this best if you're using programs such as SourceTree as a Git GUI. You can also edit source using your usual IDE.
 
-<details>
-<summary>Alternatively you can clone the repo in your operating system file system But...</summary>
+**Ubuntu File System:** Run the Git commands to clone and pull source files from a WSL command prompt. In this case consider [using the Visual Studio Code WSL extension](https://code.visualstudio.com/docs/remote/wsl) as your dev environment - for features such as hot reload.
 
-In this case consider [using WSL as your dev environement](https://code.visualstudio.com/docs/remote/wsl). ( for features like hot reload )
-</details>
+#### Running
 
-<br />
+Start the application by running the NPM command at a WSL command prompt.
 
-Running requires `node` version 18+. The recommended way to get node is `nvm`: https://github.com/nvm-sh/nvm
-
-**Important note before you clone this repo:** This repo uses Git submodules.
-You need to install with the `--recurse-submodules` flag or installation will not work. Copy the code below to clone the repository if you aren't sure.
-
-```sh
-git clone --recurse-submodules https://github.com/webaverse/app.git
-cd app/ # Go into the repository
-git pull --recurse-submodules # Pull recursively
-npm install # Install dependencies
-```
-
-##### Note for Windows Users
-We recommend that you use Windows Subsystem for Linux to run Webaverse. This [video](https://www.youtube.com/watch?v=5RTSlby-l9w) shows you how you can set up WSL. Once you've installed it, run `wsl` in your terminal to enter Ubuntu 20+, and then run Webaverse from there.
-
-## Quickstart
-
-Starting the application is as easy as:
-
-```sh
-npm run start
-```
-
-Once the server has started up, you can visit `https://local.webaverse.com` 
 
 ## Let's build it together!
 
