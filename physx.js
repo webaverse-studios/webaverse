@@ -2322,7 +2322,7 @@ const physxWorker = (() => {
       animationAvatarPtr,
     )
   }
-  w.getActionInterpolantAnimationAvatar = (animationAvatarPtr, actionName, type = 0) => { // 0: get(), 1: getNormalized(), 2: getInverse()
+  w.getActionInterpolantAnimationAvatar = (animationAvatarPtr, actionName, type = 0) => { // 0: get(), 1: getNormalized(), 2: getInverse() // todo: type use string?
     const bytes = textEncoder.encode(actionName)
     const stringByteLength = bytes.length;
     for (let i = 0; i < stringByteLength; i++) {

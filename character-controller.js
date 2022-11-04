@@ -1032,7 +1032,8 @@ class UninterpolatedPlayer extends AvatarCharacter {
   static init() {
     this.actionInterpolants = {
       crouch: new BiActionInterpolant(() => this.hasAction('crouch'), 0, crouchMaxTime),
-      activate: new UniActionInterpolant(() => this.hasAction('activate'), 0, activateMaxTime),
+      // activate: new UniActionInterpolant(() => this.hasAction('activate'), 0, activateMaxTime),
+      // activate: {getNormalized() {return 0}, update() {}}, // test
       use: new InfiniteActionInterpolant(() => this.hasAction('use'), 0),
       pickUp: new InfiniteActionInterpolant(() => this.hasAction('pickUp'), 0),
       unuse: new InfiniteActionInterpolant(() => !this.hasAction('use'), 0),

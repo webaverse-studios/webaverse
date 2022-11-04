@@ -557,7 +557,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
           grabUseMesh.updateMatrixWorld();
           grabUseMesh.targetApp = object;
           grabUseMesh.targetPhysicsId = physicsId;
-          grabUseMesh.setComponent('value', localPlayer.actionInterpolants.activate.getNormalized());
+          grabUseMesh.setComponent('value', physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'activate', 1));
           
           grabUseMesh.visible = true;
         }
@@ -587,7 +587,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
           gridSnap: gameManager.getGridSnap(),
         });
 
-        grabUseMesh.setComponent('value', localPlayer.actionInterpolants.activate.getNormalized());
+        grabUseMesh.setComponent('value', physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'activate', 1));
       }
     }
   };
@@ -925,7 +925,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
   _updateDrags(); */
   
   const _updateActivate = () => {
-    const v = localPlayer.actionInterpolants.activate.getNormalized();
+    const v = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'activate', 1);
     const currentActivated = v >= 1;
     
     if (currentActivated && !lastActivated) {
