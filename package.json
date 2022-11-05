@@ -20,7 +20,6 @@
   "dependencies": {
     "@babel/preset-react": "^7.17.12",
     "@pixiv/three-vrm": "./packages/three-vrm",
-    "@react-three/fiber": "^8.9.0",
     "@shaderfrog/glsl-parser": "^0.1.23",
     "@vitejs/plugin-react": "^2.1.0",
     "classnames": "^2.3.1",
