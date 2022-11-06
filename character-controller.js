@@ -1030,38 +1030,11 @@ class UninterpolatedPlayer extends AvatarCharacter {
     UninterpolatedPlayer.init.apply(this, arguments)
   }
   static init() {
-    // todo: put all infos such as `hands`/`keys` into actions.
-    this.actionInterpolants = {
-      // movements: new InfiniteActionInterpolant(() => {
-      //   const ioManager = metaversefile.useIoManager();
-      //   return  ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right;
-      // }, 0),
-      // movementsTransition: new BiActionInterpolant(() => {
-      //   const ioManager = metaversefile.useIoManager();
-      //   return  ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right;
-      // }, 0, crouchMaxTime),
-      // sprint: new BiActionInterpolant(() => {
-      //   const ioManager = metaversefile.useIoManager();
-      //   return  ioManager.keys.shift;
-      // }, 0, crouchMaxTime),
-      // throw: new UniActionInterpolant(() => this.hasAction('throw'), 0, throwMaxTime),
-      // chargeJump: new InfiniteActionInterpolant(() => this.hasAction('chargeJump'), 0),
-      // standCharge: new InfiniteActionInterpolant(() => this.hasAction('standCharge'), 0),
-      // swordSideSlash: new InfiniteActionInterpolant(() => this.hasAction('swordSideSlash'), 0),
-      // swordTopDownSlash: new InfiniteActionInterpolant(() => this.hasAction('swordTopDownSlash'), 0),
-    };
-    this.actionInterpolantsArray = Object.keys(this.actionInterpolants).map(k => this.actionInterpolants[k]);
 
     this.avatarBinding = {
       position: this.position,
       quaternion: this.quaternion,
     };
-  }
-  updateInterpolation(timeDiff) { // todo: del
-    // debugger
-    for (const actionInterpolant of this.actionInterpolantsArray) {
-      actionInterpolant.update(timeDiff);
-    }
   }
 }
 class LocalPlayer extends UninterpolatedPlayer {
@@ -1308,7 +1281,6 @@ class LocalPlayer extends UninterpolatedPlayer {
       this.characterHitter.update(timestamp, timeDiffS);
       this.avatarFace.update(timestamp, timeDiffS);
 
-      this.updateInterpolation(timeDiff); // todo: del
       physx.physxWorker.updateInterpolationAnimationAvatar(this.avatar.animationAvatarPtr, timeDiff);
 
       const session = _getSession();

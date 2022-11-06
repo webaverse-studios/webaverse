@@ -964,21 +964,10 @@ class Avatar {
 
     this.manuallySetMouth=false;
 
-    // this.actionInterpolants = {
-    //   crouch: new BiActionInterpolant(() => this.crouchState, 0, crouchMaxTime),
-    //   fly: new InfiniteActionInterpolant(() => this.flyState, 0),
-    // }
-    // this.actionInterpolantsArray = Object.keys(this.actionInterpolants).map(k => this.actionInterpolants[k]);
-
     //
 
     _createAnimation(this);
   }
-  // updateInterpolation(timeDiff) {
-  //   for (const actionInterpolant of this.actionInterpolantsArray) {
-  //     actionInterpolant.update(timeDiff);
-  //   }
-  // }
   static bindAvatar(object) {
     const model = object.scene;
     model.updateMatrixWorld(true);
@@ -1476,10 +1465,6 @@ class Avatar {
   update(timestamp, timeDiff) {
     const now = timestamp;
     const timeDiffS = timeDiff / 1000;
-
-    // this.updateInterpolation(timeDiff);
-    // this.flyTime = this.flyState ? this.actionInterpolants.fly.get() : -1;
-    // this.crouchTime = this.actionInterpolants.crouch.getInverse();
 
     this.setDirection(timestamp);
 
