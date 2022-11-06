@@ -547,6 +547,7 @@ ioManager.keydown = e => {
     }
     case 16: { // shift
       ioManager.keys.shift = true;
+      game.setSprint(true);
       break;
     }
     case 32: { // space
@@ -713,6 +714,7 @@ ioManager.keyup = e => {
       ioManager.keys.doubleTap = false;
       
       game.menuUnDoubleTap();
+      game.setSprint(false);
       break;
     }
     case 46: { // delete

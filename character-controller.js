@@ -1058,6 +1058,7 @@ class UninterpolatedPlayer extends AvatarCharacter {
     };
   }
   updateInterpolation(timeDiff) { // todo: del
+    // debugger
     for (const actionInterpolant of this.actionInterpolantsArray) {
       actionInterpolant.update(timeDiff);
     }

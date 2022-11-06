@@ -1643,6 +1643,16 @@ class GameManager extends EventTarget {
     mouseDomEquipmentHoverObject = o;
     mouseDomEquipmentHoverPhysicsId = physicsId;
   }
+  setSprint(bool) {
+    const localPlayer = playersManager.getLocalPlayer();
+    if (bool) {
+      console.log('add sprint')
+      localPlayer.addAction({type: 'sprint'});
+    } else {
+      console.log('remove sprint')
+      localPlayer.removeAction('sprint');
+    }
+  }
   getSpeed() {
     let speed = 0;
     
