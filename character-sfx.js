@@ -242,11 +242,11 @@ export class AvatarCharacterSfx {
           // const candidateAudios = soundFiles.water;
           // console.log(candidateAudios);
           if(this.character.getAction('swim').animationType === 'breaststroke'){
-              if(this.setSwimmingHand && this.character.actionInterpolants.movements.get() % breaststrokeDuration <= breaststrokeOffset){
+              if(this.setSwimmingHand && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % breaststrokeDuration <= breaststrokeOffset){
                   this.setSwimmingHand = false;
                   this.currentSwimmingHand = null;
               }
-              else if(!this.setSwimmingHand && this.character.actionInterpolants.movements.get() % breaststrokeDuration > breaststrokeOffset){
+              else if(!this.setSwimmingHand && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % breaststrokeDuration > breaststrokeOffset){
                   let regex = new RegExp('^water/swim[0-9]*.wav$');
                   const candidateAudios = soundFiles.water.filter(f => regex.test(f.name));
                   const audioSpec = candidateAudios[Math.floor(Math.random() * candidateAudios.length)];
@@ -263,14 +263,14 @@ export class AvatarCharacterSfx {
               const candidateAudios = soundFiles.water.filter(f => regex.test(f.name));
               const audioSpec = candidateAudios[Math.floor(Math.random() * candidateAudios.length)];
 
-              if(this.setSwimmingHand && this.character.actionInterpolants.movements.get() % freestyleDuration <= freestyleOffset){
+              if(this.setSwimmingHand && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % freestyleDuration <= freestyleOffset){
                   // console.log('left hand')
                   if(this.character.getAction('swim').onSurface)
                     sounds.playSound(audioSpec);
                   this.currentSwimmingHand = 'left';
                   this.setSwimmingHand = false;
               }
-              else if(!this.setSwimmingHand && this.character.actionInterpolants.movements.get() % freestyleDuration > freestyleOffset){
+              else if(!this.setSwimmingHand && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % freestyleDuration > freestyleOffset){
                   // console.log('right hand')
                   if(this.character.getAction('swim').onSurface)
                     sounds.playSound(audioSpec);

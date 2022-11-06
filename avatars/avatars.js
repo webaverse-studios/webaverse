@@ -946,9 +946,9 @@ class Avatar {
     this.activateAnimation = null;
 
     // internal state
-    this.movementsTime = 0;
-    this.movementsTransitionTime = NaN;
-    this.movementsTransitionFactor = NaN;
+    // this.movementsTime = 0;
+    // this.movementsTransitionTime = NaN;
+    // this.movementsTransitionFactor = NaN;
     // this.sprintTime = 0;
     // this.sprintFactor = 0;
     this.velocity = new THREE.Vector3();
@@ -1494,7 +1494,7 @@ class Avatar {
     this.aimRightFactorReverse = 1 - this.aimRightFactor;
     this.aimLeftFactor = this.aimLeftTransitionTime / aimTransitionMaxTime;
     this.aimLeftFactorReverse = 1 - this.aimLeftFactor;
-    this.movementsTransitionFactor = Math.min(Math.max(this.movementsTransitionTime / crouchMaxTime, 0), 1);
+    // this.movementsTransitionFactor = Math.min(Math.max(this.movementsTransitionTime / crouchMaxTime, 0), 1);
     // this.sprintFactor = Math.min(Math.max(this.sprintTime / crouchMaxTime, 0), 1);
     
     const _overwritePose = poseName => {

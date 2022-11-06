@@ -497,11 +497,11 @@ export const _updateAnimation = (avatar, now, timeDiff) => {
       avatar.walkRunFactor,
       // avatar.crouchFactor,
       // avatar.sprintFactor,
-      avatar.movementsTransitionFactor,
+      // avatar.movementsTransitionFactor,
 
       // avatar.activateTime,
       // avatar.swimTime,
-      avatar.movementsTime,
+      // avatar.movementsTime,
 
       // // action states ---
       // avatar.jumpState,

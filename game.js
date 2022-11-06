@@ -1643,15 +1643,26 @@ class GameManager extends EventTarget {
     mouseDomEquipmentHoverObject = o;
     mouseDomEquipmentHoverPhysicsId = physicsId;
   }
+  setMovements() {
+    if (ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right) {
+      console.log('add movements')
+      if (!localPlayer.hasAction('movements')) {
+        localPlayer.addAction({type: 'movements'});
+      }
+    } else {
+      console.log('remove movements')
+      localPlayer.removeAction('movements');
+    }
+  }
   setSprint(bool) {
     const localPlayer = playersManager.getLocalPlayer();
     if (bool) {
-      console.log('add sprint')
+      // console.log('add sprint')
       if (!localPlayer.hasAction('sprint')) { // note: prevent holding shift switch browser page.
         localPlayer.addAction({type: 'sprint'});
       }
     } else {
-      console.log('remove sprint')
+      // console.log('remove sprint')
       localPlayer.removeAction('sprint');
     }
   }

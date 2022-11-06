@@ -1032,14 +1032,14 @@ class UninterpolatedPlayer extends AvatarCharacter {
   static init() {
     // todo: put all infos such as `hands`/`keys` into actions.
     this.actionInterpolants = {
-      movements: new InfiniteActionInterpolant(() => {
-        const ioManager = metaversefile.useIoManager();
-        return  ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right;
-      }, 0),
-      movementsTransition: new BiActionInterpolant(() => {
-        const ioManager = metaversefile.useIoManager();
-        return  ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right;
-      }, 0, crouchMaxTime),
+      // movements: new InfiniteActionInterpolant(() => {
+      //   const ioManager = metaversefile.useIoManager();
+      //   return  ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right;
+      // }, 0),
+      // movementsTransition: new BiActionInterpolant(() => {
+      //   const ioManager = metaversefile.useIoManager();
+      //   return  ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right;
+      // }, 0, crouchMaxTime),
       // sprint: new BiActionInterpolant(() => {
       //   const ioManager = metaversefile.useIoManager();
       //   return  ioManager.keys.shift;
