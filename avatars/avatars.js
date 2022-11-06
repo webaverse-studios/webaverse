@@ -949,8 +949,8 @@ class Avatar {
     this.movementsTime = 0;
     this.movementsTransitionTime = NaN;
     this.movementsTransitionFactor = NaN;
-    this.sprintTime = 0;
-    this.sprintFactor = 0;
+    // this.sprintTime = 0;
+    // this.sprintFactor = 0;
     this.velocity = new THREE.Vector3();
     this.lastMoveTime = 0;
     this.lastEmoteTime = 0;
@@ -1495,7 +1495,7 @@ class Avatar {
     this.aimLeftFactor = this.aimLeftTransitionTime / aimTransitionMaxTime;
     this.aimLeftFactorReverse = 1 - this.aimLeftFactor;
     this.movementsTransitionFactor = Math.min(Math.max(this.movementsTransitionTime / crouchMaxTime, 0), 1);
-    this.sprintFactor = Math.min(Math.max(this.sprintTime / crouchMaxTime, 0), 1);
+    // this.sprintFactor = Math.min(Math.max(this.sprintTime / crouchMaxTime, 0), 1);
     
     const _overwritePose = poseName => {
       const poseAnimation = animations.index[poseName];
@@ -1895,6 +1895,7 @@ class Avatar {
       globalThis.domInfo.innerHTML += `<div style="display:;">actions: --- ${globalThis.localPlayer?.getActionsArray().map(n=>n.type)}</div>`;
       // globalThis.domInfo.innerHTML += `<div style="display:;">unuseAnimation: --- ${this.unuseAnimation || ''}</div>`;
       // globalThis.domInfo.innerHTML += `<div style="display:;">unuseTime: --- ${globalThis.logNum(this.unuseTime)}</div>`;
+      // globalThis.domInfo.innerHTML += `<div style="display:;">sprintTime: --- ${globalThis.logNum(this.sprintTime)}</div>`;
       // globalThis.domInfo.innerHTML += `<div style="display:;">angle: --- ${globalThis.logNum(this.getAngle())}</div>`;
       // globalThis.domInfo.innerHTML += `<div style="display:;">mirrorFactor:  --- ${this.mirrorFactor?.toFixed(2)}</div>`;
       // globalThis.domInfo.innerHTML += `<div style="display:;">mirrorFactor2: --- ${this.mirrorFactor2?.toFixed(2)}</div>`;

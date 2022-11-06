@@ -1647,7 +1647,9 @@ class GameManager extends EventTarget {
     const localPlayer = playersManager.getLocalPlayer();
     if (bool) {
       console.log('add sprint')
-      localPlayer.addAction({type: 'sprint'});
+      if (!localPlayer.hasAction('sprint')) { // note: prevent holding shift switch browser page.
+        localPlayer.addAction({type: 'sprint'});
+      }
     } else {
       console.log('remove sprint')
       localPlayer.removeAction('sprint');
