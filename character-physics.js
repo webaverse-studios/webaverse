@@ -11,6 +11,7 @@ import {groundFriction, flyFriction, airFriction, swimFriction, flatGroundJumpAi
 import {getRenderer, camera} from './renderer.js';
 // import physx from './physx.js';
 import metaversefileApi from 'metaversefile';
+import physx from './physx.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();

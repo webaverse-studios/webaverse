@@ -19,6 +19,7 @@ import {
   // loadJson,
   // loadAudioBuffer,
 } from './util.js';
+import physx from './physx.js';
 
 const localVector = new THREE.Vector3();
 

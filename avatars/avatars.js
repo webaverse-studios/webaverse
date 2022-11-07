@@ -38,10 +38,7 @@ import {
 import {
   getClosest2AnimationAngles,
   getFirstPersonCurves,
-  loadPromise,
-  _applyAnimation,
   _findArmature,
-  _getLerpFn,
   animations,
   animationStepIndices,
   waitForLoad,

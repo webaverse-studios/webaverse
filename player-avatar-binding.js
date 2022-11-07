@@ -7,6 +7,7 @@ import Avatar from './avatars/avatars.js';
 import {
   getEyePosition,
 } from './avatars/util.mjs';
+import physx from './physx.js';
 // import {playersManager} from './players-manager.js';
 
 const appSymbol = 'app'; // Symbol('app');

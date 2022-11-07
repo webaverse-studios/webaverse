@@ -1713,6 +1713,7 @@ class GameManager extends EventTarget {
   }
 
   setMovements() {
+    const localPlayer = playersManager.getLocalPlayer();
     if (ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right) {
       console.log('add movements')
       if (!localPlayer.hasAction('movements')) {
