@@ -19,6 +19,7 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
     const {state, setState} = useContext(AppContext);
     const sceneNameInputRef = useRef(null);
     const [ rooms, setRooms ] = useState([]);
+    const [ multiplayerEnabled, setMultiplayerEnabled ] = useState(false);
     const [ micEnabled, setMicEnabled ] = useState(false);
     const [ speechEnabled, setSpeechEnabled ] = useState(false);
     const [ sceneInputName, setSceneInputName ] = useState(selectedScene);
@@ -202,6 +203,11 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
 
     };
 
+    const handleMultiplayerBtnClick = () => {
+        universe.toggleMultiplayer();
+        setMultiplayerEnabled(universe.multiplayerEnabled);
+    }
+
     const handleMicBtnClick = async () => {
 
         setState({openedPanel: null});
@@ -276,8 +282,8 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
                     <input type="text" className={ styles.input } ref={ sceneNameInputRef } value={ multiplayerConnected ? selectedRoom : sceneInputName } onKeyUp={ handleSceneMenuKeyUp } onFocus={ handleSceneMenuOpen.bind(null, false) } disabled={ multiplayerConnected } onChange={ handleSceneInputKeyDown } placeholder="Goto..." />
                     <img src="images/webpencil.svg" className={ classnames(styles.background, styles.green) } />
                 </div>
-                <div className={ styles.buttonWrap  } onClick={ handleRoomMenuOpen.bind(null, null) } >
-                    <div className={ classnames(styles.button, (state.openedPanel === 'RoomsMenuPanel' || multiplayerConnected) ? null : styles.disabled) } >
+                <div className={ styles.buttonWrap  } onClick={ handleMultiplayerBtnClick.bind(null, null) } >
+                    <div className={classnames(styles.button, (state.openedPanel === 'RoomsMenuPanel' || multiplayerEnabled) ? null : styles.disabled) } >
                         <img src="images/wifi.svg" />
                     </div>
                 </div>

@@ -25,6 +25,8 @@ class Universe extends EventTarget {
 
     this.currentWorld = null;
     this.sceneLoadedPromise = null;
+
+    this.multiplayerEnabled = false;
   }
 
   getWorldsHost() {
@@ -113,6 +115,10 @@ class Universe extends EventTarget {
   async handleUrlUpdate() {
     const q = parseQuery(location.search);
     await this.enterWorld(q);
+  }
+
+  toggleMultiplayer() {
+    this.multiplayerEnabled = !this.multiplayerEnabled;
   }
 
   isSceneLoaded() {
