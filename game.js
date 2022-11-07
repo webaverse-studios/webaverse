@@ -1715,12 +1715,10 @@ class GameManager extends EventTarget {
   setMovements() {
     const localPlayer = playersManager.getLocalPlayer();
     if (ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right) {
-      console.log('add movements')
       if (!localPlayer.hasAction('movements')) {
         localPlayer.addAction({type: 'movements'});
       }
     } else {
-      console.log('remove movements')
       localPlayer.removeAction('movements');
     }
   }
@@ -1728,12 +1726,10 @@ class GameManager extends EventTarget {
   setSprint(bool) {
     const localPlayer = playersManager.getLocalPlayer();
     if (bool) {
-      // console.log('add sprint')
       if (!localPlayer.hasAction('sprint')) { // note: prevent holding shift switch browser page.
         localPlayer.addAction({type: 'sprint'});
       }
     } else {
-      // console.log('remove sprint')
       localPlayer.removeAction('sprint');
     }
   }

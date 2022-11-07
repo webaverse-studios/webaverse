@@ -2296,7 +2296,6 @@ const physxWorker = (() => {
     )
   }
   w.addActionAnimationAvatar = (animationAvatarPtr, action) => {
-    // console.log(JSON.stringify(action))
     const bytes = textEncoder.encode(JSON.stringify(action))
     const stringByteLength = bytes.length;
     for (let i = 0; i < stringByteLength; i++) {

@@ -503,18 +503,14 @@ class CharacterPhysics {
           if (enabled) {
             if (i === 0) {
               this.character.addAction({type: 'rightHand'});
-              console.log('addAction righthand');
             } else if (i === 1) {
               this.character.addAction({type: 'leftHand'});
-              console.log('addAction lefthand');
             }
           } else {
             if (i === 0) {
               this.character.removeAction('rightHand');
-              console.log('removeAction righthand');
             } else if (i === 1) {
               this.character.removeAction('leftHand');
-              console.log('removeAction lefthand');
             }
           }
         }
