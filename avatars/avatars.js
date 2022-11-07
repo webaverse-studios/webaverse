@@ -54,8 +54,6 @@ import Nodder from './Nodder.js';
 
 import * as wind from './simulation/wind.js';
 
-import { BiActionInterpolant, InfiniteActionInterpolant } from '../interpolants.js';
-
 // const infinityUpVector = new THREE.Vector3(0, Infinity, 0);
 
 const localVector = new THREE.Vector3();
