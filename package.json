@@ -18,11 +18,9 @@
     "lint": "eslint --fix --quiet --ext .js,.jsx ."
   },
   "dependencies": {
-    "@babel/preset-react": "^7.17.12",
     "@pixiv/three-vrm": "./packages/three-vrm",
     "@react-three/fiber": "^7.0.29",
     "@shaderfrog/glsl-parser": "^0.1.23",
-    "@vitejs/plugin-react": "^2.1.0",
     "classnames": "^2.3.1",
     "encoding-japanese": "^1.0.30",
     "ethers": "^5.6.8",
@@ -38,7 +36,6 @@
     "stats.js": "^0.17.0",
     "three": "./packages/three",
     "troika-three-text": "^0.43.1-alpha.0",
-    "vite": "^3.1.6",
     "webm-writer": "^1.0.0",
     "wsrtc": "./packages/wsrtc",
     "xhr2": "^0.2.1",
@@ -58,6 +55,8 @@
     "last 1 chrome version"
   ],
   "devDependencies": {
+    "@babel/preset-react": "^7.17.12",
+    "@vitejs/plugin-react": "^2.1.0",
     "compiler": "./packages/compiler",
     "eslint": "^8.26.0",
     "eslint-config-semistandard": "^15.0.1",
@@ -68,6 +67,8 @@
     "eslint-plugin-standard": "^4.1.0",
     "multiplayer-do": "./packages/multiplayer-do",
     "previewer": "./packages/previewer",
+    "vite": "^3.1.6",
+    "vite-plugin-swc-react-refresh": "^2.2.1",
     "wiki": "./packages/wiki"
   }
 }
