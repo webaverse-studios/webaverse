@@ -60,7 +60,7 @@ export class LodChunkTracker {
       const instancedPlaneGeometry = new THREE.InstancedBufferGeometry();
       {
         const planeGeometry = new THREE.PlaneBufferGeometry(1, 1)
-          //.scale(0.9, 0.9, 0.9)
+          // .scale(0.9, 0.9, 0.9)
           .translate(0.5, -0.5, 0)
           .rotateX(-Math.PI / 2);
         for (const k in planeGeometry.attributes) {
@@ -128,6 +128,7 @@ export class LodChunkTracker {
 
     this.ensureTracker();
   }
+
   #getCurrentCoord(position, target) {
     const cx = Math.floor(position.x / this.chunkSize);
     const cz = Math.floor(position.z / this.chunkSize);
@@ -138,9 +139,11 @@ export class LodChunkTracker {
   onPostUpdate(fn) {
     this.listeners.postUpdate.push(fn);
   }
+
   onChunkAdd(fn) {
     this.listeners.chunkAdd.push(fn);
   }
+
   onChunkRemove(fn) {
     this.listeners.chunkRemove.push(fn);
   }
@@ -165,6 +168,7 @@ export class LodChunkTracker {
       listener(dataRequest);
     }
   }
+
   handleChunkRemove(dataRequest) {
     for (const listener of this.listeners.chunkRemove) {
       listener(dataRequest);
@@ -191,11 +195,21 @@ export class LodChunkTracker {
   async waitForLoad() {
     await Promise.all(this.liveTasks.map(task => task.waitForLoad()));
   }
+
   async ensureTracker() {
     if (!this.tracker) {
       this.tracker = await this.pgWorkerManager.createTracker();
     }
   }
+
+  async destroyTracker() {
+    if(this.tracker) {
+      await this.pgWorkerManager.destroyTracker(this.tracker);
+      // console.log('Destroying Lod Tracker');
+      this.tracker = null;
+    }
+  }
+
   async updateInternal(position, minLod, maxLod, lod1Range) {
     await this.ensureTracker();
 
@@ -238,6 +252,7 @@ export class LodChunkTracker {
 
     this.postUpdate(position);
   }
+
   update(position) {
     // update coordinate
     if (!this.isUpdating) {
@@ -274,8 +289,5 @@ export class LodChunkTracker {
       this.queued = true;
       this.queuePosition.copy(position);
     }
-  }
-  destroy() {
-    throw new Error('not implemented');
   }
 }

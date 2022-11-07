@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
 import classnames from 'classnames';
 import imageAI from '../../../../../ai/image/image-ai';
 import {canvasHasContent} from '../../../../../util';

@@ -28,6 +28,7 @@ class GIFLoader {
     });
     this.worker = worker;
   }
+
   async createGif(url) {
     // await this.loadPromise;
     const id = ++nextId;
@@ -50,6 +51,7 @@ class GIFLoader {
     }, []);
     return await p;
   }
+
   async renderFrame(gifId) {
     // await this.loadPromise;
     const id = ++nextId;
@@ -72,6 +74,7 @@ class GIFLoader {
     }, []);
     return await p;
   }
+
   async renderFrames(gifId) {
     // await this.loadPromise;
     const id = ++nextId;
@@ -94,6 +97,7 @@ class GIFLoader {
     }, []);
     return await p;
   }
+
   async destroyGif(gifId) {
     // await this.loadPromise;
     const id = ++nextId;
@@ -116,6 +120,7 @@ class GIFLoader {
     }, []);
     return await p;
   }
+
   destroy() {
     this.worker.terminate();
     this.worker = null;

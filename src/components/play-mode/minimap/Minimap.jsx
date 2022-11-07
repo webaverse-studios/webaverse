@@ -14,7 +14,7 @@ const minimapWorldSize = 400;
 const minimapMinZoom = 0.1;
 const minimapBaseSpeed = 30;
 
-export const Minimap = ({ className }) => {
+export const Minimap = ({className}) => {
 
     const canvasRef = useRef();
 
@@ -36,7 +36,7 @@ export const Minimap = ({ className }) => {
       }, [canvasRef.current]);
 
     return (
-        <div className={ classNames( className, styles.locationMenu ) } >
+        <div className={ classNames(className, styles.locationMenu) } >
 
             <canvas width={canvasSize} height={canvasSize} className={ styles.map } ref={canvasRef} />
 

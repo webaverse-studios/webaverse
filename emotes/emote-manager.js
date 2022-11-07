@@ -6,11 +6,13 @@ class EmoteManager {
   constructor() {
     this.emoteTimeouts = new Map();
   }
+
   getEmoteSpec(emoteName) {
     const emoteHardName = emoteName.replace(/Soft$/, '');
     const emote = emotes.find(emote => emote.name === emoteHardName);
     return emote;
   }
+
   triggerEmote(emoteName, player = playersManager.getLocalPlayer()) {
     return new Promise((accept, reject) => {
       const emoteSpec = this.getEmoteSpec(emoteName);

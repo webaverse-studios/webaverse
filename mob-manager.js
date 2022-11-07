@@ -123,9 +123,11 @@ class Mob {
       })();
     }
   }
+
   #getRng() {
     return alea(this.name);
   }
+
   async loadApp(mobJsonUrl) {
     let live = true;
     this.cleanupFns.push(() => {
@@ -384,8 +386,8 @@ class Mob {
 
                 mesh.matrixWorld.compose(meshPosition, meshQuaternion, meshScale);
                 mesh.matrix.copy(mesh.matrixWorld);
-                if (app.parent) {
-                  mesh.matrix.premultiply(localMatrix.copy(app.parent.matrixWorld).invert());
+                if (this.app.parent) {
+                  mesh.matrix.premultiply(localMatrix.copy(this.app.parent.matrixWorld).invert());
                 }
                 mesh.matrix.decompose(mesh.position, mesh.quaternion, mesh.scale);
               }
@@ -436,6 +438,7 @@ class Mob {
       });
     }
   }
+
   getPhysicsObjects() {
     if (this.subApp) {
       return this.subApp.getPhysicsObjects();
@@ -443,11 +446,13 @@ class Mob {
       return [];
     }
   }
+
   update(timestamp, timeDiff) {
     for (const fn of this.updateFns) {
       fn(timestamp, timeDiff);
     }
   }
+
   destroy() {
     for (const fn of this.cleanupFns) {
       fn();
@@ -473,6 +478,7 @@ class InstancedSkeleton extends THREE.Skeleton {
     unifiedBoneTextureSize = boneTexture.image.width;
     // console.log('boneTextureSize', unifiedBoneTextureSize);
   }
+
   bakeFrame(skeleton, drawCallIndex, frameIndex) {
     const boneMatrices = this.unifiedBoneMatrices;
     
@@ -487,13 +493,13 @@ class InstancedSkeleton extends THREE.Skeleton {
 
     // flatten bone matrices to array
 
-    for ( let i = 0, il = bones.length; i < il; i ++ ) {
+    for (let i = 0, il = bones.length; i < il; i ++) {
 
       // compute the offset between the current and the original transform
 
       const matrix = bones[ i ] ? bones[ i ].matrixWorld : identityMatrix;
 
-      localMatrix.multiplyMatrices( matrix, boneInverses[ i ] );
+      localMatrix.multiplyMatrices(matrix, boneInverses[ i ]);
 
       // decompose the transformation, and assign to bone matrix in layout of
       // [t_3, s], [q_4]
@@ -616,7 +622,7 @@ class MobBatchedMesh extends InstancedBatchedMesh {
           value: attributeTextures.boneTexture,
           needsUpdate: true,
         };
-        shader.uniforms.uTime = { value: 0 };
+        shader.uniforms.uTime = {value: 0};
 
         // skin vertex
 
@@ -923,7 +929,7 @@ gl_Position = projectionMatrix * mvPosition;
       const rootBone2 = _findBone(glb2Scene);
       const skeleton2 = mesh2.skeleton;
       if (skeleton2.bones.length > maxBonesPerInstance) {
-        throw new Error('too many bones in base mesh skeleton: ' + bones.length);
+        throw new Error('too many bones in base mesh skeleton: ' + skeleton2.bones.length);
       }
 
       this.getDrawCall(i);
@@ -931,7 +937,7 @@ gl_Position = projectionMatrix * mvPosition;
       // animations
       let mixer = null;
       const clip = animations[0];
-      //{
+      // {
         mixer = new THREE.AnimationMixer(rootBone2);
         // console.log('new action', clip);
         const action = mixer.clipAction(clip);
@@ -939,7 +945,7 @@ gl_Position = projectionMatrix * mvPosition;
         mixer.updateMatrixWorld = () => {
           glb2Scene.updateMatrixWorld();
         };
-      //}
+      // }
 
       // console.log('got animations', animations);
       // const idleAnimation = animations.find(a => a.name === 'idle');
@@ -955,6 +961,7 @@ gl_Position = projectionMatrix * mvPosition;
     }
     this.skeleton.unifiedBoneTexture.needsUpdate = true;
   }
+
   getDrawCall(geometryIndex) {
     let drawCall = this.drawCalls[geometryIndex];
     if (!drawCall) {
@@ -965,6 +972,7 @@ gl_Position = projectionMatrix * mvPosition;
     }
     return drawCall;
   }
+
   drawChunk(chunk, renderData, tracker) {
     const mobData = renderData;
 
@@ -1105,6 +1113,7 @@ gl_Position = projectionMatrix * mvPosition;
       tracker.onChunkRemove(chunk, onchunkremove);
     }
   }
+
   update(timestamp, timeDiff) {
     const shader = this.material.userData.shader;
     if (shader) {
@@ -1153,6 +1162,7 @@ class MobsCompiledData {
       this.skinnedMeshes = skinnedMeshes;
     })();
   }
+
   waitForLoad() {
     return this.loadPromise;
   }
@@ -1177,17 +1187,21 @@ class MobGenerator {
     this.object.add(mobBatchedMesh);
     this.mobBatchedMesh = mobBatchedMesh;
   }
+
   getMobModuleNames() {
     return Object.keys(this.mobModules).sort();
   }
+
   disposeChunk(chunk) {
     const {abortController} = chunk.binding;
     abortController.abort();
     chunk.binding = null;
   }
+
   update(timestamp, timeDiff) {
     this.mobBatchedMesh.update(timestamp, timeDiff);
   }
+
   destroy() {
     // nothing; the owning lod tracker disposes of our contents
   }
@@ -1245,6 +1259,7 @@ class Mobber {
 
     this.tracker = tracker;
   }
+
   async waitForUpdate() {
     await new Promise((accept, reject) => {
       this.tracker.onPostUpdate(() => {
@@ -1252,6 +1267,7 @@ class Mobber {
       });
     });
   }
+
   /* async addMobModule(srcUrl) {
     const m = await metaversefile.import(srcUrl);
     this.mobModules[srcUrl] = m;
@@ -1262,11 +1278,13 @@ class Mobber {
   getChunks() {
     return this.generator.object;
   }
+
   update(timestamp, timeDiff) {
     const localPlayer = playersManager.getLocalPlayer();
     !this.procGenInstance.range && this.tracker.update(localPlayer.position);
     this.generator.update(timestamp, timeDiff);
   }
+
   destroy() {
     this.tracker.destroy();
     this.generator.destroy();
@@ -1278,6 +1296,7 @@ class MobManager {
     this.mobbers = [];
     this.mobs = [];
   }
+
   createMobber({
     procGenInstance,
     mobData,
@@ -1289,10 +1308,12 @@ class MobManager {
     this.mobbers.push(mobber);
     return mobber;
   }
+
   destroyMobber(mobber) {
     mobber.destroy();
     this.mobbers.splice(this.mobbers.indexOf(mobber), 1);
   }
+
   async loadData(appUrls) {
     const mobData = new MobsCompiledData({
       appUrls,
@@ -1300,6 +1321,7 @@ class MobManager {
     await mobData.waitForLoad();
     return mobData;
   }
+
   addMobApp(app, srcUrl) {
     if (app.appType !== 'mob') {
       console.warn('not a mob app', app);
@@ -1313,6 +1335,7 @@ class MobManager {
     const mob = new Mob(app, srcUrl);
     this.mobs.push(mob);
   }
+
   removeMobApp(app) {
     const index = this.mobs.findIndex(mob => mob.app === app);
     if (index !== -1) {
@@ -1321,6 +1344,7 @@ class MobManager {
       this.mobs.splice(index, 1);
     }
   }
+
   getPhysicsObjects() {
     let results = [];
     for (const mob of this.mobs) {
@@ -1330,6 +1354,7 @@ class MobManager {
     results = results.flat();
     return results;
   }
+
   update(timestamp, timeDiff) {
     // mobber is updated by the app that created it
     /* for (const mobber of this.mobbers) {

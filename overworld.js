@@ -39,8 +39,8 @@ class OverworldApp {
     lodMesh.updateMatrixWorld();
 
     for (const skyboxMesh of skyboxMeshes) {
-      skyboxMesh.position.copy(previewPosition);
-      skyboxMesh.quaternion.copy(previewQuaternion);
+      skyboxMesh.position.copy(previewer.position);
+      skyboxMesh.quaternion.copy(previewer.quaternion);
       overworldObject.add(skyboxMesh);
       skyboxMesh.updateMatrixWorld();
     }
@@ -57,6 +57,7 @@ class OverworldApp {
     this.loadPromise = previewer.loadScene(start_url)
       .then(() => {});
   }
+
   waitForLoad() {
     return this.loadPromise;
   }

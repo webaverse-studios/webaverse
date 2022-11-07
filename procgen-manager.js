@@ -46,12 +46,15 @@ class ProcGenInstance {
       instance,
     });
   }
+
   setCamera(worldPosition, cameraPosition, cameraQuaternion, projectionMatrix) {
     this.pgWorkerManager.setCamera(worldPosition, cameraPosition, cameraQuaternion, projectionMatrix);
   }
+
   setClipRange() {
     this.pgWorkerManager.setClipRange(range);
   }
+
   async createLodChunkTracker(opts = {}) {
     await this.pgWorkerManager.waitForLoad();
 
@@ -64,6 +67,7 @@ class ProcGenInstance {
     const tracker = new LodChunkTracker(opts2);
     return tracker;
   }
+
   async generateChunk(
     position,
     lod,
@@ -97,6 +101,7 @@ class ProcGenInstance {
     );
     return result;
   }
+
   async generateBarrier(
     position,
     minLod,
@@ -118,6 +123,10 @@ class ProcGenInstance {
     );
     return result;
   }
+
+  async destroy() {
+    await this.pgWorkerManager.destroy();
+  }
 }
 
 export class ProcGenManager {
@@ -127,6 +136,7 @@ export class ProcGenManager {
     this.instances = new Map();
     this.chunkSize = chunkSize;
   }
+
   getInstance(key) {
     let instance = this.instances.get(key);
     if (!instance) {
@@ -138,6 +148,15 @@ export class ProcGenManager {
     }
     return instance;
   }
+
+  deleteInstance(key) {
+    let instance = this.instances.get(key);
+    if (instance) {
+      instance.destroy();
+      this.instances.delete(key);
+    }
+  }
+
   getNodeHash(node) {
     return ((node.min.x & 0xFFF) << 20) |
       ((node.min.y & 0xFFF) << 8) |

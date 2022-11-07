@@ -131,6 +131,7 @@ class SmokeBgFxMesh extends THREE.Mesh {
     super(geometry, material);
     this.frustumCulled = false;
   }
+
   update(timestamp, timeDiff, width, height) {
     const timestampS = timestamp / 1000;
     
@@ -145,6 +146,7 @@ class SmokeBgFxMesh extends THREE.Mesh {
     this.material.uniforms.iResolution.value.set(width, height, pixelRatio);
     this.material.uniforms.iResolution.needsUpdate = true;
   }
+
   static async waitForLoad() {
     const res = await fetch('textures/noise3d.bin');
     const arrayBuffer = await res.arrayBuffer();

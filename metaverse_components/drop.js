@@ -183,10 +183,4 @@ export default app => {
       app.updateMatrixWorld();
     });
   }
-
-  return {
-    remove() {
-      metaversefile.clearFrame(frame);
-    },
-  };
 };

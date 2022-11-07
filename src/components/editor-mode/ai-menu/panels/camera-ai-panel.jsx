@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
 // import { AppContext } from '../../../app';
 
 import styles from './camera-ai-panel.module.css';

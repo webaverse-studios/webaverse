@@ -117,6 +117,7 @@ class RadialBgFxMesh extends THREE.Mesh {
     
     this.frustumCulled = false;
   }
+
   update(timestamp, timeDiff, width, height) {
     const timestampS = timestamp / 1000;
 
@@ -126,6 +127,7 @@ class RadialBgFxMesh extends THREE.Mesh {
     this.material.uniforms.iFrame.value = Math.floor(timestampS * 60);
     this.material.uniforms.iFrame.needsUpdate = true;
   }
+
   static async waitForLoad() {
     // nothing
   }

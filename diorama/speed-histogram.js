@@ -23,9 +23,11 @@ export class SpeedHistogram {
   constructor() {
     this.elements = [];
   }
+
   add(speed, duration) {
     this.elements.push({speed, duration});
   }
+
   totalDuration() {
     const {elements} = this;
     let totalDuration = 0;
@@ -34,6 +36,7 @@ export class SpeedHistogram {
     }
     return totalDuration;
   }
+
   totalDistance() {
     const {elements} = this;
     // const totalDuration = this.totalDuration();
@@ -43,10 +46,12 @@ export class SpeedHistogram {
     }
     return totalDistance;
   }
+
   fromArray(elements) {
     this.elements = elements;
     return this;
   }
+
   toArray(frameRate = 60, startTime = 0, endTime = this.totalDuration()) {
     // const {elements} = this;
     // const totalDuration = this.totalDuration();

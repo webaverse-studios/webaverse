@@ -49,26 +49,26 @@ const open = url => {
 
 //
 
-const _waitForRegex = (compilerProcess, regex) => {
+const _waitForRegex = (process, regex) => {
   return new Promise((resolve, reject) => {
     const onerror = err => {
       reject(err);
       cleanup();
     };
-    compilerProcess.on('error', onerror);
+    process.on('error', onerror);
     
-    compilerProcess.stdout.setEncoding('utf8');
+    process.stdout.setEncoding('utf8');
     const ondata = data => {
       if (regex.test(data)) {
         resolve();
         cleanup();
       }
     };
-    compilerProcess.stdout.on('data', ondata);
+    process.stdout.on('data', ondata);
     
     const cleanup = () => {
-      compilerProcess.removeListener('error', onerror);
-      compilerProcess.stdout.removeListener('data', ondata);
+      process.removeListener('error', onerror);
+      process.stdout.removeListener('data', ondata);
     };
   });
 };
@@ -167,7 +167,7 @@ const _logProcess = childProcess => {
   };
   const data = (key) => {
     if (key === 'a') {
-      open(`http://local.webaverse.com/`);
+      open(`https://local.webaverse.com/`);
     } else if (key === 'm') {
       open(`http://127.0.0.1:${MULTIPLAYER_PORT}/`);
     } else if (key === 'w') {
@@ -213,7 +213,7 @@ const _startDevServer = async () => {
 };
 const _startCompiler = async () => {
   const compilerPath = path.join(dirname, 'packages', 'compiler');
-  const nextPath = path.join(compilerPath, 'node_modules', '.bin', 'next');
+  const nextPath = path.join(dirname, 'node_modules', '.bin', 'next');
   const compilerProcess = child_process.spawn(process.argv[0], [nextPath, 'dev'], {
     cwd: compilerPath,
     env: {
@@ -234,7 +234,8 @@ const _startCompiler = async () => {
 };
 const _startMultiplayer = async () => {
   const multiplayerPath = path.join(dirname, 'packages', 'multiplayer-do');
-  const multiplayerProcess = child_process.spawn(process.argv[0], ['./node_modules/wrangler/', 'dev', '-l', '--port', MULTIPLAYER_PORT + ''], {
+  const wranglerPath = path.join(dirname, 'node_modules', 'wrangler');
+  const multiplayerProcess = child_process.spawn(process.argv[0], [wranglerPath, 'dev', '-l', '--port', MULTIPLAYER_PORT + ''], {
     cwd: multiplayerPath,
     env: {
       ...process.env,

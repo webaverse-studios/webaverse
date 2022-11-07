@@ -258,6 +258,7 @@ export class LightMapper /* extends EventTarget */ {
       })();
     }
   }
+
   /* drawChunk(chunk, {
     skylights,
     aos,

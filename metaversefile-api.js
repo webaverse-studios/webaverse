@@ -95,10 +95,12 @@ class App extends THREE.Object3D {
       performanceTracker.removeEventListener('startframe', startframe);
     });
   }
+
   getComponent(key) {
     const component = this.components.find(component => component.key === key);
     return component ? component.value : null;
   }
+
   #setComponentInternal(key, value) {
     let component = this.components.find(component => component.key === key);
     if (!component) {
@@ -113,6 +115,7 @@ class App extends THREE.Object3D {
       value,
     });
   }
+
   setComponent(key, value = true) {
     this.#setComponentInternal(key, value);
     this.dispatchEvent({
@@ -120,6 +123,7 @@ class App extends THREE.Object3D {
       keys: [key],
     });
   }
+
   setComponents(o) {
     const keys = Object.keys(o);
     for (const k of keys) {
@@ -131,9 +135,11 @@ class App extends THREE.Object3D {
       keys,
     });
   }
+
   hasComponent(key) {
     return this.components.some(component => component.key === key);
   }
+
   removeComponent(key) {
     const index = this.components.findIndex(component => component.key === key);
     if (index !== -1) {
@@ -145,51 +151,65 @@ class App extends THREE.Object3D {
       });
     }
   }
+
   get contentId() {
     const contentIdComponent = this.getComponent('contentId');
     return (contentIdComponent !== null) ? contentIdComponent : '';
   }
+
   set contentId(contentId) {
     this.setComponent('contentId', contentId + '');
   }
+
   get instanceId() {
     const instanceIdComponent = this.getComponent('instanceId');
     return (instanceIdComponent !== null) ? instanceIdComponent : '';
   }
+
   set instanceId(instanceId) {
     this.setComponent('instanceId', instanceId + '');
   }
+
   get paused() {
     return this.getComponent('paused') === true;
   }
+
   set paused(paused) {
     this.setComponent('paused', !!paused);
   }
+
   addModule(m) {
     throw new Error('method not bound');
   }
+
   updateModulesHash() {
     this.modulesHash = murmurhash3(this.modules.map(m => m.contentId).join(','));
   }
+
   getPhysicsObjects() {
     return this.physicsObjects;
   }
+
   addPhysicsObject(object) {
     this.physicsObjects.push(object);
   }
+
   removePhysicsObject(object) {
     const removeIndex = this.physicsObjects.indexOf(object);
     if (removeIndex !== -1) {
       this.physicsObjects.splice(removeIndex);
     }
   }
+
   setPhysicsObject(object) {
     this.physicsObjects.length = 0;
     this.physicsObjects.push(object);
   }
+
   hit(damage, opts) {
     this.hitTracker && this.hitTracker.hit(damage, opts);
   }
+
   getRenderSettings() {
     if (this.hasSubApps) {
       return renderSettingsManager.findRenderSettings(this);
@@ -197,6 +217,7 @@ class App extends THREE.Object3D {
       return null;
     }
   }
+
   activate({
     physicsId = -1,
   } = {}) {
@@ -205,20 +226,24 @@ class App extends THREE.Object3D {
       physicsId,
     });
   }
+
   wear() {
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.wear(this);
   }
+
   unwear() {
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.unwear(this);
   }
+
   use() {
     this.dispatchEvent({
       type: 'use',
       use: true,
     });
   }
+
   destroy() {
     this.dispatchEvent({
       type: 'destroy',
@@ -256,12 +281,12 @@ world.loreAIScene = loreAIScene;
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false };
+    this.state = {hasError: false};
   }
 
   static getDerivedStateFromError(error) {
     // Update state so the next render will show the fallback UI.
-    return { hasError: true };
+    return {hasError: true, error: error};
   }
 
   componentDidCatch(error, errorInfo) {
@@ -299,26 +324,26 @@ function createPointerEvents(store) {
   return {
     connected: false,
     handlers: (Object.keys(names).reduce(
-      (acc, key) => ({ ...acc, [key]: handlePointer(key) }),
+      (acc, key) => ({...acc, [key]: handlePointer(key)}),
       {},
     )),
     connect: (target) => {
-      const { set, events } = store.getState()
+      const {set, events} = store.getState()
       events.disconnect?.()
-      set((state) => ({ events: { ...state.events, connected: target } }))
+      set((state) => ({events: {...state.events, connected: target}}))
       Object.entries(events?.handlers ?? []).forEach(([name, event]) =>
-        target.addEventListener(names[name], event, { passive: true }),
+        target.addEventListener(names[name], event, {passive: true}),
       )
     },
     disconnect: () => {
-      const { set, events } = store.getState()
+      const {set, events} = store.getState()
       if (events.connected) {
         Object.entries(events.handlers ?? []).forEach(([name, event]) => {
           if (events && events.connected instanceof HTMLElement) {
             events.connected.removeEventListener(names[name], event)
           }
         })
-        set((state) => ({ events: { ...state.events, connected: false } }))
+        set((state) => ({events: {...state.events, connected: false}}))
       }
     },
   }
@@ -401,7 +426,7 @@ metaversefile.setApi({
         content = JSON.stringify(content);
       }
       const dataUrlPrefix = 'data:' + type + ',';
-      return dataUrlPrefix + encodeURIComponent(content) + '.data'; //.replace(/\\//g, '%2F');
+      return dataUrlPrefix + encodeURIComponent(content) + '.data'; // .replace(/\\//g, '%2F');
     }
 
     if (start_url) {
@@ -713,7 +738,7 @@ metaversefile.setApi({
         //   .decompose(localVector, localQuaternion, localVector2);
         // position = localVector;
         // quaternion = localQuaternion;
-        //size = localVector2;
+        // size = localVector2;
         
         const physicsObject = addCapsuleGeometry.call(this, position, quaternion, radius, halfHeight, physicsMaterial, dynamic, flags);
         // physicsObject.position.copy(app.position);
@@ -731,16 +756,16 @@ metaversefile.setApi({
 
         // const localPlayer = metaversefile.useLocalPlayer();
 
-        /*if(localPlayer.avatar) {
+        /* if(localPlayer.avatar) {
           if(localPlayer.avatar.height) {
             console.log(localPlayer.avatar.height);
           }
-        }*/
+        } */
         
         app.physicsObjects.push(physicsObject);
 
         // physicsManager.pushUpdate(app, physicsObject);
-        //physicsManager.setTransform(physicsObject);
+        // physicsManager.setTransform(physicsObject);
         return physicsObject;
       })(physicsScene.addCapsuleGeometry);
       /* physics.addSphereGeometry = (addSphereGeometry => function(position, quaternion, radius, physicsMaterial, ccdEnabled) {
