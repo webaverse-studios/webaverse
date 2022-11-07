@@ -1,4 +1,4 @@
-import { PropertyBinding, AnimationClip } from 'three';
+import {PropertyBinding, AnimationClip} from 'three';
 
 // Modified version of Don McCurdy's AnimationUtils.clone
 // https://github.com/mrdoob/three.js/pull/14494
@@ -17,7 +17,7 @@ function parallelTraverse(a, b, callback) {
 // uuid.objectName[objectIndex].propertyName[propertyIndex]
 // Does not support property bindings that use object3D names or parent nodes
 function cloneKeyframeTrack(sourceKeyframeTrack, cloneUUIDLookup) {
-  const { nodeName: uuid, objectName, objectIndex, propertyName, propertyIndex } = PropertyBinding.parseTrackName(
+  const {nodeName: uuid, objectName, objectIndex, propertyName, propertyIndex} = PropertyBinding.parseTrackName(
     sourceKeyframeTrack.name
   );
 

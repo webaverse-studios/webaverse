@@ -63,9 +63,11 @@ class NpcManager extends EventTarget {
   getAppByNpc(npc) {
     return this.npcAppMap.get(npc);
   }
+
   getNpcByApp(app) {
     return this.npcs.find(npc => this.getAppByNpc(npc) === app);
   }
+
   getDetachedNpcByApp(app) {
     return this.detachedNpcs.find(npc => this.getAppByNpc(npc) === app);
   }
@@ -137,6 +139,7 @@ class NpcManager extends EventTarget {
       });
     }
   }
+
   removeNpcApp(app) {
     const fn = cancelFnsMap.get(app);
     if (fn) {
@@ -154,6 +157,7 @@ class NpcManager extends EventTarget {
       }
     }
   }
+
   updateAvatar(timestamp, timeDiff) {
     const allNpcs = [].concat(this.npcs, this.detachedNpcs);
     for (const npc of allNpcs) {
@@ -167,6 +171,7 @@ class NpcManager extends EventTarget {
   setPartyTarget(player, target) {
     this.targetMap.set(player, target);
   }
+
   #getPartyTarget(player) {
     return this.targetMap.get(player);
   }

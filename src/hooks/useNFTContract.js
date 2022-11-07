@@ -162,7 +162,7 @@ export default function useNFTContract(currentAccount) {
     }
   }
 
-  async function mintfromVoucher(app, callback = () => {}, afterminting = f => f) { //server drop
+  async function mintfromVoucher(app, callback = () => {}, afterminting = f => f) { // server drop
     setMinting(true);
     setError('');
     if(app.type !== "major") {  // app.type === "major"

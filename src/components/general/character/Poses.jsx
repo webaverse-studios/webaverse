@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, {useState, useRef} from 'react';
 import classnames from 'classnames';
 
 import {setFacePoseValue} from './Emotions';
@@ -40,7 +40,7 @@ export const Poses = ({
             ref={posesRef}
         >
             {emotes.map((emote, emoteIndex) => {
-                const { name, icon } = emote;
+                const {name, icon} = emote;
                 return (
                     <div
                         className={styles.pose}

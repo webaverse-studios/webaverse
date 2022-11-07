@@ -9,6 +9,7 @@ class OffscreenEngineProxy {
 
     this.loadPromise = null;
   }
+
   async waitForLoad() {
     if (!this.loadPromise) {
       this.loadPromise = (async () => {
@@ -67,6 +68,7 @@ class OffscreenEngineProxy {
     this.port = port;
     return port;
   }
+
   async request(funcName, args = [], {
     signal = null,
   } = {}) {
@@ -126,6 +128,7 @@ class OffscreenEngineProxy {
     });
     return result;
   }
+
   destroy() {
     // this.live = false;
     

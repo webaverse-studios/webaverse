@@ -30,6 +30,7 @@ export class CharacterHitter {
 
     this.lastHitTime = -Infinity;
   }
+
   attemptHit({
     type,
     args,
@@ -142,6 +143,7 @@ export class CharacterHitter {
       }
     }
   }
+
   getHit(damage) {
     const newAction = {
       type: 'hurt',
@@ -204,6 +206,7 @@ export class CharacterHitter {
       this.character.removeActionIndex(faceposeActionIndex);
     }, 1000);
   }
+
   update() {
     // nothing
   }

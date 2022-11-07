@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import React from 'react';
 
 // import {sceneLowerPriority} from './renderer.js';
 import easing from './easing.js';
@@ -67,6 +68,7 @@ class DomItem extends THREE.Object3D {
     physicsScene.disableGeometryQueries(physicsObject);
     this.physicsObject = physicsObject;
   }
+
   startAnimation(enabled, startTime, endTime) {
     this.enabled = enabled;
     
@@ -79,6 +81,7 @@ class DomItem extends THREE.Object3D {
       endValue,
     };
   }
+
   update(timestamp) {
     if (this.animation) {
       const {startTime, endTime, startValue, endValue} = this.animation;
@@ -118,6 +121,7 @@ class DomItem extends THREE.Object3D {
       // this.visible = false;
     }
   }
+
   onBeforeRaycast() {
     if (this.enabled) {
       const physicsScene = physicsManager.getScene();
@@ -125,6 +129,7 @@ class DomItem extends THREE.Object3D {
       physicsScene.enableGeometryQueries(this.physicsObject);
     }
   }
+
   onAfterRaycast() {
     if (this.enabled) {
       const physicsScene = physicsManager.getScene();
@@ -132,6 +137,7 @@ class DomItem extends THREE.Object3D {
       physicsScene.disableGeometryQueries(this.physicsObject);
     }
   }
+
   destroy() {
     const physicsScene = physicsManager.getScene();
     physicsScene.enableActor(this.physicsObject);
@@ -232,9 +238,11 @@ export class DomRenderEngine extends EventTarget {
     this.physicsObjects = [];
     this.lastHover = false;
   }
+
   static getScaleFactor(width, height) {
     return Math.min(1/width, 1/height);
   }
+
   addDom({
     position = new THREE.Vector3(),
     quaternion = new THREE.Quaternion(),
@@ -254,6 +262,7 @@ export class DomRenderEngine extends EventTarget {
 
     return dom;
   }
+
   removeDom(dom) {
     const index = this.doms.indexOf(dom);
     if (index !== -1) {
@@ -261,6 +270,7 @@ export class DomRenderEngine extends EventTarget {
       this.physicsObjects.splice(index, 1);
     }
   }
+
   /* update() {
     const hover = this.doms.some(dom => {
       return false;
@@ -278,16 +288,19 @@ export class DomRenderEngine extends EventTarget {
   getPhysicsObjects() {
     return this.physicsObjects;
   }
+
   onBeforeRaycast() {
     for (const dom of this.doms) {
       dom.onBeforeRaycast();
     }
   }
+
   onAfterRaycast() {
     for (const dom of this.doms) {
       dom.onAfterRaycast();
     }
   }
+
   destroy() {
     // XXX finish this
   }

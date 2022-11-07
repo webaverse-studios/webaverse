@@ -39,7 +39,6 @@ import * as voices from './voices.js';
 import performanceTracker from './performance-tracker.js';
 import renderSettingsManager from './rendersettings-manager.js';
 import metaversefileApi from 'metaversefile';
-import WebaWallet from './src/components/wallet.js';
 // import domRenderEngine from './dom-renderer.jsx';
 import musicManager from './music-manager.js';
 import story from './story.js';
@@ -96,7 +95,6 @@ export default class Webaverse extends EventTarget {
         backgroundFx.waitForLoad(),
         voices.waitForLoad(),
         musicManager.waitForLoad(),
-        WebaWallet.waitForLoad(),
       ]);
     })();
     this.contentLoaded = false;
@@ -109,15 +107,19 @@ export default class Webaverse extends EventTarget {
   getRenderer() {
     return getRenderer();
   }
+
   getScene() {
     return scene;
   }
+
   getSceneHighPriority() {
     return sceneHighPriority;
   }
+
   getSceneLowPriority() {
     return sceneLowPriority;
   }
+
   getCamera() {
     return camera;
   }
@@ -125,17 +127,21 @@ export default class Webaverse extends EventTarget {
   setContentLoaded() {
     this.contentLoaded = true;
   }
+
   bindInput() {
     ioManager.bindInput();
   }
+
   bindInterface() {
     ioManager.bindInterface();
     // blockchain.bindInterface();
   }
+
   bindCanvas(c) {
     bindCanvas(c);
     postProcessing.bindCanvas();
   }
+
   async isXrSupported() {
     if (navigator.xr) {
       let ok = false;
@@ -149,6 +155,7 @@ export default class Webaverse extends EventTarget {
       return false;
     }
   }
+
   async enterXr() {
     const renderer = getRenderer();
     const session = renderer.xr.getSession();
@@ -356,7 +363,7 @@ export default class Webaverse extends EventTarget {
 
           const session = renderer.xr.getSession();
           const xrCamera = session ? renderer.xr.getCamera(camera) : camera;
-          localMatrix.multiplyMatrices(xrCamera.projectionMatrix, /*localMatrix2.multiplyMatrices(*/xrCamera.matrixWorldInverse/*, physx.worldContainer.matrixWorld)*/);
+          localMatrix.multiplyMatrices(xrCamera.projectionMatrix, /* localMatrix2.multiplyMatrices( */xrCamera.matrixWorldInverse/*, physx.worldContainer.matrixWorld) */);
           localMatrix2.copy(xrCamera.matrix)
             .premultiply(camera.matrix)
             .decompose(localVector, localQuaternion, localVector2);

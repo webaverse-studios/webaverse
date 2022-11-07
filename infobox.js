@@ -253,6 +253,7 @@ class InfoboxRenderer {
     this.selectFactor = +selected;
     this.needsUpdate = false;
   }
+
   addCanvas(canvas) {
     const ctx = canvas.getContext('2d');
     canvas.ctx = ctx;
@@ -260,10 +261,12 @@ class InfoboxRenderer {
     this.canvases.push(canvas);
     this.needsUpdate = true;
   }
+
   removeCanvas(canvas) {
     this.canvases.splice(this.canvases.indexOf(canvas), 1);
     this.needsUpdate = true;
   }
+
   setSpritesheet(spritesheet) {
     if (spritesheet) {
       const {
@@ -291,6 +294,7 @@ class InfoboxRenderer {
       this.scene.fullScreenQuadMesh.material.uniforms.numFramesPerRow.needsUpdate = true; */
     }
   }
+
   update(timestamp, timeDiff) {
     const renderer = getRenderer();
     const size = renderer.getSize(localVector2D);

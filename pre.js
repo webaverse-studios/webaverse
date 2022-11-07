@@ -1,4 +1,13 @@
-window.global = window.globalThis;
+// window.global = window.globalThis;
+// console.log('eliding global set');
+/* Object.defineProperty(window, 'global', {
+  get() {
+    debugger;
+  },
+  set(o) {
+    debugger;
+  },
+}); */
 
 window.logNum = function(n) {
   const nStr = n.toFixed(2);

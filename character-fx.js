@@ -11,8 +11,8 @@ const localVector2 = new THREE.Vector3();
 const localVector3 = new THREE.Vector3();
 
 const _makeKiHairMaterial = () => {
-  let wVertex = THREE.ShaderLib["standard"].vertexShader;
-  let wFragment = THREE.ShaderLib["standard"].fragmentShader;
+  let wVertex = THREE.ShaderLib.standard.vertexShader;
+  let wFragment = THREE.ShaderLib.standard.fragmentShader;
   // let wUniforms = THREE.UniformsUtils.clone(THREE.ShaderLib["standard"].uniforms);
   let wUniforms = {
     iTime: {
@@ -98,6 +98,7 @@ export class AvatarCharacterFx {
     this.hairMeshes = null;
     this.lastSSS = false;
   }
+
   update(timestamp, timeDiffS) {
     if (!this.character.avatar) {
       return;
@@ -286,6 +287,7 @@ export class AvatarCharacterFx {
     };
     _updateHealEffectMesh();
   }
+
   destroy() {
     if (this.kiMesh) {
       sceneLowPriority.remove(this.kiMesh);

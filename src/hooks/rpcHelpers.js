@@ -1,3 +1,4 @@
+import {CHAINS, CHAIN_ID_MAP} from './web3-constants';
 const RPC_METHODS = {
   SWITCH_CHAIN: 'wallet_switchEthereumChain',
   ADD_CHAIN: 'wallet_addEthereumChain',
@@ -14,7 +15,6 @@ const RPC_METHODS = {
   SIGN: 'eth_signTransaction',
   CHAIN_ID: 'eth_chainId',
 };
-import {CHAINS, CHAIN_ID_MAP} from './web3-constants';
 
 export async function connectToNetwork({
   chainName = '',

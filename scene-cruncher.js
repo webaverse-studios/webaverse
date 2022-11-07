@@ -318,7 +318,7 @@ const _makeGeometry = (position, quaternion, worldSize, worldDepthResolution, de
   geometry2.setIndex(new THREE.BufferAttribute(faces, 1));
   geometry2.computeVertexNormals();
 
-  return [geometry2/*, cubePositions*/];
+  return [geometry2/*, cubePositions */];
 };
 // const normalMaterial = new THREE.MeshNormalMaterial();
 const baseMaterial = new THREE.MeshBasicMaterial({

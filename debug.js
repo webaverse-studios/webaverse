@@ -3,6 +3,7 @@ class Debug extends EventTarget {
     super();
     this.enabled = false;
   }
+
   toggle(enabled) {
     if (enabled === undefined) {
       enabled = !this.enabled;

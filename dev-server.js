@@ -100,7 +100,7 @@ const _proxyFile = (req, res, u) => {
 
     _setHeaders(res);
 
-    if (req.headers['host'] === COMPILER_NAME) {
+    if (req.headers.host === COMPILER_NAME) {
       const u = `http://localhost:${COMPILER_PORT}${req.url}`;
       _proxyUrl(req, res, u);
     } else if (serveDirectories.some(d => req.url.startsWith(d))) {
