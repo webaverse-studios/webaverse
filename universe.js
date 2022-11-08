@@ -37,6 +37,7 @@ class Universe extends EventTarget {
   }
 
   async enterWorld(worldSpec) {
+    this.disconnectMultiplayer();
     this.disconnectRoom();
     
     const localPlayer = metaversefile.useLocalPlayer();
@@ -57,15 +58,17 @@ class Universe extends EventTarget {
 
       const promises = [];
       const {src, room} = worldSpec;
-      if (!room) {
+      if (!this.multiplayerEnabled && !room) {
         const state = new Z.Doc();
         this.connectState(state);
-        
+
         let match;
         if (src === undefined) {
           const sceneNames = await sceneManager.getSceneNamesAsync();
+          const sceneUrl = sceneManager.getSceneUrl(sceneNames[0]);
+          worldSpec = { src: sceneUrl };
           promises.push(metaversefile.createAppAsync({
-            start_url: sceneManager.getSceneUrl(sceneNames[0]),
+            start_url: sceneUrl,
           }));
         } else if (src === '') {
           // nothing
@@ -80,6 +83,11 @@ class Universe extends EventTarget {
           });
           promises.push(p);
         }
+      } else if (this.multiplayerEnabled) {
+        const p = (async () => {
+          await this.connectMultiplayer(src);
+        })();
+        promises.push(p);
       } else {
         const p = (async () => {
           const roomUrl = this.getWorldsHost() + room;
@@ -121,14 +129,7 @@ class Universe extends EventTarget {
 
   toggleMultiplayer() {
     this.multiplayerEnabled = !this.multiplayerEnabled;
-    if (this.multiplayerEnabled && this.realms === null) {
-      if (this.realms === null) {
-        const playerId = "0123456789";
-        this.realms = new NetworkRealms(playerId);
-      }
-    }
-
-    // TODO: Disconnect from and dispose of realms when disable multiplayer.
+    this.reload();
   }
 
   isSceneLoaded() {
@@ -174,6 +175,25 @@ class Universe extends EventTarget {
 
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.bindState(state.getArray(playersMapName));
+  }
+
+    // Called by enterWorld() when a player enables multi-player.
+  async connectMultiplayer(src, state = new Z.Doc()) {
+    this.connectState(state);
+    // Set up the network realms.
+    const localPlayer = playersManager.getLocalPlayer();
+    this.realms = new NetworkRealms(localPlayer.playerId);
+
+    // Load the scene.
+    await metaversefile.createAppAsync({
+      start_url: src,
+    });
+  }
+
+  // Called by enterWorld() to ensure we aren't connected to multi-player.
+  disconnectMultiplayer() {
+    // TODO: Disconnect from and dispose of realms.
+    this.realms = null;
   }
 
   // called by enterWorld() in universe.js
