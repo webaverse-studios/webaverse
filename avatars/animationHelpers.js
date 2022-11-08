@@ -43,7 +43,7 @@ let animationStepIndices;
 // let animationsBaseModel;
 
 const UseAnimationIndexes = {};
-const EmoteAnimationIndexes = {};
+// const EmoteAnimationIndexes = {};
 const SitAnimationIndexes = {};
 const DanceAnimationIndexes = {};
 const ActivateAnimationIndexes = {};
@@ -326,9 +326,9 @@ export const initAnimationSystem = () => {
 
   // EmoteAnimationIndexes
   const emoteAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'emote')[0];
-  emoteAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-    EmoteAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-  });
+  // emoteAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+  //   EmoteAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+  // });
 
   // SitAnimationIndexes
   const sitAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'sit')[0];
@@ -355,7 +355,7 @@ export const initAnimationSystem = () => {
     HurtAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
   });
 
-  // EmoteAnimationIndexes
+  // AimAnimationIndexes
   const aimAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'aim')[0];
   aimAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
     AimAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
@@ -543,7 +543,7 @@ export const _updateAnimation = (avatar, now, timeDiff) => {
       // aimMaxTime,
       // avatar.pickUpTime,
       UseAnimationIndexes[avatar.useAnimation] ?? -1,
-      EmoteAnimationIndexes[avatar.emoteAnimation] ?? -1,
+      // EmoteAnimationIndexes[avatar.emoteAnimation] ?? -1,
       SitAnimationIndexes[avatar.sitAnimation] ?? -1,
       DanceAnimationIndexes[avatar.danceAnimation] ?? -1,
       ActivateAnimationIndexes[avatar.activateAnimation] ?? -1,
