@@ -464,14 +464,114 @@ class Mob {
   }
 }
 
+/*
+  Action to be attached to AI controlled entities
+  durationFrames: action duration
+  actionMethod: action to be performed
+  actionMethodTick: if true the action method will be called every frame of the action
+*/
+class ActionComponent {
+  constructor(
+    durationFrames = 30,
+    actionMethod = (mob, frameId)=>{},
+    actionMethodTick = false) {
+    this.hasAnimations = animationId !== undefined;
+    this.animationId = animationId;
+    this.Do = actionMethod;
+    this.durationFrames = durationFrames;
+    this.actionMethodTick = actionMethodTick;
+    this.currentFrame = 0;
+    this.started = false;
+  }
+
+  /*
+    get the promise called when the action finishes
+  */
+  getActionFinishPromise(){
+    return new Promise((resolve) => {
+      this.resolvePromise = resolve;
+    });
+  }
+
+  /*
+    starts the action, return the promise called at the end of the action
+  */
+  start(mob){
+    this.currentMob = mob;
+    this.started = true;
+    this.Do(mob, this.currentFrame);
+    return this.resolvePromise ?? this.getActionFinishPromise();
+  }
+
+  /*
+    return true if the action is currently running, false if the action is not yet started
+  */
+  isRunning(){
+    return this.started;
+  }
+
+  /*
+    called every frame
+  */
+  tick(){
+    if(!this.started)
+      return;
+
+    this.currentFrame++;
+
+    if(this.actionMethodTick && this.currentMob){
+      this.Do(this.currentMob, this.currentFrame);
+    }
+
+    if(this.currentFrame == this.durationFrames){
+      if(this.resolvePromise)
+        this.resolvePromise();
+
+      this.stop();
+    }
+  }
+
+  /*
+    stops the action and rewinds it back at the beginning
+  */
+  stop(){
+    this.currentFrame = 0;
+    this.currentMob = undefined;
+    this.started = false;
+    this.resolvePromise = undefined;
+  }
+}
+
+/*
+  default class for simple idle animation play
+*/
+class DefaultIdleAction extends ActionComponent {
+  constructor(durationFrames){
+    const actionMethod = (mob, frameId)=>{
+      mob.playAnimation('idle');
+    }
+    super(durationFrames, actionMethod, false);
+  }
+}
+
+/*
+  class for mob instances. integrate the action system, performing actions through action components
+  pos: mob position
+  quat: mob orientation
+  geometryIndex: geometry to use
+  radius: for physics collision
+  height: for physics collision
+  velocity: mob walking speed
+  idleAction: action to repeatedly perform when no other action are provided
+*/
 export class MobInstance {
-  constructor(pos, quat, geometryIndex, timeOffset, radius, height) {
+  constructor(pos, quat, geometryIndex, timeOffset, radius, height, velocity, idleAction) {
+    this.actions = [];
     this.position = new Vector3().fromArray(pos);
     this.quaternion = new Quaternion().fromArray(quat);
     this.geometryIndex = geometryIndex;
     this.timeOffset = timeOffset;
     this.animations = animationKeys[this.geometryIndex]
-    this.currentAnimation = this.animations.get('idle');
     this.updatePosition = true;
     this.updateRotation = true;
     this.updateTimeOffset = true;
@@ -480,7 +580,7 @@ export class MobInstance {
     this.easing = 16;
     this.lookAtTarget = new Vector3(1, 0, 0);
     this.locationTarget = new Vector3().copy(this.position);
-    this.velocity = 5;
+    this.velocity = velocity;
     this.grounded = false;
     this.controller = physicsManager.getScene().createCharacterController(
       radius,
@@ -489,28 +589,90 @@ export class MobInstance {
       height*0.05,
       this.position
     );
+    this.movement = new Vector3(0, 0, 0);
     this.controller.position.copy(this.position);
     this.controller.applyQuaternion(this.quaternion);
+    this.fallTime = 0;
     physicsManager.getScene().setTransform(this.controller, true);
+    this.idleAction = idleAction ??
+    new DefaultIdleAction(this.animations.get('idle').frameCount);
   }
 
-  lookAt(t){
+  /*
+    turn mob towards t versor with an ease out profile animation
+  */
+  animatedLookAt(t){
     const p = this.position;
     this.lookAtTarget = new Vector3(t.x - p.x, 0/* t.y - p.y */, t.z - p.z);
     this.rotationInterpolation = 0;
   }
 
-  update(playerLocation, timeDiff){
-    if(debugAnimation){
-      this.debugAnimation(playerLocation, timeDiff);
-      return;
+  /*
+    walk mob for one frame towards a direction;
+  */
+  walk(walkVersor){
+    this.playAnimation('walk');
+    this.movement.add(walkVersor.normalize().multiplyScalar(this.velocity));
+  }
+
+  /*
+    action management routine, it will play action in a blocking way (for the moment).
+    after each action is finised it will pop it out of the action queue
+  */
+  manageActions(){
+    if(this.actions.length == 0){
+      this.actions.push(this.idleAction);
+    }
+
+    const currentAction = this.actions[0];
+    if(currentAction.isRunning()){
+      currentAction.tick();
+    } else{
+      currentAction.start(this).then(()=>{
+        this.actions.shift();
+      });
     }
   }
 
-  moveMob(movementVector, timeDiffS){
+  /*
+    called every frame
+  */
+  update(playerLocation, timeDiff){
+    const timeDiffS = timeDiff / 1000;
+    this.manageActions();
+    if(!this.grounded){
+      //15 seconds it reach terminal velocity in air
+      this.fallTime = this.fallTime >= 15 ? this.fallTime : this.fallTime + timeDiffS;
+      const gravity = physicsManager.getScene().getGravity().clone();
+      //this.movement.add(gravity);
+      this.movement.add(gravity.multiplyScalar(this.fallTime * this.fallTime));
+    }
+    else{
+      this.fallTime = 0;
+    }
+
+    if(false){
+      this.movement.add(this.debugAnimation(playerLocation, timeDiff));
+    }
+
+    // manage Rotation
+    if(this.rotationInterpolation < 1){
+      this.rotationInterpolation += (1-this.rotationInterpolation) / this.easing;
+      this.rotationInterpolation.toFixed(2);
+      this.quaternion.slerp(lookAtQuaternion(this.lookAtTarget), this.rotationInterpolation);
+      this.updateRotation = true;
+    }
+    //manage position
+    this.moveMobInternal(timeDiffS);
+  }
+
+  /*
+    mixes up gravity movement with action movements
+  */
+  moveMobInternal(timeDiffS){
     const flags = physicsManager.getScene().moveCharacterController(
       this.controller,
-      movementVector.multiplyScalar(this.velocity * timeDiffS),
+      this.movement.multiplyScalar(timeDiffS),
       0,
       timeDiffS,
       this.controller.position
@@ -520,6 +682,20 @@ export class MobInstance {
     if(this.controller.position.distanceTo(this.position) > 0.01 ){
       this.position.copy(this.controller.position);
       this.updatePosition = true;
+    }
+    this.movement.setLength(0);
+  }
+
+  /*
+    plays the animationName animation. If the animationName is not among the available animations returns
+  */
+  playAnimation(animationName){
+    if(!this.animations.has(animationName))
+      return;
+    const animId = this.animations.get(animationName).id;
+    if(this.currentAnimation != animId){
+      this.currentAnimation = this.animations.get(animationName).id;
+      this.updateAnimation = true;
     }
   }
 
@@ -533,43 +709,30 @@ export class MobInstance {
     const walkID         = this.animations.get('walk');
     const idleID         = this.animations.get('idle');
     const movement       = new Vector3(0, 0, 0);
-    const timeDiffS      = timeDiff / 1000;
-    if(!this.grounded)
-        movement.copy(physicsManager.getScene().getGravity());
     // player is in sight
     if(playerDistance < 8){
-
+      this.animatedLookAt(playerLocation);
       if(playerDistance > 4){
         // update position
         this.locationTarget =
-          playerLocation.clone()
-          .add(
-          selfToPlayer.clone()
-          .negate()
-          .normalize()
-          .multiplyScalar(3));
-      }
-      else if(this.currentAnimation == idleID){ // attack the player
+          playerLocation.clone().add(
+            selfToPlayer.clone().negate().normalize().multiplyScalar(3)
+          );
+      } else if(this.currentAnimation == idleID) { // attack the player
         if(attackID !== undefined && this.currentAnimation != attackID){
-          this.currentAnimation = attackID;
-          this.updateAnimation = true;
+          playAnimation('attack');
         }
       }
-
-      this.lookAt(playerLocation);
-      
     }
     else if(this.currentAnimation != idleID){
       this.locationTarget.copy(this.position);
-      this.currentAnimation = idleID;
-      this.updateAnimation = true;
+      playAnimation('idle');
     }
 
     // manage Position
     if(this.locationTarget.clone().sub(this.position).length() > 0.5){
       if(this.currentAnimation != walkID){
-        this.currentAnimation = walkID;
-        this.updateAnimation = true;
+        this.playAnimation('walk');
       }
 
       const t = this.locationTarget.clone().sub(this.position).normalize();
@@ -577,19 +740,10 @@ export class MobInstance {
     }
     else{
       if(this.currentAnimation == walkID){
-        this.currentAnimation = idleID;
-        this.updateAnimation = true;
+        playAnimation('idle');
       }
     }
-
-    // manage Rotation
-    if(this.rotationInterpolation < 1){
-      this.rotationInterpolation += (1-this.rotationInterpolation) / this.easing;
-      this.rotationInterpolation.toFixed(2);
-      this.quaternion.slerp(lookAtQuaternion(this.lookAtTarget), this.rotationInterpolation);
-      this.updateRotation = true;
-    }
-    this.moveMob(movement, timeDiffS);
+    return movement;
   }
 }
 
@@ -1106,8 +1260,8 @@ void main() {
       for(let j = 0; j < maxAnimationPerGeometry/* animations.length */; j++){
         if(j >= animations.length) break;
         const clip = animations[j];
-        animKeys.set(clip.name, j);
         const frameCount = Math.floor(clip.duration * bakeFps);
+        animKeys.set(clip.name, {id: j, frameCount: frameCount});
         const drawCall = this.getDrawCall(i);
         const offset = drawCall.getTextureOffset('animationsFrameInfo');
         const padding = this.allocator.getTextureBytePadding();
