@@ -893,7 +893,7 @@ class Avatar {
     this.walkRunFactor = NaN;
     // this.crouchFactor = NaN;
     this.sitState = false;
-    this.sitAnimation = null;
+    // this.sitAnimation = null;
     // this.activateState = false;
     this.activateTime = 0;
     this.holdState = false;
@@ -901,7 +901,7 @@ class Avatar {
     // this.pickUpTime = 0;
     // this.danceState = false;
     // this.danceFactor = 0;
-    this.danceAnimation = null;
+    // this.danceAnimation = null;
     // this.emoteFactor = 0;
     this.emoteAnimation = null;
     this.poseFactor = 0;
@@ -933,11 +933,11 @@ class Avatar {
     // this.swordTopDownSlashState = false;
     // this.swordTopDownSlashTime = 0;
     // this.aimTime = NaN;
-    this.aimAnimation = null;
+    // this.aimAnimation = null;
     // this.aimDirection = new THREE.Vector3();
     // this.hurtTime = NaN;
-    this.hurtAnimation = null;
-    this.activateAnimation = null;
+    // this.hurtAnimation = null;
+    // this.activateAnimation = null;
 
     // internal state
     // this.movementsTime = 0;

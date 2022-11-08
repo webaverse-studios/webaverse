@@ -44,11 +44,11 @@ let animationStepIndices;
 
 const UseAnimationIndexes = {};
 // const EmoteAnimationIndexes = {};
-const SitAnimationIndexes = {};
-const DanceAnimationIndexes = {};
-const ActivateAnimationIndexes = {};
-const HurtAnimationIndexes = {};
-const AimAnimationIndexes = {};
+// const SitAnimationIndexes = {};
+// const DanceAnimationIndexes = {};
+// const ActivateAnimationIndexes = {};
+// const HurtAnimationIndexes = {};
+// const AimAnimationIndexes = {};
 
 const emoteAnimations = {};
 
@@ -330,36 +330,36 @@ export const initAnimationSystem = () => {
   //   EmoteAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
   // });
 
-  // SitAnimationIndexes
-  const sitAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'sit')[0];
-  sitAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-    SitAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-  });
-  // console.log('SitAnimationIndexes', SitAnimationIndexes)
+  // // SitAnimationIndexes
+  // const sitAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'sit')[0];
+  // sitAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+  //   SitAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+  // });
+  // // console.log('SitAnimationIndexes', SitAnimationIndexes)
 
-  // DanceAnimationIndexes
-  const danceAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'dance')[0];
-  danceAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-    DanceAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-  });
+  // // DanceAnimationIndexes
+  // const danceAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'dance')[0];
+  // danceAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+  //   DanceAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+  // });
 
-  // ActivateAnimationIndexes
-  const activateAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'activate')[0];
-  activateAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-    ActivateAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-  });
+  // // ActivateAnimationIndexes
+  // const activateAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'activate')[0];
+  // activateAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+  //   ActivateAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+  // });
 
-  // HurtAnimationIndexes
-  const hurtAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'hurt')[0];
-  hurtAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-    HurtAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-  });
+  // // HurtAnimationIndexes
+  // const hurtAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'hurt')[0];
+  // hurtAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+  //   HurtAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+  // });
 
-  // AimAnimationIndexes
-  const aimAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'aim')[0];
-  aimAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
-    AimAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
-  });
+  // // AimAnimationIndexes
+  // const aimAnimationGroupDeclaration = animationGroupDeclarations.filter(n => n.name === 'aim')[0];
+  // aimAnimationGroupDeclaration.animations.forEach(animationDeclaration => {
+  //   AimAnimationIndexes[animationDeclaration.keyName] = animationDeclaration.index;
+  // });
 
   // ---
 
@@ -544,13 +544,13 @@ export const _updateAnimation = (avatar, now, timeDiff) => {
       // avatar.pickUpTime,
       UseAnimationIndexes[avatar.useAnimation] ?? -1,
       // EmoteAnimationIndexes[avatar.emoteAnimation] ?? -1,
-      SitAnimationIndexes[avatar.sitAnimation] ?? -1,
-      DanceAnimationIndexes[avatar.danceAnimation] ?? -1,
-      ActivateAnimationIndexes[avatar.activateAnimation] ?? -1,
-      HurtAnimationIndexes[avatar.hurtAnimation] ?? -1,
+      // SitAnimationIndexes[avatar.sitAnimation] ?? -1,
+      // DanceAnimationIndexes[avatar.danceAnimation] ?? -1,
+      // ActivateAnimationIndexes[avatar.activateAnimation] ?? -1,
+      // HurtAnimationIndexes[avatar.hurtAnimation] ?? -1,
       UseAnimationIndexes[useAnimationComboName] ?? -1,
       UseAnimationIndexes[avatar.unuseAnimation] ?? -1,
-      AimAnimationIndexes[avatar.aimAnimation] ?? -1,
+      // AimAnimationIndexes[avatar.aimAnimation] ?? -1,
       avatar.fallLoopFromJump,
       landTimeS,
       timeSinceLastMoveS,
@@ -561,6 +561,8 @@ export const _updateAnimation = (avatar, now, timeDiff) => {
     physx.physxWorker.updateAnimationAvatar(avatar.animationAvatarPtr, values, timeDiff);
   };
   updateValues();
+
+  // console.log(AimAnimationIndexes[avatar.aimAnimation] ?? -1)
 
   // console.log(avatar.useAnimation)
 
