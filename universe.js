@@ -5,6 +5,7 @@ responsibilities include loading the world on url change.
 
 // import * as THREE from 'three';
 import metaversefile from 'metaversefile';
+import {NetworkRealms} from 'multiplayer-do/public/network-realms.mjs';
 import WSRTC from 'wsrtc/wsrtc.js';
 import * as Z from 'zjs';
 
@@ -27,6 +28,7 @@ class Universe extends EventTarget {
     this.sceneLoadedPromise = null;
 
     this.multiplayerEnabled = false;
+    this.realms = null;
   }
 
   getWorldsHost() {
@@ -119,6 +121,14 @@ class Universe extends EventTarget {
 
   toggleMultiplayer() {
     this.multiplayerEnabled = !this.multiplayerEnabled;
+    if (this.multiplayerEnabled && this.realms === null) {
+      if (this.realms === null) {
+        const playerId = "0123456789";
+        this.realms = new NetworkRealms(playerId);
+      }
+    }
+
+    // TODO: Disconnect from and dispose of realms when disable multiplayer.
   }
 
   isSceneLoaded() {
