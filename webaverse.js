@@ -124,15 +124,6 @@ export default class Webaverse extends EventTarget {
     this.contentLoaded = true;
   }
 
-  bindInput() {
-    ioManager.bindInput();
-  }
-
-  bindInterface() {
-    ioManager.bindInterface();
-    // blockchain.bindInterface();
-  }
-
   bindCanvas(c) {
     bindCanvas(c);
     postProcessing.bindCanvas();
