@@ -6,11 +6,12 @@ import physicsManager from './physics-manager.js';
 import hpManager from './hp-manager.js';
 // import {LodChunkTracker} from './lod.js';
 import {alea} from './procgen/procgen.js';
-import {createRelativeUrl} from './util.js';
+import {createRelativeUrl, lookAtQuaternion} from './util.js';
 import dropManager from './drop-manager.js';
 import loaders from './loaders.js';
 import {InstancedBatchedMesh, InstancedGeometryAllocator} from './geometry-batching.js';
 import {createTextureAtlas} from './atlasing.js';
+import {Matrix4,Quaternion,Vector3,Euler} from 'three';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -32,15 +33,19 @@ const hitDistance = 1.5;
 const maxAnisotropy = 16;
 
 let numGeometries = 8;
+const maxNumGeometries = 32;
+const maxAnimationPerGeometry = 8;
 const maxInstancesPerDrawCall = 128;
 const maxDrawCallsPerGeometry = 1;
 const maxBonesPerInstance = 128;
+const maxFrameCountPerAnimation = 512;
 
 const bakeFps = 24;
 const maxAnimationFrameLength = 512;
 
 let unifiedBoneTextureSize = 1024;
-
+const animationKeys = [];
+const debugAnimation = false;
 // window.THREE = THREE;
 
 const _zeroY = v => {
@@ -97,7 +102,7 @@ function makeCharacterController(app, {
         .applyQuaternion(localQuaternion)
     );
 
-  const characterController = physicsManager.createCharacterController(
+  const characterController = physicsManager.getScene().createCharacterController(
     radius - contactOffset,
     innerHeight,
     contactOffset,
@@ -356,7 +361,7 @@ class Mob {
 
                 // const collided = flags !== 0;
                 let grounded = !!(flags & 0x1);
-                if (!grounded) {                  
+                if (!grounded) {
                   velocity.add(
                     localVector.copy(physicsManager.getGravity())
                       .multiplyScalar(timeDiffS)
@@ -460,8 +465,132 @@ class Mob {
   }
 }
 
-class MobInstance {
-  constructor() {
+export class MobInstance {
+  constructor(pos, quat, geometryIndex, timeOffset, radius, height) {
+    this.position = new Vector3().fromArray(pos);
+    this.quaternion = new Quaternion().fromArray(quat);
+    this.geometryIndex = geometryIndex;
+    this.timeOffset = timeOffset;
+    this.animations = animationKeys[this.geometryIndex]
+    this.currentAnimation = this.animations.get('idle');
+    this.updatePosition = true;
+    this.updateRotation = true;
+    this.updateTimeOffset = true;
+    this.updateAnimation = true;
+    this.rotationInterpolation = 1;
+    this.easing = 16;
+    this.lookAtTarget = new Vector3(1, 0, 0);
+    this.locationTarget = new Vector3().copy(this.position);
+    this.velocity = 5;
+    this.grounded = false;
+    this.controller = physicsManager.getScene().createCharacterController(
+      radius,
+      height,
+      height*0.05,
+      height*0.05,
+      this.position
+    );
+    this.controller.position.copy(this.position);
+    this.controller.applyQuaternion(this.quaternion);
+    physicsManager.getScene().setTransform(this.controller, true);
+  }
+
+  lookAt(t){
+    const p = this.position;
+    this.lookAtTarget = new Vector3(t.x - p.x, 0/* t.y - p.y */, t.z - p.z);
+    this.rotationInterpolation = 0;
+  }
+
+  update(playerLocation, timeDiff){
+    if(debugAnimation){
+      this.debugAnimation(playerLocation, timeDiff);
+      return;
+    }
+  }
+
+  moveMob(movementVector, timeDiffS){
+    const flags = physicsManager.getScene().moveCharacterController(
+      this.controller,
+      movementVector.multiplyScalar(this.velocity * timeDiffS),
+      0,
+      timeDiffS,
+      this.controller.position
+    );
+    // const collided = flags !== 0;
+    this.grounded = !!(flags & 0x1);
+    if(this.controller.position.distanceTo(this.position) > 0.01 ){
+      this.position.copy(this.controller.position);
+      this.updatePosition = true;
+    }
+  }
+
+  /*
+    animation debug function. Contains hardcoded value interally to not pollute external code
+  */
+  debugAnimation(playerLocation, timeDiff){
+    const selfToPlayer   = playerLocation.clone().sub(this.position);
+    const playerDistance = selfToPlayer.length();
+    const attackID       = this.animations.get('attack');
+    const walkID         = this.animations.get('walk');
+    const idleID         = this.animations.get('idle');
+    const movement       = new Vector3(0, 0, 0);
+    const timeDiffS      = timeDiff / 1000;
+    if(!this.grounded)
+        movement.copy(physicsManager.getScene().getGravity());
+    // player is in sight
+    if(playerDistance < 8){
+
+      if(playerDistance > 4){
+        // update position
+        this.locationTarget =
+          playerLocation.clone()
+          .add(
+          selfToPlayer.clone()
+          .negate()
+          .normalize()
+          .multiplyScalar(3));
+      }
+      else if(this.currentAnimation == idleID){ // attack the player
+        if(attackID !== undefined && this.currentAnimation != attackID){
+          this.currentAnimation = attackID;
+          this.updateAnimation = true;
+        }
+      }
+
+      this.lookAt(playerLocation);
+      
+    }
+    else if(this.currentAnimation != idleID){
+      this.locationTarget.copy(this.position);
+      this.currentAnimation = idleID;
+      this.updateAnimation = true;
+    }
+
+    // manage Position
+    if(this.locationTarget.clone().sub(this.position).length() > 0.5){
+      if(this.currentAnimation != walkID){
+        this.currentAnimation = walkID;
+        this.updateAnimation = true;
+      }
+
+      const t = this.locationTarget.clone().sub(this.position).normalize();
+      movement.add(t)
+    }
+    else{
+      if(this.currentAnimation == walkID){
+        this.currentAnimation = idleID;
+        this.updateAnimation = true;
+      }
+    }
+
+    // manage Rotation
+    if(this.rotationInterpolation < 1){
+      this.rotationInterpolation += (1-this.rotationInterpolation) / this.easing;
+      this.rotationInterpolation.toFixed(2);
+      this.quaternion.slerp(lookAtQuaternion(this.lookAtTarget), this.rotationInterpolation);
+      this.updateRotation = true;
+    }
+    this.moveMob(movement, timeDiffS);
   }
 }
 
@@ -479,14 +608,13 @@ class InstancedSkeleton extends THREE.Skeleton {
     // console.log('boneTextureSize', unifiedBoneTextureSize);
   }
 
-  bakeFrame(skeleton, drawCallIndex, frameIndex) {
+  bakeFrame(skeleton, freeListEntry, frameIndex) {
+
     const boneMatrices = this.unifiedBoneMatrices;
-    
-    const drawCall = this.parent.drawCalls[drawCallIndex];
-    
+
     // frame -> geometry (skeleton) -> bone -> matrix
     const dstOffset = frameIndex * numGeometries * maxBonesPerInstance * 8 +
-      drawCall.freeListEntry * maxBonesPerInstance * 8;
+      freeListEntry * maxBonesPerInstance * 8;
 
     const bones = skeleton.bones;
     const boneInverses = skeleton.boneInverses;
@@ -524,40 +652,25 @@ class MobBatchedMesh extends InstancedBatchedMesh {
   constructor({
     procGenInstance,
     mobData,
+    physics,
   }) {
     const {
       glbs,
       skinnedMeshes: meshes,
     } = mobData;
     const {
-      // atlas,
-      // atlasImages,
-      atlasTextures,
-      geometries,
+      meshes: mobDataMeshes,
+      materials: atlasTextures,
     } = createTextureAtlas(meshes, {
       attributes: ['position', 'normal', 'uv', 'skinIndex', 'skinWeight'],
       textures: ['map', 'normalMap', 'roughnessMap', 'metalnessMap'],
     });
 
-    numGeometries = geometries.length;
-
-    for (let i = 0; i < geometries.length; i++) {
-      const geometry = geometries[i];
-      const glb = glbs[i];
-      const {animations} = glb;
-      // console.log('got animations', animations);
-      // const idleAnimation = animations.find(a => a.name === 'idle');
-      const clip = animations[0];
-
-      const frameCount = Math.floor(clip.duration * bakeFps);
-      const frameCounts = new Float32Array(geometry.attributes.position.count)
-        .fill(frameCount);
-      geometry.setAttribute('frameCount', new THREE.BufferAttribute(frameCounts, 1));
-    }
+    numGeometries = mobDataMeshes.length;
+    const geometries = mobDataMeshes.map(m => m.geometry);
 
     // allocator
-
-    const allocator = new InstancedGeometryAllocator(geometries, [
+    const allocator = new InstancedGeometryAllocator([
       {
         name: 'p',
         Type: Float32Array,
@@ -574,16 +687,35 @@ class MobBatchedMesh extends InstancedBatchedMesh {
         itemSize: 1,
       },
       {
+        name: 'animationIndex',
+        Type: Float32Array,
+        itemSize: 1,
+      },
+      {
+        name: 'animationsFrameInfo',
+        Type: Float32Array,
+        itemSize: 1,
+        customItemCount: maxNumGeometries * maxDrawCallsPerGeometry * maxAnimationPerGeometry
+      },
+      {
         name: 'boneTexture',
         Type: Float32Array,
         itemSize: maxBonesPerInstance * 8,
-        instanced: false,
+        customItemCount: maxNumGeometries * maxDrawCallsPerGeometry * maxAnimationPerGeometry * maxFrameCountPerAnimation
       },
     ], {
-      maxInstancesPerDrawCall,
+      maxNumGeometries,
+      maxInstancesPerGeometryPerDrawCall: maxInstancesPerDrawCall,
       maxDrawCallsPerGeometry,
-      maxSlotsPerGeometry: maxAnimationFrameLength,
+      boundingType: 'box'
+      // maxSlotsPerGeometry: maxAnimationFrameLength,
     });
+
+    allocator.setGeometries(geometries.map(g => [g]), [
+      {name: 'skinIndex', itemSize: 4},
+      {name: 'skinWeight', itemSize: 4}
+    ]);
+
     const {geometry, textures: attributeTextures} = allocator;
     for (const k in attributeTextures) {
       const texture = attributeTextures[k];
@@ -602,8 +734,7 @@ class MobBatchedMesh extends InstancedBatchedMesh {
       // alphaTest: 0.5,
     });
     material.onBeforeCompile = (shader) => {
-        // console.log('on before compile', shader.fragmentShader);
-        
+
         material.userData.shader = shader;
 
         shader.uniforms.pTexture = {
@@ -616,6 +747,14 @@ class MobBatchedMesh extends InstancedBatchedMesh {
         };
         shader.uniforms.timeOffsetTexture = {
           value: attributeTextures.timeOffset,
+          needsUpdate: true,
+        };
+        shader.uniforms.animationIndex = {
+          value: attributeTextures.animationIndex,
+          needsUpdate: true,
+        };
+        shader.uniforms.animationsFrameInfo = {
+          value: attributeTextures.animationsFrameInfo,
           needsUpdate: true,
         };
         shader.uniforms.uBoneTexture = {
@@ -702,15 +841,15 @@ vec4 q_slerp(vec4 a, vec4 b, float t) {
 `);
 
         shader.vertexShader = shader.vertexShader.replace(`#include <skinning_pars_vertex>`, `\
-// #undef USE_SKINNING
 
 #ifdef USE_SKINNING
 uniform mat4 bindMatrix;
 uniform mat4 bindMatrixInverse;
 uniform highp sampler2D uBoneTexture;
 uniform sampler2D timeOffsetTexture;
-uniform float     uTime;
-attribute float frameCount;
+uniform float uTime;
+uniform sampler2D animationIndex;
+uniform sampler2D animationsFrameInfo;
 
 struct BoneTransform
 {
@@ -755,13 +894,14 @@ mat4 getBoneMatrix( const in float base1, const in float base2, const in float r
         `);
         shader.vertexShader = shader.vertexShader.replace(`#include <skinbase_vertex>`, `\
 int boneTextureIndex = gl_DrawID * ${maxBonesPerInstance};
-int instanceIndex = gl_DrawID * ${maxInstancesPerDrawCall} + gl_InstanceID;
+float instanceIndex = float(gl_DrawID * ${maxInstancesPerDrawCall} + gl_InstanceID);
+
 #ifdef USE_SKINNING
   
   const float timeOffsetWidth = ${attributeTextures.timeOffset.image.width.toFixed(8)};
   const float timeOffsetHeight = ${attributeTextures.timeOffset.image.height.toFixed(8)};
-  float timeOffsetX = mod(float(instanceIndex), timeOffsetWidth);
-  float timeOffsetY = floor(float(instanceIndex) / timeOffsetWidth);
+  float timeOffsetX = mod(instanceIndex, timeOffsetWidth);
+  float timeOffsetY = floor(instanceIndex / timeOffsetWidth);
   vec2 timeOffsetpUv = (vec2(timeOffsetX, timeOffsetY) + 0.5) / vec2(timeOffsetWidth, timeOffsetHeight);
   float timeOffset = texture2D(timeOffsetTexture, timeOffsetpUv).x;
   
@@ -771,8 +911,27 @@ int instanceIndex = gl_DrawID * ${maxInstancesPerDrawCall} + gl_InstanceID;
   if (time2 == time1) {
     timeRatio = 0.0f;
   }
-  float frame1 = mod( float(time1) + timeOffset * frameCount, frameCount );
-  float frame2 = mod( float(time2) + timeOffset * frameCount, frameCount );
+  const float animIdwidth = ${attributeTextures.animationIndex.image.width.toFixed(8)};
+  const float animIdheight = ${attributeTextures.animationIndex.image.height.toFixed(8)};
+  float animIdx = mod(instanceIndex, animIdwidth);
+  float animIdy = floor(instanceIndex / animIdwidth);
+  vec2 animIdUv = (vec2(animIdx, animIdy) + 0.5) / vec2(animIdwidth, animIdheight);
+  float animationID = texture2D(animationIndex, animIdUv).x;
+
+
+  float frameInfoId = float(gl_DrawID * ${maxAnimationPerGeometry});
+
+  const float fInfoWidth = ${attributeTextures.animationsFrameInfo.image.width.toFixed(8)};
+  const float fInfoHeight = ${attributeTextures.animationsFrameInfo.image.height.toFixed(8)};
+  float fInfox = mod(frameInfoId, fInfoWidth) + animationID;
+  float fInfoy = floor(frameInfoId / fInfoWidth) + floor(fInfox / fInfoWidth);
+  fInfox = fInfox - fInfoWidth * floor(fInfox / fInfoWidth);
+  vec2 fInfoUv = (vec2(fInfox, fInfoy) + 0.5) / vec2(fInfoWidth, fInfoHeight);
+  vec2 animationData = texture2D(animationsFrameInfo, fInfoUv).xy;
+  float frameCount = animationData.x;
+
+  float frame1 = animationID * float(${maxAnimationFrameLength}) + mod( float(time1) + timeOffset * frameCount, frameCount );
+  float frame2 = animationID * float(${maxAnimationFrameLength}) + mod( float(time2) + timeOffset * frameCount, frameCount );
   int boneTextureIndex1 = boneTextureIndex + int(frame1) * ${numGeometries} * ${maxBonesPerInstance};
   int boneTextureIndex2 = boneTextureIndex + int(frame2) * ${numGeometries} * ${maxBonesPerInstance};
   float boneIndexOffset1 = float(boneTextureIndex1) * 2.;
@@ -818,12 +977,10 @@ int instanceIndex = gl_DrawID * ${maxInstancesPerDrawCall} + gl_InstanceID;
         // vertex shader
 
         shader.vertexShader = shader.vertexShader.replace(`#include <uv_pars_vertex>`, `\
-#undef USE_INSTANCING
-
 #include <uv_pars_vertex>
-
 uniform sampler2D pTexture;
 uniform sampler2D qTexture;
+varying vec4 debugColor;
 
 vec3 rotate_vertex_position(vec3 position, vec4 q) { 
   return position + 2.0 * cross(q.xyz, cross(q.xyz, position) + q.w * position);
@@ -832,24 +989,26 @@ vec3 rotate_vertex_position(vec3 position, vec4 q) {
         shader.vertexShader = shader.vertexShader.replace(`#include <project_vertex>`, `\
 const float width = ${attributeTextures.p.image.width.toFixed(8)};
 const float height = ${attributeTextures.p.image.height.toFixed(8)};
-float x = mod(float(instanceIndex), width);
-float y = floor(float(instanceIndex) / width);
+float x = mod(instanceIndex, width);
+float y = floor(instanceIndex / width);
 vec2 pUv = (vec2(x, y) + 0.5) / vec2(width, height);
 vec3 p = texture2D(pTexture, pUv).xyz;
 vec4 q = texture2D(qTexture, pUv).xyzw;
-
 // instance offset position
 {
   transformed = rotate_vertex_position(transformed, q);
   transformed += p;
+  //transformed += vec3(frameCount, 0.0, 0.0);
 }
 
+// debugColor = vec4((instanceMatrix[0][0] + 1.0)/2.0, 0.0, 0.0, 1.0);
 vec4 mvPosition = vec4( transformed, 1.0 );
 #ifdef USE_INSTANCING
   mvPosition = instanceMatrix * mvPosition;
 #endif
-mvPosition = modelViewMatrix * mvPosition;
+mvPosition = viewMatrix * modelMatrix * mvPosition;
 gl_Position = projectionMatrix * mvPosition;
+
         `);
         /* shader.vertexShader = shader.vertexShader.replace(`#include <worldpos_vertex>`, `\
 #if defined( USE_ENVMAP ) || defined( DISTANCE ) || defined ( USE_SHADOWMAP )
@@ -866,15 +1025,31 @@ gl_Position = projectionMatrix * mvPosition;
         shader.fragmentShader = shader.fragmentShader.replace(`#include <uv_pars_fragment>`, `\
 #undef USE_INSTANCING
 #if ( defined( USE_UV ) && ! defined( UVS_VERTEX_ONLY ) )
-	varying vec2 vUv;
+  varying vec2 vUv;
 #endif
         `);
+        
+        // put true to debug shader
+        if(false)
+          shader.fragmentShader = `\
+#define DEBUG_SHADER
+#if ( defined( USE_UV ) && ! defined( UVS_VERTEX_ONLY ) )
+  varying vec2 vUv;
+#endif
+#ifdef DEBUG_SHADER
+varying vec4 debugColor;
+void main() {
+  gl_FragColor = debugColor;
+}
+#endif
+        `
     };
 
     // mesh
 
-    super(geometry, material, allocator);
+    super(geometry, material, allocator, maxNumGeometries * maxDrawCallsPerGeometry * maxInstancesPerDrawCall);
     this.frustumCulled = false;
+    this.physics = physics;
 
     this.procGenInstance = procGenInstance;
 
@@ -915,11 +1090,6 @@ gl_Position = projectionMatrix * mvPosition;
     // this.rootBones = rootBones;
     this.drawCalls = Array(meshes.length).fill(null);
 
-    /* this.meshes = lodMeshes;
-    this.shapeAddresses = shapeAddresses;
-    this.physics = physics;
-    this.physicsObjects = []; */
-
     for (let i = 0; i < geometries.length; i++) {
       const glb = glbs[i];
       const {animations} = glb;
@@ -932,40 +1102,44 @@ gl_Position = projectionMatrix * mvPosition;
         throw new Error('too many bones in base mesh skeleton: ' + skeleton2.bones.length);
       }
 
-      this.getDrawCall(i);
-      
       // animations
-      let mixer = null;
-      const clip = animations[0];
-      // {
-        mixer = new THREE.AnimationMixer(rootBone2);
-        // console.log('new action', clip);
+      let animKeys = new Map();
+      for(let j = 0; j < maxAnimationPerGeometry/* animations.length */; j++){
+        if(j >= animations.length) break;
+        const clip = animations[j];
+        animKeys.set(clip.name, j);
+        const frameCount = Math.floor(clip.duration * bakeFps);
+        const drawCall = this.getDrawCall(i);
+        const offset = drawCall.getTextureOffset('animationsFrameInfo');
+        const padding = this.allocator.getTextureBytePadding();
+        const dataId = i*maxAnimationPerGeometry * padding + j * padding;
+        const texture = drawCall.getTexture('animationsFrameInfo');
+        texture.image.data[dataId] = frameCount;
+
+        const mixer = new THREE.AnimationMixer(rootBone2);
         const action = mixer.clipAction(clip);
         action.play();
         mixer.updateMatrixWorld = () => {
           glb2Scene.updateMatrixWorld();
         };
-      // }
 
-      // console.log('got animations', animations);
-      // const idleAnimation = animations.find(a => a.name === 'idle');
-
-      mixer.setTime(0);
-      const frameCount = Math.floor(clip.duration * bakeFps);
-      for (let t = 0; t < frameCount; t++) {
-        mixer.update(1. / bakeFps);
-        mixer.updateMatrixWorld();
-
-        this.skeleton.bakeFrame(skeleton2, i, t);
+        mixer.setTime(0);
+        for (let t = 0; t < frameCount; t++) {
+          mixer.update(1. / bakeFps);
+          mixer.updateMatrixWorld();
+          this.skeleton.bakeFrame(skeleton2, drawCall.freeListEntry, j * maxFrameCountPerAnimation + t);
+        }
       }
+      animationKeys.push(animKeys);
     }
     this.skeleton.unifiedBoneTexture.needsUpdate = true;
+    this.physicsScene = physicsManager.getScene();
   }
 
   getDrawCall(geometryIndex) {
     let drawCall = this.drawCalls[geometryIndex];
     if (!drawCall) {
-      drawCall = this.allocator.allocDrawCall(geometryIndex);
+      drawCall = this.allocator.allocDrawCall(geometryIndex, 0, 0, {min: new Vector3(), max: new Vector3()});
       drawCall.instances = [];
 
       this.drawCalls[geometryIndex] = drawCall;
@@ -973,145 +1147,143 @@ gl_Position = projectionMatrix * mvPosition;
     return drawCall;
   }
 
-  drawChunk(chunk, renderData, tracker) {
-    const mobData = renderData;
-
-    if (!renderData.instances) return;
-
-    // mob geometry
-    {
-      const _renderMobGeometry = (drawCall, ps, qs, index) => {
-        // locals
-
-        const instanceIndex = drawCall.getInstanceCount();
-        const pTexture = drawCall.getTexture('p');
-        const pOffset = drawCall.getTextureOffset('p');
-        const qTexture = drawCall.getTexture('q');
-        const qOffset = drawCall.getTextureOffset('q');
-        const timeOffsetTexture = drawCall.getTexture('timeOffset');
-        const timeOffsetOffset = drawCall.getTextureOffset('timeOffset');
-
-        // position
-
-        const px = ps[index * 3];
-        const py = ps[index * 3 + 1];
-        const pz = ps[index * 3 + 2];
-        pTexture.image.data[pOffset + instanceIndex * 3] = px;
-        pTexture.image.data[pOffset + instanceIndex * 3 + 1] = py;
-        pTexture.image.data[pOffset + instanceIndex * 3 + 2] = pz;
-
-        drawCall.updateTexture('p', pOffset + instanceIndex * 3, 3);
-
-        // quaternion
-
-        const qx = qs[index * 4];
-        const qy = qs[index * 4 + 1];
-        const qz = qs[index * 4 + 2];
-        const qw = qs[index * 4 + 3];
-        qTexture.image.data[qOffset + instanceIndex * 4] = qx;
-        qTexture.image.data[qOffset + instanceIndex * 4 + 1] = qy;
-        qTexture.image.data[qOffset + instanceIndex * 4 + 2] = qz;
-        qTexture.image.data[qOffset + instanceIndex * 4 + 3] = qw;
-
-        drawCall.updateTexture('q', qOffset + instanceIndex * 4, 4);
-
-        // time offset
-
-        timeOffsetTexture.image.data[timeOffsetOffset + instanceIndex] = Math.random();
-
-        drawCall.updateTexture('timeOffset', timeOffsetOffset + instanceIndex, 1);
-
-
-        const instance = new MobInstance();
-        drawCall.instances.push(instance);
-
-        // physics
-        // const shapeAddress = this.#getShapeAddress(drawCall.geometryIndex);
-        // const physicsObject = this.#addPhysicsShape(shapeAddress, px, py, pz, qx, qy, qz, qw);
-        // this.physicsObjects.push(physicsObject);
-
-        // bookkeeping
-
-        drawCall.incrementInstanceCount();
-
-        // return
-
-        return instance;
-      };
-      const _unrenderMobGeometry = (drawCall, mobInstance) => {
-        const instanceIndex = drawCall.instances.indexOf(mobInstance);
-        if (drawCall.instances.length >= 2) {
-          // locals
-          
-          const lastInstanceIndex = drawCall.getInstanceCount() - 1;
-          
-          const pTexture = drawCall.getTexture('p');
-          const pOffset = drawCall.getTextureOffset('p');
-          const qTexture = drawCall.getTexture('q');
-          const qOffset = drawCall.getTextureOffset('q');
-          const timeOffsetTexture = drawCall.getTexture('timeOffset');
-          const timeOffsetOffset = drawCall.getTextureOffset('timeOffset');
-
-          // delete by replacing current instance with last instance
-
-          pTexture.image.data[pOffset + instanceIndex * 3] = pTexture.image.data[pOffset + lastInstanceIndex * 3];
-          pTexture.image.data[pOffset + instanceIndex * 3 + 1] = pTexture.image.data[pOffset + lastInstanceIndex * 3 + 1];
-          pTexture.image.data[pOffset + instanceIndex * 3 + 2] = pTexture.image.data[pOffset + lastInstanceIndex * 3 + 2];
-
-          qTexture.image.data[qOffset + instanceIndex * 4] = qTexture.image.data[qOffset + lastInstanceIndex * 4];
-          qTexture.image.data[qOffset + instanceIndex * 4 + 1] = qTexture.image.data[qOffset + lastInstanceIndex * 4 + 1];
-          qTexture.image.data[qOffset + instanceIndex * 4 + 2] = qTexture.image.data[qOffset + lastInstanceIndex * 4 + 2];
-          qTexture.image.data[qOffset + instanceIndex * 4 + 3] = qTexture.image.data[qOffset + lastInstanceIndex * 4 + 3];
-
-          timeOffsetTexture.image.data[timeOffsetOffset + instanceIndex] = timeOffsetTexture.image.data[timeOffsetOffset + lastInstanceIndex];
-
-
-          drawCall.updateTexture('p', pOffset + instanceIndex * 3, 3);
-          drawCall.updateTexture('q', qOffset + instanceIndex * 4, 4);
-          drawCall.updateTexture('timeOffset', timeOffsetOffset + instanceIndex, 1);
-
-          // mob instance
-          drawCall.instances[instanceIndex] = drawCall.instances[lastInstanceIndex];
-          drawCall.instances.length--;
-        } else {
-          drawCall.instances.length = 0;
-        }
-
-        // bookkeeping
-
-        drawCall.decrementInstanceCount();
+  updateMobs(drawCall){
+    if(!this.material.userData.shader)
+      return;
+    const pOffset           = drawCall.getTextureOffset('p');
+    const qOffset           = drawCall.getTextureOffset('q');
+    const timeOffsetOffset  = drawCall.getTextureOffset('timeOffset');
+    const animOffset        = drawCall.getTextureOffset('animationIndex');
+    const padding           = this.allocator.getTextureBytePadding();
+    const textureToUpdate   = new Set();
+    let   updateBBox        = false;
+    
+    for(let instanceIndex = 0; instanceIndex < drawCall.instances.length; instanceIndex++){
+      const mob = drawCall.instances[instanceIndex];
+      if(mob.updatePosition){
+        drawCall.getTexture('p').image.data.set(mob.position.toArray(), pOffset + instanceIndex * padding);
+        mob.updatePosition = false;
+        textureToUpdate.add(JSON.stringify({name: 'p', size: 3}));
+        this.material.userData.shader.uniforms.pTexture.value.needsUpdate = true;
+        updateBBox = true;
+      }
+      
+      if(mob.updateRotation){
+        drawCall.getTexture('q').image.data.set(mob.quaternion.toArray(), qOffset + instanceIndex * padding);
+        mob.updateRotation = false;
+        textureToUpdate.add(JSON.stringify({name: 'q', size: 4}));
+        this.material.userData.shader.uniforms.qTexture.value.needsUpdate = true;
       }
 
-      let mobInstances = [];
-      for (let i = 0; i < mobData.instances.length; i++) {
-        const geometryNoise = mobData.instances[i];
-        // console.log('got noise', geometryNoise);
-        const geometryIndex = Math.floor(geometryNoise * this.meshes.length);
-        
-        const drawCall = this.getDrawCall(geometryIndex);
-        const mobInstance = _renderMobGeometry(drawCall, mobData.ps, mobData.qs, i);
-        mobInstances.push(mobInstance);
+      if(mob.updateTimeOffset){
+        drawCall.getTexture('timeOffset').image.data[timeOffsetOffset + instanceIndex * padding] = mob.timeOffset;
+        mob.updateTimeOffset = false;
+        textureToUpdate.add(JSON.stringify({name: 'timeOffset', size: 1}));
+        this.material.userData.shader.uniforms.timeOffsetTexture.value.needsUpdate = true;
       }
 
-      const onchunkremove = () => {
-        // const {chunk: removeChunk} = e;
-        // if (chunk.equalsNodeLod(removeChunk)) {
-          for (let i = 0; i < mobData.instances.length; i++) {
-            const geometryNoise = mobData.instances[i];
-            const geometryIndex = Math.floor(geometryNoise * this.meshes.length);
-            
-            const drawCall = this.getDrawCall(geometryIndex);
-
-            const mobInstance = mobInstances[i];
-
-            _unrenderMobGeometry(drawCall, mobInstance);
-          }
-
-          tracker.offChunkRemove(chunk, onchunkremove);
-        // }
-      };
-      tracker.onChunkRemove(chunk, onchunkremove);
+      if(mob.updateAnimation){
+        drawCall.getTexture('animationIndex').image.data[animOffset + instanceIndex * padding] = mob.currentAnimation;
+        mob.updateTimeOffset = false;
+        textureToUpdate.add(JSON.stringify({name: 'animationIndex', size: 1}));
+        this.material.userData.shader.uniforms.animationIndex.value.needsUpdate = true;
+      }
     }
+    for(const tJson of textureToUpdate){
+      const t = JSON.parse(tJson);
+      drawCall.updateTexture(t.name, drawCall.getTextureOffset(t.name), t.size);
+    }
+
+    if(!updateBBox)
+      return;
+
+    const bbox = [0, 0, 0, 0, 0, 0];
+
+    // min bbox
+    for(let i = 0; i < 3; i++){
+      bbox[i] = drawCall.instances.reduce((prev, curr) => 
+      prev.position.toArray()[i] < curr.position.toArray()[i] ? prev : curr).position.toArray()[i];
+    }
+
+    // max bbox
+    for(let i = 0; i < 3; i++){
+      bbox[i+3] = drawCall.instances.reduce((prev, curr) =>
+      prev.position.toArray()[i] > curr.position.toArray()[i] ? prev : curr).position.toArray()[i];
+    }
+
+    const min = new Vector3(bbox[0], bbox[1], bbox[2]);
+    const max = new Vector3(bbox[3], bbox[4], bbox[5]);
+    this.allocator.setBoundingObject({min, max}, drawCall.freeListEntry);
+  }
+
+  addMobGeometry = (drawCall, mob, chunkPose) => {
+    const instanceIndex = drawCall.getInstanceCount();
+    if(chunkPose){
+      this.setMatrixAt(instanceIndex, chunkPose);
+      this.instanceMatrix.needsUpdate = true;
+    }
+    drawCall.instances.push(mob);
+
+    // physics
+
+    // bookkeeping
+
+    drawCall.incrementInstanceCount();
+  };
+
+  removeMobGeometry = (drawCall, mobInstance) => {
+    const instanceIndex = drawCall.instances.indexOf(mobInstance);
+    if (drawCall.instances.length >= 2) {
+      // locals
+      
+      const lastInstanceIndex = drawCall.getInstanceCount() - 1;
+      
+      const pTexture = drawCall.getTexture('p');
+      const pOffset = drawCall.getTextureOffset('p');
+      const qTexture = drawCall.getTexture('q');
+      const qOffset = drawCall.getTextureOffset('q');
+      const timeOffsetTexture = drawCall.getTexture('timeOffset');
+      const timeOffsetOffset = drawCall.getTextureOffset('timeOffset');
+
+      // delete by replacing current instance with last instance
+
+      pTexture.image.data[pOffset + instanceIndex * 3] = pTexture.image.data[pOffset + lastInstanceIndex * 3];
+      pTexture.image.data[pOffset + instanceIndex * 3 + 1] = pTexture.image.data[pOffset + lastInstanceIndex * 3 + 1];
+      pTexture.image.data[pOffset + instanceIndex * 3 + 2] = pTexture.image.data[pOffset + lastInstanceIndex * 3 + 2];
+
+      qTexture.image.data[qOffset + instanceIndex * 4] = qTexture.image.data[qOffset + lastInstanceIndex * 4];
+      qTexture.image.data[qOffset + instanceIndex * 4 + 1] = qTexture.image.data[qOffset + lastInstanceIndex * 4 + 1];
+      qTexture.image.data[qOffset + instanceIndex * 4 + 2] = qTexture.image.data[qOffset + lastInstanceIndex * 4 + 2];
+      qTexture.image.data[qOffset + instanceIndex * 4 + 3] = qTexture.image.data[qOffset + lastInstanceIndex * 4 + 3];
+
+      timeOffsetTexture.image.data[timeOffsetOffset + instanceIndex] = timeOffsetTexture.image.data[timeOffsetOffset + lastInstanceIndex];
+
+
+      drawCall.updateTexture('p', pOffset + instanceIndex * 3, 3);
+      drawCall.updateTexture('q', qOffset + instanceIndex * 4, 4);
+      drawCall.updateTexture('timeOffset', timeOffsetOffset + instanceIndex, 1);
+
+      // mob instance
+      drawCall.instances[instanceIndex] = drawCall.instances[lastInstanceIndex];
+      drawCall.instances.length--;
+    } else {
+      drawCall.instances.length = 0;
+    }
+
+    // bookkeeping
+
+    drawCall.decrementInstanceCount();
+  }
+
+  addChunk(chunk) {
+    if (!chunk.mobs) return;
+
+    for (let mob of chunk.mobs) {
+      const drawCall = this.getDrawCall(mob.geometryIndex);
+      this.addMobGeometry(drawCall, mob, chunk.pose);
+    }
+
+    
   }
 
   update(timestamp, timeDiff) {
@@ -1120,6 +1292,9 @@ gl_Position = projectionMatrix * mvPosition;
       const frameIndex = timestamp * bakeFps / 1000;
       shader.uniforms.uTime.value = frameIndex;
     }
+    
+    for(const d of this.drawCalls)
+      this.updateMobs(d, timeDiff);
   }
 }
 
@@ -1172,9 +1347,8 @@ class MobGenerator {
   constructor({
     procGenInstance,
     mobData,
+    physics,
   }) {
-    // this.procGenInstance = procGenInstance;
-    // this.mobData = mobData;
 
     this.object = new THREE.Object3D();
     this.object.name = 'mob-chunks';
@@ -1183,9 +1357,32 @@ class MobGenerator {
     const mobBatchedMesh = new MobBatchedMesh({
       procGenInstance,
       mobData,
+      physics,
     });
+    this.mobs = this.generateRandomMobs(mobData.skinnedMeshes);
+    mobBatchedMesh.addChunk({mobs: this.mobs, pose: new Matrix4().identity()});
     this.object.add(mobBatchedMesh);
     this.mobBatchedMesh = mobBatchedMesh;
+  }
+
+  generateRandomMobs(meshes){
+    const mobs = [];
+    const seed = 1234;
+    const rng = alea(seed);
+    for(let i = 0; i < 100; i++){
+      const geoId = i%meshes.length;
+      //const size = new Vector3();
+      //new THREE.Box3().setFromObject(meshes[geoId]).getSize(size);
+      mobs.push(new MobInstance(
+        [rng()*100, 100, 110+rng()*100],
+        new Quaternion().setFromEuler(new Euler(0, rng()*Math.PI*2, 0)).toArray(),
+        geoId,
+        rng(),
+        0.3,
+        0.1
+      ));
+    }
+    return mobs;
   }
 
   getMobModuleNames() {
@@ -1199,7 +1396,12 @@ class MobGenerator {
   }
 
   update(timestamp, timeDiff) {
+    const localPlayer = playersManager.getLocalPlayer();
+    for(const m of this.mobs){
+      m.update(localPlayer.position, timeDiff);
+    }
     this.mobBatchedMesh.update(timestamp, timeDiff);
+    
   }
 
   destroy() {
@@ -1223,44 +1425,46 @@ class Mobber {
     /* this.tracker = new LodChunkTracker(this.generator, {
       chunkWorldSize,
     }); */
-    const numLods = 1;
-    const tracker = procGenInstance.getChunkTracker({
-      numLods,
-      // trackY: true,
-      // relod: true,
-    });
-    const chunkdatarequest = (e) => {
-      const {chunk, waitUntil, signal} = e;
-      const {lod} = chunk;
+    const lods = 1;
+    this.trackerCreated = new Promise((resolve, reject)=>{
+      (async ()=>{
+        const tracker = await procGenInstance.createLodChunkTracker({lods});
+        const chunkdatarequest = (e) => {
+          const {chunk, waitUntil, signal} = e;
+          const {lod} = chunk;
 
-      if (chunk.min.y !== 0) return;
-  
-      const loadPromise = (async () => {
-        const result = await procGenInstance.dcWorkerManager.createMobSplat(
-          chunk.min.x * chunkWorldSize,
-          chunk.min.z * chunkWorldSize,
-          lod
-        );
-        
-        signal.throwIfAborted();
-  
-        return result;
+          if (chunk.min.y !== 0) return;
+
+          const loadPromise = (async () => {
+            const result = await procGenInstance.dcWorkerManager.createMobSplat(
+              chunk.min.x * chunkWorldSize,
+              chunk.min.z * chunkWorldSize,
+              lod
+            );
+            
+            signal.throwIfAborted();
+
+            return result;
+          })();
+          waitUntil(loadPromise);
+        };
+        const chunkadd = (e) => {
+          const {renderData, chunk} = e;
+          generator.mobBatchedMesh.drawChunk(chunk, renderData, tracker);
+        };
+        tracker.addEventListener('chunkdatarequest', chunkdatarequest);
+        tracker.addEventListener('chunkadd', chunkadd);
+        // tracker.onChunkDataRequest(chunkdatarequest);
+        tracker.onChunkAdd(chunkadd);
+
+        this.tracker = tracker;
+        resolve();
       })();
-      waitUntil(loadPromise);
-    };
-    const chunkadd = (e) => {
-      const {renderData, chunk} = e;
-      generator.mobBatchedMesh.drawChunk(chunk, renderData, tracker);
-    };
-    // tracker.addEventListener('chunkdatarequest', chunkdatarequest);
-    // tracker.addEventListener('chunkadd', chunkadd);
-    tracker.onChunkDataRequest(chunkdatarequest);
-    tracker.onChunkAdd(chunkadd);
-
-    this.tracker = tracker;
+    });
   }
 
   async waitForUpdate() {
+    await trackerCreated;
     await new Promise((accept, reject) => {
       this.tracker.onPostUpdate(() => {
         accept();
@@ -1281,37 +1485,34 @@ class Mobber {
 
   update(timestamp, timeDiff) {
     const localPlayer = playersManager.getLocalPlayer();
-    !this.procGenInstance.range && this.tracker.update(localPlayer.position);
+    if(!this.procGenInstance.range && this.tracker)
+      this.tracker.update(localPlayer.position);
+    
     this.generator.update(timestamp, timeDiff);
   }
 
   destroy() {
-    this.tracker.destroy();
+    // this.tracker.destroy();
     this.generator.destroy();
   }
 }
 
 class MobManager {
   constructor() {
-    this.mobbers = [];
     this.mobs = [];
   }
 
   createMobber({
     procGenInstance,
     mobData,
+    physics,
   }) {
-    const mobber = new Mobber({
+    const mobber = new MobGenerator({
       procGenInstance,
       mobData,
+      physics,
     });
-    this.mobbers.push(mobber);
     return mobber;
-  }
-
-  destroyMobber(mobber) {
-    mobber.destroy();
-    this.mobbers.splice(this.mobbers.indexOf(mobber), 1);
   }
 
   async loadData(appUrls) {
@@ -1356,10 +1557,6 @@ class MobManager {
   }
 
   update(timestamp, timeDiff) {
-    // mobber is updated by the app that created it
-    /* for (const mobber of this.mobbers) {
-      mobber.update(timestamp, timeDiff);
-    } */
 
     for (const mob of this.mobs) {
       mob.update(timestamp, timeDiff);
