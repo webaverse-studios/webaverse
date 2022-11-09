@@ -1,9 +1,8 @@
-import {fetchArrayBuffer} from '../../util.js';
+import {fetchArrayBuffer, createCanvas} from '../../util.js';
 import {AvatarRenderer} from '../../avatars/avatar-renderer.js';
 import {createAvatarForScreenshot, screenshotAvatar} from '../../avatar-screenshotter.js';
 import {maxAvatarQuality, offscreenCanvasSize} from '../../constants.js';
 import {emotes} from '../../emotes/emote-manager.js';
-import {createCanvas} from '../../renderer.js';
 
 const allEmotions = [''].concat(emotes.map(emote => emote.name));
 
