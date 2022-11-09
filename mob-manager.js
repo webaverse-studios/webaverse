@@ -44,7 +44,15 @@ const maxAnimationFrameLength = 512;
 
 let unifiedBoneTextureSize = 1024;
 const animationKeys = [];
+<<<<<<< HEAD
 const debugAnimation = false;
+=======
+const debugAnimation = true;
+const IDLEACTIONTYPE = 'IDLE';
+const ATTACKACTIONTYPE = 'ATCK';
+const DIEACTIONTYPE = 'DIE';
+const ANIMATIONACTIONTYPE = 'ANMT';
+>>>>>>> 87e374967 (mob api implemented, action component added for attack death and general animation action)
 // window.THREE = THREE;
 
 const _zeroY = v => {
@@ -468,20 +476,22 @@ class Mob {
   Action to be attached to AI controlled entities
   durationFrames: action duration
   actionMethod: action to be performed
-  actionMethodTick: if true the action method will be called every frame of the action
+  actionMethodFrames: contains the frame id that need the action to be performed. If empty it will be performed only at the starting frame
 */
-class ActionComponent {
+export class ActionComponent {
   constructor(
-    durationFrames = 30,
+    actionId,
+    type,
+    durationFrames,
     actionMethod = (mob, frameId)=>{},
-    actionMethodTick = false) {
-    this.hasAnimations = animationId !== undefined;
-    this.animationId = animationId;
+    actionMethodFrames = []) {
     this.Do = actionMethod;
     this.durationFrames = durationFrames;
-    this.actionMethodTick = actionMethodTick;
+    this.actionMethodFrames = actionMethodFrames;
     this.currentFrame = 0;
     this.started = false;
+    this.type = type;
+    this.actionId = actionId;
   }
 
   /*
@@ -519,7 +529,7 @@ class ActionComponent {
 
     this.currentFrame++;
 
-    if(this.actionMethodTick && this.currentMob){
+    if(this.currentFrame != 0 && this.actionMethodFrames.includes(this.currentFrame) && this.currentMob){
       this.Do(this.currentMob, this.currentFrame);
     }
 
@@ -549,8 +559,49 @@ class DefaultIdleAction extends ActionComponent {
   constructor(durationFrames){
     const actionMethod = (mob, frameId)=>{
       mob.playAnimation('idle');
+
     }
-    super(durationFrames, actionMethod, false);
+    super('idle', IDLEACTIONTYPE, durationFrames, actionMethod, []);
+  }
+}
+
+/*
+  attack action. gameLogic is an additional operation that can be performed at the beginning of the attack
+*/
+class AttackAction extends ActionComponent {
+  constructor(durationFrames, attackId, gameLogic){
+    const actionMethod = (mob, frameId)=>{
+      mob.playAnimation(attackId);
+      if(gameLogic)
+        gameLogic(mob);
+    }
+    super(attackId, ATTACKACTIONTYPE, durationFrames, actionMethod, []);
+  }
+}
+
+class DieAction extends ActionComponent {
+  constructor(durationFrames, gameLogic){
+    const actionMethod = (mob, frameId)=>{
+      if(frameId == 0){
+        mob.playAnimation('death');
+        return;
+      }
+
+      if(gameLogic)
+        gameLogic(mob);
+      
+      mob.despawn();
+    }
+    super('death', DIEACTIONTYPE, durationFrames, actionMethod, [durationFrames-1]);
+  }
+}
+
+class AnimationAction extends ActionComponent {
+  constructor(durationFrames, animationId){
+    const actionMethod = (mob, frameId)=>{
+      mob.playAnimation(animationId);
+    }
+    super('animationAction'+animationId, ANIMATIONACTIONTYPE, durationFrames, actionMethod, []);
   }
 }
 
@@ -567,6 +618,7 @@ class DefaultIdleAction extends ActionComponent {
 export class MobInstance {
   constructor(pos, quat, geometryIndex, timeOffset, radius, height, velocity, idleAction) {
     this.actions = [];
+    this.actionsQueue = [];
     this.position = new Vector3().fromArray(pos);
     this.quaternion = new Quaternion().fromArray(quat);
     this.geometryIndex = geometryIndex;
@@ -596,6 +648,55 @@ export class MobInstance {
     physicsManager.getScene().setTransform(this.controller, true);
     this.idleAction = idleAction ??
     new DefaultIdleAction(this.animations.get('idle').frameCount);
+    this._createActionFromClip();
+  }
+
+  _createActionFromClip(){
+    for(let [key, value] of this.animations){
+      if(key == 'idle'){
+        continue;
+      }
+
+      if(key.startsWith('attack')){
+        this.actions.push(new AttackAction(value.frameCount, key));
+        continue;
+      }
+
+      if(key.startsWith('death')){
+        this.actions.push(new DieAction(value.frameCount));
+        continue;
+      }
+
+      this.actions.push(new AnimationAction(value.frameCount, key));
+    }
+  }
+
+  getPostion(){
+    return this.position.toArray();
+  }
+
+  getQuaternion(){
+    return this.quaternion.toArray();
+  }
+
+  hasAction(type){
+    for(const a of this.actions){
+      if (a.type == type)
+        return true;
+    }
+    return false;
+  }
+
+  startAction(actionId){
+    for(const a of this.actions){
+      if(a.actionId == actionId){
+        this.actionsQueue.push(a);
+      }
+    }
+  }
+
+  addAction(action){
+    this.action.push(action);
   }
 
   /*
@@ -605,6 +706,15 @@ export class MobInstance {
     const p = this.position;
     this.lookAtTarget = new Vector3(t.x - p.x, 0/* t.y - p.y */, t.z - p.z);
     this.rotationInterpolation = 0;
+  }
+
+  /*
+    rotate mob instantly
+  */
+  lookAt(t){
+    const p = this.position;
+    this.quaternion = lookAtQuaternion(new Vector3(t.x - p.x, 0, t.z - p.z));
+    this.updateRotation = true;
   }
 
   /*
@@ -620,16 +730,16 @@ export class MobInstance {
     after each action is finised it will pop it out of the action queue
   */
   manageActions(){
-    if(this.actions.length == 0){
-      this.actions.push(this.idleAction);
+    if(this.actionsQueue.length == 0){
+      this.actionsQueue.push(this.idleAction);
     }
 
-    const currentAction = this.actions[0];
+    const currentAction = this.actionsQueue[0];
     if(currentAction.isRunning()){
       currentAction.tick();
     } else{
       currentAction.start(this).then(()=>{
-        this.actions.shift();
+        this.actionsQueue.shift();
       });
     }
   }
@@ -697,6 +807,10 @@ export class MobInstance {
       this.currentAnimation = this.animations.get(animationName).id;
       this.updateAnimation = true;
     }
+  }
+
+  despawn(){
+    //to be implemented
   }
 
   /*
@@ -1520,9 +1634,13 @@ class MobGenerator {
 
   generateRandomMobs(meshes){
     const mobs = [];
+<<<<<<< HEAD
     const seed = 1234;
     const rng = alea(seed);
     for(let i = 0; i < 100; i++){
+=======
+    for(let i = 0; i < 1; i++){
+>>>>>>> 87e374967 (mob api implemented, action component added for attack death and general animation action)
       const geoId = i%meshes.length;
       //const size = new Vector3();
       //new THREE.Box3().setFromObject(meshes[geoId]).getSize(size);
