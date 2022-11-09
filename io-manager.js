@@ -7,90 +7,74 @@ the functionality is implemented in other managers.
 import * as THREE from 'three';
 import metaversefile from 'metaversefile';
 import cameraManager from './camera-manager.js';
-// import controlsManager from './controls-manager.js';
 import game from './game.js';
-import {world} from './world.js';
+import { world } from './world.js';
 import voiceInput from './voice-input/voice-input.js';
-// import * as universe from './universe.js';
-// import {toggle as inventoryToggle} from './inventory.js';
-import {isInIframe, getVelocityDampingFactor} from './util.js';
-import {getRenderer, /* renderer2, */ scene, camera, getContainerElement} from './renderer.js';
+import { getRenderer, camera } from './renderer.js';
 import physicsManager from './physics-manager.js';
-/* import {menuActions} from './mithril-ui/store/actions.js';
-import {menuState} from './mithril-ui/store/state.js'; */
-// import physx from './physx.js';
-// import {airFriction, flyFriction} from './constants.js';
 import transformControls from './transform-controls.js';
 import storyManager from './story.js';
-// import domRenderer from './dom-renderer.jsx';
-import raycastManager from './raycast-manager.js';
-
-// const localVector = new THREE.Vector3();
-// const localVector2 = new THREE.Vector3();
-const localVector3 = new THREE.Vector3();
-// const localVector2D = new THREE.Vector2();
-// const localVector2D2 = new THREE.Vector2();
-// const localQuaternion = new THREE.Quaternion();
+import raycastManager from './raycast-manager.js'
+const localVector = new THREE.Vector3();
 const localQuaternion2 = new THREE.Quaternion();
 const localEuler = new THREE.Euler();
 const localMatrix2 = new THREE.Matrix4();
 const localMatrix3 = new THREE.Matrix4();
-const localRaycaster = new THREE.Raycaster();
 const zeroVector = new THREE.Vector3();
 
 const doubleTapTime = 200;;
 
-class ioManager extends EventTarget {
+class IoManager extends EventTarget {
   lastAxes = [[0, 0, 0, 0], [0, 0, 0, 0]];
-lastButtons = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]];
-currentWeaponValue = 0;
-lastWeaponValue = 0;
-currentTeleport = false;
-lastTeleport = false;
-currentMenuDown = false;
-lastMenuDown = false;
-menuExpanded = false;
-lastMenuExpanded = false;
-currentWeaponGrabs = [false, false];
-lastWeaponGrabs = [false, false];
-currentWalked = false;
-lastCtrlKey = false;
-lastMouseButtons = 0;
-movementEnabled = true;
+  lastButtons = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]];
+  currentWeaponValue = 0;
+  lastWeaponValue = 0;
+  currentTeleport = false;
+  lastTeleport = false;
+  currentMenuDown = false;
+  lastMenuDown = false;
+  menuExpanded = false;
+  lastMenuExpanded = false;
+  currentWeaponGrabs = [false, false];
+  lastWeaponGrabs = [false, false];
+  currentWalked = false;
+  lastCtrlKey = false;
+  lastMouseButtons = 0;
+  movementEnabled = true;
 
-keysDirection = new THREE.Vector3();
+  keysDirection = new THREE.Vector3();
 
-keys = {
-  up: false,
-  down: false,
-  left: false,
-  right: false,
-  forward: false,
-  backward: false,
-  shift: false,
-  doubleTap: false,
-  space: false,
-  ctrl: false,
-};
+  keys = {
+    up: false,
+    down: false,
+    left: false,
+    right: false,
+    forward: false,
+    backward: false,
+    shift: false,
+    doubleTap: false,
+    space: false,
+    ctrl: false,
+  };
 
-lastKeysDownTime = {
-  keyW: 0,
-  keyA: 0,
-  keyS: 0,
-  keyD: 0,
-  keyE: 0,
-};
+  lastKeysDownTime = {
+    keyW: 0,
+    keyA: 0,
+    keyS: 0,
+    keyD: 0,
+    keyE: 0,
+  };
 
-constructor() {
+  constructor() {
     super();
     cameraManager.addEventListener('pointerlockchange', () => {
       this.resetKeys();
     });
   }
 
-  inputFocused = () => document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.getAttribute('contenteditable') !== null);
+  inputFocused() { return document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.getAttribute('contenteditable') !== null) };
 
-  update = timeDiff => {
+  update(timeDiff) {
     const renderer = getRenderer();
     const xrCamera = renderer.xr.getSession() ? renderer.xr.getCamera(camera) : camera;
     if (renderer.xr.getSession()) {
@@ -98,12 +82,12 @@ constructor() {
       const inputSources = Array.from(renderer.xr.getSession().inputSources);
       for (let i = 0; i < inputSources.length; i++) {
         const inputSource = inputSources[i];
-        const {handedness, gamepad} = inputSource;
+        const { handedness, gamepad } = inputSource;
         if (gamepad && gamepad.buttons.length >= 2) {
           const index = handedness === 'right' ? 1 : 0;
-  
+
           // axes
-          const {axes: axesSrc, buttons: buttonsSrc} = gamepad;
+          const { axes: axesSrc, buttons: buttonsSrc } = gamepad;
           const axes = [
             axesSrc[0] || 0,
             axesSrc[1] || 0,
@@ -125,24 +109,24 @@ constructor() {
               localEuler.setFromQuaternion(xrCamera.quaternion, 'YXZ');
               localEuler.x = 0;
               localEuler.z = 0;
-              localVector3.set(dx, 0, dy)
+              localVector.set(dx, 0, dy)
                 .applyEuler(localEuler)
                 .multiplyScalar(0.05);
-  
+
               camera.matrix
                 // .premultiply(localMatrix2.makeTranslation(-xrCamera.position.x, -xrCamera.position.y, -xrCamera.position.z))
-                .premultiply(localMatrix3.makeTranslation(localVector3.x, localVector3.y, localVector3.z))
+                .premultiply(localMatrix3.makeTranslation(localVector.x, localVector.y, localVector.z))
                 // .premultiply(localMatrix2.copy(localMatrix2).invert())
                 .decompose(camera.position, camera.quaternion, camera.scale);
               ioManager.currentWalked = true;
             }
-            
+
             ioManager.currentWeaponGrabs[1] = buttons[1] > 0.5;
           } else if (handedness === 'right') {
             const _applyRotation = r => {
               camera.matrix
                 .premultiply(localMatrix2.makeTranslation(-xrCamera.position.x, -xrCamera.position.y, -xrCamera.position.z))
-                .premultiply(localMatrix3.makeRotationFromQuaternion(localQuaternion2.setFromAxisAngle(localVector3.set(0, 1, 0), r)))
+                .premultiply(localMatrix3.makeRotationFromQuaternion(localQuaternion2.setFromAxisAngle(localVector.set(0, 1, 0), r)))
                 .premultiply(localMatrix2.copy(localMatrix2).invert())
                 .decompose(camera.position, camera.quaternion, camera.scale);
             };
@@ -159,11 +143,11 @@ constructor() {
             }
             ioManager.currentTeleport = (axes[1] < -0.75 || axes[3] < -0.75);
             ioManager.currentMenuDown = (axes[1] > 0.75 || axes[3] > 0.75);
-  
+
             ioManager.currentWeaponDown = buttonsSrc[0].pressed;
             ioManager.currentWeaponValue = buttons[0];
             ioManager.currentWeaponGrabs[0] = buttonsSrc[1].pressed;
-  
+
             if (
               buttons[3] >= 0.5 && ioManager.lastButtons[index][3] < 0.5 &&
               !(Math.abs(axes[0]) > 0.5 || Math.abs(axes[1]) > 0.5 || Math.abs(axes[2]) > 0.5 || Math.abs(axes[3]) > 0.5) &&
@@ -173,12 +157,12 @@ constructor() {
               game.jump();
             }
           }
-  
+
           ioManager.lastAxes[index][0] = axes[0];
           ioManager.lastAxes[index][1] = axes[1];
           ioManager.lastAxes[index][2] = axes[2];
           ioManager.lastAxes[index][3] = axes[3];
-          
+
           ioManager.lastButtons[index][0] = buttons[0];
           ioManager.lastButtons[index][1] = buttons[1];
           ioManager.lastButtons[index][2] = buttons[2];
@@ -188,9 +172,9 @@ constructor() {
       }
     } else {
       this.keysDirection.set(0, 0, 0);
-      
+
       const localPlayer = metaversefile.useLocalPlayer();
-      
+
       const _updateHorizontal = direction => {
         if (ioManager.keys.left) {
           direction.x -= 1;
@@ -223,15 +207,15 @@ constructor() {
       } else {
         cameraManager.lastNonzeroDirectionVector.copy(this.keysDirection);
       }
-      
-      if (localPlayer.hasAction('swim')){
-        if(ioManager.keys.shift && this.keysDirection.length() > 0){
+
+      if (localPlayer.hasAction('swim')) {
+        if (ioManager.keys.shift && this.keysDirection.length() > 0) {
           localPlayer.getAction('swim').animationType = 'freestyle';
         }
-        else if(!ioManager.keys.shift && this.keysDirection.length() > 0){
+        else if (!ioManager.keys.shift && this.keysDirection.length() > 0) {
           localPlayer.getAction('swim').animationType = 'breaststroke';
         }
-        else{
+        else {
           localPlayer.getAction('swim').animationType = 'null';
         }
       }
@@ -243,7 +227,7 @@ constructor() {
         cameraEuler.x = 0;
         cameraEuler.z = 0;
         this.keysDirection.applyEuler(cameraEuler);
-        
+
         if (ioManager.keys.ctrl && !ioManager.lastCtrlKey && game.isGrounded()) {
           game.toggleCrouch();
         }
@@ -258,7 +242,7 @@ constructor() {
     }
   };
 
-  updatePost = () => {
+  updatePost() {
     ioManager.lastTeleport = ioManager.currentTeleport;
     ioManager.lastMenuDown = ioManager.currentMenuDown;
     ioManager.lastWeaponDown = ioManager.currentWeaponDown;
@@ -269,27 +253,27 @@ constructor() {
     }
   };
 
-  setMovementEnabled = newMovementEnabled => {
+  setMovementEnabled(newMovementEnabled) {
     this.movementEnabled = newMovementEnabled;
   };
 
-  resetKeys = () => {
+  resetKeys() {
     for (const k in ioManager.keys) {
       ioManager.keys[k] = false;
     }
   };
 
-  keydown = e => {
+  keydown(e) {
     if (this.inputFocused() || e.repeat) {
       return;
     }
-  
+
     if (e.keyCode === 18) { // alt
       e.preventDefault();
       e.stopPropagation();
       return;
     }
-  
+
     // HACK: these keybindings control developer avatar animation offset settings in avatars.js
     /* if (e.which === 74) {
       window.lol -= 0.01;
@@ -304,7 +288,7 @@ constructor() {
       window.lol2 += 0.01;
       console.log(window.lol2);
     } */
-  
+
     switch (e.which) {
       case 9: { // tab
         break;
@@ -317,16 +301,16 @@ constructor() {
       case 54: // 6
       case 55: // 7
       case 56: // 8
-      {
-        game.selectLoadout(e.which - 49);
-        break;
-      }
+        {
+          game.selectLoadout(e.which - 49);
+          break;
+        }
       case 87: { // W
         ioManager.keys.up = true;
         if (!cameraManager.pointerLockElement) {
           game.menuVertical(-1);
         }
-  
+
         const now = performance.now();
         const timeDiff = now - this.lastKeysDownTime.keyW;
         if (timeDiff < doubleTapTime && ioManager.keys.shift) {
@@ -342,7 +326,7 @@ constructor() {
         if (!cameraManager.pointerLockElement) {
           game.menuHorizontal(-1);
         }
-  
+
         const now = performance.now();
         const timeDiff = now - this.lastKeysDownTime.keyA;
         if (timeDiff < doubleTapTime && ioManager.keys.shift) {
@@ -357,7 +341,7 @@ constructor() {
         if (e.ctrlKey) {
           e.preventDefault();
           e.stopPropagation();
-  
+
           game.saveScene();
         } else {
           ioManager.keys.down = true;
@@ -366,11 +350,11 @@ constructor() {
               game.menuVertical(1);
             } else {
               // if (!game.dragging) {
-                // _setTransformMode('scale');
+              // _setTransformMode('scale');
               // }
             }
           }
-  
+
           const now = performance.now();
           const timeDiff = now - this.lastKeysDownTime.keyS;
           if (timeDiff < doubleTapTime && ioManager.keys.shift) {
@@ -387,7 +371,7 @@ constructor() {
         if (!cameraManager.pointerLockElement) {
           game.menuHorizontal(1);
         }
-  
+
         const now = performance.now();
         const timeDiff = now - this.lastKeysDownTime.keyD;
         if (timeDiff < doubleTapTime && ioManager.keys.shift) {
@@ -428,7 +412,7 @@ constructor() {
           } else if (game.canBuild()) {
             game.setBuildMode('floor');
           } else { */
-            game.menuDelete();
+          game.menuDelete();
           // }
         }
         break;
@@ -440,10 +424,10 @@ constructor() {
           } else if (game.canBuild()) {
             game.setBuildMode('stair');
           } else */if (game.canPush()) {
-            ioManager.keys.backward = true;
-          } else {
-            ioManager.keys.ctrl = true;
-          }
+          ioManager.keys.backward = true;
+        } else {
+          ioManager.keys.ctrl = true;
+        }
         // }
         break;
       }
@@ -465,30 +449,30 @@ constructor() {
       }
       case 86: { // V
         // if (!this.inputFocused()) {
-          e.preventDefault();
-          e.stopPropagation();
-          game.menuVDown(e);
+        e.preventDefault();
+        e.stopPropagation();
+        game.menuVDown(e);
         // }
         break;
       }
       case 66: { // B
         // if (!this.inputFocused()) {
-          e.preventDefault();
-          e.stopPropagation();
-          game.menuBDown(e);
+        e.preventDefault();
+        e.stopPropagation();
+        game.menuBDown(e);
         // }
         break;
       }
       case 69: { // E
         // if (cameraManager.pointerLockElement) {
-        
+
         const now = performance.now();
         const timeDiff = now - this.lastKeysDownTime.keyE;
         if (timeDiff < doubleTapTime) {
           game.menuMiddleToggle();
         } else {
           game.menuMiddleUp();
-  
+
           if (game.canRotate()) {
             game.menuRotate(-1);
           } else {
@@ -496,7 +480,7 @@ constructor() {
           }
         }
         this.lastKeysDownTime.keyE = now;
-  
+
         // }
         break;
       }
@@ -526,7 +510,7 @@ constructor() {
           }
         } else {
           // if (!game.dragging) {
-            // _setTransformMode('rotate');
+          // _setTransformMode('rotate');
           // }
         }
         break;
@@ -538,11 +522,11 @@ constructor() {
       case 32: { // space
         ioManager.keys.space = true;
         // if (controlsManager.isPossessed()) {
-          if (!game.isJumping()) {
-            game.jump('jump');
-          } else if (!game.isDoubleJumping()) {
-            game.doubleJump();
-          }
+        if (!game.isJumping()) {
+          game.jump('jump');
+        } else if (!game.isDoubleJumping()) {
+          game.doubleJump();
+        }
         // }
         break;
       }
@@ -596,11 +580,11 @@ constructor() {
     }
   }
 
-  keypress = e => {
+  keypress = (e) => {
     // nothing
   };
 
-  wheel = e => {
+  wheel = (e) => {
     if (storyManager.handleWheel(e)) {
       // nothing
     } else {
@@ -614,17 +598,17 @@ constructor() {
     }
   }
 
-  keyup = e => {
+  keyup = (e) => {
     if (this.inputFocused() || e.repeat) {
       return;
     }
-  
+
     if (e.keyCode === 18) { // alt
       e.preventDefault();
       e.stopPropagation();
       return;
     }
-  
+
     switch (e.which) {
       /* case 81: { // Q
         game.setWeaponWheel(false);
@@ -662,14 +646,14 @@ constructor() {
       }
       case 70: { // F
         // if (cameraManager.pointerLockElement) {
-          ioManager.keys.forward = false;
+        ioManager.keys.forward = false;
         // }
         break;
       }
       case 67: { // C
         // if (cameraManager.pointerLockElement) {
-          ioManager.keys.backward = false;
-          ioManager.keys.ctrl = false;
+        ioManager.keys.backward = false;
+        ioManager.keys.ctrl = false;
         // }
         break;
       }
@@ -683,24 +667,24 @@ constructor() {
       } */
       case 86: { // V
         // if (!this.inputFocused()) {
-          e.preventDefault();
-          e.stopPropagation();
-          game.menuVUp();
+        e.preventDefault();
+        e.stopPropagation();
+        game.menuVUp();
         // }
         break;
       }
       case 66: { // B
         // if (!this.inputFocused()) {
-          e.preventDefault();
-          e.stopPropagation();
-          game.menuBUp();
+        e.preventDefault();
+        e.stopPropagation();
+        game.menuBUp();
         // }
         break;
       }
       case 16: { // shift
         ioManager.keys.shift = false;
         ioManager.keys.doubleTap = false;
-        
+
         game.menuUnDoubleTap();
         break;
       }
@@ -715,43 +699,43 @@ constructor() {
       }
       case 27: {
         // if (game.getMouseSelectedObject()) {
-          game.setMouseSelectedObject(null);
+        game.setMouseSelectedObject(null);
         // }
       }
     }
   };
 
-  mousemove = e => {
+  mousemove = (e) => {
     /* if (game.weaponWheel) {
       game.updateWeaponWheel(e);
     } else { */
-      if (cameraManager.pointerLockElement) {
-        cameraManager.handleMouseMove(e);
-      } else {
-        if (game.dragging) {
-          game.menuDrag(e);
-          game.menuDragRight(e);
-        }
+    if (cameraManager.pointerLockElement) {
+      cameraManager.handleMouseMove(e);
+    } else {
+      if (game.dragging) {
+        game.menuDrag(e);
+        game.menuDragRight(e);
       }
-      raycastManager.setLastMouseEvent(e);
+    }
+    raycastManager.setLastMouseEvent(e);
     // }
   };
 
-  mouseleave = e => {
+  mouseleave = (e) => {
     const renderer = getRenderer();
     renderer.domElement.classList.remove('hover');
   };
 
-  click = e => {
+  click = (e) => {
     if (cameraManager.pointerLockElement) {
       game.menuClick(e);
     } else {
       // game.setContextMenu(false);
-      
+
       if (!game.hoverEnabled) {
         cameraManager.requestPointerLock();
       }
-      
+
       /* if (controlsManager.isPossessed()) {
         cameraManager.requestPointerLock();
       } else {
@@ -770,11 +754,11 @@ constructor() {
     raycastManager.setLastMouseEvent(e);
   };
 
-  dblclick = e => {
+  dblclick = (e) => {
     // nothing
   };
 
-  mousedown = e => {
+  mousedown = (e) => {
     const changedButtons = this.lastMouseButtons ^ e.buttons;
     if (cameraManager.pointerLockElement) {
       if ((changedButtons & 1) && (e.buttons & 1)) { // left
@@ -807,31 +791,31 @@ constructor() {
     raycastManager.setLastMouseEvent(e);
   };
 
-  mouseup = e => {
+  mouseup = (e) => {
     const changedButtons = this.lastMouseButtons ^ e.buttons;
     // if (mouseDown) {
-      if (cameraManager.pointerLockElement) {
-        if ((changedButtons & 1) && !(e.buttons & 1)) { // left
-          game.menuMouseUp();
-        }
-        if ((changedButtons & 2) && !(e.buttons & 2)) { // right
-          game.menuUnaim();
-        }
-      } else {
-        if ((changedButtons & 2) && !(e.buttons & 2)) { // right
-          game.menuDragupRight();
-        }
+    if (cameraManager.pointerLockElement) {
+      if ((changedButtons & 1) && !(e.buttons & 1)) { // left
+        game.menuMouseUp();
       }
-      if ((changedButtons & 4) && !(e.buttons & 4)) { // middle
-        game.menuMiddleUp();
+      if ((changedButtons & 2) && !(e.buttons & 2)) { // right
+        game.menuUnaim();
       }
-      // mouseDown = false;
+    } else {
+      if ((changedButtons & 2) && !(e.buttons & 2)) { // right
+        game.menuDragupRight();
+      }
+    }
+    if ((changedButtons & 4) && !(e.buttons & 4)) { // middle
+      game.menuMiddleUp();
+    }
+    // mouseDown = false;
     // }
     this.lastMouseButtons = e.buttons;
     raycastManager.setLastMouseEvent(e);
   };
 
-  paste = e => {
+  paste = (e) => {
     if (!window.document.activeElement) {
       const items = Array.from(e.clipboardData.items);
       if (items.length > 0) {
@@ -846,5 +830,7 @@ constructor() {
     }
   };
 }
+
+const ioManager = new IoManager();
 
 export default ioManager;
