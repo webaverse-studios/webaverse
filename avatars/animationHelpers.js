@@ -1,38 +1,21 @@
 import {Vector3, Quaternion, AnimationClip, MathUtils} from 'three';
 import metaversefile from 'metaversefile';
-import {/* VRMSpringBoneImporter, VRMLookAtApplyer, */ VRMCurveMapper} from '@pixiv/three-vrm/lib/three-vrm.module.js';
-// import easing from '../easing.js';
+import {VRMCurveMapper} from '@pixiv/three-vrm/lib/three-vrm.module.js';
 import {easing} from '../math-utils.js';
 import loaders from '../loaders.js';
 import {zbdecode} from 'zjs/encoding.mjs';
 
 import {
-//   getSkinnedMeshes,
-//   getSkeleton,
-//   getEyePosition,
-//   getHeight,
-  // makeBoneMap,
-//   getTailBones,
-//   getModelBones,
-  // cloneModelBones,
   decorateAnimation,
-  // retargetAnimation,
-  // animationBoneToModelBone,
 } from './util.mjs';
 
 import {
   angleDifference,
-  // getVelocityDampingFactor,
-  // getNextPhysicsId,
 } from '../util.js';
 
 import {
   crouchMaxTime,
-  // useMaxTime,
   aimMaxTime,
-  // avatarInterpolationFrameRate,
-  // avatarInterpolationTimeDelay,
-  // avatarInterpolationNumFrames,
   narutoRunTimeFactor,
 } from '../constants.js';
 

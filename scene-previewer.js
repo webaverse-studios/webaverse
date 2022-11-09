@@ -1,6 +1,4 @@
 import * as THREE from 'three';
-// import metaversefile from 'metaversefile';
-// const {useApp, useFrame, useRenderer, useCamera, useMaterials, useCleanup} = metaversefile;
 import {getRenderer, camera} from './renderer.js';
 import {WebaverseShaderMaterial} from './materials.js';
 import renderSettingsManager from './rendersettings-manager.js';

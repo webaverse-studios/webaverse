@@ -7,35 +7,21 @@ the functionality is implemented in other managers.
 import * as THREE from 'three';
 import metaversefile from 'metaversefile';
 import cameraManager from './camera-manager.js';
-// import controlsManager from './controls-manager.js';
 import game from './game.js';
 import {world} from './world.js';
 import voiceInput from './voice-input/voice-input.js';
-// import * as universe from './universe.js';
-// import {toggle as inventoryToggle} from './inventory.js';
-import {isInIframe, getVelocityDampingFactor} from './util.js';
-import {getRenderer, /* renderer2, */ scene, camera, getContainerElement} from './renderer.js';
+import {isInIframe} from './util.js';
+import {getRenderer, camera} from './renderer.js';
 import physicsManager from './physics-manager.js';
-/* import {menuActions} from './mithril-ui/store/actions.js';
-import {menuState} from './mithril-ui/store/state.js'; */
-// import physx from './physx.js';
-// import {airFriction, flyFriction} from './constants.js';
 import transformControls from './transform-controls.js';
 import storyManager from './story.js';
-// import domRenderer from './dom-renderer.jsx';
 import raycastManager from './raycast-manager.js';
 
-// const localVector = new THREE.Vector3();
-// const localVector2 = new THREE.Vector3();
 const localVector3 = new THREE.Vector3();
-// const localVector2D = new THREE.Vector2();
-// const localVector2D2 = new THREE.Vector2();
-// const localQuaternion = new THREE.Quaternion();
 const localQuaternion2 = new THREE.Quaternion();
 const localEuler = new THREE.Euler();
 const localMatrix2 = new THREE.Matrix4();
 const localMatrix3 = new THREE.Matrix4();
-const localRaycaster = new THREE.Raycaster();
 const zeroVector = new THREE.Vector3();
 
 //

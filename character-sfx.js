@@ -16,8 +16,6 @@ import {
 import {
   mod,
   selectVoice,
-  // loadJson,
-  // loadAudioBuffer,
 } from './util.js';
 
 const localVector = new THREE.Vector3();

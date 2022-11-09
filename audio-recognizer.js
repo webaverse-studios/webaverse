@@ -1,5 +1,3 @@
-// import {makePromise} from './util.js';
-
 class CallbackManager {
   constructor() {
     this.currentId = 0;

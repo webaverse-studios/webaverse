@@ -1,4 +1,3 @@
-// import * as THREE from 'three';
 import React, {useState, useEffect} from 'react';
 import classnames from 'classnames';
 import {RpgText} from '../../../RpgText.jsx';

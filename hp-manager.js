@@ -1,16 +1,11 @@
 import * as THREE from 'three';
-// import physx from './physx.js';
-// import physicsManager from './physics-manager.js';
 import {world} from './world.js';
 import {damageMaterial} from './shaders.js';
 import {scene} from './renderer.js';
 import * as sounds from './sounds.js';
 import metaversefileApi from 'metaversefile';
 
-// const localVector = new THREE.Vector3();
 const localEuler = new THREE.Euler();
-// const localMatrix = new THREE.Matrix4();
-// const localMatrix2 = new THREE.Matrix4();
 
 const _makeDamagePhysicsMesh = () => {
   const geometry = new THREE.BoxBufferGeometry(1, 1, 1);

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {scene, sceneLowPriority} from './renderer.js';
+import {sceneLowPriority} from './renderer.js';
 import game from './game.js';
 import TransformGizmo from './TransformGizmo.js';
 import {capitalize} from './util.js';
@@ -10,7 +10,6 @@ const localVector3 = new THREE.Vector3();
 const localVector4 = new THREE.Vector3();
 const localQuaternion = new THREE.Quaternion();
 const localMatrix = new THREE.Matrix4();
-const localPlane = new THREE.Plane();
 
 const TransformAxisConstraints = {
   X: new THREE.Vector3(1, 0, 0),

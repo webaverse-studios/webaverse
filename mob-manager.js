@@ -4,7 +4,6 @@ import metaversefile from 'metaversefile';
 import {playersManager} from './players-manager.js';
 import physicsManager from './physics-manager.js';
 import hpManager from './hp-manager.js';
-// import {LodChunkTracker} from './lod.js';
 import {alea} from './procgen/procgen.js';
 import {createRelativeUrl} from './util.js';
 import dropManager from './drop-manager.js';
@@ -40,8 +39,6 @@ const bakeFps = 24;
 const maxAnimationFrameLength = 512;
 
 let unifiedBoneTextureSize = 1024;
-
-// window.THREE = THREE;
 
 const _zeroY = v => {
   v.y = 0;

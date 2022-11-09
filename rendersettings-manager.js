@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import postProcessing from './post-processing.js';
-// import {rootScene} from './renderer.js';
 
 const blackColor = new THREE.Color(0x000000);
 

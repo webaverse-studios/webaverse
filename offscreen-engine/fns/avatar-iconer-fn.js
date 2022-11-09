@@ -1,7 +1,7 @@
 import {fetchArrayBuffer} from '../../util.js';
 import {AvatarRenderer} from '../../avatars/avatar-renderer.js';
 import {createAvatarForScreenshot, screenshotAvatar} from '../../avatar-screenshotter.js';
-import {maxAvatarQuality, offscreenCanvasSize} from '../../constants.js';
+import {maxAvatarQuality} from '../../constants.js';
 import {emotes} from '../../emotes/emote-manager.js';
 import {createCanvas} from '../../renderer.js';
 

@@ -1,9 +1,9 @@
-import React, {useEffect, useState, useRef, useContext} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import classnames from 'classnames';
 
 import {defaultPlayerName} from '../../../../ai/lore/lore-model.js';
 import * as sounds from '../../../../sounds.js';
-// import cameraManager from '../../../../camera-manager.js';
+
 import {
     hp,
     mp,

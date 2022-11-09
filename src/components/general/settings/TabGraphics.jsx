@@ -3,7 +3,6 @@ import React, {useEffect, useState} from 'react';
 import classNames from 'classnames';
 
 import game from '../../../../game.js';
-import metaversefileApi from '../../../../metaversefile-api'
 import settingsManager from '../../../../settings-manager.js';
 import {Switch} from './switch';
 

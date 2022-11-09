@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {getRenderer, camera} from './renderer.js';
+import {getRenderer} from './renderer.js';
 import {WebaverseShaderMaterial} from './materials.js';
 
 //
