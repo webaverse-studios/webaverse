@@ -149,6 +149,7 @@ export function applyCharacterActionsToAvatar(character, rig) {
       }
     }
     rig.useAnimationIndex = useAction?.index;
+    // rig.useTime = character.actionInterpolants.use.get();
     rig.unuseTime = physx.physxWorker.getActionInterpolantAnimationAvatar(character.avatar.animationAvatarPtr, 'unuse', 0);
     if (rig.unuseTime === 0) { // this means use is active
       if (useAction?.animationEnvelope) {

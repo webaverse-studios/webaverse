@@ -337,7 +337,7 @@ class Character extends THREE.Object3D {
   }
 
   getCrouchFactor() {
-    return 1 - 0.4 *physx.physxWorker.getActionInterpolantAnimationAvatar(this.avatar.animationAvatarPtr, 'crouch', 1);
+    return 1 - 0.4 * physx.physxWorker.getActionInterpolantAnimationAvatar(this.avatar.animationAvatarPtr, 'crouch', 1);
     /* let factor = 1;
     factor *= 1 - 0.4 * this.actionInterpolants.crouch.getNormalized();
     return factor; */
