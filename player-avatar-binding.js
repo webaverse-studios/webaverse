@@ -108,20 +108,23 @@ export function applyCharacterActionsToAvatar(character, rig) {
   const fallLoopAction = character.getAction('fallLoop');
   // const fallLoopAnimation = fallLoopAction ? fallLoopAction.animation : '';
   // const hurtAction = character.getAction('hurt');
-  // const activateAction = character.getAction('activate');
   // const swordSideSlash = character.getAction('swordSideSlash');
   // const swordSideSlashAnimation = swordSideSlash ? swordSideSlash.animation : '';
   // const swordTopDownSlash = character.getAction('swordTopDownSlash');
   // const swordTopDownSlashAnimation = swordTopDownSlash ? swordTopDownSlash.animation : '';
 
   rig.jumpState = !!jumpAction;
+  // rig.jumpTime = character.actionInterpolants.jump.get();
   rig.doubleJumpState = !!doubleJumpAction;
+  // rig.doubleJumpTime = character.actionInterpolants.doubleJump.get();
+  // rig.landTime = character.actionInterpolants.land.get();
   rig.lastLandStartTime = landAction ? landAction.time : 0;
   rig.landWithMoving = landAction?.isMoving;
   rig.flyState = !!flyAction;
-  // rig.activateState = !!activateAction;
-  // rig.activateAnimation = activateAction?.animationName;
+  // rig.flyTime = flyAction ? character.actionInterpolants.fly.get() : -1;
+  // rig.activateTime = character.actionInterpolants.activate.get();
   rig.swimState = !!swimAction;
+  // rig.swimTime = swimAction ? character.actionInterpolants.swim.get() : -1;
   
   const _handleUse = () => {
     if (useAction?.animation) {
@@ -157,10 +160,11 @@ export function applyCharacterActionsToAvatar(character, rig) {
   };
   _handleUse();
 
-  const _handlePickUp = () => {
-    // rig.pickUpState = !!pickUpAction;
-  };
-  _handlePickUp();
+  // const _handlePickUp = () => {
+  //   rig.pickUpState = !!pickUpAction;
+  //   rig.pickUpTime = character.actionInterpolants.pickUp.get();
+  // };
+  // _handlePickUp();
 
   rig.manuallySetMouth  = character.avatarFace.manuallySetMouth;
   rig.vowels[1] = character.avatarFace.manuallySetMouth ? 0 : rig.vowels[1];
@@ -169,8 +173,9 @@ export function applyCharacterActionsToAvatar(character, rig) {
   rig.vowels[4] = character.avatarFace.manuallySetMouth ? 0 : rig.vowels[4];
 
   rig.narutoRunState = !!narutoRunAction && !crouchAction;
+  // rig.narutoRunTime = character.actionInterpolants.narutoRun.get();
   rig.aimState = !!aimAction;
-  // if (rig.aimState) debugger
+  // rig.aimTime = character.actionInterpolants.aim.get();
   rig.aimRightTransitionTime = physx.physxWorker.getActionInterpolantAnimationAvatar(rig.animationAvatarPtr, 'aimRightTransition', 0);
   rig.aimLeftTransitionTime = physx.physxWorker.getActionInterpolantAnimationAvatar(rig.animationAvatarPtr, 'aimLeftTransition', 0);
   // rig.aimAnimation = (aimAction?.characterAnimation) || '';
@@ -183,24 +188,38 @@ export function applyCharacterActionsToAvatar(character, rig) {
   rig.holdState = wearAction?.holdAnimation === 'pick_up_idle';
   if (rig.holdState) rig.unuseAnimation = null;
   // rig.danceState = !!danceAction;
+  // rig.danceFactor = character.actionInterpolants.dance.get();
   // if (danceAction) {
   //   rig.danceAnimation = danceAnimation;
   // }
+  // rig.emoteFactor = character.actionInterpolants.emote.get();
   rig.emoteAnimation = emoteAnimation;
   // rig.throwState = !!throwAction;
+  // rig.throwTime = character.actionInterpolants.throw.get();
+  // rig.crouchTime = character.actionInterpolants.crouch.getInverse();
+  // rig.chargeJumpTime = character.actionInterpolants.chargeJump.get();
   // rig.chargeAnimation = chargeJumpAnimation;
   // rig.chargeJumpState = !!chargeJump;
+  // rig.standChargeTime = character.actionInterpolants.standCharge.get();
   // rig.standChargeAnimation = standChargeAnimation;
   // rig.standChargeState = !!standCharge;
+  // rig.fallLoopTime = character.actionInterpolants.fallLoop.get();
+  // rig.fallLoopFactor = character.actionInterpolants.fallLoopTransition.getNormalized();
   rig.fallLoopFromJump = fallLoopAction?.from === 'jump';
   // rig.fallLoopAnimation = fallLoopAnimation;
   rig.fallLoopState = !!fallLoopAction;
   rig.landState = !!landAction;
+  // rig.swordSideSlashTime = character.actionInterpolants.swordSideSlash.get();
   // rig.swordSideSlashAnimation = swordSideSlashAnimation;
   // rig.swordSideSlashState = !!swordSideSlash;
+  // rig.swordTopDownSlashTime = character.actionInterpolants.swordTopDownSlash.get();
   // rig.swordTopDownSlashAnimation = swordTopDownSlashAnimation;
   // rig.swordTopDownSlashState = !!swordTopDownSlash;
   // rig.hurtAnimation = (hurtAction?.animation) || '';
+  // rig.hurtTime = character.actionInterpolants.hurt.get();
+  // rig.movementsTime = character.actionInterpolants.movements.get();
+  // rig.movementsTransitionTime = character.actionInterpolants.movementsTransition.get();
+  // rig.sprintTime = character.actionInterpolants.sprint.get();
 }
 // returns whether headTarget were applied
 export function applyCharacterHeadTargetToAvatar(character, rig) {

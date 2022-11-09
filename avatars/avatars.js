@@ -883,7 +883,7 @@ class Avatar {
     this.idleWalkFactor = NaN;
     this.walkRunFactor = NaN;
     // this.crouchFactor = NaN;
-    this.sitState = false;
+    // this.sitState = false;
     // this.sitAnimation = null;
     // this.activateState = false;
     this.activateTime = 0;
@@ -928,7 +928,6 @@ class Avatar {
     // this.aimDirection = new THREE.Vector3();
     // this.hurtTime = NaN;
     // this.hurtAnimation = null;
-    // this.activateAnimation = null;
 
     // internal state
     // this.movementsTime = 0;
