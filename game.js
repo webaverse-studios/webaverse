@@ -14,7 +14,7 @@ import {buildMaterial, highlightMaterial, selectMaterial, hoverMaterial, hoverEq
 import {getRenderer, sceneLowPriority, camera} from './renderer.js';
 import {downloadFile, snapPosition, getDropUrl, handleDropJsonItem, makeId} from './util.js';
 import {maxGrabDistance, throwReleaseTime, throwAnimationDuration, walkSpeed, crouchSpeed, flySpeed} from './constants.js';
-import metaversefileApi from './metaversefile-api.js';
+import metaversefileApi from 'metaversefile';
 import loadoutManager from './loadout-manager.js';
 import * as sounds from './sounds.js';
 import {playersManager} from './players-manager.js';
@@ -85,6 +85,7 @@ class GameManager extends EventTarget {
     this.setFirstPersonAction(this.lastFirstPerson);
     this.bindPointerLock();
     this.registerHighlightMeshes();
+    this.init()
   }
 
   registerHighlightMeshes() {
@@ -110,6 +111,15 @@ class GameManager extends EventTarget {
   }
 
   init() {
+    // check if metaversefileApi.createApp exists
+    // if not, delay and try again
+    if (!metaversefileApi.createApp) {
+      setTimeout(() => {
+        this.init();
+      }, 1000);
+      return;
+    }
+
     this.grabUseMesh = metaversefileApi.createApp();
     (async () => {
       const {importModule} = metaversefileApi.useDefaultModules();
@@ -1545,5 +1555,4 @@ class GameManager extends EventTarget {
 }
 
 const gameManager = new GameManager();
-
 export default gameManager;

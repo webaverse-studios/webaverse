@@ -48,7 +48,6 @@ import universe from './universe.js';
 import npcManager from './npc-manager.js';
 import settingsManager from './settings-manager.js';
 import backgroundFx from './background-fx/background-fx.js';
-import gameManager from './game.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -94,7 +93,6 @@ export default class Webaverse extends EventTarget {
         musicManager.waitForLoad(),
       ]);
     })();
-    gameManager.init();
     this.contentLoaded = false;
   }
   
