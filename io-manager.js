@@ -8,9 +8,9 @@ import * as THREE from 'three';
 import metaversefile from 'metaversefile';
 import cameraManager from './camera-manager.js';
 import game from './game.js';
-import { world } from './world.js';
+import {world} from './world.js';
 import voiceInput from './voice-input/voice-input.js';
-import { getRenderer, camera } from './renderer.js';
+import {getRenderer, camera} from './renderer.js';
 import physicsManager from './physics-manager.js';
 import transformControls from './transform-controls.js';
 import storyManager from './story.js';
@@ -82,12 +82,12 @@ class IoManager extends EventTarget {
       const inputSources = Array.from(renderer.xr.getSession().inputSources);
       for (let i = 0; i < inputSources.length; i++) {
         const inputSource = inputSources[i];
-        const { handedness, gamepad } = inputSource;
+        const {handedness, gamepad} = inputSource;
         if (gamepad && gamepad.buttons.length >= 2) {
           const index = handedness === 'right' ? 1 : 0;
 
           // axes
-          const { axes: axesSrc, buttons: buttonsSrc } = gamepad;
+          const {axes: axesSrc, buttons: buttonsSrc} = gamepad;
           const axes = [
             axesSrc[0] || 0,
             axesSrc[1] || 0,
@@ -274,21 +274,6 @@ class IoManager extends EventTarget {
       return;
     }
 
-    // HACK: these keybindings control developer avatar animation offset settings in avatars.js
-    /* if (e.which === 74) {
-      window.lol -= 0.01;
-      console.log(window.lol);
-    } else if (e.which === 75) {
-      window.lol += 0.01;
-      console.log(window.lol);
-    } else if (e.which === 78) {
-      window.lol2 += 0.01;
-      console.log(window.lol2);
-    } else if (e.which === 77) {
-      window.lol2 += 0.01;
-      console.log(window.lol2);
-    } */
-
     switch (e.which) {
       case 9: { // tab
         break;
@@ -348,10 +333,6 @@ class IoManager extends EventTarget {
           if (!cameraManager.pointerLockElement) {
             if (game.menuOpen) {
               game.menuVertical(1);
-            } else {
-              // if (!game.dragging) {
-              // _setTransformMode('scale');
-              // }
             }
           }
 
@@ -388,84 +369,41 @@ class IoManager extends EventTarget {
         if (game.canPush()) {
           ioManager.keys.forward = true;
         } else {
-          /* if (game.canJumpOff()) {
-            game.jumpOff();
-          } */
           game.toggleFly();
         }
         break;
       }
-      /* case 90: { // Z
-        if (!e.ctrlKey) {
-          if (game.canStartBuild()) {
-            game.startBuild('wall');
-          } else if (game.canBuild()) {
-            game.setBuildMode('wall');
-          }
-        }
-        break;
-      } */
       case 88: { // X
         if (!e.ctrlKey) {
-          /* if (game.canStartBuild()) {
-            game.startBuild('floor');
-          } else if (game.canBuild()) {
-            game.setBuildMode('floor');
-          } else { */
           game.menuDelete();
-          // }
         }
         break;
       }
       case 67: { // C
-        // if (!e.ctrlKey) {
-          /* if (game.canStartBuild()) {
-            game.startBuild('stair');
-          } else if (game.canBuild()) {
-            game.setBuildMode('stair');
-          } else */if (game.canPush()) {
+        if (game.canPush()) {
           ioManager.keys.backward = true;
         } else {
           ioManager.keys.ctrl = true;
         }
-        // }
         break;
       }
-      /* case 73: { // I
-        inventoryToggle();
-        break;
-      } */
-      /* case 82: { // R
-        e.preventDefault();
-        e.stopPropagation();
-        document.getElementById('key-r').click(); // equip
-        break;
-      } */
       case 71: { // G
-        // game.menuDrop();
-        // game.menuGDown();
         game.menuSwitchCharacter();
         break;
       }
       case 86: { // V
-        // if (!this.inputFocused()) {
         e.preventDefault();
         e.stopPropagation();
         game.menuVDown(e);
-        // }
         break;
       }
       case 66: { // B
-        // if (!this.inputFocused()) {
         e.preventDefault();
         e.stopPropagation();
         game.menuBDown(e);
-        // }
         break;
       }
       case 69: { // E
-        // if (cameraManager.pointerLockElement) {
-
         const now = performance.now();
         const timeDiff = now - this.lastKeysDownTime.keyE;
         if (timeDiff < doubleTapTime) {
@@ -480,8 +418,6 @@ class IoManager extends EventTarget {
           }
         }
         this.lastKeysDownTime.keyE = now;
-
-        // }
         break;
       }
       case 84: { // T
@@ -496,11 +432,6 @@ class IoManager extends EventTarget {
         voiceInput.toggleSpeech();
         break;
       }
-      case 80: { // P
-        // game.destroyWorld()
-        // game.menuPhysics();
-        break;
-      }
       case 82: { // R
         if (cameraManager.pointerLockElement) {
           if (game.canRotate()) {
@@ -508,10 +439,6 @@ class IoManager extends EventTarget {
           } else {
             game.dropSelectedApp();
           }
-        } else {
-          // if (!game.dragging) {
-          // _setTransformMode('rotate');
-          // }
         }
         break;
       }
@@ -530,10 +457,6 @@ class IoManager extends EventTarget {
         // }
         break;
       }
-      /* case 17: { // ctrl
-        ioManager.keys.ctrl = true;
-        break;
-      } */
       case 81: { // Q
         if (e.ctrlKey) {
           if (cameraManager.pointerLockElement) {
@@ -552,14 +475,6 @@ class IoManager extends EventTarget {
         }
         break;
       }
-      /* case 13: { // enter
-        game.enter();
-        break;
-      } */
-      /* case 77: { // M
-        game.toggleMap();
-        break;
-      } */
       case 74: { // J
         game.inventoryHack = !game.inventoryHack;
         break;
@@ -580,11 +495,11 @@ class IoManager extends EventTarget {
     }
   }
 
-  keypress = (e) => {
+  keypress = e => {
     // nothing
   };
 
-  wheel = (e) => {
+  wheel = e => {
     if (storyManager.handleWheel(e)) {
       // nothing
     } else {
@@ -598,7 +513,7 @@ class IoManager extends EventTarget {
     }
   }
 
-  keyup = (e) => {
+  keyup = e => {
     if (this.inputFocused() || e.repeat) {
       return;
     }
@@ -610,10 +525,6 @@ class IoManager extends EventTarget {
     }
 
     switch (e.which) {
-      /* case 81: { // Q
-        game.setWeaponWheel(false);
-        break;
-      } */
       case 87: { // W
         ioManager.keys.up = false;
         break;
@@ -634,10 +545,6 @@ class IoManager extends EventTarget {
         ioManager.keys.space = false;
         break;
       }
-      /* case 17: { // ctrl
-        ioManager.keys.ctrl = false;
-        break;
-      } */
       case 69: { // E
         if (cameraManager.pointerLockElement) {
           game.menuActivateUp();
@@ -645,40 +552,24 @@ class IoManager extends EventTarget {
         break;
       }
       case 70: { // F
-        // if (cameraManager.pointerLockElement) {
         ioManager.keys.forward = false;
-        // }
         break;
       }
       case 67: { // C
-        // if (cameraManager.pointerLockElement) {
         ioManager.keys.backward = false;
         ioManager.keys.ctrl = false;
-        // }
         break;
       }
-      /* case 71: { // G
-        // if (!this.inputFocused()) {
-          e.preventDefault();
-          e.stopPropagation();
-          game.menuGUp();
-        // }
-        break;
-      } */
       case 86: { // V
-        // if (!this.inputFocused()) {
         e.preventDefault();
         e.stopPropagation();
         game.menuVUp();
-        // }
         break;
       }
       case 66: { // B
-        // if (!this.inputFocused()) {
         e.preventDefault();
         e.stopPropagation();
         game.menuBUp();
-        // }
         break;
       }
       case 16: { // shift
@@ -698,17 +589,12 @@ class IoManager extends EventTarget {
         break;
       }
       case 27: {
-        // if (game.getMouseSelectedObject()) {
         game.setMouseSelectedObject(null);
-        // }
       }
     }
   };
 
-  mousemove = (e) => {
-    /* if (game.weaponWheel) {
-      game.updateWeaponWheel(e);
-    } else { */
+  mousemove = e => {
     if (cameraManager.pointerLockElement) {
       cameraManager.handleMouseMove(e);
     } else {
@@ -718,47 +604,27 @@ class IoManager extends EventTarget {
       }
     }
     raycastManager.setLastMouseEvent(e);
-    // }
   };
 
-  mouseleave = (e) => {
+  mouseleave = e => {
     const renderer = getRenderer();
     renderer.domElement.classList.remove('hover');
   };
 
-  click = (e) => {
+  click = e => {
     if (cameraManager.pointerLockElement) {
       game.menuClick(e);
-    } else {
-      // game.setContextMenu(false);
-
-      if (!game.hoverEnabled) {
+    } else if (!game.hoverEnabled) {
         cameraManager.requestPointerLock();
       }
-
-      /* if (controlsManager.isPossessed()) {
-        cameraManager.requestPointerLock();
-      } else {
-        const mouseHoverObject = game.getMouseHoverObject();
-        const mouseHoverPhysicsId = game.getMouseHoverPhysicsId();
-        if (mouseHoverObject) {
-          const mouseSelectedObject = game.getMouseSelectedObject();
-          if (mouseHoverObject !== mouseSelectedObject) {
-            game.setMouseSelectedObject(mouseHoverObject, mouseHoverPhysicsId);
-          } else {
-            game.setMouseSelectedObject(null);
-          }
-        }
-      } */
-    }
     raycastManager.setLastMouseEvent(e);
   };
 
-  dblclick = (e) => {
+  dblclick = e => {
     // nothing
   };
 
-  mousedown = (e) => {
+  mousedown = e => {
     const changedButtons = this.lastMouseButtons ^ e.buttons;
     if (cameraManager.pointerLockElement) {
       if ((changedButtons & 1) && (e.buttons & 1)) { // left
@@ -787,13 +653,11 @@ class IoManager extends EventTarget {
       game.menuMiddleDown();
     }
     this.lastMouseButtons = e.buttons;
-    // mouseDown = true;
     raycastManager.setLastMouseEvent(e);
   };
 
-  mouseup = (e) => {
+  mouseup = e => {
     const changedButtons = this.lastMouseButtons ^ e.buttons;
-    // if (mouseDown) {
     if (cameraManager.pointerLockElement) {
       if ((changedButtons & 1) && !(e.buttons & 1)) { // left
         game.menuMouseUp();
@@ -809,23 +673,16 @@ class IoManager extends EventTarget {
     if ((changedButtons & 4) && !(e.buttons & 4)) { // middle
       game.menuMiddleUp();
     }
-    // mouseDown = false;
-    // }
     this.lastMouseButtons = e.buttons;
     raycastManager.setLastMouseEvent(e);
   };
 
-  paste = (e) => {
+  paste = e => {
     if (!window.document.activeElement) {
       const items = Array.from(e.clipboardData.items);
       if (items.length > 0) {
         e.preventDefault();
         console.log('paste items', items);
-        /* let s = await new Promise((accept, reject) => {
-          items[0].getAsString(accept);
-        });
-        s = s.replace(/[\n\r]+/g, '').slice(0, 256);
-        game.menuPaste(s); */
       }
     }
   };
