@@ -26,6 +26,7 @@ import zTargeting from './z-targeting.js';
 import Avatar from './avatars/avatars.js';
 import {avatarManager} from './avatar-manager.js';
 import npcManager from './npc-manager.js';
+import universe from './universe';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -530,6 +531,15 @@ const _gameUpdate = (timestamp, timeDiff) => {
     }
   };
   _handlePush();
+
+  const _updateRealms = () => {
+    if (universe.multiplayerEnabled) {
+      const REALM_SIZE = 256;
+      const position = localPlayer.position;
+      universe.realms.updatePosition([position.x, position.y, position.z], REALM_SIZE);
+    }
+  };
+  _updateRealms();
 
   const _updateGrab = () => {
     const renderer = getRenderer();
