@@ -92,9 +92,9 @@ export function applyCharacterActionsToAvatar(character, rig) {
   const pickUpAction = character.getAction('pickUp');
   const narutoRunAction = character.getAction('narutoRun');
   const sitAction = character.getAction('sit');
-  const sitAnimation = sitAction ? sitAction.animation : '';
-  const danceAction = character.getAction('dance');
-  const danceAnimation = danceAction ? danceAction.animation : '';
+  // const sitAnimation = sitAction ? sitAction.animation : '';
+  // const danceAction = character.getAction('dance');
+  // const danceAnimation = danceAction ? danceAction.animation : '';
   const emoteAction = character.getAction('emote');
   const emoteAnimation = emoteAction ? emoteAction.animation : '';
   // const throwAction = character.getAction('throw');
@@ -107,8 +107,8 @@ export function applyCharacterActionsToAvatar(character, rig) {
   // const standChargeAnimation = standCharge ? standCharge.animation : '';
   const fallLoopAction = character.getAction('fallLoop');
   // const fallLoopAnimation = fallLoopAction ? fallLoopAction.animation : '';
-  const hurtAction = character.getAction('hurt');
-  const activateAction = character.getAction('activate');
+  // const hurtAction = character.getAction('hurt');
+  // const activateAction = character.getAction('activate');
   // const swordSideSlash = character.getAction('swordSideSlash');
   // const swordSideSlashAnimation = swordSideSlash ? swordSideSlash.animation : '';
   // const swordTopDownSlash = character.getAction('swordTopDownSlash');
@@ -119,8 +119,8 @@ export function applyCharacterActionsToAvatar(character, rig) {
   rig.lastLandStartTime = landAction ? landAction.time : 0;
   rig.landWithMoving = landAction?.isMoving;
   rig.flyState = !!flyAction;
-  rig.activateState = !!activateAction;
-  rig.activateAnimation = activateAction?.animationName;
+  // rig.activateState = !!activateAction;
+  // rig.activateAnimation = activateAction?.animationName;
   rig.swimState = !!swimAction;
   
   const _handleUse = () => {
@@ -173,19 +173,19 @@ export function applyCharacterActionsToAvatar(character, rig) {
   // if (rig.aimState) debugger
   rig.aimRightTransitionTime = physx.physxWorker.getActionInterpolantAnimationAvatar(rig.animationAvatarPtr, 'aimRightTransition', 0);
   rig.aimLeftTransitionTime = physx.physxWorker.getActionInterpolantAnimationAvatar(rig.animationAvatarPtr, 'aimLeftTransition', 0);
-  rig.aimAnimation = (aimAction?.characterAnimation) || '';
+  // rig.aimAnimation = (aimAction?.characterAnimation) || '';
   // rig.aimDirection.set(0, 0, -1);
   // aimAction && rig.aimDirection.applyQuaternion(rig.inputs.hmd.quaternion);
   // rig.sitState = !!sitAction;
-  rig.sitAnimation = sitAnimation;
+  // rig.sitAnimation = sitAnimation;
 
   // XXX this needs to be based on the current loadout index
   rig.holdState = wearAction?.holdAnimation === 'pick_up_idle';
   if (rig.holdState) rig.unuseAnimation = null;
   // rig.danceState = !!danceAction;
-  if (danceAction) {
-    rig.danceAnimation = danceAnimation;
-  }
+  // if (danceAction) {
+  //   rig.danceAnimation = danceAnimation;
+  // }
   rig.emoteAnimation = emoteAnimation;
   // rig.throwState = !!throwAction;
   // rig.chargeAnimation = chargeJumpAnimation;
@@ -200,7 +200,7 @@ export function applyCharacterActionsToAvatar(character, rig) {
   // rig.swordSideSlashState = !!swordSideSlash;
   // rig.swordTopDownSlashAnimation = swordTopDownSlashAnimation;
   // rig.swordTopDownSlashState = !!swordTopDownSlash;
-  rig.hurtAnimation = (hurtAction?.animation) || '';
+  // rig.hurtAnimation = (hurtAction?.animation) || '';
 }
 // returns whether headTarget were applied
 export function applyCharacterHeadTargetToAvatar(character, rig) {
