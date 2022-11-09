@@ -85,8 +85,6 @@ class GameManager extends EventTarget {
     this.setFirstPersonAction(this.lastFirstPerson);
     this.bindPointerLock();
     this.registerHighlightMeshes();
-    
-    // use a promise to defer the init until the first frame
   }
 
   registerHighlightMeshes() {
@@ -123,7 +121,7 @@ class GameManager extends EventTarget {
     sceneLowPriority.add(this.grabUseMesh);
   };
 
-  delete = () => {
+  delete() {
     const grabbedObject = this.getGrabbedObject(0);
     if (grabbedObject) {
       const localPlayer = playersManager.getLocalPlayer();
@@ -162,7 +160,7 @@ class GameManager extends EventTarget {
     }
   }
 
-  startUse = () => {
+  startUse() {
     const wearApp = loadoutManager.getSelectedApp();
     if (wearApp) {
       const useComponent = wearApp.getComponent('use');
@@ -195,7 +193,7 @@ class GameManager extends EventTarget {
     }
   };
 
-  endUse = () => {
+  endUse() {
     const localPlayer = playersManager.getLocalPlayer();
     const useAction = localPlayer.getAction('use');
     if (useAction) {
@@ -208,15 +206,15 @@ class GameManager extends EventTarget {
     }
   };
 
-  mousedown = () => {
+  mousedown() {
     this.startUse();
   };
 
-  mouseup = () => {
+  mouseup() {
     this.isMouseUp = true;
   };
 
-  grab = object => {
+  grab (object) {
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.grab(object);
 
@@ -238,7 +236,7 @@ class GameManager extends EventTarget {
     return result;
   };
 
-  unwearAppIfHasSitComponent = player => {
+  unwearAppIfHasSitComponent(player) {
     const wearActions = player.getActionsByType('wear');
     for (const wearAction of wearActions) {
       const instanceId = wearAction.instanceId;
@@ -313,7 +311,7 @@ class GameManager extends EventTarget {
     };
   }
 
-  getCurrentGrabAnimation = () => {
+  getCurrentGrabAnimation() {
     let currentAnimation = '';
     const localPlayer = playersManager.getLocalPlayer();
 
@@ -381,7 +379,7 @@ class GameManager extends EventTarget {
     return currentAnimation;
   };
 
-  makeHighlightPhysicsMesh = material => {
+  makeHighlightPhysicsMesh(material) {
     const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
     material = material.clone();
     const mesh = new THREE.Mesh(geometry, material);
@@ -404,7 +402,7 @@ class GameManager extends EventTarget {
     }
   };
 
-  bindPointerLock = () => {
+  bindPointerLock() {
     cameraManager.addEventListener('pointerlockchange', e => {
       const {pointerLockElement} = e.data;
 
@@ -429,11 +427,6 @@ class GameManager extends EventTarget {
 
   setContextMenuObject(contextMenuObject) {
     this.contextMenuObject = contextMenuObject;
-  }
-
-  menuUse() {
-    throw new Error('not implemented - code has been commented out because it has errors');
-    // this.use();
   }
 
   menuDelete() {
