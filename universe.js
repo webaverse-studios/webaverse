@@ -9,7 +9,7 @@ import {NetworkRealms} from 'multiplayer-do/public/network-realms.mjs';
 import WSRTC from 'wsrtc/wsrtc.js';
 import * as Z from 'zjs';
 
-import {appsMapName, partyMapName, initialPosY, playersMapName} from './constants.js';
+import {appsMapName, partyMapName, initialPosY, playersMapName, realmSize} from './constants.js';
 import {loadOverworld} from './overworld.js';
 import {partyManager} from './party-manager.js';
 import physicsManager from './physics-manager.js';
@@ -28,6 +28,7 @@ class Universe extends EventTarget {
     this.sceneLoadedPromise = null;
 
     this.multiplayerEnabled = false;
+    this.multiplayerConnected = false;
     this.realms = null;
   }
 
@@ -129,6 +130,7 @@ class Universe extends EventTarget {
 
   toggleMultiplayer() {
     this.multiplayerEnabled = !this.multiplayerEnabled;
+    console.log(this.multiplayerEnabled ? 'Enter multiplayer' : 'Exit multiplayer');
     this.reload();
   }
 
@@ -180,19 +182,84 @@ class Universe extends EventTarget {
     // Called by enterWorld() when a player enables multi-player.
   async connectMultiplayer(src, state = new Z.Doc()) {
     this.connectState(state);
+
     // Set up the network realms.
     const localPlayer = playersManager.getLocalPlayer();
     this.realms = new NetworkRealms(localPlayer.playerId);
+    this.realmsCleanupFns = new Map();
+
+    this.realms.addEventListener('realmjoin', e => {
+      const {realm} = e.data;
+      const {dataClient, networkedDataClient} = realm;
+
+      const onsyn = e => {
+        const {synId} = e.data;
+        const synAckMessage = dataClient.getSynAckMessage(synId);
+        networkedDataClient.emitUpdate(synAckMessage);
+      };
+      dataClient.addEventListener('syn', onsyn);
+
+      const cleanupFns = [
+        () => {
+          dataClient.removeEventListener('syn', onsyn);
+        },
+      ];
+
+      this.realmsCleanupFns.set(realm, () => {
+        for (const cleanupFn of cleanupFns) {
+          cleanupFn();
+        }
+      });
+    });
+
+    this.realms.addEventListener('realmleave', e => {
+      const {realm} = e.data;
+
+      this.realmsCleanupFns.get(realm)();
+      this.realmsCleanupFns.delete(realm);
+    });
+
+    // Use default scene if none specified.
+    if (src === undefined) {
+      const sceneNames = await sceneManager.getSceneNamesAsync();
+      src = sceneManager.getSceneUrl(sceneNames[0]);
+    }
 
     // Load the scene.
     await metaversefile.createAppAsync({
       start_url: src,
     });
+
+    const onConnect = (position) => {
+
+      // Default player apps and actions can be included here.
+
+      this.realms.localPlayer.initializePlayer({
+        position: position,
+      }, {});
+
+      console.log('Multiplayer connected');
+      this.multiplayerConnected = true;
+    };
+
+    const initialPosition = [
+      localPlayer.position.x,
+      localPlayer.position.y,
+      localPlayer.position.z
+    ];
+
+    this.realms.updatePosition(initialPosition, realmSize, {
+      onConnect
+    });
   }
 
   // Called by enterWorld() to ensure we aren't connected to multi-player.
   disconnectMultiplayer() {
+    console.log('Multiplayer disconnected');
+    this.multiplayerConnected = false;
+
     // TODO: Disconnect from and dispose of realms.
+
     this.realms = null;
   }
 

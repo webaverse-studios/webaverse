@@ -14,7 +14,7 @@ import {world} from './world.js';
 import {buildMaterial, highlightMaterial, selectMaterial, hoverMaterial, hoverEquipmentMaterial} from './shaders.js';
 import {getRenderer, sceneLowPriority, camera} from './renderer.js';
 import {downloadFile, snapPosition, getDropUrl, handleDropJsonItem,makeId} from './util.js';
-import {maxGrabDistance, throwReleaseTime, storageHost, minFov, maxFov, throwAnimationDuration, walkSpeed, runSpeed, narutoRunSpeed, crouchSpeed, flySpeed, minAvatarQuality} from './constants.js';
+import {maxGrabDistance, throwReleaseTime, storageHost, minFov, maxFov, throwAnimationDuration, walkSpeed, runSpeed, narutoRunSpeed, crouchSpeed, flySpeed, minAvatarQuality, realmSize} from './constants.js';
 import metaversefileApi from './metaversefile-api.js';
 import loadoutManager from './loadout-manager.js';
 import * as sounds from './sounds.js';
@@ -533,10 +533,9 @@ const _gameUpdate = (timestamp, timeDiff) => {
   _handlePush();
 
   const _updateRealms = () => {
-    if (universe.multiplayerEnabled) {
-      const REALM_SIZE = 256;
+    if (universe.multiplayerConnected) {
       const position = localPlayer.position;
-      universe.realms.updatePosition([position.x, position.y, position.z], REALM_SIZE);
+      universe.realms.updatePosition([position.x, position.y, position.z], realmSize);
     }
   };
   _updateRealms();
