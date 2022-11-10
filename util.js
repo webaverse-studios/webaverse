@@ -1261,3 +1261,8 @@ export const getBoundingSize = boundingType => {
     default: return 0;
   }
 };
+
+export const lookAtQuaternion = (dirVec)=>{
+  var mx = new THREE.Matrix4().lookAt(new THREE.Vector3(0,0,0), dirVec, new THREE.Vector3(0,1,0));
+  return new THREE.Quaternion().setFromRotationMatrix(mx);
+};

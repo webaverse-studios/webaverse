@@ -298,6 +298,7 @@ export const createTextureAtlas = (meshes, {
     atlasImages,
     meshes: meshes2,
     textureNames: textures,
+    materials: material,
   };
 };
 

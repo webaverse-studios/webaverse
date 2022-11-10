@@ -11,6 +11,7 @@ import {groundFriction, flyFriction, airFriction, swimFriction, flatGroundJumpAi
 import {getRenderer, camera} from './renderer.js';
 // import physx from './physx.js';
 import metaversefileApi from 'metaversefile';
+import physx from './physx.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -149,7 +150,7 @@ class CharacterPhysics {
         const doubleJumpAction = this.character.getAction('doubleJump');
         if (doubleJumpAction) {
           const doubleJumpTime =
-            this.character.actionInterpolants.doubleJump.get();
+            physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'doubleJump', 0);
           localVector3.y =
             Math.sin(doubleJumpTime * (Math.PI / flatGroundJumpAirTime)) *
               jumpHeight +
@@ -159,7 +160,7 @@ class CharacterPhysics {
             this.character.setControlAction({type: 'fallLoop', from: 'jump'});
           }
         } else {
-          const jumpTime = this.character.actionInterpolants.jump.get();
+          const jumpTime = physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'jump', 0);
           localVector3.y =
             Math.sin(jumpTime * (Math.PI / flatGroundJumpAirTime)) *
               jumpHeight +
@@ -497,6 +498,22 @@ class CharacterPhysics {
             ? 0
             : null);
         const enabled = isHandEnabled && isExpectedHandIndex;
+        //
+        if (this.character.hands[i].enabled !== enabled) {
+          if (enabled) {
+            if (i === 0) {
+              this.character.addAction({type: 'rightHand'});
+            } else if (i === 1) {
+              this.character.addAction({type: 'leftHand'});
+            }
+          } else {
+            if (i === 0) {
+              this.character.removeAction('rightHand');
+            } else if (i === 1) {
+              this.character.removeAction('leftHand');
+            }
+          }
+        }
         this.character.hands[i].enabled = enabled;
       }
     };

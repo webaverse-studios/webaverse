@@ -556,7 +556,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
           grabUseMesh.updateMatrixWorld();
           grabUseMesh.targetApp = object;
           grabUseMesh.targetPhysicsId = physicsId;
-          grabUseMesh.setComponent('value', localPlayer.actionInterpolants.activate.getNormalized());
+          grabUseMesh.setComponent('value', physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'activate', 1));
           
           grabUseMesh.visible = true;
         }
@@ -586,7 +586,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
           gridSnap: gameManager.getGridSnap(),
         });
 
-        grabUseMesh.setComponent('value', localPlayer.actionInterpolants.activate.getNormalized());
+        grabUseMesh.setComponent('value', physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'activate', 1));
       }
     }
   };
@@ -615,7 +615,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
 
       const animations = Avatar.getAnimations();
       const pickUpZeldaAnimation = animations.find(a => a.name === 'pick_up_zelda.fbx');
-      const pickUpTime = localPlayer.actionInterpolants.pickUp.get();
+      const pickUpTime = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'pickUp', 0);
       const pickUpTimeS = pickUpTime / 1000;
       if (pickUpTimeS < pickUpZeldaAnimation.duration) {
         // still playing the pick up animation
@@ -924,7 +924,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
   _updateDrags(); */
   
   const _updateActivate = () => {
-    const v = localPlayer.actionInterpolants.activate.getNormalized();
+    const v = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'activate', 1);
     const currentActivated = v >= 1;
     
     if (currentActivated && !lastActivated) {
@@ -951,7 +951,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
   const _updateThrow = () => {
     const useAction = localPlayer.getAction('use');
     if (useAction && useAction.behavior === 'throw') {
-      const v = localPlayer.actionInterpolants.use.get() / throwReleaseTime;
+      const v = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'use', 0) / throwReleaseTime;
       const currentThrowing = v >= 1;
 
       if (currentThrowing && !lastThrowing) {
@@ -1037,7 +1037,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
     const useAction = localPlayer.getAction('use');
     if (useAction) {
       if (useAction.animation === 'pickUpThrow') {
-        const useTime = localPlayer.actionInterpolants.use.get();
+        const useTime = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'use', 0);
         if (useTime / 1000 >= throwAnimationDuration) {
           _endUse();
         }
@@ -1199,12 +1199,12 @@ class GameManager extends EventTarget {
       const wearAimComponent = wearAimApp?.getComponent('aim');
 
       const {instanceId} = wearAimApp ?? {};
-      const {appAnimation, playerAnimation, boneAttachment, position, quaternion, scale} = wearAimComponent ?? {};
+      const {appAnimation, characterAnimation, boneAttachment, position, quaternion, scale} = wearAimComponent ?? {};
       const aimAction = {
         type: 'aim',
         instanceId,
         appAnimation,
-        playerAnimation,
+        characterAnimation,
         boneAttachment,
         position,
         quaternion,
@@ -1710,6 +1710,28 @@ class GameManager extends EventTarget {
   setMouseDomEquipmentHoverObject(o, physicsId) {
     mouseDomEquipmentHoverObject = o;
     mouseDomEquipmentHoverPhysicsId = physicsId;
+  }
+
+  setMovements() {
+    const localPlayer = playersManager.getLocalPlayer();
+    if (ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right) {
+      if (!localPlayer.hasAction('movements')) {
+        localPlayer.addAction({type: 'movements'});
+      }
+    } else {
+      localPlayer.removeAction('movements');
+    }
+  }
+
+  setSprint(bool) {
+    const localPlayer = playersManager.getLocalPlayer();
+    if (bool) {
+      if (!localPlayer.hasAction('sprint')) { // note: prevent holding shift switch browser page.
+        localPlayer.addAction({type: 'sprint'});
+      }
+    } else {
+      localPlayer.removeAction('sprint');
+    }
   }
 
   getSpeed() {
