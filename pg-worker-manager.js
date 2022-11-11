@@ -172,6 +172,7 @@ export class PGWorkerManager {
     chunkSize,
     generateFlagsInt,
     numVegetationInstances,
+    numRockInstances,
     numGrassInstances,
     numPoiInstances,
     {
@@ -186,6 +187,7 @@ export class PGWorkerManager {
       chunkSize,
       generateFlagsInt,
       numVegetationInstances,
+      numRockInstances,
       numGrassInstances,
       numPoiInstances,
     }, {signal});
