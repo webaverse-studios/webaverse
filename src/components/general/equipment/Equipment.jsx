@@ -1,4 +1,4 @@
-import React, {forwardRef, useEffect, useState, useRef, useContext} from 'react';
+import React, {useEffect, useState, useRef, useContext} from 'react';
 import classnames from 'classnames';
 import styles from './equipment.module.css';
 import {AppContext} from '../../app';

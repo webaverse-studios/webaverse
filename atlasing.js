@@ -1,15 +1,9 @@
 import * as THREE from 'three';
 import {MaxRectsPacker} from 'maxrects-packer';
-import {modUv} from './util.js';
 import {startTextureAtlasSize, maxTextureAtlasSize} from './constants.js';
 
-// const localVector = new THREE.Vector3();
-// const localVector2 = new THREE.Vector3();
 const localVector2D = new THREE.Vector2();
 const localVector2D2 = new THREE.Vector2();
-// const localVector4D = new THREE.Vector4();
-// const localQuaternion = new THREE.Quaternion();
-// const localMatrix = new THREE.Matrix4();
 
 const clampUv = (uv, min, max) => {
   return Math.max(min, Math.min(uv, max));

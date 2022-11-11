@@ -1,9 +1,5 @@
-// import * as THREE from 'three';
 import {Pass} from 'three/examples/jsm/postprocessing/Pass.js';
 import {
-  // scene,
-  // sceneHighPriority,
-  // sceneLowPriority,
   rootScene,
   camera,
 } from './renderer.js';

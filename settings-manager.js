@@ -9,12 +9,12 @@ const DefaultSettings = {
     enabled:        'ON',
     depthOfField:   'ON',
     hdr:            'ON',
-    bloom:          'ON'
+    bloom:          'ON',
   },
   character: {
     details:        'HIGH',
-    hairPhysics:    'ON'
-  }
+    hairPhysics:    'ON',
+  },
 };
 
 class SettingsManager extends EventTarget {
@@ -82,8 +82,8 @@ class SettingsManager extends EventTarget {
     localStorage.setItem('GfxSettings', JSON.stringify(settings));
     this.dispatchEvent(new MessageEvent('change', {
       data: {
-        settings: settings
-      }
+        settings: settings,
+      },
     }));
   }
 }

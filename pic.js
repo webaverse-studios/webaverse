@@ -1,18 +1,13 @@
 import * as THREE from 'three';
 import metaversefile from './metaversefile-api.js';
-// import {getExt, makePromise, parseQuery, fitCameraToBoundingBox} from './util.js';
 import Avatar from './avatars/avatars.js';
-import * as audioManager from './audio-manager.js';
 import npcManager from './npc-manager.js';
 import dioramaManager from './diorama.js';
-// import {getRenderer, scene, camera} from './renderer.js';
 
-// import GIF from './gif.js';
 import * as WebMWriter from 'webm-writer';
-// const defaultWidth = 512;
-// const defaultHeight = 512;
+
 const FPS = 60;
-// const videoQuality = 0.99999;
+
 const videoQuality = 0.95;
 const narutoRunSpeed = 59;
 

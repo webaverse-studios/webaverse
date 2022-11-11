@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import classnames from 'classnames';
 import styles from './MegaHotBox.module.css';
 import {BigButton} from '../../../BigButton';

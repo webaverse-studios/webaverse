@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-// import {defaultChunkSize} from './constants.js';
 
 const localVector2D = new THREE.Vector2();
 

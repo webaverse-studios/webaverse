@@ -1,23 +1,14 @@
 import {
 	Color,
-	MeshBasicMaterial,
-	MeshDepthMaterial,
 	MeshNormalMaterial,
 	NearestFilter,
-	LinearFilter,
 	NoBlending,
-	RGBADepthPacking,
-	ShaderMaterial,
-	UniformsUtils,
 	WebGLRenderTarget,
 	Scene,
 	DepthTexture,
-	UnsignedShortType,
-	FloatType,
 	RGBAFormat,
 } from 'three';
-import {Pass, FullScreenQuad} from 'three/examples/jsm/postprocessing/Pass.js';
-// import { BokehShader } from './BokehShader.js';
+import {Pass} from 'three/examples/jsm/postprocessing/Pass.js';
 
 const oldParentCache = new WeakMap();
 const oldMaterialCache = new WeakMap();

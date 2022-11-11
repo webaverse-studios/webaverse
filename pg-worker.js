@@ -1,5 +1,5 @@
 import pg from './pg-binding.js';
-import {makePromise, align, align4} from './util.js';
+import {makePromise} from './util.js';
 
 //
 

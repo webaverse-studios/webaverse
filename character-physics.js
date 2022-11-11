@@ -2,14 +2,10 @@
 it sets up and ticks the physics loop for our local character */
 
 import * as THREE from 'three';
-// import cameraManager from './camera-manager.js';
-// import {getPlayerCrouchFactor} from './character-controller.js';
 import physicsManager from './physics-manager.js';
-// import ioManager from './io-manager.js';
-import {getVelocityDampingFactor, applyVelocity} from './util.js';
-import {groundFriction, flyFriction, airFriction, swimFriction, flatGroundJumpAirTime, jumpHeight} from './constants.js';
+import {applyVelocity} from './util.js';
+import {groundFriction, flyFriction, swimFriction, flatGroundJumpAirTime, jumpHeight} from './constants.js';
 import {getRenderer, camera} from './renderer.js';
-// import physx from './physx.js';
 import metaversefileApi from 'metaversefile';
 import physx from './physx.js';
 

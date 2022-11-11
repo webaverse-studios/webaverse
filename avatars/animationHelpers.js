@@ -9,23 +9,11 @@ import physx from '../physx.js';
 import {animationMappingConfig} from './AnimationMapping.js';
 
 import {
-//   getSkinnedMeshes,
-//   getSkeleton,
-//   getEyePosition,
-//   getHeight,
-  // makeBoneMap,
-//   getTailBones,
-//   getModelBones,
-  // cloneModelBones,
   decorateAnimation,
-  // retargetAnimation,
-  // animationBoneToModelBone,
 } from './util.mjs';
 
 import {
   angleDifference,
-  // getVelocityDampingFactor,
-  // getNextPhysicsId,
 } from '../util.js';
 
 let animations;

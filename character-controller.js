@@ -11,8 +11,6 @@ import * as Z from 'zjs';
 import {getRenderer, scene, camera} from './renderer.js';
 import physicsManager from './physics-manager.js';
 import {world} from './world.js';
-// import cameraManager from './camera-manager.js';
-// import physx from './physx.js';
 import audioManager from './audio-manager.js';
 import metaversefile from 'metaversefile';
 import {
@@ -21,12 +19,9 @@ import {
   playersMapName,
   crouchMaxTime,
   activateMaxTime,
-  // useMaxTime,
   aimTransitionMaxTime,
-  // avatarInterpolationFrameRate,
   avatarInterpolationTimeDelay,
   avatarInterpolationNumFrames,
-  // groundFriction,
   numLoadoutSlots,
 } from './constants.js';
 import {
@@ -47,12 +42,10 @@ import {
   defaultPlayerName,
   defaultPlayerBio,
 } from './ai/lore/lore-model.js';
-// import * as sounds from './sounds.js';
 import musicManager from './music-manager.js';
 import {makeId, clone} from './util.js';
 import overrides from './overrides.js';
 import physx from './physx.js';
-// import * as voices from './voices.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();

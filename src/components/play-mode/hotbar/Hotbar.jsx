@@ -1,4 +1,4 @@
-import React, {useState, useContext, useRef, useEffect} from 'react';
+import React, {useContext, useEffect} from 'react';
 import classnames from 'classnames';
 import {AppContext} from '../../app';
 import styles from './hotbar.module.css';
