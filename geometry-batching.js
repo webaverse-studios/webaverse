@@ -46,7 +46,7 @@ export class DrawCallBinding {
   updateTexture(name, dataIndex, dataLength) {
     const texture = this.getTexture(name);
 
-    let pixelIndex = dataIndex * texture.itemSize;
+    let pixelIndex = dataIndex / texture.itemSize;
     let itemCount = dataLength / texture.itemSize;
 
     // update all pixels from pixelIndex to pixelIndex + itemCount
