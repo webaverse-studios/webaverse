@@ -258,9 +258,10 @@ class Universe extends EventTarget {
     console.log('Multiplayer disconnected');
     this.multiplayerConnected = false;
 
-    // TODO: Disconnect from and dispose of realms.
-
-    this.realms = null;
+    if (this.realms) {
+      this.realms.disconnect();
+      this.realms = null;
+    }
   }
 
   // called by enterWorld() in universe.js
