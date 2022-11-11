@@ -3,7 +3,6 @@ import React, {useState, useEffect, useRef} from 'react';
 import classnames from 'classnames';
 // import dioramaManager from '../diorama.js';
 import styles from './LightArrow.module.css';
-import {createCanvas} from '../renderer.js';
 
 const frameSize = 64;
 const numFrames = 64;

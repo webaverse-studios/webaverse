@@ -9,6 +9,7 @@ import {
 } from './constants.js';
 // import { getRenderer } from './renderer.js';
 import {IdAllocator} from './id-allocator.js';
+import {isWorker} from './env.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -1109,6 +1110,17 @@ export const imageToCanvas = (img, w, h) => {
   drawImageContain(ctx, img);
   return canvas;
 };
+
+export function createCanvas(width, height) {
+  if (isWorker) {
+    return new OffscreenCanvas(width, height);
+  } else {
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    return canvas;
+  }
+}
 
 export const isTransferable = (o) => {
   const ctor = o?.constructor;
