@@ -219,6 +219,21 @@ class Universe extends EventTarget {
       this.realmsCleanupFns.delete(realm);
     });
 
+    // Handle remote players joining and leaving the set of realms.
+    // These events are received both upon starting and during multiplayer.
+    const virtualPlayers = this.realms.getVirtualPlayers();
+    virtualPlayers.addEventListener('join', e => {
+      const {player} = e.data;
+      const playerId = player.arrayIndexId;
+      console.log('Player joined:', playerId);
+      // TODO
+    });
+    virtualPlayers.addEventListener('leave', e => {
+      const {playerId} = e.data;
+      console.log('Player left:', playerId);
+      // TODO
+    });
+
     // Use default scene if none specified.
     if (src === undefined) {
       const sceneNames = await sceneManager.getSceneNamesAsync();
