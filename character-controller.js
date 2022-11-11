@@ -45,6 +45,7 @@ import {
 import musicManager from './music-manager.js';
 import {makeId, clone} from './util.js';
 import overrides from './overrides.js';
+import physx from './physx.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -329,7 +330,7 @@ class Character extends THREE.Object3D {
   }
 
   getCrouchFactor() {
-    return 1 - 0.4 * this.actionInterpolants.crouch.getNormalized();
+    return 1 - 0.4 * physx.physxWorker.getActionInterpolantAnimationAvatar(this.avatar.animationAvatarPtr, 'crouch', 1);
     /* let factor = 1;
     factor *= 1 - 0.4 * this.actionInterpolants.crouch.getNormalized();
     return factor; */
@@ -704,15 +705,22 @@ class StateCharacter extends Character {
     action = clone(action);
     action.actionId = makeId(5);
     this.getActionsState().push([action]);
+    if (this.avatar) {
+      physx.physxWorker.addActionAnimationAvatar(this.avatar.animationAvatarPtr, action);
+    }
     return action;
   }
 
   removeAction(type) {
     const actions = this.getActionsState();
+    const actionsArray = this.getActionsArray();
     let i = 0;
     for (const action of actions) {
       if (action.type === type) {
         actions.delete(i);
+        if (this.avatar) {
+          physx.physxWorker.removeActionAnimationAvatar(this.avatar.animationAvatarPtr, actionsArray[i]);
+        }
         break;
       }
       i++;
@@ -720,7 +728,11 @@ class StateCharacter extends Character {
   }
 
   removeActionIndex(index) {
+    const actionsArray = this.getActionsArray();
     this.getActionsState().delete(index);
+    if (this.avatar) {
+      physx.physxWorker.removeActionAnimationAvatar(this.avatar.animationAvatarPtr, actionsArray[index]);
+    }
   }
 
   clearActions() {
@@ -733,15 +745,22 @@ class StateCharacter extends Character {
 
   setControlAction(action) {
     const actions = this.getActionsState();
+    const actionsArray = this.getActionsArray();
     for (let i = 0; i < actions.length; i++) {
       const action = actions.get(i);
       const isControlAction = controlActionTypes.includes(action.type);
       if (isControlAction) {
         actions.delete(i);
+        if (this.avatar) {
+          physx.physxWorker.removeActionAnimationAvatar(this.avatar.animationAvatarPtr, actionsArray[i]);
+        }
         i--;
       }
     }
     actions.push([action]);
+    if (this.avatar) {
+      physx.physxWorker.addActionAnimationAvatar(this.avatar.animationAvatarPtr, action);
+    }
   }
 
   new() {
@@ -1057,58 +1076,14 @@ class UninterpolatedPlayer extends AvatarCharacter {
   }
 
   static init() {
-    this.actionInterpolants = {
-      crouch: new BiActionInterpolant(() => this.hasAction('crouch'), 0, crouchMaxTime),
-      activate: new UniActionInterpolant(() => this.hasAction('activate'), 0, activateMaxTime),
-      use: new InfiniteActionInterpolant(() => this.hasAction('use'), 0),
-      pickUp: new InfiniteActionInterpolant(() => this.hasAction('pickUp'), 0),
-      unuse: new InfiniteActionInterpolant(() => !this.hasAction('use'), 0),
-      aim: new InfiniteActionInterpolant(() => this.hasAction('aim'), 0),
-      aimRightTransition: new BiActionInterpolant(() => this.hasAction('aim') && this.hands[0].enabled, 0, aimTransitionMaxTime),
-      aimLeftTransition: new BiActionInterpolant(() => this.hasAction('aim') && this.hands[1].enabled, 0, aimTransitionMaxTime),
-      narutoRun: new InfiniteActionInterpolant(() => this.hasAction('narutoRun'), 0),
-      fly: new InfiniteActionInterpolant(() => this.hasAction('fly'), 0),
-      swim: new InfiniteActionInterpolant(() => this.hasAction('swim'), 0),
-      jump: new InfiniteActionInterpolant(() => this.hasAction('jump'), 0),
-      doubleJump: new InfiniteActionInterpolant(() => this.hasAction('doubleJump'), 0),
-      land: new InfiniteActionInterpolant(() => !this.hasAction('jump') && !this.hasAction('fallLoop') && !this.hasAction('fly'), 0),
-      dance: new BiActionInterpolant(() => this.hasAction('dance'), 0, crouchMaxTime),
-      emote: new BiActionInterpolant(() => this.hasAction('emote'), 0, crouchMaxTime),
-      movements: new InfiniteActionInterpolant(() => {
-        const ioManager = metaversefile.useIoManager();
-        return  ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right;
-      }, 0),
-      movementsTransition: new BiActionInterpolant(() => {
-        const ioManager = metaversefile.useIoManager();
-        return  ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right;
-      }, 0, crouchMaxTime),
-      sprint: new BiActionInterpolant(() => {
-        const ioManager = metaversefile.useIoManager();
-        return  ioManager.keys.shift;
-      }, 0, crouchMaxTime),
-      // throw: new UniActionInterpolant(() => this.hasAction('throw'), 0, throwMaxTime),
-      // chargeJump: new InfiniteActionInterpolant(() => this.hasAction('chargeJump'), 0),
-      // standCharge: new InfiniteActionInterpolant(() => this.hasAction('standCharge'), 0),
-      fallLoop: new InfiniteActionInterpolant(() => this.hasAction('fallLoop'), 0),
-      fallLoopTransition: new BiActionInterpolant(() => this.hasAction('fallLoop'), 0, 300),
-      // swordSideSlash: new InfiniteActionInterpolant(() => this.hasAction('swordSideSlash'), 0),
-      // swordTopDownSlash: new InfiniteActionInterpolant(() => this.hasAction('swordTopDownSlash'), 0),
-      hurt: new InfiniteActionInterpolant(() => this.hasAction('hurt'), 0),
-    };
-    this.actionInterpolantsArray = Object.keys(this.actionInterpolants).map(k => this.actionInterpolants[k]);
 
     this.avatarBinding = {
       position: this.position,
       quaternion: this.quaternion,
     };
   }
-
-  updateInterpolation(timeDiff) {
-    for (const actionInterpolant of this.actionInterpolantsArray) {
-      actionInterpolant.update(timeDiff);
-    }
-  }
 }
+
 class LocalPlayer extends UninterpolatedPlayer {
   constructor(opts) {
     super(opts);
@@ -1226,6 +1201,9 @@ class LocalPlayer extends UninterpolatedPlayer {
       const actions = self.getActionsState();
       for (const oldAction of oldActions) {
         actions.push([oldAction]);
+        if (self.avatar) {
+          physx.physxWorker.addActionAnimationAvatar(self.avatar.animationAvatarPtr, oldAction);
+        }
       }
       
       const apps = self.getAppsState();
@@ -1364,7 +1342,7 @@ class LocalPlayer extends UninterpolatedPlayer {
       this.characterHitter.update(timestamp, timeDiffS);
       this.avatarFace.update(timestamp, timeDiffS);
 
-      this.updateInterpolation(timeDiff);
+      physx.physxWorker.updateInterpolationAnimationAvatar(this.avatar.animationAvatarPtr, timeDiff);
 
       const session = _getSession();
       const mirrors = metaversefile.getMirrors();

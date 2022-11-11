@@ -323,6 +323,7 @@ ioManager.keydown = e => {
     }
     case 87: { // W
       ioManager.keys.up = true;
+      game.setMovements();
       if (!cameraManager.pointerLockElement) {
         game.menuVertical(-1);
       }
@@ -339,6 +340,7 @@ ioManager.keydown = e => {
     }
     case 65: { // A
       ioManager.keys.left = true;
+      game.setMovements();
       if (!cameraManager.pointerLockElement) {
         game.menuHorizontal(-1);
       }
@@ -361,6 +363,7 @@ ioManager.keydown = e => {
         game.saveScene();
       } else {
         ioManager.keys.down = true;
+        game.setMovements();
         if (!cameraManager.pointerLockElement) {
           if (game.menuOpen) {
             game.menuVertical(1);
@@ -384,6 +387,7 @@ ioManager.keydown = e => {
     }
     case 68: { // D
       ioManager.keys.right = true;
+      game.setMovements();
       if (!cameraManager.pointerLockElement) {
         game.menuHorizontal(1);
       }
@@ -533,6 +537,7 @@ ioManager.keydown = e => {
     }
     case 16: { // shift
       ioManager.keys.shift = true;
+      game.setSprint(true);
       break;
     }
     case 32: { // space
@@ -629,18 +634,22 @@ ioManager.keyup = e => {
     } */
     case 87: { // W
       ioManager.keys.up = false;
+      game.setMovements();
       break;
     }
     case 65: { // A
       ioManager.keys.left = false;
+      game.setMovements();
       break;
     }
     case 83: { // S
       ioManager.keys.down = false;
+      game.setMovements();
       break;
     }
     case 68: { // D
       ioManager.keys.right = false;
+      game.setMovements();
       break;
     }
     case 32: { // space
@@ -699,6 +708,7 @@ ioManager.keyup = e => {
       ioManager.keys.doubleTap = false;
       
       game.menuUnDoubleTap();
+      game.setSprint(false);
       break;
     }
     case 46: { // delete
