@@ -184,8 +184,11 @@ class Universe extends EventTarget {
     this.connectState(state);
 
     // Set up the network realms.
+    // https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
+    const hashCode = s => s.split('').reduce((a, b) => (((a << 5) - a) + b.charCodeAt(0)) | 0, 0);
+    const sceneId = hashCode(src).toString();
     const localPlayer = playersManager.getLocalPlayer();
-    this.realms = new NetworkRealms(localPlayer.playerId);
+    this.realms = new NetworkRealms(sceneId, localPlayer.playerId);
     this.realmsCleanupFns = new Map();
 
     this.realms.addEventListener('realmjoin', e => {
