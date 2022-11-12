@@ -238,6 +238,8 @@ export const createTextureAtlas = (meshes, {
     atlasImages,
   } = generateTextureAtlas(textureSpecs);
 
+  // !!atlas && console.error('Texture Atlas Creation Failed : The Provided Mesh Has No Textures');
+
   const canvasSize = Math.min(atlas.width, maxTextureAtlasSize);
   const canvasScale = canvasSize / atlas.width;
 
