@@ -163,13 +163,13 @@ class Universe extends EventTarget {
   connectState(state) {
     this.state = state;
     state.setResolvePriority(1);
+
     playersManager.clearRemotePlayers();
     playersManager.bindState(state.getArray(playersMapName));
 
     world.appManager.unbindState();
     world.appManager.clear();
     const appsArray = state.get(appsMapName, Z.Array);
-
     world.appManager.bindState(appsArray);
 
     const partyMap = state.get(partyMapName, Z.Map);
@@ -226,10 +226,21 @@ class Universe extends EventTarget {
     // These events are received both upon starting and during multiplayer.
     const virtualPlayers = this.realms.getVirtualPlayers();
     virtualPlayers.addEventListener('join', e => {
-      const {player} = e.data;
-      const playerId = player.arrayIndexId;
+      const {playerId, player} = e.data;
       console.log('Player joined:', playerId);
+
       // TODO
+
+      // Handle remote player updates.
+      player.addEventListener('update', e => {
+        const { key, val } = e.data;
+        if (key === 'position') {
+          // TODO: Remote player position updates.
+        }
+      });
+
+      const position = player.getKeyValue('position');
+      // TODO: Remote player initial position;
     });
     virtualPlayers.addEventListener('leave', e => {
       const {playerId} = e.data;
@@ -253,8 +264,9 @@ class Universe extends EventTarget {
       // Default player apps and actions can be included here.
 
       this.realms.localPlayer.initializePlayer({
-        position: position,
+        position,
       }, {});
+      this.realms.localPlayer.setKeyValue('position', position);
 
       console.log('Multiplayer connected');
       this.multiplayerConnected = true;

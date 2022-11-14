@@ -516,6 +516,7 @@ Promise.resolve()
 
 let lastActivated = false;
 let lastThrowing = false;
+let lastPosition = [NaN, NaN, NaN];
 const _gameUpdate = (timestamp, timeDiff) => {
   const now = timestamp;
   const renderer = getRenderer();
@@ -534,8 +535,12 @@ const _gameUpdate = (timestamp, timeDiff) => {
 
   const _updateRealms = () => {
     if (universe.multiplayerConnected) {
-      const position = localPlayer.position;
-      universe.realms.updatePosition([position.x, position.y, position.z], realmSize);
+      const position = [localPlayer.position.x, localPlayer.position.y, localPlayer.position.z];
+      if (lastPosition[0] !== position[0] || lastPosition[1] !== position[1] || lastPosition[2] !== position[2]) {
+        universe.realms.updatePosition(position, realmSize);
+        universe.realms.localPlayer.setKeyValue('position', position);
+        lastPosition = position;
+      }
     }
   };
   _updateRealms();
