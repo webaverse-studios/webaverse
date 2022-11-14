@@ -479,16 +479,17 @@ export class ActionComponent {
   constructor(
     actionId,
     type,
-    durationFrames = 1,
-    actionMethod = (mob, frameId)=>{},
-    actionMethodFrames = []) {
+    durationS = 0.016,
+    actionMethod = (mob)=>{},
+    onFinish = (mob)=>{}) {
     this.Do = actionMethod;
-    this.durationFrames = durationFrames;
-    this.actionMethodFrames = actionMethodFrames;
-    this.currentFrame = 0;
+    this.onFinish = onFinish;
+    this.durationS = durationS;
+    this.timeStamp = 0;
     this.started = false;
     this.type = type;
     this.actionId = actionId;
+    this.currentMob = undefined;
   }
 
   /*
@@ -506,7 +507,7 @@ export class ActionComponent {
   start(mob){
     this.currentMob = mob;
     this.started = true;
-    this.Do(mob, this.currentFrame);
+    this.Do(mob);
     return this.resolvePromise ?? this.getActionFinishPromise();
   }
 
@@ -520,19 +521,16 @@ export class ActionComponent {
   /*
     called every frame
   */
-  tick(){
+  tick(timeDiffS){
     if(!this.started)
       return;
 
-    this.currentFrame++;
-
-    if(this.currentFrame != 0 && this.actionMethodFrames.includes(this.currentFrame) && this.currentMob){
-      this.Do(this.currentMob, this.currentFrame);
-    }
-
-    if(this.currentFrame >= this.durationFrames){
+    this.timeStamp += timeDiffS;
+    if(this.timeStamp >= this.durationS){
       if(this.resolvePromise)
         this.resolvePromise();
+      if(this.onFinish)
+        this.onFinish(this.currentMob)
 
       this.stop();
     }
@@ -542,7 +540,7 @@ export class ActionComponent {
     stops the action and rewinds it back at the beginning
   */
   stop(){
-    this.currentFrame = 0;
+    this.timeStamp = 0;
     this.currentMob = undefined;
     this.started = false;
     this.resolvePromise = undefined;
@@ -553,75 +551,62 @@ export class ActionComponent {
   default class for simple idle animation play
 */
 class DefaultIdleAction extends ActionComponent {
-  constructor(durationFrames){
-    const actionMethod = (mob, frameId)=>{
-      mob.playAnimation('idle');
+  constructor(durationS){
+    const actionMethod = (mob)=>{
+      mob.playAnimation('idle', false);
 
     }
-    super('idle', IDLEACTIONTYPE, durationFrames, actionMethod, []);
+    super('idle', IDLEACTIONTYPE, durationS, actionMethod);
   }
 }
 
-/*
-  attack action. gameLogic is an additional operation that can be performed at the beginning of the attack
-*/
 class AttackAction extends ActionComponent {
-  constructor(durationFrames, attackId, gameLogic){
-    const actionMethod = (mob, frameId)=>{
+  constructor(durationS, attackId){
+    const actionMethod = (mob)=>{
       if(!mob)
         return;
       
-      mob.playAnimation(attackId);
+      mob.playAnimation(attackId, true);
       if(mob.target && mob.target.hasAction(HITACTIONTYPE)){
         mob.target.startAction('hit');
       }
-      if(gameLogic)
-        gameLogic(mob);
     }
-    super(attackId, ATTACKACTIONTYPE, durationFrames, actionMethod, []);
+    super(attackId, ATTACKACTIONTYPE, durationS, actionMethod);
   }
 }
 
 class HitAction extends ActionComponent {
-  constructor(durationFrames, gameLogic){
-    const actionMethod = (mob, frameId)=>{
+  constructor(durationS){
+    const actionMethod = (mob)=>{
       if(mob.animations.has('hit')){
-        mob.playAnimation('hit');
+        mob.playAnimation('hit', true);
       }
       mob.life -= 1;
-      if(mob.life == 0){
-        mob.startAction('death');
-      }
-      if(gameLogic)
-        gameLogic(mob);
+      mob.checkDeath();
     }
-    super('hit', HITACTIONTYPE, durationFrames, actionMethod, []);
+    super('hit', HITACTIONTYPE, durationS, actionMethod);
   }
 }
 
 class DieAction extends ActionComponent {
-  constructor(durationFrames, gameLogic){
-    const actionMethod = (mob, frameId)=>{
-      if(frameId == 0){
-        mob.playAnimation('death');
-        return;
-      }
+  constructor(durationS){
+    const actionMethod = (mob)=>{
+      mob.playAnimation('death', true);
+    }
 
-      if(gameLogic)
-        gameLogic(mob);
-
+    const onFinish = (mob)=>{
       mob.kill();
     }
-    super('death', DIEACTIONTYPE, durationFrames, actionMethod, [durationFrames-1]);
+    super('death', DIEACTIONTYPE, durationS, actionMethod, onFinish);
   }
 }
 
 class AnimationAction extends ActionComponent {
-  constructor(durationFrames, animationId){
-    const actionMethod = (mob, frameId)=>{
-      mob.playAnimation(animationId);
+  constructor(durationS, animationId){
+    const actionMethod = (mob)=>{
+      mob.playAnimation(animationId, true);
     }
-    super('animationAction'+animationId, ANIMATIONACTIONTYPE, durationFrames, actionMethod, []);
+    super('animationAction'+animationId, ANIMATIONACTIONTYPE, durationS, actionMethod);
   }
 }
 
@@ -659,7 +644,7 @@ class MobAIControllerPrototype {
     }
   }
 }
-
+const debugMob = false;
 /*
   class for mob instances. integrate the action system, performing actions through action components
   pos: mob position
@@ -674,7 +659,7 @@ export class MobInstance {
   constructor(pos, quat, geometryIndex, timeOffset, radius, height, velocity, idleAction) {
     this.actions = [];
     this.target;
-    this.life = 10;
+    this.life = 5;
     this.actionsQueue = [];
     this.position = new Vector3().fromArray(pos);
     this.quaternion = new Quaternion().fromArray(quat);
@@ -704,7 +689,7 @@ export class MobInstance {
     this.fallTime = 0;
     physicsManager.getScene().setTransform(this.controller, true);
     this.idleAction = idleAction ??
-    new DefaultIdleAction(this.animations.get('idle').frameCount);
+    new DefaultIdleAction(this.animations.get('idle').duration);
     this._createActionFromClip();
     this.killEvents = [];
     this.askForTarget = undefined;
@@ -712,12 +697,21 @@ export class MobInstance {
     this.dead = false
   }
 
-
+  checkDeath(){
+    if(this.life <= 0){
+      this.actionsQueue = [];
+      this.startAction('death');
+    }
+  }
   kill(){
+    /*if(debugMob)
+      return;*/
+    
     for(const k of this.killEvents){
       k();
     }
     this.dead = true;
+    this.actionsQueue = [];
   }
   _createActionFromClip(){
     for(let [key, value] of this.animations){
@@ -726,19 +720,19 @@ export class MobInstance {
       }
 
       if(key.startsWith('attack')){
-        this.actions.push(new AttackAction(value.frameCount, key));
+        this.actions.push(new AttackAction(value.duration, key));
         continue;
       }
 
       if(key == 'death'){
-        this.actions.push(new DieAction(value.frameCount));
+        this.actions.push(new DieAction(value.duration));
         continue;
       }
 
-      this.actions.push(new AnimationAction(value.frameCount, key));
+      this.actions.push(new AnimationAction(value.duration, key));
     }
     const hitAnim = this.animations.get('death');
-    this.actions.push(new HitAction(hitAnim.frameCount/2));
+    this.actions.push(new HitAction(0));
   }
 
   getPostion(){
@@ -794,15 +788,31 @@ export class MobInstance {
     walk mob for one frame towards a direction;
   */
   walk(walkVersor){
-    this.playAnimation('walk');
+    this.playAnimation('walk', false);
     this.movement.add(walkVersor.normalize().multiplyScalar(this.velocity));
+  }
+
+  debugAction(timeDiffS){
+    if(this.actionsQueue.length == 0){
+      this.startAction('attack');
+      this.actionsQueue.push(this.idleAction);
+    }
+
+    const currentAction = this.actionsQueue[0];
+    if(currentAction.isRunning()){
+      currentAction.tick(timeDiffS);
+    } else{
+      currentAction.start(this).then(()=>{
+        this.actionsQueue.shift();
+      });
+    }
   }
 
   /*
     action management routine, it will play action in a blocking way (for the moment).
     after each action is finised it will pop it out of the action queue
   */
-  manageActions(){
+  manageActions(timeDiffS){
     if(this.dead)
       return;
     
@@ -812,7 +822,7 @@ export class MobInstance {
 
     const currentAction = this.actionsQueue[0];
     if(currentAction.isRunning()){
-      currentAction.tick();
+      currentAction.tick(timeDiffS);
     } else{
       currentAction.start(this).then(()=>{
         this.actionsQueue.shift();
@@ -821,7 +831,7 @@ export class MobInstance {
   }
 
   targetManagement(){
-    if(this.life <= 0)
+    if(this.life <= 0 || debugMob)
       return;
     if(!this.target && this.askForTarget){
       this.target = this.askForTarget();
@@ -836,6 +846,9 @@ export class MobInstance {
     this.animatedLookAt(this.target.position);
     const targetVector = this.target.position.clone().sub(this.position);
     if(targetVector.length() < this.aggroDistance){
+      if(this.currentAnimation == this.animations.get('walk').id){
+        this.playAnimation('idle', false);
+      }
       let isAttacking = false;
       for(const a of this.actionsQueue){
         if(a.type == ATTACKACTIONTYPE){
@@ -859,12 +872,17 @@ export class MobInstance {
   update(playerLocation, timeDiff){
     const timeDiffS = timeDiff / 1000;
     this.targetManagement();
-    this.manageActions();
+
+    if(debugMob){
+      this.debugAction(timeDiffS);
+    }
+    else
+      this.manageActions(timeDiffS);
+
     if(!this.grounded){
       //15 seconds it reach terminal velocity in air
       this.fallTime = this.fallTime >= 15 ? this.fallTime : this.fallTime + timeDiffS;
       const gravity = physicsManager.getScene().getGravity().clone();
-      //this.movement.add(gravity);
       this.movement.add(gravity.multiplyScalar(this.fallTime * this.fallTime));
     }
     else{
@@ -910,23 +928,30 @@ export class MobInstance {
 
   updateDrawTime(uTime){
     this.uTime = uTime;
+    if(this.dead){
+      const anim = this.animations.get('death');
+      if(this.currentAnimation != anim.id){
+        this.currentAnimation = anim.id;
+        this.updateAnimation = true;
+      }
+    }
   }
 
   /*
     plays the animationName animation. If the animationName is not among the available animations returns
   */
-  playAnimation(animationName){
+  playAnimation(animationName, restart){
     if(!this.animations.has(animationName))
       return;
     
     const anim = this.animations.get(animationName);
     if(this.currentAnimation != anim.id){
       this.currentAnimation = anim.id;
+      this.updateAnimation = true;
+    }
+    if(restart){
       this.timeOffset = -((this.uTime % anim.frameCount) / anim.frameCount);
       this.updateTimeOffset = true;
-
-      this.updateAnimation = true;
-      
     }
   }
 
@@ -1492,9 +1517,8 @@ void main() {
         if(j >= animations.length) break;
         const clip = animations[j];
         const frameCount = Math.floor(clip.duration * bakeFps);
-        animKeys.set(clip.name, {id: j, frameCount: frameCount});
+        animKeys.set(clip.name, {id: j, frameCount: frameCount, duration: clip.duration});
         const drawCall = this.getDrawCall(i);
-        const offset = drawCall.getTextureOffset('animationsFrameInfo');
         const padding = this.allocator.getTextureBytePadding();
         const dataId = i*maxAnimationPerGeometry * padding + j * padding;
         const texture = drawCall.getTexture('animationsFrameInfo');
@@ -1579,7 +1603,7 @@ void main() {
       drawCall.updateTexture(t.name, drawCall.getTextureOffset(t.name), t.size);
     }
 
-    if(!this.updateBBox)
+    if(!this.updateBBox || drawCall.instances.length < 1)
       return;
 
     const bbox = [0, 0, 0, 0, 0, 0];
@@ -1622,34 +1646,46 @@ void main() {
       // locals
       
       const lastInstanceIndex = drawCall.getInstanceCount() - 1;
-      
+      const padding = this.allocator.getTextureBytePadding();
       const pTexture = drawCall.getTexture('p');
       const pOffset = drawCall.getTextureOffset('p');
       const qTexture = drawCall.getTexture('q');
       const qOffset = drawCall.getTextureOffset('q');
       const timeOffsetTexture = drawCall.getTexture('timeOffset');
       const timeOffsetOffset = drawCall.getTextureOffset('timeOffset');
+      const animationIndexTexture = drawCall.getTexture('animationIndex');
+      const animationIndexOffset = drawCall.getTextureOffset('animationIndex');
 
       // delete by replacing current instance with last instance
 
-      pTexture.image.data[pOffset + instanceIndex * 3] = pTexture.image.data[pOffset + lastInstanceIndex * 3];
-      pTexture.image.data[pOffset + instanceIndex * 3 + 1] = pTexture.image.data[pOffset + lastInstanceIndex * 3 + 1];
-      pTexture.image.data[pOffset + instanceIndex * 3 + 2] = pTexture.image.data[pOffset + lastInstanceIndex * 3 + 2];
+      pTexture.image.data[pOffset + instanceIndex * padding] = pTexture.image.data[pOffset + lastInstanceIndex * padding];
+      pTexture.image.data[pOffset + instanceIndex * padding + 1] = pTexture.image.data[pOffset + lastInstanceIndex * padding + 1];
+      pTexture.image.data[pOffset + instanceIndex * padding + 2] = pTexture.image.data[pOffset + lastInstanceIndex * padding + 2];
 
-      qTexture.image.data[qOffset + instanceIndex * 4] = qTexture.image.data[qOffset + lastInstanceIndex * 4];
-      qTexture.image.data[qOffset + instanceIndex * 4 + 1] = qTexture.image.data[qOffset + lastInstanceIndex * 4 + 1];
-      qTexture.image.data[qOffset + instanceIndex * 4 + 2] = qTexture.image.data[qOffset + lastInstanceIndex * 4 + 2];
-      qTexture.image.data[qOffset + instanceIndex * 4 + 3] = qTexture.image.data[qOffset + lastInstanceIndex * 4 + 3];
+      pTexture.image.data[pOffset + lastInstanceIndex * padding] = 0;
+      pTexture.image.data[pOffset + lastInstanceIndex * padding + 1] = 0;
+      pTexture.image.data[pOffset + lastInstanceIndex * padding + 2] = 0;
 
-      timeOffsetTexture.image.data[timeOffsetOffset + instanceIndex] = timeOffsetTexture.image.data[timeOffsetOffset + lastInstanceIndex];
+      qTexture.image.data[qOffset + instanceIndex * padding] = qTexture.image.data[qOffset + lastInstanceIndex * padding];
+      qTexture.image.data[qOffset + instanceIndex * padding + 1] = qTexture.image.data[qOffset + lastInstanceIndex * padding + 1];
+      qTexture.image.data[qOffset + instanceIndex * padding + 2] = qTexture.image.data[qOffset + lastInstanceIndex * padding + 2];
+      qTexture.image.data[qOffset + instanceIndex * padding + 3] = qTexture.image.data[qOffset + lastInstanceIndex * padding + 3];
+
+      timeOffsetTexture.image.data[timeOffsetOffset + instanceIndex * padding] = timeOffsetTexture.image.data[timeOffsetOffset + lastInstanceIndex * padding];
+      timeOffsetTexture.image.data[timeOffsetOffset + lastInstanceIndex * padding] = 0;
+
+      animationIndexTexture.image.data[animationIndexOffset + instanceIndex * padding] = animationIndexTexture.image.data[animationIndexOffset + lastInstanceIndex * padding];
+      animationIndexTexture.image.data[animationIndexOffset + lastInstanceIndex * padding] = 0;
 
 
-      drawCall.updateTexture('p', pOffset + instanceIndex * 3, 3);
-      drawCall.updateTexture('q', qOffset + instanceIndex * 4, 4);
-      drawCall.updateTexture('timeOffset', timeOffsetOffset + instanceIndex, 1);
+      drawCall.updateTexture('p', pOffset, 3);
+      drawCall.updateTexture('q', qOffset, 4);
+      drawCall.updateTexture('timeOffset', timeOffsetOffset, 1);
+      drawCall.updateTexture('animationIndex', animationIndexOffset, 1);
 
       // mob instance
       drawCall.instances[instanceIndex] = drawCall.instances[lastInstanceIndex];
+      drawCall.instances[lastInstanceIndex] = undefined;
       drawCall.instances.length--;
     } else {
       drawCall.instances.length = 0;
@@ -1757,12 +1793,14 @@ class MobGenerator {
     const mobs = [];
     const seed = 1234;
     const rng = alea(seed);
-    for(let i = 0; i < 50; i++){
+    for(let i = 0; i < 5; i++){
       const geoId = i%meshes.length;
       //const size = new Vector3();
       //new THREE.Box3().setFromObject(meshes[geoId]).getSize(size);
+      //const pos = [rng()*150, 100, 110+rng()*150];
+      const pos = [i*4 - 2*2,  2, -10];
       const mob = new MobInstance(
-        [rng()*100, 100, 110+rng()*100],
+        pos,
         new Quaternion().setFromEuler(new Euler(0, rng()*Math.PI*2, 0)).toArray(),
         geoId,
         rng(),
