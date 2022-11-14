@@ -9,13 +9,14 @@ import {NetworkRealms} from 'multiplayer-do/public/network-realms.mjs';
 import WSRTC from 'wsrtc/wsrtc.js';
 import * as Z from 'zjs';
 
-import {appsMapName, partyMapName, initialPosY, playersMapName, realmSize} from './constants.js';
+import {actionsMapName, appsMapName, partyMapName, initialPosY, playersMapName, realmSize} from './constants.js';
+import {characterSelectManager} from './characterselect-manager.js';
 import {loadOverworld} from './overworld.js';
 import {partyManager} from './party-manager.js';
 import physicsManager from './physics-manager.js';
 import physxWorkerManager from './physx-worker-manager.js';
 import {playersManager} from './players-manager.js';
-import {parseQuery} from './util.js';
+import {makeId, parseQuery} from './util.js';
 import {world} from './world.js';
 import {sceneManager} from './scene-manager.js';
 
@@ -225,11 +226,40 @@ class Universe extends EventTarget {
     // Handle remote players joining and leaving the set of realms.
     // These events are received both upon starting and during multiplayer.
     const virtualPlayers = this.realms.getVirtualPlayers();
-    virtualPlayers.addEventListener('join', e => {
+    virtualPlayers.addEventListener('join', async e => {
       const {playerId, player} = e.data;
       console.log('Player joined:', playerId);
 
-      // TODO
+      const defaultPlayerSpec = await characterSelectManager.getDefaultSpecAsync();
+      const defaultTransform = new Float32Array([0, 0, 0, 0, 0, 0, 1, 1, 1, 1]);
+
+      const playersArray = this.state.getArray(playersMapName);
+      const playerMap = new Z.Map();
+      playersArray.doc.transact(() => {
+        playerMap.set('playerId', playerId);
+
+        const appId = makeId(5);
+
+        const appsArray = new Z.Array();
+        const avatarApp = {
+          instanceId: appId,
+          contentId: defaultPlayerSpec.avatarUrl,
+          transform: defaultTransform,
+          components: [],
+        };
+        appsArray.push([avatarApp]);
+        playerMap.set(appsMapName, appsArray);
+
+        const actionsArray = new Z.Array();
+        // TODO: Add landAction?
+        playerMap.set(actionsMapName, actionsArray);
+
+        playerMap.set('avatar', appId);
+        // TODO: Add voiceSpec?
+
+        playersArray.push([playerMap]);
+
+      });
 
       // Handle remote player updates.
       player.addEventListener('update', e => {
@@ -245,7 +275,15 @@ class Universe extends EventTarget {
     virtualPlayers.addEventListener('leave', e => {
       const {playerId} = e.data;
       console.log('Player left:', playerId);
-      // TODO
+
+      const playersArray = this.state.getArray(playersMapName);
+      for (let i = 0; i < playersArray.length; i++) {
+        const playerMap = playersArray.get(i, Z.Map);
+        if (playerMap.get('playerId') === playerId) {
+          playersArray.delete(i);
+          break;
+        }
+      }
     });
 
     // Use default scene if none specified.
