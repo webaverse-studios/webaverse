@@ -659,7 +659,7 @@ export class MobInstance {
   constructor(pos, quat, geometryIndex, timeOffset, radius, height, velocity, idleAction) {
     this.actions = [];
     this.target;
-    this.life = 5;
+    this.life = 10;
     this.actionsQueue = [];
     this.position = new Vector3().fromArray(pos);
     this.quaternion = new Quaternion().fromArray(quat);
@@ -1647,35 +1647,39 @@ void main() {
       
       const lastInstanceIndex = drawCall.getInstanceCount() - 1;
       const padding = this.allocator.getTextureBytePadding();
-      const pTexture = drawCall.getTexture('p');
+      const pTexture = drawCall.getTexture('p').image.data;
       const pOffset = drawCall.getTextureOffset('p');
-      const qTexture = drawCall.getTexture('q');
+      const qTexture = drawCall.getTexture('q').image.data;
       const qOffset = drawCall.getTextureOffset('q');
-      const timeOffsetTexture = drawCall.getTexture('timeOffset');
+      const timeOffsetTexture = drawCall.getTexture('timeOffset').image.data;
       const timeOffsetOffset = drawCall.getTextureOffset('timeOffset');
-      const animationIndexTexture = drawCall.getTexture('animationIndex');
+      const animationIndexTexture = drawCall.getTexture('animationIndex').image.data;
       const animationIndexOffset = drawCall.getTextureOffset('animationIndex');
+      const instanceDataBegin = instanceIndex * padding;
 
       // delete by replacing current instance with last instance
 
-      pTexture.image.data[pOffset + instanceIndex * padding] = pTexture.image.data[pOffset + lastInstanceIndex * padding];
-      pTexture.image.data[pOffset + instanceIndex * padding + 1] = pTexture.image.data[pOffset + lastInstanceIndex * padding + 1];
-      pTexture.image.data[pOffset + instanceIndex * padding + 2] = pTexture.image.data[pOffset + lastInstanceIndex * padding + 2];
+      pTexture[pOffset + instanceIndex * padding] = pTexture[pOffset + lastInstanceIndex * padding];
+      pTexture[pOffset + instanceIndex * padding + 1] = pTexture[pOffset + lastInstanceIndex * padding + 1];
+      pTexture[pOffset + instanceIndex * padding + 2] = pTexture[pOffset + lastInstanceIndex * padding + 2];
 
-      pTexture.image.data[pOffset + lastInstanceIndex * padding] = 0;
-      pTexture.image.data[pOffset + lastInstanceIndex * padding + 1] = 0;
-      pTexture.image.data[pOffset + lastInstanceIndex * padding + 2] = 0;
+      //sets position of last instance to 0
+      for(const i of [0, 1, 2]){
+        pTexture[pOffset + lastInstanceIndex * padding + i] = 0;
+      }
 
-      qTexture.image.data[qOffset + instanceIndex * padding] = qTexture.image.data[qOffset + lastInstanceIndex * padding];
-      qTexture.image.data[qOffset + instanceIndex * padding + 1] = qTexture.image.data[qOffset + lastInstanceIndex * padding + 1];
-      qTexture.image.data[qOffset + instanceIndex * padding + 2] = qTexture.image.data[qOffset + lastInstanceIndex * padding + 2];
-      qTexture.image.data[qOffset + instanceIndex * padding + 3] = qTexture.image.data[qOffset + lastInstanceIndex * padding + 3];
+      qTexture[qOffset + instanceIndex * padding] = qTexture[qOffset + lastInstanceIndex * padding];
+      qTexture[qOffset + instanceIndex * padding + 1] = qTexture[qOffset + lastInstanceIndex * padding + 1];
+      qTexture[qOffset + instanceIndex * padding + 2] = qTexture[qOffset + lastInstanceIndex * padding + 2];
+      qTexture[qOffset + instanceIndex * padding + 3] = qTexture[qOffset + lastInstanceIndex * padding + 3];
 
-      timeOffsetTexture.image.data[timeOffsetOffset + instanceIndex * padding] = timeOffsetTexture.image.data[timeOffsetOffset + lastInstanceIndex * padding];
-      timeOffsetTexture.image.data[timeOffsetOffset + lastInstanceIndex * padding] = 0;
+      timeOffsetTexture[timeOffsetOffset + instanceIndex * padding] = timeOffsetTexture[timeOffsetOffset + lastInstanceIndex * padding];
+      animationIndexTexture[animationIndexOffset + instanceIndex * padding] = animationIndexTexture[animationIndexOffset + lastInstanceIndex * padding];
 
-      animationIndexTexture.image.data[animationIndexOffset + instanceIndex * padding] = animationIndexTexture.image.data[animationIndexOffset + lastInstanceIndex * padding];
-      animationIndexTexture.image.data[animationIndexOffset + lastInstanceIndex * padding] = 0;
+      this.material.userData.shader.uniforms.pTexture.value.needsUpdate = true;
+      this.material.userData.shader.uniforms.qTexture.value.needsUpdate = true;
+      this.material.userData.shader.uniforms.timeOffsetTexture.value.needsUpdate = true;
+      this.material.userData.shader.uniforms.animationIndex.value.needsUpdate = true;
 
 
       drawCall.updateTexture('p', pOffset, 3);
@@ -1793,12 +1797,12 @@ class MobGenerator {
     const mobs = [];
     const seed = 1234;
     const rng = alea(seed);
-    for(let i = 0; i < 5; i++){
+    for(let i = 0; i < 500; i++){
       const geoId = i%meshes.length;
       //const size = new Vector3();
       //new THREE.Box3().setFromObject(meshes[geoId]).getSize(size);
-      //const pos = [rng()*150, 100, 110+rng()*150];
-      const pos = [i*4 - 2*2,  2, -10];
+      const pos = [rng()*200, 20, 200+rng()*200];
+      //const pos = [i*4 - 2*2,  2, -10];
       const mob = new MobInstance(
         pos,
         new Quaternion().setFromEuler(new Euler(0, rng()*Math.PI*2, 0)).toArray(),
