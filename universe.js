@@ -234,7 +234,9 @@ class Universe extends EventTarget {
       const defaultTransform = new Float32Array([0, 0, 0, 0, 0, 0, 1, 1, 1, 1]);
 
       const playersArray = this.state.getArray(playersMapName);
+      globalThis.playersArray = playersArray
       const playerMap = new Z.Map();
+      globalThis.playerMap = playerMap
       playersArray.doc.transact(() => {
         playerMap.set('playerId', playerId);
 
