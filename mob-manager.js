@@ -1797,11 +1797,15 @@ class MobGenerator {
     const mobs = [];
     const seed = 1234;
     const rng = alea(seed);
-    for(let i = 0; i < 500; i++){
-      const geoId = i%meshes.length;
+    const mobCount = 512;
+    const w = Math.sqrt(mobCount);
+    for(let i = 0; i < 256; i++){
+      //const geoId = i%meshes.length;
+      const geoId = Math.floor(rng() * meshes.length);
       //const size = new Vector3();
       //new THREE.Box3().setFromObject(meshes[geoId]).getSize(size);
-      const pos = [rng()*200, 20, 200+rng()*200];
+      //random position
+      const pos = [rng()*100, 400, 200+rng()*100];
       //const pos = [i*4 - 2*2,  2, -10];
       const mob = new MobInstance(
         pos,
