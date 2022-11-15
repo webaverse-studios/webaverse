@@ -1,6 +1,5 @@
 
-import React, {useState, useEffect, useRef} from 'react';
-// import classnames from 'classnames';
+import React, {useEffect, useRef} from 'react';
 
 import styles from './zone-title-card.module.css';
 

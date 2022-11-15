@@ -1,5 +1,4 @@
 import React from 'react';
-// import PropTypes from 'prop-types';
 
 export const dropEffect = {
   All: 'all',
@@ -46,13 +45,6 @@ const Draggable = props => {
   );
 };
 
-/* Draggable.propTypes = {
-  dataItem: PropTypes.string.isRequired,
-  dragImage: PropTypes.string,
-  dropEffect: PropTypes.string,
-  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
-}; */
-
 Draggable.defaultProps = {
   dragImage: null,
   dropEffect: dropEffect.All,
@@ -92,12 +84,6 @@ const DropTarget = props => {
     </div>
   );
 };
-
-/* DropTarget.propTypes = {
-  onItemDropped: PropTypes.func.isRequired,
-  dropEffect: PropTypes.string,
-  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
-}; */
 
 DropTarget.defaultProps = {
   dropEffect: dropEffect.All,

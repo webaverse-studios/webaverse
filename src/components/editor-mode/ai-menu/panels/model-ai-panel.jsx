@@ -1,8 +1,7 @@
-import React, {useState, useEffect, useRef, useContext} from 'react';
+import React, {useState, useRef} from 'react';
 import classnames from 'classnames';
 import imageAI from '../../../../../ai/image/image-ai';
-import {canvasHasContent} from '../../../../../util';
-import {createCanvas} from '../../../../../renderer.js';
+import {createCanvas, canvasHasContent} from '../../../../../util';
 
 import styles from './model-ai-panel.module.css';
 

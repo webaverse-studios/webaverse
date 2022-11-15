@@ -7,35 +7,21 @@ the functionality is implemented in other managers.
 import * as THREE from 'three';
 import metaversefile from 'metaversefile';
 import cameraManager from './camera-manager.js';
-// import controlsManager from './controls-manager.js';
 import game from './game.js';
 import {world} from './world.js';
 import voiceInput from './voice-input/voice-input.js';
-// import * as universe from './universe.js';
-// import {toggle as inventoryToggle} from './inventory.js';
-import {isInIframe, getVelocityDampingFactor} from './util.js';
-import {getRenderer, /* renderer2, */ scene, camera, getContainerElement} from './renderer.js';
+import {isInIframe} from './util.js';
+import {getRenderer, camera} from './renderer.js';
 import physicsManager from './physics-manager.js';
-/* import {menuActions} from './mithril-ui/store/actions.js';
-import {menuState} from './mithril-ui/store/state.js'; */
-// import physx from './physx.js';
-// import {airFriction, flyFriction} from './constants.js';
 import transformControls from './transform-controls.js';
 import storyManager from './story.js';
-// import domRenderer from './dom-renderer.jsx';
 import raycastManager from './raycast-manager.js';
 
-// const localVector = new THREE.Vector3();
-// const localVector2 = new THREE.Vector3();
 const localVector3 = new THREE.Vector3();
-// const localVector2D = new THREE.Vector2();
-// const localVector2D2 = new THREE.Vector2();
-// const localQuaternion = new THREE.Quaternion();
 const localQuaternion2 = new THREE.Quaternion();
 const localEuler = new THREE.Euler();
 const localMatrix2 = new THREE.Matrix4();
 const localMatrix3 = new THREE.Matrix4();
-const localRaycaster = new THREE.Raycaster();
 const zeroVector = new THREE.Vector3();
 
 //
@@ -337,6 +323,7 @@ ioManager.keydown = e => {
     }
     case 87: { // W
       ioManager.keys.up = true;
+      game.setMovements();
       if (!cameraManager.pointerLockElement) {
         game.menuVertical(-1);
       }
@@ -353,6 +340,7 @@ ioManager.keydown = e => {
     }
     case 65: { // A
       ioManager.keys.left = true;
+      game.setMovements();
       if (!cameraManager.pointerLockElement) {
         game.menuHorizontal(-1);
       }
@@ -375,6 +363,7 @@ ioManager.keydown = e => {
         game.saveScene();
       } else {
         ioManager.keys.down = true;
+        game.setMovements();
         if (!cameraManager.pointerLockElement) {
           if (game.menuOpen) {
             game.menuVertical(1);
@@ -398,6 +387,7 @@ ioManager.keydown = e => {
     }
     case 68: { // D
       ioManager.keys.right = true;
+      game.setMovements();
       if (!cameraManager.pointerLockElement) {
         game.menuHorizontal(1);
       }
@@ -547,6 +537,7 @@ ioManager.keydown = e => {
     }
     case 16: { // shift
       ioManager.keys.shift = true;
+      game.setSprint(true);
       break;
     }
     case 32: { // space
@@ -643,18 +634,22 @@ ioManager.keyup = e => {
     } */
     case 87: { // W
       ioManager.keys.up = false;
+      game.setMovements();
       break;
     }
     case 65: { // A
       ioManager.keys.left = false;
+      game.setMovements();
       break;
     }
     case 83: { // S
       ioManager.keys.down = false;
+      game.setMovements();
       break;
     }
     case 68: { // D
       ioManager.keys.right = false;
+      game.setMovements();
       break;
     }
     case 32: { // space
@@ -713,6 +708,7 @@ ioManager.keyup = e => {
       ioManager.keys.doubleTap = false;
       
       game.menuUnDoubleTap();
+      game.setSprint(false);
       break;
     }
     case 46: { // delete

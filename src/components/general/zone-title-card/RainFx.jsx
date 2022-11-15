@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import React, {useState, useEffect, useRef} from 'react';
-// import classnames from 'classnames';
 import {world} from '../../../../world.js';
 import {RainBgFxMesh} from '../../../../background-fx/RainBgFx.js';
 

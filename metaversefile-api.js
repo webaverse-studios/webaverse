@@ -8,7 +8,7 @@ import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {Text} from 'troika-three-text';
 import React from 'react';
-import * as ReactThreeFiber from '@react-three/fiber';
+// import * as ReactThreeFiber from '@react-three/fiber';
 import metaversefile from 'metaversefile';
 import {getRenderer, scene, sceneHighPriority, sceneLowPriority, sceneLowerPriority, sceneLowestPriority, rootScene, camera} from './renderer.js';
 import cameraManager from './camera-manager.js';
@@ -1461,6 +1461,7 @@ export default () => {
       _bindDefaultComponents(app);
       
       return app;
+    /*
     } else if (React.isValidElement(renderSpec)) {
       const o = new THREE.Object3D();
       // o.contentId = contentId;
@@ -1574,6 +1575,7 @@ export default () => {
       _bindDefaultComponents(app);
       
       return app;
+    */
     } else if (renderSpec === false || renderSpec === null || renderSpec === undefined) {
       app.destroy();
       return null;

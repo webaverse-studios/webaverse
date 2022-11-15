@@ -7,11 +7,7 @@ import metaversefile from 'metaversefile';
 import {SwirlPass} from './SwirlPass.js';
 import {
   getRenderer,
-  // getComposer,
   rootScene,
-  // sceneHighPriority,
-  // scene,
-  // sceneLowPriority,
   camera,
 } from './renderer.js';
 import * as sounds from './sounds.js';

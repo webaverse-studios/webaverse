@@ -4,8 +4,6 @@ import audioManager from '../audio-manager.js';
 import {AudioRecognizer} from '../audio-recognizer.js';
 import {scene} from '../renderer.js';
 import {
-  // angleDifference,
-  // getVelocityDampingFactor,
   getNextPhysicsId,
 } from '../util.js';
 import MicrophoneWorker from './microphone-worker.js';
@@ -13,15 +11,13 @@ import LegsManager from './vrarmik/LegsManager.js';
 import PoseManager from './vrarmik/PoseManager.js';
 import ShoulderTransforms from './vrarmik/ShoulderTransforms.js';
 import {fixSkeletonZForward} from './vrarmik/SkeletonUtils.js';
-// import Simplex from '../simplex-noise.js';
 import {
-  // useMaxTime,
-  // aimMaxTime,
-  aimTransitionMaxTime, crouchMaxTime, idleSpeed, runSpeed, walkSpeed,
+  aimTransitionMaxTime,
+  crouchMaxTime,
+  idleSpeed,
+  runSpeed,
+  walkSpeed,
 } from '../constants.js';
-// import {FixedTimeStep} from '../interpolants.js';
-// import {AvatarRenderer} from './avatar-renderer.js';
-// import * as sceneCruncher from '../scene-cruncher.js';
 import metaversefile from 'metaversefile';
 import {easing} from '../math-utils.js';
 import {
@@ -31,19 +27,18 @@ import {
   getModelBones,
   getSkeleton,
   getSkinnedMeshes,
-  // makeBoneMap,
   getTailBones,
 } from './util.mjs';
 
 import {
   getClosest2AnimationAngles,
   getFirstPersonCurves,
-  loadPromise,
-  _applyAnimation,
   _findArmature,
-  _getLerpFn,
   animations,
-  animationStepIndices
+  animationStepIndices,
+  waitForLoad,
+  _createAnimation,
+  _updateAnimation
 } from './animationHelpers.js';
 
 import {animationMappingConfig} from './AnimationMapping.js';
@@ -54,30 +49,18 @@ import Nodder from './Nodder.js';
 
 import * as wind from './simulation/wind.js';
 
-// const infinityUpVector = new THREE.Vector3(0, Infinity, 0);
-
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
-const localVector3 = new THREE.Vector3();
-// const localVector4 = new THREE.Vector3();
-// const localVector5 = new THREE.Vector3();
-// const localVector6 = new THREE.Vector3();     
+const localVector3 = new THREE.Vector3();  
 const localQuaternion = new THREE.Quaternion();
 const localQuaternion2 = new THREE.Quaternion();
-// const localQuaternion3 = new THREE.Quaternion();
-// const localQuaternion4 = new THREE.Quaternion();
-// const localQuaternion5 = new THREE.Quaternion();
-// const localQuaternion6 = new THREE.Quaternion();
 const localEuler = new THREE.Euler(0, 0, 0, 'YXZ');
 const localEuler2 = new THREE.Euler(0, 0, 0, 'YXZ');
 const localMatrix = new THREE.Matrix4();
 const localMatrix2 = new THREE.Matrix4();
-// const localPlane = new THREE.Plane();
-const localFrustum = new THREE.Frustum();
 
-const textEncoder = new TextEncoder();
+// const textEncoder = new TextEncoder();
 
-// const y180Quaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
 const maxIdleVelocity = 0.01;
 const maxHeadTargetTime = 2000;
 
@@ -849,11 +832,7 @@ class Avatar {
 
     this.animationMappings = animationMappingConfig.map((animationMapping, i) => {
       animationMapping = animationMapping.clone();
-      const isPosition = /\.position$/.test(animationMapping.animationTrackName);
-      animationMapping.dst = this.modelBoneOutputs[animationMapping.boneName][isPosition ? 'position' : 'quaternion'];
-      animationMapping.lerpFn = _getLerpFn(isPosition);
-      animationMapping.isFirstBone = i === 0;
-      animationMapping.isLastBone = i === animationMappingConfig.length - 1;
+      animationMapping.dst = this.modelBoneOutputs[animationMapping.boneName][animationMapping.isPosition ? 'position' : 'quaternion'];
       return animationMapping;
     });
 
@@ -865,39 +844,39 @@ class Avatar {
     // shared state
     this.direction = new THREE.Vector3();
     this.jumpState = false;
-    this.jumpTime = NaN;
+    // this.jumpTime = NaN;
     this.doubleJumpState = false;
-    this.doubleJumpTime = NaN;
-    this.landTime = Infinity;
+    // this.doubleJumpTime = NaN;
+    // this.landTime = Infinity;
     this.lastLandStartTime = 0;
     this.landWithMoving = false;
     this.flyState = false;
-    this.flyTime = NaN;
+    // this.flyTime = NaN;
     this.swimState = false;
-    this.swimTime = NaN;
+    // this.swimTime = NaN;
     this.swimAnimTime = 0;
 
-    this.useTime = NaN;
+    // this.useTime = NaN;
     this.useAnimation = null;
     this.useAnimationCombo = [];
     this.useAnimationEnvelope = [];
     this.unuseAnimation = null;
-    this.unuseTime = -1;
+    // this.unuseTime = -1;
     
     this.idleWalkFactor = NaN;
     this.walkRunFactor = NaN;
-    this.crouchFactor = NaN;
-    this.sitState = false;
-    this.sitAnimation = null;
+    // this.crouchFactor = NaN;
+    // this.sitState = false;
+    // this.sitAnimation = null;
     // this.activateState = false;
     this.activateTime = 0;
     this.holdState = false;
     this.pickUpState = false;
-    this.pickUpTime = 0;
+    // this.pickUpTime = 0;
     // this.danceState = false;
-    this.danceFactor = 0;
-    this.danceAnimation = null;
-    this.emoteFactor = 0;
+    // this.danceFactor = 0;
+    // this.danceAnimation = null;
+    // this.emoteFactor = 0;
     this.emoteAnimation = null;
     this.poseFactor = 0;
     this.poseAnimation = null;
@@ -917,28 +896,28 @@ class Avatar {
     this.narutoRunState = false;
     this.chargeJumpState = false;
     this.chargeJumpTime = 0;
-    this.narutoRunTime = 0;
+    // this.narutoRunTime = 0;
     // this.standChargeState = false;
     // this.standChargeTime = 0;
     this.fallLoopState = false;
-    this.fallLoopTime = 0;
-    this.fallLoopFactor = 0;
+    // this.fallLoopTime = 0;
+    // this.fallLoopFactor = 0;
     // this.swordSideSlashState = false;
     // this.swordSideSlashTime = 0;
     // this.swordTopDownSlashState = false;
     // this.swordTopDownSlashTime = 0;
-    this.aimTime = NaN;
-    this.aimAnimation = null;
+    // this.aimTime = NaN;
+    // this.aimAnimation = null;
     // this.aimDirection = new THREE.Vector3();
-    this.hurtTime = NaN;
-    this.hurtAnimation = null;
+    // this.hurtTime = NaN;
+    // this.hurtAnimation = null;
 
     // internal state
-    this.movementsTime = 0;
-    this.movementsTransitionTime = NaN;
-    this.movementsTransitionFactor = NaN;
-    this.sprintTime = 0;
-    this.sprintFactor = 0;
+    // this.movementsTime = 0;
+    // this.movementsTransitionTime = NaN;
+    // this.movementsTransitionFactor = NaN;
+    // this.sprintTime = 0;
+    // this.sprintFactor = 0;
     this.velocity = new THREE.Vector3();
     this.lastMoveTime = 0;
     this.lastEmoteTime = 0;
@@ -951,6 +930,10 @@ class Avatar {
     this.lastHeadTargetTime = -Infinity;
 
     this.manuallySetMouth=false;
+
+    //
+
+    _createAnimation(this);
   }
 
   static bindAvatar(object) {
@@ -1469,14 +1452,14 @@ class Avatar {
 
     this.idleWalkFactor = Math.min(Math.max((currentSpeed - idleSpeed) / (walkSpeed - idleSpeed), 0), 1);
     this.walkRunFactor = Math.min(Math.max((currentSpeed - walkSpeed) / (runSpeed - walkSpeed), 0), 1);
-    this.crouchFactor = Math.min(Math.max(1 - (this.crouchTime / crouchMaxTime), 0), 1);
+    // this.crouchFactor = Math.min(Math.max(1 - (this.crouchTime / crouchMaxTime), 0), 1);
     // console.log('current speed', currentSpeed, idleWalkFactor, walkRunFactor);
     this.aimRightFactor = this.aimRightTransitionTime / aimTransitionMaxTime;
     this.aimRightFactorReverse = 1 - this.aimRightFactor;
     this.aimLeftFactor = this.aimLeftTransitionTime / aimTransitionMaxTime;
     this.aimLeftFactorReverse = 1 - this.aimLeftFactor;
-    this.movementsTransitionFactor = Math.min(Math.max(this.movementsTransitionTime / crouchMaxTime, 0), 1);
-    this.sprintFactor = Math.min(Math.max(this.sprintTime / crouchMaxTime, 0), 1);
+    // this.movementsTransitionFactor = Math.min(Math.max(this.movementsTransitionTime / crouchMaxTime, 0), 1);
+    // this.sprintFactor = Math.min(Math.max(this.sprintTime / crouchMaxTime, 0), 1);
     
     const _overwritePose = poseName => {
       const poseAnimation = animations.index[poseName];
@@ -1862,7 +1845,7 @@ class Avatar {
       _motionControls.call(this)
     }
     
-    _applyAnimation(this, now);
+    _updateAnimation(this, now, timeDiff);
 
     if (this.poseAnimation) {
       _overwritePose(this.poseAnimation);
@@ -2115,7 +2098,7 @@ class Avatar {
     this.setAudioEnabled(false);
   }
 }
-Avatar.waitForLoad = () => loadPromise;
+Avatar.waitForLoad = waitForLoad;
 Avatar.getAnimations = () => animations;
 Avatar.getAnimationStepIndices = () => animationStepIndices;
 Avatar.getAnimationMappingConfig = () => animationMappingConfig;
