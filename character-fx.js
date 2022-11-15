@@ -263,7 +263,10 @@ export class AvatarCharacterFx {
         })();
       }
     };
+    // FIXME MULTIPLAYER
+    /*
     _updateNameplate();
+    */
     const _updateHealEffectMesh = () => {
       if(this.character.hasAction('cure')){
         if (!this.healEffect) {
