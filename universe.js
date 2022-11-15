@@ -263,8 +263,10 @@ class Universe extends EventTarget {
       // Handle remote player updates.
       player.addEventListener('update', e => {
         const { key, val } = e.data;
-        if (key === 'position') {
-          // TODO: Remote player position updates.
+        if (key === 'transform') {
+          playersArray.doc.transact(() => {
+            playerMap.set('transform', val);
+          });
         }
       });
 

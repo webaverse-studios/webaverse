@@ -509,7 +509,7 @@ Promise.resolve()
 
 let lastActivated = false;
 let lastThrowing = false;
-let lastPosition = [NaN, NaN, NaN];
+let lastTransform = [NaN, NaN, NaN, NaN, NaN, NaN, NaN];
 const _gameUpdate = (timestamp, timeDiff) => {
   const now = timestamp;
   const renderer = getRenderer();
@@ -528,11 +528,16 @@ const _gameUpdate = (timestamp, timeDiff) => {
 
   const _updateRealms = () => {
     if (universe.multiplayerConnected) {
-      const position = [localPlayer.position.x, localPlayer.position.y, localPlayer.position.z];
-      if (lastPosition[0] !== position[0] || lastPosition[1] !== position[1] || lastPosition[2] !== position[2]) {
-        universe.realms.updatePosition(position, realmSize);
-        universe.realms.localPlayer.setKeyValue('position', position);
-        lastPosition = position;
+      const transformCalc = localPlayer.transform.reduce((acc, val, i) => {
+        acc.transform.push(val);
+        acc.changed = acc.changed || val !== lastTransform[i];
+        return acc;
+      }, { transform: [], changed: false });
+
+      if (transformCalc.changed) {
+        universe.realms.updatePosition(transformCalc.transform.slice(0, 3), realmSize);
+        universe.realms.localPlayer.setKeyValue('transform', transformCalc.transform);
+        lastTransform = transformCalc.transform;
       }
     }
   };
