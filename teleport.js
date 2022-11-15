@@ -10,9 +10,7 @@ const localQuaternion2 = new THREE.Quaternion();
 const localEuler = new THREE.Euler();
 const localEuler2 = new THREE.Euler();
 const localMatrix = new THREE.Matrix4();
-// const localRay = new THREE.Ray();
 
-// const floorPlane = new THREE.Plane().setFromNormalAndCoplanarPoint(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 0));
 const geometries = (() => {
   const result = [];
   for (let i = 0; i < 200; i += 3) {

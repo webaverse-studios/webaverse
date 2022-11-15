@@ -1,6 +1,3 @@
-/* eslint-disable camelcase */
-/* eslint-disable no-useless-escape */
-
 import React, {useContext, useEffect, useState} from 'react';
 import classnames from 'classnames';
 
@@ -12,11 +9,9 @@ import styles from '../Header.module.css';
 //
 
 export const Tokens = ({userOpen, loginFrom, hacks, address}) => {
-
     const {state} = useContext(AppContext);
     const [nftPreviews, setNftPreviews] = useState({});
     const [nfts, setNfts] = useState(null);
-    const [fetchPromises, setFetchPromises] = useState([]);
 
     //
 

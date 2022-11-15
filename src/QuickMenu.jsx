@@ -11,7 +11,7 @@ import emoteManager, {emotes} from '../emotes/emote-manager.js';
 import game from '../game.js';
 import cameraManager from '../camera-manager.js';
 import * as sounds from '../sounds.js';
-import {mod, loadImage, drawImageContain, imageToCanvas} from '../util.js';
+import {mod, loadImage, imageToCanvas} from '../util.js';
 
 const modPi2 = angle => mod(angle, Math.PI*2);
 

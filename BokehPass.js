@@ -1,24 +1,10 @@
 import {
 	Color,
-	MeshBasicMaterial,
-	MeshDepthMaterial,
-	NearestFilter,
-	NoBlending,
-	RGBADepthPacking,
 	ShaderMaterial,
 	UniformsUtils,
-	WebGLRenderTarget,
-	Scene,
-	DepthTexture,
-	UnsignedShortType,
-	FloatType,
-	RGBAFormat,
 } from 'three';
 import {Pass, FullScreenQuad} from 'three/examples/jsm/postprocessing/Pass.js';
 import {BokehShader} from './BokehShader.js';
-
-const oldParentCache = new WeakMap();
-const oldMaterialCache = new WeakMap();
 
 /**
  * Depth-of-field post-process with bokeh shader

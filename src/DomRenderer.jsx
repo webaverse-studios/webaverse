@@ -5,7 +5,6 @@ import {camera} from '../renderer.js';
 import cameraManager from '../camera-manager.js';
 import {playersManager} from '../players-manager.js';
 
-// import {CharacterBanner} from './CharacterBanner.jsx';
 import domRenderEngine, {DomRenderEngine} from '../dom-renderer.jsx';
 
 const floatFactor = 0.05;

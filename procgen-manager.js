@@ -16,15 +16,17 @@ const GenerateFlags = {
   terrain: 1 << 0,
   water: 1 << 1,
   vegetation: 1 << 2,
-  grass: 1 << 3,
-  poi: 1 << 4,
-  heightfield: 1 << 5,
+  rock: 1 << 3,
+  grass: 1 << 4,
+  poi: 1 << 5,
+  heightfield: 1 << 6,
 };
 const _generateFlagsToInt = generateFlags => {
   let result = 0;
   generateFlags.terrain && (result |= GenerateFlags.terrain);
   generateFlags.water && (result |= GenerateFlags.water);
   generateFlags.vegetation && (result |= GenerateFlags.vegetation);
+  generateFlags.rock && (result |= GenerateFlags.rock);
   generateFlags.grass && (result |= GenerateFlags.grass);
   generateFlags.poi && (result |= GenerateFlags.poi);
   generateFlags.heightfield && (result |= GenerateFlags.heightfield);
@@ -74,6 +76,7 @@ class ProcGenInstance {
     lodArray,
     generateFlags,
     numVegetationInstances,
+    numRockInstances,
     numGrassInstances,
     numPoiInstances,
     {
@@ -93,6 +96,7 @@ class ProcGenInstance {
       chunkSize,
       generateFlagsInt,
       numVegetationInstances,
+      numRockInstances,
       numGrassInstances,
       numPoiInstances,
       {

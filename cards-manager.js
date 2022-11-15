@@ -1,11 +1,3 @@
-/* import offscreenEngineManager from './offscreen-engine/offscreen-engine-manager.js';
-
-const _generateObjectUrlCardRemote = (() => {
-  return async function(args, options) {
-    const result = await offscreenEngineManager.request('generateObjectUrlCardRemote', args, options);
-    return result;
-  };
-})(); */
 import {generateObjectUrlCard} from './card-renderer.js';
 
 class CardsManager {

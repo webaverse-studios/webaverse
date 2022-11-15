@@ -29,7 +29,6 @@ import {
   sceneLowPriority,
   rootScene,
   camera,
-  // dolly,
   bindCanvas,
   getComposer,
 } from './renderer.js';
@@ -39,7 +38,6 @@ import * as voices from './voices.js';
 import performanceTracker from './performance-tracker.js';
 import renderSettingsManager from './rendersettings-manager.js';
 import metaversefileApi from 'metaversefile';
-// import domRenderEngine from './dom-renderer.jsx';
 import musicManager from './music-manager.js';
 import story from './story.js';
 import zTargeting from './z-targeting.js';

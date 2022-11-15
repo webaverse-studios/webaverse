@@ -16,9 +16,8 @@ import {
 import {
   mod,
   selectVoice,
-  // loadJson,
-  // loadAudioBuffer,
 } from './util.js';
+import physx from './physx.js';
 
 const localVector = new THREE.Vector3();
 
@@ -243,11 +242,11 @@ export class AvatarCharacterSfx {
           // const candidateAudios = soundFiles.water;
           // console.log(candidateAudios);
           if(this.character.getAction('swim').animationType === 'breaststroke'){
-              if(this.setSwimmingHand && this.character.actionInterpolants.movements.get() % breaststrokeDuration <= breaststrokeOffset){
+              if(this.setSwimmingHand && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % breaststrokeDuration <= breaststrokeOffset){
                   this.setSwimmingHand = false;
                   this.currentSwimmingHand = null;
               }
-              else if(!this.setSwimmingHand && this.character.actionInterpolants.movements.get() % breaststrokeDuration > breaststrokeOffset){
+              else if(!this.setSwimmingHand && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % breaststrokeDuration > breaststrokeOffset){
                   let regex = new RegExp('^water/swim[0-9]*.wav$');
                   const candidateAudios = soundFiles.water.filter(f => regex.test(f.name));
                   const audioSpec = candidateAudios[Math.floor(Math.random() * candidateAudios.length)];
@@ -264,14 +263,14 @@ export class AvatarCharacterSfx {
               const candidateAudios = soundFiles.water.filter(f => regex.test(f.name));
               const audioSpec = candidateAudios[Math.floor(Math.random() * candidateAudios.length)];
 
-              if(this.setSwimmingHand && this.character.actionInterpolants.movements.get() % freestyleDuration <= freestyleOffset){
+              if(this.setSwimmingHand && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % freestyleDuration <= freestyleOffset){
                   // console.log('left hand')
                   if(this.character.getAction('swim').onSurface)
                     sounds.playSound(audioSpec);
                   this.currentSwimmingHand = 'left';
                   this.setSwimmingHand = false;
               }
-              else if(!this.setSwimmingHand && this.character.actionInterpolants.movements.get() % freestyleDuration > freestyleOffset){
+              else if(!this.setSwimmingHand && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % freestyleDuration > freestyleOffset){
                   // console.log('right hand')
                   if(this.character.getAction('swim').onSurface)
                     sounds.playSound(audioSpec);
@@ -372,7 +371,7 @@ export class AvatarCharacterSfx {
       const useAction = this.character.getAction('use');
       if (useAction) {
         const _handleEat = () => {
-          const v = this.character.actionInterpolants.use.get();
+          const v = physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'use', 0);
           const eatFrameIndex = _getActionFrameIndex(v, eatFrameIndices);
 
           // console.log('chomp', v, eatFrameIndex, this.lastEatFrameIndex);
@@ -387,7 +386,7 @@ export class AvatarCharacterSfx {
         const _handleDrink = () => {
           // console.log('drink action', useAction);
 
-          const v = this.character.actionInterpolants.use.get();
+          const v = physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'use', 0);
           const drinkFrameIndex = _getActionFrameIndex(v, drinkFrameIndices);
 
           // console.log('gulp', v, drinkFrameIndex, this.lastDrinkFrameIndex);
@@ -433,7 +432,7 @@ export class AvatarCharacterSfx {
         if (Array.isArray(animationCombo) && index !== undefined) {
           const useAnimationName = animationCombo[index];
           const localUseFrameIndices = useFrameIndices[useAnimationName];
-          const useFrameIndex = _getActionFrameIndex(this.character.actionInterpolants.use.get(), localUseFrameIndices);
+          const useFrameIndex = _getActionFrameIndex(physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'use', 0), localUseFrameIndices);
 
           if (useFrameIndex !== 0 && useFrameIndex !== this.lastUseFrameIndex) {
             sounds.playSoundName('swordSlash');

@@ -3,7 +3,6 @@ this file contains the universe/meta-world/scenes/multiplayer code.
 responsibilities include loading the world on url change.
 */
 
-// import * as THREE from 'three';
 import metaversefile from 'metaversefile';
 import {NetworkRealms} from 'multiplayer-do/public/network-realms.mjs';
 import WSRTC from 'wsrtc/wsrtc.js';

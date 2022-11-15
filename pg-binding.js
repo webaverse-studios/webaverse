@@ -65,6 +65,7 @@ const _parseTrackerUpdate = bufferAddress => {
   const cancelDataRequests = _parseNodes();
 
   return {
+    bufferAddress,
     leafNodes,
     newDataRequests,
     keepDataRequests,
@@ -169,7 +170,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
       // materials
       const numMaterials = dataView2.getUint32(index2, true);
       index2 += Uint32Array.BYTES_PER_ELEMENT;
-      const materials = new Float32Array(
+      const materials = new Int32Array(
         arrayBuffer,
         bufferAddress + index2,
         numMaterials * 4
@@ -320,6 +321,142 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
       return null;
     }
   };
+
+  const _parsePQMIInstances = () => {
+    const bufferAddress = dataView.getUint32(index, true);
+    index += Uint32Array.BYTES_PER_ELEMENT;
+
+    if (bufferAddress) {
+      const dataView2 = new DataView(arrayBuffer, bufferAddress);
+      let index2 = 0;
+      
+      const numInstances = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+
+      const instances = Array(numInstances);
+      for (let i = 0; i < numInstances; i++) {
+        const instanceId = dataView2.getInt32(index2, true);
+        index2 += Int32Array.BYTES_PER_ELEMENT;
+
+        const psSize = dataView2.getUint32(index2, true);
+        index2 += Uint32Array.BYTES_PER_ELEMENT;
+        const ps = new Float32Array(dataView2.buffer, dataView2.byteOffset + index2, psSize);
+        index2 += psSize * Float32Array.BYTES_PER_ELEMENT;
+
+        const qsSize = dataView2.getUint32(index2, true);
+        index2 += Uint32Array.BYTES_PER_ELEMENT;
+        const qs = new Float32Array(dataView2.buffer, dataView2.byteOffset + index2, qsSize);
+        index2 += qsSize * Float32Array.BYTES_PER_ELEMENT;
+
+        // materials
+        const numMaterials = dataView2.getUint32(index2, true);
+        index2 += Uint32Array.BYTES_PER_ELEMENT;
+        const materials = new Float32Array(
+          arrayBuffer,
+          bufferAddress + index2,
+          numMaterials * 4
+        );
+        index2 += Float32Array.BYTES_PER_ELEMENT * numMaterials * 4;
+
+        const numMaterialsWeights = dataView2.getUint32(index2, true);
+        index2 += Uint32Array.BYTES_PER_ELEMENT;
+        const materialsWeights = new Float32Array(
+          arrayBuffer,
+          bufferAddress + index2,
+          numMaterialsWeights * 4
+        );
+        index2 += Float32Array.BYTES_PER_ELEMENT * numMaterialsWeights * 4;
+
+        instances[i] = {
+          instanceId,
+          ps,
+          qs,
+          materials,
+          materialsWeights
+        };
+      }
+
+      return {
+        bufferAddress,
+        instances,
+      };
+    } else {
+      return null;
+    }
+  };
+
+  const _parseGrassInstances = () => {
+    const bufferAddress = dataView.getUint32(index, true);
+    index += Uint32Array.BYTES_PER_ELEMENT;
+
+    if (bufferAddress) {
+      const dataView2 = new DataView(arrayBuffer, bufferAddress);
+      let index2 = 0;
+      
+      const numInstances = dataView2.getUint32(index2, true);
+      index2 += Uint32Array.BYTES_PER_ELEMENT;
+
+      const instances = Array(numInstances);
+      for (let i = 0; i < numInstances; i++) {
+        const instanceId = dataView2.getInt32(index2, true);
+        index2 += Int32Array.BYTES_PER_ELEMENT;
+
+        const psSize = dataView2.getUint32(index2, true);
+        index2 += Uint32Array.BYTES_PER_ELEMENT;
+        const ps = new Float32Array(dataView2.buffer, dataView2.byteOffset + index2, psSize);
+        index2 += psSize * Float32Array.BYTES_PER_ELEMENT;
+
+        const qsSize = dataView2.getUint32(index2, true);
+        index2 += Uint32Array.BYTES_PER_ELEMENT;
+        const qs = new Float32Array(dataView2.buffer, dataView2.byteOffset + index2, qsSize);
+        index2 += qsSize * Float32Array.BYTES_PER_ELEMENT;
+
+        // materials
+        const numMaterials = dataView2.getUint32(index2, true);
+        index2 += Uint32Array.BYTES_PER_ELEMENT;
+        const materials = new Float32Array(
+          arrayBuffer,
+          bufferAddress + index2,
+          numMaterials * 4
+        );
+        index2 += Float32Array.BYTES_PER_ELEMENT * numMaterials * 4;
+
+        const numMaterialsWeights = dataView2.getUint32(index2, true);
+        index2 += Uint32Array.BYTES_PER_ELEMENT;
+        const materialsWeights = new Float32Array(
+          arrayBuffer,
+          bufferAddress + index2,
+          numMaterialsWeights * 4
+        );
+        index2 += Float32Array.BYTES_PER_ELEMENT * numMaterialsWeights * 4;
+
+        const numGrassProps = dataView2.getUint32(index2, true);
+        index2 += Uint32Array.BYTES_PER_ELEMENT;
+        const grassProps = new Float32Array(
+          arrayBuffer,
+          bufferAddress + index2,
+          numGrassProps * 4
+        );
+        index2 += Float32Array.BYTES_PER_ELEMENT * numGrassProps * 4;
+
+        instances[i] = {
+          instanceId,
+          ps,
+          qs,
+          materials,
+          materialsWeights,
+          grassProps
+        };
+      }
+
+      return {
+        bufferAddress,
+        instances,
+      };
+    } else {
+      return null;
+    }
+  };
   const _parsePIInstances = () => {
     const bufferAddress = dataView.getUint32(index, true);
     index += Uint32Array.BYTES_PER_ELEMENT;
@@ -376,8 +513,11 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
 
   const terrainGeometry = _parseTerrainVertexBuffer();
   const waterGeometry = _parseWaterVertexBuffer();
-  const vegetationInstances = _parsePQIInstances();
-  const grassInstances = _parsePQIInstances();
+  const treeInstances = _parsePQIInstances();
+  const bushInstances = _parsePQIInstances();
+  const rockInstances = _parsePQIInstances();
+  const stoneInstances = _parsePQIInstances();
+  const grassInstances = _parseGrassInstances();
   const poiInstances = _parsePIInstances();
   const heightfields = _parseHeightfields();
 
@@ -385,7 +525,10 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
     bufferAddress,
     terrainGeometry,
     waterGeometry,
-    vegetationInstances,
+    treeInstances,
+    bushInstances,
+    rockInstances,
+    stoneInstances,
     grassInstances,
     poiInstances,
     heightfields,
@@ -399,6 +542,7 @@ w.createChunkMeshAsync = async (
   lodArray,
   generateFlagsInt,
   numVegetationInstances,
+  numRockInstances,
   numGrassInstances,
   numPoiInstances,
 ) => {
@@ -406,7 +550,7 @@ w.createChunkMeshAsync = async (
 
   const lodArray2 = allocator.alloc(Int32Array, 2);
   lodArray2.set(lodArray);
-  
+
   Module._createChunkMeshAsync(
     inst,
     taskId,
@@ -415,6 +559,7 @@ w.createChunkMeshAsync = async (
     lodArray2.byteOffset,
     generateFlagsInt,
     numVegetationInstances,
+    numRockInstances,
     numGrassInstances,
     numPoiInstances,
   );
@@ -426,11 +571,11 @@ w.createChunkMeshAsync = async (
   const outputBufferOffset = await p;
 
   if (outputBufferOffset) {
-    const result = _parseChunkResult(
-      Module.HEAP8.buffer,
-      Module.HEAP8.byteOffset + outputBufferOffset
-    );
-    return result;
+  const result = _parseChunkResult(
+    Module.HEAP8.buffer,
+    Module.HEAP8.byteOffset + outputBufferOffset
+  );
+  return result;
   } else {
     return null;
   }

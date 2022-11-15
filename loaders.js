@@ -2,7 +2,6 @@
 this file contains common file format loaders which are re-used throughout the engine and userspace apps.
 */
 
-// import * as THREE from 'three';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {DRACOLoader} from 'three/examples/jsm/loaders/DRACOLoader.js';
 import {KTX2Loader} from 'three/examples/jsm/loaders/KTX2Loader.js';

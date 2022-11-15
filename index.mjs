@@ -2,10 +2,6 @@ import path from 'path';
 import fs from 'fs';
 
 import child_process from 'child_process';
-// import open from 'open';
-// import express from 'express';
-// import * as vite from 'vite';
-// import wsrtc from 'wsrtc/wsrtc-server.mjs';
 
 //
 
