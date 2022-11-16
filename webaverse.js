@@ -4,6 +4,8 @@ it uses the help of various managers and stores, and executes the render loop.
 */
 
 import * as THREE from 'three';
+import npcManager from './npc-manager.js';
+import './comms/index.js'; // need this to be imported early
 import Avatar from './avatars/avatars.js';
 import * as sounds from './sounds.js';
 import physx from './physx.js';
@@ -31,6 +33,8 @@ import {
   camera,
   bindCanvas,
   getComposer,
+  offscreenCanvas,
+  canvas
 } from './renderer.js';
 import transformControls from './transform-controls.js';
 import dioramaManager from './diorama/diorama-manager.js';
@@ -43,7 +47,6 @@ import story from './story.js';
 import zTargeting from './z-targeting.js';
 import raycastManager from './raycast-manager.js';
 import universe from './universe.js';
-import npcManager from './npc-manager.js';
 import settingsManager from './settings-manager.js';
 import backgroundFx from './background-fx/background-fx.js';
 
@@ -275,19 +278,25 @@ export default class Webaverse extends EventTarget {
   render(timestamp, timeDiff) {
     // console.log('frame 1');
 
-    const renderer = getRenderer();
     frameEvent.data.timestamp = timestamp;
     frameEvent.data.timeDiff = timeDiff;
     game.dispatchEvent(frameEvent);
 
     getComposer().render();
+    
+    // call transferimagebitmap to move the contents of offscreencanvas to canvas
+  
+    const context = canvas.getContext('bitmaprenderer');
+    const imageBitmap = offscreenCanvas.transferToImageBitmap();
+    context.transferFromImageBitmap(imageBitmap);
 
-    this.dispatchEvent(new MessageEvent('frameend', {
-      data: {
-        canvas: renderer.domElement,
-        context: renderer.getContext(),
-      }
-    }));
+    // TODO: reenable for mirror
+    // this.dispatchEvent(new MessageEvent('frameend', {
+    //   data: {
+    //     canvas: renderer.domElement,
+    //     context: renderer.getContext(),
+    //   }
+    // }));
 
     // console.log('frame 2');
   }

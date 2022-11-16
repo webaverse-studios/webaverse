@@ -2,17 +2,34 @@
 <html>
 
 <head>
-<title>Webaverse</title>
-<link href="/index.css" rel=stylesheet>
-<!-- webgpu -->
-<meta http-equiv="origin-trial" content="AvnbC2dywh4mcb2RVVjWSoBizD7iOkHmLUUjFl2u1X5pKwLoybNY9AKiIl5vMdMmmhfIR0eVVlZ9WxSBczeAGgAAAABgeyJvcmlnaW4iOiJodHRwczovL3dlYmF2ZXJzZS5jb206NDQzIiwiZmVhdHVyZSI6IldlYkdQVSIsImV4cGlyeSI6MTY0MzE1NTE5OSwiaXNTdWJkb21haW4iOnRydWV9"><!-- *.webaverse.com -->
-<link href="https://fonts.googleapis.com/css2?family=Muli:wght@400;600&display=swap" rel="stylesheet">
+  <title>Webaverse</title>
+  <link href="/index.css" rel=stylesheet>
+  <!-- webgpu -->
+  <meta http-equiv="origin-trial" content="AvnbC2dywh4mcb2RVVjWSoBizD7iOkHmLUUjFl2u1X5pKwLoybNY9AKiIl5vMdMmmhfIR0eVVlZ9WxSBczeAGgAAAABgeyJvcmlnaW4iOiJodHRwczovL3dlYmF2ZXJzZS5jb206NDQzIiwiZmVhdHVyZSI6IldlYkdQVSIsImV4cGlyeSI6MTY0MzE1NTE5OSwiaXNTdWJkb21haW4iOnRydWV9"><!-- *.webaverse.com -->
+  <link href="https://fonts.googleapis.com/css2?family=Muli:wght@400;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
-  <div id=iframe-container></div>
+  <div id="iframe-container"></div>
+  <!-- Uncomment me to split the UI from the engine!
+  <div id="interface-contanier"
+    style="width: 100%; height: 100%; padding: 0; margin: 0; position: fixed; z-index: 1000;">
+    <iframe id="interface-iframe" style="width: 100%; height: 100%; padding: 0; margin: 0;">
+    </iframe>
+  </div>
+  -->
   <div id="root"></div>
-  <script type=module src="/pre.js"></script>
+  <!-- Uncomment me to split the UI from the engine!
+  <script type="module" src="/webaverse.js"></script>
+  <script type="module">
+    // get the iframe
+    const iframe = document.getElementById('interface-iframe');
+    // get the current url and replace the tld
+    // this is a hack to force multithreading in chromium-based browsers
+    const url = window.location.href.replace('.com', '.online');
+    iframe.src = url + "interface.html";
+  </script>
+  -->
   <script type=module src="/src/main.jsx"></script>
 </body>
 

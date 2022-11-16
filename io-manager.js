@@ -324,9 +324,6 @@ ioManager.keydown = e => {
     case 87: { // W
       ioManager.keys.up = true;
       game.setMovements();
-      if (!cameraManager.pointerLockElement) {
-        game.menuVertical(-1);
-      }
 
       const now = performance.now();
       const timeDiff = now - lastKeysDownTime.keyW;
@@ -341,9 +338,6 @@ ioManager.keydown = e => {
     case 65: { // A
       ioManager.keys.left = true;
       game.setMovements();
-      if (!cameraManager.pointerLockElement) {
-        game.menuHorizontal(-1);
-      }
 
       const now = performance.now();
       const timeDiff = now - lastKeysDownTime.keyA;
@@ -364,15 +358,6 @@ ioManager.keydown = e => {
       } else {
         ioManager.keys.down = true;
         game.setMovements();
-        if (!cameraManager.pointerLockElement) {
-          if (game.menuOpen) {
-            game.menuVertical(1);
-          } else {
-            // if (!game.dragging) {
-              // _setTransformMode('scale');
-            // }
-          }
-        }
 
         const now = performance.now();
         const timeDiff = now - lastKeysDownTime.keyS;
@@ -388,9 +373,9 @@ ioManager.keydown = e => {
     case 68: { // D
       ioManager.keys.right = true;
       game.setMovements();
-      if (!cameraManager.pointerLockElement) {
-        game.menuHorizontal(1);
-      }
+      // if (!cameraManager.pointerLockElement) {
+      //   game.menuHorizontal(1);
+      // }
 
       const now = performance.now();
       const timeDiff = now - lastKeysDownTime.keyD;
@@ -604,16 +589,8 @@ ioManager.keypress = e => {
   // nothing
 };
 ioManager.wheel = e => {
-  if (storyManager.handleWheel(e)) {
-    // nothing
-  } else {
-    const physicsScene = physicsManager.getScene();
-    if (physicsScene.getPhysicsEnabled()) {
-      const renderer = getRenderer();
-      if (renderer && (e.target === renderer.domElement || e.target.id === 'app')) {
-        cameraManager.handleWheelEvent(e);
-      }
-    }
+  if (!storyManager.handleWheel(e)) {
+    cameraManager.handleWheelEvent(e);
   }
 };
 ioManager.keyup = e => {
@@ -743,8 +720,6 @@ ioManager.mousemove = e => {
   // }
 };
 ioManager.mouseleave = e => {
-  const renderer = getRenderer();
-  renderer.domElement.classList.remove('hover');
 };
 ioManager.click = e => {
   if (cameraManager.pointerLockElement) {
