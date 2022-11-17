@@ -257,12 +257,12 @@ class Universe extends EventTarget {
         // TODO: Add voiceSpec?
 
         playersArray.push([playerMap]);
-
       });
 
       // Handle remote player updates.
       player.addEventListener('update', e => {
-        const { key, val } = e.data;
+        const {key, val} = e.data;
+
         if (key === 'transform') {
           playersArray.doc.transact(() => {
             playerMap.set('transform', val);
@@ -332,6 +332,8 @@ class Universe extends EventTarget {
         const localPlayerRealm = universe.realms.localPlayer.headTracker.getHeadRealm();
         universe.realms.localPlayer.playerActions.deleteEntityAt(e.action.type, localPlayerRealm);
         */
+      });
+
       this.realms.localPlayer.initializePlayer({
         position,
       }, {});
