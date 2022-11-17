@@ -18,6 +18,7 @@ import {playersManager} from './players-manager.js';
 import {makeId, parseQuery} from './util.js';
 import {world} from './world.js';
 import {sceneManager} from './scene-manager.js';
+import physx from './physx.js';
 
 class Universe extends EventTarget {
   constructor() {
@@ -233,9 +234,7 @@ class Universe extends EventTarget {
       const defaultTransform = new Float32Array([0, 0, 0, 0, 0, 0, 1, 1, 1, 1]);
 
       const playersArray = this.state.getArray(playersMapName);
-      globalThis.playersArray = playersArray
       const playerMap = new Z.Map();
-      globalThis.playerMap = playerMap
       playersArray.doc.transact(() => {
         playerMap.set('playerId', playerId);
 
@@ -286,9 +285,7 @@ class Universe extends EventTarget {
             if (val !== null) {
               // Add action to state.
               getActionsState().push([val]);
-              // console.log('add remote action', player, val)
-              console.log('add remote action', val)
-              const remotePlayer = metaversefile.getRemotePlayerByPlayerId(playerId)
+              const remotePlayer = metaversefile.getRemotePlayerByPlayerId(playerId);
               if (remotePlayer.avatar) {
                 physx.physxWorker.addActionAnimationAvatar(remotePlayer.avatar.animationAvatarPtr, val);
               }
@@ -300,9 +297,7 @@ class Universe extends EventTarget {
               for (const action of actionsState) {
                 if (action.type === actionType) {
                   actionsState.delete(i);
-                  console.log('remove remote action')
-                  const remotePlayer = metaversefile.getRemotePlayerByPlayerId(playerId)
-                  console.log({actionsArray})
+                  const remotePlayer = metaversefile.getRemotePlayerByPlayerId(playerId);
                   if (remotePlayer.avatar) {
                     physx.physxWorker.removeActionAnimationAvatar(remotePlayer.avatar.animationAvatarPtr, actionsArray[i]);
                   }

@@ -302,10 +302,6 @@ export default class Webaverse extends EventTarget {
     const animate = (timestamp, frame) => {
       performanceTracker.startFrame();
 
-      // if (globalThis.localPlayer?.avatar && globalThis.remotePlayer?.avatar) {
-      //   console.log(globalThis.localPlayer.avatar.idleWalkFactor, globalThis.remotePlayer.avatar.idleWalkFactor)
-      // }
-
       const _frame = () => {
         timestamp = timestamp ?? performance.now();
         const timeDiff = timestamp - lastTimestamp;
@@ -387,21 +383,6 @@ export default class Webaverse extends EventTarget {
 const _startHacks = webaverse => {
   const localPlayer = metaversefileApi.useLocalPlayer();
   const vpdAnimations = Avatar.getAnimations().filter(animation => animation.name.endsWith('.vpd'));
-  
-  globalThis.localPlayer = localPlayer;
-  globalThis.THREE = THREE;
-  globalThis.physicsManager = physicsManager;
-  globalThis.physx = physx;
-  globalThis.metaversefileApi = metaversefileApi;
-  globalThis.rootScene = rootScene;
-  globalThis.loadoutManager = loadoutManager;
-  globalThis.game = game;
-  globalThis.cameraManager = cameraManager;
-  globalThis.camera = camera;
-  globalThis.ioManager = ioManager;
-  globalThis.universe = universe;
-  globalThis.playersManager = playersManager;
-  // globalThis.npcManager = npcManager;
 
   // press R to debug current state in console
   window.addEventListener('keydown', event => {
