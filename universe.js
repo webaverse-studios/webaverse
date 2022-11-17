@@ -259,6 +259,15 @@ class Universe extends EventTarget {
         playersArray.push([playerMap]);
       });
 
+      const getActionsState = () => {
+        let actionsArray = playerMap.has(actionsMapName) ? playerMap.get(actionsMapName, Z.Array) : null;
+        if (!actionsArray) {
+          actionsArray = new Z.Array();
+          playerMap.set(actionsMapName, actionsArray);
+        }
+        return actionsArray;
+      }
+
       // Handle remote player updates.
       player.addEventListener('update', e => {
         const {key, val} = e.data;
@@ -269,6 +278,25 @@ class Universe extends EventTarget {
           });
         } else if (key.startsWith('action.')) {
           // TODO: Update player state.
+          const actionType = key.slice(7);
+
+          playersArray.doc.transact(() => {
+            if (val !== null) {
+              // Add action to state.
+              getActionsState().push([val]);
+            } else {
+              // Remove action from state.
+              const actionsState = getActionsState();
+              let i = 0;
+              for (const action of actionsState) {
+                if (action.type === actionType) {
+                  actionsState.delete(i);
+                  break;
+                }
+                i++;
+              }
+            }
+          });
         }
       });
 
