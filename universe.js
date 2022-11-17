@@ -259,18 +259,59 @@ class Universe extends EventTarget {
         // TODO: Add voiceSpec?
 
         playersArray.push([playerMap]);
-
       });
+
+      const getActionsState = () => {
+        let actionsArray = playerMap.has(actionsMapName) ? playerMap.get(actionsMapName, Z.Array) : null;
+        if (!actionsArray) {
+          actionsArray = new Z.Array();
+          playerMap.set(actionsMapName, actionsArray);
+        }
+        return actionsArray;
+      }
 
       // Handle remote player updates.
       player.addEventListener('update', e => {
-        const { key, val } = e.data;
+        const {key, val} = e.data;
+
         if (key === 'transform') {
           playersArray.doc.transact(() => {
             playerMap.set('transform', val);
           });
+        } else if (key.startsWith('action.')) {
+          // TODO: Update player state.
+          const actionType = key.slice(7);
+
+          playersArray.doc.transact(() => {
+            if (val !== null) {
+              // Add action to state.
+              getActionsState().push([val]);
+            } else {
+              // Remove action from state.
+              const actionsState = getActionsState();
+              let i = 0;
+              for (const action of actionsState) {
+                if (action.type === actionType) {
+                  actionsState.delete(i);
+                  break;
+                }
+                i++;
+              }
+            }
+          });
         }
       });
+
+      // FIXME MULTIPLAYER - Use playerActions event listeners instead of player event listener for 'action.` key changes.
+      /*
+      player.playerActions.addEventListener('needledentityadd', e => {
+        // ...
+      });
+
+      player.playerActions.addEventListener('needledentityremove', e => {
+        // ...
+      });
+      */
 
       const position = player.getKeyValue('position');
       // TODO: Remote player initial position;
@@ -303,6 +344,25 @@ class Universe extends EventTarget {
     const onConnect = (position) => {
 
       // Default player apps and actions can be included here.
+
+      // Player actions.
+      const localPlayer = playersManager.getLocalPlayer();
+      localPlayer.addEventListener('actionadd', (e, origin) => {
+        // FIXME MULTIPLAYER - Should use playerActions.addEntityAt() instead but need a playerActions.deleteEntityAt() method.
+        universe.realms.localPlayer.setKeyValue('action.' + e.action.type, e.action);
+        /*
+        const localPlayerRealm = universe.realms.localPlayer.headTracker.getHeadRealm();
+        universe.realms.localPlayer.playerActions.addEntityAt(e.action.type, e.action, localPlayerRealm);
+        */
+      });
+      localPlayer.addEventListener('actionremove', (e, origin) => {
+        // FIXME MULTIPLAYER
+        universe.realms.localPlayer.setKeyValue('action.' + e.action.type, null);
+        /*
+        const localPlayerRealm = universe.realms.localPlayer.headTracker.getHeadRealm();
+        universe.realms.localPlayer.playerActions.deleteEntityAt(e.action.type, localPlayerRealm);
+        */
+      });
 
       this.realms.localPlayer.initializePlayer({
         position,
