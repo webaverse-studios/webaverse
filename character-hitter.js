@@ -172,7 +172,7 @@ export class CharacterHitter {
     ];
     const gruntType = gruntTypes[Math.floor(Math.random() * gruntTypes.length)];
     // console.log('play grunt', emotion, gruntType);
-    this.character.characterSfx.playGrunt(gruntType);
+    this.character.characterSfx?.playGrunt(gruntType);
 
     {
       const damageMeshApp = metaversefile.createApp();
