@@ -5,12 +5,14 @@ import {playersManager} from './players-manager.js';
 import physicsManager from './physics-manager.js';
 import hpManager from './hp-manager.js';
 import {alea} from './procgen/procgen.js';
-import {createRelativeUrl, lookAtQuaternion} from './util.js';
+import {createRelativeUrl, lookAtQuaternion, getNextPhysicsId} from './util.js';
 import dropManager from './drop-manager.js';
 import loaders from './loaders.js';
 import {InstancedBatchedMesh, InstancedGeometryAllocator} from './geometry-batching.js';
 import {createTextureAtlas} from './atlasing.js';
 import {Matrix4,Quaternion,Vector3,Euler} from 'three';
+import * as sounds from './sounds.js';
+import { ConstructorFragment } from 'ethers/lib/utils.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -43,13 +45,14 @@ const bakeFps = 24;
 const maxAnimationFrameLength = 512;
 
 let unifiedBoneTextureSize = 1024;
-const animationKeys = [];
+const mobGlobalData = [];
 const debugAnimation = false;
 const IDLEACTIONTYPE = 'IDLE';
 const ATTACKACTIONTYPE = 'ATCK';
 const DIEACTIONTYPE = 'DIE';
 const ANIMATIONACTIONTYPE = 'ANMT';
 const HITACTIONTYPE = 'HIT';
+//const MAXSOUNDSSAMETIME = 2;
 // window.THREE = THREE;
 
 const _zeroY = v => {
@@ -469,6 +472,24 @@ class Mob {
   }
 }
 
+/*class MobSoundsPlayer{
+  constructor(){
+    this.soundsRequests = 0;
+  }
+
+  playSound(name){
+    if(this.soundsRequests >= MAXSOUNDSSAMETIME){
+      return;
+    }
+    sounds.playSoundName(name);
+    this.soundsRequests++;
+    const duration = sounds.getSoundFiles()[name][0].duration * 1000;
+    setTimeout(()=>{this.soundsRequests--}, duration);
+  }
+}
+
+const mobSoundsPlayer = new MobSoundsPlayer();*/
+
 /*
   Action to be attached to AI controlled entities
   durationFrames: action duration
@@ -567,6 +588,7 @@ class AttackAction extends ActionComponent {
         return;
       
       mob.playAnimation(attackId, true);
+      //mobSoundsPlayer.playSound('silkAttack');
       if(mob.target && mob.target.hasAction(HITACTIONTYPE)){
         mob.target.startAction('hit');
       }
@@ -578,9 +600,6 @@ class AttackAction extends ActionComponent {
 class HitAction extends ActionComponent {
   constructor(durationS){
     const actionMethod = (mob)=>{
-      if(mob.animations.has('hit')){
-        mob.playAnimation('hit', true);
-      }
       mob.life -= 1;
       mob.checkDeath();
     }
@@ -591,13 +610,14 @@ class HitAction extends ActionComponent {
 class DieAction extends ActionComponent {
   constructor(durationS){
     const actionMethod = (mob)=>{
-      mob.playAnimation('death', true);
+      //mob.playAnimation('death', true);
     }
 
     const onFinish = (mob)=>{
       mob.kill();
+      //ragdollSpawner.spawnRagdoll(mob.position, mob.quaternion, mob.geometryIndex);
     }
-    super('death', DIEACTIONTYPE, durationS, actionMethod, onFinish);
+    super('death', DIEACTIONTYPE, 0, actionMethod, onFinish);
   }
 }
 
@@ -609,7 +629,6 @@ class AnimationAction extends ActionComponent {
     super('animationAction'+animationId, ANIMATIONACTIONTYPE, durationS, actionMethod);
   }
 }
-
 
 class MobAIControllerPrototype {
   constructor(){
@@ -644,6 +663,23 @@ class MobAIControllerPrototype {
     }
   }
 }
+
+/*class RagdollSpawner{
+  constructor(addToScene){
+    this.addToScene = addToScene;
+  }
+
+  spawnRagdoll(pos, quat, geoId){
+    console.log(geoId)
+    console.log(mobGlobalData)
+    const mesh = mobGlobalData[geoId].mesh;
+    //this.addToScene(mesh);
+    mesh.position.copy(pos);
+    mesh.rotation.setFromQuaternion(quat);
+  }
+}
+
+let ragdollSpawner;*/
 const debugMob = false;
 /*
   class for mob instances. integrate the action system, performing actions through action components
@@ -659,13 +695,13 @@ export class MobInstance {
   constructor(pos, quat, geometryIndex, timeOffset, radius, height, velocity, idleAction) {
     this.actions = [];
     this.target;
-    this.life = 10;
+    this.life = 1;
     this.actionsQueue = [];
     this.position = new Vector3().fromArray(pos);
     this.quaternion = new Quaternion().fromArray(quat);
     this.geometryIndex = geometryIndex;
     this.timeOffset = timeOffset;
-    this.animations = animationKeys[this.geometryIndex]
+    this.animations = mobGlobalData[this.geometryIndex].animationsData;
     this.updatePosition = true;
     this.updateRotation = true;
     this.updateTimeOffset = true;
@@ -695,6 +731,10 @@ export class MobInstance {
     this.askForTarget = undefined;
     this.aggroDistance = 3;
     this.dead = false
+  }
+
+  getGeometryIndex(){
+    return this.geometryIndex;
   }
 
   checkDeath(){
@@ -831,7 +871,7 @@ export class MobInstance {
   }
 
   targetManagement(){
-    if(this.life <= 0 || debugMob)
+    if(this.life <= 0)
       return;
     if(!this.target && this.askForTarget){
       this.target = this.askForTarget();
@@ -873,7 +913,7 @@ export class MobInstance {
     const timeDiffS = timeDiff / 1000;
     this.targetManagement();
 
-    if(debugMob){
+    if(false){
       this.debugAction(timeDiffS);
     }
     else
@@ -1538,7 +1578,7 @@ void main() {
           this.skeleton.bakeFrame(skeleton2, drawCall.freeListEntry, j * maxFrameCountPerAnimation + t);
         }
       }
-      animationKeys.push(animKeys);
+      mobGlobalData.push({animationsData: animKeys, mesh: this.meshes[i]});
     }
     this.skeleton.unifiedBoneTexture.needsUpdate = true;
     this.physicsScene = physicsManager.getScene();
@@ -1705,7 +1745,7 @@ void main() {
     if (!chunk.mobs) return;
 
     for (let mob of chunk.mobs) {
-      const drawCall = this.getDrawCall(mob.geometryIndex);
+      const drawCall = this.getDrawCall(mob.getGeometryIndex());
       this.addMobGeometry(drawCall, mob, chunk.pose);
       mob.killEvents.push(()=>{
         this.removeMobGeometry(drawCall, mob);
@@ -1724,6 +1764,35 @@ void main() {
       this.updateMobs(d, frameIndex);
   }
 }
+
+/*const ragdollMeshGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+const ragdollMeshMaterial = new THREE.MeshNormalMaterial({
+  // color: 0xFF0000,
+  transparent: true,
+  depthTest: false,
+});
+
+const makeCubeMesh = (name, isTop, scale = 1) => { // todo: redundant with _makeCapsuleGeometry?
+
+  const object = new THREE.Object3D(); // === flatMeshes.Hips/Spine etc
+  object.name = name;
+  object.physicsId = getNextPhysicsId();
+
+  const physicsMesh = new THREE.Mesh(ragdollMeshGeometry, ragdollMeshMaterial);
+  object.add(physicsMesh);
+  object.physicsMesh = physicsMesh;
+
+  object.parent2 = null;
+  object.children2 = [];
+  object.add2 = function(child) {
+    object.children2.push(child);
+    child.parent2 = object;
+  };
+
+  object.isTop = isTop;
+
+  return object;
+};*/
 
 class MobsCompiledData {
   constructor({
@@ -1770,6 +1839,20 @@ class MobsCompiledData {
   }
 }
 
+/*function makeSkeleton(node, object, bone){
+  
+  if(bone == undefined)
+    bone = makeCubeMesh(node.name)
+
+  object.add(bone);
+  for(const c of node.children){
+    const childrenBone = makeCubeMesh(c.name);
+    bone.add2(childrenBone);
+    makeSkeleton(c, object, childrenBone);
+  }
+  return {object, bone};
+}*/
+
 class MobGenerator {
   constructor({
     procGenInstance,
@@ -1779,8 +1862,16 @@ class MobGenerator {
 
     this.object = new THREE.Object3D();
     this.object.name = 'mob-chunks';
+    /*
+    //begin
+    const glb = mobData.glbs[0];
+    //this.object.add(glb.scene);
+    const rootBone2 = _findBone(glb.scene);
+    makeSkeleton(rootBone2, this.object);
+    return;
+    ragdollSpawner = new RagdollSpawner((model)=> this.object.add(model));
+    //end*/
     this.MobController = new MobAIControllerPrototype();
-
     // make batched mesh
     const mobBatchedMesh = new MobBatchedMesh({
       procGenInstance,
@@ -1797,16 +1888,24 @@ class MobGenerator {
     const mobs = [];
     const seed = 1234;
     const rng = alea(seed);
-    const mobCount = 512;
-    const w = Math.sqrt(mobCount);
-    for(let i = 0; i < 256; i++){
-      //const geoId = i%meshes.length;
-      const geoId = Math.floor(rng() * meshes.length);
+    const mobCount = debugMob ? 5 : 256;
+    for(let i = 0; i < mobCount; i++){
       //const size = new Vector3();
       //new THREE.Box3().setFromObject(meshes[geoId]).getSize(size);
-      //random position
-      const pos = [rng()*100, 400, 200+rng()*100];
-      //const pos = [i*4 - 2*2,  2, -10];
+      
+      let geoId;
+      let pos;
+      if(debugMob){
+        geoId = i%meshes.length;
+        pos = [i*4 - 2*2,  2, -10];
+      }
+        
+      else{
+        geoId = Math.floor(rng() * meshes.length);
+        pos = [rng()*100, 400, 200+rng()*100];
+      }
+        
+      
       const mob = new MobInstance(
         pos,
         new Quaternion().setFromEuler(new Euler(0, rng()*Math.PI*2, 0)).toArray(),
@@ -1834,6 +1933,8 @@ class MobGenerator {
 
   update(timestamp, timeDiff) {
     const localPlayer = playersManager.getLocalPlayer();
+    /*this.mixer.update(1. / bakeFps);
+    this.mixer.updateMatrixWorld();*/
     for(const m of this.mobs){
       m.update(localPlayer.position, timeDiff);
     }
