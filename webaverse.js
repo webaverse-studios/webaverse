@@ -400,6 +400,7 @@ const _startHacks = webaverse => {
   globalThis.camera = camera;
   globalThis.ioManager = ioManager;
   globalThis.universe = universe;
+  globalThis.playersManager = playersManager;
   // globalThis.npcManager = npcManager;
 
   // press R to debug current state in console

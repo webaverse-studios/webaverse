@@ -286,13 +286,26 @@ class Universe extends EventTarget {
             if (val !== null) {
               // Add action to state.
               getActionsState().push([val]);
+              // console.log('add remote action', player, val)
+              console.log('add remote action', val)
+              const remotePlayer = metaversefile.getRemotePlayerByPlayerId(playerId)
+              if (remotePlayer.avatar) {
+                physx.physxWorker.addActionAnimationAvatar(remotePlayer.avatar.animationAvatarPtr, val);
+              }
             } else {
               // Remove action from state.
               const actionsState = getActionsState();
+              const actionsArray = Array.from(actionsState); // todo: check isBound ?
               let i = 0;
               for (const action of actionsState) {
                 if (action.type === actionType) {
                   actionsState.delete(i);
+                  console.log('remove remote action')
+                  const remotePlayer = metaversefile.getRemotePlayerByPlayerId(playerId)
+                  console.log({actionsArray})
+                  if (remotePlayer.avatar) {
+                    physx.physxWorker.removeActionAnimationAvatar(remotePlayer.avatar.animationAvatarPtr, actionsArray[i]);
+                  }
                   break;
                 }
                 i++;

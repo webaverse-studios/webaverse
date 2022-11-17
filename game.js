@@ -1725,25 +1725,25 @@ class GameManager extends EventTarget {
   }
 
   setMovements() {
-    const localPlayer = playersManager.getLocalPlayer();
-    if (ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right) {
-      if (!localPlayer.hasAction('movements')) {
-        localPlayer.addAction({type: 'movements'});
-      }
-    } else {
-      localPlayer.removeAction('movements');
-    }
+    // const localPlayer = playersManager.getLocalPlayer();
+    // if (ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right) {
+    //   if (!localPlayer.hasAction('movements')) {
+    //     localPlayer.addAction({type: 'movements'});
+    //   }
+    // } else {
+    //   localPlayer.removeAction('movements');
+    // }
   }
 
   setSprint(bool) {
-    const localPlayer = playersManager.getLocalPlayer();
-    if (bool) {
-      if (!localPlayer.hasAction('sprint')) { // note: prevent holding shift switch browser page.
-        localPlayer.addAction({type: 'sprint'});
-      }
-    } else {
-      localPlayer.removeAction('sprint');
-    }
+    // const localPlayer = playersManager.getLocalPlayer();
+    // if (bool) {
+    //   if (!localPlayer.hasAction('sprint')) { // note: prevent holding shift switch browser page.
+    //     localPlayer.addAction({type: 'sprint'});
+    //   }
+    // } else {
+    //   localPlayer.removeAction('sprint');
+    // }
   }
 
   getSpeed() {
