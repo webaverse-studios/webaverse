@@ -972,67 +972,67 @@ class InterpolatedPlayer extends AvatarCharacter {
     super(opts);
     this.positionInterpolant = new PositionInterpolant(() => this.getPosition(), avatarInterpolationTimeDelay, avatarInterpolationNumFrames);
     this.quaternionInterpolant = new QuaternionInterpolant(() => this.getQuaternion(), avatarInterpolationTimeDelay, avatarInterpolationNumFrames);
-    this.actionBinaryInterpolants = {
-      crouch: new BinaryInterpolant(() => this.hasAction('crouch'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
-      activate: new BinaryInterpolant(() => this.hasAction('activate'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
-      use: new BinaryInterpolant(() => this.hasAction('use'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
-      pickUp: new BinaryInterpolant(() => this.hasAction('pickUp'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
-      aim: new BinaryInterpolant(() => this.hasAction('aim'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
-      narutoRun: new BinaryInterpolant(() => this.hasAction('narutoRun'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
-      fly: new BinaryInterpolant(() => this.hasAction('fly'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
-      jump: new BinaryInterpolant(() => this.hasAction('jump'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
-      doubleJump: new BinaryInterpolant(() => this.hasAction('doubleJump'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
-      land: new BinaryInterpolant(() => this.hasAction('land'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
-      dance: new BinaryInterpolant(() => this.hasAction('dance'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
-      emote: new BinaryInterpolant(() => this.hasAction('emote'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
-      // throw: new BinaryInterpolant(() => this.hasAction('throw'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
-      // chargeJump: new BinaryInterpolant(() => this.hasAction('chargeJump'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
-      // standCharge: new BinaryInterpolant(() => this.hasAction('standCharge'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
-      fallLoop: new BinaryInterpolant(() => this.hasAction('fallLoop'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
-      // swordSideSlash: new BinaryInterpolant(() => this.hasAction('swordSideSlash'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
-      // swordTopDownSlash: new BinaryInterpolant(() => this.hasAction('swordTopDownSlash'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
-      hurt: new BinaryInterpolant(() => this.hasAction('hurt'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
-    };
-    this.actionBinaryInterpolantsArray = Object.keys(this.actionBinaryInterpolants).map(k => this.actionBinaryInterpolants[k]);
-    this.actionInterpolants = {
-      crouch: new BiActionInterpolant(() => this.actionBinaryInterpolants.crouch.get(), 0, crouchMaxTime),
-      activate: new UniActionInterpolant(() => this.actionBinaryInterpolants.activate.get(), 0, activateMaxTime),
-      use: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.use.get(), 0),
-      pickUp: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.pickUp.get(), 0),
-      unuse: new InfiniteActionInterpolant(() => !this.actionBinaryInterpolants.use.get(), 0),
-      aim: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.aim.get(), 0),
-      aimRightTransition: new BiActionInterpolant(() => this.hasAction('aim') && this.hands[0].enabled, 0, aimTransitionMaxTime),
-      aimLeftTransition: new BiActionInterpolant(() => this.hasAction('aim') && this.hands[1].enabled, 0, aimTransitionMaxTime),
-      narutoRun: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.narutoRun.get(), 0),
-      fly: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.fly.get(), 0),
-      jump: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.jump.get(), 0),
-      doubleJump: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.doubleJump.get(), 0),
-      land: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.land.get(), 0),
-      fallLoop: new InfiniteActionInterpolant(() => this.hasAction('fallLoop'), 0),
-      fallLoopTransition: new BiActionInterpolant(() => this.actionBinaryInterpolants.fallLoop.get(), 0, 300),
-      dance: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.dance.get(), 0),
-      emote: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.emote.get(), 0),
-      // throw: new UniActionInterpolant(() => this.actionBinaryInterpolants.throw.get(), 0, throwMaxTime),
-      // chargeJump: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.chargeJump.get(), 0),
-      // standCharge: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.standCharge.get(), 0),
-      // fallLoop: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.fallLoop.get(), 0),
-      // swordSideSlash: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.swordSideSlash.get(), 0),
-      // swordTopDownSlash: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.swordTopDownSlash.get(), 0),
-      hurt: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.hurt.get(), 0),
-      movements: new InfiniteActionInterpolant(() => {
-        const ioManager = metaversefile.useIoManager();
-        return  ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right;
-      }, 0),
-      movementsTransition: new BiActionInterpolant(() => {
-        const ioManager = metaversefile.useIoManager();
-        return  ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right;
-      }, 0, crouchMaxTime),
-      sprint: new BiActionInterpolant(() => {
-        const ioManager = metaversefile.useIoManager();
-        return  ioManager.keys.shift;
-      }, 0, crouchMaxTime),
-    };
-    this.actionInterpolantsArray = Object.keys(this.actionInterpolants).map(k => this.actionInterpolants[k]);
+    // this.actionBinaryInterpolants = {
+    //   crouch: new BinaryInterpolant(() => this.hasAction('crouch'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
+    //   activate: new BinaryInterpolant(() => this.hasAction('activate'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
+    //   use: new BinaryInterpolant(() => this.hasAction('use'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
+    //   pickUp: new BinaryInterpolant(() => this.hasAction('pickUp'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
+    //   aim: new BinaryInterpolant(() => this.hasAction('aim'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
+    //   narutoRun: new BinaryInterpolant(() => this.hasAction('narutoRun'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
+    //   fly: new BinaryInterpolant(() => this.hasAction('fly'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
+    //   jump: new BinaryInterpolant(() => this.hasAction('jump'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
+    //   doubleJump: new BinaryInterpolant(() => this.hasAction('doubleJump'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
+    //   land: new BinaryInterpolant(() => this.hasAction('land'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
+    //   dance: new BinaryInterpolant(() => this.hasAction('dance'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
+    //   emote: new BinaryInterpolant(() => this.hasAction('emote'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
+    //   // throw: new BinaryInterpolant(() => this.hasAction('throw'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
+    //   // chargeJump: new BinaryInterpolant(() => this.hasAction('chargeJump'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
+    //   // standCharge: new BinaryInterpolant(() => this.hasAction('standCharge'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
+    //   fallLoop: new BinaryInterpolant(() => this.hasAction('fallLoop'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
+    //   // swordSideSlash: new BinaryInterpolant(() => this.hasAction('swordSideSlash'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
+    //   // swordTopDownSlash: new BinaryInterpolant(() => this.hasAction('swordTopDownSlash'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
+    //   hurt: new BinaryInterpolant(() => this.hasAction('hurt'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
+    // };
+    // this.actionBinaryInterpolantsArray = Object.keys(this.actionBinaryInterpolants).map(k => this.actionBinaryInterpolants[k]);
+    // this.actionInterpolants = {
+    //   crouch: new BiActionInterpolant(() => this.actionBinaryInterpolants.crouch.get(), 0, crouchMaxTime),
+    //   activate: new UniActionInterpolant(() => this.actionBinaryInterpolants.activate.get(), 0, activateMaxTime),
+    //   use: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.use.get(), 0),
+    //   pickUp: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.pickUp.get(), 0),
+    //   unuse: new InfiniteActionInterpolant(() => !this.actionBinaryInterpolants.use.get(), 0),
+    //   aim: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.aim.get(), 0),
+    //   aimRightTransition: new BiActionInterpolant(() => this.hasAction('aim') && this.hands[0].enabled, 0, aimTransitionMaxTime),
+    //   aimLeftTransition: new BiActionInterpolant(() => this.hasAction('aim') && this.hands[1].enabled, 0, aimTransitionMaxTime),
+    //   narutoRun: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.narutoRun.get(), 0),
+    //   fly: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.fly.get(), 0),
+    //   jump: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.jump.get(), 0),
+    //   doubleJump: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.doubleJump.get(), 0),
+    //   land: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.land.get(), 0),
+    //   fallLoop: new InfiniteActionInterpolant(() => this.hasAction('fallLoop'), 0),
+    //   fallLoopTransition: new BiActionInterpolant(() => this.actionBinaryInterpolants.fallLoop.get(), 0, 300),
+    //   dance: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.dance.get(), 0),
+    //   emote: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.emote.get(), 0),
+    //   // throw: new UniActionInterpolant(() => this.actionBinaryInterpolants.throw.get(), 0, throwMaxTime),
+    //   // chargeJump: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.chargeJump.get(), 0),
+    //   // standCharge: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.standCharge.get(), 0),
+    //   // fallLoop: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.fallLoop.get(), 0),
+    //   // swordSideSlash: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.swordSideSlash.get(), 0),
+    //   // swordTopDownSlash: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.swordTopDownSlash.get(), 0),
+    //   hurt: new InfiniteActionInterpolant(() => this.actionBinaryInterpolants.hurt.get(), 0),
+    //   movements: new InfiniteActionInterpolant(() => {
+    //     const ioManager = metaversefile.useIoManager();
+    //     return  ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right;
+    //   }, 0),
+    //   movementsTransition: new BiActionInterpolant(() => {
+    //     const ioManager = metaversefile.useIoManager();
+    //     return  ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right;
+    //   }, 0, crouchMaxTime),
+    //   sprint: new BiActionInterpolant(() => {
+    //     const ioManager = metaversefile.useIoManager();
+    //     return  ioManager.keys.shift;
+    //   }, 0, crouchMaxTime),
+    // };
+    // this.actionInterpolantsArray = Object.keys(this.actionInterpolants).map(k => this.actionInterpolants[k]);
     
     this.avatarBinding = {
       position: this.positionInterpolant.get(),
@@ -1060,12 +1060,12 @@ class InterpolatedPlayer extends AvatarCharacter {
   updateInterpolation(timeDiff) {
     this.positionInterpolant.update(timeDiff);
     this.quaternionInterpolant.update(timeDiff);
-    for (const actionBinaryInterpolant of this.actionBinaryInterpolantsArray) {
-      actionBinaryInterpolant.update(timeDiff);
-    }
-    for (const actionInterpolant of this.actionInterpolantsArray) {
-      actionInterpolant.update(timeDiff);
-    }
+    // for (const actionBinaryInterpolant of this.actionBinaryInterpolantsArray) {
+    //   actionBinaryInterpolant.update(timeDiff);
+    // }
+    // for (const actionInterpolant of this.actionInterpolantsArray) {
+    //   actionInterpolant.update(timeDiff);
+    // }
   }
 }
 class UninterpolatedPlayer extends AvatarCharacter {
@@ -1495,9 +1495,9 @@ class RemotePlayer extends InterpolatedPlayer {
         this.positionInterpolant.snapshot(timeDiff);
         this.quaternionInterpolant.snapshot(timeDiff);
 
-        for (const actionBinaryInterpolant of this.actionBinaryInterpolantsArray) {
-          actionBinaryInterpolant.snapshot(timeDiff);
-        }
+        // for (const actionBinaryInterpolant of this.actionBinaryInterpolantsArray) {
+        //   actionBinaryInterpolant.snapshot(timeDiff);
+        // }
 
         if(this.avatar){
           localVector.copy(this.position);
@@ -1527,6 +1527,7 @@ class RemotePlayer extends InterpolatedPlayer {
     if(!this.avatar) return // console.log("no avatar"); // avatar takes time to load, ignore until it does
 
     this.updateInterpolation(timeDiff);
+    physx.physxWorker.updateInterpolationAnimationAvatar(this.avatar.animationAvatarPtr, timeDiff);
 
     const mirrors = metaversefile.getMirrors();
     applyCharacterToAvatar(this, null, this.avatar, mirrors);

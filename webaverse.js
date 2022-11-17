@@ -302,6 +302,10 @@ export default class Webaverse extends EventTarget {
     const animate = (timestamp, frame) => {
       performanceTracker.startFrame();
 
+      // if (globalThis.localPlayer?.avatar && globalThis.remotePlayer?.avatar) {
+      //   console.log(globalThis.localPlayer.avatar.idleWalkFactor, globalThis.remotePlayer.avatar.idleWalkFactor)
+      // }
+
       const _frame = () => {
         timestamp = timestamp ?? performance.now();
         const timeDiff = timestamp - lastTimestamp;
