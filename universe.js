@@ -267,8 +267,21 @@ class Universe extends EventTarget {
           playersArray.doc.transact(() => {
             playerMap.set('transform', val);
           });
+        } else if (key.startsWith('action.')) {
+          // TODO: Update player state.
         }
       });
+
+      // FIXME MULTIPLAYER - Use playerActions event listeners instead of player event listener for 'action.` key changes.
+      /*
+      player.playerActions.addEventListener('needledentityadd', e => {
+        // ...
+      });
+
+      player.playerActions.addEventListener('needledentityremove', e => {
+        // ...
+      });
+      */
 
       const position = player.getKeyValue('position');
       // TODO: Remote player initial position;
@@ -302,6 +315,23 @@ class Universe extends EventTarget {
 
       // Default player apps and actions can be included here.
 
+      // Player actions.
+      const localPlayer = playersManager.getLocalPlayer();
+      localPlayer.addEventListener('actionadd', (e, origin) => {
+        // FIXME MULTIPLAYER - Should use playerActions.addEntityAt() instead but need a playerActions.deleteEntityAt() method.
+        universe.realms.localPlayer.setKeyValue('action.' + e.action.type, e.action);
+        /*
+        const localPlayerRealm = universe.realms.localPlayer.headTracker.getHeadRealm();
+        universe.realms.localPlayer.playerActions.addEntityAt(e.action.type, e.action, localPlayerRealm);
+        */
+      });
+      localPlayer.addEventListener('actionremove', (e, origin) => {
+        // FIXME MULTIPLAYER
+        universe.realms.localPlayer.setKeyValue('action.' + e.action.type, null);
+        /*
+        const localPlayerRealm = universe.realms.localPlayer.headTracker.getHeadRealm();
+        universe.realms.localPlayer.playerActions.deleteEntityAt(e.action.type, localPlayerRealm);
+        */
       this.realms.localPlayer.initializePlayer({
         position,
       }, {});
