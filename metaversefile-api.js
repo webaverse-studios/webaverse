@@ -1118,6 +1118,13 @@ export default () => {
       return null;
     }
   },
+  getRemotePlayerByPlayerId(playerId) { // todo: don't add this, use existing functions ?
+    for (const pair of playersManager.getRemotePlayers()) {
+      if (pair[0] === playerId) {
+        return pair[1];
+      }
+    }
+  },
   getAppByInstanceId(instanceId) {
     // local
     const localPlayer = playersManager.getLocalPlayer();

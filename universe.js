@@ -18,6 +18,7 @@ import {playersManager} from './players-manager.js';
 import {makeId, parseQuery} from './util.js';
 import {world} from './world.js';
 import {sceneManager} from './scene-manager.js';
+import physx from './physx.js';
 
 class Universe extends EventTarget {
   constructor() {
@@ -283,13 +284,22 @@ class Universe extends EventTarget {
             if (val !== null) {
               // Add action to state.
               getActionsState().push([val]);
+              const remotePlayer = metaversefile.getRemotePlayerByPlayerId(playerId);
+              if (remotePlayer.avatar) {
+                physx.physxWorker.addActionAnimationAvatar(remotePlayer.avatar.animationAvatarPtr, val);
+              }
             } else {
               // Remove action from state.
               const actionsState = getActionsState();
+              const actionsArray = Array.from(actionsState);
               let i = 0;
               for (const action of actionsState) {
                 if (action.type === actionType) {
                   actionsState.delete(i);
+                  const remotePlayer = metaversefile.getRemotePlayerByPlayerId(playerId);
+                  if (remotePlayer.avatar) {
+                    physx.physxWorker.removeActionAnimationAvatar(remotePlayer.avatar.animationAvatarPtr, actionsArray[i]);
+                  }
                   break;
                 }
                 i++;
