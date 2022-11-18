@@ -30,6 +30,7 @@ class Universe extends EventTarget {
     this.multiplayerEnabled = false;
     this.multiplayerConnected = false;
     this.realms = null;
+    this.actionsPrefix = 'actions.';
   }
 
   getWorldsHost() {
@@ -179,7 +180,7 @@ class Universe extends EventTarget {
     localPlayer.bindState(state.getArray(playersMapName));
   }
 
-    // Called by enterWorld() when a player enables multi-player.
+  // Called by enterWorld() when a player enables multi-player.
   async connectMultiplayer(src, state = new Z.Doc()) {
     this.connectState(state);
 
@@ -276,10 +277,8 @@ class Universe extends EventTarget {
           playersArray.doc.transact(() => {
             playerMap.set('transform', val);
           });
-        } else if (key.startsWith('action.')) {
-          // TODO: Update player state.
-          const actionType = key.slice(7);
-
+        } else if (key.startsWith(this.actionsPrefix)) {
+          const actionType = key.slice(this.actionsPrefix.length);
           playersArray.doc.transact(() => {
             if (val !== null) {
               // Add action to state.
@@ -299,17 +298,6 @@ class Universe extends EventTarget {
           });
         }
       });
-
-      // FIXME MULTIPLAYER - Use playerActions event listeners instead of player event listener for 'action.` key changes.
-      /*
-      player.playerActions.addEventListener('needledentityadd', e => {
-        // ...
-      });
-
-      player.playerActions.addEventListener('needledentityremove', e => {
-        // ...
-      });
-      */
 
       const position = player.getKeyValue('position');
       // TODO: Remote player initial position;
@@ -346,20 +334,10 @@ class Universe extends EventTarget {
       // Player actions.
       const localPlayer = playersManager.getLocalPlayer();
       localPlayer.addEventListener('actionadd', (e, origin) => {
-        // FIXME MULTIPLAYER - Should use playerActions.addEntityAt() instead but need a playerActions.deleteEntityAt() method.
-        universe.realms.localPlayer.setKeyValue('action.' + e.action.type, e.action);
-        /*
-        const localPlayerRealm = universe.realms.localPlayer.headTracker.getHeadRealm();
-        universe.realms.localPlayer.playerActions.addEntityAt(e.action.type, e.action, localPlayerRealm);
-        */
+        universe.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, e.action);
       });
       localPlayer.addEventListener('actionremove', (e, origin) => {
-        // FIXME MULTIPLAYER
-        universe.realms.localPlayer.setKeyValue('action.' + e.action.type, null);
-        /*
-        const localPlayerRealm = universe.realms.localPlayer.headTracker.getHeadRealm();
-        universe.realms.localPlayer.playerActions.deleteEntityAt(e.action.type, localPlayerRealm);
-        */
+        universe.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, null);
       });
 
       this.realms.localPlayer.initializePlayer({
