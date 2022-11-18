@@ -191,6 +191,7 @@ class Universe extends EventTarget {
     const sceneId = hashCode(src).toString();
     const localPlayer = playersManager.getLocalPlayer();
     this.realms = new NetworkRealms(sceneId, localPlayer.playerId);
+    await this.realms.initAudioContext();
     this.realmsCleanupFns = new Map();
 
     this.realms.addEventListener('realmjoin', e => {
