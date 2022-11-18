@@ -292,7 +292,7 @@ class Universe extends EventTarget {
             } else {
               // Remove action from state.
               const actionsState = getActionsState();
-              const actionsArray = Array.from(actionsState); // todo: check isBound ?
+              const actionsArray = Array.from(actionsState);
               let i = 0;
               for (const action of actionsState) {
                 if (action.type === actionType) {
