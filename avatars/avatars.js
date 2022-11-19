@@ -1449,9 +1449,14 @@ class Avatar {
     this.setDirection(timestamp);
 
     const currentSpeed = localVector.set(this.velocity.x, 0, this.velocity.z).length();
+    // if (this === globalThis.localPlayer.avatar) console.log(currentSpeed)
+    // if (this === globalThis.remotePlayer?.avatar) console.log(currentSpeed, globalThis.logVector3(this.velocity), globalThis.logVector3(remotePlayer.characterPhysics.velocity))
 
-    this.idleWalkFactor = Math.min(Math.max((currentSpeed - idleSpeed) / (walkSpeed - idleSpeed), 0), 1);
-    this.walkRunFactor = Math.min(Math.max((currentSpeed - walkSpeed) / (runSpeed - walkSpeed), 0), 1);
+    // if (this === globalThis.remotePlayer?.avatar) console.log('avatar.update')
+    // if (this !== globalThis.remotePlayer?.avatar) {
+      this.idleWalkFactor = Math.min(Math.max((currentSpeed - idleSpeed) / (walkSpeed - idleSpeed), 0), 1);
+      this.walkRunFactor = Math.min(Math.max((currentSpeed - walkSpeed) / (runSpeed - walkSpeed), 0), 1);
+    // }
     // this.crouchFactor = Math.min(Math.max(1 - (this.crouchTime / crouchMaxTime), 0), 1);
     // console.log('current speed', currentSpeed, idleWalkFactor, walkRunFactor);
     this.aimRightFactor = this.aimRightTransitionTime / aimTransitionMaxTime;
@@ -1461,6 +1466,8 @@ class Avatar {
     // this.movementsTransitionFactor = Math.min(Math.max(this.movementsTransitionTime / crouchMaxTime, 0), 1);
     // this.sprintFactor = Math.min(Math.max(this.sprintTime / crouchMaxTime, 0), 1);
     
+    // if (this === globalThis.remotePlayer?.avatar) console.log(this.idleWalkFactor);
+
     const _overwritePose = poseName => {
       const poseAnimation = animations.index[poseName];
       // const noiseAnimation = animations.index['t-pose_rot.fbx'];
