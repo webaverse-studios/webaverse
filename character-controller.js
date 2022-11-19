@@ -838,6 +838,8 @@ class AvatarCharacter extends StateCharacter {
     this.leftHand = new AvatarHand();
     this.rightHand = new AvatarHand();
     this.hands = [this.leftHand, this.rightHand];
+
+    this.velocity = new THREE.Vector3();
   }
 
   getControlMode() {
@@ -1510,20 +1512,30 @@ class RemotePlayer extends InterpolatedPlayer {
       }
 
       // debugger
+
+      if (e.changes.keys.has('velocity')) {
         if (this.avatar) {
-          const idleWalkFactor = e.changes.keys.get('idleWalkFactor').value;
-          // console.log('idleWalkFactor', idleWalkFactor)
-          this.avatar.idleWalkFactor = idleWalkFactor;
+          const velocity = e.changes.keys.get('velocity').value;
+          this.velocity.fromArray(velocity);
         }
       }
 
-      if (e.changes.keys.has('walkRunFactor')) {
-        if (this.avatar) {
-          const walkRunFactor = e.changes.keys.get('walkRunFactor').value;
-          // console.log('walkRunFactor', walkRunFactor)
-          this.avatar.walkRunFactor = walkRunFactor;
-        }
-      }
+      // if (e.changes.keys.has('idleWalkFactor')) {
+      //   if (this.avatar) {
+      //     const idleWalkFactor = e.changes.keys.get('idleWalkFactor').value;
+      //     // console.log('idleWalkFactor', idleWalkFactor)
+      //     this.avatar.idleWalkFactor = idleWalkFactor;
+      //     console.log('remotePlayer.attachState')
+      //   }
+      // }
+
+      // if (e.changes.keys.has('walkRunFactor')) {
+      //   if (this.avatar) {
+      //     const walkRunFactor = e.changes.keys.get('walkRunFactor').value;
+      //     // console.log('walkRunFactor', walkRunFactor)
+      //     this.avatar.walkRunFactor = walkRunFactor;
+      //   }
+      // }
     }
     this.playerMap.observe(observePlayerFn);
     this.unbindFns.push(this.playerMap.unobserve.bind(this.playerMap, observePlayerFn));

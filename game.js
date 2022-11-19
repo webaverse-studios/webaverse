@@ -540,8 +540,10 @@ const _gameUpdate = (timestamp, timeDiff) => {
         lastTransform = transformCalc.transform;
       }
       
-      universe.realms.localPlayer.setKeyValue('idleWalkFactor', localPlayer.avatar.idleWalkFactor);
-      universe.realms.localPlayer.setKeyValue('walkRunFactor', localPlayer.avatar.walkRunFactor);
+      // universe.realms.localPlayer.setKeyValue('idleWalkFactor', localPlayer.avatar.idleWalkFactor);
+      // universe.realms.localPlayer.setKeyValue('walkRunFactor', localPlayer.avatar.walkRunFactor);
+
+      universe.realms.localPlayer.setKeyValue('velocity', localPlayer.characterPhysics.velocity.toArray()); // todo: toArray(localVector)
     }
   };
   _updateRealms();
