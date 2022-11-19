@@ -535,10 +535,13 @@ const _gameUpdate = (timestamp, timeDiff) => {
       }, { transform: [], changed: false });
 
       if (transformCalc.changed) {
-        universe.realms.updatePosition(transformCalc.transform.slice(0, 3), realmSize);
+        // universe.realms.updatePosition(transformCalc.transform.slice(0, 3), realmSize); // don't need ?
         universe.realms.localPlayer.setKeyValue('transform', transformCalc.transform);
         lastTransform = transformCalc.transform;
       }
+      
+      universe.realms.localPlayer.setKeyValue('idleWalkFactor', localPlayer.avatar.idleWalkFactor);
+      universe.realms.localPlayer.setKeyValue('walkRunFactor', localPlayer.avatar.walkRunFactor);
     }
   };
   _updateRealms();

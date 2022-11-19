@@ -1507,6 +1507,22 @@ class RemotePlayer extends InterpolatedPlayer {
         }
         this.lastPosition.copy(this.position);
       }
+
+      if (e.changes.keys.has('idleWalkFactor')) {
+        if (this.avatar) {
+          const idleWalkFactor = e.changes.keys.get('idleWalkFactor').value;
+          // console.log('idleWalkFactor', idleWalkFactor)
+          this.avatar.idleWalkFactor = idleWalkFactor;
+        }
+      }
+
+      if (e.changes.keys.has('walkRunFactor')) {
+        if (this.avatar) {
+          const walkRunFactor = e.changes.keys.get('walkRunFactor').value;
+          // console.log('walkRunFactor', walkRunFactor)
+          this.avatar.walkRunFactor = walkRunFactor;
+        }
+      }
     }
     this.playerMap.observe(observePlayerFn);
     this.unbindFns.push(this.playerMap.unobserve.bind(this.playerMap, observePlayerFn));
