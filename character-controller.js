@@ -1329,6 +1329,7 @@ class LocalPlayer extends UninterpolatedPlayer {
 
   updatePhysics(timestamp, timeDiff) {
     if (this.avatar) {
+      // debugger
       const timeDiffS = timeDiff / 1000;
       this.characterPhysics.update(timestamp, timeDiffS);
     }
@@ -1508,7 +1509,7 @@ class RemotePlayer extends InterpolatedPlayer {
         this.lastPosition.copy(this.position);
       }
 
-      if (e.changes.keys.has('idleWalkFactor')) {
+      // debugger
         if (this.avatar) {
           const idleWalkFactor = e.changes.keys.get('idleWalkFactor').value;
           // console.log('idleWalkFactor', idleWalkFactor)

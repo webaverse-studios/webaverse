@@ -1452,6 +1452,7 @@ class Avatar {
     // if (this === globalThis.localPlayer.avatar) console.log(currentSpeed)
     // if (this === globalThis.remotePlayer?.avatar) console.log(currentSpeed, globalThis.logVector3(this.velocity), globalThis.logVector3(remotePlayer.characterPhysics.velocity))
 
+    // if (this === globalThis.remotePlayer?.avatar) console.log('avatar.update')
     if (this !== globalThis.remotePlayer?.avatar) {
       this.idleWalkFactor = Math.min(Math.max((currentSpeed - idleSpeed) / (walkSpeed - idleSpeed), 0), 1);
       this.walkRunFactor = Math.min(Math.max((currentSpeed - walkSpeed) / (runSpeed - walkSpeed), 0), 1);

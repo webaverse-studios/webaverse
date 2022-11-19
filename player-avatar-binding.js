@@ -284,6 +284,7 @@ export function applyCharacterPoseToAvatar(character, rig) {
   rig.poseAnimation = poseAction?.animation || null;
 }
 export function applyCharacterToAvatar(character, session, rig, mirrors) {
+  // if (rig === globalThis.remotePlayer?.avatar) console.log('binding')
   applyCharacterTransformsToAvatar(character, session, rig);
   applyCharacterMetaTransformsToAvatar(character, session, rig);
   
