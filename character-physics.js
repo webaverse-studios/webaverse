@@ -141,7 +141,6 @@ class CharacterPhysics {
       localVector3.copy(this.wantMoveDistancePerFrame);
 
       // aesthetic jump
-      // if (this.character === globalThis.remotePlayer) console.log('aesthetic jump')
       const jumpAction = this.character.getAction('jump');
       if (jumpAction?.trigger === 'jump') {
         const doubleJumpAction = this.character.getAction('doubleJump');

@@ -535,15 +535,12 @@ const _gameUpdate = (timestamp, timeDiff) => {
       }, { transform: [], changed: false });
 
       if (transformCalc.changed) {
-        // universe.realms.updatePosition(transformCalc.transform.slice(0, 3), realmSize); // don't need ?
+        universe.realms.updatePosition(transformCalc.transform.slice(0, 3), realmSize);
         universe.realms.localPlayer.setKeyValue('transform', transformCalc.transform);
         lastTransform = transformCalc.transform;
       }
-      
-      // universe.realms.localPlayer.setKeyValue('idleWalkFactor', localPlayer.avatar.idleWalkFactor);
-      // universe.realms.localPlayer.setKeyValue('walkRunFactor', localPlayer.avatar.walkRunFactor);
 
-      universe.realms.localPlayer.setKeyValue('velocity', localPlayer.characterPhysics.velocity.toArray()); // todo: toArray(localVector)
+      universe.realms.localPlayer.setKeyValue('velocity', localPlayer.characterPhysics.velocity.toArray());
     }
   };
   _updateRealms();
