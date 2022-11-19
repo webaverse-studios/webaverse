@@ -278,23 +278,19 @@ class Universe extends EventTarget {
           playersArray.doc.transact(() => {
             playerMap.set('transform', val);
           });
-        }
-        // else if (key === 'idleWalkFactor') {
+        // } else if (key === 'idleWalkFactor') {
         //   playersArray.doc.transact(() => {
         //     playerMap.set('idleWalkFactor', val);
         //   });
-        // }
-        // else if (key === 'walkRunFactor') {
+        // } else if (key === 'walkRunFactor') {
         //   playersArray.doc.transact(() => {
         //     playerMap.set('walkRunFactor', val);
         //   });
-        // }
-        else if (key === 'velocity') {
+        } else if (key === 'velocity') {
           playersArray.doc.transact(() => {
             playerMap.set('velocity', val);
           });
-        }
-        else if (key.startsWith('action.')) {
+        } else if (key.startsWith('action.')) {
           // TODO: Update player state.
           const actionType = key.slice(7);
 
