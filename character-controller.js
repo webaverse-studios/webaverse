@@ -156,6 +156,8 @@ class Character extends THREE.Object3D {
     
     this.voicePack = null;
     this.voiceEndpoint = null;
+
+    this.velocity = new THREE.Vector3();
   }
 
   setSpawnPoint(position, quaternion) {
@@ -838,8 +840,6 @@ class AvatarCharacter extends StateCharacter {
     this.leftHand = new AvatarHand();
     this.rightHand = new AvatarHand();
     this.hands = [this.leftHand, this.rightHand];
-
-    this.velocity = new THREE.Vector3();
   }
 
   getControlMode() {
