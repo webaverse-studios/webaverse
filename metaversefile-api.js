@@ -66,7 +66,7 @@ import {skyManager} from './engine-hooks/environment/skybox/sky-manager.js';
 import {compilerBaseUrl} from './endpoints.js';
 import {getDefaultCanvas} from './offscreen-engine/fns/avatar-iconer-fn.js';
 import {encodePNG2KTX} from './basisu/encode.js';
-import {loadKtx2Texture} from './basisu/decode.js';
+import {loadKtx2TextureBlob, loadKtx2TextureUrl} from './basisu/decode.js';
 import {isWorker} from './env.js';
 import './metaversefile-binding.js';
 
@@ -560,7 +560,8 @@ metaversefile.setApi({
   useKtx2Util() {
     return {
       encodePNG2KTX,
-      loadKtx2Texture,
+      loadKtx2TextureBlob,
+      loadKtx2TextureUrl,
     };
   },
   useScenePreviewer() {

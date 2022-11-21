@@ -1,15 +1,14 @@
 import loaders from '../loaders.js';
 
-export async function loadKtx2Texture(data) {
-  const blob = new Blob([data]);
+export async function loadKtx2TextureBlob(blob) {
   const imageUrl = window.URL.createObjectURL(blob);
 
-  const ktx2Loader = loaders.ktx2Loader;
-  const tex = await new Promise((accept, reject) => {
-    ktx2Loader.load(imageUrl, function (texture) {
-      accept(texture);
-    });
-  });
+  return loadKtx2TextureUrl(imageUrl);
+}
 
-  return tex;
+export async function loadKtx2TextureUrl(url) {
+  return await new Promise((accept, reject) => {
+    const {ktx2Loader} = loaders;
+    ktx2Loader.load(url, accept, function onProgress() {}, reject);
+  });
 }
