@@ -16,6 +16,7 @@ import physicsManager from './physics-manager.js';
 import physxWorkerManager from './physx-worker-manager.js';
 import {playersManager} from './players-manager.js';
 import {makeId, parseQuery} from './util.js';
+import voiceInput from './voice-input/voice-input.js';
 import {world} from './world.js';
 import {sceneManager} from './scene-manager.js';
 import physx from './physx.js';
@@ -355,6 +356,10 @@ class Universe extends EventTarget {
         position,
       }, {});
       this.realms.localPlayer.setKeyValue('position', position);
+
+      if (voiceInput.micEnabled()) {
+        this.realms.enableMic();
+      }
 
       console.log('Multiplayer connected');
       this.multiplayerConnected = true;
