@@ -343,7 +343,7 @@ class Universe extends EventTarget {
       start_url: src,
     });
 
-    const onConnect = (position) => {
+    const onConnect = position => {
 
       // Default player apps and actions can be included here.
 
@@ -372,11 +372,11 @@ class Universe extends EventTarget {
     const initialPosition = [
       localPlayer.position.x,
       localPlayer.position.y,
-      localPlayer.position.z
+      localPlayer.position.z,
     ];
 
     this.realms.updatePosition(initialPosition, realmSize, {
-      onConnect
+      onConnect,
     });
   }
 
