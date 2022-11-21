@@ -98,7 +98,7 @@ const DomRendererChild = ({
 
     if (iframeContainer2) {
       const frame = e => {
-          const floatNodeMatrixWorld = localMatrix3
+        const floatNodeMatrixWorld = localMatrix3
           .multiplyMatrices(dom.floatNode.matrixWorld, scaleMatrix);
 
         const _updateCameraContainerMatrix = () => {
