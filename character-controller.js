@@ -156,6 +156,8 @@ class Character extends THREE.Object3D {
     
     this.voicePack = null;
     this.voiceEndpoint = null;
+
+    this.velocity = new THREE.Vector3();
   }
 
   setSpawnPoint(position, quaternion) {
@@ -1500,6 +1502,11 @@ class RemotePlayer extends InterpolatedPlayer {
           physicsScene.setCharacterControllerPosition(this.characterPhysics.characterController, localVector);
         }
         this.lastPosition.copy(this.position);
+      }
+
+      if (e.changes.keys.has('velocity')) {
+        const velocity = e.changes.keys.get('velocity').value;
+        this.velocity.fromArray(velocity);
       }
     }
     this.playerMap.observe(observePlayerFn);

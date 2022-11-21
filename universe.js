@@ -280,6 +280,10 @@ class Universe extends EventTarget {
           playersArray.doc.transact(() => {
             playerMap.set('transform', val);
           });
+        } else if (key === 'velocity') {
+          playersArray.doc.transact(() => {
+            playerMap.set('velocity', val);
+          });
         } else if (key.startsWith(this.actionsPrefix)) {
           const actionType = key.slice(this.actionsPrefix.length);
           playersArray.doc.transact(() => {

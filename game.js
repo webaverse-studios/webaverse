@@ -510,6 +510,7 @@ Promise.resolve()
 let lastActivated = false;
 let lastThrowing = false;
 let lastTransform = [NaN, NaN, NaN, NaN, NaN, NaN, NaN];
+let lastVelocity = [NaN, NaN, NaN];
 const _gameUpdate = (timestamp, timeDiff) => {
   const now = timestamp;
   const renderer = getRenderer();
@@ -538,6 +539,17 @@ const _gameUpdate = (timestamp, timeDiff) => {
         universe.realms.updatePosition(transformCalc.transform.slice(0, 3), realmSize);
         universe.realms.localPlayer.setKeyValue('transform', transformCalc.transform);
         lastTransform = transformCalc.transform;
+      }
+
+      const velocityCalc = localPlayer.characterPhysics.velocity.toArray().reduce((acc, val, i) => {
+        acc.velocity.push(val);
+        acc.changed = acc.changed || val !== lastVelocity[i];
+        return acc;
+      }, { velocity: [], changed: false });
+
+      if (velocityCalc.changed) {
+        universe.realms.localPlayer.setKeyValue('velocity', velocityCalc.velocity);
+        lastVelocity = velocityCalc.velocity;
       }
     }
   };
