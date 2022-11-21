@@ -65,7 +65,7 @@ import {lightsManager} from './engine-hooks/lights/lights-manager.js';
 import {skyManager} from './engine-hooks/environment/skybox/sky-manager.js';
 import {compilerBaseUrl} from './endpoints.js';
 import {getDefaultCanvas} from './offscreen-engine/fns/avatar-iconer-fn.js';
-import {convertPngToKtx2} from './offscreen-engine/fns/avatar-renderer-fns.js';
+import {encodePNG2KTX} from './basisu/encode.js';
 import {loadKtx2Texture} from './basisu/decode.js';
 import {isWorker} from './env.js';
 import './metaversefile-binding.js';
@@ -559,7 +559,7 @@ metaversefile.setApi({
   }, */
   useKtx2Util() {
     return {
-      convertPngToKtx2,
+      encodePNG2KTX,
       loadKtx2Texture,
     };
   },
