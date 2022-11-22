@@ -9,7 +9,6 @@ import universe from '../../../universe.js';
 import cameraManager from '../../../camera-manager';
 import {world} from '../../../world';
 
-import {ActionMenu} from '../general/action-menu';
 import {Crosshair} from '../general/crosshair';
 import {Settings} from '../general/settings';
 import {WorldObjectsList} from '../general/world-objects-list';
@@ -322,9 +321,6 @@ export const App = () => {
                 <DomRenderer />
                 <canvas className={ classnames(styles.canvas, domHover ? styles.domHover : null) } ref={ canvasRef } />
                 <Crosshair />
-                <UIMode hideDirection='right'>
-                    <ActionMenu setUIMode={ setUIMode } />
-                </UIMode>
                 <Settings />
                 <ClaimsNotification />
                 <WorldObjectsList

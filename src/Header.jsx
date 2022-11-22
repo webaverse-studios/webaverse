@@ -15,10 +15,10 @@ import {registerIoEventHandler, unregisterIoEventHandler} from './components/gen
 import {AppContext} from './components/app';
 import {AvatarIcon} from './AvatarIcon';
 import {StoryTime} from './StoryTime';
-import {User} from './User';
 
 import styles from './Header.module.css';
 import {UIMode} from './components/general/ui-mode/index.jsx';
+import { UserBox } from './components/general/user-box';
 
 //
 
@@ -269,9 +269,9 @@ export default function Header() {
                     <AvatarIcon />
                 </UIMode>
                 <UIMode hideDirection='right' >
-                    <User
-                        address={address}
-                        setAddress={setAddress}
+                    <UserBox
+                        // address={address}
+                        // setAddress={setAddress}
                         setLoginFrom={setLoginFrom}
                     />
                 </UIMode>
