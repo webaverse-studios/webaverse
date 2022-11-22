@@ -1,4 +1,3 @@
-// import * as THREE from 'three';
 import React, {useState, useRef, useEffect} from 'react';
 import styles from './quests.module.css';
 import {scene} from '../../../../renderer.js';
@@ -12,11 +11,6 @@ const screenshotHeight = 100;
 
 const size = 2048;
 const numFrames = 128;
-// const numFramesPow2 = Math.pow(2, Math.ceil(Math.log2(numFrames)));
-// const numFramesPerRow = Math.ceil(Math.sqrt(numFramesPow2));
-// const frameSize = size / numFramesPerRow;
-// const frameLoopTime = 2000;
-// const frameTime = frameLoopTime / numFrames;
 
 export const Drop = ({
     drop,
@@ -54,21 +48,6 @@ export const Quest = ({
             infoboxRenderer.addCanvas(canvas); */
 
             const ctx = canvas.getContext('2d');
-
-            /* const canvas2 = document.createElement('canvas');
-            canvas2.style.cssText = `\
-                position: fixed;
-                top: 100px;
-                left: 100px;
-                width: ${300}px;
-                height: ${300}px;
-                background-color: #F00;
-            `;
-            canvas2.width = screenshotSize;
-            canvas2.height = screenshotSize;
-            const ctx2 = canvas2.getContext('2d');
-            // ctx2.drawImage(imageBitmap, 0, 0);
-            document.body.appendChild(canvas2); */
 
             let live = true;
             let timeout = null;

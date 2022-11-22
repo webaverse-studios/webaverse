@@ -1,15 +1,16 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
 import classnames from 'classnames';
-import { AppContext } from '../../../app';
+import {AppContext} from '../../../app';
+import metaversefile from 'metaversefile';
 
-import { registerIoEventHandler, unregisterIoEventHandler } from '../../../general/io-handler';
+import {registerIoEventHandler, unregisterIoEventHandler} from '../../../general/io-handler';
 
 import styles from './code-ai-panel.module.css';
 
 // import game from '../../../../../game';
 
 export function CodeAiPanel() {
-    const { state, setState } = useContext( AppContext );
+    const {state, setState} = useContext(AppContext);
     const [page, setPage] = useState('input');
     const [input, setInput] = useState('');
     const [output, setOutput] = useState('');
@@ -22,13 +23,13 @@ export function CodeAiPanel() {
 
     const _compile = async () => {
 
-        if ( ! compiling ) {
+        if (! compiling) {
 
-            setCompiling( true );
+            setCompiling(true);
 
             const oldAi = ai;
 
-            if ( oldAi ) {
+            if (oldAi) {
 
                 oldAi.destroy();
                 setAi(null);
@@ -100,14 +101,14 @@ export function CodeAiPanel() {
 
         })();
 
-        setState({ openedPanel: null });
+        setState({openedPanel: null});
 
     };
 
     //
 
     useEffect(() => {
-        const handleKeyUp = ( event ) => {
+        const handleKeyUp = (event) => {
             if (
                 event.which === 13 && // enter
                 window.document.activeElement !== outputTextarea.current &&
@@ -142,10 +143,10 @@ export function CodeAiPanel() {
             return true;
         };
 
-        registerIoEventHandler( 'keyup', handleKeyUp );
+        registerIoEventHandler('keyup', handleKeyUp);
 
         return () => {
-            unregisterIoEventHandler( 'keyup', handleKeyUp );
+            unregisterIoEventHandler('keyup', handleKeyUp);
         };
     }, []);
 
@@ -164,7 +165,7 @@ export function CodeAiPanel() {
                     }
                     setCompiling(false);
                 }
-            }} onChange={e => { console.log( e.target.value ); setInput(e.target.value); }} placeholder="Teleport me to the nearest object" ref={inputTextarea} />
+            }} onChange={e => { console.log(e.target.value); setInput(e.target.value); }} placeholder="Teleport me to the nearest object" ref={inputTextarea} />
             {
                 (() => {
                     switch (page) {

@@ -1,4 +1,3 @@
-// import * as THREE from 'three';
 import React, {useState, useRef, useEffect} from 'react';
 import classnames from 'classnames';
 import styles from './infobox.module.css';
@@ -30,7 +29,7 @@ export const Infobox = () => {
             infoboxRenderer.addCanvas(canvas);
 
             return () => {
-                infoBoxRenderer.removeCanvas(canvas);
+                infoboxRenderer.removeCanvas(canvas);
             };
         }
     }, [canvasRef]);

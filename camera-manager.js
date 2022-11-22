@@ -1,15 +1,11 @@
 import * as THREE from 'three';
-import {getRenderer, camera, scene} from './renderer.js';
-// import * as notifications from './notifications.js';
+import {getRenderer, camera} from './renderer.js';
 import physicsManager from './physics-manager.js';
-import {shakeAnimationSpeed} from './constants.js';
+import {shakeAnimationSpeed, minFov, maxFov, midFov} from './constants.js';
 import Simplex from './simplex-noise.js';
 import {playersManager} from './players-manager.js';
-// import alea from './alea.js';
-// import * as sounds from './sounds.js';
-import {minFov, maxFov, midFov} from './constants.js';
-// import { updateRaycasterFromMouseEvent } from './util.js';
 import easing from './easing.js';
+import {isWorker} from './env.js';
 
 const cubicBezier = easing(0, 1, 0, 1);
 const cubicBezier2 = easing(0.5, 0, 0.5, 1);
@@ -192,25 +188,33 @@ class CameraManager extends EventTarget {
     this.cinematicScript = null;
     this.cinematicScriptStartTime = -1;
 
-    document.addEventListener('pointerlockchange', e => {
-      let pointerLockElement = document.pointerLockElement;
-      const renderer = getRenderer();
-      if (pointerLockElement !== null && pointerLockElement !== renderer.domElement) {
-        pointerLockElement = null;
-      }
-
-      this.pointerLockElement = pointerLockElement;
-      this.dispatchEvent(new MessageEvent('pointerlockchange', {
-        data: {
-          pointerLockElement,
-        },
-      }));
-    });
+    this.bindEvents();
   }
+
+  bindEvents() {
+    if (!isWorker) {
+      document.addEventListener('pointerlockchange', e => {
+        let pointerLockElement = document.pointerLockElement;
+        const renderer = getRenderer();
+        if (pointerLockElement !== null && pointerLockElement !== renderer.domElement) {
+          pointerLockElement = null;
+        }
+
+        this.pointerLockElement = pointerLockElement;
+        this.dispatchEvent(new MessageEvent('pointerlockchange', {
+          data: {
+            pointerLockElement,
+          },
+        }));
+      });
+    }
+  }
+
   focusCamera(position) {
     camera.lookAt(position);
     camera.updateMatrixWorld();
   }
+
   async requestPointerLock() {
     // const localPointerLockEpoch = ++this.pointerLockEpoch;
     for (const options of [
@@ -269,9 +273,11 @@ class CameraManager extends EventTarget {
       }
     }
   }
+
   exitPointerLock() {
     document.exitPointerLock();
   }
+
   getMode() {
     if (this.target || this.cinematicScript) {
       return 'isometric';
@@ -279,9 +285,11 @@ class CameraManager extends EventTarget {
       return cameraOffset.z > -0.5 ? 'firstperson' : 'isometric';
     }
   }
+
   getCameraOffset() {
     return cameraOffset;
   }
+
   handleMouseMove(e) {
     const {movementX, movementY} = e;
 
@@ -300,11 +308,13 @@ class CameraManager extends EventTarget {
       this.targetQuaternion.copy(camera.quaternion);
     }
   }
+
   handleWheelEvent(e) {
     if (!this.target) {
       cameraOffsetTargetZ = Math.min(cameraOffset.z - e.deltaY * 0.01, 0);
     }
   }
+
   addShake(position, intensity, radius, decay) {
     const startTime = performance.now();
     const shake = new Shake(intensity, startTime, radius, decay);
@@ -312,12 +322,14 @@ class CameraManager extends EventTarget {
     this.shakes.push(shake);
     return shake;
   }
+
   flushShakes() {
     if (this.shakes.length > 0) {
       const now = performance.now();
       this.shakes = this.shakes.filter(shake => now < shake.startTime + shake.decay);
     }
   }
+
   getShakeFactor() {
     let result = 0;
     if (this.shakes.length > 0) {
@@ -331,6 +343,7 @@ class CameraManager extends EventTarget {
     }
     return result;
   }
+
   setFocus(focus) {
     if (focus !== this.focus) {
       this.focus = focus;
@@ -343,6 +356,7 @@ class CameraManager extends EventTarget {
       }));
     }
   }
+
   setDynamicTarget(target = null, target2 = null) {
     this.targetType = 'dynamic';
     this.target = target;
@@ -422,6 +436,7 @@ class CameraManager extends EventTarget {
       this.setCameraToNullTarget();
     }
   }
+
   setStaticTarget(target = null, target2 = null) {
     this.targetType = 'static';
     this.target = target;
@@ -461,6 +476,7 @@ class CameraManager extends EventTarget {
       this.setCameraToNullTarget();
     }
   }
+
   setCameraToNullTarget() {
     this.sourcePosition.copy(camera.position);
     this.sourceQuaternion.copy(camera.quaternion);
@@ -472,10 +488,12 @@ class CameraManager extends EventTarget {
     this.lerpStartTime = timestamp;
     this.lastTimestamp = timestamp;
   }
+
   startCinematicScript(cinematicScript) {
     this.cinematicScript = cinematicScript;
     this.cinematicScriptStartTime = performance.now();
   }
+
   updatePost(timestamp, timeDiff) {
     const renderer = getRenderer();
     const session = renderer.xr.getSession();
@@ -617,10 +635,10 @@ class CameraManager extends EventTarget {
         switch (this.getMode()) {
           case 'firstperson': {
             if (localPlayer.avatar) {
-              const boneNeck = localPlayer.avatar.foundModelBones['Neck'];
-              const boneEyeL = localPlayer.avatar.foundModelBones['Eye_L'];
-              const boneEyeR = localPlayer.avatar.foundModelBones['Eye_R'];
-              const boneHead = localPlayer.avatar.foundModelBones['Head'];
+              const boneNeck = localPlayer.avatar.foundModelBones.Neck;
+              const boneEyeL = localPlayer.avatar.foundModelBones.Eye_L;
+              const boneEyeR = localPlayer.avatar.foundModelBones.Eye_R;
+              const boneHead = localPlayer.avatar.foundModelBones.Head;
 
               boneNeck.quaternion.setFromEuler(localEuler.set(Math.min(camera.rotation.x * -0.5, 0.6), 0, 0, 'XYZ'));
               boneNeck.updateMatrixWorld();
@@ -653,7 +671,7 @@ class CameraManager extends EventTarget {
             break;
           }
           default: {
-            throw new Error('invalid camera mode: ' + cameraMode);
+            throw new Error('invalid camera mode: ' + this.getMode());
           }
         }
 

@@ -11,6 +11,7 @@ const _removeFromArray = (array, el) => {
 
 const _addShadows = (light, params) => {
   light.castShadow = true;
+
   if (typeof params[1] === 'number') {
     light.shadow.mapSize.width = params[1];
     light.shadow.mapSize.height = params[1];

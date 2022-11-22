@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react'
+import React, {useEffect} from 'react'
 
 import ioManager from '../../../../io-manager.js';
 
@@ -8,26 +8,26 @@ import ioManager from '../../../../io-manager.js';
 const types = [ 'keydown', 'keypress', 'keyup', 'click', 'dblclick', 'mousedown', 'mouseup', 'mousemove', 'mouseenter', 'mouseleave', 'wheel', 'paste' ];
 const ioEventHandlers = {};
 
-for ( const type of types.concat(['']) ) {
+for (const type of types.concat([''])) {
 
     ioEventHandlers[ type ] = [];
 
 }
 
-function registerIoEventHandler ( type, fn ) {
+function registerIoEventHandler (type, fn) {
 
-    ioEventHandlers[ type ].push( fn );
+    ioEventHandlers[ type ].push(fn);
 
 };
 
-function unregisterIoEventHandler ( type, fn ) {
+function unregisterIoEventHandler (type, fn) {
 
     const hs = ioEventHandlers[ type ];
-    const index = hs.indexOf( fn );
+    const index = hs.indexOf(fn);
 
-    if ( index !== -1 ) {
+    if (index !== -1) {
 
-        hs.splice( index, 1 );
+        hs.splice(index, 1);
 
     }
 
@@ -37,21 +37,21 @@ function unregisterIoEventHandler ( type, fn ) {
 
 function IoHandler () {
 
-    useEffect( () => {
+    useEffect(() => {
 
-        const cleanups = types.map( ( type ) => {
+        const cleanups = types.map((type) => {
 
-            const fn = ( event ) => {
+            const fn = (event) => {
 
                 let broke = false;
 
                 // type
 
-                for ( let i = 0; i < ioEventHandlers[ type ].length; i ++ ) {
+                for (let i = 0; i < ioEventHandlers[ type ].length; i ++) {
 
-                    const result = ioEventHandlers[ type ][ i ]( event );
+                    const result = ioEventHandlers[ type ][ i ](event);
 
-                    if ( result === false ) {
+                    if (result === false) {
 
                         broke = true;
                         break;
@@ -62,15 +62,15 @@ function IoHandler () {
 
                 // all
 
-                if ( ! broke ) {
+                if (! broke) {
 
                     const type = '';
 
-                    for ( let i = 0; i < ioEventHandlers[ type ].length; i ++ ) {
+                    for (let i = 0; i < ioEventHandlers[ type ].length; i ++) {
 
-                        const result = ioEventHandlers[ type ][ i ]( event );
+                        const result = ioEventHandlers[ type ][ i ](event);
 
-                        if ( result === false ) {
+                        if (result === false) {
 
                             broke = true;
                             break;
@@ -83,11 +83,11 @@ function IoHandler () {
 
                 // default
 
-                if ( ! broke ) {
+                if (! broke) {
 
-                    ioManager[ type ]( event );
+                    ioManager[ type ](event);
 
-                } else if ( event.cancelable ) {
+                } else if (event.cancelable) {
 
                     event.stopPropagation();
                     event.preventDefault();
@@ -96,11 +96,11 @@ function IoHandler () {
 
             };
 
-            window.addEventListener( type, fn, { passive: type === 'wheel' });
+            window.addEventListener(type, fn, {passive: type === 'wheel'});
 
             return () => {
 
-                window.removeEventListener( type, fn );
+                window.removeEventListener(type, fn);
 
             };
 
@@ -108,7 +108,7 @@ function IoHandler () {
 
         return () => {
 
-            for ( const fn of cleanups ) {
+            for (const fn of cleanups) {
 
                 fn();
 
@@ -116,7 +116,7 @@ function IoHandler () {
 
         };
 
-    }, [] );
+    }, []);
 
     //
 

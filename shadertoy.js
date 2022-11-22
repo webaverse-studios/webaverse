@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {scene, camera, getRenderer} from './renderer.js';
+import {getRenderer} from './renderer.js';
 import {copyScenePlaneGeometry, copySceneVertexShader, copyScene, copySceneCamera} from './shaders.js';
 
 /* const size = 1024;
@@ -51,12 +51,12 @@ class ShaderToyPass {
       uniforms['iChannel' + channel] = {
         value: buffer,
       };
-      if (!uniforms['iChannelResolution']) {
-        uniforms['iChannelResolution'] = {
+      if (!uniforms.iChannelResolution) {
+        uniforms.iChannelResolution = {
           value: [],
         };
       }
-      uniforms['iChannelResolution'].value[channel] = new THREE.Vector3(buffer.image.width, buffer.image.height, 1);
+      uniforms.iChannelResolution.value[channel] = new THREE.Vector3(buffer.image.width, buffer.image.height, 1);
     }
     this.mesh = new THREE.Mesh(
       copyScenePlaneGeometry,
@@ -107,6 +107,7 @@ class ShaderToyPass {
     
     this._copyBuffer = _makeRenderTarget(renderTarget.width, renderTarget.height);
   }
+
   update() {
     this.mesh.material.uniforms.iTime.value = this.parent.getITime();
     this.mesh.material.uniforms.iFrame.value = this.parent.getIFrame();
@@ -136,7 +137,7 @@ class ShaderToyPass {
     }
 
     if (this.type === 'buffer') {
-      
+      // do nothing
     } else if (this.type === 'image') {
       const oldRenderTarget = renderer.getRenderTarget();
 
@@ -280,18 +281,23 @@ class ShadertoyRenderer {
         this.loaded = true;
       });
   }
+
   setCurrentTime(currentTime) {
     this.currentTime = currentTime;
   }
+
   getITime() {
     return this.currentTime;
   }
+
   getIFrame() {
     return this.frame;
-  } 
+  }
+ 
   waitForLoad() {
     return this.loadPromise;
   }
+
   update(timeDiff) {
     this.currentTime += timeDiff;
     this.frame++;

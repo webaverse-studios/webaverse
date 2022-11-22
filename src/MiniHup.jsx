@@ -1,14 +1,8 @@
-// import * as THREE from 'three';
-import React, {useState, useEffect, useRef} from 'react';
-// import classnames from 'classnames';
-// import dioramaManager from '../diorama.js';
+import React, {useEffect, useRef} from 'react';
 import game from '../game.js';
 import styles from './MiniHup.module.css';
 import {RpgText} from './RpgText.jsx';
 import {chatTextSpeed} from '../constants.js';
-// import metaversefile from 'metaversefile';
-// const {useLocalPlayer} = metaversefile;
-// import {chatTextSpeed} from '../constants.js';
 
 const defaultHupSize = 150;
 const pixelRatio = window.devicePixelRatio;
@@ -32,7 +26,7 @@ const MiniHup = function({
     const canvas = canvasRef.current;
     if (canvas) {
       // const localPlayer = metaversefile.useLocalPlayer();
-      const diorama = game.playerDiorama;
+      const diorama = game.getPlayerDiorama();
 
       diorama.addCanvas(canvas);
       diorama.enabled = true;

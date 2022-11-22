@@ -1,8 +1,6 @@
 import * as THREE from 'three';
 import {parser, generate} from '@shaderfrog/glsl-parser';
 
-// const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
-
 const replaceStatementText = 'bool _webaverseShaderReplace = false;';
 const appendMain = (shaderText, postfixLine) => {
   const replaceStatmentAst = parser.parse(replaceStatementText);
@@ -17,26 +15,8 @@ const appendMain = (shaderText, postfixLine) => {
   }
   const s = generate(ast)
     .replace(replaceStatementText, postfixLine + '\n');
-  // console.log('got o', ast, s);
   return s;
 };
-
-/* window.shaderText = `\
-  ${THREE.ShaderChunk.common}
-  uniform float iTime;
-  varying vec2 uvs;
-  varying vec3 vNormal;
-  varying vec3 vWorldPosition;
-  ${THREE.ShaderChunk.logdepthbuf_pars_vertex}
-  void main() {
-    uvs = uv;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-    vNormal = normal;
-    vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
-    vWorldPosition = worldPosition.xyz;
-    ${THREE.ShaderChunk.logdepthbuf_vertex}
-  }
-`; */
 
 // memoize a function which takes a string and returns a string
 const _memoize = fn => {
@@ -64,7 +44,7 @@ ${THREE.ShaderChunk.logdepthbuf_pars_fragment}
 ${appendMain(fragmentShader, THREE.ShaderChunk.logdepthbuf_fragment)}
 `);
 
-class WebaverseShaderMaterial extends THREE.ShaderMaterial {
+/* class WebaverseShaderMaterial extends THREE.ShaderMaterial {
   constructor(opts = {}) {
     if (opts.vertexShader !== undefined) {
       opts.vertexShader = formatVertexShader(opts.vertexShader);
@@ -94,7 +74,9 @@ class WebaverseRawShaderMaterial extends THREE.RawShaderMaterial {
     opts.fragmentShader = formatFragmentShader(opts.fragmentShader);
     super(opts);
   }
-}
+} */
+const WebaverseShaderMaterial = THREE.ShaderMaterial;
+const WebaverseRawShaderMaterial = THREE.RawShaderMaterial;
 export {
   WebaverseShaderMaterial,
   WebaverseRawShaderMaterial,

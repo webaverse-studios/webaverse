@@ -1,24 +1,19 @@
 import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-// import atlaspack from './atlaspack.js';
 import {
   playersMapName,
   tokensHost,
   storageHost,
-  /*accountsHost, loginEndpoint,*/ audioTimeoutTime,
+  audioTimeoutTime,
 } from './constants.js';
-// import { getRenderer } from './renderer.js';
 import {IdAllocator} from './id-allocator.js';
+import {isWorker} from './env.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
 const localVector3 = new THREE.Vector3();
 const localVector4 = new THREE.Vector3();
 const localVector5 = new THREE.Vector3();
-// const localVector6 = new THREE.Vector3();
-// const localQuaternion = new THREE.Quaternion();
-// const localQuaternion2 = new THREE.Quaternion();
-// const localQuaternion3 = new THREE.Quaternion();
 const localMatrix = new THREE.Matrix4();
 const localMatrix2 = new THREE.Matrix4();
 
@@ -205,160 +200,160 @@ export class WaitQueue {
     rects,
   };
 }; */
-export function mergeMeshes(meshes, geometries, textures) {
-  const size = 512;
-  const images = textures.map((texture) => texture && texture.image);
-  const colorsImage = document.createElement('canvas');
-  colorsImage.width = size / 2;
-  colorsImage.height = 1;
-  colorsImage.rigid = true;
-  const colorsImageCtx = colorsImage.getContext('2d');
-  colorsImageCtx.fillStyle = '#FFF';
-  colorsImageCtx.fillRect(0, 0, colorsImage.width, colorsImage.height);
-  const { atlasCanvas, rects } = _makeAtlas(size, images.concat(colorsImage));
-  const colorsImageRect = rects[rects.length - 1];
-  let colorsImageColorIndex = 0;
-  const atlasCanvasCtx = atlasCanvas.getContext('2d');
+// export function mergeMeshes(meshes, geometries, textures) {
+//   const size = 512;
+//   const images = textures.map((texture) => texture && texture.image);
+//   const colorsImage = document.createElement('canvas');
+//   colorsImage.width = size / 2;
+//   colorsImage.height = 1;
+//   colorsImage.rigid = true;
+//   const colorsImageCtx = colorsImage.getContext('2d');
+//   colorsImageCtx.fillStyle = '#FFF';
+//   colorsImageCtx.fillRect(0, 0, colorsImage.width, colorsImage.height);
+//   const {atlasCanvas, rects} = _makeAtlas(size, images.concat(colorsImage));
+//   const colorsImageRect = rects[rects.length - 1];
+//   let colorsImageColorIndex = 0;
+//   const atlasCanvasCtx = atlasCanvas.getContext('2d');
 
-  const geometry = new THREE.BufferGeometry();
-  {
-    let numPositions = 0;
-    let numIndices = 0;
-    for (const geometry of geometries) {
-      numPositions += geometry.attributes.position.array.length;
-      numIndices += geometry.index.array.length;
-    }
+//   const geometry = new THREE.BufferGeometry();
+//   {
+//     let numPositions = 0;
+//     let numIndices = 0;
+//     for (const geometry of geometries) {
+//       numPositions += geometry.attributes.position.array.length;
+//       numIndices += geometry.index.array.length;
+//     }
 
-    const positions = new Float32Array(numPositions);
-    const uvs = new Float32Array((numPositions / 3) * 2);
-    const colors = new Float32Array(numPositions);
-    const indices = new Uint32Array(numIndices);
-    let positionIndex = 0;
-    let uvIndex = 0;
-    let colorIndex = 0;
-    let indicesIndex = 0;
-    for (let i = 0; i < meshes.length; i++) {
-      const mesh = meshes[i];
-      const geometry = geometries[i];
-      const { material } = mesh;
-      const rect = rects[i];
+//     const positions = new Float32Array(numPositions);
+//     const uvs = new Float32Array((numPositions / 3) * 2);
+//     const colors = new Float32Array(numPositions);
+//     const indices = new Uint32Array(numIndices);
+//     let positionIndex = 0;
+//     let uvIndex = 0;
+//     let colorIndex = 0;
+//     let indicesIndex = 0;
+//     for (let i = 0; i < meshes.length; i++) {
+//       const mesh = meshes[i];
+//       const geometry = geometries[i];
+//       const {material} = mesh;
+//       const rect = rects[i];
 
-      geometry.applyMatrix4(mesh.matrixWorld);
+//       geometry.applyMatrix4(mesh.matrixWorld);
 
-      const indexOffset = positionIndex / 3;
-      if (geometry.index) {
-        for (let i = 0; i < geometry.index.array.length; i++) {
-          indices[indicesIndex++] = geometry.index.array[i] + indexOffset;
-        }
-      } else {
-        for (
-          let i = 0;
-          i < geometry.attributes.position.array.length / 3;
-          i++
-        ) {
-          indices[indicesIndex++] = i + indexOffset;
-        }
-      }
+//       const indexOffset = positionIndex / 3;
+//       if (geometry.index) {
+//         for (let i = 0; i < geometry.index.array.length; i++) {
+//           indices[indicesIndex++] = geometry.index.array[i] + indexOffset;
+//         }
+//       } else {
+//         for (
+//           let i = 0;
+//           i < geometry.attributes.position.array.length / 3;
+//           i++
+//         ) {
+//           indices[indicesIndex++] = i + indexOffset;
+//         }
+//       }
 
-      positions.set(geometry.attributes.position.array, positionIndex);
-      positionIndex += geometry.attributes.position.array.length;
-      if (geometry.attributes.uv && rect) {
-        for (let i = 0; i < geometry.attributes.uv.array.length; i += 2) {
-          uvs[uvIndex + i] =
-            rect.x / size + (geometry.attributes.uv.array[i] * rect.w) / size;
-          uvs[uvIndex + i + 1] =
-            rect.y / size +
-            (geometry.attributes.uv.array[i + 1] * rect.h) / size;
-        }
-      } else {
-        if (material.color) {
-          const color = material.color.clone();
-          if (material.emissive && material.emissiveIntensity > 0) {
-            color.lerp(material.emissive, material.emissiveIntensity);
-          }
-          atlasCanvasCtx.fillStyle = color.getStyle();
-          const uv = new THREE.Vector2(
-            colorsImageRect.x + colorsImageColorIndex,
-            colorsImageRect.y
-          );
-          atlasCanvasCtx.fillRect(uv.x, uv.y, uv.x + 1, uv.y + 1);
-          colorsImageColorIndex++;
-          uv.x += 0.5;
-          uv.y += 0.5;
+//       positions.set(geometry.attributes.position.array, positionIndex);
+//       positionIndex += geometry.attributes.position.array.length;
+//       if (geometry.attributes.uv && rect) {
+//         for (let i = 0; i < geometry.attributes.uv.array.length; i += 2) {
+//           uvs[uvIndex + i] =
+//             rect.x / size + (geometry.attributes.uv.array[i] * rect.w) / size;
+//           uvs[uvIndex + i + 1] =
+//             rect.y / size +
+//             (geometry.attributes.uv.array[i + 1] * rect.h) / size;
+//         }
+//       } else {
+//         if (material.color) {
+//           const color = material.color.clone();
+//           if (material.emissive && material.emissiveIntensity > 0) {
+//             color.lerp(material.emissive, material.emissiveIntensity);
+//           }
+//           atlasCanvasCtx.fillStyle = color.getStyle();
+//           const uv = new THREE.Vector2(
+//             colorsImageRect.x + colorsImageColorIndex,
+//             colorsImageRect.y
+//           );
+//           atlasCanvasCtx.fillRect(uv.x, uv.y, uv.x + 1, uv.y + 1);
+//           colorsImageColorIndex++;
+//           uv.x += 0.5;
+//           uv.y += 0.5;
 
-          for (let i = 0; i < geometry.attributes.uv.array.length; i += 2) {
-            uvs[uvIndex + i] = uv.x / size;
-            uvs[uvIndex + i + 1] = uv.y / size;
-          }
-        } else if (
-          material.uniforms &&
-          material.uniforms.color1 &&
-          material.uniforms.color2
-        ) {
-          atlasCanvasCtx.fillStyle = material.uniforms.color1.value.getStyle();
-          const uv1 = new THREE.Vector2(
-            colorsImageRect.x + colorsImageColorIndex,
-            colorsImageRect.y
-          );
-          atlasCanvasCtx.fillRect(uv1.x, uv1.y, uv1.x + 1, uv1.y + 1);
-          colorsImageColorIndex++;
-          uv1.x += 0.5;
-          uv1.y += 0.5;
+//           for (let i = 0; i < geometry.attributes.uv.array.length; i += 2) {
+//             uvs[uvIndex + i] = uv.x / size;
+//             uvs[uvIndex + i + 1] = uv.y / size;
+//           }
+//         } else if (
+//           material.uniforms &&
+//           material.uniforms.color1 &&
+//           material.uniforms.color2
+//         ) {
+//           atlasCanvasCtx.fillStyle = material.uniforms.color1.value.getStyle();
+//           const uv1 = new THREE.Vector2(
+//             colorsImageRect.x + colorsImageColorIndex,
+//             colorsImageRect.y
+//           );
+//           atlasCanvasCtx.fillRect(uv1.x, uv1.y, uv1.x + 1, uv1.y + 1);
+//           colorsImageColorIndex++;
+//           uv1.x += 0.5;
+//           uv1.y += 0.5;
 
-          atlasCanvasCtx.fillStyle = material.uniforms.color2.value.getStyle();
-          const uv2 = new THREE.Vector2(
-            colorsImageRect.x + colorsImageColorIndex,
-            colorsImageRect.y
-          );
-          atlasCanvasCtx.fillRect(uv2.x, uv2.y, uv2.x + 1, uv2.y + 1);
-          colorsImageColorIndex++;
-          uv2.x += 0.5;
-          uv2.y += 0.5;
+//           atlasCanvasCtx.fillStyle = material.uniforms.color2.value.getStyle();
+//           const uv2 = new THREE.Vector2(
+//             colorsImageRect.x + colorsImageColorIndex,
+//             colorsImageRect.y
+//           );
+//           atlasCanvasCtx.fillRect(uv2.x, uv2.y, uv2.x + 1, uv2.y + 1);
+//           colorsImageColorIndex++;
+//           uv2.x += 0.5;
+//           uv2.y += 0.5;
 
-          for (let i = 0; i < geometry.attributes.uv.array.length; i += 2) {
-            const y = geometry.attributes.uv.array[i];
-            const uv = uv1.clone().lerp(uv2, y);
+//           for (let i = 0; i < geometry.attributes.uv.array.length; i += 2) {
+//             const y = geometry.attributes.uv.array[i];
+//             const uv = uv1.clone().lerp(uv2, y);
 
-            uvs[uvIndex + i] = uv.x / size;
-            uvs[uvIndex + i + 1] = uv.y / size;
-          }
-        } else {
-          throw new Error('failed to uv mesh colors');
-        }
-      }
-      uvIndex += (geometry.attributes.position.array.length / 3) * 2;
-      if (geometry.attributes.color) {
-        colors.set(geometry.attributes.color.array, colorIndex);
-      } else {
-        colors.fill(1, colorIndex, geometry.attributes.position.array.length);
-      }
-      colorIndex += geometry.attributes.position.array.length;
-    }
-    if (textures.some((texture) => !!texture)) {
-      colors.fill(1);
-    }
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    geometry.setIndex(new THREE.BufferAttribute(indices, 1));
-  }
-  geometry.boundingBox = new THREE.Box3().setFromBufferAttribute(
-    geometry.attributes.position
-  );
+//             uvs[uvIndex + i] = uv.x / size;
+//             uvs[uvIndex + i + 1] = uv.y / size;
+//           }
+//         } else {
+//           throw new Error('failed to uv mesh colors');
+//         }
+//       }
+//       uvIndex += (geometry.attributes.position.array.length / 3) * 2;
+//       if (geometry.attributes.color) {
+//         colors.set(geometry.attributes.color.array, colorIndex);
+//       } else {
+//         colors.fill(1, colorIndex, geometry.attributes.position.array.length);
+//       }
+//       colorIndex += geometry.attributes.position.array.length;
+//     }
+//     if (textures.some((texture) => !!texture)) {
+//       colors.fill(1);
+//     }
+//     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+//     geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+//     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+//     geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+//   }
+//   geometry.boundingBox = new THREE.Box3().setFromBufferAttribute(
+//     geometry.attributes.position
+//   );
 
-  const texture = new THREE.Texture(atlasCanvas);
-  texture.flipY = false;
-  texture.needsUpdate = true;
-  const material = new THREE.MeshBasicMaterial({
-    map: texture,
-    side: THREE.DoubleSide,
-    vertexColors: true,
-    transparent: true,
-  });
+//   const texture = new THREE.Texture(atlasCanvas);
+//   texture.flipY = false;
+//   texture.needsUpdate = true;
+//   const material = new THREE.MeshBasicMaterial({
+//     map: texture,
+//     side: THREE.DoubleSide,
+//     vertexColors: true,
+//     transparent: true,
+//   });
 
-  const mesh = new THREE.Mesh(geometry, material);
-  return mesh;
-}
+//   const mesh = new THREE.Mesh(geometry, material);
+//   return mesh;
+// }
 
 /* let nextPhysicsId = 0;
 export function getNextPhysicsId() {
@@ -381,7 +376,7 @@ export function convertMeshToPhysicsMesh(topMesh) {
     }
   });
   const newGeometries = meshes.map((mesh) => {
-    const { geometry } = mesh;
+    const {geometry} = mesh;
     const newGeometry = new THREE.BufferGeometry();
     if (mesh.isSkinnedMesh) {
       localMatrix2.identity();
@@ -514,7 +509,7 @@ export async function contentIdToFile(contentId) {
   if (typeof contentId === 'number') {
     const res = await fetch(`${tokensHost}/${contentId}`);
     token = await res.json();
-    const { hash, name, ext } = token.properties;
+    const {hash, name, ext} = token.properties;
 
     const res2 = await fetch(`${storageHost}/${hash}`);
     const file = await res2.blob();
@@ -645,29 +640,9 @@ export function makeId(length) {
   return result;
 }
 
-/* export function chunkMinForPosition(x, y, z, chunkSize) {
-  localVector6.set(
-    Math.floor(x / chunkSize),
-    Math.floor(y / chunkSize),
-    Math.floor(z / chunkSize)
-  );
-  return localVector6;
-} */
-
 export function getLockChunkId(chunkPosition) {
   return `chunk:${chunkPosition.x}, ${chunkPosition.y}, ${chunkPosition.z}}`;
 }
-
-/* async function contentIdToStorageUrl(id) {
-  if (typeof id === 'number') {
-    const hash = await contracts.mainnetsidechain.NFT.methods.getHash(id + '').call();
-    return `${storageHost}/${hash}`;
-  } else if (typeof id === 'string') {
-    return id;
-  } else {
-    return null;
-  }
-} */
 
 export function mod(a, n) {
   return ((a % n) + n) % n;
@@ -743,6 +718,12 @@ export async function loadJson(u) {
   const res = await fetch(u);
   return await res.json();
 }
+export async function loadImageBitmap(u) {
+  const res = await fetch(u);
+  const blob = await res.blob();
+  const imageBitmap = await createImageBitmap(blob);
+  return imageBitmap;
+}
 export async function loadAudio(u) {
   const audio = new Audio();
   const p = new Promise((accept, reject) => {
@@ -787,11 +768,11 @@ export const memoize = (fn) => {
   };
 };
 export function shuffle(array, rng = Math.random) {
-  let currentIndex = array.length,
-    randomIndex;
+  let currentIndex = array.length;
+    let randomIndex;
 
   // While there remain elements to shuffle...
-  while (currentIndex != 0) {
+  while (currentIndex !== 0) {
     // Pick a remaining element...
     randomIndex = Math.floor(rng() * currentIndex);
     currentIndex--;
@@ -812,7 +793,7 @@ export const waitForFrame = () =>
     });
   });
 
-const doUpload = async (u, f, { onProgress = null } = {}) => {
+const doUpload = async (u, f, {onProgress = null} = {}) => {
   var xhr = new XMLHttpRequest();
   xhr.open('POST', u, true);
   // xhr.setRequestHeader('Content-Type', 'application/json');
@@ -871,59 +852,6 @@ export const getDropUrl = (o) => {
   let u = null;
   if (typeof o?.start_url === 'string') {
     u = o.start_url;
-    /* } else if (typeof j?.asset_contract?.address === 'string') {
-    const {token_id, asset_contract} = j;
-    const {address} = asset_contract;
-    
-    if (contractNames[address]) {
-      u = `/@proxy/` + encodeURI(`eth://${address}/${token_id}`);
-    } else {
-      console.log('got j', j);
-      const {traits} = j;
-      // cryptovoxels wearables
-      const voxTrait = traits.find(t => t.trait_type === 'vox'); // XXX move to a loader
-      if (voxTrait) {
-        const {value} = voxTrait;
-        u = proxifyUrl(value) + '?type=vox';
-      } else {
-        const {token_metadata} = j;
-        // console.log('proxify', token_metadata);
-        const res = await fetch(proxifyUrl(token_metadata), {
-          mode: 'cors',
-        });
-        const j2 = await res.json();
-        // console.log('got metadata', j2);
-        
-        // dcl wearables
-        if (j2.id?.startsWith('urn:decentraland:')) {
-          // 'urn:decentraland:ethereum:collections-v1:mch_collection:mch_enemy_upper_body'
-          const res = await fetch(`https://peer-lb.decentraland.org/lambdas/collections/wearables?wearableId=${j2.id}`, { // XXX move to a loader
-            mode: 'cors',
-          });
-          const j3 = await res.json();
-          const {wearables} = j3;
-          const wearable = wearables[0];
-          const representation = wearable.data.representations[0];
-          const {mainFile, contents} = representation;
-          const file = contents.find(f => f.key === mainFile);
-          const match = mainFile.match(/\.([a-z0-9]+)$/i);
-          const type = match && match[1];
-          // console.log('got wearable', {mainFile, contents, file, type});
-          u = '/@proxy/' + encodeURI(file.url) + (type ? ('?type=' + type) : '');
-        } else {
-          // avatar
-          const {avatar_url, asset} = j2;
-          const avatarUrl = avatar_url || asset;
-          if (avatarUrl) {
-            u = '/@proxy/' + encodeURI(avatarUrl) + '?type=vrm';
-          } else {
-            // default
-            const {image} = j2;
-            u = '/@proxy/' + encodeURI(image);
-          }
-        }
-      }
-    } */
   }
   return u;
 };
@@ -943,7 +871,7 @@ export const handleDropJsonItem = async (item) => {
   }
   return null;
 };
-export const handleUpload = async (item, { onProgress = null } = {}) => {
+export const handleUpload = async (item, {onProgress = null} = {}) => {
   console.log('uploading...', item);
 
   const _handleFileList = async (item) => {
@@ -1033,8 +961,8 @@ export const handleUpload = async (item, { onProgress = null } = {}) => {
     const j = await doUpload(`https://ipfs.webaverse.com/`, file, {
       onProgress,
     });
-    const { hash } = j;
-    const { name } = file;
+    const {hash} = j;
+    const {name} = file;
 
     return `${storageHost}/${hash}/${name}`;
   };
@@ -1157,6 +1085,17 @@ export const imageToCanvas = (img, w, h) => {
   return canvas;
 };
 
+export function createCanvas(width, height) {
+  if (isWorker) {
+    return new OffscreenCanvas(width, height);
+  } else {
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    return canvas;
+  }
+}
+
 export const isTransferable = (o) => {
   const ctor = o?.constructor;
   return (
@@ -1215,7 +1154,7 @@ export const selectVoice = (voicer) => {
   };
   // the weight of each voice is proportional to the inverse of the number of times it has been used
   const maxNonce = voicer.reduce((max, voice) => Math.max(max, voice.nonce), 0);
-  const weights = voicer.map(({ nonce }) => {
+  const weights = voicer.map(({nonce}) => {
     return 1 - nonce / (maxNonce + 1);
   });
   const selectionIndex = weightedRandom(weights);
@@ -1307,4 +1246,9 @@ export const getBoundingSize = boundingType => {
     case 'box': return 6;
     default: return 0;
   }
+};
+
+export const lookAtQuaternion = (dirVec)=>{
+  var mx = new THREE.Matrix4().lookAt(new THREE.Vector3(0,0,0), dirVec, new THREE.Vector3(0,1,0));
+  return new THREE.Quaternion().setFromRotationMatrix(mx);
 };

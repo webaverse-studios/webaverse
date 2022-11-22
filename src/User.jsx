@@ -1,14 +1,9 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import classnames from 'classnames';
 
-// import * as ceramicApi from '../ceramic.js';
-// import { discordClientId } from '../constants';
-import { parseQuery } from '../util.js';
-// import Modal from './components/modal';
-// import WebaWallet from './components/wallet';
+import {parseQuery} from '../util.js';
 
-// import blockchainManager from '../blockchain-manager.js';
-import { AppContext } from './components/app';
+import {AppContext} from './components/app';
 
 import styles from './User.module.css';
 
@@ -38,16 +33,16 @@ const UserPopover = ({
     );
 };
 
-export const User = ({ className, setLoginFrom }) => {
+export const User = ({className, setLoginFrom}) => {
 
-    const { state, setState, account, chain } = useContext( AppContext );
+    const {state, setState, account, chain} = useContext(AppContext);
     const [ensName, setEnsName] = useState('');
     const [avatarUrl, setAvatarUrl] = useState('');
     const [ loggingIn, setLoggingIn ] = useState(false);
     // const [ loginError, setLoginError ] = useState(null);
     // const [ autoLoginRequestMade, setAutoLoginRequestMade ] = useState(false);
-    const { isConnected, currentAddress, connectWallet, disconnectWallet, errorMessage, wrongChain, getAccounts, getAccountDetails } = account;
-    const { selectedChain } = chain;
+    const {isConnected, currentAddress, connectWallet, disconnectWallet, errorMessage, wrongChain, getAccounts, getAccountDetails} = account;
+    const {selectedChain} = chain;
     const [address, setAddress] = useState('');
 
     //
@@ -63,13 +58,13 @@ export const User = ({ className, setLoginFrom }) => {
 
     const toggleUserPopover = e => {
 
-        setState({ openedPanel: !popoverOpen ? 'UserPopover' : null });
+        setState({openedPanel: !popoverOpen ? 'UserPopover' : null});
 
     };
 
     const handleCancelBtnClick = () => {
 
-        setState({ openedPanel: null });
+        setState({openedPanel: null});
 
         sounds.playSoundName('menuBack');
 
@@ -107,7 +102,7 @@ export const User = ({ className, setLoginFrom }) => {
         }
     }, [currentAddress, selectedChain])
     
-    const metaMaskLogin = async ( event ) => {
+    const metaMaskLogin = async (event) => {
 
         event.preventDefault();
         event.stopPropagation();
@@ -118,9 +113,9 @@ export const User = ({ className, setLoginFrom }) => {
 
         } else { */
 
-            if ( ! loggingIn ) {
+            if (! loggingIn) {
 
-                setLoggingIn( true );
+                setLoggingIn(true);
 
                 try {
 
@@ -136,7 +131,7 @@ export const User = ({ className, setLoginFrom }) => {
 
                 } finally {
 
-                    setState({ openedPanel: null });
+                    setState({openedPanel: null});
 
                     setLoggingIn(false);
 
@@ -148,9 +143,9 @@ export const User = ({ className, setLoginFrom }) => {
 
     };
 
-    useEffect( () => {
+    useEffect(() => {
 
-        const { error, code, id, play, realmId } = parseQuery( window.location.search );
+        const {error, code, id, play, realmId} = parseQuery(window.location.search);
 
         //
 
@@ -230,7 +225,7 @@ export const User = ({ className, setLoginFrom }) => {
 
         } */
 
-    }, [ currentAddress ] );
+    }, [ currentAddress ]);
 
     //
 
@@ -263,12 +258,12 @@ export const User = ({ className, setLoginFrom }) => {
                     e.preventDefault();
                     e.stopPropagation();
 
-                        if ( !loginOpen ) {
+                        if (!loginOpen) {
 
-                            setState({ openedPanel: 'LoginPanel' });
+                            setState({openedPanel: 'LoginPanel'});
 
                         } else {
-                            setState({ openedPanel: null });
+                            setState({openedPanel: null});
                         }
 
                         sounds.playSoundName('menuNext');
