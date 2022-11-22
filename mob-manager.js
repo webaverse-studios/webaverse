@@ -52,6 +52,7 @@ const ATTACKACTIONTYPE = 'ATCK';
 const DIEACTIONTYPE = 'DIE';
 const ANIMATIONACTIONTYPE = 'ANMT';
 const HITACTIONTYPE = 'HIT';
+const VANISHACTIONTYPE = 'VANISH';
 //const MAXSOUNDSSAMETIME = 2;
 // window.THREE = THREE;
 
@@ -496,13 +497,15 @@ const mobSoundsPlayer = new MobSoundsPlayer();*/
   actionMethod: action to be performed
   actionMethodFrames: contains the frame id that need the action to be performed. If empty it will be performed only at the starting frame
 */
+
 export class ActionComponent {
   constructor(
     actionId,
     type,
     durationS = 0.016,
     actionMethod = (mob)=>{},
-    onFinish = (mob)=>{}) {
+    onFinish = undefined,
+    tickMethod = undefined) {
     this.Do = actionMethod;
     this.onFinish = onFinish;
     this.durationS = durationS;
@@ -511,6 +514,7 @@ export class ActionComponent {
     this.type = type;
     this.actionId = actionId;
     this.currentMob = undefined;
+    this.tickMethod = tickMethod;
   }
 
   /*
@@ -547,12 +551,14 @@ export class ActionComponent {
       return;
 
     this.timeStamp += timeDiffS;
+    if(this.tickMethod){
+      this.tickMethod(this.currentMob, this.timeStamp, timeDiffS);
+    }
     if(this.timeStamp >= this.durationS){
-      if(this.resolvePromise)
-        this.resolvePromise();
       if(this.onFinish)
         this.onFinish(this.currentMob)
-
+      if(this.resolvePromise)
+        this.resolvePromise();
       this.stop();
     }
   }
@@ -610,14 +616,13 @@ class HitAction extends ActionComponent {
 class DieAction extends ActionComponent {
   constructor(durationS){
     const actionMethod = (mob)=>{
-      //mob.playAnimation('death', true);
+      mob.playAnimation('death', true);
     }
 
     const onFinish = (mob)=>{
       mob.kill();
-      //ragdollSpawner.spawnRagdoll(mob.position, mob.quaternion, mob.geometryIndex);
     }
-    super('death', DIEACTIONTYPE, 0, actionMethod, onFinish);
+    super('death', DIEACTIONTYPE, durationS, actionMethod, onFinish);
   }
 }
 
@@ -627,6 +632,23 @@ class AnimationAction extends ActionComponent {
       mob.playAnimation(animationId, true);
     }
     super('animationAction'+animationId, ANIMATIONACTIONTYPE, durationS, actionMethod);
+  }
+}
+
+class VanishAction extends ActionComponent {
+  constructor(durationS){
+    const actionMethod = (mob)=>{
+    }
+
+    const tickMethod = (mob, timeStampS, timeDiffS)=>{
+      mob.vanish += timeDiffS/durationS;
+      mob.updateVanish = true;
+    }
+
+    const onFinish = (mob)=>{
+      mob.destroy();
+    }
+    super('vanish', VANISHACTIONTYPE, durationS, actionMethod, onFinish, tickMethod);
   }
 }
 
@@ -705,6 +727,8 @@ export class MobInstance {
     this.updatePosition = true;
     this.updateRotation = true;
     this.updateTimeOffset = true;
+    this.updateVanish = true;
+    this.vanish = 0;
     this.updateAnimation = true;
     this.rotationInterpolation = 1;
     this.easing = 16;
@@ -726,7 +750,7 @@ export class MobInstance {
     physicsManager.getScene().setTransform(this.controller, true);
     this.idleAction = idleAction ??
     new DefaultIdleAction(this.animations.get('idle').duration);
-    this._createActionFromClip();
+    this._createActions();
     this.killEvents = [];
     this.askForTarget = undefined;
     this.aggroDistance = 3;
@@ -743,17 +767,22 @@ export class MobInstance {
       this.startAction('death');
     }
   }
-  kill(){
-    /*if(debugMob)
-      return;*/
-    
+
+  destroy(){
     for(const k of this.killEvents){
       k();
     }
-    this.dead = true;
-    this.actionsQueue = [];
   }
-  _createActionFromClip(){
+
+  kill(){
+    this.dead = true;
+    const anim = this.animations.get('death');
+    this.timeOffset = anim.frameCount*0.99;
+    this.updateTimeOffset = true;
+    this.startAction('vanish');
+  }
+
+  _createActions(){
     for(let [key, value] of this.animations){
       if(key == 'idle'){
         continue;
@@ -765,7 +794,7 @@ export class MobInstance {
       }
 
       if(key == 'death'){
-        this.actions.push(new DieAction(value.duration));
+        this.actions.push(new DieAction(value.duration * 0.99));
         continue;
       }
 
@@ -773,6 +802,7 @@ export class MobInstance {
     }
     const hitAnim = this.animations.get('death');
     this.actions.push(new HitAction(0));
+    this.actions.push(new VanishAction(4))
   }
 
   getPostion(){
@@ -794,7 +824,7 @@ export class MobInstance {
   startAction(actionId){
     for(const a of this.actions){
       if(a.actionId == actionId){
-        if(this.life <= 0 && a.type != DIEACTIONTYPE)
+        if(this.life <= 0 && a.type != DIEACTIONTYPE && a.type != VANISHACTIONTYPE)
           return;
         
         this.actionsQueue.push(a);
@@ -853,11 +883,13 @@ export class MobInstance {
     after each action is finised it will pop it out of the action queue
   */
   manageActions(timeDiffS){
-    if(this.dead)
-      return;
     
     if(this.actionsQueue.length == 0){
-      this.actionsQueue.push(this.idleAction);
+      if(!this.dead)
+        this.actionsQueue.push(this.idleAction);
+      else{
+        return;
+      }
     }
 
     const currentAction = this.actionsQueue[0];
@@ -929,10 +961,6 @@ export class MobInstance {
       this.fallTime = 0;
     }
 
-    if(false){
-      this.movement.add(this.debugAnimation(playerLocation, timeDiff));
-    }
-
     // manage Rotation
     if(this.rotationInterpolation < 1){
       this.rotationInterpolation += (1-this.rotationInterpolation) / this.easing;
@@ -942,6 +970,8 @@ export class MobInstance {
     }
     //manage position
     this.moveMobInternal(timeDiffS);
+
+
   }
 
   /*
@@ -966,21 +996,21 @@ export class MobInstance {
     this.movement.z = 0;
   }
 
-  updateDrawTime(uTime){
-    this.uTime = uTime;
+  updateDrawTime(uTime, diff){
     if(this.dead){
-      const anim = this.animations.get('death');
-      if(this.currentAnimation != anim.id){
-        this.currentAnimation = anim.id;
-        this.updateAnimation = true;
-      }
+      return;
     }
+    this.uTime = uTime;
+    this.timeOffset += diff;
+    this.updateTimeOffset = true;
   }
 
   /*
     plays the animationName animation. If the animationName is not among the available animations returns
   */
   playAnimation(animationName, restart){
+    if(this.dead)
+      return;
     if(!this.animations.has(animationName))
       return;
     
@@ -990,7 +1020,8 @@ export class MobInstance {
       this.updateAnimation = true;
     }
     if(restart){
-      this.timeOffset = -((this.uTime % anim.frameCount) / anim.frameCount);
+      //this.timeOffset = -((this.uTime % anim.frameCount) / anim.frameCount);
+      this.timeOffset = 0;
       this.updateTimeOffset = true;
     }
   }
@@ -1136,6 +1167,11 @@ class MobBatchedMesh extends InstancedBatchedMesh {
         itemSize: 1,
       },
       {
+        name: 'vanish',
+        Type: Float32Array,
+        itemSize: 1,
+      },
+      {
         name: 'animationIndex',
         Type: Float32Array,
         itemSize: 1,
@@ -1196,6 +1232,10 @@ class MobBatchedMesh extends InstancedBatchedMesh {
         };
         shader.uniforms.timeOffsetTexture = {
           value: attributeTextures.timeOffset,
+          needsUpdate: true,
+        };
+        shader.uniforms.vanishTexture = {
+          value: attributeTextures.vanish,
           needsUpdate: true,
         };
         shader.uniforms.animationIndex = {
@@ -1299,6 +1339,7 @@ uniform sampler2D timeOffsetTexture;
 uniform float uTime;
 uniform sampler2D animationIndex;
 uniform sampler2D animationsFrameInfo;
+varying float instanceIndex;
 
 struct BoneTransform
 {
@@ -1343,7 +1384,7 @@ mat4 getBoneMatrix( const in float base1, const in float base2, const in float r
         `);
         shader.vertexShader = shader.vertexShader.replace(`#include <skinbase_vertex>`, `\
 int boneTextureIndex = gl_DrawID * ${maxBonesPerInstance};
-float instanceIndex = float(gl_DrawID * ${maxInstancesPerDrawCall} + gl_InstanceID);
+instanceIndex = float(gl_DrawID * ${maxInstancesPerDrawCall} + gl_InstanceID);
 
 #ifdef USE_SKINNING
   
@@ -1353,13 +1394,7 @@ float instanceIndex = float(gl_DrawID * ${maxInstancesPerDrawCall} + gl_Instance
   float timeOffsetY = floor(instanceIndex / timeOffsetWidth);
   vec2 timeOffsetpUv = (vec2(timeOffsetX, timeOffsetY) + 0.5) / vec2(timeOffsetWidth, timeOffsetHeight);
   float timeOffset = texture2D(timeOffsetTexture, timeOffsetpUv).x;
-  
-  float time1 = float(floor(uTime));
-  float time2 = float(ceil(uTime));
-  float timeRatio = (uTime - time1) / (time2 - time1);
-  if (time2 == time1) {
-    timeRatio = 0.0f;
-  }
+
   const float animIdwidth = ${attributeTextures.animationIndex.image.width.toFixed(8)};
   const float animIdheight = ${attributeTextures.animationIndex.image.height.toFixed(8)};
   float animIdx = mod(instanceIndex, animIdwidth);
@@ -1379,8 +1414,20 @@ float instanceIndex = float(gl_DrawID * ${maxInstancesPerDrawCall} + gl_Instance
   vec2 animationData = texture2D(animationsFrameInfo, fInfoUv).xy;
   float frameCount = animationData.x;
 
-  float frame1 = animationID * float(${maxAnimationFrameLength}) + mod( float(time1) + timeOffset * frameCount, frameCount );
-  float frame2 = animationID * float(${maxAnimationFrameLength}) + mod( float(time2) + timeOffset * frameCount, frameCount );
+  //float time1 = float(floor(uTime));
+  //float time2 = float(ceil(uTime));
+  //float timeRatio = (uTime - time1) / (time2 - time1);
+  float time1 = float(floor(timeOffset));
+  float time2 = float(ceil(timeOffset));
+  float timeRatio = (timeOffset - time1) / (time2 - time1);
+  if (time2 == time1) {
+    timeRatio = 0.0f;
+  }
+
+  //float frame1 = animationID * float(${maxAnimationFrameLength}) + mod( float(time1) + timeOffset * frameCount, frameCount );
+  //float frame2 = animationID * float(${maxAnimationFrameLength}) + mod( float(time2) + timeOffset * frameCount, frameCount );
+  float frame1 = animationID * float(${maxAnimationFrameLength}) + mod( float(time1), frameCount );
+  float frame2 = animationID * float(${maxAnimationFrameLength}) + mod( float(time2), frameCount );
   int boneTextureIndex1 = boneTextureIndex + int(frame1) * ${numGeometries} * ${maxBonesPerInstance};
   int boneTextureIndex2 = boneTextureIndex + int(frame2) * ${numGeometries} * ${maxBonesPerInstance};
   float boneIndexOffset1 = float(boneTextureIndex1) * 2.;
@@ -1473,9 +1520,58 @@ gl_Position = projectionMatrix * mvPosition;
 
         shader.fragmentShader = shader.fragmentShader.replace(`#include <uv_pars_fragment>`, `\
 #undef USE_INSTANCING
+uniform sampler2D vanishTexture;
+varying float instanceIndex;
 #if ( defined( USE_UV ) && ! defined( UVS_VERTEX_ONLY ) )
   varying vec2 vUv;
 #endif
+
+        `);
+
+        shader.fragmentShader = shader.fragmentShader.replace(`#include <clipping_planes_fragment>`, `\
+
+
+const float vanishWidth = ${attributeTextures.vanish.image.width.toFixed(8)};
+const float vanishHeight = ${attributeTextures.vanish.image.height.toFixed(8)};
+float vanishX = mod(instanceIndex, vanishWidth);
+float vanishY = floor(instanceIndex / vanishWidth);
+vec2 vanishpUv = (vec2(vanishX, vanishY) + 0.5) / vec2(vanishWidth, vanishHeight);
+float vanish = texture2D(vanishTexture, vanishpUv).x;
+float v1 = 
+  (sin(vUv.x*100.0) + 
+  sin(vUv.x*65.5) +
+  sin(vUv.x*82.364) +
+  sin(vUv.x*23.185) +
+  sin(vUv.x*71.346) +
+  sin(vUv.y*100.0) + 
+  sin(vUv.y*93.113) +
+  sin(vUv.y*42.388) +
+  sin(vUv.y*32.581) +
+  sin(vUv.x*26.12) +
+  sin(vUv.x*16.15) +
+  sin(vUv.x*301.2) +
+  sin(vUv.x*152.78) +
+  sin(vUv.y*98.45) + 
+  sin(vUv.y*64.12) +
+  sin(vUv.y*98.4) +
+  sin(vUv.y*45.945) +
+  sin(vUv.y*37.85)) / 18.;
+
+v1 = (v1+1.)/2. - vanish;
+if(v1 < 0.){
+  discard;
+}
+
+if (v1 < 0.1) {
+    float fac = (0.1 - v1) * 10.0;
+    gl_FragColor.z = fac * 0.5;
+    gl_FragColor.y = fac * 0.75;
+    gl_FragColor.x = fac;
+    return;
+}
+
+#include <clipping_planes_fragment>
+
         `);
         
         // put true to debug shader
@@ -1596,19 +1692,20 @@ void main() {
     return drawCall;
   }
 
-  updateMobs(drawCall, uTime){
+  updateMobs(drawCall, uTime, uTimeDiff){
     if(!this.material.userData.shader)
       return;
     const pOffset           = drawCall.getTextureOffset('p');
     const qOffset           = drawCall.getTextureOffset('q');
     const timeOffsetOffset  = drawCall.getTextureOffset('timeOffset');
+    const vanishOffset      = drawCall.getTextureOffset('vanish');
     const animOffset        = drawCall.getTextureOffset('animationIndex');
     const padding           = this.allocator.getTextureBytePadding();
     const textureToUpdate   = new Set();
     
     for(let instanceIndex = 0; instanceIndex < drawCall.instances.length; instanceIndex++){
       const mob = drawCall.instances[instanceIndex];
-      mob.updateDrawTime(uTime);
+      mob.updateDrawTime(uTime, uTimeDiff);
       if(mob.updatePosition){
         drawCall.getTexture('p').image.data.set(mob.position.toArray(), pOffset + instanceIndex * padding);
         mob.updatePosition = false;
@@ -1629,6 +1726,13 @@ void main() {
         mob.updateTimeOffset = false;
         textureToUpdate.add(JSON.stringify({name: 'timeOffset', size: 1}));
         this.material.userData.shader.uniforms.timeOffsetTexture.value.needsUpdate = true;
+      }
+
+      if(mob.updateVanish){
+        drawCall.getTexture('vanish').image.data[vanishOffset + instanceIndex * padding] = mob.vanish;
+        mob.updateVanish = false;
+        textureToUpdate.add(JSON.stringify({name: 'vanish', size: 1}));
+        this.material.userData.shader.uniforms.vanishTexture.value.needsUpdate = true;
       }
 
       if(mob.updateAnimation){
@@ -1693,6 +1797,8 @@ void main() {
       const qOffset = drawCall.getTextureOffset('q');
       const timeOffsetTexture = drawCall.getTexture('timeOffset').image.data;
       const timeOffsetOffset = drawCall.getTextureOffset('timeOffset');
+      const vanishTexture = drawCall.getTexture('vanish').image.data;
+      const vanishOffset = drawCall.getTextureOffset('vanish');
       const animationIndexTexture = drawCall.getTexture('animationIndex').image.data;
       const animationIndexOffset = drawCall.getTextureOffset('animationIndex');
       const instanceDataBegin = instanceIndex * padding;
@@ -1715,16 +1821,18 @@ void main() {
 
       timeOffsetTexture[timeOffsetOffset + instanceIndex * padding] = timeOffsetTexture[timeOffsetOffset + lastInstanceIndex * padding];
       animationIndexTexture[animationIndexOffset + instanceIndex * padding] = animationIndexTexture[animationIndexOffset + lastInstanceIndex * padding];
+      vanishTexture[vanishOffset + instanceIndex * padding] = vanishTexture[vanishOffset + lastInstanceIndex * padding];
 
       this.material.userData.shader.uniforms.pTexture.value.needsUpdate = true;
       this.material.userData.shader.uniforms.qTexture.value.needsUpdate = true;
       this.material.userData.shader.uniforms.timeOffsetTexture.value.needsUpdate = true;
+      this.material.userData.shader.uniforms.vanishTexture.value.needsUpdate = true;
       this.material.userData.shader.uniforms.animationIndex.value.needsUpdate = true;
 
 
       drawCall.updateTexture('p', pOffset, 3);
       drawCall.updateTexture('q', qOffset, 4);
-      drawCall.updateTexture('timeOffset', timeOffsetOffset, 1);
+      drawCall.updateTexture('vanish', vanishOffset, 1);
       drawCall.updateTexture('animationIndex', animationIndexOffset, 1);
 
       // mob instance
@@ -1761,7 +1869,7 @@ void main() {
     }
     
     for(const d of this.drawCalls)
-      this.updateMobs(d, frameIndex);
+      this.updateMobs(d, frameIndex, timeDiff * bakeFps / 1000);
   }
 }
 
