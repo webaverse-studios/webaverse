@@ -96,7 +96,10 @@ export class SnapshotInterpolant {
   }
 
   update(timeDiff) {
+    debugger
     this.readTime += timeDiff;
+
+    let effectiveReadTime = this.readTime - this.timeDelay;
     
     let minEndTime = Infinity;
     let maxEndTime = -Infinity;
@@ -111,15 +114,7 @@ export class SnapshotInterpolant {
     }
 
     if (maxEndTime > 0) { // if we had at least one snapshot
-      if (
-        (this.readTime - this.timeDelay) < minEndTime ||
-        (this.readTime - this.timeDelay) > maxEndTime
-      ) {
-        this.readTime = maxEndTime;
-      }
-
-      const effectiveReadTime = this.readTime - this.timeDelay;
-
+      effectiveReadTime = THREE.MathUtils.clamp(effectiveReadTime, minEndTime, maxEndTime);
       this.seekTo(effectiveReadTime);
     }
   }
