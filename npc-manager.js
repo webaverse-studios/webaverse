@@ -191,6 +191,12 @@ class NpcManager extends EventTarget {
     });
     player.name = name;
 
+    if (!globalThis.npcPlayers) {
+      globalThis.npcPlayers = [];
+      globalThis.npcPlayer = player;
+    }
+    globalThis.npcPlayers.push(player);
+
     let matrixNeedsUpdate = false;
     if (position) {
       player.position.copy(position);

@@ -1403,6 +1403,12 @@ class RemotePlayer extends InterpolatedPlayer {
     this.isRemotePlayer = true;
     this.lastPosition = new THREE.Vector3();
     this.controlMode = 'remote';
+
+    if (!globalThis.remotePlayers) {
+      globalThis.remotePlayers = [];
+      globalThis.remotePlayer = this;
+    }
+    globalThis.remotePlayers.push(this);
   }
 
     // The audio worker handles hups and incoming voices
