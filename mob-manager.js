@@ -1531,44 +1531,48 @@ varying float instanceIndex;
         shader.fragmentShader = shader.fragmentShader.replace(`#include <clipping_planes_fragment>`, `\
 
 
+
 const float vanishWidth = ${attributeTextures.vanish.image.width.toFixed(8)};
 const float vanishHeight = ${attributeTextures.vanish.image.height.toFixed(8)};
 float vanishX = mod(instanceIndex, vanishWidth);
 float vanishY = floor(instanceIndex / vanishWidth);
 vec2 vanishpUv = (vec2(vanishX, vanishY) + 0.5) / vec2(vanishWidth, vanishHeight);
 float vanish = texture2D(vanishTexture, vanishpUv).x;
-float v1 = 
-  (sin(vUv.x*100.0) + 
-  sin(vUv.x*65.5) +
-  sin(vUv.x*82.364) +
-  sin(vUv.x*23.185) +
-  sin(vUv.x*71.346) +
-  sin(vUv.y*100.0) + 
-  sin(vUv.y*93.113) +
-  sin(vUv.y*42.388) +
-  sin(vUv.y*32.581) +
-  sin(vUv.x*26.12) +
-  sin(vUv.x*16.15) +
-  sin(vUv.x*301.2) +
-  sin(vUv.x*152.78) +
-  sin(vUv.y*98.45) + 
-  sin(vUv.y*64.12) +
-  sin(vUv.y*98.4) +
-  sin(vUv.y*45.945) +
-  sin(vUv.y*37.85)) / 18.;
+if(vanish > 0.){
+  float v1 = 
+    (sin(vUv.x*100.0) + 
+    sin(vUv.x*65.5) +
+    sin(vUv.x*82.364) +
+    sin(vUv.x*23.185) +
+    sin(vUv.x*71.346) +
+    sin(vUv.y*100.0) + 
+    sin(vUv.y*93.113) +
+    sin(vUv.y*42.388) +
+    sin(vUv.y*32.581) +
+    sin(vUv.x*26.12) +
+    sin(vUv.x*16.15) +
+    sin(vUv.x*301.2) +
+    sin(vUv.x*152.78) +
+    sin(vUv.y*98.45) + 
+    sin(vUv.y*64.12) +
+    sin(vUv.y*98.4) +
+    sin(vUv.y*45.945) +
+    sin(vUv.y*37.85)) / 18.;
 
-v1 = (v1+1.)/2. - vanish;
-if(v1 < 0.){
-  discard;
-}
+  v1 = (v1+1.)/2. - vanish;
+  if(v1 < 0.){
+    discard;
+  }
 
-if (v1 < 0.1) {
+  if (v1 < 0.1) {
     float fac = (0.1 - v1) * 10.0;
     gl_FragColor.z = fac * 0.5;
     gl_FragColor.y = fac * 0.75;
     gl_FragColor.x = fac;
     return;
+  }
 }
+
 
 #include <clipping_planes_fragment>
 
