@@ -45,6 +45,7 @@ const maxAnimationFrameLength = 512;
 let unifiedBoneTextureSize = 1024;
 const animationKeys = [];
 const debugAnimation = false;
+const debugShader = false;
 // window.THREE = THREE;
 
 const _zeroY = v => {
@@ -503,7 +504,7 @@ export class MobInstance {
   update(playerLocation, timeDiff){
     if(debugAnimation){
       this.debugAnimation(playerLocation, timeDiff);
-      return;
+      
     }
   }
 
@@ -517,7 +518,7 @@ export class MobInstance {
     );
     // const collided = flags !== 0;
     this.grounded = !!(flags & 0x1);
-    if(this.controller.position.distanceTo(this.position) > 0.01 ){
+    if(this.controller.position.distanceTo(this.position) > 0.01){
       this.position.copy(this.controller.position);
       this.updatePosition = true;
     }
@@ -549,8 +550,8 @@ export class MobInstance {
           .normalize()
           .multiplyScalar(3));
       }
-      else if(this.currentAnimation == idleID){ // attack the player
-        if(attackID !== undefined && this.currentAnimation != attackID){
+      else if(this.currentAnimation === idleID){ // attack the player
+        if(attackID !== undefined && this.currentAnimation !== attackID){
           this.currentAnimation = attackID;
           this.updateAnimation = true;
         }
@@ -559,7 +560,7 @@ export class MobInstance {
       this.lookAt(playerLocation);
       
     }
-    else if(this.currentAnimation != idleID){
+    else if(this.currentAnimation !== idleID){
       this.locationTarget.copy(this.position);
       this.currentAnimation = idleID;
       this.updateAnimation = true;
@@ -567,7 +568,7 @@ export class MobInstance {
 
     // manage Position
     if(this.locationTarget.clone().sub(this.position).length() > 0.5){
-      if(this.currentAnimation != walkID){
+      if(this.currentAnimation !== walkID){
         this.currentAnimation = walkID;
         this.updateAnimation = true;
       }
@@ -576,7 +577,7 @@ export class MobInstance {
       movement.add(t)
     }
     else{
-      if(this.currentAnimation == walkID){
+      if(this.currentAnimation === walkID){
         this.currentAnimation = idleID;
         this.updateAnimation = true;
       }
@@ -1029,7 +1030,7 @@ gl_Position = projectionMatrix * mvPosition;
         `);
         
         // put true to debug shader
-        if(false)
+        if(debugShader)
           shader.fragmentShader = `\
 #define DEBUG_SHADER
 #if ( defined( USE_UV ) && ! defined( UVS_VERTEX_ONLY ) )
@@ -1370,8 +1371,8 @@ class MobGenerator {
     const rng = alea(seed);
     for(let i = 0; i < 100; i++){
       const geoId = i%meshes.length;
-      //const size = new Vector3();
-      //new THREE.Box3().setFromObject(meshes[geoId]).getSize(size);
+      // const size = new Vector3();
+      // new THREE.Box3().setFromObject(meshes[geoId]).getSize(size);
       mobs.push(new MobInstance(
         [rng()*100, 100, 110+rng()*100],
         new Quaternion().setFromEuler(new Euler(0, rng()*Math.PI*2, 0)).toArray(),
@@ -1463,7 +1464,7 @@ class Mobber {
   }
 
   async waitForUpdate() {
-    await trackerCreated;
+    await this.trackerCreated();
     await new Promise((accept, reject) => {
       this.tracker.onPostUpdate(() => {
         accept();

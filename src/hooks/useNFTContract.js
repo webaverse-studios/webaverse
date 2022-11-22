@@ -126,20 +126,20 @@ export default function useNFTContract(currentAccount) {
       const mintfee = BigNumber.from(Bigmintfee).toNumber();
 
       if (mintfee > 0) { // webaverse side chain mintfee != 0
-        const FTapprovetx = await FTcontract.approve(NFTcontractAddress, mintfee); // mintfee = 10 default
-        const FTapproveres = await FTapprovetx.wait();
-        if (FTapproveres.transactionHash) {
-          try {
-            const minttx = await Webaversecontract.mint(currentAccount, 1, metadatahash, '0x');
-            const res = await minttx.wait();
-            if (res.transactionHash) {
-              callback();
-            }
-          } catch (err) {
-            console.warn('minting to webaverse contract failed');
-            setError('Mint Failed');
-          }
-        }
+        // const FTapprovetx = await FTcontract.approve(NFTcontractAddress, mintfee); // mintfee = 10 default
+        // const FTapproveres = await FTapprovetx.wait();
+        // if (FTapproveres.transactionHash) {
+        //   try {
+        //     const minttx = await Webaversecontract.mint(currentAccount, 1, metadatahash, '0x');
+        //     const res = await minttx.wait();
+        //     if (res.transactionHash) {
+        //       callback();
+        //     }
+        //   } catch (err) {
+        //     console.warn('minting to webaverse contract failed');
+        //     setError('Mint Failed');
+        //   }
+        // }
       } else { // mintfee = 0 for Polygon not webaverse sidechain
         try {
           const minttx = await Webaversecontract.mint(currentAccount, 1, currentApp.contentId,  name, '0x');

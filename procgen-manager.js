@@ -53,10 +53,6 @@ class ProcGenInstance {
     this.pgWorkerManager.setCamera(worldPosition, cameraPosition, cameraQuaternion, projectionMatrix);
   }
 
-  setClipRange() {
-    this.pgWorkerManager.setClipRange(range);
-  }
-
   async createLodChunkTracker(opts = {}) {
     await this.pgWorkerManager.waitForLoad();
 

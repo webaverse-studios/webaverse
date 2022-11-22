@@ -56,8 +56,6 @@ export class GeometryAllocator {
           localSphere.center.fromArray(this.boundingData, i * 4);
           localSphere.radius = this.boundingData[i * 4 + 3];
           return frustum.intersectsSphere(localSphere)
-            ? localSphere.center.distanceTo(camera.position)
-            : false;
         };
       } else if (this.boundingType === 'box') {
         return (i, frustum) => {
