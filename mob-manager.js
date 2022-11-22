@@ -349,7 +349,7 @@ class Mob {
                   };
                 })();
 
-                const flags = physicsManager.moveCharacterController(
+                const flags = physicsManager.getScene().moveCharacterController(
                   characterController,
                   moveDelta,
                   minDist,
@@ -362,7 +362,7 @@ class Mob {
                 let grounded = !!(flags & 0x1);
                 if (!grounded) {
                   velocity.add(
-                    localVector.copy(physicsManager.getGravity())
+                    localVector.copy(physicsManager.getScene().getGravity())
                       .multiplyScalar(timeDiffS)
                   );
                 } else {
