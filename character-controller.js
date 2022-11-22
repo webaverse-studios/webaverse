@@ -1498,6 +1498,8 @@ class RemotePlayer extends InterpolatedPlayer {
         this.positionInterpolant.snapshot(timeDiff);
         this.quaternionInterpolant.snapshot(timeDiff);
 
+        // if (!globalThis.isNewFrame) debugger
+
         // for (const actionBinaryInterpolant of this.actionBinaryInterpolantsArray) {
         //   actionBinaryInterpolant.snapshot(timeDiff);
         // }
@@ -1536,6 +1538,8 @@ class RemotePlayer extends InterpolatedPlayer {
       //     this.avatar.walkRunFactor = walkRunFactor;
       //   }
       // }
+      
+      globalThis.isNewFrame = false;
     }
     this.playerMap.observe(observePlayerFn);
     this.unbindFns.push(this.playerMap.unobserve.bind(this.playerMap, observePlayerFn));
