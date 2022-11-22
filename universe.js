@@ -40,7 +40,7 @@ class Universe extends EventTarget {
       ((window.location.port ? parseInt(window.location.port, 10) : (window.location.protocol === 'https:' ? 443 : 80)) + 1) + '/worlds/';
   }
 
-  async enterWorld(worldSpec) {
+  async enterWorld(worldSpec, locationSpec) {
     this.disconnectMultiplayer();
     this.disconnectRoom();
     
@@ -48,7 +48,11 @@ class Universe extends EventTarget {
     /* localPlayer.teleportTo(new THREE.Vector3(0, 1.5, 0), camera.quaternion, {
       relation: 'float',
     }); */
-    localPlayer.position.set(0, initialPosY, 0);
+    if (locationSpec) {
+      localPlayer.position.copy(locationSpec.position);
+    } else {
+      localPlayer.position.set(0, initialPosY, 0);
+    }
     localPlayer.characterPhysics.setPosition(localPlayer.position);
     localPlayer.characterPhysics.reset();
     localPlayer.updateMatrixWorld();
@@ -134,7 +138,10 @@ class Universe extends EventTarget {
   toggleMultiplayer() {
     this.multiplayerEnabled = !this.multiplayerEnabled;
     console.log(this.multiplayerEnabled ? 'Enter multiplayer' : 'Exit multiplayer');
-    this.reload();
+    const localPlayer = playersManager.getLocalPlayer();
+    this.enterWorld(this.currentWorld, {
+      position: localPlayer.position,
+    });
   }
 
   isSceneLoaded() {
