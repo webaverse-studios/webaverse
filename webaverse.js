@@ -305,6 +305,8 @@ export default class Webaverse extends EventTarget {
 
       performanceTracker.startFrame();
 
+      // window.domInfo.innerHTML = '';
+
       // if (globalThis.localPlayer?.avatar && globalThis.remotePlayer?.avatar) {
       //   console.log(globalThis.localPlayer.avatar.idleWalkFactor, globalThis.remotePlayer.avatar.idleWalkFactor)
       // }
@@ -407,6 +409,11 @@ const _startHacks = webaverse => {
   // globalThis.npcManager = npcManager;
 
   globalThis.remoteTimeBias = 0;
+  globalThis.needSyncRemoteTimestamp = true;;
+
+  setInterval(() => {
+    globalThis.needSyncRemoteTimestamp = true;;
+  }, 10000);
 
   // press R to debug current state in console
   window.addEventListener('keydown', event => {

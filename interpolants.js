@@ -96,7 +96,7 @@ export class SnapshotInterpolant {
   }
 
   update(timestamp) {
-    debugger
+    // debugger
     this.readTime = timestamp + globalThis.remoteTimeBias;
 
     let effectiveReadTime = this.readTime - this.timeDelay;
@@ -114,6 +114,11 @@ export class SnapshotInterpolant {
     }
 
     if (maxEndTime > 0) { // if we had at least one snapshot
+      if (effectiveReadTime > minEndTime && effectiveReadTime < maxEndTime) {
+        console.log('in snapshots:', true)
+      } else {
+        console.log('in snapshots:', false)
+      }
       effectiveReadTime = THREE.MathUtils.clamp(effectiveReadTime, minEndTime, maxEndTime);
       this.seekTo(effectiveReadTime);
     }

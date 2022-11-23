@@ -973,7 +973,7 @@ class InterpolatedPlayer extends AvatarCharacter {
   constructor(opts) {
     super(opts);
     this.positionInterpolant = new PositionInterpolant(() => this.getPosition(), avatarInterpolationTimeDelay, avatarInterpolationNumFrames);
-    this.quaternionInterpolant = new QuaternionInterpolant(() => this.getQuaternion(), avatarInterpolationTimeDelay, avatarInterpolationNumFrames);
+    // this.quaternionInterpolant = new QuaternionInterpolant(() => this.getQuaternion(), avatarInterpolationTimeDelay, avatarInterpolationNumFrames);
     // this.actionBinaryInterpolants = {
     //   crouch: new BinaryInterpolant(() => this.hasAction('crouch'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
     //   activate: new BinaryInterpolant(() => this.hasAction('activate'), avatarInterpolationTimeDelay, avatarInterpolationNumFrames),
@@ -1038,7 +1038,8 @@ class InterpolatedPlayer extends AvatarCharacter {
     
     this.avatarBinding = {
       position: this.positionInterpolant.get(),
-      quaternion: this.quaternionInterpolant.get(),
+      // quaternion: this.quaternionInterpolant.get(),
+      quaternion: this.quaternion, // test
     };
   }
 
@@ -1061,7 +1062,7 @@ class InterpolatedPlayer extends AvatarCharacter {
   } */
   updateInterpolation(timestamp) {
     this.positionInterpolant.update(timestamp);
-    this.quaternionInterpolant.update(timestamp);
+    // this.quaternionInterpolant.update(timestamp);
     // for (const actionBinaryInterpolant of this.actionBinaryInterpolantsArray) {
     //   actionBinaryInterpolant.update(timeDiff);
     // }
@@ -1496,11 +1497,18 @@ class RemotePlayer extends InterpolatedPlayer {
         const remoteTimestamp = transform[7];
 
         const now = performance.now(); // todo: use input local timestamp
-        // todo: if (needSync) globalThis.remoteTimeBias = remoteTimestamp - now;
+        if (globalThis.needSyncRemoteTimestamp) {
+          globalThis.remoteTimeBias = remoteTimestamp - now;
+          globalThis.needSyncRemoteTimestamp = false;
+        }
 
         this.positionInterpolant.snapshot(remoteTimestamp); // todo: sync to local timestamp directly ?
-        this.quaternionInterpolant.snapshot(remoteTimestamp);
-        console.log(now, remoteTimestamp, remoteTimestamp - now);
+        // this.quaternionInterpolant.snapshot(remoteTimestamp);
+        // console.log(now, remoteTimestamp, remoteTimestamp - now);
+        // window.domInfo.innerHTML = '';
+        // globalThis.domInfo.innerHTML += `<div style="display:;">local__timestamp: --- ${now}</div>`;
+        // globalThis.domInfo.innerHTML += `<div style="display:;">remote_timestamp: --- ${remoteTimestamp}</div>`;
+        // globalThis.domInfo.innerHTML += `<div style="display:;">________timediff: --- ${remoteTimestamp - now}</div>`;
 
         // if (!globalThis.isNewFrame) debugger
 
