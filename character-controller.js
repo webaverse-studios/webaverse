@@ -1553,6 +1553,11 @@ class RemotePlayer extends InterpolatedPlayer {
 
     this.avatar.update(timestamp, timeDiff);
   }
+
+  destroy() {
+    super.destroy();
+    clearInterval(this.syncRemoteTimestampInterval);
+  }
 }
 /* class StaticUninterpolatedPlayer extends UninterpolatedPlayer {
   constructor(opts) {
