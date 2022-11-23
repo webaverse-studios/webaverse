@@ -263,8 +263,8 @@ export class AvatarCharacterFx {
         })();
       }
     };
-    // FIXME MULTIPLAYER
     /*
+    // Nameplate code is currently not working.
     _updateNameplate();
     */
     const _updateHealEffectMesh = () => {
