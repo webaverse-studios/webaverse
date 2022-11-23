@@ -533,7 +533,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
         acc.transform.push(val);
         acc.changed = acc.changed || val !== lastTransform[i];
         return acc;
-      }, { transform: [], changed: false });
+      }, {transform: [], changed: false});
 
       if (transformCalc.changed) {
         universe.realms.updatePosition(transformCalc.transform.slice(0, 3), realmSize);
@@ -545,7 +545,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
         acc.velocity.push(val);
         acc.changed = acc.changed || val !== lastVelocity[i];
         return acc;
-      }, { velocity: [], changed: false });
+      }, {velocity: [], changed: false});
 
       if (velocityCalc.changed) {
         universe.realms.localPlayer.setKeyValue('velocity', velocityCalc.velocity);
