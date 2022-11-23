@@ -322,8 +322,12 @@ class Universe extends EventTarget {
         }
       });
 
-      const position = player.getKeyValue('position');
-      // TODO: Remote player initial position;
+      const transform = player.getKeyValue('transform');
+      if (transform) {
+        playersArray.doc.transact(() => {
+          playerMap.set('transform', transform);
+        });
+      }
     });
     virtualPlayers.addEventListener('leave', e => {
       const {playerId} = e.data;
@@ -366,7 +370,7 @@ class Universe extends EventTarget {
       this.realms.localPlayer.initializePlayer({
         position,
       }, {});
-      this.realms.localPlayer.setKeyValue('position', position);
+      this.realms.localPlayer.setKeyValue('transform', localPlayer.transform);
 
       if (voiceInput.micEnabled()) {
         this.realms.enableMic();
