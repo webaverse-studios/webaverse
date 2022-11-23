@@ -46,13 +46,20 @@ const maxAnimationFrameLength = 512;
 
 let unifiedBoneTextureSize = 1024;
 const mobGlobalData = [];
-const debugAnimation = false;
+
+// mob instances constants
+const debugMob = false;
 const IDLEACTIONTYPE = 'IDLE';
 const ATTACKACTIONTYPE = 'ATCK';
 const DIEACTIONTYPE = 'DIE';
 const ANIMATIONACTIONTYPE = 'ANMT';
 const HITACTIONTYPE = 'HIT';
 const VANISHACTIONTYPE = 'VANISH';
+const defaultMobLifePoint = 5;
+const animationEasing = 16;
+const defaultAggroDistance = 3;
+const debugMobActions = false;
+
 //const MAXSOUNDSSAMETIME = 2;
 // window.THREE = THREE;
 
@@ -702,7 +709,6 @@ class MobAIControllerPrototype {
 }
 
 let ragdollSpawner;*/
-const debugMob = false;
 /*
   class for mob instances. integrate the action system, performing actions through action components
   pos: mob position
@@ -717,7 +723,7 @@ export class MobInstance {
   constructor(pos, quat, geometryIndex, timeOffset, radius, height, velocity, idleAction) {
     this.actions = [];
     this.target;
-    this.life = 1;
+    this.life = defaultMobLifePoint;
     this.actionsQueue = [];
     this.position = new Vector3().fromArray(pos);
     this.quaternion = new Quaternion().fromArray(quat);
@@ -731,7 +737,6 @@ export class MobInstance {
     this.vanish = 0;
     this.updateAnimation = true;
     this.rotationInterpolation = 1;
-    this.easing = 16;
     this.lookAtTarget = new Vector3(1, 0, 0);
     this.locationTarget = new Vector3().copy(this.position);
     this.velocity = velocity;
@@ -753,7 +758,7 @@ export class MobInstance {
     this._createActions();
     this.killEvents = [];
     this.askForTarget = undefined;
-    this.aggroDistance = 3;
+    this.aggroDistance = defaultAggroDistance;
     this.dead = false
   }
 
@@ -944,12 +949,7 @@ export class MobInstance {
   update(playerLocation, timeDiff){
     const timeDiffS = timeDiff / 1000;
     this.targetManagement();
-
-    if(false){
-      this.debugAction(timeDiffS);
-    }
-    else
-      this.manageActions(timeDiffS);
+    this.manageActions(timeDiffS);
 
     if(!this.grounded){
       //15 seconds it reach terminal velocity in air
@@ -963,15 +963,14 @@ export class MobInstance {
 
     // manage Rotation
     if(this.rotationInterpolation < 1){
-      this.rotationInterpolation += (1-this.rotationInterpolation) / this.easing;
+      this.rotationInterpolation += (1-this.rotationInterpolation) / animationEasing;
       this.rotationInterpolation.toFixed(2);
       this.quaternion.slerp(lookAtQuaternion(this.lookAtTarget), this.rotationInterpolation);
       this.updateRotation = true;
     }
+
     //manage position
     this.moveMobInternal(timeDiffS);
-
-
   }
 
   /*
@@ -1339,7 +1338,7 @@ uniform sampler2D timeOffsetTexture;
 uniform float uTime;
 uniform sampler2D animationIndex;
 uniform sampler2D animationsFrameInfo;
-varying float instanceIndex;
+flat varying int instanceIndex;
 
 struct BoneTransform
 {
@@ -1384,21 +1383,21 @@ mat4 getBoneMatrix( const in float base1, const in float base2, const in float r
         `);
         shader.vertexShader = shader.vertexShader.replace(`#include <skinbase_vertex>`, `\
 int boneTextureIndex = gl_DrawID * ${maxBonesPerInstance};
-instanceIndex = float(gl_DrawID * ${maxInstancesPerDrawCall} + gl_InstanceID);
+instanceIndex = gl_DrawID * ${maxInstancesPerDrawCall} + gl_InstanceID;
 
 #ifdef USE_SKINNING
   
   const float timeOffsetWidth = ${attributeTextures.timeOffset.image.width.toFixed(8)};
   const float timeOffsetHeight = ${attributeTextures.timeOffset.image.height.toFixed(8)};
-  float timeOffsetX = mod(instanceIndex, timeOffsetWidth);
-  float timeOffsetY = floor(instanceIndex / timeOffsetWidth);
+  float timeOffsetX = mod(float(instanceIndex), timeOffsetWidth);
+  float timeOffsetY = floor(float(instanceIndex) / timeOffsetWidth);
   vec2 timeOffsetpUv = (vec2(timeOffsetX, timeOffsetY) + 0.5) / vec2(timeOffsetWidth, timeOffsetHeight);
   float timeOffset = texture2D(timeOffsetTexture, timeOffsetpUv).x;
 
   const float animIdwidth = ${attributeTextures.animationIndex.image.width.toFixed(8)};
   const float animIdheight = ${attributeTextures.animationIndex.image.height.toFixed(8)};
-  float animIdx = mod(instanceIndex, animIdwidth);
-  float animIdy = floor(instanceIndex / animIdwidth);
+  float animIdx = mod(float(instanceIndex), animIdwidth);
+  float animIdy = floor(float(instanceIndex) / animIdwidth);
   vec2 animIdUv = (vec2(animIdx, animIdy) + 0.5) / vec2(animIdwidth, animIdheight);
   float animationID = texture2D(animationIndex, animIdUv).x;
 
@@ -1485,8 +1484,8 @@ vec3 rotate_vertex_position(vec3 position, vec4 q) {
         shader.vertexShader = shader.vertexShader.replace(`#include <project_vertex>`, `\
 const float width = ${attributeTextures.p.image.width.toFixed(8)};
 const float height = ${attributeTextures.p.image.height.toFixed(8)};
-float x = mod(instanceIndex, width);
-float y = floor(instanceIndex / width);
+float x = mod(float(instanceIndex), width);
+float y = floor(float(instanceIndex) / width);
 vec2 pUv = (vec2(x, y) + 0.5) / vec2(width, height);
 vec3 p = texture2D(pTexture, pUv).xyz;
 vec4 q = texture2D(qTexture, pUv).xyzw;
@@ -1521,23 +1520,21 @@ gl_Position = projectionMatrix * mvPosition;
         shader.fragmentShader = shader.fragmentShader.replace(`#include <uv_pars_fragment>`, `\
 #undef USE_INSTANCING
 uniform sampler2D vanishTexture;
-varying float instanceIndex;
+flat varying int instanceIndex;
 #if ( defined( USE_UV ) && ! defined( UVS_VERTEX_ONLY ) )
   varying vec2 vUv;
 #endif
 
         `);
-
+        // vanish effect shader
         shader.fragmentShader = shader.fragmentShader.replace(`#include <clipping_planes_fragment>`, `\
-
-
-
 const float vanishWidth = ${attributeTextures.vanish.image.width.toFixed(8)};
 const float vanishHeight = ${attributeTextures.vanish.image.height.toFixed(8)};
-float vanishX = mod(instanceIndex, vanishWidth);
-float vanishY = floor(instanceIndex / vanishWidth);
+float vanishX = mod(float(instanceIndex), vanishWidth);
+float vanishY = floor(float(instanceIndex) / vanishWidth);
 vec2 vanishpUv = (vec2(vanishX, vanishY) + 0.5) / vec2(vanishWidth, vanishHeight);
 float vanish = texture2D(vanishTexture, vanishpUv).x;
+//generating hight field for vanish effect
 if(vanish > 0.){
   float v1 = 
     (sin(vUv.x*100.0) + 
@@ -1877,35 +1874,6 @@ void main() {
   }
 }
 
-/*const ragdollMeshGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-const ragdollMeshMaterial = new THREE.MeshNormalMaterial({
-  // color: 0xFF0000,
-  transparent: true,
-  depthTest: false,
-});
-
-const makeCubeMesh = (name, isTop, scale = 1) => { // todo: redundant with _makeCapsuleGeometry?
-
-  const object = new THREE.Object3D(); // === flatMeshes.Hips/Spine etc
-  object.name = name;
-  object.physicsId = getNextPhysicsId();
-
-  const physicsMesh = new THREE.Mesh(ragdollMeshGeometry, ragdollMeshMaterial);
-  object.add(physicsMesh);
-  object.physicsMesh = physicsMesh;
-
-  object.parent2 = null;
-  object.children2 = [];
-  object.add2 = function(child) {
-    object.children2.push(child);
-    child.parent2 = object;
-  };
-
-  object.isTop = isTop;
-
-  return object;
-};*/
-
 class MobsCompiledData {
   constructor({
     appUrls = [],
@@ -1951,20 +1919,6 @@ class MobsCompiledData {
   }
 }
 
-/*function makeSkeleton(node, object, bone){
-  
-  if(bone == undefined)
-    bone = makeCubeMesh(node.name)
-
-  object.add(bone);
-  for(const c of node.children){
-    const childrenBone = makeCubeMesh(c.name);
-    bone.add2(childrenBone);
-    makeSkeleton(c, object, childrenBone);
-  }
-  return {object, bone};
-}*/
-
 class MobGenerator {
   constructor({
     procGenInstance,
@@ -1974,16 +1928,8 @@ class MobGenerator {
 
     this.object = new THREE.Object3D();
     this.object.name = 'mob-chunks';
-    /*
-    //begin
-    const glb = mobData.glbs[0];
-    //this.object.add(glb.scene);
-    const rootBone2 = _findBone(glb.scene);
-    makeSkeleton(rootBone2, this.object);
-    return;
-    ragdollSpawner = new RagdollSpawner((model)=> this.object.add(model));
-    //end*/
-    this.MobController = new MobAIControllerPrototype();
+    if(debugMobActions)
+      this.MobController = new MobAIControllerPrototype();
     // make batched mesh
     const mobBatchedMesh = new MobBatchedMesh({
       procGenInstance,
@@ -2016,8 +1962,7 @@ class MobGenerator {
         geoId = Math.floor(rng() * meshes.length);
         pos = [rng()*100, 400, 200+rng()*100];
       }
-        
-      
+
       const mob = new MobInstance(
         pos,
         new Quaternion().setFromEuler(new Euler(0, rng()*Math.PI*2, 0)).toArray(),
@@ -2027,7 +1972,8 @@ class MobGenerator {
         0.1,
         3
       );
-      this.MobController.addMob(mob);
+      if(debugMobActions)
+        this.MobController.addMob(mob);
       mobs.push(mob);
     }
     return mobs;
