@@ -97,6 +97,7 @@ export class SnapshotInterpolant {
 
   update(timestamp, remoteTimeBias) {
     // debugger
+    this.testStr = '';
     this.readTime = timestamp + remoteTimeBias;
 
     let effectiveReadTime = this.readTime - this.timeDelay;
@@ -119,8 +120,16 @@ export class SnapshotInterpolant {
       // } else {
       //   console.log('in snapshots:', false)
       // }
+      if (effectiveReadTime > maxEndTime) {
+        this.testStr += 'snapshots: bigger';
+      } else if (effectiveReadTime < minEndTime) {
+        this.testStr += 'snapshots: lower';
+      } else {
+        this.testStr += 'snapshots: inner';
+      }
       effectiveReadTime = THREE.MathUtils.clamp(effectiveReadTime, minEndTime, maxEndTime);
       this.seekTo(effectiveReadTime);
+      console.log(this.testStr)
     }
   }
 
@@ -134,6 +143,7 @@ export class SnapshotInterpolant {
         if (t >= startTime) {
           const duration = snapshot.endTime - startTime;
           const f = (duration > 0 && duration < Infinity) ? ((t - startTime) / duration) : 0;
+          // this.testStr += ' ' + f.toFixed(2)
           const {startValue} = prevSnapshot;
           // const nextSnapshot = this.snapshots[mod(index + 1, this.numFrames)];
           const {startValue: endValue} = snapshot;

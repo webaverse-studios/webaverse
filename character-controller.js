@@ -1407,7 +1407,7 @@ class RemotePlayer extends InterpolatedPlayer {
     this.remoteTimeBias = 0;
     this.needSyncRemoteTimestamp = true;
     this.syncRemoteTimestampInterval = setInterval(() => {
-      console.log('sync remote timestamp')
+      // console.log('sync remote timestamp')
       this.needSyncRemoteTimestamp = true;;
     }, 10000);
 
