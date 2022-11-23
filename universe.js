@@ -74,7 +74,7 @@ class Universe extends EventTarget {
         if (src === undefined) {
           const sceneNames = await sceneManager.getSceneNamesAsync();
           const sceneUrl = sceneManager.getSceneUrl(sceneNames[0]);
-          worldSpec = { src: sceneUrl };
+          worldSpec = {src: sceneUrl};
           promises.push(metaversefile.createAppAsync({
             start_url: sceneUrl,
           }));
@@ -380,13 +380,7 @@ class Universe extends EventTarget {
       this.multiplayerConnected = true;
     };
 
-    const initialPosition = [
-      localPlayer.position.x,
-      localPlayer.position.y,
-      localPlayer.position.z,
-    ];
-
-    this.realms.updatePosition(initialPosition, realmSize, {
+    this.realms.updatePosition(localPlayer.position.toArray(), realmSize, {
       onConnect,
     });
   }

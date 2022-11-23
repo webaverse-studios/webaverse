@@ -1118,7 +1118,7 @@ export default () => {
       return null;
     }
   },
-  getRemotePlayerByPlayerId(playerId) { // todo: don't add this, use existing functions ?
+  getRemotePlayerByPlayerId(playerId) {
     for (const pair of playersManager.getRemotePlayers()) {
       if (pair[0] === playerId) {
         return pair[1];
