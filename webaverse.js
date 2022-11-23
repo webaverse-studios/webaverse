@@ -412,6 +412,7 @@ const _startHacks = webaverse => {
   globalThis.needSyncRemoteTimestamp = true;;
 
   setInterval(() => {
+    console.log('sync remote timestamp')
     globalThis.needSyncRemoteTimestamp = true;;
   }, 10000);
 
