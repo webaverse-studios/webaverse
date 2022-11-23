@@ -537,7 +537,8 @@ const _gameUpdate = (timestamp, timeDiff) => {
 
       if (transformCalc.changed) {
         // universe.realms.updatePosition(transformCalc.transform.slice(0, 3), realmSize); // don't need ?
-        universe.realms.localPlayer.setKeyValue('transform', transformCalc.transform);
+        const transformAndTimestamp = [...transformCalc.transform, performance.now()]; // todo: performance
+        universe.realms.localPlayer.setKeyValue('transform', transformAndTimestamp);
         lastTransform = transformCalc.transform;
       }
       

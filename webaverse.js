@@ -302,7 +302,7 @@ export default class Webaverse extends EventTarget {
     const animate = (timestamp, frame) => {
       // console.log('---animate')
       globalThis.isNewFrame = true;
-      
+
       performanceTracker.startFrame();
 
       // if (globalThis.localPlayer?.avatar && globalThis.remotePlayer?.avatar) {
@@ -405,6 +405,8 @@ const _startHacks = webaverse => {
   globalThis.universe = universe;
   globalThis.playersManager = playersManager;
   // globalThis.npcManager = npcManager;
+
+  globalThis.remoteTimeBias = 0;
 
   // press R to debug current state in console
   window.addEventListener('keydown', event => {

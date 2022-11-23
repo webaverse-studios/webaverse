@@ -95,9 +95,9 @@ export class SnapshotInterpolant {
     this.value = constructor();
   }
 
-  update(timeDiff) {
+  update(timestamp) {
     debugger
-    this.readTime += timeDiff;
+    this.readTime = timestamp + globalThis.remoteTimeBias;
 
     let effectiveReadTime = this.readTime - this.timeDelay;
     
@@ -140,16 +140,16 @@ export class SnapshotInterpolant {
     console.warn('could not seek to time', t, JSON.parse(JSON.stringify(this.snapshots)));
   }
 
-  snapshot(timeDiff) {
+  snapshot(remoteTimestamp) {
     const value = this.fn();
     // console.log('got value', value.join(','), timeDiff);
     const writeSnapshot = this.snapshots[this.snapshotWriteIndex];
     
-    const lastWriteSnapshot = this.snapshots[mod(this.snapshotWriteIndex - 1, this.numFrames)];
-    const startTime = lastWriteSnapshot.endTime;
+    // const lastWriteSnapshot = this.snapshots[mod(this.snapshotWriteIndex - 1, this.numFrames)];
+    // const startTime = lastWriteSnapshot.endTime;
     
     writeSnapshot.startValue = this.readFn(writeSnapshot.startValue, value);
-    writeSnapshot.endTime = startTime + timeDiff;
+    writeSnapshot.endTime = remoteTimestamp; // todo: sync to local timestamp directly ?
     
     this.snapshotWriteIndex = mod(this.snapshotWriteIndex + 1, this.numFrames);
   }
