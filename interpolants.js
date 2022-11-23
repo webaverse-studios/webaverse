@@ -96,7 +96,7 @@ export class SnapshotInterpolant {
   }
 
   update(timestamp) {
-    debugger
+    // debugger
     this.readTime = timestamp + globalThis.remoteTimeBias;
 
     let effectiveReadTime = this.readTime - this.timeDelay;

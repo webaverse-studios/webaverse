@@ -1506,10 +1506,10 @@ class RemotePlayer extends InterpolatedPlayer {
         this.positionInterpolant.snapshot(remoteTimestamp); // todo: sync to local timestamp directly ?
         // this.quaternionInterpolant.snapshot(remoteTimestamp);
         // console.log(now, remoteTimestamp, remoteTimestamp - now);
-        window.domInfo.innerHTML = '';
-        globalThis.domInfo.innerHTML += `<div style="display:;">local__timestamp: --- ${now}</div>`;
-        globalThis.domInfo.innerHTML += `<div style="display:;">remote_timestamp: --- ${remoteTimestamp}</div>`;
-        globalThis.domInfo.innerHTML += `<div style="display:;">________timediff: --- ${remoteTimestamp - now}</div>`;
+        // window.domInfo.innerHTML = '';
+        // globalThis.domInfo.innerHTML += `<div style="display:;">local__timestamp: --- ${now}</div>`;
+        // globalThis.domInfo.innerHTML += `<div style="display:;">remote_timestamp: --- ${remoteTimestamp}</div>`;
+        // globalThis.domInfo.innerHTML += `<div style="display:;">________timediff: --- ${remoteTimestamp - now}</div>`;
 
         // if (!globalThis.isNewFrame) debugger
 
