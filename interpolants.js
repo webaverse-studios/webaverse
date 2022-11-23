@@ -95,9 +95,10 @@ export class SnapshotInterpolant {
     this.value = constructor();
   }
 
-  update(timestamp) {
+  update(timestamp, remoteTimeBias) {
     // debugger
-    this.readTime = timestamp + globalThis.remoteTimeBias;
+    this.testStr = '';
+    this.readTime = timestamp + remoteTimeBias;
 
     let effectiveReadTime = this.readTime - this.timeDelay;
     
@@ -114,13 +115,21 @@ export class SnapshotInterpolant {
     }
 
     if (maxEndTime > 0) { // if we had at least one snapshot
-      if (effectiveReadTime > minEndTime && effectiveReadTime < maxEndTime) {
-        console.log('in snapshots:', true)
-      } else {
-        console.log('in snapshots:', false)
-      }
+      // if (effectiveReadTime > minEndTime && effectiveReadTime < maxEndTime) {
+      //   console.log('in snapshots:', true)
+      // } else {
+      //   console.log('in snapshots:', false)
+      // }
+      // if (effectiveReadTime > maxEndTime) {
+      //   this.testStr += 'snapshots: bigger';
+      // } else if (effectiveReadTime < minEndTime) {
+      //   this.testStr += 'snapshots: lower';
+      // } else {
+      //   this.testStr += 'snapshots: inner';
+      // }
       effectiveReadTime = THREE.MathUtils.clamp(effectiveReadTime, minEndTime, maxEndTime);
       this.seekTo(effectiveReadTime);
+      // console.log(this.testStr)
     }
   }
 
@@ -134,6 +143,7 @@ export class SnapshotInterpolant {
         if (t >= startTime) {
           const duration = snapshot.endTime - startTime;
           const f = (duration > 0 && duration < Infinity) ? ((t - startTime) / duration) : 0;
+          // this.testStr += ' ' + f.toFixed(2)
           const {startValue} = prevSnapshot;
           // const nextSnapshot = this.snapshots[mod(index + 1, this.numFrames)];
           const {startValue: endValue} = snapshot;

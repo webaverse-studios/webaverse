@@ -408,13 +408,6 @@ const _startHacks = webaverse => {
   globalThis.playersManager = playersManager;
   // globalThis.npcManager = npcManager;
 
-  globalThis.remoteTimeBias = 0;
-  globalThis.needSyncRemoteTimestamp = true;;
-
-  setInterval(() => {
-    globalThis.needSyncRemoteTimestamp = true;;
-  }, 10000);
-
   // press R to debug current state in console
   window.addEventListener('keydown', event => {
     if (event.key === '}') {
