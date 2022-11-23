@@ -96,8 +96,6 @@ export class SnapshotInterpolant {
   }
 
   update(timestamp, remoteTimeBias) {
-    // debugger
-    this.testStr = '';
     this.readTime = timestamp + remoteTimeBias;
 
     let effectiveReadTime = this.readTime - this.timeDelay;
@@ -115,21 +113,8 @@ export class SnapshotInterpolant {
     }
 
     if (maxEndTime > 0) { // if we had at least one snapshot
-      // if (effectiveReadTime > minEndTime && effectiveReadTime < maxEndTime) {
-      //   console.log('in snapshots:', true)
-      // } else {
-      //   console.log('in snapshots:', false)
-      // }
-      // if (effectiveReadTime > maxEndTime) {
-      //   this.testStr += 'snapshots: bigger';
-      // } else if (effectiveReadTime < minEndTime) {
-      //   this.testStr += 'snapshots: lower';
-      // } else {
-      //   this.testStr += 'snapshots: inner';
-      // }
       effectiveReadTime = THREE.MathUtils.clamp(effectiveReadTime, minEndTime, maxEndTime);
       this.seekTo(effectiveReadTime);
-      // console.log(this.testStr)
     }
   }
 
@@ -143,9 +128,7 @@ export class SnapshotInterpolant {
         if (t >= startTime) {
           const duration = snapshot.endTime - startTime;
           const f = (duration > 0 && duration < Infinity) ? ((t - startTime) / duration) : 0;
-          // this.testStr += ' ' + f.toFixed(2)
           const {startValue} = prevSnapshot;
-          // const nextSnapshot = this.snapshots[mod(index + 1, this.numFrames)];
           const {startValue: endValue} = snapshot;
           this.value = this.seekFn(this.value, startValue, endValue, f);
           return;
@@ -160,11 +143,8 @@ export class SnapshotInterpolant {
     // console.log('got value', value.join(','), timeDiff);
     const writeSnapshot = this.snapshots[this.snapshotWriteIndex];
     
-    // const lastWriteSnapshot = this.snapshots[mod(this.snapshotWriteIndex - 1, this.numFrames)];
-    // const startTime = lastWriteSnapshot.endTime;
-    
     writeSnapshot.startValue = this.readFn(writeSnapshot.startValue, value);
-    writeSnapshot.endTime = remoteTimestamp; // todo: sync to local timestamp directly ?
+    writeSnapshot.endTime = remoteTimestamp;
     
     this.snapshotWriteIndex = mod(this.snapshotWriteIndex + 1, this.numFrames);
   }

@@ -536,8 +536,8 @@ const _gameUpdate = (timestamp, timeDiff) => {
       }, { transform: [], changed: false });
 
       if (transformCalc.changed) {
-        // universe.realms.updatePosition(transformCalc.transform.slice(0, 3), realmSize); // don't need ?
-        const transformAndTimestamp = [...transformCalc.transform, performance.now() - 10000]; // todo: performance //  - 10000 for testing ( force local vs remote timestamp different)
+        universe.realms.updatePosition(transformCalc.transform.slice(0, 3), realmSize);
+        const transformAndTimestamp = [...transformCalc.transform, performance.now()];
         universe.realms.localPlayer.setKeyValue('transform', transformAndTimestamp);
         lastTransform = transformCalc.transform;
       }
