@@ -908,7 +908,7 @@ export class MobInstance {
   }
 
   targetManagement(){
-    if(this.life <= 0)
+    if(this.life <= 0 || !this.target)
       return;
     if(!this.target && this.askForTarget){
       this.target = this.askForTarget();
@@ -920,6 +920,7 @@ export class MobInstance {
       this.target = undefined;
       return;
     }
+
     this.animatedLookAt(this.target.position);
     const targetVector = this.target.position.clone().sub(this.position);
     if(targetVector.length() < this.aggroDistance){
