@@ -1061,7 +1061,7 @@ class InterpolatedPlayer extends AvatarCharacter {
     this.avatar.update(timestamp, timeDiff);
   } */
   updateInterpolation(timestamp) {
-    this.positionInterpolant.update(timestamp);
+    this.positionInterpolant.update(timestamp, this.remoteTimeBias);
     // this.quaternionInterpolant.update(timestamp);
     // for (const actionBinaryInterpolant of this.actionBinaryInterpolantsArray) {
     //   actionBinaryInterpolant.update(timeDiff);
@@ -1404,6 +1404,12 @@ class RemotePlayer extends InterpolatedPlayer {
     this.isRemotePlayer = true;
     this.lastPosition = new THREE.Vector3();
     this.controlMode = 'remote';
+    this.remoteTimeBias = 0;
+    this.needSyncRemoteTimestamp = true;
+    this.syncRemoteTimestampInterval = setInterval(() => {
+      console.log('sync remote timestamp')
+      this.needSyncRemoteTimestamp = true;;
+    }, 10000);
 
     if (!globalThis.remotePlayers) {
       globalThis.remotePlayers = [];
@@ -1498,9 +1504,9 @@ class RemotePlayer extends InterpolatedPlayer {
         const remoteTimestamp = transform[7];
 
         const now = performance.now(); // todo: use input local timestamp
-        if (globalThis.needSyncRemoteTimestamp) {
-          globalThis.remoteTimeBias = remoteTimestamp - now;
-          globalThis.needSyncRemoteTimestamp = false;
+        if (this.needSyncRemoteTimestamp) {
+          this.needSyncRemoteTimestamp = false;
+          this.remoteTimeBias = remoteTimestamp - now;
         }
 
         this.positionInterpolant.snapshot(remoteTimestamp); // todo: sync to local timestamp directly ?
