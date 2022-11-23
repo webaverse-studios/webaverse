@@ -120,16 +120,16 @@ export class SnapshotInterpolant {
       // } else {
       //   console.log('in snapshots:', false)
       // }
-      if (effectiveReadTime > maxEndTime) {
-        this.testStr += 'snapshots: bigger';
-      } else if (effectiveReadTime < minEndTime) {
-        this.testStr += 'snapshots: lower';
-      } else {
-        this.testStr += 'snapshots: inner';
-      }
+      // if (effectiveReadTime > maxEndTime) {
+      //   this.testStr += 'snapshots: bigger';
+      // } else if (effectiveReadTime < minEndTime) {
+      //   this.testStr += 'snapshots: lower';
+      // } else {
+      //   this.testStr += 'snapshots: inner';
+      // }
       effectiveReadTime = THREE.MathUtils.clamp(effectiveReadTime, minEndTime, maxEndTime);
       this.seekTo(effectiveReadTime);
-      console.log(this.testStr)
+      // console.log(this.testStr)
     }
   }
 
