@@ -1059,9 +1059,9 @@ class InterpolatedPlayer extends AvatarCharacter {
 
     this.avatar.update(timestamp, timeDiff);
   } */
-  updateInterpolation(timeDiff) {
-    this.positionInterpolant.update(timeDiff);
-    this.quaternionInterpolant.update(timeDiff);
+  updateInterpolation(timestamp) {
+    this.positionInterpolant.update(timestamp);
+    this.quaternionInterpolant.update(timestamp);
     // for (const actionBinaryInterpolant of this.actionBinaryInterpolantsArray) {
     //   actionBinaryInterpolant.update(timeDiff);
     // }
@@ -1402,6 +1402,12 @@ class RemotePlayer extends InterpolatedPlayer {
     this.isRemotePlayer = true;
     this.lastPosition = new THREE.Vector3();
     this.controlMode = 'remote';
+
+    if (!globalThis.remotePlayers) {
+      globalThis.remotePlayers = [];
+      globalThis.remotePlayer = this;
+    }
+    globalThis.remotePlayers.push(this);
   }
 
     // The audio worker handles hups and incoming voices
@@ -1487,9 +1493,16 @@ class RemotePlayer extends InterpolatedPlayer {
 
         this.position.fromArray(transform);
         this.quaternion.fromArray(transform, 3);
+        const remoteTimestamp = transform[7];
 
-        this.positionInterpolant.snapshot(timeDiff);
-        this.quaternionInterpolant.snapshot(timeDiff);
+        const now = performance.now(); // todo: use input local timestamp
+        // todo: if (needSync) globalThis.remoteTimeBias = remoteTimestamp - now;
+
+        this.positionInterpolant.snapshot(remoteTimestamp); // todo: sync to local timestamp directly ?
+        this.quaternionInterpolant.snapshot(remoteTimestamp);
+        console.log(now, remoteTimestamp, remoteTimestamp - now);
+
+        // if (!globalThis.isNewFrame) debugger
 
         // for (const actionBinaryInterpolant of this.actionBinaryInterpolantsArray) {
         //   actionBinaryInterpolant.snapshot(timeDiff);
@@ -1527,7 +1540,7 @@ class RemotePlayer extends InterpolatedPlayer {
   update(timestamp, timeDiff) {
     if(!this.avatar) return // console.log("no avatar"); // avatar takes time to load, ignore until it does
 
-    this.updateInterpolation(timeDiff);
+    this.updateInterpolation(timestamp);
     physx.physxWorker.updateInterpolationAnimationAvatar(this.avatar.animationAvatarPtr, timeDiff);
 
     const mirrors = metaversefile.getMirrors();
