@@ -393,9 +393,7 @@ class Universe extends EventTarget {
 
   // Called by enterWorld() to ensure we aren't connected to multi-player.
   disconnectMultiplayer() {
-    console.log('Multiplayer disconnected');
     this.multiplayerConnected = false;
-
     if (this.realms) {
       this.realms.disconnect();
       this.realms = null;
