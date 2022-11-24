@@ -1464,7 +1464,6 @@ class RemotePlayer extends InterpolatedPlayer {
     } else {
       throw new Error('binding to nonexistent player object', this.playersArray.toJSON());
     }
-    let lastTimestamp = performance.now();
     // let lastPosition = new THREE.Vector3();
     const observePlayerFn = (e) => {
       if (e.changes.keys.has('avatar')) {
@@ -1487,17 +1486,14 @@ class RemotePlayer extends InterpolatedPlayer {
       if (e.changes.keys.has('transform')) {
         const transform = e.changes.keys.get('transform').value;
         const timestamp = performance.now();
-        const timeDiff = timestamp - lastTimestamp;
-        lastTimestamp = timestamp;
 
         this.position.fromArray(transform);
         this.quaternion.fromArray(transform, 3);
         const remoteTimestamp = transform[7];
 
-        const now = performance.now();
         if (this.needSyncRemoteTimestamp) {
           this.needSyncRemoteTimestamp = false;
-          this.remoteTimeBias = remoteTimestamp - now;
+          this.remoteTimeBias = remoteTimestamp - timestamp;
         }
 
         this.positionInterpolant.snapshot(remoteTimestamp);
