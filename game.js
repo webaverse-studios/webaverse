@@ -536,7 +536,7 @@ const _gameUpdate = (timestamp, timeDiff) => {
       }, { transform: [], changed: false });
 
       if (transformCalc.changed) {
-        // universe.realms.updatePosition(transformCalc.transform.slice(0, 3), realmSize); // Not sure what this line of code doing. But from testing, it'll cause position jitter in slow network, and multiplayer works well without this line.
+        universe.realms.updatePosition(transformCalc.transform.slice(0, 3), realmSize);
         const transformAndTimestamp = [...transformCalc.transform, performance.now()];
         universe.realms.localPlayer.setKeyValue('transform', transformAndTimestamp);
         lastTransform = transformCalc.transform;
