@@ -18,7 +18,7 @@ import {StoryTime} from './StoryTime';
 
 import styles from './Header.module.css';
 import {UIMode} from './components/general/ui-mode/index.jsx';
-import { UserBox } from './components/general/user-box';
+import {UserBox} from './components/general/user-box';
 
 //
 
