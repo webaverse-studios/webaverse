@@ -19,6 +19,7 @@ import {StoryTime} from './StoryTime';
 import styles from './Header.module.css';
 import {UIMode} from './components/general/ui-mode/index.jsx';
 import { UserBox } from './components/general/user-box';
+import {Inventory} from './components/general/inventory/index.jsx';
 
 //
 
@@ -286,6 +287,7 @@ export default function Header() {
                         
                     />
                     <Equipment />
+                    <Inventory />
                     {/* <Claims
                         open={ claimsOpen }
                         toggleOpen={ toggleClaimsOpen }
