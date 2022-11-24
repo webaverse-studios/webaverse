@@ -33,6 +33,7 @@ class Universe extends EventTarget {
     this.multiplayerConnected = false;
     this.realms = null;
     this.actionsPrefix = 'actions.';
+    this.actionsCleanupFns = [];
   }
 
   getWorldsHost() {
@@ -187,14 +188,6 @@ class Universe extends EventTarget {
 
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.bindState(state.getArray(playersMapName));
-  }
-
-  onActionAddMultiplayer(e, origin) {
-    universe.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, e.action);
-  }
-
-  onActionRemoveMultiplayer(e, origin) {
-    universe.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, null);
   }
 
   // Called by enterWorld() when a player enables multi-player.
@@ -368,8 +361,20 @@ class Universe extends EventTarget {
 
       // Player actions.
       const localPlayer = playersManager.getLocalPlayer();
-      localPlayer.addEventListener('actionadd', this.onActionAddMultiplayer);
-      localPlayer.addEventListener('actionremove', this.onActionRemoveMultiplayer);
+      const onActionAdd = e => {
+        universe.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, e.action);
+      };
+      localPlayer.addEventListener('actionadd', onActionAdd);
+      this.actionsCleanupFns.push(() => {
+        localPlayer.removeEventListener('actionadd', onActionAdd);
+      });
+      const onActionRemove = e => {
+        universe.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, null);
+      };
+      localPlayer.addEventListener('actionremove', onActionRemove);
+      this.actionsCleanupFns.push(() => {
+        localPlayer.removeEventListener('actionremove', onActionRemove);
+      });
 
       this.realms.localPlayer.initializePlayer({
         position,
@@ -393,11 +398,10 @@ class Universe extends EventTarget {
   disconnectMultiplayer() {
     this.multiplayerConnected = false;
 
-    const localPlayer = playersManager.getLocalPlayer();
-    if (localPlayer) {
-      localPlayer.removeEventListener('actionadd', this.onActionAddMultiplayer);
-      localPlayer.removeEventListener('actionremove', this.onActionRemoveMultiplayer);
+    for (const cleanupFn of this.actionsCleanupFns) {
+      cleanupFn();
     }
+    this.actionsCleanupFns = [];
 
     if (this.realms) {
       this.realms.disconnect();
