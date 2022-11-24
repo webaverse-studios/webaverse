@@ -183,8 +183,7 @@ export const UserBox = ({className, setLoginFrom}) => {
   //
 
   const handleSettingsBtnClick = () => {
-    console.info("setting btn click")
-    setState({openedModal: 'settings', openedPanel: 'SettingsPanel'});
+    setState({openedModal: 'settings'});
   };
 
   const handleLocationBtnClick = () => {
@@ -198,7 +197,8 @@ export const UserBox = ({className, setLoginFrom}) => {
       }
 
       setState({openedPanel: null});
-    } else if (state.openedPanel !== 'SettingsPanel') {
+      
+    } else {
       if (cameraManager.pointerLockElement) {
         cameraManager.exitPointerLock();
       }

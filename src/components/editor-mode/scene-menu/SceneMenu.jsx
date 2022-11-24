@@ -263,10 +263,21 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
     }, []);
 
     //
+    const sceneName = selectedScene.replace('.scn', '').replace('./scenes/', '');
 
     return (
         <div className={ classnames(className, styles.location) } onClick={ stopPropagation } >
-            <div className={ styles.row }>
+            <div className={styles.leftCorner} />
+            <div className={styles.rightCorner} />
+            <div className={styles.row}>
+                <div className={styles.roomName}>
+                    {sceneName}
+                    {selectedRoom && ` / ${selectedRoom}`}
+                </div>
+                <div className={styles.title}>Your Location</div>
+            </div>
+
+            {/* <div className={ styles.row }>
                 <div className={ styles.buttonWrap } onClick={ handleSceneMenuOpen.bind(null, null) } >
                     <button className={ classnames(styles.button, styles.primary, state.openedPanel === 'SceneMenuPanel' ? null : styles.disabled) } >
                         <img src="images/webarrow.svg" />
@@ -292,7 +303,7 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
                         <img src="images/speak.svg" />
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             {
                 state.openedPanel === 'SceneMenuPanel' ? (

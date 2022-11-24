@@ -250,7 +250,7 @@ export const WorldObjectsList = () => {
                 
                         setState({openedPanel: null});
 
-                    } else if (state.openedPanel !== 'SettingsPanel') {
+                    } else {
 
                         if (cameraManager.pointerLockElement) {
 

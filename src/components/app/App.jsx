@@ -40,6 +40,7 @@ import {AccountContext} from '../../hooks/web3AccountProvider';
 import {ChainContext} from '../../hooks/chainProvider';
 import loadoutManager from '../../../loadout-manager';
 import {partyManager} from '../../../party-manager';
+import Modals from '../modals';
 
 //
 
@@ -101,7 +102,8 @@ let appStarted = false;
 
 export const App = () => {
 
-    const [ state, setState ] = useState({openedPanel: null});
+    // const [ state, setState ] = useState({openedPanel: null});
+    const [ state, setState ] = useState({ openedPanel: null, openedModal: null });
     const [ uiMode, setUIMode ] = useState('normal');
 
     const canvasRef = useRef(null);
@@ -317,12 +319,13 @@ export const App = () => {
             onDragOver={onDragOver}
         >
             <AppContext.Provider value={{state, setState, app, setSelectedApp, selectedApp, uiMode, account, chain}}>
+                <Modals />
                 <Header setSelectedApp={ setSelectedApp } selectedApp={ selectedApp } />
                 <DomRenderer />
                 <canvas className={ classnames(styles.canvas, domHover ? styles.domHover : null) } ref={ canvasRef } />
                 <Crosshair />
-                <Settings />
-                <ClaimsNotification />
+                {/* <Settings />
+                <ClaimsNotification /> */}
                 <WorldObjectsList
                     setSelectedApp={ setSelectedApp }
                     selectedApp={ selectedApp }
