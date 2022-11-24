@@ -189,6 +189,14 @@ class Universe extends EventTarget {
     localPlayer.bindState(state.getArray(playersMapName));
   }
 
+  onActionAddMultiplayer(e, origin) {
+    universe.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, e.action);
+  }
+
+  onActionRemoveMultiplayer(e, origin) {
+    universe.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, null);
+  }
+
   // Called by enterWorld() when a player enables multi-player.
   async connectMultiplayer(src, state = new Z.Doc()) {
     this.connectState(state);
@@ -360,12 +368,8 @@ class Universe extends EventTarget {
 
       // Player actions.
       const localPlayer = playersManager.getLocalPlayer();
-      localPlayer.addEventListener('actionadd', (e, origin) => {
-        universe.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, e.action);
-      });
-      localPlayer.addEventListener('actionremove', (e, origin) => {
-        universe.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, null);
-      });
+      localPlayer.addEventListener('actionadd', this.onActionAddMultiplayer);
+      localPlayer.addEventListener('actionremove', this.onActionRemoveMultiplayer);
 
       this.realms.localPlayer.initializePlayer({
         position,
@@ -388,6 +392,13 @@ class Universe extends EventTarget {
   // Called by enterWorld() to ensure we aren't connected to multi-player.
   disconnectMultiplayer() {
     this.multiplayerConnected = false;
+
+    const localPlayer = playersManager.getLocalPlayer();
+    if (localPlayer) {
+      localPlayer.removeEventListener('actionadd', this.onActionAddMultiplayer);
+      localPlayer.removeEventListener('actionremove', this.onActionRemoveMultiplayer);
+    }
+
     if (this.realms) {
       this.realms.disconnect();
       this.realms = null;
