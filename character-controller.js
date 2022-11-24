@@ -1060,7 +1060,7 @@ class InterpolatedPlayer extends AvatarCharacter {
     this.avatar.update(timestamp, timeDiff);
   } */
   updateInterpolation(timestamp) {
-    this.positionInterpolant.update(timestamp, this.remoteTimeBias);
+    this.positionInterpolant.update(timestamp, this.remoteTimeBias, true);
     this.quaternionInterpolant.update(timestamp, this.remoteTimeBias);
     // for (const actionBinaryInterpolant of this.actionBinaryInterpolantsArray) {
     //   actionBinaryInterpolant.update(timeDiff);
