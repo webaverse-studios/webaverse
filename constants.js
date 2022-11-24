@@ -121,7 +121,7 @@ export const flatGroundJumpAirTime = 666;
 
 export const avatarInterpolationFrameRate = 60;
 export const avatarInterpolationTimeDelay = 1000/(avatarInterpolationFrameRate * 0.5); // 33.333333333333336
-export const avatarInterpolationNumFrames = 100; // 4
+export const avatarInterpolationNumFrames = 15; // For chrome "Network throttling: Slow 3G", old value `4` is too less to hit snapshots cache. `10` can hit most. `15` can hit almot all and safe for worse real network connections.
 
 export const eatFrameIndices = [500, 800, 1100];
 export const drinkFrameIndices = [400, 700, 1000];

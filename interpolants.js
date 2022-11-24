@@ -95,7 +95,7 @@ export class SnapshotInterpolant {
     this.value = constructor();
   }
 
-  update(timestamp, remoteTimeBias) {
+  update(timestamp, remoteTimeBias, isDebug) {
     // debugger
     this.testStr = '';
     this.readTime = timestamp + remoteTimeBias;
@@ -115,21 +115,23 @@ export class SnapshotInterpolant {
     }
 
     if (maxEndTime > 0) { // if we had at least one snapshot
-      // if (effectiveReadTime > minEndTime && effectiveReadTime < maxEndTime) {
-      //   console.log('in snapshots:', true)
-      // } else {
-      //   console.log('in snapshots:', false)
-      // }
-      // if (effectiveReadTime > maxEndTime) {
-      //   this.testStr += 'snapshots: bigger';
-      // } else if (effectiveReadTime < minEndTime) {
-      //   this.testStr += 'snapshots: lower';
-      // } else {
-      //   this.testStr += 'snapshots: inner';
-      // }
+      if (isDebug) {
+        if (effectiveReadTime > minEndTime && effectiveReadTime < maxEndTime) {
+          console.log('in snapshots:', true)
+        } else {
+          console.log('in snapshots:', false)
+        }
+        // if (effectiveReadTime > maxEndTime) {
+        //   this.testStr += 'snapshots: bigger';
+        // } else if (effectiveReadTime < minEndTime) {
+        //   this.testStr += 'snapshots: lower';
+        // } else {
+        //   this.testStr += 'snapshots: inner';
+        // }
+      }
       effectiveReadTime = THREE.MathUtils.clamp(effectiveReadTime, minEndTime, maxEndTime);
       this.seekTo(effectiveReadTime);
-      // console.log(this.testStr)
+      // if (isDebug) console.log(this.testStr)
     }
   }
 
