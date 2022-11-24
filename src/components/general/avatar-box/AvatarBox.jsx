@@ -1,14 +1,14 @@
-import React, { useEffect, useRef, useContext, useState } from "react";
+import React, {useEffect, useRef, useContext, useState} from "react";
 import classnames from "classnames";
 
-import { AppContext } from "../../app";
-import { world } from "../../../../world.js";
-import { hp, mp, xp, level } from "../../../../player-stats.js";
+import {AppContext} from "../../app";
+import {world} from "../../../../world.js";
+import {hp, mp, xp, level} from "../../../../player-stats.js";
 
 import styles from "./AvatarBox.module.css";
-import { PlaceholderImg } from "../../../PlaceholderImg.jsx";
-import { playersManager } from "../../../../players-manager.js";
-import { AvatarIconer } from "../../../../avatar-iconer.js";
+import {PlaceholderImg} from "../../../PlaceholderImg.jsx";
+import {playersManager} from "../../../../players-manager.js";
+import {AvatarIconer} from "../../../../avatar-iconer.js";
 import cameraManager from "../../../../camera-manager.js";
 import * as sounds from "../../../../sounds.js";
 
@@ -106,21 +106,21 @@ const CharacterBox = () => {
                         <div className={classnames(styles.stat, styles.hp)}>
                             <img className={styles.icon} src={'assets/icons/health.svg'} />
                             <div className={styles.progressBar}>
-                                <div style={{ width: `${userData?.hp}%` }} />
+                                <div style={{width: `${userData?.hp}%`}} />
                             </div>
                             <div className={styles.value}>{hp}</div>
                         </div>
                         <div className={classnames(styles.stat, styles.mp)}>
                             <img className={styles.icon} src={'assets/icons/mana.svg'} />
                             <div className={styles.progressBar}>
-                                <div style={{ width: `${userData?.mp}%` }} />
+                                <div style={{width: `${userData?.mp}%`}} />
                             </div>
                             <div className={styles.value}>{mp}</div>
                         </div>
                         <div className={classnames(styles.stat, styles.xp)}>
                             <img className={styles.icon} src={'assets/icons/exp.svg'} />
                             <div className={styles.progressBar}>
-                                <div style={{ width: `${userData?.xp}%` }} />
+                                <div style={{width: `${userData?.xp}%`}} />
                             </div>
                             <div className={styles.value}>{xp}</div>
                         </div>
@@ -129,7 +129,7 @@ const CharacterBox = () => {
                         <img className={styles.icon} src={'assets/icons/limit.svg'} />
                         <div className={classnames(styles.background)} />
                         <div className={styles.progressBar}>
-                            <div style={{ width: `${userData?.limit}%` }} />
+                            <div style={{width: `${userData?.limit}%`}} />
                                 {/* <div />
                             </div> */}
                         </div>
@@ -141,8 +141,8 @@ const CharacterBox = () => {
     );
 };
 
-export const AvatarBox = ({ className }) => {
-    const { state, setState } = useContext(AppContext);
+export const AvatarBox = ({className}) => {
+    const {state, setState} = useContext(AppContext);
 
     const handleCharacterBtnClick = () => {
         setState({
