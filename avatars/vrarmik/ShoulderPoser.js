@@ -150,47 +150,47 @@ class ShoulderPoser {
     Helpers.updateMatrixWorld(this.shoulder.upperChest);
     Helpers.updateMatrixWorld(this.shoulder.leftShoulderAnchor);
     Helpers.updateMatrixWorld(this.shoulder.rightShoulderAnchor);
-    return;
 
-    const hmdRotation = localQuaternion.copy(this.vrTransforms.head.quaternion)
-      .multiply(z180Quaternion);
-    /* const hmdXYRotation = localQuaternion2.setFromRotationMatrix(localMatrix.lookAt(
-    	new THREE.Vector3(),
-    	new THREE.Vector3(0, 0, -1).applyQuaternion(hmdRotation),
-    	new THREE.Vector3(0, 1, 0).applyQuaternion(hmdRotation)
-    )); */
-    const hmdEuler = localEuler.setFromQuaternion(hmdRotation, 'YXZ');
-    hmdEuler.x = 0;
-    hmdEuler.z = 0;
-    const hmdXYRotation = localQuaternion2.setFromEuler(hmdEuler);
-    hmdXYRotation.multiply(localQuaternion3.setFromAxisAngle(rightVector, this.shoulder.proneFactor * Math.PI / 2));
-    /* if (!this.rig.legsManager.leftLeg.standing && !this.rig.legsManager.rightLeg.standing) {
-      const jumpFactor = 1 - Math.min(this.rig.legsManager.leftLeg.standFactor, this.rig.legsManager.rightLeg.standFactor);
-      hmdXYRotation.multiply(localQuaternion3.setFromAxisAngle(rightVector, jumpFactor * Math.PI / 4));
-    } else {
-      const standFactor = Math.min(this.rig.legsManager.leftLeg.standFactor, this.rig.legsManager.rightLeg.standFactor);
-      hmdXYRotation.multiply(localQuaternion3.setFromAxisAngle(rightVector, (1 - standFactor) * Math.PI / 4));
-    } */
+    // commented out but might be needed for VR
+    // const hmdRotation = localQuaternion.copy(this.vrTransforms.head.quaternion)
+    //   .multiply(z180Quaternion);
+    // /* const hmdXYRotation = localQuaternion2.setFromRotationMatrix(localMatrix.lookAt(
+    // 	new THREE.Vector3(),
+    // 	new THREE.Vector3(0, 0, -1).applyQuaternion(hmdRotation),
+    // 	new THREE.Vector3(0, 1, 0).applyQuaternion(hmdRotation)
+    // )); */
+    // const hmdEuler = localEuler.setFromQuaternion(hmdRotation, 'YXZ');
+    // hmdEuler.x = 0;
+    // hmdEuler.z = 0;
+    // const hmdXYRotation = localQuaternion2.setFromEuler(hmdEuler);
+    // hmdXYRotation.multiply(localQuaternion3.setFromAxisAngle(rightVector, this.shoulder.proneFactor * Math.PI / 2));
+    // /* if (!this.rig.legsManager.leftLeg.standing && !this.rig.legsManager.rightLeg.standing) {
+    //   const jumpFactor = 1 - Math.min(this.rig.legsManager.leftLeg.standFactor, this.rig.legsManager.rightLeg.standFactor);
+    //   hmdXYRotation.multiply(localQuaternion3.setFromAxisAngle(rightVector, jumpFactor * Math.PI / 4));
+    // } else {
+    //   const standFactor = Math.min(this.rig.legsManager.leftLeg.standFactor, this.rig.legsManager.rightLeg.standFactor);
+    //   hmdXYRotation.multiply(localQuaternion3.setFromAxisAngle(rightVector, (1 - standFactor) * Math.PI / 4));
+    // } */
 
-    const headPosition = localVector.copy(this.vrTransforms.head.position)
-      // .sub(localVector2.copy(this.shoulder.head.position).applyQuaternion(hmdRotation));
-    const neckPosition = headPosition.sub(localVector2.copy(this.shoulder.head.position).applyQuaternion(hmdRotation));
-    const upperChestPosition = neckPosition.sub(localVector2.copy(this.shoulder.neck.position).applyQuaternion(hmdXYRotation));
-    const chestPosition = upperChestPosition.sub(localVector2.copy(this.shoulder.upperChest.position).applyQuaternion(hmdXYRotation));
-    const spinePosition = chestPosition.sub(localVector2.copy(this.shoulder.chest.position).applyQuaternion(hmdXYRotation));
-    const hipsPosition = spinePosition.sub(localVector2.copy(this.shoulder.spine.position).applyQuaternion(hmdXYRotation));
-    const rootPosition = hipsPosition.sub(localVector2.copy(this.shoulder.hips.position).applyQuaternion(hmdXYRotation));
+    // const headPosition = localVector.copy(this.vrTransforms.head.position)
+    //   // .sub(localVector2.copy(this.shoulder.head.position).applyQuaternion(hmdRotation));
+    // const neckPosition = headPosition.sub(localVector2.copy(this.shoulder.head.position).applyQuaternion(hmdRotation));
+    // const upperChestPosition = neckPosition.sub(localVector2.copy(this.shoulder.neck.position).applyQuaternion(hmdXYRotation));
+    // const chestPosition = upperChestPosition.sub(localVector2.copy(this.shoulder.upperChest.position).applyQuaternion(hmdXYRotation));
+    // const spinePosition = chestPosition.sub(localVector2.copy(this.shoulder.chest.position).applyQuaternion(hmdXYRotation));
+    // const hipsPosition = spinePosition.sub(localVector2.copy(this.shoulder.spine.position).applyQuaternion(hmdXYRotation));
+    // const rootPosition = hipsPosition.sub(localVector2.copy(this.shoulder.hips.position).applyQuaternion(hmdXYRotation));
 
-    this.shoulder.root.position.copy(rootPosition);
-    if (this.rig.legsManager.enabled) {
-	    this.shoulder.root.quaternion.copy(hmdXYRotation);
-	  }
-    Helpers.updateMatrix(this.shoulder.root);
-    this.shoulder.root.matrixWorld.copy(this.shoulder.root.matrix);
-    Helpers.updateMatrixWorld(this.shoulder.hips);
-    Helpers.updateMatrixWorld(this.shoulder.spine);
-    Helpers.updateMatrixWorld(this.shoulder.chest);
-    Helpers.updateMatrixWorld(this.shoulder.upperChest);
+    // this.shoulder.root.position.copy(rootPosition);
+    // if (this.rig.legsManager.enabled) {
+	  //   this.shoulder.root.quaternion.copy(hmdXYRotation);
+	  // }
+    // Helpers.updateMatrix(this.shoulder.root);
+    // this.shoulder.root.matrixWorld.copy(this.shoulder.root.matrix);
+    // Helpers.updateMatrixWorld(this.shoulder.hips);
+    // Helpers.updateMatrixWorld(this.shoulder.spine);
+    // Helpers.updateMatrixWorld(this.shoulder.chest);
+    // Helpers.updateMatrixWorld(this.shoulder.upperChest);
   }
 
   /* updateNeck() {

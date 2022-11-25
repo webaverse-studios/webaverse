@@ -1,10 +1,8 @@
 import * as THREE from 'three';
 import {camera} from './renderer.js';
 import {WebaverseShaderMaterial} from './materials.js';
-// import {world} from './world.js';
 import loaders from './loaders.js';
 
-// const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 const urlPrefix = `https://webaverse.github.io/fx-textures/`;
 const particlesJsonUrl = `${urlPrefix}fx-files.json`;
 
@@ -299,9 +297,11 @@ class Particle extends THREE.Object3D {
     this.loop = loop;
     this.parent = parent;
   }
+
   update() {
     this.parent.needsUpdate = true;
   }
+
   destroy() {
     this.parent.removeParticle(this);
   }
@@ -330,9 +330,11 @@ class ParticleSystem extends THREE.InstancedMesh {
     this.particles = Array(maxParticles).fill(null);
     this.count = 0;
   }
+
   #getParticleTextureIndex(name) {
     return this.textures.findIndex(t => t.name === name);
   }
+
   addParticle(name, {
     offsetTime = 0,
     duration = 1000,
@@ -358,10 +360,12 @@ class ParticleSystem extends THREE.InstancedMesh {
       throw new Error('no such particle texture found: ' + JSON.stringify(name));
     }
   }
+
   removeParticle(particle) {
     this.particles[particle.index] = null;
     this.needsUpdate = true;
   }
+
   update(timestamp, timeDiff) {
     if (this.needsUpdate) {
       this.needsUpdate = false;
@@ -373,6 +377,7 @@ class ParticleSystem extends THREE.InstancedMesh {
     this.material.uniforms.uTime.needsUpdate = true;
     this.material.uniforms.cameraBillboardQuaternion.value.copy(camera.quaternion);
   }
+
   updateGeometry() {
     let index = 0;
     for (const particle of this.particles) {
@@ -402,9 +407,11 @@ class ParticleSystem extends THREE.InstancedMesh {
     
     this.count = index;
   }
+
   waitForLoad() {
     return this.loadPromise;
   }
+
   destroy() {
     // nothing
   }

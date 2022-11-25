@@ -19,19 +19,19 @@ const SSAOShader = {
 
 	uniforms: {
 
-		'tDiffuse': { value: null },
-		'tNormal': { value: null },
-		'tDepth': { value: null },
-		'tNoise': { value: null },
-		'kernel': { value: null },
-		'cameraNear': { value: null },
-		'cameraFar': { value: null },
-		'resolution': { value: new Vector2() },
-		'cameraProjectionMatrix': { value: new Matrix4() },
-		'cameraInverseProjectionMatrix': { value: new Matrix4() },
-		'kernelRadius': { value: 8 },
-		'minDistance': { value: 0.005 },
-		'maxDistance': { value: 0.05 },
+		'tDiffuse': {value: null},
+		'tNormal': {value: null},
+		'tDepth': {value: null},
+		'tNoise': {value: null},
+		'kernel': {value: null},
+		'cameraNear': {value: null},
+		'cameraFar': {value: null},
+		'resolution': {value: new Vector2()},
+		'cameraProjectionMatrix': {value: new Matrix4()},
+		'cameraInverseProjectionMatrix': {value: new Matrix4()},
+		'kernelRadius': {value: 8},
+		'minDistance': {value: 0.005},
+		'maxDistance': {value: 0.05},
 
 	},
 
@@ -182,9 +182,9 @@ const SSAODepthShader = {
 
 	uniforms: {
 
-		'tDepth': { value: null },
-		'cameraNear': { value: null },
-		'cameraFar': { value: null },
+		'tDepth': {value: null},
+		'cameraNear': {value: null},
+		'cameraFar': {value: null},
 
 	},
 
@@ -243,8 +243,8 @@ const SSAOBlurShader = {
 
 	uniforms: {
 
-		'tDiffuse': { value: null },
-		'resolution': { value: new Vector2() }
+		'tDiffuse': {value: null},
+		'resolution': {value: new Vector2()}
 
 	},
 
@@ -289,4 +289,4 @@ const SSAOBlurShader = {
 
 };
 
-export { SSAOShader, SSAODepthShader, SSAOBlurShader };
+export {SSAOShader, SSAODepthShader, SSAOBlurShader};

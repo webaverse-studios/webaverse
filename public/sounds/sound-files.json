@@ -775,67 +775,67 @@
     "duration": 0.3425
   },
   {
-    "name": "doubleJump/double jump_doublejump1.wav",
+    "name": "doubleJump/doublejump1.wav",
     "offset": 120.70114583333334,
     "duration": 0.53
   },
   {
-    "name": "doubleJump/double jump_doublejump10.wav",
+    "name": "doubleJump/doublejump10.wav",
     "offset": 121.23114583333334,
     "duration": 0.53
   },
   {
-    "name": "doubleJump/double jump_doublejump11.wav",
+    "name": "doubleJump/doublejump11.wav",
     "offset": 121.76114583333334,
     "duration": 0.53
   },
   {
-    "name": "doubleJump/double jump_doublejump12.wav",
+    "name": "doubleJump/doublejump12.wav",
     "offset": 122.29114583333335,
     "duration": 0.53
   },
   {
-    "name": "doubleJump/double jump_doublejump13.wav",
+    "name": "doubleJump/doublejump13.wav",
     "offset": 122.82114583333335,
     "duration": 0.53
   },
   {
-    "name": "doubleJump/double jump_doublejump2.wav",
+    "name": "doubleJump/doublejump2.wav",
     "offset": 123.35114583333335,
     "duration": 0.53
   },
   {
-    "name": "doubleJump/double jump_doublejump3.wav",
+    "name": "doubleJump/doublejump3.wav",
     "offset": 123.88114583333335,
     "duration": 0.53
   },
   {
-    "name": "doubleJump/double jump_doublejump4.wav",
+    "name": "doubleJump/doublejump4.wav",
     "offset": 124.41114583333335,
     "duration": 0.53
   },
   {
-    "name": "doubleJump/double jump_doublejump5.wav",
+    "name": "doubleJump/doublejump5.wav",
     "offset": 124.94114583333335,
     "duration": 0.53
   },
   {
-    "name": "doubleJump/double jump_doublejump6.wav",
+    "name": "doubleJump/doublejump6.wav",
     "offset": 125.47114583333335,
     "duration": 0.53
   },
   {
-    "name": "doubleJump/double jump_doublejump7.wav",
+    "name": "doubleJump/doublejump7.wav",
     "offset": 126.00114583333335,
     "duration": 0.53
   },
   {
-    "name": "doubleJump/double jump_doublejump8.wav",
+    "name": "doubleJump/doublejump8.wav",
     "offset": 126.53114583333335,
     "duration": 0.53
   },
   {
-    "name": "doubleJump/double jump_doublejump9.wav",
+    "name": "doubleJump/doublejump9.wav",
     "offset": 127.06114583333336,
     "duration": 0.53
   },
@@ -1338,5 +1338,235 @@
     "name": "walk/walk9.wav",
     "offset": 211.64479166666683,
     "duration": 0.6119166666666667
+  },
+  {
+    "name": "water/jump_water1.wav",
+    "offset": 212.2567083333335,
+    "duration": 0.53
+  },
+  {
+    "name": "water/jump_water2.wav",
+    "offset": 212.7867083333335,
+    "duration": 0.53
+  },
+  {
+    "name": "water/jump_water3.wav",
+    "offset": 213.3167083333335,
+    "duration": 0.53
+  },
+  {
+    "name": "water/jump_water4.wav",
+    "offset": 213.8467083333335,
+    "duration": 0.53
+  },
+  {
+    "name": "water/jump_water5.wav",
+    "offset": 214.3767083333335,
+    "duration": 0.53
+  },
+  {
+    "name": "water/jump_water6.wav",
+    "offset": 214.9067083333335,
+    "duration": 0.53
+  },
+  {
+    "name": "water/jump_water7.wav",
+    "offset": 215.4367083333335,
+    "duration": 0.53
+  },
+  {
+    "name": "water/step_water1.wav",
+    "offset": 215.96670833333351,
+    "duration": 0.53
+  },
+  {
+    "name": "water/step_water10.wav",
+    "offset": 216.49670833333352,
+    "duration": 0.53
+  },
+  {
+    "name": "water/step_water11.wav",
+    "offset": 217.02670833333352,
+    "duration": 0.53
+  },
+  {
+    "name": "water/step_water12.wav",
+    "offset": 217.55670833333352,
+    "duration": 0.43625
+  },
+  {
+    "name": "water/step_water13.wav",
+    "offset": 217.99295833333352,
+    "duration": 0.53
+  },
+  {
+    "name": "water/step_water14.wav",
+    "offset": 218.52295833333352,
+    "duration": 0.62375
+  },
+  {
+    "name": "water/step_water15.wav",
+    "offset": 219.14670833333352,
+    "duration": 0.53
+  },
+  {
+    "name": "water/step_water2.wav",
+    "offset": 219.67670833333352,
+    "duration": 0.43625
+  },
+  {
+    "name": "water/step_water3.wav",
+    "offset": 220.11295833333352,
+    "duration": 0.53
+  },
+  {
+    "name": "water/step_water4.wav",
+    "offset": 220.64295833333352,
+    "duration": 0.62375
+  },
+  {
+    "name": "water/step_water5.wav",
+    "offset": 221.26670833333353,
+    "duration": 0.53
+  },
+  {
+    "name": "water/step_water6.wav",
+    "offset": 221.79670833333353,
+    "duration": 0.53
+  },
+  {
+    "name": "water/step_water7.wav",
+    "offset": 222.32670833333353,
+    "duration": 0.43625
+  },
+  {
+    "name": "water/step_water8.wav",
+    "offset": 222.76295833333353,
+    "duration": 0.53
+  },
+  {
+    "name": "water/step_water9.wav",
+    "offset": 223.29295833333353,
+    "duration": 0.62375
+  },
+  {
+    "name": "water/swim1.wav",
+    "offset": 223.91670833333353,
+    "duration": 1.03
+  },
+  {
+    "name": "water/swim2.wav",
+    "offset": 224.94670833333353,
+    "duration": 1.03
+  },
+  {
+    "name": "water/swim3.wav",
+    "offset": 225.97670833333353,
+    "duration": 1.155
+  },
+  {
+    "name": "water/swim4.wav",
+    "offset": 227.13170833333353,
+    "duration": 1.28
+  },
+  {
+    "name": "water/swim5.wav",
+    "offset": 228.41170833333354,
+    "duration": 1.155
+  },
+  {
+    "name": "water/swim6.wav",
+    "offset": 229.56670833333354,
+    "duration": 1.155
+  },
+  {
+    "name": "water/swim7.wav",
+    "offset": 230.72170833333354,
+    "duration": 1.155
+  },
+  {
+    "name": "water/swim8.wav",
+    "offset": 231.87670833333354,
+    "duration": 1.24875
+  },
+  {
+    "name": "water/swim9.wav",
+    "offset": 233.12545833333354,
+    "duration": 1.2175
+  },
+  {
+    "name": "water/swim_fast1.wav",
+    "offset": 234.34295833333354,
+    "duration": 0.5925
+  },
+  {
+    "name": "water/swim_fast10.wav",
+    "offset": 234.93545833333354,
+    "duration": 0.5925
+  },
+  {
+    "name": "water/swim_fast11.wav",
+    "offset": 235.52795833333354,
+    "duration": 0.5925
+  },
+  {
+    "name": "water/swim_fast12.wav",
+    "offset": 236.12045833333354,
+    "duration": 0.5925
+  },
+  {
+    "name": "water/swim_fast13.wav",
+    "offset": 236.71295833333355,
+    "duration": 0.5925
+  },
+  {
+    "name": "water/swim_fast14.wav",
+    "offset": 237.30545833333355,
+    "duration": 0.5925
+  },
+  {
+    "name": "water/swim_fast2.wav",
+    "offset": 237.89795833333355,
+    "duration": 0.5925
+  },
+  {
+    "name": "water/swim_fast3.wav",
+    "offset": 238.49045833333355,
+    "duration": 0.5925
+  },
+  {
+    "name": "water/swim_fast4.wav",
+    "offset": 239.08295833333355,
+    "duration": 0.5925
+  },
+  {
+    "name": "water/swim_fast5.wav",
+    "offset": 239.67545833333355,
+    "duration": 0.5925
+  },
+  {
+    "name": "water/swim_fast6.wav",
+    "offset": 240.26795833333355,
+    "duration": 0.5925
+  },
+  {
+    "name": "water/swim_fast7.wav",
+    "offset": 240.86045833333355,
+    "duration": 0.5925
+  },
+  {
+    "name": "water/swim_fast8.wav",
+    "offset": 241.45295833333356,
+    "duration": 0.5925
+  },
+  {
+    "name": "water/swim_fast9.wav",
+    "offset": 242.04545833333356,
+    "duration": 0.5925
+  },
+  {
+    "name": "water/water_river.wav",
+    "offset": 242.63795833333356,
+    "duration": 64.03
   }
 ]

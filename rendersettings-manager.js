@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import postProcessing from './post-processing.js';
-// import {rootScene} from './renderer.js';
 
 const blackColor = new THREE.Color(0x000000);
 
@@ -12,6 +11,7 @@ class RenderSettings {
     this.passes = passes;
     this.internalPasses = internalPasses;
   }
+
   #makeBackground(background) {
     if (background) {
       let {color} = background;
@@ -21,6 +21,7 @@ class RenderSettings {
     }
     return null;
   }
+
   #makeFog(fog) {
     if (fog) {
       if (fog.fogType === 'linear') {
@@ -44,15 +45,19 @@ class RenderSettingsManager {
     this.fog = new THREE.FogExp2(0x000000, 0);
     this.extraPasses = [];
   }
+
   addExtraPass(pass) {
     this.extraPasses.push(pass);
   }
+
   removeExtraPass(pass) {
     this.extraPasses.splice(this.extraPasses.indexOf(pass), 1);
   }
+
   makeRenderSettings(json) {
     return new RenderSettings(json);
   }
+
   // traverse the scene to find render settings from a rendersettings app
   findRenderSettings(scene) {
     const _recurse = o => {
@@ -76,6 +81,7 @@ class RenderSettingsManager {
     }
     return null;
   }
+
   applyRenderSettingsToScene(renderSettings, scene) {
     const oldBackground = scene.background;
     const oldFog = scene.fog;
@@ -100,6 +106,7 @@ class RenderSettingsManager {
       scene.fog = oldFog;
     };
   }
+
   push(srcScene, dstScene = srcScene, {
     postProcessing = null,
   } = {}) {

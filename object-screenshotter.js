@@ -1,25 +1,14 @@
 import * as THREE from 'three';
 import {getRenderer} from './renderer.js';
 import metaversefile from 'metaversefile';
-// import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-// import {world} from './world.js';
 import {fitCameraToBoundingBox} from './util.js';
-// import {Text} from 'troika-three-text';
-// import {defaultDioramaSize} from './constants.js';
-// import postProcessing from './post-processing.js';
-// import gradients from './gradients.json';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
-// const localVector3 = new THREE.Vector3();
 const localVector2D = new THREE.Vector2();
-// const localVector2D2 = new THREE.Vector2();
 const localVector4D = new THREE.Vector4();
 const localColor = new THREE.Color();
 const localMatrix = new THREE.Matrix4();
-
-// const defaultSize = 2048;
-// const defaultNumFrames = 128;
 
 export const screenshotObjectUrl = async ({
   start_url,

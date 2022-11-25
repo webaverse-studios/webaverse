@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useRef} from 'react';
 import classnames from 'classnames';
 import imageAI from '../../../../../ai/image/image-ai';
 import materialColors from '../../../../../material-colors';

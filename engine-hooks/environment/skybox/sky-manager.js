@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {lightsManager} from '../../lights/lights-manager.js';
 
-const DIR_LIGHT_SHADOW_PARAMS = [50, 4096, 0.01, 10000, 0, 0.2];
+const DIR_LIGHT_SHADOW_PARAMS = [100, 4096, 0.1, 100, -0.005, 0];
 const _addSkyLightToLightManager = (light) => {
   lightsManager.addLight(
     light,

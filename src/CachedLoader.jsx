@@ -9,6 +9,7 @@ export class CachedLoader extends EventTarget {
       this.cache = new Map();
       this.promiseCache = new Map();
   }
+
   #setLoading(loading) {
       this.loading = loading;
       this.dispatchEvent(new MessageEvent('loadingchange', {
@@ -17,6 +18,7 @@ export class CachedLoader extends EventTarget {
           },
       }));
   }
+
   async loadItem(url, value, {signal = null} = {}) {
       this.#setLoading(true);
 
@@ -25,7 +27,7 @@ export class CachedLoader extends EventTarget {
         if (!promise) {
             promise = this.loadFn(url, value, {signal})
                 .catch(err => {
-                    // console.warn(err);
+                    console.warn('cached load error:', err);
                     this.promiseCache.delete(url);
                     return null;
                 })
@@ -46,6 +48,7 @@ export class CachedLoader extends EventTarget {
         this.#setLoading(false);
       }
   }
+
   destroy() {
       for (const url of this.promiseCache.keys()) {
           URL.revokeObjectURL(url);

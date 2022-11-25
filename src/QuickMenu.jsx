@@ -6,13 +6,12 @@ import {LightArrow} from './LightArrow';
 
 import styles from './QuickMenu.module.css';
 
-import emotes from './components/general/character/emotes.json';
-import {triggerEmote} from './components/general/character/Poses';
+import emoteManager, {emotes} from '../emotes/emote-manager.js';
 
 import game from '../game.js';
 import cameraManager from '../camera-manager.js';
 import * as sounds from '../sounds.js';
-import {mod, loadImage, drawImageContain, imageToCanvas} from '../util.js';
+import {mod, loadImage, imageToCanvas} from '../util.js';
 
 const modPi2 = angle => mod(angle, Math.PI*2);
 
@@ -74,18 +73,22 @@ export default function QuickMenu() {
     }
   };
 
-  useEffect(async () => {
+  useEffect(() => {
+    (async () => {
     const emoteIconImages = await Promise.all(emotes.map(async ({icon}) => {
       const img = await loadImage(`./images/poses/${icon}`);
       const canvas = imageToCanvas(img, iconSize, iconSize);
       return canvas;
     }));
     setEmoteIconImages(emoteIconImages);
+    })();
   }, []);
-  useEffect(async () => {
-    const img = await loadImage(chevronImgSrc);
-    const canvas = imageToCanvas(img, chevronSize, chevronSize);
-    setChevronImage(canvas);
+  useEffect(() => {
+    (async () => {
+      const img = await loadImage(chevronImgSrc);
+      const canvas = imageToCanvas(img, chevronSize, chevronSize);
+      setChevronImage(canvas);
+    })();
   }, []);
 
   useEffect(() => {
@@ -117,7 +120,7 @@ export default function QuickMenu() {
         if (e.keyCode === 81) { // Q
           if (open) {
             /* const emote = _getSelectedEmote();
-            emote && triggerEmote(emote); */
+            emote && emoteManager.triggerEmote(emote); */
             
             setOpen(false);
             setDown(false);
@@ -151,7 +154,7 @@ export default function QuickMenu() {
       function mouseup(e) {
         setDown(false);
         const emote = _getSelectedEmote();
-        emote && triggerEmote(emote);
+        emote && emoteManager.triggerEmote(emote);
         setOpen(false);
         
         sounds.playSoundName('menuNext');

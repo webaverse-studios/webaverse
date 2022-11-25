@@ -7,11 +7,7 @@ import metaversefile from 'metaversefile';
 import {SwirlPass} from './SwirlPass.js';
 import {
   getRenderer,
-  // getComposer,
   rootScene,
-  // sceneHighPriority,
-  // scene,
-  // sceneLowPriority,
   camera,
 } from './renderer.js';
 import * as sounds from './sounds.js';
@@ -25,12 +21,15 @@ import {playersManager} from './players-manager.js';
 import {alea} from './procgen/procgen.js';
 import renderSettingsManager from './rendersettings-manager.js';
 
-import {triggerEmote} from './src/components/general/character/Poses.jsx';
-import validEmotionMapping from './validEmotionMapping.json';
+import emoteManager from './emotes/emote-manager.js';
+
+//
 
 const localVector2D = new THREE.Vector2();
 
 const upVector = new THREE.Vector3(0, 1, 0);
+
+//
 
 function makeSwirlPass() {
   const renderer = getRenderer();
@@ -61,6 +60,25 @@ const _stopSwirl = () => {
     return false;
   }
 };
+
+//
+
+const fuzzyEmotionMappings = {
+  "alert": "alert",
+  "angry": "angry",
+  "embarrassed": "embarrassed",
+  "headNod": "headNod",
+  "headShake": "headShake",
+  "sad": "sad",
+  "surprise": "surprise",
+  "victory": "victory",
+  "surprised": "surprise",
+  "happy": "victory",
+  "sorrow": "sad",
+  "joy": "victory",
+  "confused": "alert",
+};
+export const getFuzzyEmotionMapping = emotionName => fuzzyEmotionMappings[emotionName];
 
 //
 
@@ -95,6 +113,7 @@ class Conversation extends EventTarget {
       }
     }); */
   }
+
   addLocalPlayerMessage(text, type = 'chat') {
     const message = {
       type,
@@ -116,6 +135,7 @@ class Conversation extends EventTarget {
 
     cameraManager.setDynamicTarget(this.localPlayer.avatar.modelBones.Head, this.remotePlayer?.avatar.modelBones.Head);
   }
+
   addRemotePlayerMessage(text, emote, type = 'chat') {
     const message = {
       type,
@@ -138,10 +158,12 @@ class Conversation extends EventTarget {
 
     cameraManager.setDynamicTarget(this.remotePlayer.avatar.modelBones.Head, this.localPlayer.avatar.modelBones.Head);
 
-    if (emote !== 'none' && validEmotionMapping[emote]!== undefined) {
-      triggerEmote(validEmotionMapping[emote], this.remotePlayer);
+    const fuzzyEmotionName = getFuzzyEmotionMapping(emote);
+    if (fuzzyEmotionName) {
+      emoteManager.triggerEmote(fuzzyEmotionName, this.remotePlayer);
     }
   }
+
   async wrapProgress(fn) {
     if (!this.progressing) {
       this.progressing = true;
@@ -157,6 +179,7 @@ class Conversation extends EventTarget {
       console.warn('ignoring conversation progress() because it was already in progress');
     }
   }
+
   progressChat() {
     console.log('progress chat');
 
@@ -176,6 +199,7 @@ class Conversation extends EventTarget {
       }
     });
   }
+
   progressSelf() {
     console.log('progress self');
 
@@ -194,6 +218,7 @@ class Conversation extends EventTarget {
       }
     });
   }
+
   progressSelfOptions() {
     console.log('progress self options');
     
@@ -212,6 +237,7 @@ class Conversation extends EventTarget {
       }
     });
   }
+
   progressOptionSelect(option) {
     if (!option) {
       option = this.options[this.hoverIndex];
@@ -223,8 +249,9 @@ class Conversation extends EventTarget {
     // say the option
     this.addLocalPlayerMessage(option.message, 'option');
 
-    if (option.emote !== 'none' && validEmotionMapping[option.emote]!== undefined) {
-      triggerEmote(validEmotionMapping[option.emote], this.localPlayer);
+    const fuzzyEmotionName = getFuzzyEmotionMapping(option.emote);
+    if (fuzzyEmotionName) {
+      emoteManager.triggerEmote(fuzzyEmotionName, this.localPlayer);
     }
     
     // clear options
@@ -234,9 +261,11 @@ class Conversation extends EventTarget {
     // 25% chance of self elaboration, 75% chance of other character reply
     this.localTurn = Math.random() < 0.25;
   }
+
   #getMessageAgo(n) {
     return this.messages[this.messages.length - n] ?? null;
   }
+
   progress() {
     if (!this.finished) {
       const lastMessage = this.#getMessageAgo(1);
@@ -297,13 +326,16 @@ class Conversation extends EventTarget {
       this.close();
     }
   }
+
   finish() {
     this.finished = true;
     this.dispatchEvent(new MessageEvent('finish'));
   }
+
   close() {
     this.dispatchEvent(new MessageEvent('close'));
   }
+
   #setOptions(options) {
     this.options = options;
     
@@ -313,6 +345,7 @@ class Conversation extends EventTarget {
       },
     }));
   }
+
   #setOption(option) {
     this.option = option;
 
@@ -322,10 +355,12 @@ class Conversation extends EventTarget {
       },
     }));
   }
+
   #getHoverIndexAbsolute() {
     const selectScrollIncrement = 150;
     return Math.floor(this.deltaY / selectScrollIncrement);
   }
+
   #setHoverIndex(hoverIndex) {
     this.hoverIndex = hoverIndex;
 
@@ -335,6 +370,7 @@ class Conversation extends EventTarget {
       },
     }));
   }
+
   handleWheel(e) {
     if (this.options) {
       const oldHoverIndexAbsolute = this.#getHoverIndexAbsolute();

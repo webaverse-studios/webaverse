@@ -1,28 +1,23 @@
-/* eslint-disable camelcase */
-/* eslint-disable no-useless-escape */
-
-import React, { useContext, useEffect, useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import classnames from 'classnames';
 
-import { tokensHost } from '../../constants';
-import { AppContext } from '../components/app';
+import {tokensHost} from '../../constants';
+import {AppContext} from '../components/app';
 
 import styles from '../Header.module.css';
 
 //
 
 export const Tokens = ({userOpen, loginFrom, hacks, address}) => {
-
-    const { state } = useContext( AppContext );
+    const {state} = useContext(AppContext);
     const [nftPreviews, setNftPreviews] = useState({});
     const [nfts, setNfts] = useState(null);
-    const [fetchPromises, setFetchPromises] = useState([]);
 
     //
 
-    useEffect( () => {
+    useEffect(() => {
 
-        if ( address && !nfts && loginFrom ) {
+        if (address && !nfts && loginFrom) {
 
             setNfts([]);
 
@@ -30,7 +25,7 @@ export const Tokens = ({userOpen, loginFrom, hacks, address}) => {
 
                 if (loginFrom === 'metamask') {
 
-                    const res = await fetch(`https://api.opensea.io/api/v1/assets?owner=${address}&limit=${50}`, { headers: { 'X-API-KEY': '6a7ceb45f3c44c84be65779ad2907046', } });
+                    const res = await fetch(`https://api.opensea.io/api/v1/assets?owner=${address}&limit=${50}`, {headers: {'X-API-KEY': '6a7ceb45f3c44c84be65779ad2907046',}});
                     const j = await res.json();
                     const {assets} = j;
                     setNfts(assets);
@@ -56,9 +51,9 @@ export const Tokens = ({userOpen, loginFrom, hacks, address}) => {
 
         }
 
-    }, [ address, nfts, loginFrom ] );
+    }, [ address, nfts, loginFrom ]);
 
-    useEffect( () => {
+    useEffect(() => {
 
         if (nfts) {
 

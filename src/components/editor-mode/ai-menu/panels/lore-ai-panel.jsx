@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React from 'react';
 import classnames from 'classnames';
-// import { AppContext } from '../../../app';
 
 import styles from './lore-ai-panel.module.css';
 

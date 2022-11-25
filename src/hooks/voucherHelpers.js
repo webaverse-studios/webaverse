@@ -1,9 +1,9 @@
-import { ethers } from 'ethers';
+import {ethers} from 'ethers';
 import Web3 from '../../web3.min.js';
 
 export async function getVoucherFromServer(metadataurl) {
     const tokenId = 0;
-    const expiry = Math.round(new Date().getTime() / 1000) + 1000;//timestamp
+    const expiry = Math.round(new Date().getTime() / 1000) + 1000;// timestamp
     const nonce = ethers.BigNumber.from(ethers.utils.randomBytes(4)).toNumber();
     const balance = 1;
 
@@ -49,18 +49,18 @@ export async function getVoucherFromUser(tokenId, signer, WebaversecontractAddre
         types: {
             // TODO: Clarify if EIP712Domain refers to the domain the contract is hosted on
             EIP712Domain: [
-                { name: 'name', type: 'string' },
-                { name: 'version', type: 'string' },
-                { name: 'chainId', type: 'uint256' },
-                { name: 'verifyingContract', type: 'address' },
+                {name: 'name', type: 'string'},
+                {name: 'version', type: 'string'},
+                {name: 'chainId', type: 'uint256'},
+                {name: 'verifyingContract', type: 'address'},
             ],
             // PrimaryType
             NFTVoucher: [
-                { name: "tokenId", type: "uint256" },
-                { name: "metadataurl", type: "string" },
-                { name: "balance", type: "uint256" },
-                { name: "nonce", type: "uint256" },
-                { name: "expiry", type: "uint256" },
+                {name: "tokenId", type: "uint256"},
+                {name: "metadataurl", type: "string"},
+                {name: "balance", type: "uint256"},
+                {name: "nonce", type: "uint256"},
+                {name: "expiry", type: "uint256"},
             ]
         },
     });
@@ -74,16 +74,15 @@ export async function getVoucherFromUser(tokenId, signer, WebaversecontractAddre
             method,
             params,
             from: signer
-        }, (err, { result }) => {
+        }, (err, {result}) => {
             if(err != null) {
-                reject();
+                reject(new Error(err));
             } else {
                 const voucher = {
                     tokenId, metadataurl, balance, nonce, expiry, signature: result
                 }
-                accept({ voucher, expiry });
+                accept({voucher, expiry});
             }
         })
     });
 }
-

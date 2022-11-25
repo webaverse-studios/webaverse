@@ -14,6 +14,7 @@ class VoiceInput extends EventTarget {
   micEnabled() {
     return !!this.mediaStream;
   }
+
   async enableMic() {
     await WSRTC.waitForReady();
     this.mediaStream = await WSRTC.getUserMedia();
@@ -32,6 +33,7 @@ class VoiceInput extends EventTarget {
       }
     }));
   }
+
   disableMic() {
     /* if (this.micEnabled()) */ {
       const wsrtc = universe.getConnection();
@@ -55,6 +57,7 @@ class VoiceInput extends EventTarget {
       this.disableSpeech();
     }
   }
+
   async toggleMic() {
     if (this.micEnabled()) {
       this.disableMic();
@@ -66,6 +69,7 @@ class VoiceInput extends EventTarget {
   speechEnabled() {
     return !!this.speechRecognition;
   }
+
   async enableSpeech() {
     if (!this.micEnabled()) {
       await this.enableMic();
@@ -123,6 +127,7 @@ class VoiceInput extends EventTarget {
       }
     }));
   }
+
   disableSpeech() {
     this.speechRecognition.stop();
     this.speechRecognition = null;
@@ -133,6 +138,7 @@ class VoiceInput extends EventTarget {
       }
     }));
   }
+
   async toggleSpeech() {
     if (this.speechEnabled()) {
       this.disableSpeech();

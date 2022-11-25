@@ -1,25 +1,18 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext} from 'react';
 import {ChainContext} from '../../hooks/chainProvider';
 import {isChainSupported} from '../../hooks/useChain';
 import classnames from 'classnames';
-import { AppContext } from '../app';
-// import {CHAIN_TYPE} from '../../hooks/web3-constants';
+import {AppContext} from '../app';
 
 import styles from './chains.module.css';
 
-/* function Supported({chain}) {
-  return <>{!isChainSupported(chain) && '❌' } {chain.type === CHAIN_TYPE.TEST && '🧪'}</>;
-} */
-
 export default function Chains() {
-  const { state, setState } = useContext( AppContext );
+  const {state, setState} = useContext(AppContext);
   const {chains, selectedChain, selectChain} = useContext(ChainContext);
-  // const {brandColor} = selectedChain;
-  // const [open, setOpen] = useState(false);
 
   const open = state.openedPanel === 'ChainsPanel';
   const setOpen = newOpen => {
-      setState({ openedPanel: newOpen ? 'ChainsPanel' : null });
+      setState({openedPanel: newOpen ? 'ChainsPanel' : null});
   };
 
   return (<div className={classnames(styles.chainSelector, open ? styles.open : null)}>
