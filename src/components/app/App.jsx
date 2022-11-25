@@ -102,7 +102,6 @@ let appStarted = false;
 
 export const App = () => {
 
-    // const [ state, setState ] = useState({openedPanel: null});
     const [ state, setState ] = useState({openedPanel: null, openedModal: null});
     const [ uiMode, setUIMode ] = useState('normal');
 
@@ -324,8 +323,6 @@ export const App = () => {
                 <DomRenderer />
                 <canvas className={ classnames(styles.canvas, domHover ? styles.domHover : null) } ref={ canvasRef } />
                 <Crosshair />
-                {/* <Settings />
-                <ClaimsNotification /> */}
                 <WorldObjectsList
                     setSelectedApp={ setSelectedApp }
                     selectedApp={ selectedApp }

@@ -277,34 +277,6 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
                 <div className={styles.title}>Your Location</div>
             </div>
 
-            {/* <div className={ styles.row }>
-                <div className={ styles.buttonWrap } onClick={ handleSceneMenuOpen.bind(null, null) } >
-                    <button className={ classnames(styles.button, styles.primary, state.openedPanel === 'SceneMenuPanel' ? null : styles.disabled) } >
-                        <img src="images/webarrow.svg" />
-                    </button>
-                </div>
-                <div className={ styles.inputWrap } >
-                    <input type="text" className={ styles.input } ref={ sceneNameInputRef } value={ multiplayerConnected ? selectedRoom : sceneInputName } onKeyUp={ handleSceneMenuKeyUp } onFocus={ handleSceneMenuOpen.bind(null, false) } disabled={ multiplayerConnected } onChange={ handleSceneInputKeyDown } placeholder="Goto..." />
-                    <img src="images/webpencil.svg" className={ classnames(styles.background, styles.green) } />
-                </div>
-                <div className={ styles.buttonWrap  } onClick={ handleRoomMenuOpen.bind(null, null) } >
-                    <div className={ classnames(styles.button, (state.openedPanel === 'RoomsMenuPanel' || multiplayerConnected) ? null : styles.disabled) } >
-                        <img src="images/wifi.svg" />
-                    </div>
-                </div>
-                <div className={styles.buttonWrap } onClick={ handleMicBtnClick } >
-                    <div className={ classnames(styles.button, micEnabled ? null : styles.disabled) } >
-                        <img src="images/microphone.svg" className={ classnames(micEnabled ? null : styles.hidden) } />
-                        <img src="images/microphone-slash.svg" className={ classnames(micEnabled ? styles.hidden : null) } />
-                    </div>
-                </div>
-                <div className={styles.buttonWrap } onClick={ handleSpeakBtnClick } >
-                    <div className={ classnames(styles.button, speechEnabled ? null : styles.disabled) } >
-                        <img src="images/speak.svg" />
-                    </div>
-                </div>
-            </div> */}
-
             {
                 state.openedPanel === 'SceneMenuPanel' ? (
                     <div className={ styles.rooms }>
