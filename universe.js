@@ -262,11 +262,9 @@ class Universe extends EventTarget {
         playerMap.set(appsMapName, appsArray);
 
         const actionsArray = new Z.Array();
-        // TODO: Add landAction?
         playerMap.set(actionsMapName, actionsArray);
 
         playerMap.set('avatar', appId);
-        // TODO: Add voiceSpec?
 
         playersArray.push([playerMap]);
       });
@@ -320,13 +318,24 @@ class Universe extends EventTarget {
               }
             }
           });
+        } else if (key === 'voiceSpec') {
+          playersArray.doc.transact(() => {
+            playerMap.set('voiceSpec', val);
+          });
         }
       });
 
+      // Handle already present remote players.
       const transform = player.getKeyValue('transform');
       if (transform) {
         playersArray.doc.transact(() => {
           playerMap.set('transform', transform);
+        });
+      }
+      const voiceSpec = player.getKeyValue('voiceSpec');
+      if (voiceSpec) {
+        playersArray.doc.transact(() => {
+          playerMap.set('voiceSpec', voiceSpec);
         });
       }
     });
@@ -380,6 +389,7 @@ class Universe extends EventTarget {
         position,
       }, {});
       this.realms.localPlayer.setKeyValue('transform', localPlayer.transform);
+      this.realms.localPlayer.setKeyValue('voiceSpec', localPlayer.playerMap.get('voiceSpec'));
 
       if (voiceInput.micEnabled()) {
         this.realms.enableMic();
