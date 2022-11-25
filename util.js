@@ -1,24 +1,19 @@
 import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-// import atlaspack from './atlaspack.js';
 import {
   playersMapName,
   tokensHost,
   storageHost,
-  /* accountsHost, loginEndpoint, */ audioTimeoutTime,
+  audioTimeoutTime,
 } from './constants.js';
-// import { getRenderer } from './renderer.js';
 import {IdAllocator} from './id-allocator.js';
+import {isWorker} from './env.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
 const localVector3 = new THREE.Vector3();
 const localVector4 = new THREE.Vector3();
 const localVector5 = new THREE.Vector3();
-// const localVector6 = new THREE.Vector3();
-// const localQuaternion = new THREE.Quaternion();
-// const localQuaternion2 = new THREE.Quaternion();
-// const localQuaternion3 = new THREE.Quaternion();
 const localMatrix = new THREE.Matrix4();
 const localMatrix2 = new THREE.Matrix4();
 
@@ -645,29 +640,9 @@ export function makeId(length) {
   return result;
 }
 
-/* export function chunkMinForPosition(x, y, z, chunkSize) {
-  localVector6.set(
-    Math.floor(x / chunkSize),
-    Math.floor(y / chunkSize),
-    Math.floor(z / chunkSize)
-  );
-  return localVector6;
-} */
-
 export function getLockChunkId(chunkPosition) {
   return `chunk:${chunkPosition.x}, ${chunkPosition.y}, ${chunkPosition.z}}`;
 }
-
-/* async function contentIdToStorageUrl(id) {
-  if (typeof id === 'number') {
-    const hash = await contracts.mainnetsidechain.NFT.methods.getHash(id + '').call();
-    return `${storageHost}/${hash}`;
-  } else if (typeof id === 'string') {
-    return id;
-  } else {
-    return null;
-  }
-} */
 
 export function mod(a, n) {
   return ((a % n) + n) % n;
@@ -1110,6 +1085,17 @@ export const imageToCanvas = (img, w, h) => {
   return canvas;
 };
 
+export function createCanvas(width, height) {
+  if (isWorker) {
+    return new OffscreenCanvas(width, height);
+  } else {
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    return canvas;
+  }
+}
+
 export const isTransferable = (o) => {
   const ctor = o?.constructor;
   return (
@@ -1260,4 +1246,9 @@ export const getBoundingSize = boundingType => {
     case 'box': return 6;
     default: return 0;
   }
+};
+
+export const lookAtQuaternion = (dirVec)=>{
+  var mx = new THREE.Matrix4().lookAt(new THREE.Vector3(0,0,0), dirVec, new THREE.Vector3(0,1,0));
+  return new THREE.Quaternion().setFromRotationMatrix(mx);
 };

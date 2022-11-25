@@ -2,7 +2,6 @@
 player manager binds y.js data to player objects
 player objects load their own avatar and apps using this binding */
 
-// import * as THREE from 'three';
 import * as Z from 'zjs';
 import {LocalPlayer, RemotePlayer} from './character-controller.js';
 import {makeId} from './util.js';

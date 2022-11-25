@@ -5,7 +5,6 @@ import {camera} from '../renderer.js';
 import cameraManager from '../camera-manager.js';
 import {playersManager} from '../players-manager.js';
 
-// import {CharacterBanner} from './CharacterBanner.jsx';
 import domRenderEngine, {DomRenderEngine} from '../dom-renderer.jsx';
 
 const floatFactor = 0.05;
@@ -99,19 +98,6 @@ const DomRendererChild = ({
 
     if (iframeContainer2) {
       const frame = e => {
-        const {timestamp} = e.data;
-        
-        const _animateMenuFloat = () => {
-          const now = timestamp;
-          
-          dom.floatNode.position.set(0, 0, 0);
-          dom.floatNode.position.y += Math.sin((now % floatTime)/floatTime * 2 * Math.PI) * floatFactor;
-          dom.floatNode.position.y += Math.cos(((now / 2) % floatTime)/floatTime * 2 * Math.PI) * floatFactor/2;
-          dom.floatNode.position.y += Math.sin(((now / 4) % floatTime)/floatTime * 2 * Math.PI) * floatFactor/4;
-          dom.floatNode.updateMatrixWorld();
-        };
-        _animateMenuFloat();
-        
         const floatNodeMatrixWorld = localMatrix3
           .multiplyMatrices(dom.floatNode.matrixWorld, scaleMatrix);
 

@@ -4,15 +4,11 @@ import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUti
 import {VRMMaterialImporter/*, MToonMaterial */} from '@pixiv/three-vrm/lib/three-vrm.module.js';
 import * as avatarSpriter from '../avatar-spriter.js';
 import {getAvatarHeight, getAvatarWidth, getModelBones} from './util.mjs';
-// import offscreenEngineManager from '../offscreen-engine/offscreen-engine-manager.js';
 import loaders from '../loaders.js';
-// import {camera} from '../renderer.js';
 import {WebaverseShaderMaterial} from '../materials.js';
-// import exporters from '../exporters.js';
 import {abortError} from '../lock-manager.js';
 import {minAvatarQuality, maxAvatarQuality} from '../constants.js';
 import settingsManager from '../settings-manager.js';
-// import {downloadFile} from '../util.js';
 import {createSpriteAvatarMesh, crunchAvatarModel, optimizeAvatarModel} from '../offscreen-engine/fns/avatar-renderer-fns.js';
 
 const localVector = new THREE.Vector3();

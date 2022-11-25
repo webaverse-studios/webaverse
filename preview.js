@@ -1,17 +1,8 @@
-import {bindCanvas, waitForLoad} from './renderer.js';
+import {bindCanvas} from './renderer.js';
 
-// import {getEmotionCanvases} from './offscreen-engine/fns/avatar-iconer-fn.js';
-// import {createSpriteAvatarMesh, crunchAvatarModel, optimizeAvatarModel} from './offscreen-engine/fns/avatar-renderer-fns.js';
-// import {generateObjectUrlCardRemote} from './offscreen-engine/fns/cards-manager-fn.js';
-// import {getLandImage} from './offscreen-engine/fns/land-iconer-fn.js';
-// import {createAppUrlSpriteSheet} from './offscreen-engine/fns/spriting-fn.js';
-// import {getSpriteAnimationForAppUrlInternal} from './offscreen-engine/fns/sprite-animation-manager-fn.js';
 import physx from './physx.js';
-// import {offscreenCanvasSize} from './constants.js';
 import metaversefile from 'metaversefile';
-import metaversefileApi from './metaversefile-api';
 
-// import physicsManager from './physics-manager.js';
 import physxWorkerManager from './physx-worker-manager.js';
 import Avatar from './avatars/avatars.js';
 
@@ -19,9 +10,6 @@ const _waitForLoad = async () => {
   const canvas = document.getElementById('canvas');
   bindCanvas(canvas);
 
-  // await bindCanvas();
-  // await metaversefile.waitForLoad();
-  // await physx.waitForLoad();
   await Avatar.waitForLoad();
   await physx.waitForLoad();
   await physxWorkerManager.waitForLoad();

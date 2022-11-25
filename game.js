@@ -471,12 +471,12 @@ class GameManager extends EventTarget {
       const wearAimComponent = wearAimApp?.getComponent('aim');
 
       const {instanceId} = wearAimApp ?? {};
-      const {appAnimation, playerAnimation, boneAttachment, position, quaternion, scale} = wearAimComponent ?? {};
+      const {appAnimation, characterAnimation, boneAttachment, position, quaternion, scale} = wearAimComponent ?? {};
       const aimAction = {
         type: 'aim',
         instanceId,
         appAnimation,
-        playerAnimation,
+        characterAnimation,
         boneAttachment,
         position,
         quaternion,
@@ -908,6 +908,28 @@ class GameManager extends EventTarget {
   setMouseDomEquipmentHoverObject(o, physicsId) {
     this.mouseDomEquipmentHoverObject = o;
     this.mouseDomEquipmentHoverPhysicsId = physicsId;
+  }
+
+  setMovements() {
+    const localPlayer = playersManager.getLocalPlayer();
+    if (ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right) {
+      if (!localPlayer.hasAction('movements')) {
+        localPlayer.addAction({type: 'movements'});
+      }
+    } else {
+      localPlayer.removeAction('movements');
+    }
+  }
+
+  setSprint(bool) {
+    const localPlayer = playersManager.getLocalPlayer();
+    if (bool) {
+      if (!localPlayer.hasAction('sprint')) { // note: prevent holding shift switch browser page.
+        localPlayer.addAction({type: 'sprint'});
+      }
+    } else {
+      localPlayer.removeAction('sprint');
+    }
   }
 
   getSpeed() {

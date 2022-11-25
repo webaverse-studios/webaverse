@@ -1,10 +1,8 @@
 
 import React, {useEffect, useState} from 'react';
 import classNames from 'classnames';
-// import game from '../../../../game';
 import {Slider} from './slider';
 import * as voices from '../../../../voices';
-// import {localPlayer} from '../../../../players';
 import overrides from '../../../../overrides';
 
 import styles from './settings.module.css';

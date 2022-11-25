@@ -4,35 +4,18 @@ it contains code for character capsules and world simulation.
 */
 
 import * as THREE from 'three'
-// import {getRenderer, camera, dolly} from './renderer.js';
 import physx from './physx.js'
-// import cameraManager from './camera-manager.js';
-// import ioManager from './io-manager.js';
-// import {getPlayerCrouchFactor} from './character-controller.js';
 import metaversefileApi from 'metaversefile'
 import {getNextPhysicsId, freePhysicsId, convertMeshToPhysicsMesh} from './util.js'
-// import {applyVelocity} from './util.js';
-// import {groundFriction} from './constants.js';
 import {CapsuleGeometry} from './geometries.js'
 import physxWorkerManager from './physx-worker-manager.js';
 
-// const localVector = new THREE.Vector3()
-const localVector2 = new THREE.Vector3()
-/* const localVector3 = new THREE.Vector3()
-const localVector4 = new THREE.Vector3()
-const localVector5 = new THREE.Vector3()
-const localQuaternion = new THREE.Quaternion()
-const localQuaternion2 = new THREE.Quaternion()
-const localMatrix = new THREE.Matrix4() */
+const localVector = new THREE.Vector3()
 
 // fake shared material to prevent shader instantiation
 const redMaterial = new THREE.MeshBasicMaterial({
   color: 0xff0000,
-  // side: THREE.DoubleSide,
 });
-
-// const zeroVector = new THREE.Vector3(0, 0, 0);
-// const upVector = new THREE.Vector3(0, 1, 0);
 
 const _makePhysicsObject = (physicsId, position, quaternion, scale) => {
   const physicsObject = new THREE.Object3D()
@@ -113,7 +96,7 @@ class PhysicsScene extends EventTarget {
       physicsId,
       position,
       quaternion,
-      localVector2.set(1, 1, 1)
+      localVector.set(1, 1, 1)
     )
     const physicsMesh = new THREE.Mesh(
       new CapsuleGeometry(radius, radius, halfHeight * 2),
@@ -145,7 +128,7 @@ class PhysicsScene extends EventTarget {
       physicsId,
       position,
       quaternion,
-      localVector2.set(1, 1, 1)
+      localVector.set(1, 1, 1)
     )
     const physicsMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), redMaterial)
     physicsMesh.visible = false
@@ -173,7 +156,7 @@ class PhysicsScene extends EventTarget {
       physicsId,
       position,
       quaternion,
-      localVector2.set(1, 1, 1)
+      localVector.set(1, 1, 1)
     )
     const physicsMesh = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), redMaterial)
     physicsMesh.scale.copy(size)

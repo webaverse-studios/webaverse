@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef, useContext} from 'react';
+import React, {useState} from 'react';
 import classnames from 'classnames';
 
 import styles from './audio-ai-panel.module.css';
