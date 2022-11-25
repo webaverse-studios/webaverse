@@ -22,15 +22,15 @@ import cameraManager from '../../../../camera-manager.js';
 
 export const UserBox = ({className, setLoginFrom}) => {
 
-  const {state, setState, account, chain} = useContext( AppContext );
+  const {state, setState, account, chain} = useContext(AppContext);
   const [address, setAddress] = useState('');
   const [ensName, setEnsName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [loggingIn, setLoggingIn] = useState(false);
   // const [loginError, setLoginError] = useState(null);
   // const [autoLoginRequestMade, setAutoLoginRequestMade] = useState(false);
-  const { isConnected, currentAddress, connectWallet, disconnectWallet, errorMessage, wrongChain, getAccounts, getAccountDetails } = account;
-  const { selectedChain } = chain;
+  const {isConnected, currentAddress, connectWallet, disconnectWallet, errorMessage, wrongChain, getAccounts, getAccountDetails} = account;
+  const {selectedChain} = chain;
 
   //
 
@@ -183,8 +183,7 @@ export const UserBox = ({className, setLoginFrom}) => {
   //
 
   const handleSettingsBtnClick = () => {
-    console.info("setting btn click")
-    setState({openedModal: 'settings', openedPanel: 'SettingsPanel'});
+    setState({openedModal: 'settings'});
   };
 
   const handleLocationBtnClick = () => {
@@ -198,7 +197,8 @@ export const UserBox = ({className, setLoginFrom}) => {
       }
 
       setState({openedPanel: null});
-    } else if (state.openedPanel !== 'SettingsPanel') {
+      
+    } else {
       if (cameraManager.pointerLockElement) {
         cameraManager.exitPointerLock();
       }
@@ -299,9 +299,7 @@ export const UserBox = ({className, setLoginFrom}) => {
                 <div className={styles.image}>
                   <img
                     src={
-                      avatarUrl
-                        ? avatarUrl
-                        : '/assets/backgrounds/profile-no-image.png'
+                      avatarUrl || '/assets/backgrounds/profile-no-image.png'
                     }
                   />
                 </div>
