@@ -2,6 +2,7 @@ import React, {useState, useRef, useEffect} from 'react';
 import classnames from 'classnames';
 import styles from './HotBox.module.css';
 import loadoutManager from '../../../../loadout-manager.js';
+import {TokenBox} from '../../general/token-box/TokenBox';
 
 export const HotBox = ({
   index,
@@ -52,17 +53,17 @@ export const HotBox = ({
         onClick={onClick}
         onDoubleClick={onDoubleClick}
       >
-        <div className={ styles.box } />
+        <TokenBox size={60} canvasRef={canvasRef} numFrames={128} />
         <div className={ styles.label }>
           <div className={ styles.background } />
           <div className={ styles.text }>{ index + 1 }</div>
         </div>
-        <canvas
+        {/* <canvas
           className={ styles.hotbox }
           width={size * pixelRatio}
           height={size * pixelRatio}
           ref={canvasRef}
-        />
+        /> */}
       </div>
     );
 };
