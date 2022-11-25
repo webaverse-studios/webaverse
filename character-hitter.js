@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import {scene, camera} from './renderer.js';
 import physicsManager from './physics-manager.js';
-// import physx from './physx.js';
 import Avatar from './avatars/avatars.js';
 import metaversefile from 'metaversefile';
 import * as coreModules from './core-modules.js';
@@ -11,8 +10,6 @@ const localVector2 = new THREE.Vector3();
 const localQuaternion = new THREE.Quaternion();
 const localEuler = new THREE.Euler();
 const localMatrix = new THREE.Matrix4();
-
-// const y180Quaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
 
 //
 
@@ -175,7 +172,7 @@ export class CharacterHitter {
     ];
     const gruntType = gruntTypes[Math.floor(Math.random() * gruntTypes.length)];
     // console.log('play grunt', emotion, gruntType);
-    this.character.characterSfx.playGrunt(gruntType);
+    this.character.characterSfx?.playGrunt(gruntType);
 
     {
       const damageMeshApp = metaversefile.createApp();

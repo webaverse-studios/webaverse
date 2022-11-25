@@ -1,6 +1,5 @@
 import {createObjectSpriteSheet} from './object-spriter.js';
 import metaversefile from './metaversefile-api.js';
-// import physx from './physx.js';
 
 export async function createAppUrlSpriteSheet(appUrl, opts) {
   const app = await metaversefile.createAppAsync({

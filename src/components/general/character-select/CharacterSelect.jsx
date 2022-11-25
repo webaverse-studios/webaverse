@@ -6,7 +6,6 @@ import styles from './character-select.module.css';
 import {AppContext} from '../../app';
 import {MegaHup} from '../../../MegaHup.jsx';
 import {LightArrow} from '../../../LightArrow.jsx';
-// import { world } from '../../../../world.js';
 import {LocalPlayer} from '../../../../character-controller.js';
 import {characterSelectManager} from '../../../../characterselect-manager.js';
 import * as sounds from '../../../../sounds.js';

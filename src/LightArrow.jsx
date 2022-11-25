@@ -1,18 +1,16 @@
-// import * as THREE from 'three';
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import classnames from 'classnames';
-// import dioramaManager from '../diorama.js';
 import styles from './LightArrow.module.css';
-import {createCanvas} from '../renderer.js';
 
 const frameSize = 64;
 const numFrames = 64;
 const numFramesPerRow = Math.sqrt(numFrames);
-// const canvasSize = frameSize * numFramesPerRow;
 const arrowTime = 5000;
 const timeDiff = arrowTime / numFrames;
 
 /* import {downloadFile} from '../util.js';
+
+const canvasSize = frameSize * numFramesPerRow;
 
 const localColor = new THREE.Color();
 const localColor2 = new THREE.Color();

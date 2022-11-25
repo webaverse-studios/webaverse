@@ -1,11 +1,10 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import classnames from 'classnames';
 import styles from './MegaHotBox.module.css';
 import {BigButton} from '../../../BigButton';
 import {PlaceholderImg} from '../../../PlaceholderImg';
 import {ImageBitmapCanvas} from '../../../ImageBitmapCanvas';
-import {loadImage} from '../../../../util.js';
-import {createCanvas} from '../../../../renderer.js';
+import {createCanvas, loadImage} from '../../../../util.js';
 
 const cardFlipAnimationTime = 200;
 

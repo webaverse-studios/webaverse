@@ -5,10 +5,13 @@ class AnimationMapping {
     this.isTop = isTop;
     this.isPosition = isPosition;
     this.isArm = isArm;
+    this.index = undefined;
   }
 
   clone() {
-    return new AnimationMapping(this.animationTrackName, this.boneName, this.isTop, this.isPosition, this.isArm);
+    const newAnimationMapping = new AnimationMapping(this.animationTrackName, this.boneName, this.isTop, this.isPosition, this.isArm);
+    newAnimationMapping.index = this.index;
+    return newAnimationMapping;
   }
 }
 
@@ -71,3 +74,8 @@ export const animationMappingConfig = [
   new AnimationMapping('mixamorigLeftFoot.quaternion', 'Left_ankle', false, false, false),
   new AnimationMapping('mixamorigLeftToeBase.quaternion', 'Left_toe', false, false, false),
 ];
+
+animationMappingConfig.forEach((animationMapping, i) => {
+  animationMapping.index = i;
+  return animationMapping;
+});

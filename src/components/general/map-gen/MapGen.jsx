@@ -2,33 +2,21 @@ import * as THREE from 'three';
 import React, {useState, useEffect, useRef, useContext} from 'react';
 import classnames from 'classnames';
 import metaversefile from 'metaversefile';
-// import {world} from '../../../../world.js';
-// import webaverse from '../../../../webaverse.js';
 import {registerIoEventHandler, unregisterIoEventHandler} from '../io-handler';
 import {MiniHup} from '../../../MiniHup.jsx';
-// import {RpgText} from '../../../RpgText.jsx';
 import {getRenderer, rootScene, scene, sceneLowPriority} from '../../../../renderer.js';
 import game from '../../../../game.js';
 import {world} from '../../../../world.js';
-import universe from '../../../../universe.js';
 import cameraManager from '../../../../camera-manager.js';
 import story from '../../../../story.js';
-// import raycastManager from '../../../../raycast-manager.js';
 import {snapshotMapChunk} from '../../../../scene-cruncher.js';
 import {Text} from 'troika-three-text';
-// import alea from '../../../../alea.js';
-// import easing from '../../../../easing.js';
-import musicManager from '../../../../music-manager.js';
 import {buildMaterial} from '../../../../shaders.js';
-import {chatManager} from '../../../../chat-manager.js';
 import physicsManager from '../../../../physics-manager.js';
 import {
   makeRng,
-  // numBlocksPerChunk,
-  // voxelPixelSize,
   chunkWorldSize,
   placeNames,
-  // MapBlock,
   createMapChunk,
   createMapChunkMesh,
 } from '../../../../procgen/procgen.js';
@@ -40,17 +28,11 @@ const {useLocalPlayer, useLoreAIScene} = metaversefile;
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
-// const localVector3 = new THREE.Vector3();
-// const localVectorX = new THREE.Vector3();
-// const localVectorX2 = new THREE.Vector3();
 const localVector2D = new THREE.Vector2();
 const localQuaternion = new THREE.Quaternion();
 const localEuler = new THREE.Euler();
 const localVector4D = new THREE.Vector4();
 const localMatrix = new THREE.Matrix4();
-// const localMatrix2 = new THREE.Matrix4();
-// const localArray = [];
-// const localColor = new THREE.Color();
 const localRaycaster = new THREE.Raycaster();
 const localPlane = new THREE.Plane();
 

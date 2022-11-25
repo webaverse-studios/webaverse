@@ -3,9 +3,6 @@ import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUti
 import {
   getRenderer,
   rootScene,
-  /* sceneHighPriority,
-  scene,
-  sceneLowPriority, */
   camera,
 } from './renderer.js';
 import universe from './universe.js';

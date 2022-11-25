@@ -14,13 +14,13 @@ import {getRenderer, camera} from './renderer.js';
 import physicsManager from './physics-manager.js';
 import transformControls from './transform-controls.js';
 import storyManager from './story.js';
-import raycastManager from './raycast-manager.js'
+import raycastManager from './raycast-manager.js';
 const localVector = new THREE.Vector3();
-const localQuaternion2 = new THREE.Quaternion();
 const localEuler = new THREE.Euler();
 const localMatrix2 = new THREE.Matrix4();
 const localMatrix3 = new THREE.Matrix4();
 const zeroVector = new THREE.Vector3();
+const localQuaternion = new THREE.Quaternion();
 
 const doubleTapTime = 200;;
 
@@ -126,7 +126,7 @@ class IoManager extends EventTarget {
             const _applyRotation = r => {
               camera.matrix
                 .premultiply(localMatrix2.makeTranslation(-xrCamera.position.x, -xrCamera.position.y, -xrCamera.position.z))
-                .premultiply(localMatrix3.makeRotationFromQuaternion(localQuaternion2.setFromAxisAngle(localVector.set(0, 1, 0), r)))
+                .premultiply(localMatrix3.makeRotationFromQuaternion(localQuaternion.setFromAxisAngle(localVector.set(0, 1, 0), r)))
                 .premultiply(localMatrix2.copy(localMatrix2).invert())
                 .decompose(camera.position, camera.quaternion, camera.scale);
             };
@@ -292,9 +292,6 @@ class IoManager extends EventTarget {
         }
       case 87: { // W
         ioManager.keys.up = true;
-        if (!cameraManager.pointerLockElement) {
-          game.menuVertical(-1);
-        }
 
         const now = performance.now();
         const timeDiff = now - this.lastKeysDownTime.keyW;
@@ -308,9 +305,6 @@ class IoManager extends EventTarget {
       }
       case 65: { // A
         ioManager.keys.left = true;
-        if (!cameraManager.pointerLockElement) {
-          game.menuHorizontal(-1);
-        }
 
         const now = performance.now();
         const timeDiff = now - this.lastKeysDownTime.keyA;
@@ -330,11 +324,6 @@ class IoManager extends EventTarget {
           game.saveScene();
         } else {
           ioManager.keys.down = true;
-          if (!cameraManager.pointerLockElement) {
-            if (game.menuOpen) {
-              game.menuVertical(1);
-            }
-          }
 
           const now = performance.now();
           const timeDiff = now - this.lastKeysDownTime.keyS;
@@ -349,9 +338,6 @@ class IoManager extends EventTarget {
       }
       case 68: { // D
         ioManager.keys.right = true;
-        if (!cameraManager.pointerLockElement) {
-          game.menuHorizontal(1);
-        }
 
         const now = performance.now();
         const timeDiff = now - this.lastKeysDownTime.keyD;

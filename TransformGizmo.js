@@ -2,7 +2,6 @@ import {Object3D, Color, Vector3} from 'three';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
 import cloneObject3D from './cloneObject3D.js';
 const transformGizmoUrl = '/assets/TransformGizmo2.glb';
-// import { TransformMode, TransformAxis } from "./SpokeControls.js";
 
 const TransformMode = {
   Disabled: "Disabled",

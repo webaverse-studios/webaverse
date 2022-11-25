@@ -1,38 +1,23 @@
 
 .switch {
     position: relative;
+    background-color: #0d1a22;
+    padding: 2px;
+    margin-top: 4px !important;
+    float: left;
+    margin-left: 32px;
+    width: 220px;
 }
 
 .switch .left {
     float: left;
     margin-left: auto;
     margin-right: auto;
-    color: #fff;
-    padding: 10px;
-    cursor: pointer;
-    opacity: 0.7;
-    border: 1px solid #aaa;
-    border-radius: 5px;
-    transition: opacity 200ms ease;
-}
-
-.switch .left:hover {
-    opacity: 0.9;
 }
 
 .switch .right {
     float: right;
     color: #fff;
-    padding: 10px;
-    cursor: pointer;
-    opacity: 0.7;
-    border: 1px solid #aaa;
-    border-radius: 5px;
-    transition: opacity 200ms ease;
-}
-
-.switch .right:hover {
-    opacity: 0.9;
 }
 
 .switch .value {
@@ -41,7 +26,7 @@
     text-align: center;
     color: #fff;
     cursor: pointer;
-    padding: 10px 20px;
+    padding: 5px 20px;
     margin-left: 50%;
     transform: translate( -50%, 0px );
 }

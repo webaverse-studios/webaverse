@@ -1,8 +1,5 @@
-// import * as THREE from 'three';
-// import metaversefile from 'metaversefile'
 import {emotions} from './src/components/general/character/Emotions';
 import offscreenEngineManager from './offscreen-engine/offscreen-engine-manager.js';
-import {fetchArrayBuffer} from './util';
 import {avatarManager} from './avatar-manager';
 import {playersManager} from './players-manager';
 

@@ -8,7 +8,7 @@ import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {Text} from 'troika-three-text';
 import React from 'react';
-import * as ReactThreeFiber from '@react-three/fiber';
+// import * as ReactThreeFiber from '@react-three/fiber';
 import metaversefile from 'metaversefile';
 import {getRenderer, scene, sceneHighPriority, sceneLowPriority, sceneLowerPriority, sceneLowestPriority, rootScene, camera} from './renderer.js';
 import cameraManager from './camera-manager.js';
@@ -65,6 +65,8 @@ import {lightsManager} from './engine-hooks/lights/lights-manager.js';
 import {skyManager} from './engine-hooks/environment/skybox/sky-manager.js';
 import {compilerBaseUrl} from './endpoints.js';
 import {getDefaultCanvas} from './offscreen-engine/fns/avatar-iconer-fn.js';
+import {encodePNG2KTX} from './basisu/encode.js';
+import {loadKtx2TextureBlob, loadKtx2TextureUrl} from './basisu/decode.js';
 import {isWorker} from './env.js';
 import './metaversefile-binding.js';
 
@@ -555,6 +557,13 @@ metaversefile.setApi({
   useSceneCruncher() {
     return sceneCruncher;
   }, */
+  useKtx2Util() {
+    return {
+      encodePNG2KTX,
+      loadKtx2TextureBlob,
+      loadKtx2TextureUrl,
+    };
+  },
   useScenePreviewer() {
     return scenePreviewer;
   },
@@ -1461,6 +1470,7 @@ export default () => {
       _bindDefaultComponents(app);
       
       return app;
+    /*
     } else if (React.isValidElement(renderSpec)) {
       const o = new THREE.Object3D();
       // o.contentId = contentId;
@@ -1574,6 +1584,7 @@ export default () => {
       _bindDefaultComponents(app);
       
       return app;
+    */
     } else if (renderSpec === false || renderSpec === null || renderSpec === undefined) {
       app.destroy();
       return null;
