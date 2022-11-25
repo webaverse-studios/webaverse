@@ -1125,8 +1125,7 @@ class GameManager extends EventTarget {
             this.grabUseMesh.updateMatrixWorld();
             this.grabUseMesh.targetApp = object;
             this.grabUseMesh.targetPhysicsId = physicsId;
-            this.grabUseMesh.setComponent('value', localPlayer.actionInterpolants.activate.getNormalized());
-
+            this.grabUseMesh.setComponent('value', physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'activate', 1));
             this.grabUseMesh.visible = true;
           }
         }
@@ -1155,8 +1154,7 @@ class GameManager extends EventTarget {
             gridSnap: gameManager.getGridSnap(),
           });
 
-          this.grabUseMesh.setComponent('value', localPlayer.actionInterpolants.activate.getNormalized());
-        }
+          this.grabUseMesh.setComponent('value', physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'activate', 1));        }
       }
     };
     _updateGrab();
@@ -1451,7 +1449,8 @@ class GameManager extends EventTarget {
     _handleUsableObject();
 
     const _updateActivate = () => {
-      const v = localPlayer.actionInterpolants.activate.getNormalized();
+      const v = localPlayer.getAction('activate').getNormalized();
+      if (!v) return;
       const currentActivated = v >= 1;
 
       if (currentActivated && !this.lastActivated) {
@@ -1464,7 +1463,9 @@ class GameManager extends EventTarget {
       }
       this.lastActivated = currentActivated;
     };
-    _updateActivate();
+
+    if(localPlayer.actionInterpolants)
+      _updateActivate();
 
     const _updateThirdPerson = () => {
       const firstPerson = cameraManager.getMode() === 'firstperson';
