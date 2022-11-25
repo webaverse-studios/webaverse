@@ -1,5 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
-// import styles from './RpgText.module.css';
+import React, {useState, useEffect} from 'react';
 import classnames from 'classnames';
 import {chatTextSpeed} from '../constants.js';
 

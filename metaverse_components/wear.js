@@ -1,12 +1,7 @@
 import * as THREE from 'three';
 import metaversefile from 'metaversefile';
 import Avatar from '../avatars/avatars.js';
-// import {world} from '../world.js';
 import physicsManager from '../physics-manager.js';
-// import {glowMaterial} from '../shaders.js';
-// import easing from '../easing.js';
-import npcManager from '../npc-manager.js';
-// import {rarityColors} from '../constants.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -62,8 +57,8 @@ export default (app, component) => {
             });
             if (skinnedMesh && player.avatar) {
               app.position.set(0, 0, 0);
-              app.quaternion.identity(); //.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
-              app.scale.copy(initialScale)//.multiplyScalar(wearableScale);
+              app.quaternion.identity(); // .setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
+              app.scale.copy(initialScale)// .multiplyScalar(wearableScale);
               app.updateMatrix();
               app.matrixWorld.copy(app.matrix);
               

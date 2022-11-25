@@ -98,7 +98,7 @@
   padding: 10px;
 }
 .equipment .menu .wing.left {
-  left: calc( - var(--width) );
+  left: calc( var(--width) * -1 );
   margin-top: 128px;
   margin-left: calc( -40px );
   padding-left: 0;

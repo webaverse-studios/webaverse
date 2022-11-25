@@ -1,13 +1,8 @@
 import * as THREE from 'three';
-// import metaversefile from 'metaversefile';
 import {playersManager} from './players-manager.js';
 import {world} from './world.js';
 import {scene} from './renderer.js';
 import {ScenePreviewer} from './scene-previewer.js';
-
-// const localVector = new THREE.Vector3();
-// const localVector2 = new THREE.Vector3();
-// const localQuaternion = new THREE.Quaternion();
 
 const range = 30;
 
@@ -39,8 +34,8 @@ class OverworldApp {
     lodMesh.updateMatrixWorld();
 
     for (const skyboxMesh of skyboxMeshes) {
-      skyboxMesh.position.copy(previewPosition);
-      skyboxMesh.quaternion.copy(previewQuaternion);
+      skyboxMesh.position.copy(previewer.position);
+      skyboxMesh.quaternion.copy(previewer.quaternion);
       overworldObject.add(skyboxMesh);
       skyboxMesh.updateMatrixWorld();
     }
@@ -57,6 +52,7 @@ class OverworldApp {
     this.loadPromise = previewer.loadScene(start_url)
       .then(() => {});
   }
+
   waitForLoad() {
     return this.loadPromise;
   }

@@ -2,15 +2,12 @@
 it sets up and ticks the physics loop for our local character */
 
 import * as THREE from 'three';
-// import cameraManager from './camera-manager.js';
-// import {getPlayerCrouchFactor} from './character-controller.js';
 import physicsManager from './physics-manager.js';
-// import ioManager from './io-manager.js';
-import {getVelocityDampingFactor, applyVelocity} from './util.js';
-import {groundFriction, flyFriction, airFriction, swimFriction, flatGroundJumpAirTime, jumpHeight} from './constants.js';
+import {applyVelocity} from './util.js';
+import {groundFriction, flyFriction, swimFriction, flatGroundJumpAirTime, jumpHeight} from './constants.js';
 import {getRenderer, camera} from './renderer.js';
-// import physx from './physx.js';
 import metaversefileApi from 'metaversefile';
+import physx from './physx.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -60,6 +57,7 @@ class CharacterPhysics {
     this.lastPistolUse = false;
     this.lastPistolUseStartTime = -Infinity;
   }
+
   loadCharacterController(characterWidth, characterHeight) {
     this.characterWidth = characterWidth;
     this.characterHeight = characterHeight;
@@ -86,6 +84,7 @@ class CharacterPhysics {
       position
     );
   }
+
   setPosition(p) {
     localVector.copy(p);
     localVector.y -= this.characterHeight * 0.5;
@@ -95,6 +94,7 @@ class CharacterPhysics {
       localVector
     );
   }
+
   /* apply the currently held keys to the character */
   applyWasd(velocity, timeDiff) {
     if (this.character.avatar) {
@@ -102,6 +102,7 @@ class CharacterPhysics {
       this.targetMoveDistancePerFrame.copy(this.targetVelocity).multiplyScalar(timeDiff / 1000);
     }
   }
+
   applyGravity(nowS, timeDiffS) {
     // if (this.character) {
       const fallLoopAction = this.character.getAction('fallLoop');
@@ -121,15 +122,18 @@ class CharacterPhysics {
         const t = nowS - this.fallLoopStartTimeS;
         const h = 0.5 * physicsScene.getGravity().y * t * t;
         this.wantMoveDistancePerFrame.y = h - this.lastGravityH;
+        this.wantVelocity.y = t * physicsScene.getGravity().y;
 
         this.lastGravityH = h;
       }
       this.lastFallLoopAction = fallLoopAction;
     // }
   }
+
   updateVelocity(timeDiffS) {
     this.applyVelocityDamping(this.velocity, timeDiffS);
   }
+
   applyCharacterPhysicsDetail(velocityAvatarDirection, updateRig, now, timeDiffS) {
     if (this.character.avatar) {
       // move character controller
@@ -142,24 +146,24 @@ class CharacterPhysics {
         const doubleJumpAction = this.character.getAction('doubleJump');
         if (doubleJumpAction) {
           const doubleJumpTime =
-            this.character.actionInterpolants.doubleJump.get();
+            physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'doubleJump', 0);
           localVector3.y =
             Math.sin(doubleJumpTime * (Math.PI / flatGroundJumpAirTime)) *
               jumpHeight +
             doubleJumpAction.startPositionY -
             this.lastCharacterControllerY;
           if (doubleJumpTime >= flatGroundJumpAirTime) {
-            this.character.setControlAction({ type: 'fallLoop', from: 'jump' });
+            this.character.setControlAction({type: 'fallLoop', from: 'jump'});
           }
         } else {
-          const jumpTime = this.character.actionInterpolants.jump.get();
+          const jumpTime = physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'jump', 0);
           localVector3.y =
             Math.sin(jumpTime * (Math.PI / flatGroundJumpAirTime)) *
               jumpHeight +
             jumpAction.startPositionY -
             this.lastCharacterControllerY;
           if (jumpTime >= flatGroundJumpAirTime) {
-            this.character.setControlAction({ type: 'fallLoop', from: 'jump' });
+            this.character.setControlAction({type: 'fallLoop', from: 'jump'});
           }
         }
       }
@@ -170,7 +174,7 @@ class CharacterPhysics {
         this.character.getAction('swim').onSurface &&
         !this.character.hasAction('fly')
       ) {
-        if (this.character.characterPhysics.velocity.y > 0) {
+        if (this.character.characterPhysics.velocity.y >= 0) {
           localVector3.y = 0;
         }
       }
@@ -290,13 +294,13 @@ class CharacterPhysics {
               !this.character.hasAction('fly') &&
               !this.character.hasAction('swim')
             ) {
-              this.character.setControlAction({ type: 'fallLoop' });
+              this.character.setControlAction({type: 'fallLoop'});
               this.velocity.y = 0;
             }
           }
         }
       } else {
-        //Outdated vehicle code
+        // Outdated vehicle code
         this.velocity.y = 0;
 
         const sitAction = this.character.getAction('sit');
@@ -394,6 +398,7 @@ class CharacterPhysics {
         this.characterController.position.y;
     }
   }
+
   /* dampen the velocity to make physical sense for the current avatar state */
   applyVelocityDamping(velocity, timeDiffS) {
     const doDamping = (factor) => {
@@ -417,6 +422,7 @@ class CharacterPhysics {
       doDamping(groundFriction);
     }
   }
+
   applyCharacterPhysics(now, timeDiffS) {
     // const renderer = getRenderer();
     // const session = renderer.xr.getSession();
@@ -444,6 +450,7 @@ class CharacterPhysics {
     }
     // }
   }
+
   applyCharacterActionKinematics(now, timeDiffS) {
     const renderer = getRenderer();
     const session = renderer.xr.getSession();
@@ -457,7 +464,7 @@ class CharacterPhysics {
           if (!app) {
             return null;
           }
-          for (const { key, value } of app.components) {
+          for (const {key, value} of app.components) {
             if (key === 'aim') {
               return value;
             }
@@ -487,6 +494,22 @@ class CharacterPhysics {
             ? 0
             : null);
         const enabled = isHandEnabled && isExpectedHandIndex;
+        //
+        if (this.character.hands[i].enabled !== enabled) {
+          if (enabled) {
+            if (i === 0) {
+              this.character.addAction({type: 'rightHand'});
+            } else if (i === 1) {
+              this.character.addAction({type: 'leftHand'});
+            }
+          } else {
+            if (i === 0) {
+              this.character.removeAction('rightHand');
+            } else if (i === 1) {
+              this.character.removeAction('leftHand');
+            }
+          }
+        }
         this.character.hands[i].enabled = enabled;
       }
     };
@@ -635,6 +658,7 @@ class CharacterPhysics {
     };
     _updateBowIkAnimation();
   }
+
   update(now, timeDiffS) {
     const nowS = now / 1000;
     this.updateVelocity(timeDiffS);
@@ -645,11 +669,13 @@ class CharacterPhysics {
     this.lastTargetVelocity.copy(this.targetVelocity);
     this.lastTargetMoveDistancePerFrame.copy(this.targetMoveDistancePerFrame);
   }
+
   reset() {
     if (this.character.avatar) {
       this.velocity.set(0, 0, 0);
     }
   }
+
   destroy() {
     if (this.characterController) {
       const physicsScene = physicsManager.getScene();

@@ -1,16 +1,11 @@
 import * as THREE from 'three';
 import metaversefileApi from './metaversefile-api.js';
-import {getExt, makePromise, parseQuery, fitCameraToBoundingBox} from './util.js';
+import {parseQuery, fitCameraToBoundingBox} from './util.js';
 import Avatar from './avatars/avatars.js';
-// import * as icons from './icons.js';
 import GIF from './gif.js';
-// import App from './webaverse';
-// import {defaultRendererUrl} from './constants.js'
 import * as WebMWriter from 'webm-writer';
 const defaultWidth = 512;
 const defaultHeight = 512;
-// const cameraPosition = new THREE.Vector3(0, 1, 2);
-// const cameraTarget = new THREE.Vector3(0, 0, 0);
 const FPS = 60;
 
 const localVector = new THREE.Vector3();

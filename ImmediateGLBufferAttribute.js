@@ -57,18 +57,23 @@ export class ImmediateGLBufferAttribute extends THREE.GLBufferAttribute {
       count: -1,
     }; */
   }
+
   static getTarget(isIndex) {
     return isIndex ? WebGLRenderingContext.ELEMENT_ARRAY_BUFFER : WebGLRenderingContext.ARRAY_BUFFER;
   }
+
   getTarget() {
     return ImmediateGLBufferAttribute.getTarget(this.isIndex);
   }
+
   static getTargetBinding(isIndex) {
     return isIndex ? WebGLRenderingContext.ELEMENT_ARRAY_BUFFER_BINDING : WebGLRenderingContext.ARRAY_BUFFER_BINDING;
   }
+
   getTargetBinding() {
     return ImmediateGLBufferAttribute.getTargetBinding(this.isIndex);
   }
+
   pushed = false;
   static pushUpdate() {
     const renderer = getRenderer();
@@ -85,6 +90,7 @@ export class ImmediateGLBufferAttribute extends THREE.GLBufferAttribute {
     };
     return popUpdate;
   }
+
   wrap(fn) {
     let popUpdate = null;
     if (!ImmediateGLBufferAttribute.pushed) {
@@ -95,6 +101,7 @@ export class ImmediateGLBufferAttribute extends THREE.GLBufferAttribute {
 
     popUpdate && popUpdate();
   }
+
   update(offset, count, array = this.array, srcOffset = offset) {
     this.wrap(() => {
       const renderer = getRenderer();

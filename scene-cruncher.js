@@ -7,9 +7,7 @@ import physicsManager from './physics-manager.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
-// const localVector3 = new THREE.Vector3();
 const localVector4D = new THREE.Vector4();
-// const localMatrix = new THREE.Matrix4();
 
 const cameraNear = 0;
 
@@ -318,7 +316,7 @@ const _makeGeometry = (position, quaternion, worldSize, worldDepthResolution, de
   geometry2.setIndex(new THREE.BufferAttribute(faces, 1));
   geometry2.computeVertexNormals();
 
-  return [geometry2/*, cubePositions*/];
+  return [geometry2/*, cubePositions */];
 };
 // const normalMaterial = new THREE.MeshNormalMaterial();
 const baseMaterial = new THREE.MeshBasicMaterial({

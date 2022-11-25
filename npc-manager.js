@@ -14,11 +14,11 @@ import * as voices from './voices.js';
 import {world} from './world.js';
 import {chatManager} from './chat-manager.js';
 import {makeId, createRelativeUrl} from './util.js';
-import { triggerEmote } from './src/components/general/character/Poses.jsx';
-import validEmotionMapping from "./validEmotionMapping.json";
 import metaversefile from './metaversefile-api.js';
-import {runSpeed, walkSpeed} from './constants.js';
 import {characterSelectManager} from './characterselect-manager.js';
+import emoteManager from './emotes/emote-manager.js';
+import {getFuzzyEmotionMapping} from './story.js';
+import {runSpeed, walkSpeed} from './constants.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -63,9 +63,11 @@ class NpcManager extends EventTarget {
   getAppByNpc(npc) {
     return this.npcAppMap.get(npc);
   }
+
   getNpcByApp(app) {
     return this.npcs.find(npc => this.getAppByNpc(npc) === app);
   }
+
   getDetachedNpcByApp(app) {
     return this.detachedNpcs.find(npc => this.getAppByNpc(npc) === app);
   }
@@ -94,12 +96,6 @@ class NpcManager extends EventTarget {
     app.addEventListener('destroy', () => {
       this.removeNpcApp(app);
     });
-
-    this.dispatchEvent(new MessageEvent('defaultplayeradd', {
-      data: {
-        player,
-      }
-    }));
   }
 
   async addNpcApp(app, srcUrl) {
@@ -143,6 +139,7 @@ class NpcManager extends EventTarget {
       });
     }
   }
+
   removeNpcApp(app) {
     const fn = cancelFnsMap.get(app);
     if (fn) {
@@ -160,6 +157,7 @@ class NpcManager extends EventTarget {
       }
     }
   }
+
   updateAvatar(timestamp, timeDiff) {
     const allNpcs = [].concat(this.npcs, this.detachedNpcs);
     for (const npc of allNpcs) {
@@ -173,6 +171,7 @@ class NpcManager extends EventTarget {
   setPartyTarget(player, target) {
     this.targetMap.set(player, target);
   }
+
   #getPartyTarget(player) {
     return this.targetMap.get(player);
   }
@@ -408,33 +407,42 @@ class NpcManager extends EventTarget {
         };
 
         chatManager.addPlayerMessage(player, m);
-        if (emote !== 'none' && validEmotionMapping[emote]!== undefined) {
-          triggerEmote(validEmotionMapping[emote], player);
-        }
-        if (emote === 'supersaiyan' || action === 'supersaiyan' || /supersaiyan/i.test(object) || /supersaiyan/i.test(target)) {
-          const newSssAction = {
-            type: 'sss',
-          };
-          player.addAction(newSssAction);  
-        } else if (action === 'follow' || (object === 'none' && target === localPlayer.name)) { // follow player
-          targetSpec = {
-            type: 'follow',
-            object: localPlayer,
-          };
-        } else if (action === 'stop') { // stop
-          targetSpec = null;
-        } else if (action === 'moveto' || (object !== 'none' && target === 'none')) { // move to object
-          console.log('move to object', object);
-        } else if (action === 'moveto' || (object === 'none' && target !== 'none')) { // move to player
-          targetSpec = {
-            type: 'moveto',
-            object: localPlayer,
-          };
-        } else if (['pickup', 'grab', 'take', 'get'].includes(action)) { // pick up object
-          console.log('pickup', action, object, target);
-        } else if (['use', 'activate'].includes(action)) { // use object
-          console.log('use', action, object, target);
-        }
+        
+        const _triggerEmotes = () => {
+          const fuzzyEmotionName = getFuzzyEmotionMapping(emote);
+          if (fuzzyEmotionName) {
+            emoteManager.triggerEmote(fuzzyEmotionName, player);
+          }
+        };
+        _triggerEmotes();
+
+        const _triggerActions = () => {
+          if (emote === 'supersaiyan' || action === 'supersaiyan' || /supersaiyan/i.test(object) || /supersaiyan/i.test(target)) {
+            const newSssAction = {
+              type: 'sss',
+            };
+            player.addAction(newSssAction);
+          } else if (action === 'follow' || (object === 'none' && target === localPlayer.name)) { // follow player
+            targetSpec = {
+              type: 'follow',
+              object: localPlayer,
+            };
+          } else if (action === 'stop') { // stop
+            targetSpec = null;
+          } else if (action === 'moveto' || (object !== 'none' && target === 'none')) { // move to object
+            console.log('move to object', object);
+          } else if (action === 'moveto' || (object === 'none' && target !== 'none')) { // move to player
+            targetSpec = {
+              type: 'moveto',
+              object: localPlayer,
+            };
+          } else if (['pickup', 'grab', 'take', 'get'].includes(action)) { // pick up object
+            console.log('pickup', action, object, target);
+          } else if (['use', 'activate'].includes(action)) { // use object
+            console.log('use', action, object, target);
+          }
+        };
+        _triggerActions();
       });
     };
     _addToAiScene();

@@ -2,7 +2,6 @@
 party manager provides invitation, deactive, and switch player features
 characters are transplanted between world app manager and local player app manager
 */
-import * as THREE from 'three';
 
 import {AppManager} from './app-manager.js';
 import {world} from './world.js';
@@ -19,19 +18,19 @@ class PartyManager extends EventTarget {
 
     this.appManager = new AppManager();
 
-    npcManager.addEventListener('defaultplayeradd', (e) => {
-      const {player} = e.data;
-      const app = npcManager.getAppByNpc(player);
-      world.appManager.importApp(app);
-      world.appManager.transplantApp(app, this.appManager);
-
-      this.invitePlayer(player);
-    });
-
     npcManager.addEventListener('playerinvited', (e) => {
       const {player} = e.data;
       this.invitePlayer(player);
     });
+  }
+
+  inviteDefaultPlayer() {
+    const player = playersManager.getLocalPlayer();
+    const app = npcManager.getAppByNpc(player);
+    world.appManager.importApp(app);
+    world.appManager.transplantApp(app, this.appManager);
+
+    this.invitePlayer(player);
   }
 
   switchCharacter() {

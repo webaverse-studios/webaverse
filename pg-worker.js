@@ -1,5 +1,5 @@
 import pg from './pg-binding.js';
-import {makePromise, align, align4} from './util.js';
+import {makePromise} from './util.js';
 
 //
 
@@ -7,7 +7,10 @@ const _cloneChunkResult = chunkResult => {
   const {
     terrainGeometry,
     waterGeometry,
-    vegetationInstances,
+    treeInstances,
+    bushInstances,
+    rockInstances,
+    stoneInstances,
     grassInstances,
     poiInstances,
     heightfields,
@@ -15,7 +18,7 @@ const _cloneChunkResult = chunkResult => {
 
   const _getTerrainGeometrySize = () => {
     if (terrainGeometry) {
-      let size = terrainGeometry.positions.length * terrainGeometry.positions.constructor.BYTES_PER_ELEMENT +
+      const size = terrainGeometry.positions.length * terrainGeometry.positions.constructor.BYTES_PER_ELEMENT +
         terrainGeometry.normals.length * terrainGeometry.normals.constructor.BYTES_PER_ELEMENT +
         terrainGeometry.biomesWeights.length * terrainGeometry.biomesWeights.constructor.BYTES_PER_ELEMENT +
         terrainGeometry.biomesUvs1.length * terrainGeometry.biomesUvs1.constructor.BYTES_PER_ELEMENT +
@@ -30,7 +33,7 @@ const _cloneChunkResult = chunkResult => {
   };
   const _getWaterGeometrySize = () => {
     if (waterGeometry) {
-      let size = waterGeometry.positions.length * waterGeometry.positions.constructor.BYTES_PER_ELEMENT +
+      const size = waterGeometry.positions.length * waterGeometry.positions.constructor.BYTES_PER_ELEMENT +
         waterGeometry.normals.length * waterGeometry.normals.constructor.BYTES_PER_ELEMENT +
         waterGeometry.factors.length * waterGeometry.factors.constructor.BYTES_PER_ELEMENT +
         waterGeometry.indices.length * waterGeometry.indices.constructor.BYTES_PER_ELEMENT;
@@ -66,10 +69,47 @@ const _cloneChunkResult = chunkResult => {
       return 0;
     }
   };
+
+  const _getPQMIInstancesSize = instancesResult => {
+    if (instancesResult) {
+      const {instances} = instancesResult;
+      let size = 0;
+      for (let i = 0; i < instances.length; i++) {
+        const instance = instances[i];
+        const {ps, qs, materials, materialsWeights} = instance;
+        size += ps.length * ps.constructor.BYTES_PER_ELEMENT;
+        size += qs.length * qs.constructor.BYTES_PER_ELEMENT;
+        size += materials.length * materials.constructor.BYTES_PER_ELEMENT;
+        size += materialsWeights.length * materialsWeights.constructor.BYTES_PER_ELEMENT;
+      }
+      return size;
+    } else {
+      return 0;
+    }
+  };
+
+  const _getGrassInstancesSize = instancesResult => {
+    if (instancesResult) {
+      const {instances} = instancesResult;
+      let size = 0;
+      for (let i = 0; i < instances.length; i++) {
+        const instance = instances[i];
+        const {ps, qs, materials, materialsWeights, grassProps} = instance;
+        size += ps.length * ps.constructor.BYTES_PER_ELEMENT;
+        size += qs.length * qs.constructor.BYTES_PER_ELEMENT;
+        size += materials.length * materials.constructor.BYTES_PER_ELEMENT;
+        size += materialsWeights.length * materialsWeights.constructor.BYTES_PER_ELEMENT;
+        size += grassProps.length * grassProps.constructor.BYTES_PER_ELEMENT;
+      }
+      return size;
+    } else {
+      return 0;
+    }
+  };
   const _getPIInstancesSize = instancesResult => {
     if (instancesResult) {
       const {ps, instances} = instancesResult;
-      let size =
+      const size =
         ps.length * ps.constructor.BYTES_PER_ELEMENT +
         instances.length * instances.constructor.BYTES_PER_ELEMENT;
       return size;
@@ -79,7 +119,7 @@ const _cloneChunkResult = chunkResult => {
   };
   const _getHeightfieldsSize = () => {
     if (heightfields) {
-      let size = heightfields.pixels.length * heightfields.pixels.constructor.BYTES_PER_ELEMENT;
+      const size = heightfields.pixels.length * heightfields.pixels.constructor.BYTES_PER_ELEMENT;
       return size;
     } else {
       return 0;
@@ -89,15 +129,21 @@ const _cloneChunkResult = chunkResult => {
   const terrainGeometrySize = _getTerrainGeometrySize();
   const waterGeometrySize = _getWaterGeometrySize();
   // const barrierGeometrySize = _getBarrierGeometrySize();
-  const vegetationInstancesSize = _getPQIInstancesSize(vegetationInstances);
-  const grassInstancesSize = _getPQIInstancesSize(grassInstances);
+  const treeInstancesSize = _getPQIInstancesSize(treeInstances);
+  const bushInstancesSize = _getPQIInstancesSize(bushInstances);
+  const rockInstancesSize = _getPQIInstancesSize(rockInstances);
+  const stoneInstancesSize = _getPQIInstancesSize(stoneInstances);
+  const grassInstancesSize = _getGrassInstancesSize(grassInstances);
   const poiInstancesSize = _getPIInstancesSize(poiInstances);
   const heightfieldsSize = _getHeightfieldsSize();
   const arrayBuffer = new ArrayBuffer(
     terrainGeometrySize +
     waterGeometrySize +
     // barrierGeometrySize +
-    vegetationInstancesSize +
+    treeInstancesSize +
+    bushInstancesSize +
+    rockInstancesSize +
+    stoneInstancesSize +
     grassInstancesSize +
     poiInstancesSize +
     heightfieldsSize
@@ -195,6 +241,7 @@ const _cloneChunkResult = chunkResult => {
       return null;
     }
   };
+
   const _cloneWaterGeometry = () => {
     if (waterGeometry) {
       const positions = new waterGeometry.positions.constructor(arrayBuffer, index, waterGeometry.positions.length);
@@ -223,6 +270,7 @@ const _cloneChunkResult = chunkResult => {
       return null;
     }
   };
+
   /* const _cloneBarrierGeometry = () => {
     if (barrierGeometry) {
       const positions = new barrierGeometry.positions.constructor(arrayBuffer, index, barrierGeometry.positions.length);
@@ -256,6 +304,7 @@ const _cloneChunkResult = chunkResult => {
       return null;
     }
   }; */
+
   const _clonePQIInstances = instancesResult => {
     if (instancesResult) {
       const {instances} = instancesResult;
@@ -283,6 +332,88 @@ const _cloneChunkResult = chunkResult => {
       return null;
     }
   };
+
+  const _clonePQMIInstances = instancesResult => {
+    if (instancesResult) {
+      const {instances} = instancesResult;
+      const instances2 = Array(instances.length);
+      for (let i = 0; i < instances.length; i++) {
+        const instance = instances[i];
+        const {instanceId, ps, qs, materials, materialsWeights} = instance;
+
+        const ps2 = new ps.constructor(arrayBuffer, index, ps.length);
+        ps2.set(ps);
+        index += ps.length * ps.constructor.BYTES_PER_ELEMENT;
+
+        const qs2 = new qs.constructor(arrayBuffer, index, qs.length);
+        qs2.set(qs);
+        index += qs.length * qs.constructor.BYTES_PER_ELEMENT;
+
+        const materials2 = new materials.constructor(arrayBuffer, index, materials.length);
+        materials2.set(materials);
+        index += materials.length * materials.constructor.BYTES_PER_ELEMENT;
+
+        const materialsWeights2 = new materialsWeights.constructor(arrayBuffer, index, materialsWeights.length);
+        materialsWeights2.set(materialsWeights);
+        index += materialsWeights.length * materialsWeights.constructor.BYTES_PER_ELEMENT;
+
+        instances2[i] = {
+          instanceId,
+          ps: ps2,
+          qs: qs2,
+          materials: materials2,
+          materialsWeights: materialsWeights2
+        };
+      }
+      return instances2;
+    } else {
+      return null;
+    }
+  };
+
+  const _cloneGrassInstances = instancesResult => {
+    if (instancesResult) {
+      const {instances} = instancesResult;
+      const instances2 = Array(instances.length);
+      for (let i = 0; i < instances.length; i++) {
+        const instance = instances[i];
+        const {instanceId, ps, qs, materials, materialsWeights, grassProps} = instance;
+
+        const ps2 = new ps.constructor(arrayBuffer, index, ps.length);
+        ps2.set(ps);
+        index += ps.length * ps.constructor.BYTES_PER_ELEMENT;
+
+        const qs2 = new qs.constructor(arrayBuffer, index, qs.length);
+        qs2.set(qs);
+        index += qs.length * qs.constructor.BYTES_PER_ELEMENT;
+
+        const materials2 = new materials.constructor(arrayBuffer, index, materials.length);
+        materials2.set(materials);
+        index += materials.length * materials.constructor.BYTES_PER_ELEMENT;
+
+        const materialsWeights2 = new materialsWeights.constructor(arrayBuffer, index, materialsWeights.length);
+        materialsWeights2.set(materialsWeights);
+        index += materialsWeights.length * materialsWeights.constructor.BYTES_PER_ELEMENT;
+
+        const grassProps2 = new grassProps.constructor(arrayBuffer, index, grassProps.length);
+        grassProps2.set(grassProps);
+        index += grassProps.length * grassProps.constructor.BYTES_PER_ELEMENT;
+
+        instances2[i] = {
+          instanceId,
+          ps: ps2,
+          qs: qs2,
+          materials: materials2,
+          materialsWeights: materialsWeights2,
+          grassProps: grassProps2
+        };
+      }
+      return instances2;
+    } else {
+      return null;
+    }
+  };
+
   const _clonePIInstances = instancesResult => {
     if (instancesResult) {
       const ps = new instancesResult.ps.constructor(arrayBuffer, index, instancesResult.ps.length);
@@ -317,8 +448,11 @@ const _cloneChunkResult = chunkResult => {
 
   const terrainGeometry2 = _cloneTerrainGeometry();
   const waterGeometry2 = _cloneWaterGeometry();
-  const vegetationInstances2 = _clonePQIInstances(vegetationInstances);
-  const grassInstances2 = _clonePQIInstances(grassInstances);
+  const treeInstances2 = _clonePQIInstances(treeInstances);
+  const bushInstances2 = _clonePQIInstances(bushInstances);
+  const rockInstances2 = _clonePQIInstances(rockInstances);
+  const stoneInstances2 = _clonePQIInstances(stoneInstances);
+  const grassInstances2 = _cloneGrassInstances(grassInstances);
   const poiInstances2 = _clonePIInstances(poiInstances);
   const heightfields2 = _cloneHeightfields();
 
@@ -329,12 +463,15 @@ const _cloneChunkResult = chunkResult => {
 
   return {
     arrayBuffer,
-    terrainGeometry: terrainGeometry2,
-    waterGeometry: waterGeometry2,
-    vegetationInstances: vegetationInstances2,
-    grassInstances: grassInstances2,
-    poiInstances: poiInstances2,
-    heightfields: heightfields2,
+    terrainGeometry: terrainGeometry2 /* null */,
+    waterGeometry: waterGeometry2 /* null */,
+    treeInstances: treeInstances2 /* null */,
+    bushInstances: bushInstances2 /* null */,
+    rockInstances: rockInstances2 /* null */,
+    stoneInstances: stoneInstances2 /* null */,
+    grassInstances: grassInstances2 /* null */,
+    poiInstances: poiInstances2 /* null */,
+    heightfields: heightfields2 /* null */,
   };
 };
 const _cloneBarrierResult = barrierResult => {
@@ -517,11 +654,12 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
       }
       return true;
     }
-    case 'deleteInstance': {
+    case 'destroyInstance': {
       const {instance: instanceKey} = args;
       const instance = instances.get(instanceKey);
       if (instance) {
-        pg.deleteInstance(instance);
+        // console.log(instance);
+        pg.destroyInstance(instance);
         instances.delete(instanceKey);
         return true;
       } else {
@@ -569,7 +707,14 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
         lod1Range,
         priority
       );
+
       const trackerUpdate2 = _cloneTrackerUpdate(trackerUpdate);
+
+      const _freeTrackerUpdateResult = () => {
+        pg.free(trackerUpdate.bufferAddress);
+      };
+      _freeTrackerUpdateResult();
+
       const spec = {
         result: trackerUpdate2,
         transfers: [],
@@ -584,6 +729,7 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
         chunkSize,
         generateFlagsInt,
         numVegetationInstances,
+        numRockInstances,
         numGrassInstances,
         numPoiInstances,
       } = args;
@@ -601,6 +747,7 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
         lodArray,
         generateFlagsInt,
         numVegetationInstances,
+        numRockInstances,
         numGrassInstances,
         numPoiInstances,
       );
@@ -609,6 +756,10 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
       const _freeChunkResult = chunkResult => {
         chunkResult.terrainGeometry && pg.free(chunkResult.terrainGeometry.bufferAddress);
         chunkResult.waterGeometry && pg.free(chunkResult.waterGeometry.bufferAddress);
+        chunkResult.treeInstances && pg.free(chunkResult.treeInstances.bufferAddress);
+        chunkResult.bushInstances && pg.free(chunkResult.bushInstances.bufferAddress);
+        chunkResult.rockInstances && pg.free(chunkResult.rockInstances.bufferAddress);
+        chunkResult.stoneInstances && pg.free(chunkResult.stoneInstances.bufferAddress);
         chunkResult.grassInstances && pg.free(chunkResult.grassInstances.bufferAddress);
         chunkResult.poiInstances && pg.free(chunkResult.poiInstances.bufferAddress);
         chunkResult.heightfields && pg.free(chunkResult.heightfields.bufferAddress);
@@ -709,7 +860,7 @@ const _handleMessage = async m => {
   if (taskId) {
     p.then(
       (spec) => {
-        const { result = null, transfers = [] } = spec ?? {};
+        const {result = null, transfers = []} = spec ?? {};
         port.postMessage(
           {
             method: 'response',

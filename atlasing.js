@@ -1,15 +1,13 @@
 import * as THREE from 'three';
 import {MaxRectsPacker} from 'maxrects-packer';
-import {modUv} from './util.js';
 import {startTextureAtlasSize, maxTextureAtlasSize} from './constants.js';
 
-// const localVector = new THREE.Vector3();
-// const localVector2 = new THREE.Vector3();
 const localVector2D = new THREE.Vector2();
 const localVector2D2 = new THREE.Vector2();
-// const localVector4D = new THREE.Vector4();
-// const localQuaternion = new THREE.Quaternion();
-// const localMatrix = new THREE.Matrix4();
+
+const clampUv = (uv, min, max) => {
+  return Math.max(min, Math.min(uv, max));
+}
 
 export const mapWarpedUvs = (
   src,
@@ -24,37 +22,17 @@ export const mapWarpedUvs = (
 ) => {
   const count = src.count;
 
-  let minX = 0;
-  let minY = 0;
-  let maxX = 1;
-  let maxY = 1;
-
-  // * finding the min and max of the UVs for scaling
-  for (let i = 0; i < count; i++) {
-    const srcIndex = srcOffset + i * 2;
-    localVector2D.fromArray(src.array, srcIndex);
-
-    minX = Math.min(minX, localVector2D.x);
-    minY = Math.min(minY, localVector2D.y);
-
-    maxX = Math.max(maxX, localVector2D.x);
-    maxY = Math.max(maxY, localVector2D.y);
-  }
-
-  const dx = maxX - minX;
-  const dy = maxY - minY;
-
   for (let i = 0; i < count; i++) {
     const srcIndex = srcOffset + i * 2;
     const localDstOffset = dstOffset + i * 2;
 
     localVector2D.fromArray(src.array, srcIndex);
 
-    // * scaling the UVs to be in the 0-1 range
-    localVector2D.x = (localVector2D.x - minX) / dx;
-    localVector2D.y = (localVector2D.y - minY) / dy;
+    // * making sure the UVs are in the range [0, 1]
+    localVector2D.x = clampUv(localVector2D.x, 0, 1);
+    localVector2D.y = clampUv(localVector2D.y, 0, 1);
 
-    modUv(localVector2D);
+    // modUv(localVector2D);
 
     localVector2D
       .multiply(localVector2D2.set(tw / canvasSize, th / canvasSize))
@@ -260,6 +238,8 @@ export const createTextureAtlas = (meshes, {
     atlasImages,
   } = generateTextureAtlas(textureSpecs);
 
+  // !!atlas && console.error('Texture Atlas Creation Failed : The Provided Mesh Has No Textures');
+
   const canvasSize = Math.min(atlas.width, maxTextureAtlasSize);
   const canvasScale = canvasSize / atlas.width;
 
@@ -312,6 +292,7 @@ export const createTextureAtlas = (meshes, {
     atlasImages,
     meshes: meshes2,
     textureNames: textures,
+    materials: material,
   };
 };
 

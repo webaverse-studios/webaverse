@@ -1,5 +1,3 @@
-// import * as THREE from 'three';
-// import {chunkMinForPosition, getLockChunkId} from './util.js';
 import {abortError} from './lock-manager.js';
 
 //
@@ -36,6 +34,7 @@ export class DcWorkerManager {
     // trigger load
     this.waitForLoad();
   }
+
   waitForLoad() {
     if (!this.loadPromise) {
       this.loadPromise = (async () => {
@@ -156,12 +155,14 @@ export class DcWorkerManager {
     }
     return this.loadPromise;
   }
+
   getNextWorker() {
-    const { workers } = this;
+    const {workers} = this;
     const worker = workers[this.nextWorker];
     this.nextWorker = (this.nextWorker + 1) % workers.length;
     return worker;
   }
+
   setCamera(worldPosition, cameraPosition, cameraQuaternion, projectionMatrix) {
     /* if (position.x === 0 && position.y === 0 && position.z === 0) {
       debugger;
@@ -182,6 +183,7 @@ export class DcWorkerManager {
       projectionMatrix: projectionMatrixArray,
     });
   }
+
   setClipRange(range) {
     const rangeArray = [range.min.toArray(), range.max.toArray()];
     
@@ -210,6 +212,7 @@ export class DcWorkerManager {
     }, {signal});
     return result;
   }
+
   async destroyTracker(tracker, {signal} = {}) {
     const worker = this.getNextWorker();
     const result = await worker.request('destroyTracker', {
@@ -218,6 +221,7 @@ export class DcWorkerManager {
     }, {signal});
     return result;
   }
+
   async trackerUpdate(tracker, position, {signal} = {}) {
     const worker = this.getNextWorker();
     const result = await worker.request('trackerUpdate', {
@@ -242,6 +246,7 @@ export class DcWorkerManager {
       return result;
     // });
   }
+
   /* async generateTerrainChunkRenderable(chunkPosition, lodArray, {signal} = {}) {
     // const chunkId = getLockChunkId(chunkPosition);
     // return await this.locks.request(chunkId, {signal}, async lock => {
@@ -265,6 +270,7 @@ export class DcWorkerManager {
     // signal.throwIfAborted();
     return result;
   }
+
   async getChunkHeightfield(x, z, lod, {signal} = {}) {
     const worker = this.getNextWorker();
     const result = await worker.request('getChunkHeightfield', {
@@ -275,6 +281,7 @@ export class DcWorkerManager {
     }, {signal});
     return result;
   }
+
   async getHeightfieldRange(x, z, w, h, lod, {signal} = {}) {
     const worker = this.getNextWorker();
     const result = await worker.request('getHeightfieldRange', {
@@ -286,6 +293,7 @@ export class DcWorkerManager {
     }, {signal});
     return result;
   }
+
   async getLightRange(x, y, z, w, h, d, lod, {signal} = {}) {
     const worker = this.getNextWorker();
     const result = await worker.request('getLightRange', {
@@ -297,6 +305,7 @@ export class DcWorkerManager {
     }, {signal});
     return result;
   }
+
   /* async getHeightfieldRange(x, z, w, h, lod) {
     const worker = this.getNextWorker();
     const result = await worker.request('getHeightfieldRange', {
@@ -348,6 +357,7 @@ export class DcWorkerManager {
     }, {signal});
     return result;
   }
+
   async createVegetationSplat(x, z, lod, {signal} = {}) {
     const worker = this.getNextWorker();
     const result = await worker.request('createVegetationSplat', {
@@ -359,6 +369,7 @@ export class DcWorkerManager {
     }, {signal});
     return result;
   }
+
   async createMobSplat(x, z, lod, {signal} = {}) {
     const worker = this.getNextWorker();
     const result = await worker.request('createMobSplat', {
@@ -370,6 +381,7 @@ export class DcWorkerManager {
     }, {signal});
     return result;
   }
+
   async drawCubeDamage(position, quaternion, scale, {signal} = {}) {
     const worker = this.getNextWorker();
     const result = await worker.request('drawCubeDamage', {
@@ -380,7 +392,8 @@ export class DcWorkerManager {
     }, {signal});
     return result;
   }
-  async eraseCubeDamage(position, quaterion, scale, {signal} = {}) {
+
+  async eraseCubeDamage(position, quaternion, scale, {signal} = {}) {
     const worker = this.getNextWorker();
     const result = await worker.request('eraseCubeDamage', {
       instance: this.instance,
@@ -390,6 +403,7 @@ export class DcWorkerManager {
     }, {signal});
     return result;
   }
+
   async drawSphereDamage(position, radius, {signal} = {}) {
     // const chunkPosition = chunkMinForPosition(
     //   position.x,
@@ -408,22 +422,23 @@ export class DcWorkerManager {
       return result;
     // });
   }
-  async eraseSphereDamage(position, radius, {signal} = {}) {
-    const chunkPosition = chunkMinForPosition(
-      position.x,
-      position.y,
-      position.z,
-      this.chunkSize
-    );
-    const chunkId = getLockChunkId(chunkPosition);
-    // return await this.locks.request(chunkId, async lock => {
-      const worker = this.getNextWorker();
-      const result = await worker.request('eraseSphereDamage', {
-        instance: this.instance,
-        position: position.toArray(),
-        radius,
-      }, {signal});
-      return result;
-    // });
-  }
+
+  // async eraseSphereDamage(position, radius, {signal} = {}) {
+  //   const chunkPosition = chunkMinForPosition(
+  //     position.x,
+  //     position.y,
+  //     position.z,
+  //     this.chunkSize
+  //   );
+  //   const chunkId = getLockChunkId(chunkPosition);
+  //   // return await this.locks.request(chunkId, async lock => {
+  //     const worker = this.getNextWorker();
+  //     const result = await worker.request('eraseSphereDamage', {
+  //       instance: this.instance,
+  //       position: position.toArray(),
+  //       radius,
+  //     }, {signal});
+  //     return result;
+  //   // });
+  // }
 }

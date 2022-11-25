@@ -1,11 +1,11 @@
 
 import React from 'react';
 
-import { Minimap } from './minimap';
-import { Hotbar } from './hotbar';
-import { Infobox } from './infobox';
-import { Chat } from './chat';
-import { UIMode } from '../general/ui-mode';
+import {Minimap} from './minimap';
+import {Hotbar} from './hotbar';
+import {Infobox} from './infobox';
+import {Chat} from './chat';
+import {UIMode} from '../general/ui-mode';
 
 import styles from './play-mode.module.css';
 

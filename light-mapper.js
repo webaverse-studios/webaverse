@@ -1,12 +1,11 @@
 import * as THREE from 'three';
-// import {getRenderer, scene} from './renderer.js';
 import {WebaverseShaderMaterial} from './materials.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
-const localVector3 = new THREE.Vector3();
+// const localVector3 = new THREE.Vector3();
 // const localVector4 = new THREE.Vector3();
-const localBox = new THREE.Box3();
+// const localBox = new THREE.Box3();
 
 // const zeroVector = new THREE.Vector3();
 
@@ -258,6 +257,7 @@ export class LightMapper /* extends EventTarget */ {
       })();
     }
   }
+
   /* drawChunk(chunk, {
     skylights,
     aos,
