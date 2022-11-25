@@ -10,7 +10,6 @@ import cameraManager from '../../../camera-manager';
 import {world} from '../../../world';
 
 import {Crosshair} from '../general/crosshair';
-import {Settings} from '../general/settings';
 import {WorldObjectsList} from '../general/world-objects-list';
 import {IoHandler, registerIoEventHandler, unregisterIoEventHandler} from '../general/io-handler';
 import {ZoneTitleCard} from '../general/zone-title-card';
@@ -25,7 +24,6 @@ import {PlayMode} from '../play-mode';
 import {EditorMode} from '../editor-mode';
 import Header from '../../Header.jsx';
 import QuickMenu from '../../QuickMenu.jsx';
-import {ClaimsNotification} from '../../ClaimsNotification.jsx';
 import {DomRenderer} from '../../DomRenderer.jsx';
 import {BuildVersion} from '../general/build-version/BuildVersion.jsx';
 import {handleStoryKeyControls} from '../../../story';
@@ -117,8 +115,6 @@ export const App = () => {
     //
     
     useEffect(() => {
-        console.log('app started', appStarted);
-        console.log('app && canvasRef.current', app, canvasRef.current);
         if(canvasRef.current && !appStarted) {
 
             _startApp(app, canvasRef.current);
