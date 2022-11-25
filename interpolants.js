@@ -95,8 +95,10 @@ export class SnapshotInterpolant {
     this.value = constructor();
   }
 
-  update(timeDiff) {
-    this.readTime += timeDiff;
+  update(timestamp, remoteTimeBias) {
+    this.readTime = timestamp + remoteTimeBias;
+
+    let effectiveReadTime = this.readTime - this.timeDelay;
     
     let minEndTime = Infinity;
     let maxEndTime = -Infinity;
@@ -111,15 +113,7 @@ export class SnapshotInterpolant {
     }
 
     if (maxEndTime > 0) { // if we had at least one snapshot
-      if (
-        (this.readTime - this.timeDelay) < minEndTime ||
-        (this.readTime - this.timeDelay) > maxEndTime
-      ) {
-        this.readTime = maxEndTime;
-      }
-
-      const effectiveReadTime = this.readTime - this.timeDelay;
-
+      effectiveReadTime = THREE.MathUtils.clamp(effectiveReadTime, minEndTime, maxEndTime);
       this.seekTo(effectiveReadTime);
     }
   }
@@ -134,9 +128,8 @@ export class SnapshotInterpolant {
         if (t >= startTime) {
           const duration = snapshot.endTime - startTime;
           const f = (duration > 0 && duration < Infinity) ? ((t - startTime) / duration) : 0;
-          const {startValue} = snapshot;
-          const nextSnapshot = this.snapshots[mod(index + 1, this.numFrames)];
-          const {startValue: endValue} = nextSnapshot;
+          const {startValue} = prevSnapshot;
+          const {startValue: endValue} = snapshot;
           this.value = this.seekFn(this.value, startValue, endValue, f);
           return;
         }
@@ -145,16 +138,13 @@ export class SnapshotInterpolant {
     console.warn('could not seek to time', t, JSON.parse(JSON.stringify(this.snapshots)));
   }
 
-  snapshot(timeDiff) {
+  snapshot(remoteTimestamp) {
     const value = this.fn();
     // console.log('got value', value.join(','), timeDiff);
     const writeSnapshot = this.snapshots[this.snapshotWriteIndex];
     
-    const lastWriteSnapshot = this.snapshots[mod(this.snapshotWriteIndex - 1, this.numFrames)];
-    const startTime = lastWriteSnapshot.endTime;
-    
     writeSnapshot.startValue = this.readFn(writeSnapshot.startValue, value);
-    writeSnapshot.endTime = startTime + timeDiff;
+    writeSnapshot.endTime = remoteTimestamp;
     
     this.snapshotWriteIndex = mod(this.snapshotWriteIndex + 1, this.numFrames);
   }

@@ -1059,9 +1059,9 @@ class InterpolatedPlayer extends AvatarCharacter {
 
     this.avatar.update(timestamp, timeDiff);
   } */
-  updateInterpolation(timeDiff) {
-    this.positionInterpolant.update(timeDiff);
-    this.quaternionInterpolant.update(timeDiff);
+  updateInterpolation(timestamp) {
+    this.positionInterpolant.update(timestamp, this.remoteTimeBias);
+    this.quaternionInterpolant.update(timestamp, this.remoteTimeBias);
     // for (const actionBinaryInterpolant of this.actionBinaryInterpolantsArray) {
     //   actionBinaryInterpolant.update(timeDiff);
     // }
@@ -1402,6 +1402,11 @@ class RemotePlayer extends InterpolatedPlayer {
     this.isRemotePlayer = true;
     this.lastPosition = new THREE.Vector3();
     this.controlMode = 'remote';
+    this.remoteTimeBias = 0;
+    this.needSyncRemoteTimestamp = true;
+    this.syncRemoteTimestampInterval = setInterval(() => {
+      this.needSyncRemoteTimestamp = true;
+    }, 10000);
   }
 
     // The audio worker handles hups and incoming voices
@@ -1459,7 +1464,6 @@ class RemotePlayer extends InterpolatedPlayer {
     } else {
       throw new Error('binding to nonexistent player object', this.playersArray.toJSON());
     }
-    let lastTimestamp = performance.now();
     // let lastPosition = new THREE.Vector3();
     const observePlayerFn = (e) => {
       if (e.changes.keys.has('avatar')) {
@@ -1482,14 +1486,18 @@ class RemotePlayer extends InterpolatedPlayer {
       if (e.changes.keys.has('transform')) {
         const transform = e.changes.keys.get('transform').value;
         const timestamp = performance.now();
-        const timeDiff = timestamp - lastTimestamp;
-        lastTimestamp = timestamp;
 
         this.position.fromArray(transform);
         this.quaternion.fromArray(transform, 3);
+        const remoteTimestamp = transform[7];
 
-        this.positionInterpolant.snapshot(timeDiff);
-        this.quaternionInterpolant.snapshot(timeDiff);
+        if (this.needSyncRemoteTimestamp) {
+          this.needSyncRemoteTimestamp = false;
+          this.remoteTimeBias = remoteTimestamp - timestamp;
+        }
+
+        this.positionInterpolant.snapshot(remoteTimestamp);
+        this.quaternionInterpolant.snapshot(remoteTimestamp);
 
         // for (const actionBinaryInterpolant of this.actionBinaryInterpolantsArray) {
         //   actionBinaryInterpolant.snapshot(timeDiff);
@@ -1526,7 +1534,7 @@ class RemotePlayer extends InterpolatedPlayer {
   update(timestamp, timeDiff) {
     if(!this.avatar) return // console.log("no avatar"); // avatar takes time to load, ignore until it does
 
-    this.updateInterpolation(timeDiff);
+    this.updateInterpolation(timestamp);
     physx.physxWorker.updateInterpolationAnimationAvatar(this.avatar.animationAvatarPtr, timeDiff);
 
     const mirrors = metaversefile.getMirrors();
@@ -1539,6 +1547,11 @@ class RemotePlayer extends InterpolatedPlayer {
     this.avatarFace.update(timestamp, timeDiffS);
 
     this.avatar.update(timestamp, timeDiff);
+  }
+
+  destroy() {
+    super.destroy();
+    clearInterval(this.syncRemoteTimestampInterval);
   }
 }
 /* class StaticUninterpolatedPlayer extends UninterpolatedPlayer {
