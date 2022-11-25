@@ -42,33 +42,9 @@ export const Settings = () => {
 
     //
 
-    useEffect(() => {
-
-        const handleKeyUp = (event) => {
-
-            if (state.openedPanel === 'SettingsPanel' && event.which === 27) { // esc key
-
-                setState({openedPanel: null});
-
-            }
-
-        };
-
-        registerIoEventHandler('keyup', handleKeyUp);
-
-        return () => {
-
-            unregisterIoEventHandler('keyup', handleKeyUp);
-
-        };
-
-    }, [ state.openedPanel ]);
-
-    //
-
     return (
 
-        <div className={ classNames(styles.settings, state.openedPanel === 'SettingsPanel' ? styles.open : null) } onClick={ stopPropagation } >
+        <div className={ classNames(styles.settings) } onClick={ stopPropagation } >
 
             <div className={ styles.closeBtn } onClick={ handleCloseBtnClick } >X</div>
 
