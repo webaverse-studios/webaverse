@@ -199,9 +199,17 @@ const _getWalletFromMnemonic = mnemonic => hdkey.fromMasterSeed(bip39.mnemonicTo
 const getAddressFromMnemonic = mnemonic => _getWalletFromMnemonic(mnemonic)
   .getAddressString();
 
+const networkNameEl = document.getElementById('network-name');
+const bindInterface = () => {
+  if (networkNameEl) {
+    networkNameEl.innerText = networkName;
+  }
+};
+
 export {
   web3,
   contracts,
+  bindInterface,
   getNetworkName,
   getMainnetAddress,
   runSidechainTransaction,
