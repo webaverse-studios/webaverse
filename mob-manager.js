@@ -58,7 +58,15 @@ const VANISHACTIONTYPE = 'VANISH';
 const defaultMobLifePoint = 5;
 const animationEasing = 16;
 const defaultAggroDistance = 3;
-const debugMobActions = false;
+const debugMobActions = true;
+
+export const MobStates = {
+  idle: 0,
+  attack: 1,
+  followTarget: 3,
+  escapeTarget: 4,
+  attackTarget: 4,
+};
 
 //const MAXSOUNDSSAMETIME = 2;
 // window.THREE = THREE;
@@ -661,7 +669,50 @@ class VanishAction extends ActionComponent {
 
 class MobAIControllerPrototype {
   constructor(){
-    this.mobs = []
+    this.mobs = [];
+    window.mobsAttack = (id)=>{
+      let mobs;
+      if(id == -1){
+        mobs = this.mobs;
+      }
+      else{
+        mobs = [this.mobs[id]];
+      }
+      for(const m of mobs){
+        m.target = playersManager.getLocalPlayer();
+        m.state = MobStates.attackTarget;
+      }
+    }
+
+    window.mobsIdle = (id)=>{
+      let mobs;
+      if(id == -1){
+        mobs = this.mobs;
+      }
+      else{
+        mobs = [this.mobs[id]];
+      }
+      for(const m of mobs)
+        m.state = MobStates.idle;
+    }
+
+    window.mobsState = (id)=>{
+      console.log(this.mobs[id].state);
+    }
+
+    window.mobsfollowTarget = (id)=>{
+      let mobs;
+      if(id == -1){
+        mobs = this.mobs;
+      }
+      else{
+        mobs = [this.mobs[id]];
+      }
+      for(const m of mobs){
+        m.target = playersManager.getLocalPlayer();
+        m.state = MobStates.followTarget;
+      }
+    }
   }
   addMob(mob){
     this.mobs.push(mob);
@@ -671,25 +722,6 @@ class MobAIControllerPrototype {
         this.mobs.splice(index, 1);
       }
     });
-    mob.askForTarget = ()=>{
-      if(this.mobs.length < 2)
-        return;
-      
-      let minDist = mob.position.clone().sub(this.mobs[0].position).length();
-      let target = this.mobs[0];
-      
-      for(const m of this.mobs){
-        if(m == mob)
-          continue;
-        
-        const dist = mob.position.clone().sub(m.position).length();
-        if(dist < minDist){
-          minDist = dist;
-          target = m;
-        }
-      }
-      return target;
-    }
   }
 }
 
@@ -753,13 +785,17 @@ export class MobInstance {
     this.controller.applyQuaternion(this.quaternion);
     this.fallTime = 0;
     physicsManager.getScene().setTransform(this.controller, true);
-    this.idleAction = idleAction ??
-    new DefaultIdleAction(this.animations.get('idle').duration);
     this._createActions();
     this.killEvents = [];
     this.askForTarget = undefined;
     this.aggroDistance = defaultAggroDistance;
-    this.dead = false
+    this.dead = false;
+    this.state = MobStates.idle;
+    this.stateActionMap = new Map([
+      [MobStates.idle, ['idle']],
+      [MobStates.attack, ['attack']]
+    ]);
+    this.followTargetOutOfRange = false;
   }
 
   getGeometryIndex(){
@@ -790,6 +826,7 @@ export class MobInstance {
   _createActions(){
     for(let [key, value] of this.animations){
       if(key == 'idle'){
+        this.actions.push(new DefaultIdleAction(value.duration));
         continue;
       }
 
@@ -807,7 +844,7 @@ export class MobInstance {
     }
     const hitAnim = this.animations.get('death');
     this.actions.push(new HitAction(0));
-    this.actions.push(new VanishAction(4))
+    this.actions.push(new VanishAction(4));
   }
 
   getPostion(){
@@ -831,7 +868,6 @@ export class MobInstance {
       if(a.actionId == actionId){
         if(this.life <= 0 && a.type != DIEACTIONTYPE && a.type != VANISHACTIONTYPE)
           return;
-        
         this.actionsQueue.push(a);
       }
     }
@@ -890,11 +926,18 @@ export class MobInstance {
   manageActions(timeDiffS){
     
     if(this.actionsQueue.length == 0){
-      if(!this.dead)
-        this.actionsQueue.push(this.idleAction);
-      else{
+      if(this.dead)
+        return;
+      
+      if(!this.stateActionMap.has(this.state)){
         return;
       }
+        
+      const currentActions = this.stateActionMap.get(this.state);
+      for(const a of currentActions){
+        this.startAction(a);
+      }
+      return;
     }
 
     const currentAction = this.actionsQueue[0];
@@ -907,8 +950,8 @@ export class MobInstance {
     }
   }
 
-  targetManagement(){
-    if(this.life <= 0 || !this.target)
+  followTarget(attack){
+    /*if(this.life <= 0 || !this.target)
       return;
     if(!this.target && this.askForTarget){
       this.target = this.askForTarget();
@@ -919,27 +962,39 @@ export class MobInstance {
     if(this.target.life <= 0){
       this.target = undefined;
       return;
-    }
+    }*/
 
     this.animatedLookAt(this.target.position);
     const targetVector = this.target.position.clone().sub(this.position);
-    if(targetVector.length() < this.aggroDistance){
-      if(this.currentAnimation == this.animations.get('walk').id){
-        this.playAnimation('idle', false);
-      }
-      let isAttacking = false;
-      for(const a of this.actionsQueue){
-        if(a.type == ATTACKACTIONTYPE){
-          isAttacking = true;
-          break;
+    if(targetVector.length() < this.aggroDistance*1.1){
+      if(targetVector.length() < this.aggroDistance*0.8){
+        this.followTargetOutOfRange = false;
+        if(this.currentAnimation == this.animations.get('walk').id){
+          this.playAnimation('idle', false);
         }
       }
-      if(!isAttacking){
-        this.startAction('attack');
-        this.actionsQueue.push(this.idleAction);
+
+      if(attack){
+        let isAttacking = false;
+        for(const a of this.actionsQueue){
+          if(a.type == ATTACKACTIONTYPE){
+            isAttacking = true;
+            break;
+          }
+        }
+        if(!isAttacking){
+          for(const a of this.stateActionMap.get(MobStates.attack)){
+            this.startAction(a);
+          }
+        }
       }
+
     }
-    else{
+    else if(targetVector.length() > this.aggroDistance){
+      this.followTargetOutOfRange = true;
+    }
+
+    if(this.followTargetOutOfRange){
       this.walk(targetVector);
     }
   }
@@ -949,7 +1004,15 @@ export class MobInstance {
   */
   update(playerLocation, timeDiff){
     const timeDiffS = timeDiff / 1000;
-    this.targetManagement();
+    switch(this.state) {
+      case MobStates.followTarget:
+        this.followTarget(false);
+        break;
+
+      case MobStates.attackTarget:
+        this.followTarget(true);
+        break;
+    }
     this.manageActions(timeDiffS);
 
     if(!this.grounded){
