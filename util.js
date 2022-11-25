@@ -645,7 +645,7 @@ export function getLockChunkId(chunkPosition) {
 }
 
 export function mod(a, n) {
-  return ((a % n) + n) % n; // in order to handle nagtive `a`, and loop in limited cache such as SnapshotInterpolant.snapshots.
+  return ((a % n) + n) % n;
 }
 
 export const modUv = (uv) => {
