@@ -116,8 +116,6 @@ export const App = () => {
     //
     
     useEffect(() => {
-        console.log('app started', appStarted);
-        console.log('app && canvasRef.current', app, canvasRef.current);
         if(canvasRef.current && !appStarted) {
 
             _startApp(app, canvasRef.current);
