@@ -1,3 +1,4 @@
+import PgWorker from './pg-worker.js?worker';
 import {abortError} from './lock-manager.js';
 
 //
@@ -9,7 +10,6 @@ const localArray16D = Array(16);
 
 //
 
-const workerUrl = `./pg-worker.js?import`;
 const TASK_PRIORITIES = {
   tracker: -10,
   splat: -1,
@@ -37,12 +37,14 @@ export class PGWorkerManager {
     // trigger load
     this.waitForLoad();
   }
+
   waitForLoad() {
     if (!this.loadPromise) {
       this.loadPromise = (async () => {
-        const worker = new Worker(workerUrl, {
+        /* const worker = new Worker(workerUrl, {
           type: 'module',
-        });
+        }); */
+        const worker = new PgWorker();
         const cbs = new Map();
         worker.onmessage = (e) => {
           const {taskId} = e.data;
@@ -108,6 +110,7 @@ export class PGWorkerManager {
     }
     return this.loadPromise;
   }
+
   setCamera(worldPosition, cameraPosition, cameraQuaternion, projectionMatrix) {
     const worldPositionArray = worldPosition.toArray(localArray3D);
     const cameraPositionArray = cameraPosition.toArray(localArray3D2);
@@ -122,6 +125,7 @@ export class PGWorkerManager {
       projectionMatrix: projectionMatrixArray,
     });
   }
+
   setClipRange(range) {
     const rangeArray = [range.min.toArray(), range.max.toArray()];
     
@@ -137,6 +141,7 @@ export class PGWorkerManager {
     }, {signal});
     return result;
   }
+
   async destroyTracker(tracker, {signal} = {}) {
     const result = await this.worker.request('destroyTracker', {
       instance: this.instance,
@@ -144,6 +149,7 @@ export class PGWorkerManager {
     }, {signal});
     return result;
   }
+
   async trackerUpdate(tracker, position, minLod, maxLod, lod1Range, {signal} = {}) {
     const result = await this.worker.request('trackerUpdate', {
       instance: this.instance,
@@ -166,6 +172,7 @@ export class PGWorkerManager {
     chunkSize,
     generateFlagsInt,
     numVegetationInstances,
+    numRockInstances,
     numGrassInstances,
     numPoiInstances,
     {
@@ -180,12 +187,14 @@ export class PGWorkerManager {
       chunkSize,
       generateFlagsInt,
       numVegetationInstances,
+      numRockInstances,
       numGrassInstances,
       numPoiInstances,
     }, {signal});
     // signal.throwIfAborted();
     return result;
   }
+
   async generateBarrier(
     chunkPosition,
     minLod,
@@ -202,6 +211,10 @@ export class PGWorkerManager {
     }, {signal});
     // signal.throwIfAborted();
     return result;
+  }
+
+  async destroy() {
+    await this.worker.request('destroyInstance', {instance: this.instance})
   }
 
   //

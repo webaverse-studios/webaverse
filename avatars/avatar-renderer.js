@@ -1,20 +1,15 @@
 /* this file implements avatar optimization and THREE.js Object management + rendering */
 import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import {VRMMaterialImporter/*, MToonMaterial*/} from '@pixiv/three-vrm/lib/three-vrm.module';
-import * as avatarOptimizer from '../avatar-optimizer.js';
-import * as avatarCruncher from '../avatar-cruncher.js';
+import {VRMMaterialImporter/*, MToonMaterial */} from '@pixiv/three-vrm/lib/three-vrm.module.js';
 import * as avatarSpriter from '../avatar-spriter.js';
 import {getAvatarHeight, getAvatarWidth, getModelBones} from './util.mjs';
-import offscreenEngineManager from '../offscreen-engine/offscreen-engine-manager.js';
 import loaders from '../loaders.js';
-// import {camera} from '../renderer.js';
 import {WebaverseShaderMaterial} from '../materials.js';
-// import exporters from '../exporters.js';
 import {abortError} from '../lock-manager.js';
 import {minAvatarQuality, maxAvatarQuality} from '../constants.js';
 import settingsManager from '../settings-manager.js';
-// import {downloadFile} from '../util.js';
+import {createSpriteAvatarMesh, crunchAvatarModel, optimizeAvatarModel} from '../offscreen-engine/fns/avatar-renderer-fns.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -30,13 +25,14 @@ const localFrustum = new THREE.Frustum();
 const greenColor = new THREE.Color(0x43a047);
 
 const avatarPlaceholderImagePromise = (async () => {
-  const avatarPlaceholderImage = new Image();
-  avatarPlaceholderImage.src = '/images/user.png';
-  await new Promise((accept, reject) => {
-    avatarPlaceholderImage.onload = accept;
-    avatarPlaceholderImage.onerror = reject;
-  });
-  return avatarPlaceholderImage;
+  const res = await fetch('/images/user.png');
+  if (res.ok) {
+    const blob = await res.blob();
+    const avatarPlaceholderImage = await createImageBitmap(blob);
+    return avatarPlaceholderImage;
+  } else {
+    throw new Error('failed to load image: ' + res.status);
+  }
 })();
 const waitForAvatarPlaceholderImage = () => avatarPlaceholderImagePromise;
 const avatarPlaceholderTexture = new THREE.Texture();
@@ -200,13 +196,6 @@ const parseVrm = (arrayBuffer, srcUrl) => new Promise((accept, reject) => {
   const {gltfLoader} = loaders;
   gltfLoader.parse(arrayBuffer, srcUrl, accept, reject);
 });
-const _cloneVrm = async () => {
-  const vrm = await parseVrm(arrayBuffer, srcUrl);
-  vrm.cloneVrm = _cloneVrm;
-  vrm.arrayBuffer = arrayBuffer;
-  vrm.srcUrl = srcUrl;
-  return vrm;
-};
 const _unfrustumCull = o => {
   o.frustumCulled = false;
 };
@@ -466,6 +455,7 @@ export class AvatarRenderer /* extends EventTarget */ {
 
     this.setQuality(quality);
   }
+
   getAvatarSize() {
     const model = this.controlObject.scene;
     model.updateMatrixWorld();
@@ -474,15 +464,7 @@ export class AvatarRenderer /* extends EventTarget */ {
     const width = getAvatarWidth(modelBones);
     return {height, width};
   }
-  createSpriteAvatarMesh(args, options) {
-    return offscreenEngineManager.request('createSpriteAvatarMesh', args, options);
-  }
-  crunchAvatarModel(args, options) {
-    return offscreenEngineManager.request('crunchAvatarModel', args, options);
-  }
-  optimizeAvatarModel(args, options) {
-    return offscreenEngineManager.request('optimizeAvatarModel', args, options);
-  }
+
   #getCurrentMesh() {
     switch (this.quality) {
       case 1: {
@@ -502,6 +484,7 @@ export class AvatarRenderer /* extends EventTarget */ {
       }
     }
   }
+
   async #ensureControlObject() {
     if (!this.controlObjectLoaded) {
       this.controlObjectLoaded = true;
@@ -519,6 +502,7 @@ export class AvatarRenderer /* extends EventTarget */ {
       }); */
     }
   }
+
   setControlled(controlled) {
     this.isControlled = controlled;
 
@@ -541,9 +525,11 @@ export class AvatarRenderer /* extends EventTarget */ {
       this.uncontrolFnMap.clear();
     }
   }
+
   #bindControlObject() {
     this.setControlled(this.isControlled);
   }
+
   async setQuality(quality) {
     // set new quality
     this.quality = quality;
@@ -575,13 +561,9 @@ export class AvatarRenderer /* extends EventTarget */ {
                 (async () => {
                   const {
                     textureImages,
-                  } = await this.createSpriteAvatarMesh([
-                    {
-                      arrayBuffer: this.arrayBuffer,
-                      srcUrl: this.srcUrl,
-                    }
-                  ], {
-                    signal,
+                  } = await createSpriteAvatarMesh({
+                    arrayBuffer: this.arrayBuffer,
+                    srcUrl: this.srcUrl,
                   });
                   const glb = avatarSpriter.createSpriteAvatarMeshFromTextures(textureImages);
                   _forAllMeshes(glb, _unfrustumCull);
@@ -611,13 +593,9 @@ export class AvatarRenderer /* extends EventTarget */ {
                 (async () => {
                   const {
                     glbData,
-                  } = await this.crunchAvatarModel([
-                    {
-                      arrayBuffer: this.arrayBuffer,
-                      srcUrl: this.srcUrl,
-                    },
-                  ], {
-                    signal,
+                  } = await crunchAvatarModel({
+                    arrayBuffer: this.arrayBuffer,
+                    srcUrl: this.srcUrl,
                   });
                   const object = await _loadGlbObject(glbData, this.srcUrl, {signal});
                   // downloadFile(new Blob([glbData], {type: 'application/octet-stream'}), 'avatar.glb');
@@ -652,13 +630,9 @@ export class AvatarRenderer /* extends EventTarget */ {
                 (async () => {
                   const {
                     glbData,
-                  } = await this.optimizeAvatarModel([
-                    {
-                      arrayBuffer: this.arrayBuffer,
-                      srcUrl: this.srcUrl,
-                    },
-                  ], {
-                    signal,
+                  } = await optimizeAvatarModel({
+                    arrayBuffer: this.arrayBuffer,
+                    srcUrl: this.srcUrl,
                   });
                   const object = await _loadGlbObject(glbData, this.srcUrl, {signal});
                   const glb = object.scene;
@@ -753,12 +727,14 @@ export class AvatarRenderer /* extends EventTarget */ {
     // add the avatar mesh
     this.scene.add(this.currentMesh);
   }
+
   adjustQuality(delta) {
     const newQuality = Math.min(Math.max(this.quality + delta, minAvatarQuality), maxAvatarQuality);
     if (newQuality !== this.quality) {
       this.setQuality(newQuality);
     }
   }
+
   update(timestamp, timeDiff, avatar) {
     // avatar can be undefined if it's not bound
     // we apply the root transform if avatar is undefined
@@ -766,6 +742,7 @@ export class AvatarRenderer /* extends EventTarget */ {
     this.#updateAvatar(timestamp, timeDiff, avatar);
     this.#updateFrustumCull(avatar);
   }
+
   #getAvatarHeadPosition(avatar) {
     let headPosition = null;
     if (avatar) {
@@ -778,6 +755,7 @@ export class AvatarRenderer /* extends EventTarget */ {
     }
     return headPosition;
   }
+
   #getAvatarCentroid(avatar) {
     if (avatar) {
       // get the centroid of avatar
@@ -790,6 +768,7 @@ export class AvatarRenderer /* extends EventTarget */ {
     }
     return localVector;
   }
+
   #updatePlaceholder(timestamp, timeDiff, avatar) {
     const headPosition = this.#getAvatarHeadPosition(avatar);
     if (this.camera && this.placeholderMesh.parent) {
@@ -832,6 +811,7 @@ export class AvatarRenderer /* extends EventTarget */ {
       this.placeholderMesh.update(timestamp);
     }
   }
+
   #updateAvatar(timestamp, timeDiff, avatar) {
     if (this.camera) {
       const currentMesh = this.#getCurrentMesh();
@@ -840,6 +820,7 @@ export class AvatarRenderer /* extends EventTarget */ {
       }
     }
   }
+
   #updateFrustumCull(avatar) {
     const centroidPosition = this.#getAvatarCentroid(avatar);
     if (this.camera) {
@@ -867,9 +848,11 @@ export class AvatarRenderer /* extends EventTarget */ {
       this.scene.visible = true;
     }
   }
+
   waitForLoad() {
     return this.loadPromise;
   }
+
   destroy() {
     this.abortController && this.abortController.abort(abortError);
   }

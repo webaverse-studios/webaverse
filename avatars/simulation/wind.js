@@ -79,7 +79,7 @@ const update = (timestamp, headPosition, springBoneManager) => {
               .normalize()
               .lerp(windDirection.normalize(), 0.5);
           
-          o.gravityPower = windNoise * (windForce * ( 1.1 - headPosition.distanceTo(windPosition) / wind.radius));
+          o.gravityPower = windNoise * (windForce * (1.1 - headPosition.distanceTo(windPosition) / wind.radius));
         }
       }
     }
@@ -107,7 +107,7 @@ const update = (timestamp, headPosition, springBoneManager) => {
               .normalize()
               .lerp(windDirection.normalize(), 0.5);
           
-          o.gravityPower = windNoise * (windForce * ( 1.1 - headPosition.distanceTo(windPosition) / wind.radius));
+          o.gravityPower = windNoise * (windForce * (1.1 - headPosition.distanceTo(windPosition) / wind.radius));
         }
       }
     }

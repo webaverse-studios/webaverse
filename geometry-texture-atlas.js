@@ -3,7 +3,6 @@ import {MaxRectsPacker} from 'maxrects-packer';
 import {getRenderer} from './renderer.js';
 import {modUv} from './util.js';
 
-const defaultTextureSize = 4096;
 const startAtlasSize = 512;
 
 const localVector2D = new THREE.Vector2();
@@ -24,6 +23,7 @@ class AttributeLayout {
 
     this.count = 0;
   }
+
   makeDefault(g) {
     return new THREE.BufferAttribute(
       new this.TypedArrayConstructor(g.attributes.position.count * this.itemSize),
@@ -36,6 +36,7 @@ class MorphAttributeLayout extends AttributeLayout {
     super(name, TypedArrayConstructor, itemSize);
     this.arraySize = arraySize;
   }
+
   makeDefault(g) {
     return Array(this.arraySize).fill(super.makeDefault(g));
   }

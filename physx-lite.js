@@ -2,7 +2,6 @@
 physx lite worker wasm integration.
 */
 
-// import * as THREE from 'three';
 import Module from './public/bin/app-wasm-worker.js';
 import {Allocator, ScratchStack} from './geometry-util.js';
 

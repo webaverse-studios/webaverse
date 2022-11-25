@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {getRenderer, camera} from './renderer.js';
+import {getRenderer} from './renderer.js';
 import {WebaverseShaderMaterial} from './materials.js';
 
 //
@@ -262,6 +262,7 @@ export class HeightfieldMapper /* extends EventTarget */ {
       })();
     }
   }
+
   update(position) {
     if (!this.updating) {
       (async () => {
@@ -304,6 +305,7 @@ export class HeightfieldMapper /* extends EventTarget */ {
       this.queuedPosition.copy(position);
     }
   }
+
   renderHeightfieldUpdate(worldModPosition, heightfield) {
     const renderer = getRenderer();
 

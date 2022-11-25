@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { defaultChunkSize } from './constants.js';
+import {defaultChunkSize} from './constants.js';
 import dc from './dual-contouring.js';
-import { makePromise } from './util.js';
+import {makePromise} from './util.js';
 
 //
 
@@ -233,7 +233,7 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
       });
     }
   }; */
-  const _chunksToResult = chunks => chunks.map(({ position }) => ({ position }));
+  const _chunksToResult = chunks => chunks.map(({position}) => ({position}));
 
   switch (method) {
     case 'initialize': {
@@ -252,7 +252,7 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
       return;
     } */
     case 'ensureInstance': {
-      const { instance: instanceKey } = args;
+      const {instance: instanceKey} = args;
       // console.log(instanceKey);
       let instance = instances.get(instanceKey);
       if (!instance) {
@@ -262,7 +262,7 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
       return true;
     }
     case 'deleteInstance': {
-      const { instance: instanceKey } = args;
+      const {instance: instanceKey} = args;
       const instance = instances.get(instanceKey);
       if (instance) {
         dc.deleteInstance(instance);
@@ -698,7 +698,7 @@ const _handleMessage = async m => {
   if (taskId) {
     p.then(
       (spec) => {
-        const { result = null, transfers = [] } = spec ?? {};
+        const {result = null, transfers = []} = spec ?? {};
         port.postMessage(
           {
             method: 'response',

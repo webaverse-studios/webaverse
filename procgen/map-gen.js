@@ -54,6 +54,7 @@ export class MapBlock extends THREE.Vector3 {
     this.splinePoint = false;
     this.neighbors = [];
   }
+
   static TYPE_INDICES = (() => {
     let iota = 0;
     return {
@@ -63,6 +64,7 @@ export class MapBlock extends THREE.Vector3 {
       path: ++iota,
     };
   })();
+
   static COLORS = {
     exit: '#00F',
     center: '#F00',
@@ -70,6 +72,7 @@ export class MapBlock extends THREE.Vector3 {
     path: '#666',
     default: '#000',
   };
+
   /* static INDEX_COLOR_MAP = (() => {
     let map = {};
     for (let key in MapBlock.COLORS) {
@@ -80,6 +83,7 @@ export class MapBlock extends THREE.Vector3 {
   getLocalPosition(target) {
     return target.set(this.x * voxelWorldSize, 0, this.y * voxelWorldSize);
   }
+
   getType() {
     if (this.exitTarget) {
       return 'exit';
@@ -93,10 +97,12 @@ export class MapBlock extends THREE.Vector3 {
       return 'default';
     }
   }
+
   toColorString() {
     const type = this.getType();
     return MapBlock.COLORS[type] ?? MapBlock.COLORS.default;
   }
+
   toUint8() {
     const type = this.getType();
     return MapBlock.TYPE_INDICES[type];
@@ -110,9 +116,11 @@ export class MapChunk {
     this.width = width;
     this.height = height;
   }
+
   getWorldPosition(target) {
     return target.set(this.x * numBlocksPerChunk * voxelWorldSize, 0, this.y * numBlocksPerChunk * voxelWorldSize);
   }
+
   getExitBlocks() {
     return this.blocks.filter(block => block.exitTarget);
   }

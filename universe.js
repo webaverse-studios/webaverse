@@ -3,7 +3,6 @@ this file contains the universe/meta-world/scenes/multiplayer code.
 responsibilities include loading the world on url change.
 */
 
-// import * as THREE from 'three';
 import metaversefile from 'metaversefile';
 import WSRTC from 'wsrtc/wsrtc.js';
 import * as Z from 'zjs';
@@ -13,11 +12,10 @@ import {loadOverworld} from './overworld.js';
 import {partyManager} from './party-manager.js';
 import physicsManager from './physics-manager.js';
 import physxWorkerManager from './physx-worker-manager.js';
-import physx from './physx.js';
 import {playersManager} from './players-manager.js';
-import sceneNames from './scenes/scenes.json';
 import {parseQuery} from './util.js';
 import {world} from './world.js';
+import {sceneManager} from './scene-manager.js';
 
 class Universe extends EventTarget {
   constructor() {
@@ -27,10 +25,12 @@ class Universe extends EventTarget {
     this.currentWorld = null;
     this.sceneLoadedPromise = null;
   }
+
   getWorldsHost() {
     return window.location.protocol + '//' + window.location.hostname + ':' +
       ((window.location.port ? parseInt(window.location.port, 10) : (window.location.protocol === 'https:' ? 443 : 80)) + 1) + '/worlds/';
   }
+
   async enterWorld(worldSpec) {
     this.disconnectRoom();
     
@@ -39,6 +39,7 @@ class Universe extends EventTarget {
       relation: 'float',
     }); */
     localPlayer.position.set(0, initialPosY, 0);
+    localPlayer.characterPhysics.setPosition(localPlayer.position);
     localPlayer.characterPhysics.reset();
     localPlayer.updateMatrixWorld();
     // physicsManager.setPhysicsEnabled(true);
@@ -57,8 +58,9 @@ class Universe extends EventTarget {
         
         let match;
         if (src === undefined) {
+          const sceneNames = await sceneManager.getSceneNamesAsync();
           promises.push(metaversefile.createAppAsync({
-            start_url: './scenes/' + sceneNames[0],
+            start_url: sceneManager.getSceneUrl(sceneNames[0]),
           }));
         } else if (src === '') {
           // nothing
@@ -96,21 +98,26 @@ class Universe extends EventTarget {
 
     this.dispatchEvent(new MessageEvent('worldload'));
   }
+
   async reload() {
     await this.enterWorld(this.currentWorld);
   }
+
   async pushUrl(u) {
     history.pushState({}, '', u);
     window.dispatchEvent(new MessageEvent('pushstate'));
     await this.handleUrlUpdate();
   }
+
   async handleUrlUpdate() {
     const q = parseQuery(location.search);
     await this.enterWorld(q);
   }
+
   isSceneLoaded() {
     return !this.sceneLoadedPromise;
   }
+
   async waitForSceneLoaded() {
     if (this.sceneLoadedPromise) {
       await this.sceneLoadedPromise;
@@ -189,11 +196,18 @@ class Universe extends EventTarget {
       // Called by WSRTC when the connection is initialized
       const init = e => {
         this.wsrtc.removeEventListener('init', init);
+
+        const partyMap = state.get(partyMapName, Z.Map);
+        partyManager.bindState(partyMap);
         localPlayer.bindState(state.getArray(playersMapName));
 
         this.wsrtc.addEventListener('audio', e => {
           const player = playersManager.remotePlayersByInteger.get(e.data.playerId);
           player.processAudioData(e.data);
+        });
+
+        world.appManager.loadApps().then(() => {
+          this.dispatchEvent(new MessageEvent('roomconnect'))
         });
       };
 
@@ -201,6 +215,12 @@ class Universe extends EventTarget {
     };
 
     this.wsrtc.addEventListener('open', open);
+
+    await new Promise((accept, reject) => {
+      this.addEventListener('roomconnect', e => {
+        accept();
+      }, {once: true});
+    });
 
     return this.wsrtc;
   }

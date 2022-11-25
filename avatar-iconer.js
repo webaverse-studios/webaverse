@@ -1,8 +1,5 @@
-// import * as THREE from 'three';
-// import metaversefile from 'metaversefile'
 import {emotions} from './src/components/general/character/Emotions';
 import offscreenEngineManager from './offscreen-engine/offscreen-engine-manager.js';
-import {fetchArrayBuffer} from './util';
 import {avatarManager} from './avatar-manager';
 import {playersManager} from './players-manager';
 
@@ -93,10 +90,12 @@ class AvatarIconer extends EventTarget {
       }));
     }
   }
+
   addCanvas(canvas) {
     canvas.ctx = canvas.getContext('2d');
     this.canvases.push(canvas);
   }
+
   updateEmotionFromActions() {
     const emotion = (() => {
       const faceposeAction = this.player.getAction('facepose');
@@ -145,6 +144,7 @@ class AvatarIconer extends EventTarget {
     })();
     this.emotion = emotion;
   }
+
   update() {
     if (this.emotion !== this.lastRenderedEmotion) {
       const emotionIndex = allEmotions.indexOf(this.emotion);
@@ -174,6 +174,7 @@ class AvatarIconer extends EventTarget {
       this.lastRenderedEmotion = this.emotion;
     }
   }
+
   destroy() {
     this.cleanup();
   }

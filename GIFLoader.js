@@ -1,8 +1,5 @@
 import {makePromise} from './util.js';
 
-const tempCanvas = document.createElement('canvas');
-const tempCtx = tempCanvas.getContext('2d');
-
 const cbs = {};
 let nextId = 0;
 class GIFLoader {
@@ -31,6 +28,7 @@ class GIFLoader {
     });
     this.worker = worker;
   }
+
   async createGif(url) {
     // await this.loadPromise;
     const id = ++nextId;
@@ -53,6 +51,7 @@ class GIFLoader {
     }, []);
     return await p;
   }
+
   async renderFrame(gifId) {
     // await this.loadPromise;
     const id = ++nextId;
@@ -75,6 +74,7 @@ class GIFLoader {
     }, []);
     return await p;
   }
+
   async renderFrames(gifId) {
     // await this.loadPromise;
     const id = ++nextId;
@@ -97,6 +97,7 @@ class GIFLoader {
     }, []);
     return await p;
   }
+
   async destroyGif(gifId) {
     // await this.loadPromise;
     const id = ++nextId;
@@ -119,6 +120,7 @@ class GIFLoader {
     }, []);
     return await p;
   }
+
   destroy() {
     this.worker.terminate();
     this.worker = null;
