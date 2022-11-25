@@ -58,12 +58,6 @@ export const HotBox = ({
           <div className={ styles.background } />
           <div className={ styles.text }>{ index + 1 }</div>
         </div>
-        {/* <canvas
-          className={ styles.hotbox }
-          width={size * pixelRatio}
-          height={size * pixelRatio}
-          ref={canvasRef}
-        /> */}
       </div>
     );
 };
