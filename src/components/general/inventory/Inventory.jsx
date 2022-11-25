@@ -25,166 +25,151 @@ const resolution = 2048;
 const numFrames = 128;
 const width = 400;
 
-// const objects = {
-//   notClaimed: [
-//     {
-//       name: 'Glavie',
-//       start_url: 'https://webaverse.github.io/axe/',
-//       description: 'A sword of greascascascascat lore.',
-//       params: [
-//         {
-//           label: 'Token type',
-//           value: 'Seasonal NFT ( ERC-20 )',
-//         },
-//         {
-//           label: 'Status',
-//           value: 'Unequipped',
-//         },
-//         {
-//           label: 'Item Type',
-//           value: 'Weapon',
-//         },
-//         {
-//           label: 'Rarity',
-//           value: 'Common',
-//         },
-//         {
-//           label: 'Durability',
-//           value: '720 / 1000',
-//         },
-//       ],
-//       claimed: false,
-//       level: 3,
-//     },
-//   ],
-//   upstreet: [
-//     {
-//       name: 'Glavie',
-//       start_url: 'https://webaverse.github.io/glaive/',
-//       description: 'A sword of greascascascascat lore.',
-//       params: [
-//         {
-//           label: 'Token type',
-//           value: 'Seasonal NFT ( ERC-20 )',
-//         },
-//         {
-//           label: 'Status',
-//           value: 'Unequipped',
-//         },
-//         {
-//           label: 'Item Type',
-//           value: 'Weapon',
-//         },
-//         {
-//           label: 'Rarity',
-//           value: 'Common',
-//         },
-//         {
-//           label: 'Durability',
-//           value: '720 / 1000',
-//         },
-//       ],
-//       claimed: true,
-//       level: 3,
-//     },
-//     {
-//       name: 'Lantern',
-//       start_url: 'https://webaverse.github.io/lantern/',
-//       description: 'A lantern.',
-//       params: [
-//         {
-//           label: 'Token type',
-//           value: 'Seasonal NFT ( ERC-20 )',
-//         },
-//         {
-//           label: 'Status',
-//           value: 'Unequipped',
-//         },
-//         {
-//           label: 'Item Type',
-//           value: 'Weapon',
-//         },
-//         {
-//           label: 'Rarity',
-//           value: 'Common',
-//         },
-//         {
-//           label: 'Durability',
-//           value: '720 / 1000',
-//         },
-//       ],
-//       claimed: true,
-//       level: 2,
-//     },
-//     {
-//       name: 'Dragon',
-//       start_url: 'https://webaverse.github.io/dragon-mount/',
-//       description: 'A cute dragon. But something is wrong with it...',
-//       params: [
-//         {
-//           label: 'Token type',
-//           value: 'Seasonal NFT ( ERC-20 )',
-//         },
-//         {
-//           label: 'Status',
-//           value: 'Unequipped',
-//         },
-//         {
-//           label: 'Item Type',
-//           value: 'Weapon',
-//         },
-//         {
-//           label: 'Rarity',
-//           value: 'Common',
-//         },
-//         {
-//           label: 'Durability',
-//           value: '720 / 1000',
-//         },
-//       ],
-//       claimed: true,
-//       level: 5,
-//     },
-//   ],
-
-//   resources: [
-//     {
-//       name: 'Silk',
-//       start_url: './metaverse_modules/silk/',
-//       claimed: false,
-//       value: 50,
-//       level: 1,
-//     },
-//     {
-//       name: 'Silk',
-//       start_url: './metaverse_modules/silk/',
-//       claimed: true,
-//       value: 12,
-//       level: 1,
-//     },
-//   ],
-// };
 const objects = {
-  notClaimed: [],
-  upstreet: [],
-  resources: [],
-};
+  notClaimed: [
+    {
+      name: 'Glavie',
+      start_url: 'https://webaverse.github.io/axe/',
+      description: 'A sword of greascascascascat lore.',
+      params: [
+        {
+          label: 'Token type',
+          value: 'Seasonal NFT ( ERC-20 )',
+        },
+        {
+          label: 'Status',
+          value: 'Unequipped',
+        },
+        {
+          label: 'Item Type',
+          value: 'Weapon',
+        },
+        {
+          label: 'Rarity',
+          value: 'Common',
+        },
+        {
+          label: 'Durability',
+          value: '720 / 1000',
+        },
+      ],
+      claimed: false,
+      level: 3,
+    },
+  ],
+  upstreet: [
+    {
+      name: 'Glavie',
+      start_url: 'https://webaverse.github.io/glaive/',
+      description: 'A sword of greascascascascat lore.',
+      params: [
+        {
+          label: 'Token type',
+          value: 'Seasonal NFT ( ERC-20 )',
+        },
+        {
+          label: 'Status',
+          value: 'Unequipped',
+        },
+        {
+          label: 'Item Type',
+          value: 'Weapon',
+        },
+        {
+          label: 'Rarity',
+          value: 'Common',
+        },
+        {
+          label: 'Durability',
+          value: '720 / 1000',
+        },
+      ],
+      claimed: true,
+      level: 3,
+    },
+    {
+      name: 'Lantern',
+      start_url: 'https://webaverse.github.io/lantern/',
+      description: 'A lantern.',
+      params: [
+        {
+          label: 'Token type',
+          value: 'Seasonal NFT ( ERC-20 )',
+        },
+        {
+          label: 'Status',
+          value: 'Unequipped',
+        },
+        {
+          label: 'Item Type',
+          value: 'Weapon',
+        },
+        {
+          label: 'Rarity',
+          value: 'Common',
+        },
+        {
+          label: 'Durability',
+          value: '720 / 1000',
+        },
+      ],
+      claimed: true,
+      level: 2,
+    },
+    {
+      name: 'Dragon',
+      start_url: 'https://webaverse.github.io/dragon-mount/',
+      description: 'A cute dragon. But something is wrong with it...',
+      params: [
+        {
+          label: 'Token type',
+          value: 'Seasonal NFT ( ERC-20 )',
+        },
+        {
+          label: 'Status',
+          value: 'Unequipped',
+        },
+        {
+          label: 'Item Type',
+          value: 'Weapon',
+        },
+        {
+          label: 'Rarity',
+          value: 'Common',
+        },
+        {
+          label: 'Durability',
+          value: '720 / 1000',
+        },
+      ],
+      claimed: true,
+      level: 5,
+    },
+  ],
 
-const landTokenObjects = [
-  {
-    name: 'Metaveris',
-    start_url: '/metaverse_components/land/',
-    description: 'Starting parcel',
-    seed: 'lol',
-    renderPosition: [0, 0, 0],
-    minLodRange: 3,
-    lods: 1,
-    clipRange: [
-      [-32, 0, -32],
-      [32, 128, 32],
-    ],
-  },
-];
+  resources: [
+    {
+      name: 'Silk',
+      start_url: 'https://webaverse.github.io/silk/',
+      claimed: false,
+      value: 50,
+      level: 1,
+    },
+    {
+      name: 'Silk',
+      start_url: 'https://webaverse.github.io/silk/',
+      claimed: true,
+      value: 12,
+      level: 1,
+    },
+  ],
+};
+// const objects = {
+//   notClaimed: [],
+//   upstreet: [],
+//   resources: [],
+// };
+
 
 const Token = ({object, enabled}) => {
   const [rendered, setRendered] = useState(false);
@@ -301,7 +286,7 @@ export const Inventory = () => {
   const [loading, setLoading] = useState(false);
 //   const [imageBitmap, setImageBitmap] = useState(null);
 
-  const { getTokens, mintfromVoucher, WebaversecontractAddress } = useNFTContract(account.currentAddress);
+  const {getTokens, mintfromVoucher, WebaversecontractAddress} = useNFTContract(account.currentAddress);
 
   const open =
     state.openedPanel === 'CharacterPanel' || state.openedPanel === 'Inventory';

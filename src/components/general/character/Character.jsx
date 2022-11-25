@@ -278,7 +278,7 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
 
     return (
         <div
-        className={ classnames( styles.characterPanelWrap, open ? styles.opened : null ) }
+        className={ classnames(styles.characterPanelWrap, open ? styles.opened : null) }
             onDrop={onDrop}
         >
             <div className={ styles.characterPanel } >
