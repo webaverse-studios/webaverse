@@ -9,7 +9,6 @@ import ioManager from '../io-manager.js'
 
 import {Character} from './components/general/character';
 import {CharacterSelect} from './components/general/character-select';
-import {Equipment} from './components/general/equipment';
 // import { Tokens } from './tabs/tokens';
 import {registerIoEventHandler, unregisterIoEventHandler} from './components/general/io-handler';
 import {AppContext} from './components/app';
@@ -18,6 +17,7 @@ import {StoryTime} from './StoryTime';
 import styles from './Header.module.css';
 import {UIMode} from './components/general/ui-mode/index.jsx';
 import {UserBox} from './components/general/user-box';
+import {Inventory} from './components/general/inventory/index.jsx';
 import {AvatarBox} from './components/general/avatar-box/AvatarBox.jsx';
 
 //
@@ -285,7 +285,7 @@ export default function Header() {
                     <CharacterSelect
                         
                     />
-                    <Equipment />
+                    <Inventory />
                     {/* <Claims
                         open={ claimsOpen }
                         toggleOpen={ toggleClaimsOpen }
