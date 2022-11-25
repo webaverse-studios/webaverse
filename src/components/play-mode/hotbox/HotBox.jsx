@@ -53,7 +53,7 @@ export const HotBox = ({
         onClick={onClick}
         onDoubleClick={onDoubleClick}
       >
-        <TokenBox size={60} canvasRef={canvasRef} numFrames={128} />
+        <TokenBox size={60} canvasRef={canvasRef} resolution={2048} numFrames={128} />
         <div className={ styles.label }>
           <div className={ styles.background } />
           <div className={ styles.text }>{ index + 1 }</div>

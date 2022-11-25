@@ -293,9 +293,9 @@ const _startPreviewer = async () => {
   await Promise.all([
     _startDevServer(),
     _startCompiler(),
-    // _startMultiplayer(),
+    _startMultiplayer(),
     _startWiki(),
-    // _startPreviewer(),
+    _startPreviewer(),
   ]);
 
   console.log(`Welcome to the Webaverse!`);
