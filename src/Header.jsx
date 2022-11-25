@@ -12,13 +12,13 @@ import {CharacterSelect} from './components/general/character-select';
 // import { Tokens } from './tabs/tokens';
 import {registerIoEventHandler, unregisterIoEventHandler} from './components/general/io-handler';
 import {AppContext} from './components/app';
-import {AvatarIcon} from './AvatarIcon';
 import {StoryTime} from './StoryTime';
 
 import styles from './Header.module.css';
 import {UIMode} from './components/general/ui-mode/index.jsx';
 import {UserBox} from './components/general/user-box';
 import {Inventory} from './components/general/inventory/index.jsx';
+import {AvatarBox} from './components/general/avatar-box/AvatarBox.jsx';
 
 //
 
@@ -266,7 +266,7 @@ export default function Header() {
             <StoryTime />
             {/* <div className={styles.inner}> */}
                 <UIMode hideDirection='left' >
-                    <AvatarIcon />
+                    <AvatarBox />
                 </UIMode>
                 <UIMode hideDirection='right' >
                     <UserBox

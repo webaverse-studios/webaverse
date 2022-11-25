@@ -1,0 +1,87 @@
+.modalWrap {
+    background-color: #060b0f;
+    z-index: 10;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+    position: absolute;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+.modalWrap::before {
+    display: block;
+    content: ' ';
+    position: absolute;
+    top: 0;
+    left: -20px;
+    height: 100%;
+    width: 40px;
+    transform: skewX(4deg);
+    background-color: #060b0f;
+    z-index: 0;
+}
+
+.modalWrap::after {
+    display: block;
+    content: ' ';
+    position: absolute;
+    top: 0;
+    right: -20px;
+    height: 100%;
+    width: 40px;
+    transform: skewX(-4deg);
+    background-color: #060b0f;
+    z-index: 0;
+}
+
+.modalWrap .modalContentWrap {
+    position: relative;
+    z-index: 1;
+}
+
+.modalWrap .modalTitle {
+    background-color: #0d1a22;
+    position: relative;
+    font-family: "TTSC-Regular";
+    text-transform: uppercase;
+    color: #efefef;
+    display: inline-block;
+    text-align: center;
+    font-size: 18px;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    transform: translateX(-50%);
+    position: absolute;
+    padding: 6px;
+    top: -14px;
+    min-width: 120px;
+}
+
+.modalWrap .modalTitle::before {
+    display: block;
+    content: ' ';
+    position: absolute;
+    top: 0;
+    left: -20px;
+    height: 100%;
+    width: 40px;
+    transform: skewX(4deg);
+    background-color: #0d1a22;
+    z-index: -1;
+}
+
+.modalWrap .modalTitle::after {
+    display: block;
+    content: ' ';
+    position: absolute;
+    top: 0;
+    right: -20px;
+    height: 100%;
+    width: 40px;
+    transform: skewX(-4deg);
+    background-color: #0d1a22;
+    z-index: -1;
+}

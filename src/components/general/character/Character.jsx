@@ -18,10 +18,6 @@ import {
 
 import {AppContext} from '../../app';
 
-import {Emotions} from './Emotions';
-import {Poses} from './Poses';
-import {BigButton} from '../../../BigButton';
-
 import styles from './character.module.css';
 import CustomButton from '../custom-button/index.jsx';
 import {TokenBox} from '../token-box/TokenBox.jsx';
@@ -54,9 +50,7 @@ const mainStatSpecs = [
 ];
 const statSpecs = [
     {
-        // imgSrc: 'images/noun-abnormal-bleeding-2360001.svg',
         imgSrc: 'images/stats/noun-skill-sword-swing-2360242.svg',
-        // imgSrc: 'images/noun-effect-circle-strike-2360022.svg',
         name: 'Attack',
         value: atk,
     },
@@ -66,8 +60,6 @@ const statSpecs = [
         value: def,
     },
     {
-        // imgSrc: 'images/stats/noun-skill-magic-shock-2360168.svg',
-        // imgSrc: 'images/noun-classes-magician-2360012.svg',
         imgSrc: 'images/stats/noun-skill-dna-2360269.svg',
         name: 'Vitality',
         value: vit,
@@ -88,29 +80,6 @@ const statSpecs = [
         value: lck,
     },
 ];
-
-//
-
-// const Stat = ({
-//     statSpec,
-// }) => {
-//     return (
-//         <div className={styles.stat}>
-//             <img className={styles.icon} src={statSpec.imgSrc} />
-//             <div className={styles.wrap}>
-//                 <div className={styles.row}>
-//                     <div className={styles.statName}>{statSpec.name}</div>
-//                     <div className={styles.statValue}>{statSpec.value}</div>
-//                 </div>
-//                 {statSpec.progress ? (
-//                     <progress className={styles.progress} value={statSpec.progress} />
-//                 )  : null}
-//             </div>
-//         </div>
-//     );
-// };
-
-//
 
 const Stat2 = ({statSpec}) => {
     return (
@@ -186,22 +155,6 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
 
     const sideSize = 400;
 
-    //
-
-    /* const handleCharacterBtnClick = () => {
-
-        setState({ openedPanel: ( state.openedPanel === 'CharacterPanel' ? null : 'CharacterPanel' ) });
-
-        if ( state.openedPanel === 'CharacterPanel' ) {
-
-            cameraManager.requestPointerLock();
-
-        }
-
-    }; */
-
-    //
-
     useEffect(() => {
 
         const canvas = dioramaCanvasRef.current;
@@ -261,11 +214,6 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
 
         setState({openedPanel: (state.openedPanel === 'CharacterSelect' ? null : 'CharacterSelect')});
 
-        /* if ( state.openedPanel === 'CharacterSelect' ) {
-
-            // cameraManager.requestPointerLock();
-
-        } */
     }
     function onDrop(e) {
         e.preventDefault();
@@ -283,13 +231,6 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
         >
             <div className={ styles.characterPanel } >
                 <div className={styles.characterTitleBox}>Character Details</div>
-                {/* <Poses
-                    parentOpened={open}
-                />
-                
-                <Emotions
-                    parentOpened={open}
-                /> */}
                 <div className={styles.avatarWrap}>
                     <div className={styles.avatarName}>
                     {defaultPlayerName}

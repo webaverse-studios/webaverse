@@ -2,16 +2,17 @@
 .keyInput {
     display: block;
     width: 140px;
-    padding: 8px 20px;
-    border: 1px solid #aaa;
-    border-radius: 5px;
+    padding: 4px 20px;
+    border: 1px solid #daf5e2;
     text-align: center;
     text-transform: uppercase;
     cursor: pointer;
-    color: #fff;
+    color: #efefef;
+    background-color: #0d1a22;
     font-size: 12px;
+    margin-left: 40px !important;
 }
 
 .active {
-    color: #ff0;
+    color: #fdc503;
 }

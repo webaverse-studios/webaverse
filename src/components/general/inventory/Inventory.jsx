@@ -14,9 +14,6 @@ import * as sounds from '../../../../sounds.js';
 import {mod} from '../../../../util.js';
 import dropManager from '../../../../drop-manager';
 import cardsManager from '../../../../cards-manager.js';
-import {CONTRACTS} from '../../../../src/hooks/web3-constants.js';
-import {ChainContext} from '../../../../src/hooks/chainProvider';
-import useNFTContract from '../../../../src/hooks/useNFTContract';
 
 //
 
@@ -29,7 +26,7 @@ const objects = {
   notClaimed: [
     {
       name: 'Glavie',
-      start_url: 'https://webaverse.github.io/axe/',
+      start_url: 'https://webaverse.github.io/glaive/',
       description: 'A sword of greascascascascat lore.',
       params: [
         {
@@ -164,11 +161,6 @@ const objects = {
     },
   ],
 };
-// const objects = {
-//   notClaimed: [],
-//   upstreet: [],
-//   resources: [],
-// };
 
 
 const Token = ({object, enabled}) => {
@@ -219,7 +211,7 @@ const Token = ({object, enabled}) => {
 const TokenList = ({
   title,
   sections,
-  open = true,
+  open,
   hoverObject,
   selectObject,
   loading,
@@ -229,7 +221,7 @@ const TokenList = ({
   onDoubleClick,
   onClick,
   highlights,
-//   ItemClass,
+  ItemClass,
 }) => {
   return (
     <div className={styles.section} key={title}>
@@ -263,30 +255,29 @@ const TokenList = ({
 };
 
 export const Inventory = () => {
-  const {state, account} = useContext(AppContext);
-  const {selectedChain} = useContext(ChainContext);
+  const {state, setState} = useContext(AppContext);
   const [hoverObject, setHoverObject] = useState(null);
   const [selectObject, setSelectObject] = useState(null);
   // const [ spritesheet, setSpritesheet ] = useState(null);
-//   const [faceIndex, setFaceIndex] = useState(1);
-  const [inventoryItems, setInventoryItems] = useState(objects);
-//   const [cachedLoader, setCachedLoader] = useState(
-//     () =>
-//       new CachedLoader({
-//         async loadFn(url, value, {signal}) {
-//           const {start_url} = value;
-//           const imageBitmap = await cardsManager.getCardsImage(start_url, {
-//             width,
-//             signal,
-//           });
-//           return imageBitmap;
-//         },
-//       }),
-//   );
+  const [faceIndex, setFaceIndex] = useState(1);
+  const [claims, setClaims] = useState([]);
+  const [cachedLoader, setCachedLoader] = useState(
+    () =>
+      new CachedLoader({
+        async loadFn(url, value, {signal}) {
+          const {start_url} = value;
+          const imageBitmap = await cardsManager.getCardsImage(start_url, {
+            width,
+            signal,
+          });
+          return imageBitmap;
+        },
+      }),
+  );
   const [loading, setLoading] = useState(false);
-//   const [imageBitmap, setImageBitmap] = useState(null);
+  const [imageBitmap, setImageBitmap] = useState(null);
 
-  const {getTokens, mintfromVoucher, WebaversecontractAddress} = useNFTContract(account.currentAddress);
+  const selectedMenuIndex = mod(faceIndex, 4);
 
   const open =
     state.openedPanel === 'CharacterPanel' || state.openedPanel === 'Inventory';
@@ -330,186 +321,74 @@ export const Inventory = () => {
     setOpenPreview(false);
     setPreviewObject();
   };
-  const OnEquip = object => () => {
-    console.log("equip", object)
-    game.handleDropJsonToPlayer(object);
-
-    // setSelectObject(object);
-  };
   const onDoubleClick = object => () => {
-    console.log("equip", object)
     game.handleDropJsonToPlayer(object);
 
-    // setSelectObject(object);
+    setSelectObject(object);
   };
-  const onSpawn = object => () => {
-    console.log("Spawn", object)
-    game.handleDropJsonForSpawn(object);
+  const menuLeft = () => {
+    setFaceIndex(faceIndex - 1);
 
-    // setSelectObject(object);
+    sounds.playSoundName('menuNext');
   };
-  const onDrop = object => () => {
-    console.log("drop", object)
-    game.handleDropJsonForDrop(object, account.currentAddress, WebaversecontractAddress, (isclaimed) => {
-      if(isclaimed) { // NFT
-        closePreview(); // will add time counter
-      } else {
-        dropManager.removeClaim(object);
-        closePreview();
-      }
-    });
+  const menuRight = () => {
+    setFaceIndex(faceIndex + 1);
 
-    // setSelectObject(object);
+    sounds.playSoundName('menuNext');
   };
-  const mintClaim = async (e) => {
-    if(!account.currentAddress) {
-      alert("Make sure wallet connected");
-      return false;
-    }
+  const selectClassName = styles[`select-${selectedMenuIndex}`];
 
-    await mintfromVoucher(e, () => {
-    }, () => {
-        dropManager.removeClaim(e);
-        closePreview();
-    });
-  }
   useEffect(() => {
-    const claimschange = async (e) => {
-        const {claims, addedClaim} = e.data;
-        console.log("claims", claims)
-        // const tokenIds = await getTokenIdsOf();
-        // if((addedClaim !== undefined) && tokenIds.includes(addedClaim.voucher.tokenId)) {
-            // dropManager.removeClaim(addedClaim);
-            // removeVoucherFromBlackList(addedClaim.voucher.tokenId)
-        // } else {
-            const claimableItem = claims.map(({name, start_url, type, voucher, serverDrop, level}) => ({
-              name,
-              start_url: start_url.split("index.js")[0],
-              description: "This is not-claimed drops",
-              params: [
-                  {
-                      label: 'Token type',
-                      value: 'Seasonal NFT ( ERC-1155 )',
-                  },
-              ],
-              type,
-              voucher,
-              serverDrop,
-              claimed: false,
-              level
-            }))
-
-            setInventoryItems({
-              notClaimed: claimableItem,
-              upstreet: inventoryItems.upstreet,
-              resources: inventoryItems.resources
-            });
-            // inventoryItems.notClaimed.push(addedClaim)
-        // }
+    const claimschange = e => {
+      const {claims} = e.data;
+      setClaims(claims.slice());
     };
     dropManager.addEventListener('claimschange', claimschange);
     return () => {
       dropManager.removeEventListener('claimschange', claimschange);
     };
-  }, [inventoryItems]);
+  }, [claims]);
 
   useEffect(() => {
-      if (account && account.currentAddress) {
-          // async function queryOpensea() {
-          //     const {nftList} = await fetch(`https://serverless-backend-blue.vercel.app/api/getPolygonNFTCollection?walletAddress=${account.currentAddress}&collectionAddress=${CONTRACTS[selectedChain.contract_name].NFT}`,
-          //         {
-          //             method: 'get',
-          //             redirect: 'follow'
-          //         }).then(response => response.json())
-          //     // TODO: params will add more
-          //     const nftData = nftList.ownedNfts.map(({id, metadata}) => (
-          //         {
-          //             tokenId: parseInt(id.tokenId),
-          //             name: metadata.name,
-          //             start_url: metadata.animation_url ? metadata.animation_url : metadata.image,
-          //             description: metadata.description,
-          //             params: [
-          //                 {
-          //                     label: 'Token type',
-          //                     value: 'Seasonal NFT ( ERC-1155 )',
-          //                 },
-          //             ],
-          //             claimed: true,
-          //             type: "major",
-          //             level: 1
-          //         }
-          //     ))
-          //     console.log("nftData", nftData)
-          //     // const nftData = [
-          //     //   {
-          //     //     name: 'Glavie',
-          //     //     start_url: 'https://webaverse.github.io/glaive/',
-          //     //     description: 'A sword of greascascascascat lore.',
-          //     //     params: [
-          //     //       {
-          //     //         label: 'Token type',
-          //     //         value: 'Seasonal NFT ( ERC-20 )',
-          //     //       },
-          //     //       {
-          //     //         label: 'Status',
-          //     //         value: 'Unequipped',
-          //     //       },
-          //     //       {
-          //     //         label: 'Item Type',
-          //     //         value: 'Weapon',
-          //     //       },
-          //     //       {
-          //     //         label: 'Rarity',
-          //     //         value: 'Common',
-          //     //       },
-          //     //       {
-          //     //         label: 'Durability',
-          //     //         value: '720 / 1000',
-          //     //       },
-          //     //     ],
-          //     //     claimed: true,
-          //     //     level: 3,
-          //     //   }
-          //     // ]
-          //     setInventoryItems({
-          //       notClaimed: inventoryItems.notClaimed,
-          //       upstreet: nftData,
-          //       resources: inventoryItems.resources
-          //     })
-          // }
-          // queryOpensea();
-          async function queryNFTList() {
-            const nftList = await getTokens();
+    if (cachedLoader) {
+      const loadingchange = e => {
+        setLoading(e.data.loading);
+      };
+      cachedLoader.addEventListener('loadingchange', loadingchange);
+      return () => {
+        cachedLoader.removeEventListener('loadingchange', loadingchange);
+      };
+    }
+  }, [cachedLoader]);
 
-            const nftData = nftList.ownedNfts.map(({tokenId, url}) => (
-              {
-                  tokenId,
-                  name: "test NFT",
-                  start_url: url,
-                  description: "This is Webaverse NFT",
-                  params: [
-                      {
-                          label: 'Token type',
-                          value: 'Seasonal NFT ( ERC-1155 )',
-                      },
-                  ],
-                  claimed: true,
-                  type: "major",
-                  level: 1
-              }
-          ))
-          console.log("nftData", nftData)
-            setInventoryItems({
-              notClaimed: inventoryItems.notClaimed,
-              upstreet: nftData,
-              resources: inventoryItems.resources
-            })
+  useEffect(() => {
+    if (open) {
+      const start_url = selectObject ? selectObject.start_url : '';
+      if (start_url) {
+        const abortController = new AbortController();
+        (async () => {
+          const imageBitmap = await cachedLoader.loadItem(
+            start_url,
+            selectObject,
+            {
+              signal: abortController.signal,
+            },
+          );
+          if (imageBitmap !== null) {
+            setImageBitmap(imageBitmap);
           }
-          queryNFTList();
-      } else {
-          console.log('could not query NFT collections')
+        })();
+        setImageBitmap(null);
+        return () => {
+          abortController.abort();
+        };
       }
-  }, [open, account])
+    } else {
+      if (selectObject) {
+        setSelectObject(null);
+      }
+    }
+  }, [open, selectObject]);
 
   useEffect(() => {
     if (open !== 'CharacterPanel') {
@@ -521,6 +400,10 @@ export const Inventory = () => {
       }
     }
   }, [open]);
+
+  useEffect(() => {
+    setSelectObject(null);
+  }, [faceIndex]);
 
   return (
     <>
@@ -539,17 +422,20 @@ export const Inventory = () => {
               sections={[
                 {
                   name: 'Resources',
-                  tokens: inventoryItems.resources,
+                  tokens: objects.resources,
                 },
               ]}
+              open={faceIndex === 1}
               hoverObject={hoverObject}
               selectObject={selectObject}
-            //   loading={loading}
+              loading={loading}
               onMouseEnter={onMouseEnter}
               onMouseDown={onMouseDown}
               onDragStart={onDragStart}
               onClick={onClick}
               onDoubleClick={onDoubleClick}
+              menuLeft={menuLeft}
+              menuRight={menuRight}
               highlights={true}
             />
             <TokenList
@@ -557,21 +443,24 @@ export const Inventory = () => {
               sections={[
                 {
                   name: 'Not Claimed',
-                  tokens: inventoryItems.notClaimed,
+                  tokens: objects.notClaimed,
                 },
                 {
                   name: 'From Upstreet',
-                  tokens: inventoryItems.upstreet,
+                  tokens: objects.upstreet,
                 },
               ]}
+              open={faceIndex === 1}
               hoverObject={hoverObject}
               selectObject={selectObject}
-            //   loading={loading}
+              loading={loading}
               onMouseEnter={onMouseEnter}
               onMouseDown={onMouseDown}
               onDragStart={onDragStart}
               onClick={onClick}
               onDoubleClick={onDoubleClick}
+              menuLeft={menuLeft}
+              menuRight={menuRight}
               highlights={false}
             />
           </div>
@@ -633,68 +522,18 @@ export const Inventory = () => {
                 <p>{previewObject?.description}</p>
               </div>
               <div className={styles.actionsWrap}>
-                { previewObject?.claimed ?
-                    <>
-                      <CustomButton
-                        theme="light"
-                        text="SPAWN"
-                        onClick={
-                          onSpawn(previewObject)
-                        }
-                        size={14}
-                        className={styles.button}
-                      />
-                      <CustomButton
-                        theme="light"
-                        text="EQUIP"
-                        onClick={
-                          OnEquip(previewObject)
-                        }
-                        size={14}
-                        className={styles.button}
-                      />
-                      <CustomButton
-                        theme="dark"
-                        text="DROP"
-                        onClick={
-                          onDrop(previewObject)
-                        }
-                        size={14}
-                        className={styles.button}
-                      />
-                    </>
-                  :
-                    <>
-                      <CustomButton
-                        theme="light"
-                        text="Claim"
-                        onClick={() => {
-                          console.log("preview", previewObject)
-                          mintClaim(previewObject)
-                        }}
-                        size={14}
-                        className={styles.button}
-                      />
-                      <CustomButton
-                        theme="light"
-                        text="EQUIP"
-                        onClick={
-                          OnEquip(previewObject)
-                        }
-                        size={14}
-                        className={styles.button}
-                      />
-                      <CustomButton
-                        theme="dark"
-                        text="DROP"
-                        onClick={
-                          onDrop(previewObject)
-                        }
-                        size={14}
-                        className={styles.button}
-                      />
-                    </>
-                }
+                <CustomButton
+                  theme="light"
+                  text="Claim"
+                  size={14}
+                  className={styles.button}
+                />
+                <CustomButton
+                  theme="dark"
+                  text="Drop"
+                  size={14}
+                  className={styles.button}
+                />
               </div>
             </>
           )}
