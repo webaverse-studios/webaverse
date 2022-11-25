@@ -35,7 +35,6 @@ export const Location = () => {
           const sceneUrl= sceneManager.getSceneUrl(name)
           origSceneList.push(sceneUrl);
         });
-        console.log("scene list", origSceneList)
         setScenesList(origSceneList)
     })();
   }, []);
