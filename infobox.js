@@ -1,10 +1,5 @@
 import * as THREE from 'three';
-// import {world} from './world.js';
 import {getRenderer} from './renderer.js';
-// import easing from './easing.js';
-// import {createObjectSprite} from './object-spriter.js';
-
-// const cubicBezier = easing(0, 1, 0, 1);
 
 const fullscreenVertexShader = `\
   varying vec2 vUv;
@@ -253,6 +248,7 @@ class InfoboxRenderer {
     this.selectFactor = +selected;
     this.needsUpdate = false;
   }
+
   addCanvas(canvas) {
     const ctx = canvas.getContext('2d');
     canvas.ctx = ctx;
@@ -260,10 +256,12 @@ class InfoboxRenderer {
     this.canvases.push(canvas);
     this.needsUpdate = true;
   }
+
   removeCanvas(canvas) {
     this.canvases.splice(this.canvases.indexOf(canvas), 1);
     this.needsUpdate = true;
   }
+
   setSpritesheet(spritesheet) {
     if (spritesheet) {
       const {
@@ -291,6 +289,7 @@ class InfoboxRenderer {
       this.scene.fullScreenQuadMesh.material.uniforms.numFramesPerRow.needsUpdate = true; */
     }
   }
+
   update(timestamp, timeDiff) {
     const renderer = getRenderer();
     const size = renderer.getSize(localVector2D);

@@ -16,15 +16,14 @@ import {
 import {
   mod,
   selectVoice,
-  // loadJson,
-  // loadAudioBuffer,
 } from './util.js';
+import physx from './physx.js';
 
 const localVector = new THREE.Vector3();
 
-const freestyleDuration = 1466.6666666666666 / 2;
+const freestyleDuration = 1466.666666666666 / 2;
 const freestyleOffset = 900 / 2;
-const breaststrokeDuration = 1066.6666666666666;
+const breaststrokeDuration = 1066.666666666666;
 const breaststrokeOffset = 433.3333333333333;
 
 
@@ -105,6 +104,7 @@ export class AvatarCharacterSfx {
 
     this.lastDoubleJump = false;
   }
+
   update(timestamp, timeDiffS) {
     /* if (!this.character.avatar) {
       return;
@@ -136,9 +136,9 @@ export class AvatarCharacterSfx {
         if(this.character.hasAction('jump') && this.character.getAction('jump').trigger === 'jump'){
           this.playGrunt('jump'); 
         }
-      } /*else if (this.lastJumpState && !this.player.avatar.jumpState) {
+      } /* else if (this.lastJumpState && !this.player.avatar.jumpState) {
         sounds.playSoundName('land');
-      }*/
+      } */
       if(this.character.avatar.landState && !this.lastLandState){
         sounds.playSoundName('land');
       }
@@ -200,7 +200,7 @@ export class AvatarCharacterSfx {
           i = i % leftStepIndices.length;
           if (i !== endIndex) {
             if (leftStepIndices[i] && !this.lastStepped[0] && !this.character.avatar.narutoRunState && timeSeconds-this.narutoRunFinishTime>0.5) {
-              const candidateAudios = localSoundFiles//.filter(a => a.paused);
+              const candidateAudios = localSoundFiles// .filter(a => a.paused);
               if (candidateAudios.length > 0) {
                 /* for (const a of candidateAudios) {
                   !a.paused && a.pause();
@@ -242,11 +242,11 @@ export class AvatarCharacterSfx {
           // const candidateAudios = soundFiles.water;
           // console.log(candidateAudios);
           if(this.character.getAction('swim').animationType === 'breaststroke'){
-              if(this.setSwimmingHand && this.character.actionInterpolants.movements.get() % breaststrokeDuration <= breaststrokeOffset){
+              if(this.setSwimmingHand && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % breaststrokeDuration <= breaststrokeOffset){
                   this.setSwimmingHand = false;
                   this.currentSwimmingHand = null;
               }
-              else if(!this.setSwimmingHand && this.character.actionInterpolants.movements.get() % breaststrokeDuration > breaststrokeOffset){
+              else if(!this.setSwimmingHand && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % breaststrokeDuration > breaststrokeOffset){
                   let regex = new RegExp('^water/swim[0-9]*.wav$');
                   const candidateAudios = soundFiles.water.filter(f => regex.test(f.name));
                   const audioSpec = candidateAudios[Math.floor(Math.random() * candidateAudios.length)];
@@ -263,14 +263,14 @@ export class AvatarCharacterSfx {
               const candidateAudios = soundFiles.water.filter(f => regex.test(f.name));
               const audioSpec = candidateAudios[Math.floor(Math.random() * candidateAudios.length)];
 
-              if(this.setSwimmingHand && this.character.actionInterpolants.movements.get() % freestyleDuration <= freestyleOffset){
+              if(this.setSwimmingHand && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % freestyleDuration <= freestyleOffset){
                   // console.log('left hand')
                   if(this.character.getAction('swim').onSurface)
                     sounds.playSound(audioSpec);
                   this.currentSwimmingHand = 'left';
                   this.setSwimmingHand = false;
               }
-              else if(!this.setSwimmingHand && this.character.actionInterpolants.movements.get() % freestyleDuration > freestyleOffset){
+              else if(!this.setSwimmingHand && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % freestyleDuration > freestyleOffset){
                   // console.log('right hand')
                   if(this.character.getAction('swim').onSurface)
                     sounds.playSound(audioSpec);
@@ -302,14 +302,14 @@ export class AvatarCharacterSfx {
           if(this.arr.reduce((a,b)=>a+b) >= Math.PI/3){
 
             this.arr.fill(0)
-            if(timeSeconds - this.narutoRunTurnSoundStartTime>soundFiles.sonicBoom[3].duration-0.9 || this.narutoRunTurnSoundStartTime==0){
+            if(timeSeconds - this.narutoRunTurnSoundStartTime>soundFiles.sonicBoom[3].duration-0.9 || this.narutoRunTurnSoundStartTime===0){
               sounds.playSound(soundFiles.sonicBoom[3]);
               this.narutoRunTurnSoundStartTime = timeSeconds;
             }
               
           }
          
-          if(timeSeconds - this.narutoRunTrailSoundStartTime>soundFiles.sonicBoom[2].duration-0.2 || this.narutoRunTrailSoundStartTime==0){
+          if(timeSeconds - this.narutoRunTrailSoundStartTime>soundFiles.sonicBoom[2].duration-0.2 || this.narutoRunTrailSoundStartTime===0){
             
             const localSound = sounds.playSound(soundFiles.sonicBoom[2]);
             this.oldNarutoRunSound = localSound;
@@ -329,7 +329,7 @@ export class AvatarCharacterSfx {
         }
 
       }
-      if(!this.character.avatar.narutoRunState && this.narutoRunStartTime!=0 ){
+      if(!this.character.avatar.narutoRunState && this.narutoRunStartTime!==0){
         this.narutoRunStartTime=0;
         this.narutoRunFinishTime=timeSeconds;
         this.narutoRunTrailSoundStartTime=0;
@@ -371,7 +371,7 @@ export class AvatarCharacterSfx {
       const useAction = this.character.getAction('use');
       if (useAction) {
         const _handleEat = () => {
-          const v = this.character.actionInterpolants.use.get();
+          const v = physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'use', 0);
           const eatFrameIndex = _getActionFrameIndex(v, eatFrameIndices);
 
           // console.log('chomp', v, eatFrameIndex, this.lastEatFrameIndex);
@@ -386,7 +386,7 @@ export class AvatarCharacterSfx {
         const _handleDrink = () => {
           // console.log('drink action', useAction);
 
-          const v = this.character.actionInterpolants.use.get();
+          const v = physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'use', 0);
           const drinkFrameIndex = _getActionFrameIndex(v, drinkFrameIndices);
 
           // console.log('gulp', v, drinkFrameIndex, this.lastDrinkFrameIndex);
@@ -432,7 +432,7 @@ export class AvatarCharacterSfx {
         if (Array.isArray(animationCombo) && index !== undefined) {
           const useAnimationName = animationCombo[index];
           const localUseFrameIndices = useFrameIndices[useAnimationName];
-          const useFrameIndex = _getActionFrameIndex(this.character.actionInterpolants.use.get(), localUseFrameIndices);
+          const useFrameIndex = _getActionFrameIndex(physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'use', 0), localUseFrameIndices);
 
           if (useFrameIndex !== 0 && useFrameIndex !== this.lastUseFrameIndex) {
             sounds.playSoundName('swordSlash');
@@ -448,6 +448,7 @@ export class AvatarCharacterSfx {
     };
     _handleUse();
   }
+
   playGrunt(type) {
     if (this.character.voicePack) { // ensure voice pack loaded
       const voiceFiles = this.character.voicePack.voiceFiles.actionVoices[type];
@@ -488,6 +489,7 @@ export class AvatarCharacterSfx {
       audioBufferSourceNode.start(0, offset, duration);
     }
   }
+
   playEmote(type, index){
     if (this.character.voicePack) { // ensure voice pack loaded
       const voiceFiles = this.character.voicePack.voiceFiles.emoteVoices[type];
@@ -528,6 +530,7 @@ export class AvatarCharacterSfx {
       audioBufferSourceNode.start(0, offset, duration);
     }
   }
+
   destroy() {
     this.cleanup();
   }

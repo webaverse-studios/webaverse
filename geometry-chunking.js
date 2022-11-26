@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-// import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {getRenderer} from './renderer.js';
 import {FreeList} from './geometry-util.js';
 import {getBoundingSize} from './util.js';
@@ -16,14 +15,17 @@ export class ChunkBinding {
     this.freeListEntry = freeListEntry;
     this.allocator = allocator;
   }
+
   getTexture(name) {
     return this.allocator.getTexture(name);
   }
+
   getTextureOffset(name) {
     const texture = this.getTexture(name);
     const {itemSize} = texture;
     return this.freeListEntry * this.allocator.maxInstancesPerDrawCall * itemSize;
   }
+
   /* getInstanceCount() {
     return this.allocator.getInstanceCount(this);
   }
@@ -307,6 +309,7 @@ export class ChunkedGeometryAllocator {
       this.freeList = new FreeList(maxDrawCalls);
     }
   }
+
   allocChunk(instanceCount, boundingObject) {
     const freeListEntry = this.freeList.alloc(1);
     const drawCall = new ChunkBinding(freeListEntry, this);
@@ -339,6 +342,7 @@ export class ChunkedGeometryAllocator {
     
     return drawCall;
   }
+
   freeChunk(chunk) {
     const {freeListEntry} = chunk;
 
@@ -361,6 +365,7 @@ export class ChunkedGeometryAllocator {
 
     this.freeList.free(freeListEntry);
   }
+
   /* getInstanceCount(drawCall) {
     return this.drawInstanceCounts[drawCall.freeListEntry];
   }
@@ -376,6 +381,7 @@ export class ChunkedGeometryAllocator {
   getTexture(name) {
     return this.textures[name];
   }
+
   getDrawSpec(camera, multiDrawStarts, multiDrawCounts, multiDrawInstanceCounts) {
     multiDrawStarts.length = this.drawStarts.length;
     multiDrawCounts.length = this.drawCounts.length;
@@ -407,6 +413,7 @@ export class ChunkedBatchedMesh extends THREE.InstancedMesh {
     this.isBatchedMesh = true;
     this.allocator = allocator;
   }
+
 	getDrawSpec(camera, multiDrawStarts, multiDrawCounts, multiDrawInstanceCounts) {
     this.allocator.getDrawSpec(camera, multiDrawStarts, multiDrawCounts, multiDrawInstanceCounts);
   }

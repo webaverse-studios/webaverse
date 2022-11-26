@@ -30,6 +30,7 @@ class ChatManager extends EventTarget {
     this.voiceRunning = false;
     this.voiceQueue = [];
   }
+
   addPlayerMessage(player, m, {timeout = 3000} = {}) {
     const match = _getEmotion(m.message);
     const emotion = match ? match.emotion : null;
@@ -73,6 +74,7 @@ class ChatManager extends EventTarget {
     
     return m;
   }
+
   addMessage(message, opts) {
     const chatId = makeId(5);
     const localPlayer = metaversefileApi.useLocalPlayer();
@@ -86,6 +88,7 @@ class ChatManager extends EventTarget {
 
     return this.addPlayerMessage(localPlayer, m, opts);
   }
+
   removePlayerMessage(player, m) {
     m.cleanup();
     
@@ -103,10 +106,12 @@ class ChatManager extends EventTarget {
       },
     }));
   }
+
   removeMessage(m) {
     const localPlayer = metaversefileApi.useLocalPlayer();
     this.removePlayerMessage(localPlayer, m);
   }
+
   async waitForVoiceTurn(fn) {
     // console.log('wait for voice queue', this.voiceRunning, this.voiceQueue.length);
     

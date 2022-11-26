@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import metaversefile from './metaversefile-api.js';
-import * as metaverseModules from './metaverse-modules.js';
+import * as coreModules from './core-modules.js';
 import {scene, camera} from './renderer.js';
 import * as sounds from './sounds.js';
 import cameraManager from './camera-manager.js';
@@ -11,7 +11,6 @@ import {playersManager} from './players-manager.js';
 
 const localVector = new THREE.Vector3();
 
-const physicsScene = physicsManager.getScene();
 // const maxResults = 16;
 
 //
@@ -44,6 +43,7 @@ const getPyramidConvexGeometry = (() => {
       scene.add(redMesh); */
 
       const fakeMesh = new THREE.Mesh(geometry);
+      const physicsScene = physicsManager.getScene();
       const buffer = physicsScene.cookConvexGeometry(fakeMesh);
       shapeAddress = physicsScene.createConvexShape(buffer);
     }
@@ -54,6 +54,7 @@ class QueryResults {
   constructor() {
     this.results = [];
   }
+
   snapshot(object) {
     const {position, quaternion} = object;
     const direction = new THREE.Vector3(0, 0, -1)
@@ -63,6 +64,7 @@ class QueryResults {
 
     const pyramidConvexGeometryAddress = getPyramidConvexGeometry();
 
+    const physicsScene = physicsManager.getScene();
     const result = physicsScene.sweepConvexShape(
       pyramidConvexGeometryAddress,
       position,
@@ -126,10 +128,11 @@ class ZTargeting extends THREE.Object3D {
 
     this.loadPromise = null;
   }
+
   waitForLoad() {
     if (!this.loadPromise) {
       this.loadPromise = (async () => {
-        const {importModule} = metaverseModules;
+        const {importModule} = coreModules;
         const m = await importModule('targetReticle');
         
         const targetReticleApp = metaversefile.createApp();
@@ -140,6 +143,7 @@ class ZTargeting extends THREE.Object3D {
     }
     return this.loadPromise;
   }
+
   setQueryResult(timestamp) {
     let reticles;
     const localPlayer = playersManager.getLocalPlayer();
@@ -172,16 +176,18 @@ class ZTargeting extends THREE.Object3D {
     const targetReticleMesh = this.targetReticleApp.children[0];
     targetReticleMesh.setReticles(reticles);
   }
+
   update(timestamp) {
     this.setQueryResult(timestamp);
   }
+
   handleDown(object = camera) {
     if (!cameraManager.focus) {
       this.queryResults.snapshot(object);
 
       if (this.queryResults.results.length > 0) {
         this.focusTargetReticle = this.queryResults.results[0];
-        sounds.playSoundName(this.focusTargetReticle.type == 'enemy' ? 'zTargetEnemy' : 'zTargetObject');
+        sounds.playSoundName(this.focusTargetReticle.type === 'enemy' ? 'zTargetEnemy' : 'zTargetObject');
       
         const naviSoundNames = [
           'naviHey',
@@ -202,6 +208,7 @@ class ZTargeting extends THREE.Object3D {
       cameraManager.setStaticTarget(localPlayer.avatar.modelBones.Head, remoteApp);
     }
   }
+
   handleUp() {
     if (cameraManager.focus) {
       cameraManager.setFocus(false);
@@ -212,6 +219,7 @@ class ZTargeting extends THREE.Object3D {
       }
     }
   }
+
   toggle() {
     if (cameraManager.focus) {
       this.handleUp();

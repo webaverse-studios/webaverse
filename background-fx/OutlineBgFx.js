@@ -103,8 +103,10 @@ class OutlineBgFxMesh extends THREE.Mesh {
       alphaToCoverage: true,
     });
     super(geometry, material);
+    material.freeze();
     this.frustumCulled = false;
   }
+
   update(timestamp, timeDiff, width, height, texture) {
     const timestampS = timestamp / 1000;
 
@@ -118,6 +120,10 @@ class OutlineBgFxMesh extends THREE.Mesh {
 
     this.material.uniforms.uColor2.value.set(colors[colors.length - 1]);
     this.material.uniforms.uColor2.needsUpdate = true;
+  }
+
+  static async waitForLoad() {
+    // nothing
   }
 }
 

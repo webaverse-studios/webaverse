@@ -1,14 +1,14 @@
 
 import classNames from 'classnames';
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 
 import styles from './key-input.module.css';
 
 //
 
-export const KeyInput = ({ value, setValue, className }) => {
+export const KeyInput = ({value, setValue, className}) => {
 
-    const [ active, setActive ] = useState( false );
+    const [ active, setActive ] = useState(false);
     const keysList = new Map();
 
     const updateValue = () => {
@@ -16,11 +16,11 @@ export const KeyInput = ({ value, setValue, className }) => {
         let value = '';
         let index = 0;
 
-        keysList.forEach( ( key, keyIndex ) => {
+        keysList.forEach((key, keyIndex) => {
 
             let keyName = '';
 
-            if ( keyIndex === ' ' ) {
+            if (keyIndex === ' ') {
 
                 keyName = 'space';
 
@@ -32,50 +32,50 @@ export const KeyInput = ({ value, setValue, className }) => {
 
             value += keyName;
             index ++;
-            if ( index < keysList.size ) value += '+';
+            if (index < keysList.size) value += '+';
 
         });
 
-        setValue( value );
+        setValue(value);
 
     };
 
-    const handleKeyDown = ( event ) => {
+    const handleKeyDown = (event) => {
 
-        keysList.set( event.key, true );
+        keysList.set(event.key, true);
         updateValue();
 
     };
 
-    const handleKeyUp = ( event ) => {
+    const handleKeyUp = (event) => {
 
-        keysList.delete( event.key );
+        keysList.delete(event.key);
 
     };
 
     const handleWindowClick = () => {
 
-        setActive( false );
-        window.removeEventListener( 'keydown', handleKeyDown );
-        window.removeEventListener( 'keyup', handleKeyUp );
-        window.removeEventListener( 'click', handleWindowClick );
+        setActive(false);
+        window.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener('keyup', handleKeyUp);
+        window.removeEventListener('click', handleWindowClick);
 
     };
 
-    const handleClick = ( event ) => {
+    const handleClick = (event) => {
 
         event.stopPropagation();
-        setActive( true );
-        window.addEventListener( 'keydown', handleKeyDown );
-        window.addEventListener( 'keyup', handleKeyUp );
-        window.addEventListener( 'mousedown', handleWindowClick );
+        setActive(true);
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+        window.addEventListener('mousedown', handleWindowClick);
 
     };
 
     //
 
     return (
-        <div className={ classNames( className, styles.keyInput, active ? styles.active : null ) } onClick={ handleClick }>{ value }</div>
+        <div className={ classNames(className, styles.keyInput, active ? styles.active : null) } onClick={ handleClick }>{ value }</div>
     );
 
 };

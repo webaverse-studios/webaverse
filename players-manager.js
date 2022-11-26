@@ -2,7 +2,6 @@
 player manager binds y.js data to player objects
 player objects load their own avatar and apps using this binding */
 
-// import * as THREE from 'three';
 import * as Z from 'zjs';
 import {LocalPlayer, RemotePlayer} from './character-controller.js';
 import {makeId} from './util.js';
@@ -20,6 +19,7 @@ class PlayersManager extends EventTarget {
     this.unbindStateFn = null;
     this.removeListenerFn = null;
   }
+
   #addLocalPlayer() {
     const localPlayerId = makeId(5);
     const localPlayersArray = new Z.Doc().getArray(playersMapName);
@@ -32,9 +32,11 @@ class PlayersManager extends EventTarget {
 
     return localPlayer;
   }
-  getLocalPlayer () {
+
+  getLocalPlayer() {
     return this.localPlayer;
   }
+
   setLocalPlayer(newLocalPlayer) {
     const oldPlayer = this.localPlayer;
     this.localPlayer = newLocalPlayer;
@@ -45,9 +47,11 @@ class PlayersManager extends EventTarget {
       }
     }));
   }
+
   getRemotePlayers(){
     return this.remotePlayers;
   }
+
   clearRemotePlayers() {
     const lastPlayers = this.playersArray;
     if (lastPlayers) {
@@ -63,9 +67,11 @@ class PlayersManager extends EventTarget {
       }
     }
   }
+
   getPlayersState() {
     return this.playersArray;
   }
+
   unbindState() {
     if(this.unbindStateFn != null) {
       this.unbindStateFn();
@@ -77,6 +83,7 @@ class PlayersManager extends EventTarget {
     this.unbindStateFn = null;
     this.removeListenerFn = null;
   }
+
   bindState(nextPlayersArray) {
     this.unbindState();
 
@@ -121,7 +128,7 @@ class PlayersManager extends EventTarget {
             });
             this.remotePlayers.set(playerId, remotePlayer);
             this.remotePlayersByInteger.set(remotePlayer.playerIdInt, remotePlayer);
-            this.dispatchEvent(new MessageEvent('playeradded', { data: { player: remotePlayer } }));
+            this.dispatchEvent(new MessageEvent('playeradded', {data: {player: remotePlayer}}));
           }
         }
         // console.log('players observe', added, deleted);
@@ -137,7 +144,7 @@ class PlayersManager extends EventTarget {
             this.remotePlayers.delete(playerId);
             this.remotePlayersByInteger.delete(remotePlayer.playerIdInt);
             remotePlayer.destroy();
-            this.dispatchEvent(new MessageEvent('playerremoved', { data: { player: remotePlayer } }));
+            this.dispatchEvent(new MessageEvent('playerremoved', {data: {player: remotePlayer}}));
           }
         }
       };
@@ -145,6 +152,7 @@ class PlayersManager extends EventTarget {
       this.unbindStateFn = this.playersArray.unobserve.bind(this.playersArray, playersObserveFn);
     }
   }
+
   updateRemotePlayers(timestamp, timeDiff) {
     for (const remotePlayer of this.remotePlayers.values()) {
       remotePlayer.update(timestamp, timeDiff);

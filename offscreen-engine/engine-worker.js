@@ -6,6 +6,9 @@ import {generateObjectUrlCardRemote} from './fns/cards-manager-fn.js';
 import {getLandImage} from './fns/land-iconer-fn.js';
 import {createAppUrlSpriteSheet} from './fns/spriting-fn.js';
 import {getSpriteAnimationForAppUrlInternal} from './fns/sprite-animation-manager-fn.js';
+import physx from '../physx.js';
+import Avatar from '../avatars/avatars.js';
+import {offscreenCanvasSize} from '../constants.js';
 
 const functionMap = {
   'createSpriteAvatarMesh': createSpriteAvatarMesh,
@@ -18,11 +21,16 @@ const functionMap = {
   'getSpriteAnimationForAppUrlInternal': getSpriteAnimationForAppUrlInternal,
 };
 
-window.addEventListener('message', e => {
+globalThis.addEventListener('message', async e => {
   const method = e.data?.method;
   if (method === 'initializeEngine') {
     const {port} = e.data;
     _bindPort(port);
+    await physx.waitForLoad();
+    await Avatar.waitForLoad();
+    port.postMessage({
+      method: 'initialized',
+    });
   }
 });
 
@@ -98,7 +106,7 @@ const _bindPort = port => {
           break;
         }
         default: {
-          console.warn(`Unknown method: ${method}`);``
+          console.warn(`Unknown method: ${method}`);
           break;
         }
       }
@@ -107,8 +115,8 @@ const _bindPort = port => {
   port.start();
 };
 
-const canvas = document.getElementById('canvas');
-window.innerWidth = canvas.width;
-window.innerHeight = canvas.height;
-window.devicePixelRatio = 1;
+const canvas = new OffscreenCanvas(offscreenCanvasSize, offscreenCanvasSize);
+globalThis.innerWidth = canvas.width;
+globalThis.innerHeight = canvas.height;
+globalThis.devicePixelRatio = 1;
 bindCanvas(canvas);

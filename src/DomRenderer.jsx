@@ -5,7 +5,6 @@ import {camera} from '../renderer.js';
 import cameraManager from '../camera-manager.js';
 import {playersManager} from '../players-manager.js';
 
-// import {CharacterBanner} from './CharacterBanner.jsx';
 import domRenderEngine, {DomRenderEngine} from '../dom-renderer.jsx';
 
 const floatFactor = 0.05;
@@ -28,25 +27,25 @@ function epsilon(value) {
   return value;
   // return Math.abs(value) < 1e-10 ? 0 : value;
 }
-function getObjectCSSMatrix( matrix, cameraCSSMatrix ) {
+function getObjectCSSMatrix(matrix, cameraCSSMatrix) {
   var elements = matrix.elements;
   var matrix3d = 'matrix3d(' +
-    epsilon( elements[ 0 ] ) + ',' +
-    epsilon( elements[ 1 ] ) + ',' +
-    epsilon( elements[ 2 ] ) + ',' +
-    epsilon( elements[ 3 ] ) + ',' +
-    epsilon( - elements[ 4 ] ) + ',' +
-    epsilon( - elements[ 5 ] ) + ',' +
-    epsilon( - elements[ 6 ] ) + ',' +
-    epsilon( - elements[ 7 ] ) + ',' +
-    epsilon( elements[ 8 ] ) + ',' +
-    epsilon( elements[ 9 ] ) + ',' +
-    epsilon( elements[ 10 ] ) + ',' +
-    epsilon( elements[ 11 ] ) + ',' +
-    epsilon( elements[ 12 ] ) + ',' +
-    epsilon( elements[ 13 ] ) + ',' +
-    epsilon( elements[ 14 ] ) + ',' +
-    epsilon( elements[ 15 ] ) +
+    epsilon(elements[ 0 ]) + ',' +
+    epsilon(elements[ 1 ]) + ',' +
+    epsilon(elements[ 2 ]) + ',' +
+    epsilon(elements[ 3 ]) + ',' +
+    epsilon(- elements[ 4 ]) + ',' +
+    epsilon(- elements[ 5 ]) + ',' +
+    epsilon(- elements[ 6 ]) + ',' +
+    epsilon(- elements[ 7 ]) + ',' +
+    epsilon(elements[ 8 ]) + ',' +
+    epsilon(elements[ 9 ]) + ',' +
+    epsilon(elements[ 10 ]) + ',' +
+    epsilon(elements[ 11 ]) + ',' +
+    epsilon(elements[ 12 ]) + ',' +
+    epsilon(elements[ 13 ]) + ',' +
+    epsilon(elements[ 14 ]) + ',' +
+    epsilon(elements[ 15 ]) +
   ')';
 
   /* if ( isIE ) {
@@ -60,25 +59,25 @@ function getObjectCSSMatrix( matrix, cameraCSSMatrix ) {
 
   return matrix3d;
 }
-function getCameraCSSMatrix( matrix ) {
+function getCameraCSSMatrix(matrix) {
   const {elements} = matrix;
   return 'matrix3d(' +
-    epsilon( elements[ 0 ] ) + ',' +
-    epsilon( - elements[ 1 ] ) + ',' +
-    epsilon( elements[ 2 ] ) + ',' +
-    epsilon( elements[ 3 ] ) + ',' +
-    epsilon( elements[ 4 ] ) + ',' +
-    epsilon( - elements[ 5 ] ) + ',' +
-    epsilon( elements[ 6 ] ) + ',' +
-    epsilon( elements[ 7 ] ) + ',' +
-    epsilon( elements[ 8 ] ) + ',' +
-    epsilon( - elements[ 9 ] ) + ',' +
-    epsilon( elements[ 10 ] ) + ',' +
-    epsilon( elements[ 11 ] ) + ',' +
-    epsilon( elements[ 12 ] ) + ',' +
-    epsilon( - elements[ 13 ] ) + ',' +
-    epsilon( elements[ 14 ] ) + ',' +
-    epsilon( elements[ 15 ] ) +
+    epsilon(elements[ 0 ]) + ',' +
+    epsilon(- elements[ 1 ]) + ',' +
+    epsilon(elements[ 2 ]) + ',' +
+    epsilon(elements[ 3 ]) + ',' +
+    epsilon(elements[ 4 ]) + ',' +
+    epsilon(- elements[ 5 ]) + ',' +
+    epsilon(elements[ 6 ]) + ',' +
+    epsilon(elements[ 7 ]) + ',' +
+    epsilon(elements[ 8 ]) + ',' +
+    epsilon(- elements[ 9 ]) + ',' +
+    epsilon(elements[ 10 ]) + ',' +
+    epsilon(elements[ 11 ]) + ',' +
+    epsilon(elements[ 12 ]) + ',' +
+    epsilon(- elements[ 13 ]) + ',' +
+    epsilon(elements[ 14 ]) + ',' +
+    epsilon(elements[ 15 ]) +
   ')';
 }
 
@@ -99,19 +98,6 @@ const DomRendererChild = ({
 
     if (iframeContainer2) {
       const frame = e => {
-        const {timestamp} = e.data;
-        
-        const _animateMenuFloat = () => {
-          const now = timestamp;
-          
-          dom.floatNode.position.set(0, 0, 0);
-          dom.floatNode.position.y += Math.sin((now % floatTime)/floatTime * 2 * Math.PI) * floatFactor;
-          dom.floatNode.position.y += Math.cos(((now / 2) % floatTime)/floatTime * 2 * Math.PI) * floatFactor/2;
-          dom.floatNode.position.y += Math.sin(((now / 4) % floatTime)/floatTime * 2 * Math.PI) * floatFactor/4;
-          dom.floatNode.updateMatrixWorld();
-        };
-        _animateMenuFloat();
-        
         const floatNodeMatrixWorld = localMatrix3
           .multiplyMatrices(dom.floatNode.matrixWorld, scaleMatrix);
 
@@ -265,7 +251,7 @@ const DomRenderer = props => {
       setFov(_getFov());
     };
     window.addEventListener('resize', resize);
-    const fovchange = (/*e*/) => {
+    const fovchange = (/* e */) => {
       // const {fov} = e.data;
       setFov(_getFov());
     };

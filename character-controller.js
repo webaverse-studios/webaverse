@@ -11,8 +11,6 @@ import * as Z from 'zjs';
 import {getRenderer, scene, camera} from './renderer.js';
 import physicsManager from './physics-manager.js';
 import {world} from './world.js';
-// import cameraManager from './camera-manager.js';
-// import physx from './physx.js';
 import audioManager from './audio-manager.js';
 import metaversefile from 'metaversefile';
 import {
@@ -21,15 +19,14 @@ import {
   playersMapName,
   crouchMaxTime,
   activateMaxTime,
-  // useMaxTime,
   aimTransitionMaxTime,
-  // avatarInterpolationFrameRate,
   avatarInterpolationTimeDelay,
   avatarInterpolationNumFrames,
-  // groundFriction,
-  voiceEndpointBaseUrl,
   numLoadoutSlots,
 } from './constants.js';
+import {
+  voiceEndpointBaseUrl,
+} from './endpoints.js';
 import {AppManager} from './app-manager.js';
 import {CharacterPhysics} from './character-physics.js';
 import {CharacterHups} from './character-hups.js';
@@ -45,15 +42,14 @@ import {
   defaultPlayerName,
   defaultPlayerBio,
 } from './ai/lore/lore-model.js';
-// import * as sounds from './sounds.js';
 import musicManager from './music-manager.js';
 import {makeId, clone} from './util.js';
 import overrides from './overrides.js';
-// import * as voices from './voices.js';
+import physx from './physx.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
-// const localQuaternion = new THREE.Quaternion();
+const localQuaternion = new THREE.Quaternion();
 // const localQuaternion2 = new THREE.Quaternion();
 const localMatrix = new THREE.Matrix4();
 const localMatrix2 = new THREE.Matrix4();
@@ -68,8 +64,6 @@ const _getSession = () => {
   const session = renderer.xr.getSession();
   return session;
 };
-
-const physicsScene = physicsManager.getScene();
 
 function makeCancelFn() {
   let live = true;
@@ -163,6 +157,7 @@ class Character extends THREE.Object3D {
     this.voicePack = null;
     this.voiceEndpoint = null;
   }
+
   setSpawnPoint(position, quaternion) {
     this.position.copy(position);
     this.quaternion.copy(quaternion);
@@ -171,13 +166,16 @@ class Character extends THREE.Object3D {
       this.characterPhysics.setPosition(position);
     }
   }
+
   // serializers
   getPosition() {
     return this.position.toArray(localArray3) ?? [0, 0, 0];
   }
+
   getQuaternion() {
     return this.quaternion.toArray(localArray4) ?? [0, 0, 0, 1];
   }
+
   findAction(fn) {
     const actions = this.getActionsState();
     for (const action of actions) {
@@ -187,6 +185,7 @@ class Character extends THREE.Object3D {
     }
     return null;
   }
+
   findActionIndex(fn) {
     const actions = this.getActionsState();
     let i = 0;
@@ -198,6 +197,7 @@ class Character extends THREE.Object3D {
     }
     return -1;
   }
+
   getAction(type) {
     const actions = this.getActionsState();
     for (const action of actions) {
@@ -207,6 +207,7 @@ class Character extends THREE.Object3D {
     }
     return null;
   }
+
   getActionByActionId(actionId) {
     const actions = this.getActionsState();
     for (const action of actions) {
@@ -216,6 +217,7 @@ class Character extends THREE.Object3D {
     }
     return null;
   }
+
   getActionIndex(type) {
     const actions = this.getActionsState();
     let i = 0;
@@ -227,6 +229,7 @@ class Character extends THREE.Object3D {
     }
     return -1;
   }
+
   indexOfAction(action) {
     const actions = this.getActionsState();
     let i = 0;
@@ -238,6 +241,7 @@ class Character extends THREE.Object3D {
     }
     return -1;
   }
+
   hasAction(type) {
     const actions = this.getActionsState();
     for (const action of actions) {
@@ -247,6 +251,7 @@ class Character extends THREE.Object3D {
     }
     return false;
   }
+
   async setVoicePack({audioUrl, indexUrl}) {
     const self = this;
     // this.playersArray.doc.transact(function tx() {
@@ -255,6 +260,7 @@ class Character extends THREE.Object3D {
     // });
     await this.loadVoicePack({audioUrl, indexUrl})
   }
+
   async loadVoicePack({audioUrl, indexUrl}) {
     this.voicePack = await VoicePack.load({
       audioUrl,
@@ -262,6 +268,7 @@ class Character extends THREE.Object3D {
     });
     this.updateVoicer();
   }
+
   setVoiceEndpoint(voiceId) {
     if (!voiceId) throw new Error('voice Id is null')
     const self = this;
@@ -288,9 +295,11 @@ class Character extends THREE.Object3D {
     }
     this.updateVoicer();
   }
+
   getVoice() {
     return this.voiceEndpoint || this.voicePack;
   }
+
   updateVoicer() {
     const voice = this.getVoice();
     if (voice instanceof VoicePack) {
@@ -304,12 +313,14 @@ class Character extends THREE.Object3D {
       throw new Error('invalid voice');
     }
   }
+
   async fetchThemeSong() {
     const avatarApp = this.getAvatarApp();
     const npcComponent = avatarApp.getComponent('npc');
     const npcThemeSongUrl = npcComponent?.themeSongUrl;
     return await Character.fetchThemeSong(npcThemeSongUrl);
   }
+
   static async fetchThemeSong(npcThemeSongUrl) {
     if (npcThemeSongUrl) {
       return await musicManager.fetchMusic(npcThemeSongUrl);
@@ -317,12 +328,14 @@ class Character extends THREE.Object3D {
       return null;
     }
   }
+
   getCrouchFactor() {
-    return 1 - 0.4 * this.actionInterpolants.crouch.getNormalized();
+    return 1 - 0.4 * physx.physxWorker.getActionInterpolantAnimationAvatar(this.avatar.animationAvatarPtr, 'crouch', 1);
     /* let factor = 1;
     factor *= 1 - 0.4 * this.actionInterpolants.crouch.getNormalized();
     return factor; */
   }
+
   wear(app, {
     loadoutIndex = -1,
   } = {}) {
@@ -380,6 +393,7 @@ class Character extends THREE.Object3D {
         // don't disable physics if the app is a pet
         if (!app.hasComponent('pet')) {
           const physicsObjects = app.getPhysicsObjects();
+          const physicsScene = physicsManager.getScene();
           for (const physicsObject of physicsObjects) {
             physicsScene.disableGeometryQueries(physicsObject);
             physicsScene.disableGeometry(physicsObject);
@@ -419,6 +433,7 @@ class Character extends THREE.Object3D {
       _emitEvents();
     }
   }
+
   unwear(app, {
     destroy = false,
     dropStartPosition = null,
@@ -441,8 +456,9 @@ class Character extends THREE.Object3D {
             physicsObject.quaternion.copy(this.quaternion);
             physicsObject.updateMatrixWorld();
 
+            const physicsScene = physicsManager.getScene();
             physicsScene.setTransform(physicsObject, true);
-            physicsScene.setVelocity(physicsObject, localVector.copy(dropDirection).multiplyScalar(5)/*.add(this.characterPhysics.velocity)*/, true);
+            physicsScene.setVelocity(physicsObject, localVector.copy(dropDirection).multiplyScalar(5)/* .add(this.characterPhysics.velocity) */, true);
             physicsScene.setAngularVelocity(physicsObject, zeroVector, true);
 
             app.position.copy(physicsObject.position);
@@ -479,6 +495,7 @@ class Character extends THREE.Object3D {
       const _enableAppPhysics = () => {
         if (!app.hasComponent('pet')) {
           const physicsObjects = app.getPhysicsObjects();
+          const physicsScene = physicsManager.getScene();
           for (const physicsObject of physicsObjects) {
             physicsScene.enableGeometryQueries(physicsObject);
             physicsScene.enableGeometry(physicsObject);
@@ -521,6 +538,7 @@ class Character extends THREE.Object3D {
       _emitEvents();
     }
   }
+
   setTarget(target) { // set both head and eyeball target;
     if (target) {
       this.headTarget.copy(target);
@@ -534,6 +552,7 @@ class Character extends THREE.Object3D {
       this.eyeballTargetEnabled = false;
     }
   }
+
   destroy() {
     this.characterHups.destroy();
   }
@@ -568,21 +587,26 @@ class StateCharacter extends Character {
     this.transform = new Float32Array(7);
     this.bindState(playersArray);
   }
+
   isBound() {
     return !!this.playersArray;
   }
+
   unbindState() {
     if (this.isBound()) {
       this.playersArray = null;
       this.playerMap = null;
     }
   }
+
   detachState() {
     throw new Error('called abstract method');
   }
+
   attachState(oldState) {
     throw new Error('called abstract method');
   }
+
   bindCommonObservers() {
     const actions = this.getActionsState();
     let lastActions = actions.toJSON();
@@ -612,12 +636,14 @@ class StateCharacter extends Character {
     actions.observe(observeActionsFn);
     this.unbindFns.push(actions.unobserve.bind(actions, observeActionsFn));
   }
+
   unbindCommonObservers() {
     for (const unbindFn of this.unbindFns) {
       unbindFn();
     }
     this.unbindFns.length = 0;
   }
+
   bindState(nextPlayersArray) {
     // latch old state
     const oldState = this.detachState();
@@ -634,17 +660,21 @@ class StateCharacter extends Character {
     this.attachState(oldState);
     this.bindCommonObservers();
   }
+
   getAvatarInstanceId() {
     return this.playerMap.get('avatar');
-  } 
+  }
+ 
   getActionsByType(type) {
    const actions = this.getActionsState(); 
    const typedActions = Array.from(actions).filter(action => action.type === type);
    return typedActions;
   }
+
   getActions() {
     return this.getActionsState();
   }
+
   getActionsState() {
     let actionsArray = this.playerMap.has(actionsMapName) ? this.playerMap.get(actionsMapName, Z.Array) : null;
     if (!actionsArray) {
@@ -653,9 +683,11 @@ class StateCharacter extends Character {
     }
     return actionsArray;
   }
+
   getActionsArray() {
     return this.isBound() ? Array.from(this.getActionsState()) : [];
   }
+
   getAppsState() {
     let appsArray = this.playerMap.has(appsMapName) ? this.playerMap.get(appsMapName, Z.Array) : null;
     if (!appsArray) {
@@ -664,29 +696,45 @@ class StateCharacter extends Character {
     }
     return appsArray;
   }
+
   getAppsArray() {
     return this.isBound() ? Array.from(this.getAppsState()) : [];
   }
+
   addAction(action) {
     action = clone(action);
     action.actionId = makeId(5);
     this.getActionsState().push([action]);
+    if (this.avatar) {
+      physx.physxWorker.addActionAnimationAvatar(this.avatar.animationAvatarPtr, action);
+    }
     return action;
   }
+
   removeAction(type) {
     const actions = this.getActionsState();
+    const actionsArray = this.getActionsArray();
     let i = 0;
     for (const action of actions) {
       if (action.type === type) {
         actions.delete(i);
+        if (this.avatar) {
+          physx.physxWorker.removeActionAnimationAvatar(this.avatar.animationAvatarPtr, actionsArray[i]);
+        }
         break;
       }
       i++;
     }
   }
+
   removeActionIndex(index) {
+    const actionsArray = this.getActionsArray();
     this.getActionsState().delete(index);
+    if (this.avatar) {
+      physx.physxWorker.removeActionAnimationAvatar(this.avatar.animationAvatarPtr, actionsArray[index]);
+    }
   }
+
   clearActions() {
     const actionsState = this.getActionsState();
     const numActions = actionsState.length;
@@ -694,18 +742,27 @@ class StateCharacter extends Character {
       this.removeActionIndex(i);
     }
   }
+
   setControlAction(action) {
     const actions = this.getActionsState();
+    const actionsArray = this.getActionsArray();
     for (let i = 0; i < actions.length; i++) {
       const action = actions.get(i);
       const isControlAction = controlActionTypes.includes(action.type);
       if (isControlAction) {
         actions.delete(i);
+        if (this.avatar) {
+          physx.physxWorker.removeActionAnimationAvatar(this.avatar.animationAvatarPtr, actionsArray[i]);
+        }
         i--;
       }
     }
     actions.push([action]);
+    if (this.avatar) {
+      physx.physxWorker.addActionAnimationAvatar(this.avatar.animationAvatarPtr, action);
+    }
   }
+
   new() {
     const self = this;
     this.playersArray.doc.transact(function tx() {
@@ -722,6 +779,7 @@ class StateCharacter extends Character {
       }
     });
   }
+
   save() {
     const actions = this.getActionsState();
     const apps = this.getAppsState();
@@ -731,6 +789,7 @@ class StateCharacter extends Character {
       apps: apps.toJSON(),
     });
   }
+
   load(s) {
     const j = JSON.parse(s);
     // console.log('load', j);
@@ -754,6 +813,7 @@ class StateCharacter extends Character {
       }
     });
   }
+
   destroy() {
     this.unbindState();
     this.appManager.unbindState();
@@ -779,12 +839,15 @@ class AvatarCharacter extends StateCharacter {
     this.rightHand = new AvatarHand();
     this.hands = [this.leftHand, this.rightHand];
   }
+
   getControlMode() {
     return this.controlMode;
   }
+
   setControlMode(mode) {
     this.controlMode = mode;
   }
+
   setSpawnPoint(position, quaternion) {
     super.setSpawnPoint(position, quaternion);
     
@@ -792,13 +855,16 @@ class AvatarCharacter extends StateCharacter {
     camera.quaternion.copy(quaternion);
     camera.updateMatrixWorld();
   }
+
   updatePhysicsStatus() {
+    const physicsScene = physicsManager.getScene();
     if (this.getControlMode() === 'controlled') {
       physicsScene.disableGeometryQueries(this.characterPhysics.characterController);
     } else {
       physicsScene.enableGeometryQueries(this.characterPhysics.characterController);
     }
   }
+
   async syncAvatar() {
     if (this.syncAvatarCancelFn) {
       this.syncAvatarCancelFn.cancel();
@@ -891,6 +957,7 @@ class AvatarCharacter extends StateCharacter {
 
     this.syncAvatarCancelFn = null;
   }
+
   destroy() {
     this.avatarFace.destroy();
     this.avatarCharacterSfx.destroy();
@@ -972,6 +1039,7 @@ class InterpolatedPlayer extends AvatarCharacter {
       quaternion: this.quaternionInterpolant.get(),
     };
   }
+
   /* update(timestamp, timeDiff) {
     if (!this.avatar) return; // avatar takes time to load, ignore until it does
 
@@ -1006,58 +1074,16 @@ class UninterpolatedPlayer extends AvatarCharacter {
     
     UninterpolatedPlayer.init.apply(this, arguments)
   }
+
   static init() {
-    this.actionInterpolants = {
-      crouch: new BiActionInterpolant(() => this.hasAction('crouch'), 0, crouchMaxTime),
-      activate: new UniActionInterpolant(() => this.hasAction('activate'), 0, activateMaxTime),
-      use: new InfiniteActionInterpolant(() => this.hasAction('use'), 0),
-      pickUp: new InfiniteActionInterpolant(() => this.hasAction('pickUp'), 0),
-      unuse: new InfiniteActionInterpolant(() => !this.hasAction('use'), 0),
-      aim: new InfiniteActionInterpolant(() => this.hasAction('aim'), 0),
-      aimRightTransition: new BiActionInterpolant(() => this.hasAction('aim') && this.hands[0].enabled, 0, aimTransitionMaxTime),
-      aimLeftTransition: new BiActionInterpolant(() => this.hasAction('aim') && this.hands[1].enabled, 0, aimTransitionMaxTime),
-      narutoRun: new InfiniteActionInterpolant(() => this.hasAction('narutoRun'), 0),
-      fly: new InfiniteActionInterpolant(() => this.hasAction('fly'), 0),
-      swim: new InfiniteActionInterpolant(() => this.hasAction('swim'), 0),
-      jump: new InfiniteActionInterpolant(() => this.hasAction('jump'), 0),
-      doubleJump: new InfiniteActionInterpolant(() => this.hasAction('doubleJump'), 0),
-      land: new InfiniteActionInterpolant(() => !this.hasAction('jump') && !this.hasAction('fallLoop') && !this.hasAction('fly'), 0),
-      dance: new BiActionInterpolant(() => this.hasAction('dance'), 0, crouchMaxTime),
-      emote: new BiActionInterpolant(() => this.hasAction('emote'), 0, crouchMaxTime),
-      movements: new InfiniteActionInterpolant(() => {
-        const ioManager = metaversefile.useIoManager();
-        return  ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right;
-      }, 0),
-      movementsTransition: new BiActionInterpolant(() => {
-        const ioManager = metaversefile.useIoManager();
-        return  ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right;
-      }, 0, crouchMaxTime),
-      sprint: new BiActionInterpolant(() => {
-        const ioManager = metaversefile.useIoManager();
-        return  ioManager.keys.shift;
-      }, 0, crouchMaxTime),
-      // throw: new UniActionInterpolant(() => this.hasAction('throw'), 0, throwMaxTime),
-      // chargeJump: new InfiniteActionInterpolant(() => this.hasAction('chargeJump'), 0),
-      // standCharge: new InfiniteActionInterpolant(() => this.hasAction('standCharge'), 0),
-      fallLoop: new InfiniteActionInterpolant(() => this.hasAction('fallLoop'), 0),
-      fallLoopTransition: new BiActionInterpolant(() => this.hasAction('fallLoop'), 0, 300),
-      // swordSideSlash: new InfiniteActionInterpolant(() => this.hasAction('swordSideSlash'), 0),
-      // swordTopDownSlash: new InfiniteActionInterpolant(() => this.hasAction('swordTopDownSlash'), 0),
-      hurt: new InfiniteActionInterpolant(() => this.hasAction('hurt'), 0),
-    };
-    this.actionInterpolantsArray = Object.keys(this.actionInterpolants).map(k => this.actionInterpolants[k]);
 
     this.avatarBinding = {
       position: this.position,
       quaternion: this.quaternion,
     };
   }
-  updateInterpolation(timeDiff) {
-    for (const actionInterpolant of this.actionInterpolantsArray) {
-      actionInterpolant.update(timeDiff);
-    }
-  }
 }
+
 class LocalPlayer extends UninterpolatedPlayer {
   constructor(opts) {
     super(opts);
@@ -1069,24 +1095,36 @@ class LocalPlayer extends UninterpolatedPlayer {
     }
     this.detached = opts.detached ?? false;
   }
+
   async setPlayerSpec(playerSpec) {
-    const p = this.setAvatarUrl(playerSpec.avatarUrl);
+    const p = this.loadAvatar(playerSpec.avatarUrl);
     
     overrides.userVoiceEndpoint.set(playerSpec.voice ?? null);
     overrides.userVoicePack.set(playerSpec.voicePack ?? null);
 
     await p;
   }
+
   getAvatarApp() {
     const instanceId = this.playerMap.get('avatar');
     return this.appManager.getAppByInstanceId(instanceId);
   }
+
   setAvatarApp(app) {
     this.#setAvatarAppFromOwnAppManager(app);
   }
-  async setAvatarUrl(u) {
+
+  async loadAvatar(url, {
+    components = [],
+  } = {}) {
     const localAvatarEpoch = ++this.avatarEpoch;
-    const avatarApp = await this.appManager.addTrackedApp(u);
+    const avatarApp = await this.appManager.addTrackedApp(
+      url,
+      localVector.set(0, 0, 0),
+      localQuaternion.set(0, 0, 0, 1),
+      localVector2.set(1, 1, 1),
+      components,
+    );
     // avatarApp.parent.remove(avatarApp);
     if (this.avatarEpoch !== localAvatarEpoch) {
       this.appManager.removeTrackedApp(avatarApp.instanceId);
@@ -1094,6 +1132,7 @@ class LocalPlayer extends UninterpolatedPlayer {
     }
     this.#setAvatarAppFromOwnAppManager(avatarApp);
   }
+
   /* importAvatarApp(app, srcAppManager) {
     srcAppManager.transplantApp(app, this.appManager);
     this.#setAvatarAppFromOwnAppManager(app);
@@ -1114,6 +1153,7 @@ class LocalPlayer extends UninterpolatedPlayer {
       self.syncAvatar();
     });
   }
+
   setMicMediaStream(mediaStream) {
     if (this.microphoneMediaStream) {
       this.microphoneMediaStream.disconnect();
@@ -1129,6 +1169,7 @@ class LocalPlayer extends UninterpolatedPlayer {
       this.microphoneMediaStream = mediaStreamSource;
     }
   }
+
   detachState() {
     const oldActions = (this.playersArray ? this.getActionsState() : new Z.Array());
     const oldAvatar = this.playersArray && this.getAvatarInstanceId();
@@ -1139,6 +1180,7 @@ class LocalPlayer extends UninterpolatedPlayer {
       oldApps,
     };
   }
+
   attachState(oldState) {
     const {
       oldActions,
@@ -1159,6 +1201,9 @@ class LocalPlayer extends UninterpolatedPlayer {
       const actions = self.getActionsState();
       for (const oldAction of oldActions) {
         actions.push([oldAction]);
+        if (self.avatar) {
+          physx.physxWorker.addActionAnimationAvatar(self.avatar.animationAvatarPtr, oldAction);
+        }
       }
       
       const apps = self.getAppsState();
@@ -1183,6 +1228,7 @@ class LocalPlayer extends UninterpolatedPlayer {
       self.appManager.bindState(self.getAppsState());
     });
   }
+
   deletePlayerId(playerId) {
     const self = this;
     this.playersArray.doc.transact(function tx() {
@@ -1195,8 +1241,9 @@ class LocalPlayer extends UninterpolatedPlayer {
       }
     });
   }
+
   grab(app, hand = 'left') {
-    let position = null, quaternion = null;
+    let position = null; let quaternion = null;
 
     if(_getSession()) {
       const h = this[hand === 'left' ? 'leftHand' : 'rightHand'];
@@ -1221,6 +1268,7 @@ class LocalPlayer extends UninterpolatedPlayer {
     };
     this.addAction(grabAction);
     
+    const physicsScene = physicsManager.getScene();
     physicsScene.disableAppPhysics(app)
 
     app.dispatchEvent({
@@ -1228,6 +1276,7 @@ class LocalPlayer extends UninterpolatedPlayer {
       grab: true,
     });
   }
+
   ungrab() {
     const actions = Array.from(this.getActionsState());
     let removeOffset = 0;
@@ -1236,6 +1285,7 @@ class LocalPlayer extends UninterpolatedPlayer {
       if (action.type === 'grab') {
         const app = metaversefile.getAppByInstanceId(action.instanceId);
 
+        const physicsScene = physicsManager.getScene();
         physicsScene.enableAppPhysics(app)
 
         this.removeActionIndex(i + removeOffset);
@@ -1248,6 +1298,7 @@ class LocalPlayer extends UninterpolatedPlayer {
       }
     }
   }
+
   /* lookAt(p) {
     const cameraOffset = cameraManager.getCameraOffset();
     camera.position.add(localVector.copy(cameraOffset).applyQuaternion(camera.quaternion));
@@ -1275,12 +1326,14 @@ class LocalPlayer extends UninterpolatedPlayer {
 
     this.appManager.updatePhysics();
   }
+
   updatePhysics(timestamp, timeDiff) {
     if (this.avatar) {
       const timeDiffS = timeDiff / 1000;
       this.characterPhysics.update(timestamp, timeDiffS);
     }
   }
+
   updateAvatar(timestamp, timeDiff) {
     if (this.avatar) {
       const timeDiffS = timeDiff / 1000;
@@ -1289,7 +1342,7 @@ class LocalPlayer extends UninterpolatedPlayer {
       this.characterHitter.update(timestamp, timeDiffS);
       this.avatarFace.update(timestamp, timeDiffS);
 
-      this.updateInterpolation(timeDiff);
+      physx.physxWorker.updateInterpolationAnimationAvatar(this.avatar.animationAvatarPtr, timeDiff);
 
       const session = _getSession();
       const mirrors = metaversefile.getMirrors();
@@ -1300,6 +1353,7 @@ class LocalPlayer extends UninterpolatedPlayer {
       this.characterHups.update(timestamp);
     }
   }
+
   destroy() {
     super.destroy();
     this.characterPhysics.destroy();
@@ -1347,6 +1401,7 @@ class RemotePlayer extends InterpolatedPlayer {
     this.lastPosition = new THREE.Vector3();
     this.controlMode = 'remote';
   }
+
     // The audio worker handles hups and incoming voices
   // This includes the microphone from the owner of this instance
   async prepareAudioWorker() {
@@ -1375,6 +1430,7 @@ class RemotePlayer extends InterpolatedPlayer {
       this.audioWorkletNode.connect(this.avatar.getAudioInput());
     }
   }
+
   // This is called by WSRTC (in world.js) when it receives new packets for this player
   processAudioData(data) {
     this.prepareAudioWorker();
@@ -1382,9 +1438,11 @@ class RemotePlayer extends InterpolatedPlayer {
       this.audioDecoder.decode(data.data);
     }
   }
+
   detachState() {
     return null;
   }
+
   attachState(oldState) {
     let index = -1;
     for (let i = 0; i < this.playersArray.length; i++) {
@@ -1438,6 +1496,7 @@ class RemotePlayer extends InterpolatedPlayer {
         if(this.avatar){
           localVector.copy(this.position);
           localVector.y -= this.avatar.height * 0.5;
+          const physicsScene = physicsManager.getScene();
           physicsScene.setCharacterControllerPosition(this.characterPhysics.characterController, localVector);
         }
         this.lastPosition.copy(this.position);
@@ -1454,6 +1513,7 @@ class RemotePlayer extends InterpolatedPlayer {
       this.syncAvatar();
     });
   }
+
   update(timestamp, timeDiff) {
     if(!this.avatar) return // console.log("no avatar"); // avatar takes time to load, ignore until it does
 
@@ -1540,4 +1600,3 @@ export {
   RemotePlayer,
   // NpcPlayer,
 };
-

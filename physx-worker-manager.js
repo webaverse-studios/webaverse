@@ -1,11 +1,5 @@
-// import * as THREE from 'three';
 import {makeId} from './util.js';
-// import {defaultChunkSize} from './constants.js';
-// import metaversefile from 'metaversefile';
-// import { terrainVertex, terrainFragment } from './shaders/terrainShader.js';
-// import physics from './physics-manager.js';
-
-// const localVector = new THREE.Vector3();
+import PhysxWorker from './physx-worker.js?worker';
 
 const defaultNumPhysicsWorkers = 2;
 
@@ -19,15 +13,17 @@ class PhysicsWorkerManager {
     this.nextWorker = 0;
     this.loadPromise = null;
   }
+
   waitForLoad() {
     if (!this.loadPromise) {
       this.loadPromise = (async () => {
         // create workers
         const workers = Array(this.numWorkers);
         for (let i = 0; i < this.numWorkers; i++) {
-          const worker = new Worker('./physx-worker.js?import', {
+          /* const worker = new Worker('./physx-worker.js?import', {
             type: 'module',
-          });
+          }); */
+          const worker = new PhysxWorker();
           const cbs = new Map();
           worker.onmessage = e => {
             const {requestId} = e.data;
@@ -67,6 +63,7 @@ class PhysicsWorkerManager {
     }
     return this.loadPromise;
   }
+
   async cookGeometry(mesh) {
     await this.waitForLoad();
 
@@ -80,6 +77,7 @@ class PhysicsWorkerManager {
     });
     return result;
   }
+
   async cookConvexGeometry(mesh) {
     await this.waitForLoad();
     
@@ -93,6 +91,7 @@ class PhysicsWorkerManager {
     });
     return result;
   }
+
   async meshoptSimplify(mesh, targetRatio, targetError) {
     await this.waitForLoad();
     
@@ -109,6 +108,7 @@ class PhysicsWorkerManager {
     });
     return result;
   }
+
   async meshoptSimplifySloppy(mesh, targetRatio, targetError) {
     await this.waitForLoad();
     

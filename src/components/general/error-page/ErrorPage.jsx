@@ -3,7 +3,7 @@ import React from 'react';
 
 //
 
-export const ErrorPage = ({ errors }) => {
+export const ErrorPage = ({errors}) => {
 
     return (
         <div>
@@ -11,7 +11,7 @@ export const ErrorPage = ({ errors }) => {
             <p>Your browser is missing the following required features:</p>
             <ul>
                 {
-                    errors.map( ( error, i ) => {
+                    errors.map((error, i) => {
                         return (
                             <li key={ i }>{ error }</li>
                         );

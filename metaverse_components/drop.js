@@ -13,7 +13,6 @@ const localEuler = new THREE.Euler();
 
 //
 
-const physicsScene = physicsManager.getScene();
 const cubicBezier = easing(0, 1, 0, 1);
 const cubicBezier2 = easing(0, 1, 1, 1);
 const rarityColorsArray = Object.keys(rarityColors).map(k => rarityColors[k][0]);
@@ -72,6 +71,7 @@ export default app => {
             localVector.copy(velocity)
               .multiplyScalar(timeDiffS)
           );
+        const physicsScene = physicsManager.getScene();
         velocity.add(
           localVector.copy(physicsScene.getGravity())
             .multiplyScalar(timeDiffS)
@@ -183,10 +183,4 @@ export default app => {
       app.updateMatrixWorld();
     });
   }
-
-  return {
-    remove() {
-      metaversefile.clearFrame(frame);
-    },
-  };
 };

@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import classnames from 'classnames';
 
 import metaversefile from '../../../../metaversefile-api.js';
@@ -18,14 +18,14 @@ export const emotions = [
 export const setFacePoseValue = (emotion, value) => {
     const localPlayer = metaversefile.useLocalPlayer();
 
-    const facePoseActionIndex = localPlayer.findActionIndex( a => a.type === 'facepose' && a.emotion === emotion );
-    if ( facePoseActionIndex !== -1 ) {
+    const facePoseActionIndex = localPlayer.findActionIndex(a => a.type === 'facepose' && a.emotion === emotion);
+    if (facePoseActionIndex !== -1) {
 
-        localPlayer.removeActionIndex( facePoseActionIndex );
+        localPlayer.removeActionIndex(facePoseActionIndex);
 
     }
 
-    if ( value > 0 ) {
+    if (value > 0) {
 
         const newAction = {
             type: 'facepose',
@@ -40,7 +40,7 @@ export const setFacePoseValue = (emotion, value) => {
 export const Emotions = ({
     parentOpened,
 }) => {
-    const [ emotionsOpen, setEmotionsOpen ] = useState( false );
+    const [ emotionsOpen, setEmotionsOpen ] = useState(false);
     const emotionStates = emotions.map(emotion => {
         const [ value, setValue ] = useState(0);
 
@@ -49,23 +49,23 @@ export const Emotions = ({
             setValue,
         };
     });
-    const [ dragEmotionIndex, setDragEmotionIndex ] = useState( -1 );
+    const [ dragEmotionIndex, setDragEmotionIndex ] = useState(-1);
     const emotionsRef = useRef();
 
     const localPlayer = metaversefile.useLocalPlayer();
 
     // handle mouse events
-    useEffect( () => {
+    useEffect(() => {
 
-        function mousemove ( e ) {
+        function mousemove (e) {
 
             const emotionsEl = emotionsRef.current;
 
-            if ( document.pointerLockElement === emotionsEl ) {
+            if (document.pointerLockElement === emotionsEl) {
 
-                const { /*movementX, */movementY } = e;
+                const {/* movementX, */movementY} = e;
 
-                if ( dragEmotionIndex !== -1 ) {
+                if (dragEmotionIndex !== -1) {
 
                     const emotion = emotions[dragEmotionIndex];
                     const emotionState = emotionStates[dragEmotionIndex];
@@ -75,7 +75,7 @@ export const Emotions = ({
                     setFacePoseValue(emotion, value);
 
                     // this set is redundant, but it ensures zero values from setFacePoseValue do not interfere with the drag
-                    emotionState.setValue( value );
+                    emotionState.setValue(value);
 
                 }
 
@@ -83,18 +83,18 @@ export const Emotions = ({
 
         }
 
-        document.addEventListener( 'mousemove', mousemove );
+        document.addEventListener('mousemove', mousemove);
 
         return () => {
 
-            document.removeEventListener( 'mousemove', mousemove );
+            document.removeEventListener('mousemove', mousemove);
 
         };
 
-    }, [ emotionsRef, dragEmotionIndex ].concat( emotionStates.map(e => e.value ) ) );
+    }, [ emotionsRef, dragEmotionIndex ].concat(emotionStates.map(e => e.value)));
 
     // update UI from external actions
-    useEffect( () => {
+    useEffect(() => {
 
         const actionadd = e => {
 

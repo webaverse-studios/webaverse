@@ -1,16 +1,16 @@
-// import {makePromise} from './util.js';
-
 class CallbackManager {
   constructor() {
     this.currentId = 0;
     this.callbackPool = {};
   }
+
   add(clb) {
     var id = this.currentId;
     this.callbackPool[id] = clb;
     this.currentId++;
     return id;
   }
+
   get(id) {
     const clb = this.callbackPool[id];
     if (clb) {
@@ -35,7 +35,7 @@ class AudioRecognizer extends EventTarget {
       this.worker.onmessage = e => {
         // This is the case when we have a callback id to be called
         if (e.data.hasOwnProperty('id')) {
-          var clb = this.callbackManager.get(e.data['id']);
+          var clb = this.callbackManager.get(e.data.id);
           var data = {};
           if (e.data.hasOwnProperty('data')) data = e.data.data;
           if (clb) clb(data);
@@ -54,7 +54,7 @@ class AudioRecognizer extends EventTarget {
           }));
         }
         // This is the case when we have an error
-        if (e.data.hasOwnProperty('status') && (e.data.status == "error")) {
+        if (e.data.hasOwnProperty('status') && (e.data.status === "error")) {
           // updateStatus("Error in " + e.data.command + " with code " + e.data.code);
           this.dispatchEvent(new MessageEvent('error', {
             data: e.data,
@@ -92,7 +92,7 @@ class AudioRecognizer extends EventTarget {
       await this.postRecognizerJob(
         {
           command: 'initialize',
-          data: [/*["-kws", "kws.txt"], ["-dict","kws.dict"], */ ['-allphone', 'en-us-phone.lm.bin'], ['-logfn', '/dev/null']],
+          data: [/* ["-kws", "kws.txt"], ["-dict","kws.dict"], */ ['-allphone', 'en-us-phone.lm.bin'], ['-logfn', '/dev/null']],
         }
       );
 
@@ -110,6 +110,7 @@ class AudioRecognizer extends EventTarget {
       'pocketsphinx.wasm': 'pocketsphinx.wasm',
     });
   }
+
   /* waitForLoad() {
     return this.loadPromise;
   } */
@@ -120,6 +121,7 @@ class AudioRecognizer extends EventTarget {
       this.worker.postMessage(msg);
     });
   }
+
   send(result) {
     if (this.loaded) {
       this.worker.postMessage({
@@ -128,6 +130,7 @@ class AudioRecognizer extends EventTarget {
       }, [result.buffer]);
     }
   }
+
   destroy() {
     this.worker.terminate();
     this.worker = null;

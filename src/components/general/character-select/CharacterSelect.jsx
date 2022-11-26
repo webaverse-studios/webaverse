@@ -1,34 +1,22 @@
 
-import React, { forwardRef, useEffect, useState, createRef, useContext } from 'react';
+import React, {forwardRef, useEffect, useState, createRef, useContext} from 'react';
 import classnames from 'classnames';
 import metaversefile from 'metaversefile';
 import styles from './character-select.module.css';
-import { AppContext } from '../../app';
-import { MegaHup } from '../../../MegaHup.jsx';
-import { LightArrow } from '../../../LightArrow.jsx';
-// import { world } from '../../../../world.js';
-import { LocalPlayer } from '../../../../character-controller.js';
-import { characterSelectManager } from '../../../../characterselect-manager.js';
+import {AppContext} from '../../app';
+import {MegaHup} from '../../../MegaHup.jsx';
+import {LightArrow} from '../../../LightArrow.jsx';
+import {LocalPlayer} from '../../../../character-controller.js';
+import {characterSelectManager} from '../../../../characterselect-manager.js';
 import * as sounds from '../../../../sounds.js';
-import { chatManager } from '../../../../chat-manager.js';
+import {chatManager} from '../../../../chat-manager.js';
 import musicManager from '../../../../music-manager.js';
-import { CachedLoader } from '../../../CachedLoader.jsx';
-import { RpgText } from '../../../RpgText.jsx';
-import { chatTextSpeed } from '../../../../constants.js';
-import { VoiceEndpointVoicer } from '../../../../voice-output/voice-endpoint-voicer.js';
+import {CachedLoader} from '../../../CachedLoader.jsx';
+import {RpgText} from '../../../RpgText.jsx';
+import {chatTextSpeed, characterSelectAvatarQuality} from '../../../../constants.js';
+import {VoiceEndpointVoicer ,getVoiceEndpointUrl} from '../../../../voice-output/voice-endpoint-voicer.js';
 import * as voices from '../../../../voices.js';
-import {getVoiceEndpointUrl} from '../../../../voice-output/voice-endpoint-voicer.js';
-import npcManager from '../../../../npc-manager.js'
-
-//
-
-function typeContentToUrl(type, content) {
-if (typeof content === 'object') {
-    content = JSON.stringify(content);
-}
-const dataUrlPrefix = 'data:' + type + ',';
-return '/@proxy/' + dataUrlPrefix + encodeURIComponent(content).replace(/\%/g, '%25')//.replace(/\\//g, '%2F');
-}
+import npcManager from '../../../../npc-manager.js';
 
 //
 
@@ -82,7 +70,7 @@ const Character = forwardRef(({
 });
 
 export const CharacterSelect = () => {
-    const { state, setState } = useContext( AppContext );
+    const {state, setState} = useContext(AppContext);
     const [ highlightCharacter, setHighlightCharacter ] = useState(null);
     const [ selectCharacter, setSelectCharacter ] = useState(null);
     const [ highlightPack, setHighlightPack ] = useState(null);
@@ -102,9 +90,13 @@ export const CharacterSelect = () => {
             let detachedCharacter = JSON.parse(JSON.stringify(targetCharacter));
             detachedCharacter.detached = true;
             const app = await metaversefile.createAppAsync({
-                start_url: typeContentToUrl('application/npc', detachedCharacter),
+                type: 'application/npc',
+                content: detachedCharacter,
+                components: {
+                    quality: characterSelectAvatarQuality,
+                },
             });
-            return npcManager.getNpcByApp(app);
+            return npcManager.getDetachedNpcByApp(app);
         },
     }));
     const [ themeSongLoader, setThemeSongLoader ] = useState(() => new CachedLoader({
@@ -113,7 +105,7 @@ export const CharacterSelect = () => {
             signal.addEventListener('abort', () => {
               live = false;
             });
-            themeSong = await LocalPlayer.fetchThemeSong(targetCharacter.themeSongUrl);
+            const themeSong = await LocalPlayer.fetchThemeSong(targetCharacter.themeSongUrl);
             if (!live) return;
             return themeSong;
         },
@@ -122,9 +114,10 @@ export const CharacterSelect = () => {
         loadFn: async (url, targetCharacter, {signal = null} = {}) => {
             // get ai text
             let live = true;
-            signal.addEventListener('abort', () => {
+            const abort = () => {
                 live = false;
-            });
+            };
+            signal.addEventListener('abort', abort);
             const loreAIScene = metaversefile.useLoreAIScene();
             const [
                 characterIntro,
@@ -133,8 +126,12 @@ export const CharacterSelect = () => {
                 loreAIScene.generateCharacterIntroPrompt(targetCharacter.name, targetCharacter.bio),
                 voices.waitForLoad(),
             ]);
+            signal.removeEventListener('abort', abort);
             if (!live) return;
 
+            if (!characterIntro) {
+                throw new Error('empty character intro response');
+            }
             // preload audio
             const voiceEndpoint = voices.voiceEndpoints.find(voiceEndpoint => voiceEndpoint.name === targetCharacter.voice);
             if (!voiceEndpoint) {
@@ -289,6 +286,8 @@ export const CharacterSelect = () => {
             return () => {
                 clearTimeout(timeout);
             };
+        } else {
+            musicManager.stopCurrentMusic();
         }
     }, [opened, targetCharacter]);
     useEffect(() => {
@@ -333,7 +332,7 @@ export const CharacterSelect = () => {
             sounds.playSoundName('menuBoop');
 
             setTimeout(() => {
-                setState({ openedPanel: null });
+                setState({openedPanel: null});
             }, 1000);
 
             (async () => {

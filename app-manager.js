@@ -6,11 +6,11 @@ you can have as many app managers as you want.
 import * as THREE from 'three';
 import * as Z from 'zjs';
 
-import {makePromise, getRandomString} from './util.js';
+import {makePromise, getRandomString,jsonParse} from './util.js';
 import physicsManager from './physics-manager.js';
 import metaversefile from 'metaversefile';
-import * as metaverseModules from './metaverse-modules.js';
-import {jsonParse} from './util.js';
+import * as coreModules from './core-modules.js';
+
 import {appsMapName} from './constants.js';
 
 const localVector = new THREE.Vector3();
@@ -27,8 +27,6 @@ const localFrameOpts = {
   data: localData,
 };
 const frameEvent = new MessageEvent('frame', localFrameOpts);
-
-const physicsScene = physicsManager.getScene();
 
 const appManagers = [];
 class AppManager extends EventTarget {
@@ -52,12 +50,14 @@ class AppManager extends EventTarget {
   
     appManagers.push(this);
   }
+
   tick(timestamp, timeDiff, frame) {
     localData.timestamp = timestamp;
     localData.frame = frame;
     localData.timeDiff = timeDiff;
     this.dispatchEvent(frameEvent);
   }
+
   /* setPushingLocalUpdates(pushingLocalUpdates) {
     this.pushingLocalUpdates = pushingLocalUpdates;
   } */
@@ -69,9 +69,11 @@ class AppManager extends EventTarget {
     }
     return null;
   }
+
   isBound() {
     return !!this.appsArray;
   }
+
   unbindState() {
     if (this.isBound()) {
       this.unbindStateFn();
@@ -79,6 +81,7 @@ class AppManager extends EventTarget {
       this.unbindStateFn = null;
     }
   }
+
   bindState(nextAppsArray) {
     this.unbindState();
   
@@ -167,6 +170,7 @@ class AppManager extends EventTarget {
     }
     this.appsArray = nextAppsArray;
   }
+
   async loadApps() {
     for (let i = 0; i < this.appsArray.length; i++) {
       const trackedApp = this.appsArray.get(i, Z.Map);
@@ -178,6 +182,7 @@ class AppManager extends EventTarget {
       }
     }
   }
+
   trackedAppBound (instanceId) {
     return !!this.trackedAppUnobserveMap.get(instanceId)
   }
@@ -285,6 +290,7 @@ class AppManager extends EventTarget {
     const instanceId = trackedApp.get('instanceId');
     this.trackedAppUnobserveMap.set(instanceId, trackedApp.unobserve.bind(trackedApp, _observe));
   }
+
   unbindTrackedApp(instanceId) {
     const fn = this.trackedAppUnobserveMap.get(instanceId);
     
@@ -295,6 +301,7 @@ class AppManager extends EventTarget {
       console.warn('tracked app was not bound:', instanceId);
     }
   }
+
   bindEvents() {
     this.addEventListener('trackedappadd', async e => {
       const {trackedApp} = e.data;
@@ -346,17 +353,20 @@ class AppManager extends EventTarget {
     const resize = e => {
       this.resize(e);
     };
-    window.addEventListener('resize', resize);
+    globalThis.addEventListener('resize', resize);
     this.cleanup = () => {
-      window.removeEventListener('resize', resize);
+      globalThis.removeEventListener('resize', resize);
     };
   }
+
   getApps() {
     return this.apps;
   }
+
   getAppByInstanceId(instanceId) {
     return this.apps.find(app => app.instanceId === instanceId);
   }
+
   getAppByPhysicsId(physicsId) {
     for (const app of this.apps) {
       if (app.getPhysicsObjects && app.getPhysicsObjects().some(o => o.physicsId === physicsId)) {
@@ -365,6 +375,7 @@ class AppManager extends EventTarget {
     }
     return null;
   }
+
   getPhysicsObjectByPhysicsId(physicsId) {
     for (const app of this.apps) {
       const physicsObjects = app.getPhysicsObjects();
@@ -376,6 +387,7 @@ class AppManager extends EventTarget {
     }
     return null;
   }
+
   getPairByPhysicsId(physicsId) {
     for (const app of this.apps) {
       const physicsObjects = app.getPhysicsObjects();
@@ -387,6 +399,7 @@ class AppManager extends EventTarget {
     }
     return null;
   }
+
   getOrCreateTrackedApp(instanceId) {
     for (let i = 0; this.appsArray.length > i; i++) {
       const app = this.appsArray.get(i, Z.Map);
@@ -399,6 +412,7 @@ class AppManager extends EventTarget {
     this.appsArray.push([appMap]);
     return appMap;
   }
+
   getTrackedApp(instanceId) {
     for (const app of this.appsArray) {
       if (app.get('instanceId') === instanceId) {
@@ -407,6 +421,7 @@ class AppManager extends EventTarget {
     }
     return null;
   }
+
   hasTrackedApp(instanceId) {
     if (!this.appsArray) {
       throw new Error('AppManager should be bound');
@@ -418,6 +433,7 @@ class AppManager extends EventTarget {
     }
     return false;
   }
+
   clear() {
     if (!this.isBound()) {
       const apps = this.apps.slice();
@@ -430,6 +446,7 @@ class AppManager extends EventTarget {
       throw new Error('cannot clear world while it is bound');
     }
   }
+
   addTrackedAppInternal(
     instanceId,
     contentId,
@@ -444,6 +461,7 @@ class AppManager extends EventTarget {
     trackedApp.set('components', components);
     return trackedApp;
   }
+
   addTrackedApp(
     contentId,
     position = new THREE.Vector3(),
@@ -477,6 +495,7 @@ class AppManager extends EventTarget {
       }
     }
   }
+
   getTrackedAppIndex(instanceId) {
     for (let i = 0; i < this.appsArray.length; i++) {
       const app = this.appsArray.get(i);
@@ -486,6 +505,7 @@ class AppManager extends EventTarget {
     }
     return -1;
   }
+
   removeTrackedAppInternal(instanceId) {
     // console.log('remove tracked app internal', removeInstanceId);
     
@@ -496,12 +516,14 @@ class AppManager extends EventTarget {
       console.warn('invalid remove instance id', instanceId);
     }
   }
+
   removeTrackedApp(removeInstanceId) {
     const self = this;
     this.appsArray.doc.transact(function tx() {
       self.removeTrackedAppInternal(removeInstanceId);
     });
   }
+
   addApp(app) {
     this.apps.push(app);
     
@@ -509,6 +531,7 @@ class AppManager extends EventTarget {
       data: app,
     }));
   }
+
   removeApp(app) {
     const index = this.apps.indexOf(app);
     // console.log('remove app', app.instanceId, app.contentId, index, this.apps.map(a => a.instanceId), new Error().stack);
@@ -520,25 +543,28 @@ class AppManager extends EventTarget {
       }));
     }
   }
+
   resize(e) {
     const apps = this.apps.slice();
     for (const app of apps) {
       app.resize && app.resize(e);
     }
   }
+
   getErrorPlaceholder() {
     const app = metaversefile.createApp({
         name: 'error-placeholder',
       });
     app.contentId = 'error-placeholder';
     (async () => {
-      await metaverseModules.waitForLoad();
-      const {modules} = metaversefile.useDefaultModules();
-      const m = modules['errorPlaceholder'];
+      // await coreModules.waitForLoad();
+      // const {modules} = metaversefile.useDefaultModules();
+      const m = await coreModules.importModule('errorPlaceholder');
       await app.addModule(m);
     })();
     return app;
   }
+
   /* setBlindStateMode(stateBlindMode) {
     this.stateBlindMode = stateBlindMode;
   } */
@@ -587,6 +613,7 @@ class AppManager extends EventTarget {
     // srcAppManager.setBlindStateMode(false);
     // dstAppManager.setBlindStateMode(false);
   }
+
   importApp(app) {
     const self = this;
     this.appsArray.doc.transact(() => {
@@ -609,9 +636,11 @@ class AppManager extends EventTarget {
       self.bindTrackedApp(dstTrackedApp, app);
     });
   }
+
   hasApp(app) {
     return this.apps.includes(app);
   }
+
   pushAppUpdates() {
     if (this.appsArray) {
       this.appsArray.doc.transact(() => { 
@@ -619,6 +648,7 @@ class AppManager extends EventTarget {
       }, 'push');
     }
   }
+
   updatePhysics() {
     for (const app of this.apps) {
       if (!app.matrix.equals(app.lastMatrix)) {
@@ -655,6 +685,7 @@ class AppManager extends EventTarget {
                   child.updateMatrixWorld();
                 }
 
+                const physicsScene = physicsManager.getScene();
                 physicsScene.setTransform(physicsObject);
                 physicsScene.getBoundingBoxForPhysicsId(physicsObject.physicsId, physicsObject.physicsMesh.geometry.boundingBox);
               }
@@ -667,6 +698,7 @@ class AppManager extends EventTarget {
       }
     }
   }
+
   exportJSON() {
     const objects = [];
 
@@ -700,8 +732,9 @@ class AppManager extends EventTarget {
       objects.push(object);
     }
 
-    return { objects };
+    return {objects};
   }
+
   destroy() {
     if (!this.isBound()) {
       this.clear();

@@ -1,21 +1,15 @@
 import * as THREE from 'three';
 import {scene, camera} from './renderer.js';
-import physics from './physics-manager.js';
-// import physx from './physx.js';
+import physicsManager from './physics-manager.js';
 import Avatar from './avatars/avatars.js';
 import metaversefile from 'metaversefile';
-import * as metaverseModules from './metaverse-modules.js';
+import * as coreModules from './core-modules.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
 const localQuaternion = new THREE.Quaternion();
 const localEuler = new THREE.Euler();
 const localMatrix = new THREE.Matrix4();
-
-//
-
-const physicsScene = physics.getScene();
-// const y180Quaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
 
 //
 
@@ -33,6 +27,7 @@ export class CharacterHitter {
 
     this.lastHitTime = -Infinity;
   }
+
   attemptHit({
     type,
     args,
@@ -50,6 +45,7 @@ export class CharacterHitter {
           position,
           quaternion,
         } = args;
+        const physicsScene = physicsManager.getScene();
         const collision = physicsScene.getCollisionObject(
           hitRadius,
           hitHalfHeight,
@@ -99,7 +95,7 @@ export class CharacterHitter {
         return null;
       }
       case 'bullet': {
-        const result = physics.raycast(args.position, args.quaternion);
+        const result = physicsManager.raycast(args.position, args.quaternion);
         if (result) {
           const _performHit = () => {
             const targetApp = metaversefile.getAppByPhysicsId(result.objectId);
@@ -144,6 +140,7 @@ export class CharacterHitter {
       }
     }
   }
+
   getHit(damage) {
     const newAction = {
       type: 'hurt',
@@ -175,14 +172,14 @@ export class CharacterHitter {
     ];
     const gruntType = gruntTypes[Math.floor(Math.random() * gruntTypes.length)];
     // console.log('play grunt', emotion, gruntType);
-    this.character.characterSfx.playGrunt(gruntType);
+    this.character.characterSfx?.playGrunt(gruntType);
 
     {
       const damageMeshApp = metaversefile.createApp();
       (async () => {
-        await metaverseModules.waitForLoad();
-        const {modules} = metaversefile.useDefaultModules();
-        const m = modules['damageMesh'];
+        // await coreModules.waitForLoad();
+        // const {modules} = metaversefile.useDefaultModules();
+        const m = await coreModules.importModule('damageMesh');
         await damageMeshApp.addModule(m);
       })();
       damageMeshApp.position.copy(this.character.position);
@@ -206,6 +203,7 @@ export class CharacterHitter {
       this.character.removeActionIndex(faceposeActionIndex);
     }, 1000);
   }
+
   update() {
     // nothing
   }

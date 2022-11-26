@@ -1,10 +1,10 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import classnames from 'classnames';
 import styles from './MegaHotBox.module.css';
-import { BigButton } from '../../../BigButton';
-import { PlaceholderImg } from '../../../PlaceholderImg';
-import { ImageBitmapCanvas } from '../../../ImageBitmapCanvas';
-import { loadImage } from '../../../../util.js';
+import {BigButton} from '../../../BigButton';
+import {PlaceholderImg} from '../../../PlaceholderImg';
+import {ImageBitmapCanvas} from '../../../ImageBitmapCanvas';
+import {createCanvas, loadImage} from '../../../../util.js';
 
 const cardFlipAnimationTime = 200;
 
@@ -119,9 +119,7 @@ export const MegaHotBox = ({
         const img = await loadImage('./images/cardback-01.svg');
         if (!live) return;
         
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
+        const canvas = createCanvas(img.width, img.height);
         const ctx = canvas.getContext('2d');
         // console.log('got canvas size', canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);

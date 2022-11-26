@@ -54,6 +54,7 @@ User documentation is <a href="https://webaverse.notion.site/User-Docs-3a36b223e
 - 10 GB Disk Space
 - 8 GB RAM
 - 4 Core CPU / vCPUs
+- Node version 18+. The recommended way to get node is `nvm`: https://github.com/nvm-sh/nvm
 
 ## Installation
 
@@ -67,18 +68,74 @@ git pull --recurse-submodules # Pull recursively
 npm install # Install dependencies
 ```
 
-##### Note for Windows Users
-We recommend that you use Windows Subsystem for Linux to run Webaverse. This [video](https://www.youtube.com/watch?v=5RTSlby-l9w) shows you how you can set up WSL. Once you've installed it, run `wsl` in your terminal to enter Ubuntu, and then run Webaverse from there.
-
-## Quickstart
+## Running
 
 Starting the application is as easy as:
 
 ```sh
-npm run start
+npm run dev
 ```
 
-Once the server has started up, you can visit `https://local.webaverse.com` 
+Once the server has started up, you can press the "A" key to visit `https://local.webaverse.com`.
+
+
+## Installation and Running on Windows
+
+#### WSL
+
+You need to use Windows Subsystem for Linux to install and run Webaverse. [This video](https://www.youtube.com/watch?v=5RTSlby-l9w) shows you how you can set up WSL and Ubuntu.
+
+Requirements:
+- WSL2. If you have WSL1 installed you need to upgrade to WSL2.
+- Ubuntu 20+. Install Ubuntu 20+.
+
+Once you have WSL and Ubuntu set up, run `wsl` in a Windows command window to get a WSL Ubuntu command prompt. Run `exit` at the WSL command prompt to return to the Windows command prompt.
+
+#### Node
+
+At a WSL command prompt, use `nvm` to install Node 18+.
+
+#### Dependencies
+
+Run the following command at the WSL command prompt to install dependencies:
+```sh
+npm run install-libs
+```
+<details>
+<summary>The following libraries get installed with this command (you can also install manually):</summary>
+
+- libatk1.0-0
+- libatk-bridge2.0-0
+- libxcomposite-dev
+- libxdamage1
+- libxrandr2
+- libgbm-dev
+- libxkbcommon-x11-0
+- libpangocairo-1.0-0
+- libasound2
+- libwayland-client0
+
+</details>
+
+#### Port Mapping
+
+To route all of the needed ports for 127.0.0.1 -> WSL to work locally, run the following command in a Powershell window:
+```
+powershell.exe .\scripts\wsl-port-forwarding.ps1
+```
+
+#### Installation
+
+You can host the source files on either your Windows file system or on the Ubuntu file system in WSL's virtual drive.
+
+**Windows File System:** Run the Git commands to clone and pull source files from a Windows command prompt. You may find this best if you're using programs such as SourceTree as a Git GUI. You can also edit source using your usual IDE.
+
+**Ubuntu File System:** Run the Git commands to clone and pull source files from a WSL command prompt. In this case consider [using the Visual Studio Code WSL extension](https://code.visualstudio.com/docs/remote/wsl) as your dev environment - for features such as hot reload.
+
+#### Running
+
+Start the application by running the NPM command at a WSL command prompt.
+
 
 ## Let's build it together!
 

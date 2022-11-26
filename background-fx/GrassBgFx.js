@@ -4,6 +4,7 @@ import {
   gradients,
   fullscreenVertexShader,
 } from './common.js';
+import {loadImageBitmap} from '../util.js';
 // import {getRenderer} from '../renderer.js';
 
 const grassFragmentShader = `\
@@ -270,15 +271,17 @@ void main() {
 }
 `;
 
-let iChannel0 = null;
-let iChannel1 = null;
+// let iChannel0 = null;
+// let iChannel1 = null;
 class GrassBgFxMesh extends THREE.Mesh {
+  static iChannel0 = new THREE.Texture();
+  static iChannel1 = new THREE.Texture();
   constructor() {
-    if (!iChannel0 || !iChannel1) {
-      const textureLoader = new THREE.TextureLoader();
-      iChannel0 = textureLoader.load('/textures/pebbles.png');
-      iChannel1 = textureLoader.load('/textures/noise.png');
-    }
+    // if (!iChannel0 || !iChannel1) {
+    //   const textureLoader = new THREE.TextureLoader();
+    //   iChannel0 = textureLoader.load('/textures/pebbles.png');
+    //   iChannel1 = textureLoader.load('/textures/noise.png');
+    // }
     const material = new THREE.ShaderMaterial({
       uniforms: {
         iTime: {
@@ -286,11 +289,11 @@ class GrassBgFxMesh extends THREE.Mesh {
           needsUpdate: false,
         },
         iChannel0: {
-          value: iChannel0,
+          value: GrassBgFxMesh.iChannel0,
           needsUpdate: true,
         },
         iChannel1: {
-          value: iChannel1,
+          value: GrassBgFxMesh.iChannel1,
           needsUpdate: true,
         },
         /* iFrame: {
@@ -321,9 +324,11 @@ class GrassBgFxMesh extends THREE.Mesh {
       alphaToCoverage: true,
     });
     super(fullscreenGeometry, material);
+    material.freeze();
     
     this.frustumCulled = false;
   }
+
   update(timestamp, timeDiff, width, height) {
     const timestampS = timestamp / 1000;
 
@@ -337,6 +342,20 @@ class GrassBgFxMesh extends THREE.Mesh {
     
     this.material.uniforms.uColor2.value.set(colors[colors.length - 1]);
     this.material.uniforms.uColor2.needsUpdate = true;
+  }
+
+  static async waitForLoad() {
+    const [
+      pebblesIB,
+      noiseIB,
+    ] = await Promise.all([
+      loadImageBitmap('/textures/pebbles.png'),
+      loadImageBitmap('/textures/noise.png'),
+    ]);
+    GrassBgFxMesh.iChannel0.image = pebblesIB;
+    GrassBgFxMesh.iChannel0.needsUpdate = true;
+    GrassBgFxMesh.iChannel1.image = noiseIB;
+    GrassBgFxMesh.iChannel1.needsUpdate = true;
   }
 }
 

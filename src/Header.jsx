@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useContext, useState } from 'react';
+import React, {useEffect, useRef, useContext, useState} from 'react';
 
 import CharacterHups from './CharacterHups.jsx';
 import game from '../game.js'
@@ -7,24 +7,24 @@ import cameraManager from '../camera-manager.js'
 import metaversefile from '../metaversefile-api.js'
 import ioManager from '../io-manager.js'
 
-import { Character } from './components/general/character';
-import { CharacterSelect } from './components/general/character-select';
-import { Equipment } from './components/general/equipment';
+import {Character} from './components/general/character';
+import {CharacterSelect} from './components/general/character-select';
 // import { Tokens } from './tabs/tokens';
-import { registerIoEventHandler, unregisterIoEventHandler } from './components/general/io-handler';
-import { AppContext } from './components/app';
-import { AvatarIcon } from './AvatarIcon';
-import { StoryTime } from './StoryTime';
-import { User } from './User';
+import {registerIoEventHandler, unregisterIoEventHandler} from './components/general/io-handler';
+import {AppContext} from './components/app';
+import {StoryTime} from './StoryTime';
 
 import styles from './Header.module.css';
-import { UIMode } from './components/general/ui-mode/index.jsx';
+import {UIMode} from './components/general/ui-mode/index.jsx';
+import {UserBox} from './components/general/user-box';
+import {Inventory} from './components/general/inventory/index.jsx';
+import {AvatarBox} from './components/general/avatar-box/AvatarBox.jsx';
 
 //
 
 export default function Header() {
 
-    const { state, setState, selectedApp } = useContext( AppContext );
+    const {state, setState, selectedApp} = useContext(AppContext);
     const localPlayer = metaversefile.useLocalPlayer();
     const _getWearActions = () => localPlayer.getActionsArray().filter(action => action.type === 'wear');
 
@@ -41,7 +41,7 @@ export default function Header() {
 
     //
 
-    const stopPropagation = ( event ) => {
+    const stopPropagation = (event) => {
 
         event.stopPropagation();
 
@@ -49,12 +49,12 @@ export default function Header() {
 
     //
 
-    useEffect( () => {
+    useEffect(() => {
 
         localPlayer.addEventListener('wearupdate', e => {
 
             const wearActions = _getWearActions();
-            setWearActions( wearActions );
+            setWearActions(wearActions);
 
             const mouseDomEquipmentHoverObject = game.getMouseDomEquipmentHoverObject();
 
@@ -68,29 +68,29 @@ export default function Header() {
 
     }, []);
 
-    useEffect( () => {
+    useEffect(() => {
 
         const pointerlockchange = e => {
 
-            const { pointerLockElement } = e.data;
+            const {pointerLockElement} = e.data;
 
-            if ( pointerLockElement && state.openedPanel !== null) {
+            if (pointerLockElement && state.openedPanel !== null) {
 
-                setState({ openedPanel: null });
+                setState({openedPanel: null});
 
             }
 
         };
 
-        cameraManager.addEventListener( 'pointerlockchange', pointerlockchange );
+        cameraManager.addEventListener('pointerlockchange', pointerlockchange);
 
         return () => {
 
-            cameraManager.removeEventListener( 'pointerlockchange', pointerlockchange );
+            cameraManager.removeEventListener('pointerlockchange', pointerlockchange);
 
         };
 
-    }, [ state.openedPanel ] );
+    }, [ state.openedPanel ]);
 
     /* useEffect(() => {
 
@@ -117,25 +117,25 @@ export default function Header() {
 
     useEffect(() => {
 
-        if ( selectedApp && panelsRef.current ) {
+        if (selectedApp && panelsRef.current) {
 
             panelsRef.current.scrollTo(0, 0);
 
         }
 
-    }, [ selectedApp, panelsRef.current ] );
+    }, [ selectedApp, panelsRef.current ]);
 
-    useEffect( () => {
+    useEffect(() => {
 
-        const handleNonInputKey = ( event ) => {
+        const handleNonInputKey = (event) => {
 
-            switch ( event.which ) {
+            switch (event.which) {
 
                 case 191: { // /
 
-                    if ( ! state.openedPanel === 'MagicPanel' && ! ioManager.inputFocused() ) {
+                    if (! state.openedPanel === 'MagicPanel' && ! ioManager.inputFocused()) {
 
-                        setState({ openedPanel: 'MagicPanel' });
+                        setState({openedPanel: 'MagicPanel'});
 
                     }
 
@@ -149,17 +149,17 @@ export default function Header() {
 
         };
 
-        const handleAnytimeKey = ( event ) => {
+        const handleAnytimeKey = (event) => {
 
-            switch ( event.which ) {
+            switch (event.which) {
 
                 case 9: { // tab
 
-                    if ( !event.repeat ) {
+                    if (!event.repeat) {
 
-                        setState({ openedPanel: ( state.openedPanel === 'CharacterPanel' ? null : 'CharacterPanel' ) });
+                        setState({openedPanel: (state.openedPanel === 'CharacterPanel' ? null : 'CharacterPanel')});
 
-                        if ( state.openedPanel === 'CharacterPanel' && !cameraManager.pointerLockElement ) {
+                        if (state.openedPanel === 'CharacterPanel' && !cameraManager.pointerLockElement) {
 
                             cameraManager.requestPointerLock();
 
@@ -175,24 +175,24 @@ export default function Header() {
 
         };
 
-        const keydown = ( event ) => {
+        const keydown = (event) => {
 
             let handled = false;
-            const inputFocused = document.activeElement && ['INPUT', 'TEXTAREA'].includes( document.activeElement.nodeName );
+            const inputFocused = document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.nodeName);
 
-            if ( ! inputFocused )  {
+            if (! inputFocused)  {
 
-                handled = handleNonInputKey( event );
-
-            }
-
-            if ( ! handled ) {
-
-                handled = handleAnytimeKey( event );
+                handled = handleNonInputKey(event);
 
             }
 
-            if ( handled ) {
+            if (! handled) {
+
+                handled = handleAnytimeKey(event);
+
+            }
+
+            if (handled) {
 
                 return false;
 
@@ -204,20 +204,20 @@ export default function Header() {
 
         };
 
-        registerIoEventHandler( 'keydown', keydown );
+        registerIoEventHandler('keydown', keydown);
 
         return () => {
 
-            unregisterIoEventHandler( 'keydown', keydown );
+            unregisterIoEventHandler('keydown', keydown);
 
         };
 
-    }, [ state.openedPanel, selectedApp ] );
+    }, [ state.openedPanel, selectedApp ]);
 
     const npcManager = metaversefile.useNpcManager();
     const [npcs, setNpcs] = useState(npcManager.npcs);
 
-    useEffect( () => {
+    useEffect(() => {
 
         npcManager.addEventListener('npcadd', e => {
 
@@ -239,17 +239,17 @@ export default function Header() {
 
     // tmp code [will be remove in next PRs]
 
-    const claimsOpen = ( state.openedPanel === 'ClaimsPanel' ? 'claims' : false );
+    const claimsOpen = (state.openedPanel === 'ClaimsPanel' ? 'claims' : false);
 
     const toggleClaimsOpen = () => {
 
-        if ( claimsOpen ) {
+        if (claimsOpen) {
 
-            setState({ openedPanel: null });
+            setState({openedPanel: null});
 
         } else {
 
-            setState({ openedPanel: 'ClaimsPanel' });
+            setState({openedPanel: 'ClaimsPanel'});
 
         }
 
@@ -266,12 +266,12 @@ export default function Header() {
             <StoryTime />
             {/* <div className={styles.inner}> */}
                 <UIMode hideDirection='left' >
-                    <AvatarIcon />
+                    <AvatarBox />
                 </UIMode>
                 <UIMode hideDirection='right' >
-                    <User
-                        address={address}
-                        setAddress={setAddress}
+                    <UserBox
+                        // address={address}
+                        // setAddress={setAddress}
                         setLoginFrom={setLoginFrom}
                     />
                 </UIMode>
@@ -285,7 +285,7 @@ export default function Header() {
                     <CharacterSelect
                         
                     />
-                    <Equipment />
+                    <Inventory />
                     {/* <Claims
                         open={ claimsOpen }
                         toggleOpen={ toggleClaimsOpen }

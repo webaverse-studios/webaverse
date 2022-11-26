@@ -1,12 +1,7 @@
 import * as THREE from 'three';
 import metaversefile from 'metaversefile';
 import Avatar from '../avatars/avatars.js';
-// import {world} from '../world.js';
 import physicsManager from '../physics-manager.js';
-// import {glowMaterial} from '../shaders.js';
-// import easing from '../easing.js';
-import npcManager from '../npc-manager.js';
-// import {rarityColors} from '../constants.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -20,10 +15,6 @@ const localMatrix = new THREE.Matrix4();
 //
 
 const identityVector = new THREE.Vector3();
-
-//
-
-const physicsScene = physicsManager.getScene();
 
 //
 
@@ -51,6 +42,7 @@ export default (app, component) => {
         // console.log('got wear spec', [wearSpec.skinnedMesh, app.glb]);
         
         const physicsObjects = app.getPhysicsObjects();
+        const physicsScene = physicsManager.getScene();
         for (const physicsObject of physicsObjects) {
           physicsScene.disableActor(physicsObject);
         }
@@ -65,8 +57,8 @@ export default (app, component) => {
             });
             if (skinnedMesh && player.avatar) {
               app.position.set(0, 0, 0);
-              app.quaternion.identity(); //.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
-              app.scale.copy(initialScale)//.multiplyScalar(wearableScale);
+              app.quaternion.identity(); // .setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
+              app.scale.copy(initialScale)// .multiplyScalar(wearableScale);
               app.updateMatrix();
               app.matrixWorld.copy(app.matrix);
               
@@ -195,6 +187,7 @@ export default (app, component) => {
   const _unwear = () => {
     if (wearSpec) {
       const physicsObjects = app.getPhysicsObjects();
+      const physicsScene = physicsManager.getScene();
       for (const physicsObject of physicsObjects) {
         physicsScene.enableActor(physicsObject);
       }

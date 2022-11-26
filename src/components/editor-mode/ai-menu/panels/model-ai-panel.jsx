@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, {useState, useRef} from 'react';
 import classnames from 'classnames';
 import imageAI from '../../../../../ai/image/image-ai';
-import {canvasHasContent} from '../../../../../util';
+import {createCanvas, canvasHasContent} from '../../../../../util';
 
 import styles from './model-ai-panel.module.css';
 
@@ -64,9 +64,7 @@ export function ModelAiPanel() {
                 let img;
                 const localPrompt = prompt || defaultPrompt;
                 if (canvasHasContent(canvasEl)) {
-                    const canvas2 = document.createElement('canvas');
-                    canvas2.width = fullSize;
-                    canvas2.height = fullSize;
+                    const canvas2 = createCanvas(fullSize, fullSize);
                     const ctx2 = canvas2.getContext('2d');
                     ctx2.imageSmoothingEnabled = false;
                     ctx2.drawImage(canvasEl, 0, 0, canvas2.width, canvas2.height);

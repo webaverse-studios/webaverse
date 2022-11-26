@@ -1,4 +1,4 @@
-import {voicePacksUrl, voiceEndpointsUrl} from './constants.js';
+import {voicePacksUrl, voiceEndpointsUrl} from './endpoints.js';
 import overrides from './overrides.js';
 import {playersManager} from './players-manager.js';
 

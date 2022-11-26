@@ -1,31 +1,43 @@
 import * as THREE from 'three';
 import {MaxRectsPacker} from 'maxrects-packer';
-import {modUv} from './util.js';
 import {startTextureAtlasSize, maxTextureAtlasSize} from './constants.js';
 
-// const localVector = new THREE.Vector3();
-// const localVector2 = new THREE.Vector3();
 const localVector2D = new THREE.Vector2();
 const localVector2D2 = new THREE.Vector2();
-// const localVector4D = new THREE.Vector4();
-// const localQuaternion = new THREE.Quaternion();
-// const localMatrix = new THREE.Matrix4();
 
-export const mapWarpedUvs = (src, srcOffset, dst, dstOffset, tx, ty, tw, th, canvasSize) => {
+const clampUv = (uv, min, max) => {
+  return Math.max(min, Math.min(uv, max));
+}
+
+export const mapWarpedUvs = (
+  src,
+  srcOffset,
+  dst,
+  dstOffset,
+  tx,
+  ty,
+  tw,
+  th,
+  canvasSize
+) => {
   const count = src.count;
+
   for (let i = 0; i < count; i++) {
     const srcIndex = srcOffset + i * 2;
     const localDstOffset = dstOffset + i * 2;
 
     localVector2D.fromArray(src.array, srcIndex);
-    modUv(localVector2D);
+
+    // * making sure the UVs are in the range [0, 1]
+    localVector2D.x = clampUv(localVector2D.x, 0, 1);
+    localVector2D.y = clampUv(localVector2D.y, 0, 1);
+
+    // modUv(localVector2D);
+
     localVector2D
-      .multiply(
-        localVector2D2.set(tw/canvasSize, th/canvasSize)
-      )
-      .add(
-        localVector2D2.set(tx/canvasSize, ty/canvasSize)
-      );
+      .multiply(localVector2D2.set(tw / canvasSize, th / canvasSize))
+      .add(localVector2D2.set(tx / canvasSize, ty / canvasSize));
+
     localVector2D.toArray(dst.array, localDstOffset);
   }
 };
@@ -226,6 +238,8 @@ export const createTextureAtlas = (meshes, {
     atlasImages,
   } = generateTextureAtlas(textureSpecs);
 
+  // !!atlas && console.error('Texture Atlas Creation Failed : The Provided Mesh Has No Textures');
+
   const canvasSize = Math.min(atlas.width, maxTextureAtlasSize);
   const canvasScale = canvasSize / atlas.width;
 
@@ -278,5 +292,60 @@ export const createTextureAtlas = (meshes, {
     atlasImages,
     meshes: meshes2,
     textureNames: textures,
+    materials: material,
   };
 };
+
+export const calculateCanvasAtlasTexturePerRow = (numTextures) => {
+  const minNumTexturesPerRow = Math.sqrt(numTextures);
+  // ? rounding the minNumTexturesPerRow to the next power of 2
+  return Math.pow(2, Math.ceil(Math.log(minNumTexturesPerRow) / Math.log(2)));
+};
+
+const _adjustAtlasTextureSettings = (
+  texture,
+  encoding = THREE.LinearEncoding
+) => {
+  texture.generateMipmaps = true;
+  texture.minFilter = THREE.NearestFilter;
+  texture.magFilter = THREE.NearestFilter;
+  texture.encoding = encoding;
+  texture.flipY = false;
+};
+
+export class CanvasTextureAtlas {
+  constructor(textures, subTextureSize, textureEncoding) {
+    this.texturePerRow = calculateCanvasAtlasTexturePerRow(textures.length);
+
+    this.canvas = document.createElement('canvas');
+
+    const width = subTextureSize * this.texturePerRow;
+    const height = subTextureSize * this.texturePerRow;
+
+    this.canvas.width = width;
+    this.canvas.height = height;
+
+    const context = this.canvas.getContext('2d');
+
+    for (let t = 0; t < textures.length; t++) {
+      const texture = textures[t];
+      const image = texture.image;
+
+      const x = t % this.texturePerRow;
+      const y = Math.floor(t / this.texturePerRow);
+
+      image &&
+        context.drawImage(
+          image,
+          x * subTextureSize,
+          y * subTextureSize
+        );
+    }
+
+    const atlasTexture = new THREE.CanvasTexture(this.canvas);
+
+    _adjustAtlasTextureSettings(atlasTexture, textureEncoding);
+
+    this.atlasTexture = atlasTexture;
+  }
+}

@@ -9,6 +9,7 @@ import * as sounds from './sounds.js';
 import physx from './physx.js';
 import ioManager from './io-manager.js';
 import physicsManager from './physics-manager.js';
+import physxWorkerManager from './physx-worker-manager.js';
 import {world} from './world.js';
 // import * as blockchain from './blockchain.js';
 import cameraManager from './camera-manager.js';
@@ -28,27 +29,23 @@ import {
   sceneLowPriority,
   rootScene,
   camera,
-  // dolly,
   bindCanvas,
   getComposer,
 } from './renderer.js';
 import transformControls from './transform-controls.js';
-// import * as metaverseModules from './metaverse-modules.js';
-import dioramaManager from './diorama.js';
+import dioramaManager from './diorama/diorama-manager.js';
 import * as voices from './voices.js';
 import performanceTracker from './performance-tracker.js';
 import renderSettingsManager from './rendersettings-manager.js';
 import metaversefileApi from 'metaversefile';
-import WebaWallet from './src/components/wallet.js';
-// import domRenderEngine from './dom-renderer.jsx';
 import musicManager from './music-manager.js';
-import physxWorkerManager from './physx-worker-manager.js';
 import story from './story.js';
 import zTargeting from './z-targeting.js';
 import raycastManager from './raycast-manager.js';
 import universe from './universe.js';
 import npcManager from './npc-manager.js';
 import settingsManager from './settings-manager.js';
+import backgroundFx from './background-fx/background-fx.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -81,17 +78,17 @@ export default class Webaverse extends EventTarget {
     story.listenHack();
 
     this.loadPromise = (async () => {
+      await physx.waitForLoad();
       await Promise.all([
-        physx.waitForLoad(),
         Avatar.waitForLoad(),
         physxWorkerManager.waitForLoad(),
         sounds.waitForLoad(),
         zTargeting.waitForLoad(),
         particleSystemManager.waitForLoad(),
         transformControls.waitForLoad(),
+        backgroundFx.waitForLoad(),
         voices.waitForLoad(),
         musicManager.waitForLoad(),
-        WebaWallet.waitForLoad(),
       ]);
     })();
     this.contentLoaded = false;
@@ -104,15 +101,19 @@ export default class Webaverse extends EventTarget {
   getRenderer() {
     return getRenderer();
   }
+
   getScene() {
     return scene;
   }
+
   getSceneHighPriority() {
     return sceneHighPriority;
   }
+
   getSceneLowPriority() {
     return sceneLowPriority;
   }
+
   getCamera() {
     return camera;
   }
@@ -120,19 +121,12 @@ export default class Webaverse extends EventTarget {
   setContentLoaded() {
     this.contentLoaded = true;
   }
-  bindInput() {
-    ioManager.bindInput();
-  }
-  bindInterface() {
-    ioManager.bindInterface();
-    // blockchain.bindInterface();
-  }
+
   bindCanvas(c) {
     bindCanvas(c);
-    game.bindDioramaCanvas();
-    
     postProcessing.bindCanvas();
   }
+
   async isXrSupported() {
     if (navigator.xr) {
       let ok = false;
@@ -146,6 +140,7 @@ export default class Webaverse extends EventTarget {
       return false;
     }
   }
+
   async enterXr() {
     const renderer = getRenderer();
     const session = renderer.xr.getSession();
@@ -337,7 +332,7 @@ export default class Webaverse extends EventTarget {
 
           const session = renderer.xr.getSession();
           const xrCamera = session ? renderer.xr.getCamera(camera) : camera;
-          localMatrix.multiplyMatrices(xrCamera.projectionMatrix, /*localMatrix2.multiplyMatrices(*/xrCamera.matrixWorldInverse/*, physx.worldContainer.matrixWorld)*/);
+          localMatrix.multiplyMatrices(xrCamera.projectionMatrix, /* localMatrix2.multiplyMatrices( */xrCamera.matrixWorldInverse/*, physx.worldContainer.matrixWorld) */);
           localMatrix2.copy(xrCamera.matrix)
             .premultiply(camera.matrix)
             .decompose(localVector, localQuaternion, localVector2);
