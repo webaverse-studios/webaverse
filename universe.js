@@ -379,7 +379,8 @@ class Universe extends EventTarget {
       this.realms.localPlayer.initializePlayer({
         position,
       }, {});
-      this.realms.localPlayer.setKeyValue('transform', localPlayer.transform);
+      const transformAndTimestamp = [...localPlayer.transform, performance.now()];
+      universe.realms.localPlayer.setKeyValue('transform', transformAndTimestamp);
 
       if (voiceInput.micEnabled()) {
         this.realms.enableMic();
