@@ -25,6 +25,7 @@ import zTargeting from './z-targeting.js';
 import Avatar from './avatars/avatars.js';
 import {avatarManager} from './avatar-manager.js';
 import npcManager from './npc-manager.js';
+import grabManager from './grab-manager.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -39,7 +40,6 @@ const localQuaternion3 = new THREE.Quaternion();
 const localEuler = new THREE.Euler();
 const localMatrix = new THREE.Matrix4();
 const localMatrix2 = new THREE.Matrix4();
-const localMatrix3 = new THREE.Matrix4();
 const localBox = new THREE.Box3();
 const localRay = new THREE.Ray();
 
@@ -47,7 +47,6 @@ const hitRadius = 1;
 const hitHeight = 0.2;
 const hitHalfHeight = hitHeight * 0.5;
 const hitboxOffsetDistance = 0.3;
-const rotationSnap = Math.PI / 6;
 
 class GameManager extends EventTarget {
   menuOpen = 0;
@@ -90,8 +89,7 @@ class GameManager extends EventTarget {
 
   registerHighlightMeshes() {
     this.highlightPhysicsMesh = this.makeHighlightPhysicsMesh(buildMaterial);
-    this.highlightPhysicsMesh.visible = false;
-    sceneLowPriority.add(this.highlightPhysicsMesh);
+    grabManager.setHighlightPhysicsMesh(this.highlightPhysicsMesh);
 
     this.mouseHighlightPhysicsMesh = this.makeHighlightPhysicsMesh(highlightMaterial);
     this.mouseHighlightPhysicsMesh.visible = false;
@@ -132,33 +130,13 @@ class GameManager extends EventTarget {
   };
 
   delete() {
-    const grabbedObject = this.getGrabbedObject(0);
-    if (grabbedObject) {
-      const localPlayer = playersManager.getLocalPlayer();
-      localPlayer.ungrab();
-
-      world.appManager.removeTrackedApp(grabbedObject.instanceId);
-
-    } else if (this.highlightedPhysicsObject) {
-      world.appManager.removeTrackedApp(this.highlightedPhysicsObject.instanceId);
-      this.highlightedPhysicsObject = null;
-
-    } else if (this.mouseSelectedObject) {
+    if (this.mouseSelectedObject) {
       world.appManager.removeTrackedApp(this.mouseSelectedObject.instanceId);
 
       if (this.mouseHoverObject === this.mouseSelectedObject) {
         gameManager.setMouseHoverObject(null);
       }
       gameManager.setMouseSelectedObject(null);
-    }
-  };
-
-  click(e) {
-    if (this.getGrabbedObject(0)) {
-      const localPlayer = playersManager.getLocalPlayer();
-      localPlayer.ungrab();
-    } else if (this.highlightedPhysicsObject) {
-      this.grab(this.highlightedPhysicsObject);
     }
   };
 
@@ -571,15 +549,6 @@ class GameManager extends EventTarget {
     return !!document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.nodeName);
   }
 
-  canRotate() {
-    return !!this.getGrabbedObject(0);
-  }
-
-  menuRotate(direction) {
-    const object = this.getGrabbedObject(0);
-    object.savedRotation.y -= direction * rotationSnap;
-  }
-
   dropSelectedApp() {
     const app = loadoutManager.getSelectedApp();
     if (app) {
@@ -600,49 +569,11 @@ class GameManager extends EventTarget {
       }
     }
   }
-
-  canPush() {
-    return !!this.getGrabbedObject(0);
-  }
-
-  menuPush(direction) {
-    const localPlayer = playersManager.getLocalPlayer();
-    const grabAction = localPlayer.findAction(action => action.type === 'grab' && action.hand === 'left');
-    if (grabAction) {
-      const matrix = localMatrix.fromArray(grabAction.matrix);
-      matrix
-        .decompose(localVector, localQuaternion, localVector2);
-      localVector.z += direction * 0.1;
-      matrix
-        .compose(localVector, localQuaternion, localVector2)
-        .toArray(grabAction.matrix);
-    } else {
-      console.warn('trying to push with no grab object');
-    }
-  }
-
-  menuGridSnap() {
-    if (this.gridSnap === 0) {
-      this.gridSnap = 32;
-    } else if (this.gridSnap > 1) {
-      this.gridSnap /= 2;
-    } else {
-      this.gridSnap = 0;
-    }
-  }
-
-  getGridSnap() {
-    if (this.gridSnap === 0) {
-      return 0;
-    } else {
-      return 4 / this.gridSnap;
-    }
-  }
-
+  
   menuVDown() {
     const localPlayer = playersManager.getLocalPlayer();
-    if (this.getGrabbedObject(0)) {
-      this.menuGridSnap();
+    if (grabManager.getGrabbedObject(0)) {
+      grabManager.menuGridSnap();
     } else {
       localPlayer.removeAction('dance');
 
@@ -798,22 +729,6 @@ class GameManager extends EventTarget {
 
   toggleAxis() {
     console.log('toggle axis');
-  }
-
-  async toggleEditMode() {
-    this.editMode = !this.editMode;
-    if (this.editMode) {
-      if (!cameraManager.pointerLockElement) {
-        await cameraManager.requestPointerLock();
-      }
-      if (this.mouseSelectedObject) {
-        this.setMouseSelectedObject(null);
-      }
-      if (this.getGrabbedObject(0)) {
-        const localPlayer = playersManager.getLocalPlayer();
-        localPlayer.ungrab();
-      }
-    }
   }
 
   isJumping() {
@@ -1139,23 +1054,12 @@ class GameManager extends EventTarget {
     const renderer = getRenderer();
     const localPlayer = playersManager.getLocalPlayer();
 
-    const _handlePush = () => {
-      if (gameManager.canPush()) {
-        if (ioManager.keys.forward) {
-          gameManager.menuPush(-1);
-        } else if (ioManager.keys.backward) {
-          gameManager.menuPush(1);
-        }
-      }
-    };
-    _handlePush();
-
     const _updateGrab = () => {
       const renderer = getRenderer();
       const _isWear = o => localPlayer.findAction(action => action.type === 'wear' && action.instanceId === o.instanceId);
 
       this.grabUseMesh.visible = false;
-      if (!gameManager.editMode) {
+      if (!grabManager.editMode) {
         const avatarHeight = localPlayer.avatar ? localPlayer.avatar.height : 0;
         localVector.copy(localPlayer.position)
           .add(localVector2.set(0, avatarHeight * (1 - localPlayer.getCrouchFactor()) * 0.5, -0.3).applyQuaternion(localPlayer.quaternion));
@@ -1179,33 +1083,6 @@ class GameManager extends EventTarget {
 
             this.grabUseMesh.visible = true;
           }
-        }
-      }
-
-      for (let i = 0; i < 2; i++) {
-        const grabAction = this.getGrabAction(i);
-        const grabbedObject = this.getGrabbedObject(i);
-        if (grabbedObject && !_isWear(grabbedObject)) {
-          let position = null;
-          let quaternion = null;
-          if (renderer.xr.getSession()) {
-            const h = localPlayer[grabAction.hand === "left" ? "leftHand" : "rightHand"];
-            position = h.position;
-            quaternion = h.quaternion;
-          } else {
-            position = localVector2.copy(localPlayer.position);
-            quaternion = camera.quaternion;
-          }
-          localMatrix.compose(position, quaternion, localVector.set(1, 1, 1));
-
-          this.updateGrabbedObject(grabbedObject, localMatrix, localMatrix3.fromArray(grabAction.matrix), {
-            collisionEnabled: true,
-            handSnapEnabled: true,
-            physx,
-            gridSnap: gameManager.getGridSnap(),
-          });
-
-          this.grabUseMesh.setComponent('value', physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'activate', 1));
         }
       }
     };
@@ -1259,22 +1136,6 @@ class GameManager extends EventTarget {
       ioManager.setMovementEnabled(!pickUpAction);
     }
     _handlePickUp();
-
-    const _handlePhysicsHighlight = () => {
-      this.highlightedPhysicsObject = null;
-
-      if (gameManager.editMode) {
-        const {position, quaternion} = renderer.xr.getSession() ? localPlayer.leftHand : camera;
-        const physicsScene = physicsManager.getScene();
-        const collision = physicsScene.raycast(position, quaternion);
-        if (collision) {
-          const physicsId = collision.objectId;
-          this.highlightedPhysicsObject = metaversefileApi.getAppByPhysicsId(physicsId);
-          this.highlightedPhysicsId = physicsId;
-        }
-      }
-    };
-    _handlePhysicsHighlight();
 
     const _updatePhysicsHighlight = () => {
       this.highlightPhysicsMesh.visible = false;
@@ -1604,7 +1465,7 @@ class GameManager extends EventTarget {
     if (crosshairEl) {
       const visible = !!cameraManager.pointerLockElement &&
         (['camera', 'firstperson', 'thirdperson'].includes(cameraManager.getMode()) || localPlayer.hasAction('aim')) &&
-        !this.getGrabbedObject(0);
+        !grabManager.getGrabbedObject(0);
       crosshairEl.style.visibility = visible ? null : 'hidden';
     }
 
