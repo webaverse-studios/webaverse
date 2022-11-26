@@ -1124,25 +1124,6 @@ class GameManager extends EventTarget {
     return this.menuOpen;
   }
 
-  // setMenu(newOpen) {
-  //   this.menuOpen = newOpen;
-  //   if (newOpen) {
-  //     _selectItem(0);
-  //   }
-  // }
-
-  // menuVertical(offset) {
-  //   if (this.menuOpen) {
-  //     _selectItemDelta(offset);
-  //   }
-  // }
-
-  // menuHorizontal(offset) {
-  //   if (this.menuOpen) {
-  //     _selectTabDelta(offset);
-  //   }
-  // }
-
   setContextMenu(contextMenu) {
     this.contextMenu = contextMenu;
   }
@@ -1564,7 +1545,12 @@ class GameManager extends EventTarget {
 
     _unwearAppIfHasSitComponent(localPlayer);
 
-    if (!localPlayer.hasAction('jump') && !localPlayer.hasAction('fly') && !localPlayer.hasAction('fallLoop') && !localPlayer.hasAction('swim')) {
+    if (!localPlayer.hasAction('jump') &&
+        !localPlayer.hasAction('fly') &&
+        !localPlayer.hasAction('fallLoop') &&
+        !localPlayer.hasAction('swim') &&
+        !!localPlayer.characterPhysics.characterController
+        ) {
       const newJumpAction = {
         type: 'jump',
         trigger:trigger,
