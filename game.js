@@ -80,8 +80,8 @@ class GameManager extends EventTarget {
   }
 
   registerHighlightMeshes() {
-    this.grabHighlightPhysicsMesh = this.makeHighlightPhysicsMesh(buildMaterial);
-    grabManager.setHighlightPhysicsMesh(this.grabHighlightPhysicsMesh);
+    this.highlightPhysicsMesh = this.makeHighlightPhysicsMesh(buildMaterial);
+    grabManager.setHighlightPhysicsMesh(this.highlightPhysicsMesh);
 
     this.mouseHighlightPhysicsMesh = this.makeHighlightPhysicsMesh(highlightMaterial);
     this.mouseHighlightPhysicsMesh.visible = false;
@@ -916,7 +916,7 @@ class GameManager extends EventTarget {
     const renderer = getRenderer();
     const localPlayer = playersManager.getLocalPlayer();
 
-    const _updateGrabUseMesh = () => {
+    const _updateGrab = () => {
       const renderer = getRenderer();
       const _isWear = o => localPlayer.findAction(action => action.type === 'wear' && action.instanceId === o.instanceId);
 
@@ -948,7 +948,7 @@ class GameManager extends EventTarget {
         }
       }
     };
-    _updateGrabUseMesh();
+    _updateGrab();
 
     zTargeting.update(timestamp, timeDiff);
 
@@ -1000,7 +1000,7 @@ class GameManager extends EventTarget {
     _handlePickUp();
 
     const _updatePhysicsHighlight = () => {
-      this.grabHighlightPhysicsMesh.visible = false;
+      this.highlightPhysicsMesh.visible = false;
 
       if (this.highlightedPhysicsObject) {
         const physicsId = this.highlightedPhysicsId;
@@ -1010,16 +1010,16 @@ class GameManager extends EventTarget {
         const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(physicsId);
         if (physicsObject) {
           const {physicsMesh} = physicsObject;
-          this.grabHighlightPhysicsMesh.geometry = physicsMesh.geometry;
-          this.grabHighlightPhysicsMesh.matrixWorld.copy(physicsMesh.matrixWorld)
-            .decompose(this.grabHighlightPhysicsMesh.position, this.grabHighlightPhysicsMesh.quaternion, this.grabHighlightPhysicsMesh.scale);
+          this.highlightPhysicsMesh.geometry = physicsMesh.geometry;
+          this.highlightPhysicsMesh.matrixWorld.copy(physicsMesh.matrixWorld)
+            .decompose(this.highlightPhysicsMesh.position, this.highlightPhysicsMesh.quaternion, this.highlightPhysicsMesh.scale);
 
-          this.grabHighlightPhysicsMesh.material.uniforms.uTime.value = (now % 1500) / 1500;
-          this.grabHighlightPhysicsMesh.material.uniforms.uTime.needsUpdate = true;
-          this.grabHighlightPhysicsMesh.material.uniforms.uColor.value.setHex(buildMaterial.uniforms.uColor.value.getHex());
-          this.grabHighlightPhysicsMesh.material.uniforms.uColor.needsUpdate = true;
-          this.grabHighlightPhysicsMesh.visible = true;
-          this.grabHighlightPhysicsMesh.updateMatrixWorld();
+          this.highlightPhysicsMesh.material.uniforms.uTime.value = (now % 1500) / 1500;
+          this.highlightPhysicsMesh.material.uniforms.uTime.needsUpdate = true;
+          this.highlightPhysicsMesh.material.uniforms.uColor.value.setHex(buildMaterial.uniforms.uColor.value.getHex());
+          this.highlightPhysicsMesh.material.uniforms.uColor.needsUpdate = true;
+          this.highlightPhysicsMesh.visible = true;
+          this.highlightPhysicsMesh.updateMatrixWorld();
         }
       }
     };
