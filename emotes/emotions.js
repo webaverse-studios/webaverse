@@ -1,4 +1,4 @@
-export const emoteTypes = [
+export const emotions = [
     'joy',
     'sorrow',
     'angry',

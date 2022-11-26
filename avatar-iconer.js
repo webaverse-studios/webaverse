@@ -1,9 +1,9 @@
-import {emoteTypes} from './emotes/emote-types';
+import {emotions} from './emotes/emotions';
 import offscreenEngineManager from './offscreen-engine/offscreen-engine-manager.js';
 import {avatarManager} from './avatar-manager';
 import {playersManager} from './players-manager';
 
-const allEmotions = [''].concat(emoteTypes);
+const allEmotions = [''].concat(emotions);
 
 class AvatarIconer extends EventTarget {
   constructor({

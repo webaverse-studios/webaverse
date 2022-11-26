@@ -4,7 +4,7 @@ import classnames from 'classnames';
 
 import metaversefile from '../../../../metaversefile-api.js';
 import {avatarManager} from '../../../../avatar-manager.js';
-import {emoteTypes} from '../../../../emotes/emote-types.js';
+import {emotions} from '../../../../emotes/emotions.js';
 
 import styles from './emotions.module.css';
 
@@ -34,7 +34,7 @@ export const Emotions = ({
     parentOpened,
 }) => {
     const [ emotionsOpen, setEmotionsOpen ] = useState(false);
-    const emotionStates = emoteTypes.map(emotion => {
+    const emotionStates = emotions.map(emotion => {
         const [ value, setValue ] = useState(0);
 
         return {
@@ -60,7 +60,7 @@ export const Emotions = ({
 
                 if (dragEmotionIndex !== -1) {
 
-                    const emotion = emoteTypes[dragEmotionIndex];
+                    const emotion = emotions[dragEmotionIndex];
                     const emotionState = emotionStates[dragEmotionIndex];
                     const oldValue = emotionState.value;
                     const value = Math.min(Math.max(oldValue - movementY * 0.01, 0), 1);
@@ -94,7 +94,7 @@ export const Emotions = ({
             const {action} = e.data;
             if (action.type === 'facepose') {
                 const {emotion, value} = action;
-                const emotionIndex = emoteTypes.indexOf(emotion);
+                const emotionIndex = emotions.indexOf(emotion);
                 if (emotionIndex !== -1) {
                     const emotionState = emotionStates[emotionIndex];
                     emotionState.setValue(value);
@@ -109,7 +109,7 @@ export const Emotions = ({
             const {action} = e.data;
             if (action.type === 'facepose') {
                 const {emotion} = action;
-                const emotionIndex = emoteTypes.indexOf(emotion);
+                const emotionIndex = emotions.indexOf(emotion);
                 if (emotionIndex !== -1) {
                     const emotionState = emotionStates[emotionIndex];
                     emotionState.setValue(0);
@@ -147,7 +147,7 @@ export const Emotions = ({
             }}
             ref={emotionsRef}
         >
-            {emoteTypes.map((emotion, emotionIndex) => {
+            {emotions.map((emotion, emotionIndex) => {
                 return (
                     <div
                         className={classnames(
