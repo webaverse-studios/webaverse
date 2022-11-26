@@ -25,6 +25,8 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
     const [ origSceneList, setOrigSceneList ] = useState([]);
     const [ scenesList, setScenesList ] = useState([]);
 
+    const sceneRoot = '/packages/scenes/';
+
     //
 
     useEffect(() => {
@@ -271,7 +273,7 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
             <div className={styles.rightCorner} />
             <div className={styles.row}>
                 <div className={styles.roomName}>
-                    {sceneName}
+                    {sceneName.replace('./', '/').replace(sceneRoot, '')}
                     {selectedRoom && ` / ${selectedRoom}`}
                 </div>
                 <div className={styles.title}>Your Location</div>

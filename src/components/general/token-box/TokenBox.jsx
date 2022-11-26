@@ -11,13 +11,12 @@ export const TokenBox = props => {
     claimed,
     spawnCopy,
     onClick,
-    canvasRef,
     object,
+    canvasRef,
     enabled,
     numFrames,
     level,
     value,
-    url,
   } = props;
   return (
     <div
@@ -25,54 +24,76 @@ export const TokenBox = props => {
       style={{width: size, height: size}}
       onClick={onClick}
     >
-      <div
-        className={classnames(
-          styles.frame,
-          styles.frameActive,
-          active && styles.open,
-        )}
-      />
-      <div
-        className={classnames(
-          styles.frame,
-          styles.frameEmptyNotToken,
-          !url && styles.open,
-        )}
-      />
-      <div
-        className={classnames(
-          styles.frame,
-          styles.frameNotClaimed,
-          !claimed && url && styles.open,
-        )}
-      >
-        <img src="/assets/icons/notClaimed.svg" className={styles.badge} />
-      </div>
-      <div
-        className={classnames(
-          styles.frame,
-          styles.frameCopy,
-          spawnCopy && styles.open,
-        )}
-      />
-      <div
-        className={classnames(
-          styles.frame,
-          styles.frameDefault,
-          claimed && url && styles.open,
-        )}
-      />
-      <div className={styles.mask}>
-        <Spritesheet
-          className={styles.item}
-          startUrl={object?.start_url}
-          enabled={enabled}
-          size={resolution}
-          numFrames={numFrames}
+      {active &&
+        <div
+          className={classnames(
+            styles.frame,
+            styles.frameActive,
+            active && styles.open,
+          )}
         />
+      }
+      {!object &&
+        <div
+          className={classnames(
+            styles.frame,
+            styles.frameEmptyNotToken,
+            styles.open,
+          )}
+        />
+      }
+      {!claimed && object &&
+        <div
+          className={classnames(
+            styles.frame,
+            styles.frameNotClaimed,
+            styles.open,
+          )}
+        >
+          <img src="/assets/icons/notClaimed.svg" className={styles.badge} />
+        </div>
+      }
+      {spawnCopy &&
+        <div
+          className={classnames(
+            styles.frame,
+            styles.frameCopy,
+            styles.open,
+          )}
+        />
+      }
+      {claimed && object &&
+        <div
+          className={classnames(
+            styles.frame,
+            styles.frameDefault,
+            styles.open,
+          )}
+        />
+      }
+      <div className={styles.mask}>
+        {object &&
+          <Spritesheet
+            className={styles.item}
+            startUrl={object.start_url}
+            enabled={enabled}
+            size={resolution}
+            numFrames={numFrames}
+          />
+        }
+        {canvasRef && 
+          <canvas
+            ref={canvasRef}
+            className={styles.canvas}
+            style={{
+              width: resolution,
+              height: resolution,
+            }}
+            />
+        }
         {level && <div className={styles.level}>{level}</div>}
         {value && <div className={styles.value}>{value}</div>}
       </div>
     </div>
   );
-};
+}

@@ -46,8 +46,6 @@ const _startApp = async (weba, canvas) => {
 
     weba.setContentLoaded();
 
-    weba.bindInput();
-    weba.bindInterface();
     weba.bindCanvas(canvas);
 
     await weba.waitForLoad();

@@ -22,10 +22,12 @@ export default function CustomButton(props) {
   useEffect(() => {
     if (icon) {
       getSVG(icon).then(res => {
-        svgRef.current.innerHTML = '';
-        if (res) {
-          res.classList.add(styles.icon);
-          svgRef.current.append(res);
+        if (svgRef.current) {
+          svgRef.current.innerHTML = '';
+          if (res) {
+            res.classList.add(styles.icon);
+            svgRef.current.append(res);
+          }
         }
       });
     }
