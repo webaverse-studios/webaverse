@@ -224,7 +224,7 @@ class GameManager extends EventTarget {
     this.isMouseUp = true;
   };
 
-  grab (object) {
+  grab(object) {
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.grab(object);
 
@@ -276,24 +276,24 @@ class GameManager extends EventTarget {
       return localVector7.set(
         (box.min.x + box.max.x) / 2,
         box.min.y,
-        (box.min.z + box.max.z) / 2
+        (box.min.z + box.max.z) / 2,
       );
     }
 
     let physicalOffset = null;
-  const grabbedPhysicsObjects = o.getPhysicsObjects();
+    const grabbedPhysicsObjects = o.getPhysicsObjects();
 
-  // Compute physical local bounding box and it's position offset from app.position.
-  // THREE.Box3.getCenter() has a console error, so I calculate manually.
-  if(grabbedPhysicsObjects) {
-    localBox.makeEmpty();
-    for(const physicsObject of grabbedPhysicsObjects) {
-      const geometry = physicsObject.physicsMesh.geometry;
-      geometry.computeBoundingBox();
-      localBox.union(geometry.boundingBox);
+    // Compute physical local bounding box and it's position offset from app.position.
+    // THREE.Box3.getCenter() has a console error, so I calculate manually.
+    if (grabbedPhysicsObjects) {
+      localBox.makeEmpty();
+      for (const physicsObject of grabbedPhysicsObjects) {
+        const geometry = physicsObject.physicsMesh.geometry;
+        geometry.computeBoundingBox();
+        localBox.union(geometry.boundingBox);
+      }
+      physicalOffset = _getPhysicalPosition(localBox);
     }
-    physicalOffset = _getPhysicalPosition(localBox);
-  }
 
     const physicsScene = physicsManager.getScene();
     const collision = collisionEnabled && physicsScene.raycast(localVector, localQuaternion);
@@ -326,26 +326,26 @@ class GameManager extends EventTarget {
     }
 
     const collisionIsWithinOffset = localVector.distanceTo(localVector6) < offset;
-  const collisionIsAboveGround = localVector4.y < localVector6.y;
+    const collisionIsAboveGround = localVector4.y < localVector6.y;
 
-  // Did the ray collide with any other object than the grabbed object? Need this check because on the first frame
-  // it collides with the grabbed object, although physical actors are being disabled. This caused teleport issue.
-  const collNonGrabbedObj = !!collision && !o.physicsObjects.some(obj => obj.physicsId === collision.objectId);
+    // Did the ray collide with any other object than the grabbed object? Need this check because on the first frame
+    // it collides with the grabbed object, although physical actors are being disabled. This caused teleport issue.
+    const collNonGrabbedObj = !!collision && !o.physicsObjects.some(obj => obj.physicsId === collision.objectId);
 
-  // if collision point is closer to the player than the grab offset and collisionDown point
-  // is below collision point then place the object at collision point
-  if (collNonGrabbedObj && !!downCollision && collisionIsWithinOffset && collisionIsAboveGround) {
-    localVector5.copy(localVector6).sub(physicalOffset);
-  }
+    // if collision point is closer to the player than the grab offset and collisionDown point
+    // is below collision point then place the object at collision point
+    if (collNonGrabbedObj && !!downCollision && collisionIsWithinOffset && collisionIsAboveGround) {
+      localVector5.copy(localVector6).sub(physicalOffset);
+    }
 
-  const objectOverlapsVertically = localVector7.copy(localVector5).add(physicalOffset).y < localVector4.y;
+    const objectOverlapsVertically = localVector7.copy(localVector5).add(physicalOffset).y < localVector4.y;
 
-  // if grabbed object would overlap vertically then place object at downCollision point
-  if (!!downCollision && objectOverlapsVertically) {
-    localVector5.setY(localVector4.sub(physicalOffset).y);
-  }
+    // if grabbed object would overlap vertically then place object at downCollision point
+    if (!!downCollision && objectOverlapsVertically) {
+      localVector5.setY(localVector4.sub(physicalOffset).y);
+    }
 
-  o.position.copy(localVector5);
+    o.position.copy(localVector5);
 
     const handSnap =
       !handSnapEnabled ||
@@ -832,11 +832,11 @@ class GameManager extends EventTarget {
     this.unwearAppIfHasSitComponent(localPlayer);
 
     if (!localPlayer.hasAction('jump') &&
-        !localPlayer.hasAction('fly') &&
-        !localPlayer.hasAction('fallLoop') &&
-        !localPlayer.hasAction('swim') &&
-        !!localPlayer.characterPhysics.characterController
-        ) {
+      !localPlayer.hasAction('fly') &&
+      !localPlayer.hasAction('fallLoop') &&
+      !localPlayer.hasAction('swim') &&
+      !!localPlayer.characterPhysics.characterController
+    ) {
       const newJumpAction = {
         type: 'jump',
         trigger: trigger,
