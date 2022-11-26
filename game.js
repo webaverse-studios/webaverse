@@ -1130,7 +1130,6 @@ class GameManager extends EventTarget {
             this.grabUseMesh.targetPhysicsId = physicsId;
             this.grabUseMesh.setComponent('value', physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'activate', 1));
 
-
             this.grabUseMesh.visible = true;
           }
         }
@@ -1468,6 +1467,7 @@ class GameManager extends EventTarget {
       }
       this.lastActivated = currentActivated;
     };
+
     _updateActivate();
 
     const _updateThirdPerson = () => {
