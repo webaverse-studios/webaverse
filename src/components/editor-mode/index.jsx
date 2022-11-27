@@ -1,32 +1,31 @@
 
-import React from 'react';
+import React, {useContext} from 'react';
 
 import {AiMenu} from './ai-menu';
 import {SceneMenu} from './scene-menu';
 import {Inspector} from './inspector';
-import {UIMode} from '../general/ui-mode';
-
+import {AppContext} from '../app';
 //
 
 export const EditorMode = ({selectedScene, setSelectedScene, selectedRoom, setSelectedRoom}) => {
-
+    const {state} = useContext(AppContext);
     const multiplayerConnected = !! selectedRoom;
 
     //
 
     return (
         <div>
-            <UIMode hideDirection='top' >
-                <SceneMenu
-                    multiplayerConnected={ multiplayerConnected }
-                    selectedScene={ selectedScene }
-                    setSelectedScene={ setSelectedScene }
-                    selectedRoom={ selectedRoom }
-                    setSelectedRoom={ setSelectedRoom }
-                />
-            </UIMode>
+            <SceneMenu
+                multiplayerConnected={ multiplayerConnected }
+                selectedScene={ selectedScene }
+                setSelectedScene={ setSelectedScene }
+                selectedRoom={ selectedRoom }
+                setSelectedRoom={ setSelectedRoom }
+            />
             <AiMenu />
-            <Inspector />
+            {state.openedPanel === 'WorldPanel' &&
+                <Inspector />
+            }
         </div>
     );
 

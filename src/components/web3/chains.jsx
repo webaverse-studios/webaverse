@@ -10,12 +10,11 @@ export default function Chains() {
   const {state, setState} = useContext(AppContext);
   const {chains, selectedChain, selectChain} = useContext(ChainContext);
 
-  const open = state.openedPanel === 'ChainsPanel';
   const setOpen = newOpen => {
       setState({openedPanel: newOpen ? 'ChainsPanel' : null});
   };
 
-  return (<div className={classnames(styles.chainSelector, open ? styles.open : null)}>
+  return state.openedPanel === 'ChainsPanel' ? (<div className={classnames(styles.chainSelector)}>
     <div className={styles.selectedChain} onClick={() => setOpen(!open)}>
       <img className={styles.img} src={'/images/ui/repeat.svg'} />
       {selectedChain.name}
@@ -38,5 +37,5 @@ export default function Chains() {
       </ul>
     </div>
   </div>
-  );
+  ) : null;
 }

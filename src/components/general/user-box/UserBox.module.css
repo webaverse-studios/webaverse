@@ -119,9 +119,6 @@
   position: fixed;
   top: 50%;
   left: 50%;
-  -ms-transform: translateX(-50%) translateY(-50%) scale(1.2, 1.2);
-  -webkit-transform: translateX(-50%) translateY(-50%) scale(1.2, 1.2);
-  transform: translateX(-50%) translateY(-50%) scale(1.2, 1.2);
   transform-origin: 50% 50%;
   padding: 10px;
   background-image: url("/assets/backgrounds/popup-bg.svg");
@@ -131,17 +128,8 @@
   width: 260px;
   height: 260px;
   pointer-events: all;
-  visibility: hidden;
   text-align: center;
 }
-
-.userLoginMethodsModal.opened {
-  -ms-transform: translateX(-50%) translateY(-50%) scale(1, 1);
-  -webkit-transform: translateX(-50%) translateY(-50%) scale(1, 1);
-  transform: translateX(-50%) translateY(-50%) scale(1, 1);
-  visibility: visible;
-}
-
 .userLoginMethodsModal .methodButton {
   width: 84%;
   text-align: left;

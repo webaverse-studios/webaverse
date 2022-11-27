@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect, useContext, Fragment} from 'react';
 import classnames from 'classnames';
 
 // import * as ceramicApi from '../../../../ceramic.js';
@@ -84,12 +84,6 @@ export const UserBox = ({className, setLoginFrom}) => {
     event.preventDefault();
     event.stopPropagation();
 
-    /* if ( address ) {
-
-            setState({ openedPanel: ( state.openedPanel === 'UserPanel' ? null : 'UserPanel' ) });
-
-        } else { */
-
     if (!loggingIn) {
       setLoggingIn(true);
 
@@ -108,8 +102,6 @@ export const UserBox = ({className, setLoginFrom}) => {
         setLoggingIn(false);
       }
     }
-
-    // }
   };
 
   useEffect(() => {
@@ -253,7 +245,7 @@ export const UserBox = ({className, setLoginFrom}) => {
           />
         </li>
         {!loggedIn && (
-          <>
+          <Fragment>
             <li>
               <div className={styles.profileImage}>
                 <div className={styles.image}>
@@ -290,10 +282,10 @@ export const UserBox = ({className, setLoginFrom}) => {
                 }}
               />
             </li>
-          </>
+          </Fragment>
         )}
         {loggedIn && (
-          <>
+          <Fragment>
             <li>
               <div className={styles.profileImage}>
                 <div className={styles.image}>
@@ -330,48 +322,49 @@ export const UserBox = ({className, setLoginFrom}) => {
                 }}
               />
             </li>
-          </>
+          </Fragment>
         )}
       </ul>
 
-      <div
-        className={classnames(
-          styles.userLoginMethodsModal,
-          open ? styles.opened : null,
-        )}
-      >
-        <div className={styles.title}>
-          <span>Log in</span>
+      {open && 
+        <div
+          className={classnames(
+            styles.userLoginMethodsModal,
+          )}
+        >
+          <div className={styles.title}>
+            <span>Log in</span>
+          </div>
+          <CustomButton
+            theme="light"
+            icon="metamask"
+            text="Metamask"
+            size={18}
+            className={styles.methodButton}
+            onClick={metaMaskLogin}
+            onMouseEnter={_triggerClickSound}
+          />
+          <CustomButton
+            theme="light"
+            icon="discord"
+            text="Discord"
+            // url={`https://discord.com/api/oauth2/authorize?client_id=${discordClientId}&redirect_uri=${window.location.origin}%2Flogin&response_type=code&scope=identify`}
+            size={18}
+            className={styles.methodButton}
+            onClick={metaMaskLogin}
+            onMouseEnter={_triggerClickSound}
+          />
+          <CustomButton
+            theme="light"
+            icon="close"
+            text="Cancel"
+            size={18}
+            className={styles.methodButton}
+            onClick={handleCancelBtnClick}
+            onMouseEnter={_triggerClickSound}
+          />
         </div>
-        <CustomButton
-          theme="light"
-          icon="metamask"
-          text="Metamask"
-          size={18}
-          className={styles.methodButton}
-          onClick={metaMaskLogin}
-          onMouseEnter={_triggerClickSound}
-        />
-        <CustomButton
-          theme="light"
-          icon="discord"
-          text="Discord"
-          // url={`https://discord.com/api/oauth2/authorize?client_id=${discordClientId}&redirect_uri=${window.location.origin}%2Flogin&response_type=code&scope=identify`}
-          size={18}
-          className={styles.methodButton}
-          onClick={metaMaskLogin}
-          onMouseEnter={_triggerClickSound}
-        />
-        <CustomButton
-          theme="light"
-          icon="close"
-          text="Cancel"
-          size={18}
-          className={styles.methodButton}
-          onClick={handleCancelBtnClick}
-          onMouseEnter={_triggerClickSound}
-        />
-      </div>
+      }
     </div>
   );
 };

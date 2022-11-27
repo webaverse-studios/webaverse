@@ -5,15 +5,9 @@
     right: 0px;
     width: 350px;
     height: 100%;
-    transform: translateX( 350px );
-    transition: transform 0.3s cubic-bezier(0, 1, 0, 1);
     background-color: #000;
     z-index: 9;
     overflow: hidden;
-}
-
-.worldObjectListWrapper.opened {
-    transform: translateX( 0px );
 }
 
 .panel {
@@ -22,13 +16,7 @@
     right: 0px;
     width: 100%;
     height: 100%;
-    transform: translateX( 100% );
-    transition: transform 1s cubic-bezier(0, 1, 0, 1);
     background-image: linear-gradient(to bottom, #222, #000);
-}
-
-.panel.opened {
-    transform: translateX( 0px );
 }
 
 .header {

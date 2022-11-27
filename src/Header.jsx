@@ -15,7 +15,6 @@ import {AppContext} from './components/app';
 import {StoryTime} from './StoryTime';
 
 import styles from './Header.module.css';
-import {UIMode} from './components/general/ui-mode/index.jsx';
 import {UserBox} from './components/general/user-box';
 import {Inventory} from './components/general/inventory/index.jsx';
 import {AvatarBox} from './components/general/avatar-box/AvatarBox.jsx';
@@ -265,16 +264,12 @@ export default function Header() {
             />
             <StoryTime />
             {/* <div className={styles.inner}> */}
-                <UIMode hideDirection='left' >
-                    <AvatarBox />
-                </UIMode>
-                <UIMode hideDirection='right' >
-                    <UserBox
-                        // address={address}
-                        // setAddress={setAddress}
-                        setLoginFrom={setLoginFrom}
-                    />
-                </UIMode>
+                <AvatarBox />
+                <UserBox
+                    // address={address}
+                    // setAddress={setAddress}
+                    setLoginFrom={setLoginFrom}
+                />
                 <div className={styles.tabs}>
                     <Character
                         panelsRef={panelsRef}
@@ -282,10 +277,12 @@ export default function Header() {
                         dioramaCanvasRef={dioramaCanvasRef}
                         game={game}
                     />
-                    <CharacterSelect
-                        
-                    />
-                    <Inventory />
+                    {state.openedPanel === 'CharacterSelect' && (
+                        <CharacterSelect />
+                    )}
+                    {(state.openedPanel === 'CharacterPanel' || state.openedPanel === 'Inventory') &&
+                        <Inventory />
+                    }
                     {/* <Claims
                         open={ claimsOpen }
                         toggleOpen={ toggleClaimsOpen }

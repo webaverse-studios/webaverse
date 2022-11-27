@@ -32,7 +32,6 @@
     top: 9px;
     width: 10px;
     height: 10px;
-    display: none;
 }
 
 .item.disabled .lock {
@@ -48,10 +47,6 @@
     transition: opacity 200ms ease;
     padding: 1px 8px;
     margin-left: -20px;
-}
-
-.item.disabled .itemRemove {
-    visibility: hidden;
 }
 
 .item:hover .itemRemove {
@@ -71,10 +66,6 @@
     margin-right: 9px;
     opacity: 0;
     transition: opacity 200ms ease;
-}
-
-.item.disabled .itemEdit {
-    visibility: hidden;
 }
 
 .item:hover .itemEdit {

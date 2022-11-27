@@ -239,11 +239,10 @@ export const LightArrow = function({
     }
   }, [canvasRef]);
 
-  return (
+  return enabled ? (
     <div
       className={classnames(
         styles.lightArrowContainer,
-        enabled ? styles.enabled : null,
         up ? styles.up : null,
         down ? styles.down : null,
         className,
@@ -271,5 +270,5 @@ export const LightArrow = function({
         </div>
       </div>
     </div>
-  );
+  ) : null;
 };
