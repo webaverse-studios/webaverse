@@ -1,5 +1,6 @@
 import React, {useState, useRef, useEffect} from 'react';
 import minimapManager from '../../../../minimap.js';
+import voiceInput from '../../../../voice-input/voice-input';
 import classNames from 'classnames';
 
 import styles from './minimap.module.css';
@@ -17,6 +18,14 @@ const minimapBaseSpeed = 30;
 export const Minimap = ({className}) => {
 
     const canvasRef = useRef();
+
+    const handleMicBtnClick = async () => {
+      if (!voiceInput.micEnabled()) {
+        await voiceInput.enableMic();
+      } else {
+        voiceInput.disableMic();
+      }
+    };
 
     useEffect(() => {
         if (canvasRef.current) {
@@ -44,6 +53,7 @@ export const Minimap = ({className}) => {
                     icon="microphone"
                     className={styles.button}
                     size={24}
+                    onClick={handleMicBtnClick}
                 />
                 <CustomButton
                     type="icon"
