@@ -7,6 +7,7 @@ import {registerIoEventHandler, unregisterIoEventHandler} from '../../../general
 
 import styles from './code-ai-panel.module.css';
 
+import {generateStream} from '../../../../../ai/code/code-ai';
 // import game from '../../../../../game';
 
 export function CodeAiPanel() {
@@ -41,7 +42,7 @@ export function CodeAiPanel() {
             try {
 
                 const input = inputTextarea.current.value;
-                newAi = codeAi.generateStream(input);
+                newAi = generateStream(input);
                 setAi(newAi);
                 setPage('output');
                 setOutput('');
