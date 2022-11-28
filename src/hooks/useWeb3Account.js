@@ -21,11 +21,13 @@ export default function useWeb3Account(currentChain = DEFAULT_CHAIN) {
   useEffect(() => {
     async function checkForAccounts() {
       const provider = getProvider();
-      const connectedAccounts = await provider.listAccounts();
-      if (connectedAccounts.length > 0) {
-        const accounts = await requestAccounts();
-        setAccounts(accounts);
-        setCurrentAddress(accounts[0]);
+      if(provider) {
+        const connectedAccounts = await provider.listAccounts();
+        if (connectedAccounts.length > 0) {
+          const accounts = await requestAccounts();
+          setAccounts(accounts);
+          setCurrentAddress(accounts[0]);
+        }
       }
     }
     checkForAccounts();

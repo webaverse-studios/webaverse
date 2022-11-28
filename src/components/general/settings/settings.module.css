@@ -3,36 +3,12 @@
     clear: both;
 }
 
-.settings {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-    background-color: #000000;
-    background-image: linear-gradient(315deg, #000000 0%, #414141 74%);
-    z-index: 10;
-    transition: transform 0.5s cubic-bezier(0, 1, 0, 1);
-    transform: translate( 100%, 0% );
+.settings * {
+    font-family: "TTSC-Regular";
 }
 
 .settings.open {
     transform: translate( 0%, 0% );
-}
-
-.closeBtn {
-    position: absolute;
-    top: 30px;
-    right: 30px;
-    font-size: 35px;
-    color: #fff;
-    opacity: 0.7;
-    transition: opacity 200ms ease;
-    cursor: pointer;
-}
-
-.closeBtn:hover {
-    opacity: 0.9;
 }
 
 .wrapper {
@@ -43,49 +19,40 @@
     height: 100%;
 }
 
-.title {
-    text-align: left;
-    padding-top: 100px;
-    font-size: 30px;
-    color: #fff;
-}
-
 .tabs {
     padding-top: 15px;
-    padding-bottom: 15px;
+    border-bottom: 2px solid #0d1a22;
+    margin-bottom: 4px;
 }
 
 .tab {
     float: left;
     margin-right: 10px;
+    margin-bottom: -2px;
     padding: 10px 0px;
     width: 118px;
-    border-radius: 10px;
-    border: 1px solid #fff;
+    border-bottom: 1px solid transparent;
     color: #fff;
     font-weight: bold;
     cursor: pointer;
     text-align: center;
 }
 
-.tab:hover {
-    background-color: rgba( 255, 255, 255, 0.1 );
+.tab.active {
+    border-bottom: 1px solid #fdc503;
 }
 
-.tab.active {
-    background-color: rgba( 255, 255, 255, 0.2 );
-}
 
 .tabContentWrapper {
     position: relative;
     width: 100%;
-    height: calc( 100% - 250px );
+    height: 300px;
     text-align: left;
     overflow-y: scroll;
 }
 
 .tabContent {
-    padding-top: 30px;
+    padding-top: 8px;
     width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -99,30 +66,27 @@
 /*  */
 
 .row {
-    margin-bottom: 20px;
+    margin-bottom: 3px;
+    margin-right: 3px;
+    background-color: #050e11;
 }
 
 .blockTitle {
-    padding: 10px;
-    border-bottom: 1px solid #aaa;
-    color: #fff;
-    margin-bottom: 20px;
+    padding: 10px 10px 0px 10px;
+    color: #525b5e;
+    margin-bottom: 4px;
     text-transform: uppercase;
 }
 
 .paramName {
     float: left;
-    width: 300px;
-    text-align: right;
+    width: 260px;
+    box-sizing: border-box;
+    padding-left: 22%;
+    text-align: left;
     padding-top: 10px;
     padding-bottom: 10px;
-    color: #fff;
-}
-
-.switch {
-    float: left;
-    margin-left: 80px;
-    width: 200px;
+    color: #aebbb4;
 }
 
 .apiKeysTab .input {
@@ -155,7 +119,7 @@
 }
 
 .audioTab .row {
-    margin-top: 50px;
+    margin-top: 8px;
 }
 
 .audioTab .paramName {
@@ -181,11 +145,10 @@
 
 .applyBtn {
     position: fixed;
-    right: 100px;
-    bottom: 20px;
+    right: 40px;
+    bottom: 40px;
     color: #fff;
     border: 1px solid #aaa;
-    border-radius: 5px;
     padding: 10px;
     cursor: pointer;
     opacity: 0;
@@ -204,10 +167,13 @@
 
 .select {
     margin-left: 20px;
-    width: 41%;
-    line-height: 35px;
-    height: 35px;
-    text-align: center;
+    width: 180px;
+    line-height: 26px;
+    height: 26px;
+    text-align: left;
     font-weight: bold;
-    background-color: #aaa;
+    background-color: #0d1a22;
+    border: 1px solid #ddf3e6;
+    color: #ddf3e6;
+    margin-top: 2px;
 }

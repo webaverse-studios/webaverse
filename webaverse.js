@@ -45,6 +45,7 @@ import raycastManager from './raycast-manager.js';
 import universe from './universe.js';
 import npcManager from './npc-manager.js';
 import settingsManager from './settings-manager.js';
+import grabManager from './grab-manager.js';
 import backgroundFx from './background-fx/background-fx.js';
 
 const localVector = new THREE.Vector3();
@@ -120,15 +121,6 @@ export default class Webaverse extends EventTarget {
   
   setContentLoaded() {
     this.contentLoaded = true;
-  }
-
-  bindInput() {
-    ioManager.bindInput();
-  }
-
-  bindInterface() {
-    ioManager.bindInterface();
-    // blockchain.bindInterface();
   }
 
   bindCanvas(c) {
@@ -322,6 +314,7 @@ export default class Webaverse extends EventTarget {
           transformControls.update();
           raycastManager.update(timestamp, timeDiffCapped);
           game.update(timestamp, timeDiffCapped);
+          grabManager.update(timestamp, timeDiffCapped);
 
           npcManager.updateAvatar(timestamp, timeDiffCapped);
           playersManager.updateRemotePlayers(timestamp, timeDiffCapped);

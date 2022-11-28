@@ -3,14 +3,13 @@
     clear: both;
 }
 
+.slider {
+    background-color: #0d1a22;
+    padding: 2px;
+}
+
 .minus {
     float: left;
-    padding: 3px 10px;
-    color: #fff;
-    cursor: pointer;
-    border: 1px solid #aaa;
-    border-radius: 5px;
-    font-weight: bold;
 }
 
 .progressWrapper {
@@ -18,9 +17,9 @@
     float: left;
     margin-left: 10px;
     margin-top: 8px;
-    width: 150px;
-    height: 10px;
-    border: 1px solid #aaa;
+    width: 120px;
+    height: 8px;
+    background-color: #1f313b;
 }
 
 .progressFill {
@@ -28,7 +27,7 @@
     top: 0px;
     left: 0px;
     height: 100%;
-    background-color: #aaa;
+    background-color: #feffff;
     transition: width 200ms ease;
 }
 
@@ -37,14 +36,10 @@
     padding: 3px 10px;
     color: #fff;
     font-weight: bold;
+    width: 44px;
+    text-align: center;
 }
 
 .plus {
     float: left;
-    padding: 3px 10px;
-    color: #fff;
-    cursor: pointer;
-    border: 1px solid #aaa;
-    border-radius: 5px;
-    font-weight: bold;
 }
