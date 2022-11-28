@@ -1061,7 +1061,7 @@ class GameManager extends EventTarget {
       if (universe.multiplayerConnected) {
         const transformCalc = localPlayer.transform.reduce((acc, val, i) => {
           acc.transform.push(val);
-          acc.changed = acc.changed || val !== lastTransform[i];
+          acc.changed = acc.changed || val !== this.lastTransform[i];
           return acc;
         }, { transform: [], changed: false });
 
@@ -1069,18 +1069,18 @@ class GameManager extends EventTarget {
           universe.realms.updatePosition(transformCalc.transform.slice(0, 3), realmSize);
           const transformAndTimestamp = [...transformCalc.transform, performance.now()];
           universe.realms.localPlayer.setKeyValue('transform', transformAndTimestamp);
-          lastTransform = transformCalc.transform;
+          this.lastTransform = transformCalc.transform;
         }
 
         const velocityCalc = localPlayer.characterPhysics.velocity.toArray().reduce((acc, val, i) => {
           acc.velocity.push(val);
-          acc.changed = acc.changed || val !== lastVelocity[i];
+          acc.changed = acc.changed || val !== this.lastVelocity[i];
           return acc;
         }, { velocity: [], changed: false });
 
         if (velocityCalc.changed) {
           universe.realms.localPlayer.setKeyValue('velocity', velocityCalc.velocity);
-          lastVelocity = velocityCalc.velocity;
+          this.lastVelocity = velocityCalc.velocity;
         }
       }
     };
