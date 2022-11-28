@@ -773,18 +773,8 @@ export class MobInstance {
     this.locationTarget = new Vector3().copy(this.position);
     this.velocity = velocity;
     this.grounded = false;
-    this.controller = physicsManager.getScene().createCharacterController(
-      radius,
-      height,
-      height*0.05,
-      height*0.05,
-      this.position
-    );
     this.movement = new Vector3(0, 0, 0);
-    this.controller.position.copy(this.position);
-    this.controller.applyQuaternion(this.quaternion);
-    this.fallTime = 0;
-    physicsManager.getScene().setTransform(this.controller, true);
+    this.initPhysics(radius, height);
     this._createActions();
     this.killEvents = [];
     this.askForTarget = undefined;
@@ -796,6 +786,20 @@ export class MobInstance {
       [MobStates.attack, ['attack']]
     ]);
     this.followTargetOutOfRange = false;
+  }
+
+  initPhysics(radius, height){
+    this.controller = physicsManager.getScene().createCharacterController(
+      radius,
+      height,
+      height*0.05,
+      height*0.05,
+      this.position
+    );
+    this.controller.position.copy(this.position);
+    this.controller.applyQuaternion(this.quaternion);
+    physicsManager.getScene().setTransform(this.controller, true);
+    this.fallTime = 0;
   }
 
   getGeometryIndex(){
@@ -1034,7 +1038,8 @@ export class MobInstance {
     }
 
     //manage position
-    this.moveMobInternal(timeDiffS);
+    if(this.movement.length() > 0)
+      this.moveMobInternal(timeDiffS);
   }
 
   /*
@@ -1319,7 +1324,6 @@ class MobBatchedMesh extends InstancedBatchedMesh {
 
         window.shader = shader;
         window.vertexShader = shader.vertexShader;
-
         shader.vertexShader = shader.vertexShader.replace(`#include <skinning_pars_vertex>`, `\
 #ifdef USE_SKINNING
 mat4 quat2mat( vec4 q ) {
@@ -1560,7 +1564,7 @@ vec4 q = texture2D(qTexture, pUv).xyzw;
   //transformed += vec3(frameCount, 0.0, 0.0);
 }
 
-// debugColor = vec4((instanceMatrix[0][0] + 1.0)/2.0, 0.0, 0.0, 1.0);
+debugColor = vec4(gl_DrawID == 0, 0.0, 0.0, 1.0);
 vec4 mvPosition = vec4( transformed, 1.0 );
 #ifdef USE_INSTANCING
   mvPosition = instanceMatrix * mvPosition;
@@ -1767,12 +1771,11 @@ void main() {
     const animOffset        = drawCall.getTextureOffset('animationIndex');
     const padding           = this.allocator.getTextureBytePadding();
     const textureToUpdate   = new Set();
-    
     for(let instanceIndex = 0; instanceIndex < drawCall.instances.length; instanceIndex++){
       const mob = drawCall.instances[instanceIndex];
       mob.updateDrawTime(uTime, uTimeDiff);
       if(mob.updatePosition){
-        drawCall.getTexture('p').image.data.set(mob.position.toArray(), pOffset + instanceIndex * padding);
+        drawCall.getTexture('p').image.data.set(mob.position.toArray(), pOffset + instanceIndex * Math.max(3, padding));
         mob.updatePosition = false;
         textureToUpdate.add(JSON.stringify({name: 'p', size: 3}));
         this.material.userData.shader.uniforms.pTexture.value.needsUpdate = true;
@@ -1780,28 +1783,28 @@ void main() {
       }
       
       if(mob.updateRotation){
-        drawCall.getTexture('q').image.data.set(mob.quaternion.toArray(), qOffset + instanceIndex * padding);
+        drawCall.getTexture('q').image.data.set(mob.quaternion.toArray(), qOffset + instanceIndex * Math.max(4, padding));
         mob.updateRotation = false;
         textureToUpdate.add(JSON.stringify({name: 'q', size: 4}));
         this.material.userData.shader.uniforms.qTexture.value.needsUpdate = true;
       }
 
       if(mob.updateTimeOffset){
-        drawCall.getTexture('timeOffset').image.data[timeOffsetOffset + instanceIndex * padding] = mob.timeOffset;
+        drawCall.getTexture('timeOffset').image.data[timeOffsetOffset + instanceIndex * Math.max(1, padding)] = mob.timeOffset;
         mob.updateTimeOffset = false;
         textureToUpdate.add(JSON.stringify({name: 'timeOffset', size: 1}));
         this.material.userData.shader.uniforms.timeOffsetTexture.value.needsUpdate = true;
       }
 
       if(mob.updateVanish){
-        drawCall.getTexture('vanish').image.data[vanishOffset + instanceIndex * padding] = mob.vanish;
+        drawCall.getTexture('vanish').image.data[vanishOffset + instanceIndex * Math.max(1, padding)] = mob.vanish;
         mob.updateVanish = false;
         textureToUpdate.add(JSON.stringify({name: 'vanish', size: 1}));
         this.material.userData.shader.uniforms.vanishTexture.value.needsUpdate = true;
       }
 
       if(mob.updateAnimation){
-        drawCall.getTexture('animationIndex').image.data[animOffset + instanceIndex * padding] = mob.currentAnimation;
+        drawCall.getTexture('animationIndex').image.data[animOffset + instanceIndex * Math.max(1, padding)] = mob.currentAnimation;
         mob.updateTimeOffset = false;
         textureToUpdate.add(JSON.stringify({name: 'animationIndex', size: 1}));
         this.material.userData.shader.uniforms.animationIndex.value.needsUpdate = true;
@@ -1866,23 +1869,23 @@ void main() {
       const vanishOffset = drawCall.getTextureOffset('vanish');
       const animationIndexTexture = drawCall.getTexture('animationIndex').image.data;
       const animationIndexOffset = drawCall.getTextureOffset('animationIndex');
-      const instanceDataBegin = instanceIndex * padding;
 
       // delete by replacing current instance with last instance
-
-      pTexture[pOffset + instanceIndex * padding] = pTexture[pOffset + lastInstanceIndex * padding];
-      pTexture[pOffset + instanceIndex * padding + 1] = pTexture[pOffset + lastInstanceIndex * padding + 1];
-      pTexture[pOffset + instanceIndex * padding + 2] = pTexture[pOffset + lastInstanceIndex * padding + 2];
+      const pPadding = Math.max(3, padding);
+      pTexture[pOffset + instanceIndex * pPadding] = pTexture[pOffset + lastInstanceIndex * pPadding];
+      pTexture[pOffset + instanceIndex * pPadding + 1] = pTexture[pOffset + lastInstanceIndex * pPadding + 1];
+      pTexture[pOffset + instanceIndex * pPadding + 2] = pTexture[pOffset + lastInstanceIndex * pPadding + 2];
 
       //sets position of last instance to 0
       for(const i of [0, 1, 2]){
-        pTexture[pOffset + lastInstanceIndex * padding + i] = 0;
+        pTexture[pOffset + lastInstanceIndex * pPadding + i] = 0;
       }
 
-      qTexture[qOffset + instanceIndex * padding] = qTexture[qOffset + lastInstanceIndex * padding];
-      qTexture[qOffset + instanceIndex * padding + 1] = qTexture[qOffset + lastInstanceIndex * padding + 1];
-      qTexture[qOffset + instanceIndex * padding + 2] = qTexture[qOffset + lastInstanceIndex * padding + 2];
-      qTexture[qOffset + instanceIndex * padding + 3] = qTexture[qOffset + lastInstanceIndex * padding + 3];
+      const qPadding = Math.max(4, padding);
+      qTexture[qOffset + instanceIndex * qPadding] = qTexture[qOffset + lastInstanceIndex * qPadding];
+      qTexture[qOffset + instanceIndex * qPadding + 1] = qTexture[qOffset + lastInstanceIndex * qPadding + 1];
+      qTexture[qOffset + instanceIndex * qPadding + 2] = qTexture[qOffset + lastInstanceIndex * qPadding + 2];
+      qTexture[qOffset + instanceIndex * qPadding + 3] = qTexture[qOffset + lastInstanceIndex * qPadding + 3];
 
       timeOffsetTexture[timeOffsetOffset + instanceIndex * padding] = timeOffsetTexture[timeOffsetOffset + lastInstanceIndex * padding];
       animationIndexTexture[animationIndexOffset + instanceIndex * padding] = animationIndexTexture[animationIndexOffset + lastInstanceIndex * padding];
@@ -2010,26 +2013,35 @@ class MobGenerator {
     const mobs = [];
     const seed = 1234;
     const rng = alea(seed);
-    const mobCount = debugMob ? 5 : 256;
+    let mobCount = 256;
     for(let i = 0; i < mobCount; i++){
       //const size = new Vector3();
       //new THREE.Box3().setFromObject(meshes[geoId]).getSize(size);
       
       let geoId;
       let pos;
+      let quat;
       if(debugMob){
-        geoId = i%meshes.length;
-        pos = [i*4 - 2*2,  2, -10];
+        //animation debug
+        //geoId = i%meshes.length;
+        //pos = [i*4 - 2*2,  2, -10];
+        // mobCount = 5
+        //massive count debug
+        const n = 30;
+        mobCount = n*n;
+        geoId = Math.floor(rng() * meshes.length);
+        pos = [(i%n)*2, 0, (i/n)*2];
+        quat = new Quaternion().toArray();
       }
-        
       else{
         geoId = Math.floor(rng() * meshes.length);
         pos = [rng()*100, 400, 200+rng()*100];
+        quat = new Quaternion().setFromEuler(new Euler(0, rng()*Math.PI*2, 0)).toArray();
       }
 
       const mob = new MobInstance(
         pos,
-        new Quaternion().setFromEuler(new Euler(0, rng()*Math.PI*2, 0)).toArray(),
+        quat,
         geoId,
         rng(),
         0.3,
