@@ -55,7 +55,7 @@ export default function useWeb3Account(currentChain = DEFAULT_CHAIN) {
 
       if (!ethereum) {
         setErrorMessage(p => [...p, 'Make sure you have metamask!']);
-        window.open( 'https://metamask.io/download/', '_blank' );
+        window.open('https://metamask.io/download/', '_blank');
         return;
       }
 

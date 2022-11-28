@@ -47,31 +47,30 @@ export const UserBox = ({className, setLoginFrom}) => {
   };
 
   const resolveAvatar = url => {
-      const match = url.match(/^ipfs:\/\/(.+)/);
-      if (match) {
-          return `https://cloudflare-ipfs.com/ipfs/${match[1]}`;
-      } else {
-          return url;
-      }
+    const match = url.match(/^ipfs:\/\/(.+)/);
+    if (match) {
+      return `https://cloudflare-ipfs.com/ipfs/${match[1]}`;
+    } else {
+      return url;
+    }
   };
 
   const metaMaskLogin = async event => {
-      event.preventDefault();
-      event.stopPropagation();
+    event.preventDefault();
+    event.stopPropagation();
 
-      if (!loggingIn) {
-          setLoggingIn(true);
-
-          try {
-              await connectWallet();
-              setLoginFrom('metamask');
-          } catch (err) {
-              console.warn(err);
-          } finally {
-              setState({openedPanel: null});
-              setLoggingIn(false);
-          }
+    if (!loggingIn) {
+      setLoggingIn(true);
+      try {
+        await connectWallet();
+        setLoginFrom('metamask');
+      } catch (err) {
+        console.warn(err);
+      } finally {
+        setState({openedPanel: null});
+        setLoggingIn(false);
       }
+    }
   };
 
   const _triggerClickSound = () => {
