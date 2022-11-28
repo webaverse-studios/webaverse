@@ -1063,7 +1063,7 @@ class GameManager extends EventTarget {
           acc.transform.push(val);
           acc.changed = acc.changed || val !== this.lastTransform[i];
           return acc;
-        }, { transform: [], changed: false });
+        }, {transform: [], changed: false});
 
         if (transformCalc.changed) {
           universe.realms.updatePosition(transformCalc.transform.slice(0, 3), realmSize);
@@ -1076,7 +1076,7 @@ class GameManager extends EventTarget {
           acc.velocity.push(val);
           acc.changed = acc.changed || val !== this.lastVelocity[i];
           return acc;
-        }, { velocity: [], changed: false });
+        }, {velocity: [], changed: false});
 
         if (velocityCalc.changed) {
           universe.realms.localPlayer.setKeyValue('velocity', velocityCalc.velocity);
