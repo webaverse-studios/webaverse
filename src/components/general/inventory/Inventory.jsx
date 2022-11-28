@@ -234,7 +234,6 @@ const TokenList = ({
               {tokens.map((object, i) => (
                 <li
                   draggable
-                  hovered={hoverObject}
                   selected={selectObject}
                   onMouseEnter={onMouseEnter(object)}
                   onMouseDown={onMouseDown(object)}

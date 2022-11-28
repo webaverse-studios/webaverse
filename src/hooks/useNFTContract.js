@@ -117,7 +117,7 @@ export default function useNFTContract(currentAccount) {
     //     load.end();
     //   }
 
-    //   const metadatahash = json_hash.split(FILE_ADDRESS)[1].split('/')[0];
+       const metadatahash = 0; // TODO: fix this json_hash.split(FILE_ADDRESS)[1].split('/')[0];
       const Webaversecontract = new ethers.Contract(WebaversecontractAddress, WebaverseABI, signer);
       // const NFTcontract = new ethers.Contract(NFTcontractAddress, NFTABI, signer);
       const FTcontract = new ethers.Contract(FTcontractAddress, FTABI, signer);

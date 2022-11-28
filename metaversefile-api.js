@@ -53,7 +53,6 @@ import dropManager from './drop-manager.js';
 import hitManager from './character-hitter.js';
 import procGenManager from './procgen-manager.js';
 import cardsManager from './cards-manager.js';
-import * as geometryBuffering from './geometry-buffering.js';
 import * as geometryBatching from './geometry-batching.js';
 import * as geometryChunking from './geometry-chunking.js';
 import * as atlasing from './atlasing.js';
@@ -1317,9 +1316,6 @@ export default () => {
     return {
       BufferGeometryUtils,
     };
-  },
-  useGeometryBuffering() {
-    return geometryBuffering;
   },
   useGeometryBatching() {
     return geometryBatching;
