@@ -1,9 +1,10 @@
-
-import React, {useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import minimapManager from '../../../../minimap.js';
+import voiceInput from '../../../../voice-input/voice-input';
 import classNames from 'classnames';
 
 import styles from './minimap.module.css';
+import CustomButton from "../../general/custom-button/index.jsx";
 
 //
 
@@ -17,6 +18,14 @@ const minimapBaseSpeed = 30;
 export const Minimap = ({className}) => {
 
     const canvasRef = useRef();
+
+    const handleMicBtnClick = async () => {
+      if (!voiceInput.micEnabled()) {
+        await voiceInput.enableMic();
+      } else {
+        voiceInput.disableMic();
+      }
+    };
 
     useEffect(() => {
         if (canvasRef.current) {
@@ -37,9 +46,47 @@ export const Minimap = ({className}) => {
 
     return (
         <div className={ classNames(className, styles.locationMenu) } >
-
-            <canvas width={canvasSize} height={canvasSize} className={ styles.map } ref={canvasRef} />
-
+            <div className={styles.controls}>
+                <CustomButton
+                    type="icon"
+                    theme="dark"
+                    icon="microphone"
+                    className={styles.button}
+                    size={24}
+                    onClick={handleMicBtnClick}
+                />
+                <CustomButton
+                    type="icon"
+                    theme="dark"
+                    icon="voice"
+                    className={styles.button}
+                    size={24}
+                />
+                <CustomButton
+                    type="icon"
+                    theme="dark"
+                    icon="vr"
+                    disabled
+                    className={styles.button}
+                    size={24}
+                />
+                <CustomButton
+                    type="icon"
+                    theme="dark"
+                    icon="hide"
+                    className={styles.button}
+                    size={24}
+                />
+            </div>
+            <div className={styles.mapBg} />
+            <div className={styles.mapWrap}>
+                <canvas
+                    width={canvasSize}
+                    height={canvasSize}
+                    className={styles.map}
+                    ref={canvasRef}
+                />
+            </div>
         </div>
     );
 
