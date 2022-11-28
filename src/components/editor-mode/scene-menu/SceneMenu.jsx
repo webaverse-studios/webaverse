@@ -19,7 +19,6 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
     const {state, setState} = useContext(AppContext);
     const sceneNameInputRef = useRef(null);
     const [ rooms, setRooms ] = useState([]);
-    const [ multiplayerEnabled, setMultiplayerEnabled ] = useState(false);
     const [ micEnabled, setMicEnabled ] = useState(false);
     const [ speechEnabled, setSpeechEnabled ] = useState(false);
     const [ sceneInputName, setSceneInputName ] = useState(selectedScene);
@@ -204,11 +203,6 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
         }
 
     };
-
-    const handleMultiplayerBtnClick = () => {
-        universe.toggleMultiplayer();
-        setMultiplayerEnabled(universe.multiplayerEnabled);
-    }
 
     const handleMicBtnClick = async () => {
 
