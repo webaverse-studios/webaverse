@@ -16,7 +16,7 @@ export function encodePNG2KTX(data, {
   enableUASTC = true,
   SRGB = true,
 } = {}) {
-  const { BasisEncoder, initializeBasis } = basisuModule;
+  const {BasisEncoder, initializeBasis} = globalThis.basisuModule;
 
   initializeBasis();
 
@@ -65,14 +65,14 @@ export function encodePNG2KTX(data, {
 
   basisEncoder.delete();
 
-  if (num_output_bytes == 0) {
+  if (num_output_bytes === 0) {
     console.warn('encodeBasisTexture() failed!');
   }
   else {
     //log('encodeBasisTexture() succeeded, output size: ' + num_output_bytes + ', encoding time: ' + elapsed.toFixed(2));
   }
 
-  if (num_output_bytes != 0) {
+  if (num_output_bytes !== 0) {
     return actualBasisFileData;
   }
 
