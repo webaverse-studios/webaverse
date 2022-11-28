@@ -4,7 +4,6 @@ import classnames from 'classnames';
 
 import game from '../../../game';
 import {parseQuery} from '../../../util.js'
-import Webaverse from '../../../webaverse.js';
 import universe from '../../../universe.js';
 import cameraManager from '../../../camera-manager';
 import {world} from '../../../world';
@@ -12,14 +11,12 @@ import {world} from '../../../world';
 import {Crosshair} from '../general/crosshair';
 import {WorldObjectsList} from '../general/world-objects-list';
 import {IoHandler, registerIoEventHandler, unregisterIoEventHandler} from '../general/io-handler';
-import {ZoneTitleCard} from '../general/zone-title-card';
 import {Quests} from '../play-mode/quests';
 import {MapGen} from '../general/map-gen/MapGen.jsx';
 import {UIMode} from '../general/ui-mode';
 import {LoadingBox} from '../../LoadingBox.jsx';
 import {FocusBar} from '../../FocusBar.jsx';
 import {DragAndDrop} from '../../DragAndDrop.jsx';
-import {Stats} from '../../Stats.jsx';
 import {PlayMode} from '../play-mode';
 import {EditorMode} from '../editor-mode';
 import Header from '../../Header.jsx';
@@ -32,32 +29,12 @@ import {scenesBaseUrl, defaultSceneName} from '../../../endpoints.js';
 import styles from './App.module.css';
 import '../../fonts.css';
 import raycastManager from '../../../raycast-manager';
-import npcManager from '../../../npc-manager';
 
 import {AccountContext} from '../../hooks/web3AccountProvider';
 import {ChainContext} from '../../hooks/chainProvider';
-import loadoutManager from '../../../loadout-manager';
-import {partyManager} from '../../../party-manager';
 import Modals from '../modals';
 
 //
-
-const _startApp = async (weba, canvas) => {
-
-    weba.setContentLoaded();
-
-    weba.bindCanvas(canvas);
-
-    await weba.waitForLoad();
-
-    await npcManager.initDefaultPlayer();
-    loadoutManager.initDefault();
-    await universe.handleUrlUpdate();
-    partyManager.inviteDefaultPlayer();
-
-    await weba.startLoop();
-
-};
 
 const _getCurrentSceneSrc = () => {
 
@@ -84,16 +61,6 @@ const _getCurrentRoom = () => {
 
 export const AppContext = createContext();
 
-const useWebaverseApp = (() => {
-  let webaverse = null;
-  return () => {
-        if (webaverse === null) {
-            webaverse = new Webaverse();
-        }
-        return webaverse;
-  };
-})();
-
 let appStarted = false;
 
 export const App = () => {
@@ -102,24 +69,12 @@ export const App = () => {
     const [ uiMode, setUIMode ] = useState('normal');
 
     const canvasRef = useRef(null);
-    const app = useWebaverseApp();
     const [ selectedApp, setSelectedApp ] = useState(null);
     const [ selectedScene, setSelectedScene ] = useState(_getCurrentSceneSrc());
     const [ selectedRoom, setSelectedRoom ] = useState(_getCurrentRoom());
     const [ apps, setApps ] = useState(world.appManager.getApps().slice());
     const account = useContext(AccountContext);
     const chain = useContext(ChainContext);
-
-    //
-    
-    useEffect(() => {
-        if(canvasRef.current && !appStarted) {
-
-            _startApp(app, canvasRef.current);
-
-            appStarted = true;
-        }
-    }, [ canvasRef ]);
 
     const [domHover, setDomHover] = useState(null)
 
@@ -311,7 +266,7 @@ export const App = () => {
             onDragEnd={onDragEnd}
             onDragOver={onDragOver}
         >
-            <AppContext.Provider value={{state, setState, app, setSelectedApp, selectedApp, uiMode, account, chain}}>
+            <AppContext.Provider value={{state, setState, setSelectedApp, selectedApp, uiMode, account, chain}}>
                 <Modals />
                 <Header setSelectedApp={ setSelectedApp } selectedApp={ selectedApp } />
                 <DomRenderer />
@@ -330,14 +285,12 @@ export const App = () => {
                 />
                 <IoHandler />
                 <QuickMenu />
-                <ZoneTitleCard />
                 <MapGen />
                 <Quests />
                 <LoadingBox />
                 <FocusBar />
                 <DragAndDrop />
                 <BuildVersion />
-                <Stats app={ app } />
             </AppContext.Provider>
         </div>
     );
