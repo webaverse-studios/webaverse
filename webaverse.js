@@ -114,7 +114,7 @@ export default class Webaverse extends EventTarget {
       loadoutManager.initDefault();
       await universe.handleUrlUpdate();
       partyManager.inviteDefaultPlayer();
-      game.init();
+
       await this.startLoop();
       this.contentLoaded = true;
     })();
