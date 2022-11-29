@@ -49,6 +49,30 @@ const maxAnimationFrameLength = 512;
 
 let unifiedBoneTextureSize = 1024;
 const mobGlobalData = [];
+const MAXSOUNDSSAMETIME = 3;
+const soundsDB = new Map([
+  ["https://webaverse.github.io/silkworm-bloater/silkworm-bloater.glbattack",     "worm_bloaterattack"],
+  ["https://webaverse.github.io/silkworm-bloater/silkworm-bloater.glbattack.001", "worm_bloaterattack"],
+  ["https://webaverse.github.io/silkworm-bloater/silkworm-bloater.glbattack.002", "worm_bloaterattack"],
+  ["https://webaverse.github.io/silkworm-bloater/silkworm-bloater.glbdeath",      "worm_bloaterdie"],
+  //["https://webaverse.github.io/silkworm-bloater/silkworm-bloater.glbidle",       ""],
+  //["https://webaverse.github.io/silkworm-bloater/silkworm-bloater.glbwalk",       ""],
+  ["https://webaverse.github.io/silkworm-slasher/silkworm-slasher.glbattack",     "worm_slasherattack"],
+  ["https://webaverse.github.io/silkworm-slasher/silkworm-slasher.glbattack.001", "worm_slasherattack"],
+  ["https://webaverse.github.io/silkworm-slasher/silkworm-slasher.glbattack.002", "worm_slasherattack"],
+  ["https://webaverse.github.io/silkworm-slasher/silkworm-slasher.glbdeath",      "worm_slasherdie"],
+  //["https://webaverse.github.io/silkworm-slasher/silkworm-slasher.glbidle",       ""],
+  //["https://webaverse.github.io/silkworm-slasher/silkworm-slasher.glbjump",       ""],
+  //["https://webaverse.github.io/silkworm-slasher/silkworm-slasher.glbwalk",       ""],
+  ["https://webaverse.github.io/silkworm-runner/silkworm-runner.glbattack",       "worm_runnerattack"],
+  ["https://webaverse.github.io/silkworm-runner/silkworm-runner.glbattack.001",   "worm_runnerattack"],
+  ["https://webaverse.github.io/silkworm-runner/silkworm-runner.glbattack.002",   "worm_runnerattack"],
+  ["https://webaverse.github.io/silkworm-runner/silkworm-runner.glbdeath",        "worm_runnerdie"],
+  //["https://webaverse.github.io/silkworm-runner/silkworm-runner.glbidle",         ""],
+  //["https://webaverse.github.io/silkworm-runner/silkworm-runner.glbwalk",         ""]
+  ["attack", "worm_attack"],
+  ["death", "worm_die"]
+]);
 
 // mob instances constants
 const debugMob = false;
@@ -492,7 +516,7 @@ class Mob {
   }
 }
 
-/* class MobSoundsPlayer{
+class MobSoundsPlayer{
   constructor(){
     this.soundsRequests = 0;
   }
@@ -508,7 +532,7 @@ class Mob {
   }
 }
 
-const mobSoundsPlayer = new MobSoundsPlayer(); */
+const mobSoundsPlayer = new MobSoundsPlayer();
 
 /*
   Action to be attached to AI controlled entities
@@ -1113,7 +1137,7 @@ export class MobInstance {
   /*
     plays the animationName animation. If the animationName is not among the available animations returns
   */
-  playAnimation(animationName, restart){
+  playAnimation(animationName, restart, withSound = true){
     if(this.dead)
       return;
     if(!this.animations.has(animationName))
@@ -1128,6 +1152,10 @@ export class MobInstance {
       // this.timeOffset = -((this.uTime % anim.frameCount) / anim.frameCount);
       this.timeOffset = 0;
       this.updateTimeOffset = true;
+      if(withSound){
+        const soundName = anim.soundName ?? soundsDB.get(anim.key);
+        soundName && mobSoundsPlayer.playSound(soundName);
+      }
     }
   }
 }
@@ -1712,7 +1740,8 @@ void main() {
         if(j >= animations.length) break;
         const clip = animations[j];
         const frameCount = Math.floor(clip.duration * bakeFps);
-        animKeys.set(clip.name, {id: j, frameCount: frameCount, duration: clip.duration});
+        console.log(glb.url+clip.name);
+        animKeys.set(clip.name, {id: j, frameCount: frameCount, duration: clip.duration, soundName: soundsDB.get(glb.url+clip.name)});
         const drawCall = this.getDrawCall(i);
         const padding = this.allocator.getTextureBytePadding();
         const dataId = i*maxAnimationPerGeometry * padding + j * padding;
@@ -1944,16 +1973,18 @@ class MobsCompiledData {
         const m = await metaversefile.import(u);
 
         // load glb
+        let mobUrl;
         const glb = await (async () => {
           const mobJsonUrl = m.srcUrl;
           const res = await fetch(mobJsonUrl);
           const j = await res.json();
 
           return await new Promise((accept, reject) => {
-            const mobUrl = createRelativeUrl(j.mobUrl, mobJsonUrl);
+            mobUrl = createRelativeUrl(j.mobUrl, mobJsonUrl);
             loaders.gltfLoader.load(mobUrl, accept, function onProgress() {}, reject);
           });
         })();
+        glb.url = mobUrl;
         return glb;
       }));
       const skinnedMeshSpecs = glbs.map(glb => {
@@ -1982,7 +2013,6 @@ class MobGenerator {
     mobData,
     physics,
   }) {
-
     this.object = new THREE.Object3D();
     this.object.name = 'mob-chunks';
     if(debugMobActions)
