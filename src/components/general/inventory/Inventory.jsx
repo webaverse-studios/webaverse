@@ -163,7 +163,7 @@ const objects = {
 };
 
 
-const Token = ({object, enabled}) => {
+const Token = ({object}) => {
   const [rendered, setRendered] = useState(false);
   const canvasRef = useRef();
 
@@ -171,7 +171,7 @@ const Token = ({object, enabled}) => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (canvas && enabled && !rendered) {
+    if (canvas && !rendered) {
       (async () => {
         const {seed, renderPosition, lods, minLodRange, clipRange} = object;
 
@@ -191,21 +191,20 @@ const Token = ({object, enabled}) => {
 
       setRendered(true);
     }
-  }, [canvasRef.current, enabled, rendered]);
+  }, [canvasRef.current, rendered]);
 
-  return (
+  return object ? (
     <TokenBox
       size={size}
       object={object}
-      level={object?.level}
-      claimed={object?.claimed}
-      url={object?.start_url}
-      enabled={enabled}
+      level={object.level}
+      claimed={object.claimed}
+      url={object.start_url}
       resolution={resolution}
-      value={object?.value}
+      value={object.value}
       numFrames={numFrames}
     />
-  );
+  ) : null;
 };
 
 const TokenList = ({
@@ -234,7 +233,6 @@ const TokenList = ({
               {tokens.map((object, i) => (
                 <li
                   draggable
-                  hovered={hoverObject}
                   selected={selectObject}
                   onMouseEnter={onMouseEnter(object)}
                   onMouseDown={onMouseDown(object)}
@@ -243,7 +241,9 @@ const TokenList = ({
                   onClick={onClick(object)}
                   key={i}
                 >
-                  <Token object={object} enabled={open} />
+                {open &&
+                  <Token object={object} />
+                }
                 </li>
               ))}
             </React.Fragment>
@@ -278,9 +278,6 @@ export const Inventory = () => {
   const [imageBitmap, setImageBitmap] = useState(null);
 
   const selectedMenuIndex = mod(faceIndex, 4);
-
-  const open =
-    state.openedPanel === 'CharacterPanel' || state.openedPanel === 'Inventory';
 
   const [openPreview, setOpenPreview] = useState(false);
   const [previewObject, setPreviewObject] = useState(undefined);
@@ -362,7 +359,6 @@ export const Inventory = () => {
   }, [cachedLoader]);
 
   useEffect(() => {
-    if (open) {
       const start_url = selectObject ? selectObject.start_url : '';
       if (start_url) {
         const abortController = new AbortController();
@@ -383,23 +379,18 @@ export const Inventory = () => {
           abortController.abort();
         };
       }
-    } else {
-      if (selectObject) {
+      return (() => {
         setSelectObject(null);
-      }
-    }
-  }, [open, selectObject]);
+      })
+  }, [selectObject]);
 
   useEffect(() => {
-    if (open !== 'CharacterPanel') {
-      if (open) {
-        sounds.playSoundName('menuOpen');
-      } else {
-        sounds.playSoundName('menuClose');
-        setOpenPreview(false);
-      }
+    sounds.playSoundName('menuOpen');
+    return () => {
+      sounds.playSoundName('menuClose');
+      setOpenPreview(false);
     }
-  }, [open]);
+  }, []);
 
   useEffect(() => {
     setSelectObject(null);
@@ -410,7 +401,6 @@ export const Inventory = () => {
       <div
         className={classnames(
           styles.inventoryPanelWrap,
-          open ? styles.opened : null,
         )}
       >
         <div className={styles.inventoryPanel}>
@@ -475,10 +465,10 @@ export const Inventory = () => {
         </div>
       </div>
       {/** Item Preview Panel */}
+      {openPreview && previewObject && 
       <div
         className={classnames(
           styles.inventoryPanelWrap,
-          openPreview && previewObject ? styles.opened : null,
         )}
       >
         <div className={styles.inventoryPanel}>
@@ -494,15 +484,14 @@ export const Inventory = () => {
             <>
               <div className={styles.sep} />
               <div className={styles.infoWrap}>
-                <h2>{previewObject?.name}</h2>
+                <h2>{previewObject.name}</h2>
                 <div className={styles.itemPreviewBoxWrap}>
                   <div className={styles.itemPreviewBox}>
                     <div className={styles.bg} />
                     <div className={styles.mask}>
                       <Spritesheet
                         className={styles.canvas}
-                        startUrl={previewObject?.start_url}
-                        enabled={true}
+                        startUrl={previewObject.start_url}
                         size={resolution}
                         numFrames={numFrames}
                         animationLoop={true}
@@ -510,16 +499,16 @@ export const Inventory = () => {
                     </div>
                   </div>
                 </div>
-                {previewObject?.params &&
+                {previewObject && previewObject.params &&
                   previewObject.params.map((param, i) => {
-                    return (
+                    return param ? (
                       <div className={styles.stat} key={i}>
-                        <span className={styles.label}>{param?.label}</span>
-                        {param?.value}
+                        <span className={styles.label}>{param.label}</span>
+                        {param.value}
                       </div>
-                    );
+                    ) : null;
                   })}
-                <p>{previewObject?.description}</p>
+                <p>{previewObject.description}</p>
               </div>
               <div className={styles.actionsWrap}>
                 <CustomButton
@@ -539,6 +528,7 @@ export const Inventory = () => {
           )}
         </div>
       </div>
+                }
     </>
-  );
+  ); 
 };

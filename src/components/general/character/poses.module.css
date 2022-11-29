@@ -9,21 +9,6 @@
   transition: transform 1s cubic-bezier(0, 1, 0, 1);
 }
 
-.poses:not(.open) .pose {
-  display: none;
-}
-.poses:not(.open) .pose:first-child {
-  display: flex;
-}
-.poses:not(.open) .pose:first-child .poseName
-{
-  display: none;
-}
-
-.poses:not(.parentOpened) {
-  transform: translate(-50px, 0px );
-}
-
 .poses .pose {
   display: flex;
   position: relative;

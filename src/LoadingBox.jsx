@@ -186,8 +186,8 @@ const LoadingBox = () => {
   const name = load ? capitalize(load.type + 'ing') : 'Loading';
   const detail = (open && progress.total > 0) ? `${formatBytes(progress.progress)} / ${formatBytes(progress.total)}` : '';
 
-  return (
-    <div className={classnames(style.loadingBox, open ? style.open : null)}>
+  return open ? (
+    <div className={classnames(style.loadingBox)}>
       <canvas className={style.canvas} width={size} height={size} ref={canvasRef} />
       <div className={style.wrap}>
         <div className={style.name}>{name}</div>
@@ -195,7 +195,7 @@ const LoadingBox = () => {
         <progress className={style.progress} value={progress.progress} max={progress.total} />
       </div>
     </div>
-  );
+  ) : null;
 };
 export {
   LoadingBox,

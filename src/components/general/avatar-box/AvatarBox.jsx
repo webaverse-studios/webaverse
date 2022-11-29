@@ -78,15 +78,14 @@ const CharacterBox = () => {
     return (
         <div
             className={classnames(
-                styles.avatarBox,
-                loaded ? styles.loaded : null
+                styles.avatarBox
             )}
             onMouseEnter={(e) => {
                 sounds.playSoundName("menuClick");
             }}
         >
             <div className={styles.main}>
-                <PlaceholderImg className={styles.placeholderImg} />
+                {!loaded && <PlaceholderImg className={styles.placeholderImg} /> }
                 <canvas
                     className={styles.canvas}
                     width={characterIconSize * pixelRatio}
@@ -96,7 +95,7 @@ const CharacterBox = () => {
                 <div className={styles.tab}>Tab</div>
                 <div className={styles.meta}>
                     <div className={styles.info}>
-                        <span className={styles.name}>{userData?.name}</span>
+                        {userData && <span className={styles.name}>{userData.name}</span>}
                         <span className={styles.level}>{level}</span>
                         <div className={styles.background} />
                     </div>
@@ -106,21 +105,21 @@ const CharacterBox = () => {
                         <div className={classnames(styles.stat, styles.hp)}>
                             <img className={styles.icon} src={'assets/icons/health.svg'} />
                             <div className={styles.progressBar}>
-                                <div style={{width: `${userData?.hp}%`}} />
+                                {userData && <div style={{width: `${userData.hp}%`}} />}
                             </div>
                             <div className={styles.value}>{hp}</div>
                         </div>
                         <div className={classnames(styles.stat, styles.mp)}>
                             <img className={styles.icon} src={'assets/icons/mana.svg'} />
                             <div className={styles.progressBar}>
-                                <div style={{width: `${userData?.mp}%`}} />
+                                {userData && <div style={{width: `${userData.mp}%`}} />}
                             </div>
                             <div className={styles.value}>{mp}</div>
                         </div>
                         <div className={classnames(styles.stat, styles.xp)}>
                             <img className={styles.icon} src={'assets/icons/exp.svg'} />
                             <div className={styles.progressBar}>
-                                <div style={{width: `${userData?.xp}%`}} />
+                                {userData && <div style={{width: `${userData.xp}%`}} />}
                             </div>
                             <div className={styles.value}>{xp}</div>
                         </div>
@@ -129,7 +128,7 @@ const CharacterBox = () => {
                         <img className={styles.icon} src={'assets/icons/limit.svg'} />
                         <div className={classnames(styles.background)} />
                         <div className={styles.progressBar}>
-                            <div style={{width: `${userData?.limit}%`}} />
+                            {userData && <div style={{width: `${userData.limit}%`}} />}
                                 {/* <div />
                             </div> */}
                         </div>
