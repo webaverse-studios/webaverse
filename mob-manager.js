@@ -92,7 +92,6 @@ export const MobStates = {
   idle: 0,
   attack: 1,
   followTarget: 3,
-  escapeTarget: 4,
   attackTarget: 4,
 };
 
