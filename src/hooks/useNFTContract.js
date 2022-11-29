@@ -41,6 +41,7 @@ export default function useNFTContract(currentAccount) {
 
   const getContract = async () => { // NFTcontract
     const simpleRpcProvider = new ethers.providers.StaticJsonRpcProvider(selectedChain.rpcUrls[0]);
+    const NFTcontractAddress = CONTRACTS[selectedChain.contract_name].NFT;
     const contract = new ethers.Contract(NFTcontractAddress, NFTABI, simpleRpcProvider);
     return contract;
   };
