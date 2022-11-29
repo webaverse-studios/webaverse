@@ -45,6 +45,7 @@ const maxAnimationFrameLength = 512;
 let unifiedBoneTextureSize = 1024;
 const animationKeys = [];
 const debugAnimation = false;
+const debugShader = false;
 // window.THREE = THREE;
 
 const _zeroY = v => {
@@ -1029,8 +1030,7 @@ gl_Position = projectionMatrix * mvPosition;
         `);
         
         // put true to debug shader
-        // eslint-disable-next-line no-constant-condition
-        if(false)
+        if(debugShader)
           shader.fragmentShader = `\
 #define DEBUG_SHADER
 #if ( defined( USE_UV ) && ! defined( UVS_VERTEX_ONLY ) )
