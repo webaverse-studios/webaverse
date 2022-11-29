@@ -5,17 +5,18 @@
     right: 0px;
     width: 350px;
     height: 100%;
+    transform: translateX( 0px );
     background-color: #000;
     z-index: 9;
     overflow: hidden;
 }
-
 .panel {
     position: absolute;
     top: 0px;
     right: 0px;
     width: 100%;
     height: 100%;
+    transform: translateX( 0px );
     background-image: linear-gradient(to bottom, #222, #000);
 }
 
@@ -119,8 +120,6 @@
     width: 350px;
     height: 100%;
     background-color: #000;
-    transform: translateX( -100% );
-    transition: transform 0.3s cubic-bezier(0, 1, 0, 1);
 }
 
 .objectProperties .header .title {

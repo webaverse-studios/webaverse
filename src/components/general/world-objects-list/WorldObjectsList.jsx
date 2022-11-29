@@ -148,8 +148,8 @@ export const WorldObjectsList = () => {
         const physicsId = physicsObject ? physicsObject.physicsId : 0;
         selectApp(targetApp, physicsId);
 
-        const localPlayer = metaversefile.useLocalPlayer();
-        localPlayer.lookAt(targetApp.position);
+        // const localPlayer = metaversefile.useLocalPlayer();
+        // localPlayer.lookAt(targetApp.position);
 
     };
 
