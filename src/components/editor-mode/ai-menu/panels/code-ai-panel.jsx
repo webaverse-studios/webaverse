@@ -115,9 +115,9 @@ export function CodeAiPanel() {
                 window.document.activeElement !== outputTextarea.current &&
                 state.openedPanel === 'AiPanel'
             ) {
-                if (panel === 'input') {
+                if (page === 'input') {
                     _compile();
-                } else if (panel === 'output') {
+                } else if (page === 'output') {
                     _run();
                 }
                 return false;
