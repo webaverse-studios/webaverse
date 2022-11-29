@@ -707,6 +707,18 @@ class MobAIControllerPrototype {
       }
     }
 
+    window.mobsAttackInPlace = (id)=>{
+      let mobs;
+      if(id == -1){
+        mobs = this.mobs;
+      }
+      else{
+        mobs = [this.mobs[id]];
+      }
+      for(const m of mobs)
+        m.state = MobStates.attack;
+    }
+
     window.mobsIdle = (id)=>{
       let mobs;
       if(id === -1){
@@ -1134,6 +1146,11 @@ export class MobInstance {
     this.updateTimeOffset = true;
   }
 
+  getLocalPlayerDistance(){
+    const player = playersManager.getLocalPlayer();
+    return this.position.clone().sub(player.position).length();
+  }
+
   /*
     plays the animationName animation. If the animationName is not among the available animations returns
   */
@@ -1154,7 +1171,8 @@ export class MobInstance {
       this.updateTimeOffset = true;
       if(withSound){
         const soundName = anim.soundName ?? soundsDB.get(anim.key);
-        soundName && mobSoundsPlayer.playSound(soundName);
+        
+        this.getLocalPlayerDistance() < 10 && soundName && mobSoundsPlayer.playSound(soundName);
       }
     }
   }
