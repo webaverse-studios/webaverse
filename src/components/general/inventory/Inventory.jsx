@@ -180,7 +180,7 @@ export const Inventory = () => {
   const [openPreview, setOpenPreview] = useState(false);
   const [previewObject, setPreviewObject] = useState(undefined);
 
-  const { getTokens, mintfromVoucher, WebaversecontractAddress } = useNFTContract(account.currentAddress);
+  const {getTokens, mintfromVoucher, WebaversecontractAddress} = useNFTContract(account.currentAddress);
 
   const open = state.openedPanel === 'CharacterPanel' || state.openedPanel === 'Inventory';
 

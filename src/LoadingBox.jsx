@@ -227,7 +227,7 @@ const LoadingBox = () => {
   ) : null;
 };
 
-function LoadingIndicator({ open, children }) {
+function LoadingIndicator({open, children}) {
   return open ? (
     <div className={classnames(style.loadingBox)}>
       { children }

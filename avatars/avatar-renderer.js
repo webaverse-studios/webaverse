@@ -28,7 +28,7 @@ const avatarPlaceholderImagePromise = (async () => {
   const res = await fetch('/images/user.png');
   if (res.ok) {
     const blob = await res.blob();
-    const options = { imageOrientation: 'flipY' };
+    const options = {imageOrientation: 'flipY'};
     const avatarPlaceholderImage = await createImageBitmap(blob, options);
     return avatarPlaceholderImage;
   } else {
