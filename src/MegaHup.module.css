@@ -13,9 +13,6 @@
   transform: none;
   transition: transform 1s cubic-bezier(0, 1, 0, 1);
 }
-.megaHup:not(.open) {
-  transform: translateX(400px);
-}
 /* .megaHup .canvas {
   width: 400px;
   height: 800px;

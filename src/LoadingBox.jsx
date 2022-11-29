@@ -211,14 +211,9 @@ const LoadingBox = () => {
       ? `${formatBytes(progress.progress)} / ${formatBytes(progress.total)}`
       : '';
 
-  return (
-    <div className={classnames(style.loadingBox, open ? style.open : null)}>
-      <canvas
-        className={style.canvas}
-        width={size}
-        height={size}
-        ref={canvasRef}
-      />
+  return open ? (
+    <div className={classnames(style.loadingBox)}>
+      <canvas className={style.canvas} width={size} height={size} ref={canvasRef} />
       <div className={style.wrap}>
         <div className={style.name}>{name}</div>
         <div className={style.detail}>{detail}</div>
@@ -229,13 +224,15 @@ const LoadingBox = () => {
         />
       </div>
     </div>
-  );
+  ) : null;
 };
 
 function LoadingIndicator({ open, children }) {
-  return <div className={classnames(style.loadingBox, open ? style.open : null)}>
-    { children }
-  </div>
+  return open ? (
+    <div className={classnames(style.loadingBox)}>
+      { children }
+    </div>
+  ) : null;
 }
 
 function GenericLoadingMessage({open, children, name, detail}) {

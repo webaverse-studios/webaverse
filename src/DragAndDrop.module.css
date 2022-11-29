@@ -24,12 +24,6 @@
   box-sizing: border-box;
 }
 
-.modalWrap:not(.open) {
-  transform: scale(0.8);
-  visibility: hidden;
-  transition: none;
-}
-
 .modalWrap::before {
   display: block;
   content: ' ';

@@ -7,10 +7,6 @@
     font-family: "TTSC-Regular";
 }
 
-.settings.open {
-    transform: translate( 0%, 0% );
-}
-
 .wrapper {
     margin-left: auto;
     margin-right: auto;
@@ -56,7 +52,6 @@
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-    display: none;
 }
 
 .tabContent.active {

@@ -272,9 +272,6 @@ const DragAndDrop = () => {
     setCurrentApp(null);
   };
 
-  const name = currentApp ? currentApp.name : '';
-  const appType = currentApp ? currentApp.appType : '';
-
   useEffect(() => {
     if (mintComplete) {
       const timer = setTimeout(() => {
@@ -297,7 +294,11 @@ const DragAndDrop = () => {
     }
   }, [error]);
 
-  return (
+  const name = currentApp ? currentApp.name : '';
+  const appType = currentApp ? currentApp.appType : '';
+
+  
+  return currentApp ? (
     <div className={style.dragAndDrop}>
       <GenericLoadingMessage
         open={minting}
@@ -315,7 +316,7 @@ const DragAndDrop = () => {
         detail={error}
       ></GenericLoadingMessage>
       <div
-        className={classnames(style.modalWrap, currentApp ? style.open : null)}
+        className={classnames(style.modalWrap)}
         onClick={_currentAppClick}
       >
         <div className={style.modalTitle}>Upload Object</div>
@@ -371,7 +372,7 @@ const DragAndDrop = () => {
         </div>
       </div>
     </div>
-  );
+  ) : null;
 };
 export {
   DragAndDrop,

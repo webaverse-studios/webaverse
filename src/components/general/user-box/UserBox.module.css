@@ -131,15 +131,10 @@
   width: 260px;
   height: 260px;
   pointer-events: all;
-  visibility: hidden;
-  text-align: center;
-}
-
-.userLoginMethodsModal.opened {
   -ms-transform: translateX(-50%) translateY(-50%) scale(1, 1);
   -webkit-transform: translateX(-50%) translateY(-50%) scale(1, 1);
   transform: translateX(-50%) translateY(-50%) scale(1, 1);
-  visibility: visible;
+  visibility: visible;  text-align: center;
 }
 
 .userLoginMethodsModal .methodButton {
