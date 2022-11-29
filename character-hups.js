@@ -116,7 +116,7 @@ export class CharacterHups extends EventTarget {
       if (oldHup) {
         oldHup.mergeAction(action);
         oldHup.updateVoicer(action.message, action.emote);
-      } else if (Hup.isHupAction(action)) {
+      } else if (Hup.isHupAction(action) && character.avatar) {
         const newHup = new Hup(action.type, this);
         newHup.mergeAction(action);
         let pendingVoices = 0;
