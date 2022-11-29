@@ -609,10 +609,7 @@ class AttackAction extends ActionComponent {
         return;
       
       mob.playAnimation(attackId, true);
-      //mobSoundsPlayer.playSound('silkAttack');
-      if(mob.target && mob.target.hasAction(HITACTIONTYPE)){
-        mob.target.startAction('hit');
-      }
+      mob.target.characterHitter.getHit(Math.random() * 10);
     }
     super(attackId, ATTACKACTIONTYPE, durationS, actionMethod);
   }
@@ -621,8 +618,6 @@ class AttackAction extends ActionComponent {
 class HitAction extends ActionComponent {
   constructor(durationS){
     const actionMethod = (mob)=>{
-      mob.life -= 1;
-      mob.checkDeath();
     }
     super('hit', HITACTIONTYPE, durationS, actionMethod);
   }
@@ -751,8 +746,9 @@ let ragdollSpawner;*/
   velocity: mob walking speed
   idleAction: action to repeatedly perform when no other action are provided
 */
-export class MobInstance {
+export class MobInstance extends EventTarget {
   constructor(pos, quat, geometryIndex, timeOffset, radius, height, velocity, idleAction) {
+    super();
     this.actions = [];
     this.target;
     this.life = defaultMobLifePoint;
@@ -786,6 +782,16 @@ export class MobInstance {
       [MobStates.attack, ['attack']]
     ]);
     this.followTargetOutOfRange = false;
+
+    /*this.hitTracker = hpManager.makeHitTracker({totalHp: 10});
+    this.controller.parent = this;
+    this.hitTracker.bind(this.controller);
+    this.dispatchEvent(new MessageEvent('hittrackeradded'));
+    const die = () => {
+      this.actionsQueue = [];
+      this.startAction('death');
+    };
+    this.addEventListener('die', die, {once: true});*/
   }
 
   initPhysics(radius, height){
@@ -1034,6 +1040,7 @@ export class MobInstance {
       this.rotationInterpolation += (1-this.rotationInterpolation) / animationEasing;
       this.rotationInterpolation.toFixed(2);
       this.quaternion.slerp(lookAtQuaternion(this.lookAtTarget), this.rotationInterpolation);
+      this.controller.rotation.setFromQuaternion(this.quaternion);
       this.updateRotation = true;
     }
 
