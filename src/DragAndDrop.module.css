@@ -9,98 +9,203 @@
   align-items: center;
   pointer-events: none;
 }
-.dragAndDrop .currentApp {
-  /* width: 600px;
-  height: 300px; */
-  color: #FFF;
-  background-image: linear-gradient(to bottom, #222, #000);
-  transform-origin: 50% 50%;
+
+.modalWrap {
+  background-color: #060b0f;
+  z-index: 10;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translateX(-50%) translateY(-50%);
+  -webkit-transform: translateX(-50%) translateY(-50%);
+  transform: translateX(-50%) translateY(-50%);
+  position: absolute;
+  padding: 24px;
   pointer-events: all;
-  transition: transform 1s cubic-bezier(0, 1, 0, 1);
+  box-sizing: border-box;
 }
-.dragAndDrop .currentApp:not(.open) {
+
+.modalWrap:not(.open) {
   transform: scale(0.8);
   visibility: hidden;
   transition: none;
 }
-/* hack to fix buttons glitching when mint panel is closed */
-.dragAndDrop .currentApp:not(.open) .buttons .button {
-  display: none;
+
+.modalWrap::before {
+  display: block;
+  content: ' ';
+  position: absolute;
+  top: 0;
+  left: -20px;
+  height: 100%;
+  width: 40px;
+  transform: skewX(4deg);
+  background-color: #060b0f;
+  z-index: 0;
 }
-.dragAndDrop .currentApp .heading,
-.dragAndDrop .currentApp .body,
-.dragAndDrop .currentApp .footer
-{
-  padding: 20px;
+
+.modalWrap::after {
+  display: block;
+  content: ' ';
+  position: absolute;
+  top: 0;
+  right: -20px;
+  height: 100%;
+  width: 40px;
+  transform: skewX(-4deg);
+  background-color: #060b0f;
+  z-index: 0;
 }
-.dragAndDrop .currentApp .heading {
+
+.modalWrap .modalContentWrap {
+  position: relative;
+  z-index: 1;
+  width:600px;
+  height: 240px;
+  margin: 16px 0;
+  border-top:2px solid #101e27;
+  border-bottom: 2px solid #101e27;
+  padding: 16px 0;
+}
+
+.modalWrap .modalTitle {
+  background-color: #0d1a22;
+  position: relative;
+  font-family: "TTSC-Regular";
+  text-transform: uppercase;
+  color: #efefef;
+  display: inline-block;
+  text-align: center;
+  font-size: 18px;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%);
+  position: absolute;
+  padding: 6px;
+  top: -14px;
+  min-width: 120px;
+}
+
+.modalWrap .modalTitle::before {
+  display: block;
+  content: ' ';
+  position: absolute;
+  top: 0;
+  left: -20px;
+  height: 100%;
+  width: 40px;
+  transform: skewX(4deg);
+  background-color: #0d1a22;
+  z-index: -1;
+}
+
+.modalWrap .modalTitle::after {
+  display: block;
+  content: ' ';
+  position: absolute;
+  top: 0;
+  right: -20px;
+  height: 100%;
+  width: 40px;
+  transform: skewX(-4deg);
+  background-color: #0d1a22;
+  z-index: -1;
+}
+
+.dragAndDrop .itemPreviewBoxWrap {
+  position: relative;
   margin: 0;
-  font-family: 'PlazaRegular';
-  text-align: left;
-  letter-spacing: 2px;
+  padding: 0;
 }
-.dragAndDrop .currentApp .body {
-  display: flex;
+
+.dragAndDrop .itemPreviewBox {
+ position: relative;
+ display: block;
+ float: left;
+ margin-bottom: 32px;
+ width: 160px;
+ height: 144px;
 }
-.dragAndDrop .currentApp .body .canvas {
-  margin-right: 20px;
+
+
+.dragAndDrop .itemPreviewBox .mask {
+  width: 190px;
+  height: 174px;
+  overflow: hidden;
+  position: relative;
+  -webkit-mask-image: url("/assets/backgrounds/token-frame-empty.svg");
+  mask-image: url("/assets/backgrounds/token-frame-empty.svg");
+  -webkit-mask-size: 100%;
+  mask-size: 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
 }
-.dragAndDrop .currentApp .body .wrap {
-  display: flex;
+
+.dragAndDrop .itemPreviewBox .bg {
+  width: 198px;
+  height: 198px;
+  position: absolute;
+  top: -16px;
+  left: -4px;
+  z-index: 0;
+  background-image: url("/assets/backgrounds/token-frame-empty.svg");
+  background-position: center;
+  background-size: 100%;
+  background-repeat: no-repeat;
+}
+
+.dragAndDrop .itemPreviewBox .canvas {
+  width: 190px;
+  height: 174px;
+}
+
+.dragAndDrop .info {
+  margin-left: 64px;
+  float: left;
+  color: #efefef;
+}
+
+.dragAndDrop .info .type {
   width: 300px;
-  font-size: 16px;
-  flex-direction: column;
+  background-color: #050e11;
+  margin-bottom: 8px;
+  padding: 8px 16px;
+  box-sizing: border-box;
+  color: #e2e3e5;
+  text-transform: uppercase;
 }
-.dragAndDrop .currentApp .footer {
-  display: flex;
-  flex-direction: column;
+
+.dragAndDrop .info .type .label {
+  text-transform: capitalize;
+  width: 80px;
+  display: inline-block;
+  color: #929c9b;
 }
-.dragAndDrop .currentApp .row {
-  display: flex;
+
+.dragAndDrop .info h2 {
+  margin: 0;
+  font-size: 24px;
+  text-transform: capitalize;
+  padding-left: 14px;
 }
-.dragAndDrop .currentApp .label {
-  margin-right: 5px;
+.dragAndDrop .info p {
+  max-width: 300px;
+  padding-left: 14px;
 }
-.dragAndDrop .currentApp .value {
+
+.dragAndDrop .actions {
+  position: absolute;
+  bottom: -52px;
+  left: 0;
+  width: 100%;
+  text-align: center;
 }
-.dragAndDrop .currentApp .buttons {
-  display: flex;
+
+.dragAndDrop .actions .button {
+  min-width: 120px;
+  border: 2px solid #000;
+  margin: 0 4px;
 }
-.dragAndDrop .currentApp .buttons + .buttons {
-  margin-top: 10px;
-}
-.dragAndDrop .currentApp .buttons .button {
-  display: flex;
-  padding: 5px 10px;
-  border: 2px solid #FFF;
-  flex-direction: column;
-  font-size: 30px;
-  font-family: 'PlazaRegular';
-  letter-spacing: 1px;
-  flex: 1;
-  cursor: pointer;
-  user-select: none;
-  transition: all 1s cubic-bezier(0, 1, 0, 1);
-}
-.dragAndDrop .currentApp .buttons .button:not([disabled]):hover {
-  background-color: #FFF;
-  color: #000;
-}
-.dragAndDrop .currentApp .buttons .button[disabled] {
-  opacity: 0.2;
-  cursor: default;
-}
-.dragAndDrop .currentApp .buttons .button > sub {
-  font-size: 16px;
-}
-.dragAndDrop .currentApp .buttons .button + .button {
-  margin-left: 10px;
-}
-.dragAndDrop .currentApp .buttons .button.small {
-  margin: 0 auto;
-  flex: none;
-  font-size: 20px;
-}
-.dragAndDrop .currentApp .buttons .button.small > sub {
-  font-size: 13px;
-}
+
+/* .dragAndDrop .actions .button * {
+  padding: 4px 0 !important;
+} */

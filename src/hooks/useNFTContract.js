@@ -6,21 +6,6 @@ import {
 } from './web3-constants.js';
 import {FTABI, NFTABI, WebaverseABI} from '../abis/contract.jsx';
 import {ChainContext} from './chainProvider.jsx';
-// import {handleBlobUpload} from '../../util.js';
-// import {registerLoad} from '../LoadingBox.jsx';
-
-const FILE_ADDRESS = 'https://ipfs.webaverse.com/ipfs/';
-
-// const CONTRACT_EVENTS = {
-//   MINT_COMPLETE: 'MintComplete',
-//   METADATA_SET: 'MetadataSet',
-//   SINGLE_METADATA_SET: 'SingleMetadataSet',
-//   HASH_UPDATE: 'HashUpdate',
-//   COLLABORATOR_ADDED: 'CollaboratorAdded',
-//   COLLABORATOR_REMOVED: 'CollaboratorRemoved',
-//   SINGLE_COLLABORATOR_ADDED: 'SingleCollaboratorAdded',
-//   SINGLE_COLLABORATOR_REMOVED: 'SingleCollaboratorRemoved',
-// };
 
 export default function useNFTContract(currentAccount) {
   const {selectedChain} = useContext(ChainContext);
@@ -60,102 +45,68 @@ export default function useNFTContract(currentAccount) {
     return contract;
   };
 
-  async function mintNFT(currentApp, previewImage, callback = () => {}, afterminting = () => {}) {
+  async function mintNFT(currentApp, callback = () => {}, afterminting = () => {}) {
     setMinting(true);
     setError('');
     try {
-      let imageURI;
-      let avatarURI;
-
       const signer = await getSigner();
-      const name = currentApp.name;
-      const ext = currentApp.appType;
-      //   const hash = currentApp.contentId.split(FILE_ADDRESS)[1].split('/')[0];
-      const description = currentApp.description;
-
-      const metadataFileName = `${name}-metadata.json`;
-      let metadata;
-      if (previewImage) { // 3D object
-        imageURI = previewImage;
-        avatarURI = currentApp.contentId;
-
-        // metadata = {
-        //   name,
-        //   description,
-        //   image: imageURI,
-        //   animation_url: avatarURI,
-        // };
-      } else { // image object
-        imageURI = currentApp.contentId;
-        avatarURI = '';
-
-        // metadata = {
-        //   name,
-        //   description,
-        //   image: imageURI,
-        // };
-      }
-
-      const type = 'upload';
-      let load = null;
-      // const json_hash = await handleBlobUpload(metadataFileName, JSON.stringify(metadata) )
-      // handleBlobUpload
-      // new Blob([JSON.stringify(metadata)], {type: 'text/plain'});
-    //   const json_hash = await handleBlobUpload(metadataFileName, new Blob([JSON.stringify(metadata)], {type: 'text/plain'}), {
-    //     onTotal(total) {
-    //       load = registerLoad(type, metadataFileName, 0, total);
-    //     },
-    //     onProgress(e) {
-    //       if (load) {
-    //         load.update(e.loaded, e.total);
-    //       } else {
-    //         load = registerLoad(type, metadataFileName, e.loaded, e.total);
-    //       }
-    //     },
-    //   });
-    //   if (load) {
-    //     load.end();
-    //   }
-
-       const metadatahash = 0; // TODO: fix this json_hash.split(FILE_ADDRESS)[1].split('/')[0];
-      const Webaversecontract = new ethers.Contract(WebaversecontractAddress, WebaverseABI, signer);
-      // const NFTcontract = new ethers.Contract(NFTcontractAddress, NFTABI, signer);
+      const Webaversecontract = new ethers.Contract(
+        WebaversecontractAddress,
+        WebaverseABI,
+        signer,
+      );
       const FTcontract = new ethers.Contract(FTcontractAddress, FTABI, signer);
 
       const Bigmintfee = await Webaversecontract.mintFee();
       const mintfee = BigNumber.from(Bigmintfee).toNumber();
 
-      if (mintfee > 0) { // webaverse side chain mintfee != 0
-        // const FTapprovetx = await FTcontract.approve(NFTcontractAddress, mintfee); // mintfee = 10 default
-        // const FTapproveres = await FTapprovetx.wait();
-        // if (FTapproveres.transactionHash) {
-        //   try {
-        //     const minttx = await Webaversecontract.mint(currentAccount, 1, metadatahash, '0x');
-        //     const res = await minttx.wait();
-        //     if (res.transactionHash) {
-        //       callback();
-        //     }
-        //   } catch (err) {
-        //     console.warn('minting to webaverse contract failed');
-        //     setError('Mint Failed');
-        //   }
-        // }
-      } else { // mintfee = 0 for Polygon not webaverse sidechain
+      if (mintfee > 0) {
+        // webaverse side chain mintfee != 0
+        const FTapprovetx = await FTcontract.approve(
+          NFTcontractAddress,
+          mintfee,
+        ); // mintfee = 10 default
+        const FTapproveres = await FTapprovetx.wait();
+        if (FTapproveres.transactionHash) {
+          try {
+            const minttx = await Webaversecontract.mint(
+              currentAccount,
+              1,
+              currentApp.contentId,
+              '0x',
+            );
+            const res = await minttx.wait();
+            if (res.transactionHash) {
+              callback();
+            }
+          } catch (err) {
+            console.warn('minting to webaverse contract failed');
+            setError('Mint Failed');
+          }
+        }
+      } else {
+        // mintfee = 0 for Polygon not webaverse sidechain
         try {
-          const minttx = await Webaversecontract.mint(currentAccount, 1, currentApp.contentId,  name, '0x');
-          //   callback(minttx);
+          const minttx = await Webaversecontract.mint(
+            currentAccount,
+            1,
+            currentApp.contentId,
+            '0x',
+          );
           callback();
           const res = await minttx.wait();
           if (res.transactionHash) {
             afterminting();
           }
         } catch (err) {
+          console.log('error', err)
           console.warn('minting to webaverse contract failed');
           setError('Mint Failed');
         }
       }
       setMinting(false);
     } catch (err) {
+      console.log('error', err)
       console.warn('minting to webaverse contract failed');
       setError('Mint Failed');
       setMinting(false);
@@ -317,27 +268,25 @@ export default function useNFTContract(currentAccount) {
   async function getToken(tokenId) {
     const contract = await getContract();
     if (contract) {
-    //   return await contract.uri(tokenId);
-    const tokenData = await contract.getTokenAttr(tokenId);
-    return tokenData;
+      const contentURL = await contract.getTokenContentURL(tokenId);
+      return contentURL;
     } else {
-      return {};
+      return "";
     }
   }
 
   async function getTokens() {
     const tokenIdsOf = await getTokenIdsOf();
-    return await Promise.all(tokenIdsOf.map(async tokenId => {
-      const token = await getToken(tokenId);
-      const [url, name, level] = token;
+    return await Promise.all(
+      tokenIdsOf.map(async tokenId => {
+        const url = await getToken(tokenId);
 
-      return {
-        tokenId,
-        url,
-        name,
-        level
-      };
-    }));
+        return {
+          tokenId,
+          url
+        };
+      }),
+    );
   }
 
   return {

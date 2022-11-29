@@ -86,7 +86,7 @@ const objects = {
     },
     {
       name: 'Lantern',
-      start_url: 'https://webaverse.github.io/lantern/',
+      start_url: 'https://webaverse.github.io/uzi/',
       description: 'A lantern.',
       params: [
         {
