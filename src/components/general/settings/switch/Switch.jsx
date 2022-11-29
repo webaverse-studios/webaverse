@@ -26,7 +26,7 @@ export const Switch = ({value, setValue, values, className}) => {
     };
 
     return (
-        <div className={ classNames( styles.switch, className ) } >
+        <div className={ classNames(styles.switch, className) } >
             <CustomButton
                 type="icon"
                 theme="dark"

@@ -1,83 +1,66 @@
-import React, {useState, useEffect, useContext, Fragment} from 'react';
-import classnames from 'classnames';
-
-// import * as ceramicApi from '../../../../ceramic.js';
-// import {discordClientId} from '../../../../constants';
-import {parseQuery} from '../../../../util.js';
-// import Modal from './components/modal';
-// import WebaWallet from '../../../components/wallet';
-
-// import blockchainManager from '../../../../blockchain-manager.js';
-import {AppContext} from '../../../components/app';
-
-import styles from './UserBox.module.css';
-
-import * as sounds from '../../../../sounds.js';
-// import Chains from './components/web3/chains';
-import CustomButton from '../custom-button';
-
-//
-
-import cameraManager from '../../../../camera-manager.js';
+import React, {Fragment, useState, useEffect, useContext} from "react";
+import classnames from "classnames";
+import {AppContext} from "../../../components/app";
+import styles from "./UserBox.module.css";
+import * as sounds from "../../../../sounds.js";
+import CustomButton from "../custom-button";
+import cameraManager from "../../../../camera-manager.js";
 
 export const UserBox = ({className, setLoginFrom}) => {
-
   const {state, setState, account, chain} = useContext(AppContext);
-  const [address, setAddress] = useState('');
-  const [ensName, setEnsName] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
+  const [address, setAddress] = useState("");
+  const [ensName, setEnsName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [loggingIn, setLoggingIn] = useState(false);
-  // const [loginError, setLoginError] = useState(null);
-  // const [autoLoginRequestMade, setAutoLoginRequestMade] = useState(false);
-  const {isConnected, currentAddress, connectWallet, disconnectWallet, errorMessage, wrongChain, getAccounts, getAccountDetails} = account;
+  const {
+    isConnected,
+    currentAddress,
+    connectWallet,
+    disconnectWallet,
+    errorMessage,
+    wrongChain,
+    getAccounts,
+    getAccountDetails,
+  } = account;
   const {selectedChain} = chain;
 
-  //
-
-  /* const showModal = ( event ) => {
-
-        event.preventDefault();
-        // setShow( ! show );
-
-        setState({ openedPanel: 'LoginPanel' });
-
-    }; */
-
   const openInventory = e => {
-    setState({openedPanel: 'Inventory'});
+    setState({openedPanel: "Inventory"});
   };
 
   const handleCancelBtnClick = () => {
     setState({openedPanel: null});
 
-    sounds.playSoundName('menuBack');
+    sounds.playSoundName("menuBack");
   };
 
+  useEffect(() => {
+    if (!currentAddress) return;
+    _setAddress(currentAddress);
+  }, [currentAddress, selectedChain]);
+
   const _setAddress = async address => {
-    if (address) {
-      // let live = true;
-      // (async () => {
-      /*
-      const ensName = await blockchainManager.getEnsName(address);
-      // if (!live) return;
-      setEnsName(ensName);
+    const {name, avatar} = await getAccountDetails(address);
+    setEnsName(name ? shortAddress(name) : "");
+    setAvatarUrl(avatar ? resolveAvatar(avatar) : "");
+    setAddress(shortAddress(address) || "");
+  };
 
-      if (ensName) {
-        const avatarUrl = await blockchainManager.getAvatarUrl(ensName);
-        // if (!live) return;
-        setAvatarUrl(avatarUrl);
-      }
-      */
-      // })();
-
-      /* return () => {
-                live = false;
-            }; */
-
-      // console.log('render name', {address, ensName, avatarUrl});
+  const shortAddress = address => {
+    if (address.length > 12) {
+      return address.slice(0, 6) + `...` + address.slice(-5);
+    } else {
+      return address;
     }
-    console.log("connected address", address)
-    setAddress(address);
+  };
+
+  const resolveAvatar = url => {
+    const match = url.match(/^ipfs:\/\/(.+)/);
+    if (match) {
+      return `https://cloudflare-ipfs.com/ipfs/${match[1]}`;
+    } else {
+      return url;
+    }
   };
 
   const metaMaskLogin = async event => {
@@ -86,116 +69,45 @@ export const UserBox = ({className, setLoginFrom}) => {
 
     if (!loggingIn) {
       setLoggingIn(true);
-
       try {
-        // const {address, profile} = await ceramicApi.login();
-        const address = await connectWallet();
-        await _setAddress(address);
-        setLoginFrom('metamask');
-        // setShow(false);
-        // setLoginFrom('metamask');
+        await connectWallet();
+        setLoginFrom("metamask");
       } catch (err) {
         console.warn(err);
       } finally {
         setState({openedPanel: null});
-
         setLoggingIn(false);
       }
     }
   };
 
-  useEffect(() => {
-    const {error, code, id, play, realmId} = parseQuery(window.location.search);
-
-    //
-
-    // const discordAutoLogin = async () => {
-    //   const {address, error} = await WebaWallet.loginDiscord(code, id);
-
-    //   if (address) {
-    //     await _setAddress(address);
-    //     // setAddress( address );
-    //     setLoginFrom('discord');
-    //     // setShow( false );
-    //   } else if (error) {
-    //     setLoginError(String(error).toLocaleUpperCase());
-    //   }
-
-    //   window.history.pushState({}, '', window.location.origin);
-    //   setLoggingIn(false);
-    // };
-
-    // const metamaskAutoLogin = async () => {
-    //   const {address} = await WebaWallet.autoLogin();
-
-    //   if (address) {
-    //     await _setAddress(address);
-    //     setLoginFrom('metamask');
-    //     // setShow( false );
-    //   } else if (error) {
-    //     setLoginError(String(error).toLocaleUpperCase());
-    //   }
-    // };
-
-    // //
-
-    // if (!autoLoginRequestMade) {
-    //   setAutoLoginRequestMade(true);
-
-    //   if (code) {
-    //     setLoggingIn(true);
-
-    //     if (WebaWallet.launched) {
-    //       discordAutoLogin();
-    //     } else {
-    //       WebaWallet.waitForLaunch().then(discordAutoLogin);
-    //     }
-    //   } else {
-    //     if (WebaWallet.launched) {
-    //       metamaskAutoLogin();
-    //     } else {
-    //       WebaWallet.waitForLaunch().then(metamaskAutoLogin);
-    //     }
-    //   }
-    // }
-  }, [address]);
-
-  //
-
   const _triggerClickSound = () => {
-    sounds.playSoundName('menuClick');
+    sounds.playSoundName("menuClick");
   };
 
-  //
-
-  const open = state.openedPanel === 'LoginPanel';
-  const loggedIn = !!address;
-  // const loggedIn = isConnected;
-
-  //
+  const loggedIn = isConnected;
 
   const handleSettingsBtnClick = () => {
-    setState({openedModal: 'settings'});
+    setState({openedModal: "settings"});
   };
 
   const handleLocationBtnClick = () => {
-    setState({openedModal: 'location'});
+    setState({openedModal: "location"});
   };
 
   const handleWorldBtnClick = () => {
-    if (state.openedPanel === 'WorldPanel') {
+    if (state.openedPanel === "WorldPanel") {
       if (!cameraManager.pointerLockElement) {
         cameraManager.requestPointerLock();
       }
 
       setState({openedPanel: null});
-      
     } else {
       if (cameraManager.pointerLockElement) {
         cameraManager.exitPointerLock();
       }
 
-      setState({openedPanel: 'WorldPanel'});
+      setState({openedPanel: "WorldPanel"});
     }
   };
 
@@ -249,7 +161,7 @@ export const UserBox = ({className, setLoginFrom}) => {
             <li>
               <div className={styles.profileImage}>
                 <div className={styles.image}>
-                  <img src={'/assets/backgrounds/profile-no-image.png'} />
+                  <img src={"/assets/backgrounds/profile-no-image.png"} />
                 </div>
               </div>
             </li>
@@ -269,13 +181,9 @@ export const UserBox = ({className, setLoginFrom}) => {
                   e.preventDefault();
                   e.stopPropagation();
 
-                  if (!open) {
-                    setState({openedPanel: 'LoginPanel'});
-                  } else {
-                    setState({openedPanel: null});
-                  }
+                  setState({openedPanel: state.openedPanel === "LoginPanel" ? null : "LoginPanel"});
 
-                  sounds.playSoundName('menuNext');
+                  sounds.playSoundName("menuNext");
                 }}
                 onMouseEnter={e => {
                   _triggerClickSound();
@@ -291,8 +199,9 @@ export const UserBox = ({className, setLoginFrom}) => {
                 <div className={styles.image}>
                   <img
                     src={
-                      avatarUrl || '/assets/backgrounds/profile-no-image.png'
+                      avatarUrl || "/assets/backgrounds/profile-no-image.png"
                     }
+                    crossOrigin="Anonymous"
                   />
                 </div>
               </div>
@@ -300,9 +209,7 @@ export const UserBox = ({className, setLoginFrom}) => {
             <li>
               <div className={styles.loggedInText}>
                 <div className={styles.chainName}>Polygon</div>
-                <div className={styles.walletAddress}>
-                  { address? address.slice(0, 7) + '...' + address.slice(-6) : ''}
-                </div>
+                <div className={styles.walletAddress}>{ensName || address}</div>
               </div>
               <CustomButton
                 type="login"
@@ -314,8 +221,6 @@ export const UserBox = ({className, setLoginFrom}) => {
                   e.preventDefault();
                   e.stopPropagation();
                   disconnectWallet();
-                  // WebaWallet.logout();
-                  _setAddress(null);
                 }}
                 onMouseEnter={e => {
                   _triggerClickSound();
@@ -326,10 +231,10 @@ export const UserBox = ({className, setLoginFrom}) => {
         )}
       </ul>
 
-      {open && 
+      {state.openedPanel === "LoginPanel" &&
         <div
           className={classnames(
-            styles.userLoginMethodsModal,
+            styles.userLoginMethodsModal
           )}
         >
           <div className={styles.title}>
@@ -351,7 +256,7 @@ export const UserBox = ({className, setLoginFrom}) => {
             // url={`https://discord.com/api/oauth2/authorize?client_id=${discordClientId}&redirect_uri=${window.location.origin}%2Flogin&response_type=code&scope=identify`}
             size={18}
             className={styles.methodButton}
-            onClick={metaMaskLogin}
+            // onClick={metaMaskLogin}
             onMouseEnter={_triggerClickSound}
           />
           <CustomButton
@@ -364,7 +269,7 @@ export const UserBox = ({className, setLoginFrom}) => {
             onMouseEnter={_triggerClickSound}
           />
         </div>
-      }
+        }
     </div>
   );
 };

@@ -136,3 +136,5 @@ export const CHAIN_ID_MAP = Object.keys(CHAINS).reduce((acc, key) => {
 
 export const NETWORK_KEYS = Object.keys(CHAINS);
 export const DEFAULT_CHAIN = CHAINS.POLYGON_MAIN;
+
+export const ALCHEMY_KEY = 'a57tVFmcBDPGi5ORq6lyuvJy2RVRmVHH';
