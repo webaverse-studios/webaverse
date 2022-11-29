@@ -309,18 +309,13 @@ export const Inventory = () => {
           const nftData = nftList.map(({tokenId, url}) => (
                 {
                     tokenId,
-                    name: "test",
+                    name: "",
                     start_url: url,
-                    description: "test description",
+                    description: "",
                     params: [
-                        {
-                            label: 'Token type',
-                            value: 'Seasonal NFT ( ERC-1155 )',
-                        },
                     ],
                     claimed: true,
                     type: "major",
-                    level: 1
                 }
             ))
 
