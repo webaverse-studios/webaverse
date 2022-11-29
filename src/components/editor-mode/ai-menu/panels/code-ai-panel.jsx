@@ -115,7 +115,6 @@ export function CodeAiPanel() {
                 window.document.activeElement !== outputTextarea.current &&
                 state.openedPanel === 'AiPanel'
             ) {
-                debugger
                 if (page === 'input') {
                     _compile();
                 } else if (page === 'output') {

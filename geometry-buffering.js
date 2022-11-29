@@ -56,6 +56,8 @@ export class GeometryAllocator {
           localSphere.center.fromArray(this.boundingData, i * 4);
           localSphere.radius = this.boundingData[i * 4 + 3];
           return frustum.intersectsSphere(localSphere)
+            ? localSphere.center.distanceTo(this.camera.position)
+            : false;
         };
       } else if (this.boundingType === 'box') {
         return (i, frustum) => {
@@ -158,6 +160,9 @@ export class GeometryAllocator {
     for (let i = 0; i < this.numDraws; i++) {
       let frustumCullVisible = true;
       if (this.testBoundingFn) {
+        if(!this.camera) {
+          this.camera = camera;
+        }
         // XXX this can be optimized by initializing the frustum only once per frame and passing it in
         const projScreenMatrix = localMatrix.multiplyMatrices(
           camera.projectionMatrix,

@@ -1464,7 +1464,7 @@ class Mobber {
   }
 
   async waitForUpdate() {
-    await this.trackerCreated();
+    await this.trackerCreated;
     await new Promise((accept, reject) => {
       this.tracker.onPostUpdate(() => {
         accept();
