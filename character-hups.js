@@ -143,6 +143,10 @@ export class CharacterHups extends EventTarget {
           }));
         });
         this.hups.push(newHup);
+        if (character.isRemotePlayer) {
+          character.matrixWorld.makeRotationFromQuaternion(character.quaternion);
+          character.matrixWorld.setPosition(...character.position.toArray());
+        }
         this.dispatchEvent(new MessageEvent('hupadd', {
           data: {
             character,
