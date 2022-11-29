@@ -27,11 +27,6 @@
   font-size: 16px;
   color: #FFF;
   flex-direction: column;
-  transform: translate(0, 0);
-  transition: transform 1s cubic-bezier(0, 1, 0, 1);
-}
-.mapGen .sidebar:not(.open) {
-  transform: translate(100%, 0);
 }
 .mapGen .sidebar h1 {
   margin: 0;

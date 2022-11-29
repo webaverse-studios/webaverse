@@ -34,10 +34,8 @@ export const Settings = () => {
     };
 
     const handleTabClick = (event) => {
-
         const tabName = event.currentTarget.getAttribute('data-tab-name');
         setActiveTab(tabName);
-
     };
 
     //
@@ -61,11 +59,11 @@ export const Settings = () => {
                 </div>
 
                 <div className={ styles.tabContentWrapper }>
-                    <TabGeneral active={ activeTab === 'general' } />
-                    <TabControls active={ activeTab === 'controls' } />
-                    <TabAudio active={ activeTab === 'audio' } />
-                    <TabGraphics active={ activeTab === 'graphics' } />
-                    <TabAi active={ activeTab === 'ai' } />
+                    {activeTab === 'general' && <TabGeneral /> }
+                    {activeTab === 'controls' && <TabControls /> }
+                    {activeTab === 'audio' && <TabAudio /> }
+                    {activeTab === 'graphics' && <TabGraphics /> }
+                    {activeTab === 'ai' && <TabAi active={ activeTab === 'ai' } />}
                 </div>
 
             </div>

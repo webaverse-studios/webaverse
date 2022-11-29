@@ -128,12 +128,11 @@ export const Emotions = ({
 
     }, []);
 
-    return (
+    return emotionsOpen ? (
         <div
             className={classnames(
                 styles.emotions,
                 parentOpened ? styles.parentOpened : null,
-                emotionsOpen ? styles.open : null,
             )}
             onMouseEnter={e => {
                 setEmotionsOpen(true);
@@ -177,5 +176,5 @@ export const Emotions = ({
                 );
             })}
         </div>
-    );
+    ) : null;
 };

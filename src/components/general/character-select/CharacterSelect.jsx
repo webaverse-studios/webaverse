@@ -4,7 +4,6 @@ import classnames from 'classnames';
 import metaversefile from 'metaversefile';
 import styles from './character-select.module.css';
 import {AppContext} from '../../app';
-import {MegaHup} from '../../../MegaHup.jsx';
 import {LightArrow} from '../../../LightArrow.jsx';
 import {LocalPlayer} from '../../../../character-controller.js';
 import {characterSelectManager} from '../../../../characterselect-manager.js';
@@ -78,7 +77,6 @@ export const CharacterSelect = () => {
     const [ lastTargetCharacter, setLastTargetCharacter ] = useState(null);
     const [ abortFn, setAbortFn ] = useState(null);
     const [ arrowPosition, setArrowPosition ] = useState(null);
-    const [ enabled, setEnabled ] = useState(false);
     const [ npcPlayer, setNpcPlayer ] = useState(null);
     const [ npcLoader, setNpcLoader ] = useState(() => new CachedLoader({
         loadFn: async (url, targetCharacter, {signal = null} = {}) => {
@@ -172,7 +170,6 @@ export const CharacterSelect = () => {
     }, [charactersMap]);
 
     const targetCharacter = selectCharacter || highlightCharacter;
-    const targetPack = selectPack || highlightPack;
     const _updateArrowPosition = () => {
         if (targetCharacter) {
             const ref = refsMap.get(targetCharacter);
@@ -275,42 +272,18 @@ export const CharacterSelect = () => {
         }
     }, [targetCharacter, lastTargetCharacter, abortFn]);
 
-    const opened = state.openedPanel === 'CharacterSelect';
     useEffect(() => {
-        if (opened) {
-            setSelectCharacter(null);
+        setSelectCharacter(null);
 
-            const timeout = setTimeout(() => {
-                _updateArrowPosition();
-            }, 1000);
-            return () => {
-                clearTimeout(timeout);
-            };
-        } else {
+        const timeout = setTimeout(() => {
+            _updateArrowPosition();
+        }, 1000);
+        return () => {
+            clearTimeout(timeout);
             musicManager.stopCurrentMusic();
         }
-    }, [opened, targetCharacter]);
-    useEffect(() => {
-        if (opened && !enabled) {
-            const timeout = setTimeout(() => {
-                setEnabled(true);
-            }, 300);
-            return () => {
-                clearTimeout(timeout);
-            };
-        } else if (!opened && enabled) {
-            setEnabled(false);
-        }
-        if (!opened) {
-            setNpcPlayer(null);
-            setHighlightCharacter(null);
-            setSelectCharacter(null);
-            setHighlightPack(null);
-            setSelectPack(null);
-            setArrowPosition(null);
-            setText('');
-        }
-    }, [opened, enabled]);
+    }, [targetCharacter]);
+
     useEffect(() => {
         characterSelectManager.loadCharactersMap().then((result) => {
             const charactersMap = result;
@@ -319,10 +292,8 @@ export const CharacterSelect = () => {
     }, []);
     
     const onMouseMove = (character, packName) => e => {
-        if (enabled) {
             setHighlightCharacter(character);
             setHighlightPack(packName);
-        }
     };
     const onClick = (character, packName) => e => {
         if (character && !selectCharacter) {
@@ -364,12 +335,8 @@ export const CharacterSelect = () => {
     return (
         <div className={styles.characterSelect}>
             <div
-                className={classnames(styles.menu, opened ? styles.open : null)}
+                className={classnames(styles.menu)}
             >
-                <MegaHup
-                    open={opened}
-                    npcPlayer={opened ? npcPlayer : null}
-                />
                 <div className={styles.heading}>
                     <h1>Character select</h1>
                 </div>
@@ -413,17 +380,19 @@ export const CharacterSelect = () => {
                                         />
                                     );
                                 })}
-                                <LightArrow
-                                    enabled={!!arrowPosition && targetPack === packName}
-                                    animate={!!selectCharacter}
-                                    x={arrowPosition?.[0] ?? 0}
-                                    y={arrowPosition?.[1] ?? 0}
-                                />
+                                {arrowPosition && 
+                                    <LightArrow
+                                        enabled={true}
+                                        animate={!!selectCharacter}
+                                        x={arrowPosition[0] ?? 0}
+                                        y={arrowPosition[1] ?? 0}
+                                    />
+                                }
                             </ul>
                         </div>
                     );
                 })}
-                {(opened && text) ? (
+                {text ? (
                     <RpgText className={styles.text} styles={styles} text={text} textSpeed={chatTextSpeed} />
                 ) : null}
             </div>
