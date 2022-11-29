@@ -13,7 +13,6 @@ export const TokenBox = props => {
     onClick,
     object,
     canvasRef,
-    enabled,
     numFrames,
     level,
     value,
@@ -29,7 +28,6 @@ export const TokenBox = props => {
           className={classnames(
             styles.frame,
             styles.frameActive,
-            active && styles.open,
           )}
         />
       }
@@ -38,7 +36,6 @@ export const TokenBox = props => {
           className={classnames(
             styles.frame,
             styles.frameEmptyNotToken,
-            styles.open,
           )}
         />
       }
@@ -47,7 +44,6 @@ export const TokenBox = props => {
           className={classnames(
             styles.frame,
             styles.frameNotClaimed,
-            styles.open,
           )}
         >
           <img src="/assets/icons/notClaimed.svg" className={styles.badge} />
@@ -58,7 +54,6 @@ export const TokenBox = props => {
           className={classnames(
             styles.frame,
             styles.frameCopy,
-            styles.open,
           )}
         />
       }
@@ -67,7 +62,6 @@ export const TokenBox = props => {
           className={classnames(
             styles.frame,
             styles.frameDefault,
-            styles.open,
           )}
         />
       }
@@ -76,7 +70,6 @@ export const TokenBox = props => {
           <Spritesheet
             className={styles.item}
             startUrl={object.start_url}
-            enabled={enabled}
             size={resolution}
             numFrames={numFrames}
           />

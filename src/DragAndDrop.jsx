@@ -247,9 +247,9 @@ const DragAndDrop = () => {
   const name = currentApp ? currentApp.name : '';
   const appType = currentApp ? currentApp.appType : '';
 
-  return (
+  return currentApp ? (
     <div className={style.dragAndDrop}>
-      <div className={classnames(style.currentApp, currentApp ? style.open : null)} onClick={_currentAppClick}>
+      <div className={classnames(style.currentApp)} onClick={_currentAppClick}>
         <h1 className={style.heading}>Upload object</h1>
         <div className={style.body}>
           <ObjectPreview object={currentApp} className={style.canvas} />
@@ -288,7 +288,7 @@ const DragAndDrop = () => {
         </div>
       </div>
     </div>
-  );
+  ) : null;
 };
 export {
   DragAndDrop,

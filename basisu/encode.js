@@ -1,8 +1,8 @@
 // Uncomment these after moving avatar optimizers to preview server
-//import { dirname } from 'path';
-//import { createRequire } from 'module';
-//globalThis.__dirname = dirname(import.meta.url).substring(7);
-//globalThis.require = createRequire(import.meta.url);
+// import { dirname } from 'path';
+// import { createRequire } from 'module';
+// globalThis.__dirname = dirname(import.meta.url).substring(7);
+// globalThis.require = createRequire(import.meta.url);
 
 import BASIS from './basis_encoder.mjs';
 
@@ -16,7 +16,7 @@ export function encodePNG2KTX(data, {
   enableUASTC = true,
   SRGB = true,
 } = {}) {
-  const { BasisEncoder, initializeBasis } = basisuModule;
+  const {BasisEncoder, initializeBasis} = globalThis.basisuModule;
 
   initializeBasis();
 
@@ -43,7 +43,7 @@ export function encodePNG2KTX(data, {
   basisEncoder.setQualityLevel(encodeQuality);
   basisEncoder.setCompressionLevel(compressionLevel);
   basisEncoder.setUASTC(uastcFlag);
-  basisEncoder.setMipGen(false); //elem('Mipmaps').checked);
+  basisEncoder.setMipGen(false); // elem('Mipmaps').checked);
   basisEncoder.setYFlip(true);
 
   basisEncoder.setCreateKTX2File(ktx);
@@ -52,7 +52,7 @@ export function encodePNG2KTX(data, {
 
   basisEncoder.setPackUASTCFlags(uastcLevel);
 
-  //if (!uastcFlag)
+  // if (!uastcFlag)
   //  log('Encoding at ETC1S quality level ' + qualityLevel);
 
   const startTime = performance.now();
@@ -65,14 +65,14 @@ export function encodePNG2KTX(data, {
 
   basisEncoder.delete();
 
-  if (num_output_bytes == 0) {
+  if (num_output_bytes === 0) {
     console.warn('encodeBasisTexture() failed!');
   }
   else {
-    //log('encodeBasisTexture() succeeded, output size: ' + num_output_bytes + ', encoding time: ' + elapsed.toFixed(2));
+    // log('encodeBasisTexture() succeeded, output size: ' + num_output_bytes + ', encoding time: ' + elapsed.toFixed(2));
   }
 
-  if (num_output_bytes != 0) {
+  if (num_output_bytes !== 0) {
     return actualBasisFileData;
   }
 

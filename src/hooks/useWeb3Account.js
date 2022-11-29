@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import {CHAINS, DEFAULT_CHAIN, WEB3_EVENTS} from './web3-constants';
+import {CHAINS, DEFAULT_CHAIN, WEB3_EVENTS, ALCHEMY_KEY} from './web3-constants';
 
 import {
   connectToNetwork,
@@ -55,6 +55,7 @@ export default function useWeb3Account(currentChain = DEFAULT_CHAIN) {
 
       if (!ethereum) {
         setErrorMessage(p => [...p, 'Make sure you have metamask!']);
+        window.open('https://metamask.io/download/', '_blank');
         return;
       }
 
@@ -74,7 +75,7 @@ export default function useWeb3Account(currentChain = DEFAULT_CHAIN) {
 
   const disconnectWallet = async () => {
     try {
-      setCurrentAddress();
+      setCurrentAddress('');
       setErrorMessage([]);
 
       return null;
@@ -85,7 +86,9 @@ export default function useWeb3Account(currentChain = DEFAULT_CHAIN) {
   };
 
   const getAccountDetails = async (address) => {
-    const provider = getProvider();
+    const provider = ethers.getDefaultProvider('mainnet', {
+      alchemy: ALCHEMY_KEY
+    });
     const check = ethers.utils.getAddress(address);
 
     try {

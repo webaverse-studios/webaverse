@@ -61,6 +61,10 @@ const _parseTrackerUpdate = bufferAddress => {
     for (let i = 0; i < numOldNodes; i++) {
       oldNodes[i] = _parseNode();
     }
+
+    const numNewNodes = dataView.getUint32(index, true);
+    index += Uint32Array.BYTES_PER_ELEMENT;
+    
     const newNodes = Array(numNewNodes);
     for (let i = 0; i < numNewNodes; i++) {
       newNodes[i] = _parseNode();

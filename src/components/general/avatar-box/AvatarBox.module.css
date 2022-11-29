@@ -48,11 +48,6 @@
     height: calc(var(--canvas-size) - 20px * 2);
     z-index: 2;
 }
-
-.avatarBoxWrap .avatarBox.loaded .placeholderImg {
-    display: none;
-}
-
 .avatarBoxWrap .avatarBox .meta {
     display: block;
     position: absolute;

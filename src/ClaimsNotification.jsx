@@ -21,8 +21,6 @@ const ClaimsNotification = () => {
     };
   }, []);
 
-  const open = numClaims > 0 && state.openedPanel === null;
-
   const onClick = e => {
     e.preventDefault();
     e.stopPropagation();
@@ -36,7 +34,6 @@ const ClaimsNotification = () => {
     <div
       className={classnames(
         styles.claimsNotification,
-        open ? styles.open : null,
       )}
       onClick={onClick}
     >

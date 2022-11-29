@@ -60,6 +60,7 @@
   "devDependencies": {
     "compiler": "./packages/compiler",
     "eslint": "^8.26.0",
+    "eslint-config-prettier": "^8.5.0",
     "eslint-config-semistandard": "^15.0.1",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.26.0",

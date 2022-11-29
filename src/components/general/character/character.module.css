@@ -3,16 +3,10 @@
   position: absolute;
   top: 0px;
   left: 0px;
-  transform: translate( -400px, 0px );
-  transition: transform 0.3s cubic-bezier(0, 1, 0, 1);
+  transform: translate( 0%, 0px );
   z-index: 1;
   height: 100vh;
 }
-
-.characterPanelWrap.opened {
-  transform: translate( 0%, 0px );
-}
-
 .characterPanelWrap .actionsWrap {
   position: absolute;
   bottom: 0;
@@ -497,12 +491,8 @@
   font-size: 16px;
   user-select: none;
   overflow: hidden;
-  transition: color 1s cubic-bezier(0, 1, 0, 1), transform 0.3s cubic-bezier(0, 1, 0, 1);
-  background-color: #000;
-}
-
-.characterWrapper.opened .characterBtn {
   transform: translate(-100%, 0);
+  background-color: #000;
 }
 
 .characterBtn .background {
@@ -510,17 +500,12 @@
   top: 0;
   bottom: 0;
   height: 100%;
-  transition: transform 1s cubic-bezier(0, 1, 0, 1);
   filter: invert(50%) sepia(99%) saturate(514%) hue-rotate(177deg) brightness(99%) contrast(94%);
   z-index: 0;
 }
 
 .characterBtn .background {
   left: 0;
-  transform: rotateZ(180deg) translateX(-100%);
-}
-
-.characterBtn:hover .background, .characterWrapper.opened .background {
   transform: rotateZ(180deg) translateX(50px);
 }
 
@@ -539,12 +524,12 @@
   z-index: 2;
 }
 
-.characterBtn:hover .btnShortKey, .characterWrapper.opened .btnShortKey {
+.characterBtn:hover .btnShortKey {
   border-color: #000;
   color: #000;
 }
 
-.characterBtn:hover .btnText, .characterWrapper.opened .btnText {
+.characterBtn:hover .btnText{
   position: relative;
   color: #000;
   z-index: 2;
