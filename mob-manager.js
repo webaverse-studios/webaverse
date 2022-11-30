@@ -13,6 +13,9 @@ import {createTextureAtlas} from './atlasing.js';
 import {Matrix4,Quaternion,Vector3,Euler} from 'three';
 import * as sounds from './sounds.js';
 import { ConstructorFragment } from 'ethers/lib/utils.js';
+import hitManager from './character-hitter.js'
+import {scene, camera} from './renderer.js';
+import * as coreModules from './core-modules.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -746,9 +749,8 @@ let ragdollSpawner;*/
   velocity: mob walking speed
   idleAction: action to repeatedly perform when no other action are provided
 */
-export class MobInstance extends EventTarget {
+export class MobInstance {
   constructor(pos, quat, geometryIndex, timeOffset, radius, height, velocity, idleAction) {
-    super();
     this.actions = [];
     this.target;
     this.life = defaultMobLifePoint;
@@ -782,16 +784,41 @@ export class MobInstance extends EventTarget {
       [MobStates.attack, ['attack']]
     ]);
     this.followTargetOutOfRange = false;
+    hitManager.addEventListener('hitattempt', (e) => this.hitAction(e.data));
+  }
 
-    /*this.hitTracker = hpManager.makeHitTracker({totalHp: 10});
-    this.controller.parent = this;
-    this.hitTracker.bind(this.controller);
-    this.dispatchEvent(new MessageEvent('hittrackeradded'));
-    const die = () => {
-      this.actionsQueue = [];
-      this.startAction('death');
-    };
-    this.addEventListener('die', die, {once: true});*/
+  hitAction(hitData){
+    if(!hitData.args.physicsId || hitData.args.physicsId !== this.controller.physicsId)
+      return;
+
+    //damage and death
+    switch(hitData.type){
+      case 'sword':
+        this.life -= 2;
+        this.checkDeath();
+        break;
+      case 'bullet':
+        this.life -= 1;
+        this.checkDeath();
+        break;
+    }
+    
+    // damage UI
+    const damageMeshApp = metaversefile.createApp();
+    (async () => {
+      // await coreModules.waitForLoad();
+      // const {modules} = metaversefile.useDefaultModules();
+      const m = await coreModules.importModule('damageMesh');
+      await damageMeshApp.addModule(m);
+    })();
+    
+    damageMeshApp.position.copy(this.position);
+    localEuler.setFromQuaternion(camera.quaternion, 'YXZ');
+    localEuler.x = 0;
+    localEuler.z = 0;
+    damageMeshApp.quaternion.setFromEuler(localEuler);
+    damageMeshApp.updateMatrixWorld();
+    scene.add(damageMeshApp);
   }
 
   initPhysics(radius, height){
