@@ -93,6 +93,20 @@ export default class Webaverse extends EventTarget {
       ]);
     })();
     this.contentLoaded = false;
+    const self = this
+    // Todo: global variable for e2e automatic tests
+    window.globalWebaverse = {
+      metaversefileApi,
+      playersManager,
+      npcManager,
+      physicsManager,
+      cameraManager,
+      hpManager,
+      universe,
+      webaverse: self,
+      world,
+      game,
+    };
   }
   
   waitForLoad() {
