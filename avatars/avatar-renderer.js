@@ -27,7 +27,8 @@ const avatarPlaceholderImagePromise = (async () => {
   const res = await fetch('/images/user.png');
   if (res.ok) {
     const blob = await res.blob();
-    const avatarPlaceholderImage = await createImageBitmap(blob);
+    const options = {imageOrientation: 'flipY'};
+    const avatarPlaceholderImage = await createImageBitmap(blob, options);
     return avatarPlaceholderImage;
   } else {
     throw new Error('failed to load image: ' + res.status);

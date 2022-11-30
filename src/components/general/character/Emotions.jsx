@@ -4,16 +4,9 @@ import classnames from 'classnames';
 
 import metaversefile from '../../../../metaversefile-api.js';
 import {avatarManager} from '../../../../avatar-manager.js';
+import {emotions} from '../../../../emotes/emotions.js';
 
 import styles from './emotions.module.css';
-
-export const emotions = [
-    'joy',
-    'sorrow',
-    'angry',
-    'fun',
-    'surprise',
-];
 
 export const setFacePoseValue = (emotion, value) => {
     const localPlayer = metaversefile.useLocalPlayer();
@@ -135,12 +128,11 @@ export const Emotions = ({
 
     }, []);
 
-    return (
+    return emotionsOpen ? (
         <div
             className={classnames(
                 styles.emotions,
                 parentOpened ? styles.parentOpened : null,
-                emotionsOpen ? styles.open : null,
             )}
             onMouseEnter={e => {
                 setEmotionsOpen(true);
@@ -184,5 +176,5 @@ export const Emotions = ({
                 );
             })}
         </div>
-    );
+    ) : null;
 };

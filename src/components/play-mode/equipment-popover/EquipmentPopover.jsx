@@ -6,9 +6,9 @@ import {PlaceholderImg} from '../../../PlaceholderImg.jsx';
 export const EquipmentPopover = ({
   open = true,
 }) => {
-  return (
-    <div className={ classnames(styles.equipmentPopover, open ? styles.open : null) } >
+  return open ? (
+    <div className={ classnames(styles.equipmentPopover) } >
       <PlaceholderImg className={styles.placeholderImg} src='./images/arc-white.svg' />
     </div>
-  );
+  ) : null;
 };

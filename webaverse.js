@@ -45,6 +45,7 @@ import raycastManager from './raycast-manager.js';
 import universe from './universe.js';
 import npcManager from './npc-manager.js';
 import settingsManager from './settings-manager.js';
+import grabManager from './grab-manager.js';
 import backgroundFx from './background-fx/background-fx.js';
 
 const localVector = new THREE.Vector3();
@@ -92,6 +93,20 @@ export default class Webaverse extends EventTarget {
       ]);
     })();
     this.contentLoaded = false;
+    const self = this
+    // Todo: global variable for e2e automatic tests
+    window.globalWebaverse = {
+      metaversefileApi,
+      playersManager,
+      npcManager,
+      physicsManager,
+      cameraManager,
+      hpManager,
+      universe,
+      webaverse: self,
+      world,
+      game,
+    };
   }
   
   waitForLoad() {
@@ -313,6 +328,7 @@ export default class Webaverse extends EventTarget {
           transformControls.update();
           raycastManager.update(timestamp, timeDiffCapped);
           game.update(timestamp, timeDiffCapped);
+          grabManager.update(timestamp, timeDiffCapped);
 
           npcManager.updateAvatar(timestamp, timeDiffCapped);
           playersManager.updateRemotePlayers(timestamp, timeDiffCapped);

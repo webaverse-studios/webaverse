@@ -31,37 +31,6 @@
       "inputs": [
         {
           "indexed": false,
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "string",
-          "name": "trait_type",
-          "type": "string"
-        },
-        {
-          "indexed": false,
-          "internalType": "string",
-          "name": "value",
-          "type": "string"
-        },
-        {
-          "indexed": false,
-          "internalType": "string",
-          "name": "display_type",
-          "type": "string"
-        }
-      ],
-      "name": "AttributeSet",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
           "internalType": "address",
           "name": "signer",
           "type": "address"
@@ -239,6 +208,20 @@
       "type": "event"
     },
     {
+      "inputs": [],
+      "name": "_proxyAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
       "inputs": [
         {
           "components": [
@@ -249,7 +232,7 @@
             },
             {
               "internalType": "string",
-              "name": "metadataurl",
+              "name": "contentURL",
               "type": "string"
             },
             {
@@ -514,6 +497,26 @@
     {
       "inputs": [
         {
+          "internalType": "bytes4",
+          "name": "interfaceId",
+          "type": "bytes4"
+        }
+      ],
+      "name": "supportsInterface",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
           "internalType": "address",
           "name": "newOwner",
           "type": "address"
@@ -535,7 +538,7 @@
             },
             {
               "internalType": "string",
-              "name": "metadataurl",
+              "name": "contentURL",
               "type": "string"
             },
             {
@@ -591,11 +594,6 @@
           "internalType": "string",
           "name": "baseURI_",
           "type": "string"
-        },
-        {
-          "internalType": "address",
-          "name": "minter",
-          "type": "address"
         }
       ],
       "name": "initialize",
@@ -681,8 +679,48 @@
     {
       "inputs": [
         {
+          "internalType": "bool",
+          "name": "_isPublicallyMintable",
+          "type": "bool"
+        }
+      ],
+      "name": "setPublicallyMintable",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_webaverseContractAddress",
+          "type": "address"
+        }
+      ],
+      "name": "setProxyAddress",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getPublicallyMintable",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
           "internalType": "uint256",
-          "name": "_id",
+          "name": "tokenId",
           "type": "uint256"
         }
       ],
@@ -704,17 +742,19 @@
           "internalType": "uint256",
           "name": "tokenId",
           "type": "uint256"
-        },
+        }
+      ],
+      "name": "getTokenContentURL",
+      "outputs": [
         {
           "internalType": "string",
-          "name": "_uri",
+          "name": "",
           "type": "string"
         }
       ],
-      "name": "setTokenURI",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -744,36 +784,6 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "getTokenAttr",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
           "internalType": "address",
           "name": "to",
           "type": "address"
@@ -786,11 +796,6 @@
         {
           "internalType": "string",
           "name": "_uri",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "_name",
           "type": "string"
         },
         {
@@ -845,16 +850,6 @@
           "type": "address"
         },
         {
-          "internalType": "string",
-          "name": "dropName",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "dropLevel",
-          "type": "string"
-        },
-        {
           "internalType": "bytes",
           "name": "data",
           "type": "bytes"
@@ -868,7 +863,7 @@
             },
             {
               "internalType": "string",
-              "name": "metadataurl",
+              "name": "contentURL",
               "type": "string"
             },
             {
@@ -905,59 +900,6 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "string",
-          "name": "trait_type",
-          "type": "string"
-        }
-      ],
-      "name": "getAttribute",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "string",
-          "name": "trait_type",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "value",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "display_type",
-          "type": "string"
-        }
-      ],
-      "name": "setAttribute",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
           "internalType": "address",
           "name": "signer",
           "type": "address"
@@ -968,11 +910,6 @@
           "type": "address"
         },
         {
-          "internalType": "bytes",
-          "name": "data",
-          "type": "bytes"
-        },
-        {
           "components": [
             {
               "internalType": "uint256",
@@ -981,7 +918,7 @@
             },
             {
               "internalType": "string",
-              "name": "metadataurl",
+              "name": "contentURL",
               "type": "string"
             },
             {
@@ -1036,7 +973,7 @@
             },
             {
               "internalType": "string",
-              "name": "metadataurl",
+              "name": "contentURL",
               "type": "string"
             },
             {
@@ -1105,52 +1042,6 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
-        }
-      ],
-      "name": "isAllowedMinter",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "minter",
-          "type": "address"
-        }
-      ],
-      "name": "addMinter",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "minter",
-          "type": "address"
-        }
-      ],
-      "name": "removeMinter",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "inputs": [],
       "name": "getNextTokenId",
       "outputs": [
@@ -1181,12 +1072,12 @@
     {
       "inputs": [
         {
-          "internalType": "bytes4",
-          "name": "interfaceId",
-          "type": "bytes4"
+          "internalType": "uint256",
+          "name": "_id",
+          "type": "uint256"
         }
       ],
-      "name": "supportsInterface",
+      "name": "isServerSigned",
       "outputs": [
         {
           "internalType": "bool",

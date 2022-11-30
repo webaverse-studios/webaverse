@@ -15,6 +15,8 @@ import physicsManager from './physics-manager.js';
 import transformControls from './transform-controls.js';
 import storyManager from './story.js';
 import raycastManager from './raycast-manager.js';
+import grabManager from './grab-manager.js';
+
 const localVector = new THREE.Vector3();
 const localEuler = new THREE.Euler();
 const localMatrix2 = new THREE.Matrix4();
@@ -352,7 +354,7 @@ class IoManager extends EventTarget {
       case 70: { // F
         e.preventDefault();
         e.stopPropagation();
-        if (game.canPush()) {
+        if (grabManager.canPush()) {
           ioManager.keys.forward = true;
         } else {
           game.toggleFly();
@@ -362,11 +364,12 @@ class IoManager extends EventTarget {
       case 88: { // X
         if (!e.ctrlKey) {
           game.menuDelete();
+          grabManager.menuDelete();
         }
         break;
       }
       case 67: { // C
-        if (game.canPush()) {
+        if (grabManager.canPush()) {
           ioManager.keys.backward = true;
         } else {
           ioManager.keys.ctrl = true;
@@ -397,8 +400,8 @@ class IoManager extends EventTarget {
         } else {
           game.menuMiddleUp();
 
-          if (game.canRotate()) {
-            game.menuRotate(-1);
+          if (grabManager.canRotate()) {
+            grabManager.menuRotate(-1);
           } else {
             game.menuActivateDown();
           }
@@ -420,11 +423,7 @@ class IoManager extends EventTarget {
       }
       case 82: { // R
         if (cameraManager.pointerLockElement) {
-          if (game.canRotate()) {
-            game.menuRotate(1);
-          } else {
             game.dropSelectedApp();
-          }
         }
         break;
       }
@@ -475,7 +474,7 @@ class IoManager extends EventTarget {
         break;
       }
       case 192: { // tilde
-        game.toggleEditMode();
+        grabManager.toggleEditMode();
         break;
       }
     }
@@ -599,7 +598,7 @@ class IoManager extends EventTarget {
 
   click = e => {
     if (cameraManager.pointerLockElement) {
-      game.menuClick(e);
+      grabManager.menuClick(e);
     } else if (!game.hoverEnabled) {
         cameraManager.requestPointerLock();
       }

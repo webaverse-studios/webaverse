@@ -135,8 +135,8 @@ export const MegaHotBox = ({
       };
     }, []);
 
-    return (
-      <div className={ classnames(styles.megaHotBox, open ? styles.open : null) } >
+    return open ? (
+      <div className={ classnames(styles.megaHotBox) } >
         <div className={ styles.box } />
 
         <Card
@@ -165,5 +165,5 @@ export const MegaHotBox = ({
           >Close</BigButton>
         </div>
       </div>
-    );
+    ) : null;
 };

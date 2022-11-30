@@ -8,7 +8,6 @@ import spriteAnimationManager from '../../../../sprite-animation-manager.js';
 export const Spritesheet = ({
     className,
     startUrl,
-    enabled,
     size,
     numFrames,
 }) => {
@@ -44,7 +43,7 @@ export const Spritesheet = ({
 
     useEffect(() => {
         const canvas = canvasRef.current;
-        if (canvas && spritesheet && enabled) {
+        if (canvas && spritesheet) {
             const ctx = canvas.getContext('2d');
             const imageBitmap = spritesheet.result;
             // console.log('render image bitmap', imageBitmap, size, canvas.width, canvas.height);
@@ -64,7 +63,7 @@ export const Spritesheet = ({
                 clearInterval(interval);
             };
         }
-    }, [canvasRef, spritesheet, enabled]);
+    }, [canvasRef, spritesheet]);
 
     return (
         <canvas
