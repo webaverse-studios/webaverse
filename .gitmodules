@@ -10,15 +10,6 @@
 [submodule "packages/totum"]
 	path = packages/totum
 	url = https://github.com/webaverse/totum.git
-[submodule "packages/three-vrm"]
-	path = packages/three-vrm
-	url = https://github.com/webaverse/three-vrm
-[submodule "packages/three-vrm-core"]
-	path = packages/three-vrm-core
-	url = https://github.com/webaverse/three-vrm-core
-[submodule "packages/three-vrm-springbone"]
-	path = packages/three-vrm-springbone
-	url = https://github.com/webaverse/three-vrm-springbone
 [submodule "packages/characters"]
 	path = packages/characters
 	url = https://github.com/webaverse/characters.git
@@ -37,6 +28,15 @@
 [submodule "packages/compiler"]
 	path = packages/compiler
 	url = https://github.com/webaverse/compiler.git
+[submodule "packages/three-vrm"]
+	path = packages/three-vrm
+	url = https://github.com/webaverse/three-vrm
+[submodule "packages/three-vrm-core"]
+	path = packages/three-vrm-core
+	url = https://github.com/webaverse/three-vrm-core
+[submodule "packages/three-vrm-springbone"]
+	path = packages/three-vrm-springbone
+	url = https://github.com/webaverse/three-vrm-springbone
 [submodule "packages/three-vrm-materials-mtoon"]
-	path = packagesthree-vrm-materials-mtoon
+	path = packages/three-vrm-materials-mtoon
 	url = https://github.com/webaverse/three-vrm-materials-mtoon
