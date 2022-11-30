@@ -193,7 +193,7 @@ const _logProcess = childProcess => {
 const _startE2eTest = () => {
   const cp = child_process.spawn('npm', ['run', 'test-e2e'], {
     env: process.env,
-    cwd: './packages/automated-tests/',
+    cwd: dirname,
     stdio: 'inherit'
   });
   cp.on('error', err => {
