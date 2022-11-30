@@ -662,6 +662,9 @@ metaversefile.setApi({
   useRemotePlayers() {
     return Array.from(playersManager.getRemotePlayers().values());
   },
+  usePlayersManager() {
+    return playersManager;
+  },
   usePartyManager() {
     return partyManager;
   },
