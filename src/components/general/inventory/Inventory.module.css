@@ -2,18 +2,9 @@
     position: fixed;
     top: 0px;
     right: 0px;
-    transform: translate(400px, 0px);
-    transition: transform 0.3s cubic-bezier(0, 1, 0, 1);
+    transform: translate( 0%, 0px );
     z-index: 1;
     height: 100vh;
-}
-
-.inventoryPanelWrap.opened {
-    transform: translate( 0%, 0px );
-  }
-
-.inventoryPanelWrap.opened {
-    transform: translate(0%, 0px);
 }
 
 .inventoryPanelWrap .actionsWrap {

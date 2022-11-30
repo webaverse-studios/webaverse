@@ -272,10 +272,9 @@ export default function QuickMenu() {
 
   //
 
-	return (
+	return open ? (
     <div className={classnames(
       styles.quickMenu,
-      open ? styles.open : null,
     )}>
       <div className={styles.container} >
         <canvas
@@ -292,5 +291,5 @@ export default function QuickMenu() {
         />
       </div>
     </div>
-  );
+  ) : null;
 };

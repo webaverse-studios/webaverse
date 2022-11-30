@@ -1,7 +1,7 @@
 import React, {useState, useContext, useEffect} from 'react';
 import styles from './Location.module.css';
-import { sceneManager } from '../../../../scene-manager'
-import { scenesBaseUrl } from '../../../../endpoints';
+import {sceneManager} from '../../../../scene-manager'
+import {scenesBaseUrl} from '../../../../endpoints';
 import CustomButton from '../custom-button';
 import {AppContext} from '../../app';
 import universe from '../../../../universe';

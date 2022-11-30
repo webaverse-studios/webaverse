@@ -43,10 +43,6 @@
     margin-left: 5px;
 }
 
-.codeAiPanel.open {
-    visibility: visible;
-}
-
 /* */
 
 .codeAiPanel .button.loading {

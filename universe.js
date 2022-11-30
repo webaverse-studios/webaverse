@@ -20,6 +20,7 @@ import voiceInput from './voice-input/voice-input.js';
 import {world} from './world.js';
 import {sceneManager} from './scene-manager.js';
 import physx from './physx.js';
+import {murmurhash3} from './procgen/murmurhash3.js';
 
 class Universe extends EventTarget {
   constructor() {
@@ -195,44 +196,10 @@ class Universe extends EventTarget {
     this.connectState(state);
 
     // Set up the network realms.
-    // https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
-    const hashCode = s => s.split('').reduce((a, b) => (((a << 5) - a) + b.charCodeAt(0)) | 0, 0);
-    const sceneId = hashCode(src).toString();
+    const sceneId = murmurhash3(src);
     const localPlayer = playersManager.getLocalPlayer();
     this.realms = new NetworkRealms(sceneId, localPlayer.playerId);
     await this.realms.initAudioContext();
-    this.realmsCleanupFns = new Map();
-
-    this.realms.addEventListener('realmjoin', e => {
-      const {realm} = e.data;
-      const {dataClient, networkedDataClient} = realm;
-
-      const onsyn = e => {
-        const {synId} = e.data;
-        const synAckMessage = dataClient.getSynAckMessage(synId);
-        networkedDataClient.emitUpdate(synAckMessage);
-      };
-      dataClient.addEventListener('syn', onsyn);
-
-      const cleanupFns = [
-        () => {
-          dataClient.removeEventListener('syn', onsyn);
-        },
-      ];
-
-      this.realmsCleanupFns.set(realm, () => {
-        for (const cleanupFn of cleanupFns) {
-          cleanupFn();
-        }
-      });
-    });
-
-    this.realms.addEventListener('realmleave', e => {
-      const {realm} = e.data;
-
-      this.realmsCleanupFns.get(realm)();
-      this.realmsCleanupFns.delete(realm);
-    });
 
     // Handle remote players joining and leaving the set of realms.
     // These events are received both upon starting and during multiplayer.

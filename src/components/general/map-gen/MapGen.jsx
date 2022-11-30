@@ -1179,7 +1179,8 @@ export const MapGen = () => {
 
   return open ? (
     <div className={styles.mapGen} onClick={stopPropagation}>
-      <div className={classnames(styles.sidebar, selectedObject ? styles.open : null)}>
+    {selectedObject && 
+      <div className={classnames(styles.sidebar)}>
         <h1>{selectedObjectName}</h1>
         <hr />
         {selectedChunk ? (
@@ -1193,6 +1194,7 @@ export const MapGen = () => {
           </button>
         </div>
       </div>
+    }
       <canvas
         width={width * pixelRatio}
         height={height * pixelRatio}
