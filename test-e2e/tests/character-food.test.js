@@ -35,7 +35,7 @@ describe('should eat and drink', () => {
       // move to sword position and rotate
       displayLog('step', 'should eat and drink: ', 'move to fruit position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 2, y: 1.5, z: 2.4},
         );
       });
@@ -51,15 +51,15 @@ describe('should eat and drink', () => {
         // Todo: check fruit is attached
         try {
           const attachedApp =
-                globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-                  app => app.name == 'fruit',
+                window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+                  app => app.name === 'fruit',
                 );
-          if (attachedApp.length != 1) return false;
+          if (attachedApp.length !== 1) return false;
           const instanceId =
-                globalWebaverse.playersManager.localPlayer.getAction(
+                window.globalWebaverse.playersManager.localPlayer.getAction(
                   'wear',
                 ).instanceId;
-          return attachedApp[0].instanceId == instanceId;
+          return attachedApp[0].instanceId === instanceId;
         } catch (error) {
           return false;
         }
@@ -70,14 +70,14 @@ describe('should eat and drink', () => {
       await page.evaluate(async () => {
         // ToDo: we should try run mouse down manually because of this issue.
         // https://github.com/puppeteer/puppeteer/issues/4562
-        globalWebaverse.game.menuMouseDown();
+        window.globalWebaverse.game.menuMouseDown();
       });
       await page.waitForTimeout(5000);
       const feedResult = await page.evaluate(async () => {
         const useTime =
-            globalWebaverse.playersManager.localPlayer.avatar.useTime;
+            window.globalWebaverse.playersManager.localPlayer.avatar.useTime;
         const useAnimation =
-            globalWebaverse.playersManager.localPlayer.avatar.useAnimation;
+            window.globalWebaverse.playersManager.localPlayer.avatar.useAnimation;
         return {
           useTime,
           useAnimation,
@@ -85,7 +85,7 @@ describe('should eat and drink', () => {
       });
 
       await page.evaluate(async () => {
-        globalWebaverse.game.menuMouseUp();
+        window.globalWebaverse.game.menuMouseUp();
       });
       await page.mouse.up();
       await page.waitForTimeout(2000);
@@ -93,10 +93,10 @@ describe('should eat and drink', () => {
       const isFoodUnAttached = await page.evaluate(async () => {
         try {
           const attachedApp =
-                globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-                  app => app.name == 'fruit',
+                window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+                  app => app.name === 'fruit',
                 );
-          return attachedApp.length == 0;
+          return attachedApp.length === 0;
         } catch (error) {
           return false;
         }
@@ -105,7 +105,7 @@ describe('should eat and drink', () => {
       // move to front of target //NPC01
       displayLog('step', 'should eat and drink: ', 'move to zero position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 0, y: 1.5, z: 0},
         );
       });
@@ -136,7 +136,7 @@ describe('should eat and drink', () => {
       // move to sword position and rotate
       displayLog('step', 'should eat and drink: ', 'move to potion position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 4, y: 1.5, z: 2.4},
         );
       });
@@ -152,15 +152,15 @@ describe('should eat and drink', () => {
         // Todo: check potion is attached
         try {
           const attachedApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-              app => app.name == 'potion',
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+              app => app.name === 'potion',
             );
-          if (attachedApp.length != 1) return false;
+          if (attachedApp.length !== 1) return false;
           const instanceId =
-            globalWebaverse.playersManager.localPlayer.getAction(
+            window.globalWebaverse.playersManager.localPlayer.getAction(
               'wear',
             ).instanceId;
-          return attachedApp[0].instanceId == instanceId;
+          return attachedApp[0].instanceId === instanceId;
         } catch (error) {
           return false;
         }
@@ -171,14 +171,14 @@ describe('should eat and drink', () => {
       await page.evaluate(async () => {
         // ToDo: we should try run mouse down manually because of this issue.
         // https://github.com/puppeteer/puppeteer/issues/4562
-        globalWebaverse.game.menuMouseDown();
+        window.globalWebaverse.game.menuMouseDown();
       });
       await page.waitForTimeout(5000);
       const feedResult = await page.evaluate(async () => {
         const useTime =
-        globalWebaverse.playersManager.localPlayer.avatar.useTime;
+        window.globalWebaverse.playersManager.localPlayer.avatar.useTime;
         const useAnimation =
-        globalWebaverse.playersManager.localPlayer.avatar.useAnimation;
+        window.globalWebaverse.playersManager.localPlayer.avatar.useAnimation;
         return {
           useTime,
           useAnimation,
@@ -186,7 +186,7 @@ describe('should eat and drink', () => {
       });
 
       await page.evaluate(async () => {
-        globalWebaverse.game.menuMouseUp();
+        window.globalWebaverse.game.menuMouseUp();
       });
       await page.mouse.up();
       await page.waitForTimeout(2000);
@@ -195,13 +195,13 @@ describe('should eat and drink', () => {
       displayLog('step', 'should eat and drink: ', 'ungrab the potion')
       await page.keyboard.press('KeyR');
       await page.evaluate(async () => {
-        globalWebaverse.game.dropSelectedApp();
+        window.globalWebaverse.game.dropSelectedApp();
       });
       await page.waitForTimeout(1000);
 
       displayLog('step', 'should eat and drink: ', 'move to zero position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 0, y: 1.5, z: 0},
         );
       });
@@ -210,7 +210,7 @@ describe('should eat and drink', () => {
       const isFoodUnAttached = await page.evaluate(async () => {
         try {
           const attachedApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
               app => app.name === 'drink',
             );
           return attachedApp.length === 0;
@@ -235,4 +235,4 @@ describe('should eat and drink', () => {
     },
     totalTimeout,
   );
-});
+})

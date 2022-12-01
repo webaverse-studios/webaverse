@@ -11,7 +11,7 @@ const {
 describe('should wear and use weapon', () => {
   beforeAll(async () => {
     await launchBrowser();
-    //Todo: define custom functions here
+    // Todo: define custom functions here
     // await page.evaluate(async () => {
     // 	window.todo = () => {}
     // })
@@ -33,46 +33,46 @@ describe('should wear and use weapon', () => {
     async () => {
       displayLog('section', 'should wear and use weapon: ', 'sword');
       const page = getCurrentPage();
-      //move to sword position and rotate
+      // move to sword position and rotate
       displayLog('step', 'should wear and use sword: ', 'move to sword position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 0, y: 1.5, z: 1.5},
         );
       });
       await page.waitForTimeout(2000);
 
-      //grab the sword
+      // grab the sword
       displayLog('step', 'should wear and use sword: ', 'grab the sword')
       await page.keyboard.down('KeyE');
       await page.waitForTimeout(4000);
       await page.keyboard.up('KeyE');
       await page.waitForTimeout(2000);
       const isWeaponAttached = await page.evaluate(async () => {
-        //Todo: check sword is attached
+        // Todo: check sword is attached
         try {
           const swordApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-              app => app.name == 'sword',
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+              app => app.name === 'sword',
             );
-          if (swordApp.length != 1) return false;
+          if (swordApp.length !== 1) return false;
           const instanceId =
-            globalWebaverse.playersManager.localPlayer.getAction(
+            window.globalWebaverse.playersManager.localPlayer.getAction(
               'wear',
             ).instanceId;
-          return swordApp[0].instanceId == instanceId;
+          return swordApp[0].instanceId === instanceId;
         } catch (error) {
           return false;
         }
       });
 
-      //move to front of target //NPC01
+      // move to front of target //NPC01
       displayLog('step', 'should wear and use sword: ', 'move to front of target')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 0, y: 1.5, z: 7.5},
         );
-        globalWebaverse.playersManager.localPlayer.characterPhysics.character.lookAt(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.character.lookAt(
           0,
           0,
           -10,
@@ -80,20 +80,20 @@ describe('should wear and use weapon', () => {
       });
       await page.waitForTimeout(2000);
 
-      //attack
+      // attack
       displayLog('step', 'should wear and use sword: ', 'attack')
       await page.mouse.down();
       await page.evaluate(async () => {
-        //ToDo: we should try run mouse down manually because of this issue.
-        //https://github.com/puppeteer/puppeteer/issues/4562
-        globalWebaverse.game.menuMouseDown();
+        // ToDo: we should try run mouse down manually because of this issue.
+        // https://github.com/puppeteer/puppeteer/issues/4562
+        window.globalWebaverse.game.menuMouseDown();
       });
       const currentNpcHealth = await page.evaluate(async () => {
         try {
-          const currentNpc = globalWebaverse.npcManager.npcs.filter(
-            npc => npc.name == 'NPC01',
+          const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+            npc => npc.name === 'NPC01',
           )[0];
-          const npcApp = globalWebaverse.npcManager.getAppByNpc(currentNpc);
+          const npcApp = window.globalWebaverse.npcManager.getAppByNpc(currentNpc);
           return npcApp.hitTracker.hp;
         } catch (error) {
           return 0;
@@ -101,67 +101,67 @@ describe('should wear and use weapon', () => {
       });
       await page.waitForTimeout(8000);
       const attackResult = await page.evaluate(async () => {
-        //Todo: check player attack animation work
-        //Todo: check npc health damaged
-        //Todo: we might have more option to validation
-        const useTime =
-          globalWebaverse.playersManager.localPlayer.avatar.useTime;
+        // Todo: check player attack animation work
+        // Todo: check npc health damaged
+        // Todo: we might have more option to validation
+        const useAction =
+          window.globalWebaverse.playersManager.localPlayer.hasAction("use");
         const useAnimation =
-          globalWebaverse.playersManager.localPlayer.avatar.useAnimation;
-        const currentNpc = globalWebaverse.npcManager.npcs.filter(
-          npc => npc.name == 'NPC01',
+          window.globalWebaverse.playersManager.localPlayer.avatar.useAnimation;
+        const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+          npc => npc.name === 'NPC01',
         )[0];
-        const npcApp = globalWebaverse.npcManager.getAppByNpc(currentNpc);
+        const npcApp = window.globalWebaverse.npcManager.getAppByNpc(currentNpc);
         const npcHealth = npcApp.hitTracker.hp;
         return {
-          useTime,
+          useAction,
           useAnimation,
           npcHealth,
         };
       });
       await page.evaluate(async () => {
-        globalWebaverse.game.menuMouseUp();
+        window.globalWebaverse.game.menuMouseUp();
       });
       await page.mouse.up();
       await page.waitForTimeout(2000);
 
-      //move to sword position
+      // move to sword position
       displayLog('step', 'should wear and use sword: ', 'move to sword position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 0, y: 1.5, z: 1.5},
         );
       });
       await page.waitForTimeout(2000);
 
-      //ungrab the sword
+      // ungrab the sword
       displayLog('step', 'should wear and use sword: ', 'ungrab the sword')
       await page.keyboard.press('KeyR');
       await page.evaluate(async () => {
-        globalWebaverse.game.dropSelectedApp();
+        window.globalWebaverse.game.dropSelectedApp();
       });
       await page.waitForTimeout(1000);
       const isWeaponUnAttached = await page.evaluate(async () => {
-        //Todo: check player attack animation work
-        //Todo: check npc health damaged
-        //Todo: we might have more option to validation
-        //Todo: check sword is attached on the hand
+        // Todo: check player attack animation work
+        // Todo: check npc health damaged
+        // Todo: we might have more option to validation
+        // Todo: check sword is attached on the hand
         try {
           const swordApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-              app => app.name == 'sword',
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+              app => app.name === 'sword',
             );
-          return swordApp.length == 0;
+          return swordApp.length === 0;
         } catch (error) {
           return false;
         }
       });
 
       await page.waitForTimeout(2000);
-      //goto zero position
+      // goto zero position
       displayLog('step', 'should wear and use sword: ', 'goto zero position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 0, y: 1.5, z: 0},
         );
       });
@@ -171,13 +171,13 @@ describe('should wear and use weapon', () => {
 
       displayLog(isWeaponAttached ? 'success' : 'error', 'should wear and use sword: ', 'grab the weapon');
 
-      displayLog(attackResult.useTime > 0 && attackResult.useAnimation === 'combo' ? 'success' : 'error', 'should wear and use sword: ', 'weapon animation');
+      displayLog(attackResult.useAction && attackResult.useAnimation === 'combo' ? 'success' : 'error', 'should wear and use sword: ', 'weapon animation');
 
       displayLog(isWeaponUnAttached ? 'success' : 'error', 'should wear and use sword: ', 'ungrab the weapon');
 
       displayLog(attackResult.npcHealth <  currentNpcHealth ? 'success' : 'error', 'should wear and use sword: health changed');
 
-      const isSuccess = attackResult && attackResult.useTime > 0
+      const isSuccess = attackResult && attackResult.useAction
                           && attackResult.useAnimation === 'combo' && isWeaponUnAttached
                           && attackResult.npcHealth <  currentNpcHealth
 
@@ -193,46 +193,46 @@ describe('should wear and use weapon', () => {
     async () => {
       displayLog('section', 'should wear and use weapon: ', 'silsword');
       const page = getCurrentPage();
-      //move to silsword position and rotate
+      // move to silsword position and rotate
       displayLog('step', 'should wear and use silsword: ', 'move to silsword position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 2, y: 1.5, z: 1.5},
         );
       });
       await page.waitForTimeout(2000);
 
-      //grab the silsword
+      // grab the silsword
       displayLog('step', 'should wear and use silsword: ', 'grab the silsword')
       await page.keyboard.down('KeyE');
       await page.waitForTimeout(4000);
       await page.keyboard.up('KeyE');
       await page.waitForTimeout(2000);
       const isWeaponAttached = await page.evaluate(async () => {
-        //Todo: check silsword is attached
+        // Todo: check silsword is attached
         try {
           const swordApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-              app => app.name == 'silsword',
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+              app => app.name === 'silsword',
             );
-          if (swordApp.length != 1) return false;
+          if (swordApp.length !== 1) return false;
           const instanceId =
-            globalWebaverse.playersManager.localPlayer.getAction(
+            window.globalWebaverse.playersManager.localPlayer.getAction(
               'wear',
             ).instanceId;
-          return swordApp[0].instanceId == instanceId;
+          return swordApp[0].instanceId === instanceId;
         } catch (error) {
           return false;
         }
       });
 
-      //move to front of target //NPC01
+      // move to front of target //NPC01
       displayLog('step', 'should wear and use silsword: ', 'move to front of target')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 2, y: 1.5, z: 7.5},
         );
-        globalWebaverse.playersManager.localPlayer.characterPhysics.character.lookAt(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.character.lookAt(
           2,
           0,
           -10,
@@ -240,20 +240,20 @@ describe('should wear and use weapon', () => {
       });
       await page.waitForTimeout(5000);
 
-      //attack
+      // attack
       displayLog('step', 'should wear and use silsword: ', 'attack')
       await page.mouse.down();
       await page.evaluate(async () => {
-        //ToDo: we should try run mouse down manually because of this issue.
-        //https://github.com/puppeteer/puppeteer/issues/4562
-        globalWebaverse.game.menuMouseDown();
+        // ToDo: we should try run mouse down manually because of this issue.
+        // https://github.com/puppeteer/puppeteer/issues/4562
+        window.globalWebaverse.game.menuMouseDown();
       });
       const currentNpcHealth = await page.evaluate(async () => {
         try {
-          const currentNpc = globalWebaverse.npcManager.npcs.filter(
-            npc => npc.name == 'NPC02',
+          const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+            npc => npc.name === 'NPC02',
           )[0];
-          const npcApp = globalWebaverse.npcManager.getAppByNpc(currentNpc);
+          const npcApp = window.globalWebaverse.npcManager.getAppByNpc(currentNpc);
           return npcApp.hitTracker.hp;
         } catch (error) {
           return 0;
@@ -261,15 +261,15 @@ describe('should wear and use weapon', () => {
       });
       await page.waitForTimeout(8000);
       const attackResult = await page.evaluate(async () => {
-        //Todo: check player attack animation work
-        //Todo: check npc health damaged
-        //Todo: we might have more option to validation
+        // Todo: check player attack animation work
+        // Todo: check npc health damaged
+        // Todo: we might have more option to validation
         const useAnimationCombo =
-          globalWebaverse.playersManager.localPlayer.avatar.useAnimationCombo;
-        const currentNpc = globalWebaverse.npcManager.npcs.filter(
-          npc => npc.name == 'NPC02',
+          window.globalWebaverse.playersManager.localPlayer.avatar.useAnimationCombo;
+        const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+          npc => npc.name === 'NPC02',
         )[0];
-        const npcApp = globalWebaverse.npcManager.getAppByNpc(currentNpc);
+        const npcApp = window.globalWebaverse.npcManager.getAppByNpc(currentNpc);
         const npcHealth = npcApp.hitTracker.hp;
         return {
           useAnimationCombo,
@@ -277,49 +277,49 @@ describe('should wear and use weapon', () => {
         };
       });
       await page.evaluate(async () => {
-        globalWebaverse.game.menuMouseUp();
+        window.globalWebaverse.game.menuMouseUp();
       });
       await page.mouse.up();
       await page.waitForTimeout(2000);
 
-      //move to sword position
+      // move to sword position
       displayLog('step', 'should wear and use silsword: ', 'move to silsword position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 2, y: 1.5, z: 1.5},
         );
       });
       await page.waitForTimeout(5000);
 
-      //ungrab the silsword
+      // ungrab the silsword
       displayLog('step', 'should wear and use silsword: ', 'ungrab the silsword')
       await page.keyboard.press('KeyR');
       await page.evaluate(async () => {
-        globalWebaverse.game.dropSelectedApp();
+        window.globalWebaverse.game.dropSelectedApp();
       });
       await page.waitForTimeout(1000);
 
       const isWeaponUnAttached = await page.evaluate(async () => {
-        //Todo: check player attack animation work
-        //Todo: check npc health damaged
-        //Todo: we might have more option to validation
-        //Todo: check silsword is attached on the hand
+        // Todo: check player attack animation work
+        // Todo: check npc health damaged
+        // Todo: we might have more option to validation
+        // Todo: check silsword is attached on the hand
         try {
           const swordApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-              app => app.name == 'silsword',
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+              app => app.name === 'silsword',
             );
-          return swordApp.length == 0;
+          return swordApp.length === 0;
         } catch (error) {
           return false;
         }
       });
 
       await page.waitForTimeout(2000);
-      //goto zero position
+      // goto zero position
       displayLog('step', 'should wear and use silsword: ', 'goto zero position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 0, y: 1.5, z: 0},
         );
       });
@@ -352,43 +352,43 @@ describe('should wear and use weapon', () => {
     async () => {
       displayLog('section', 'should wear and use weapon: ', 'pistol');
       const page = getCurrentPage();
-      //move to silsword position and rotate
+      // move to silsword position and rotate
       displayLog('step', 'should wear and use pistol: ', 'move to pistol position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 4, y: 1.5, z: 1.9},
         );
       });
       await page.waitForTimeout(2000);
 
-      //grab the pistol
+      // grab the pistol
       displayLog('step', 'should wear and use pistol: ', 'grab the pistol')
       await page.keyboard.down('KeyE');
       await page.waitForTimeout(4000);
       await page.keyboard.up('KeyE');
       await page.waitForTimeout(2000);
       const isWeaponAttached = await page.evaluate(async () => {
-        //Todo: check pistol is attached
+        // Todo: check pistol is attached
         try {
           const swordApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-              app => app.name == 'pistol',
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+              app => app.name === 'pistol',
             );
-          if (swordApp.length != 1) return false;
+          if (swordApp.length !== 1) return false;
           const instanceId =
-            globalWebaverse.playersManager.localPlayer.getAction(
+            window.globalWebaverse.playersManager.localPlayer.getAction(
               'wear',
             ).instanceId;
-          return swordApp[0].instanceId == instanceId;
+          return swordApp[0].instanceId === instanceId;
         } catch (error) {
           return false;
         }
       });
 
-      //move to front of target //NPC01
+      // move to front of target //NPC01
       displayLog('step', 'should wear and use pistol: ', 'move to front of target')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 3.85, y: 1.5, z: 8.5},
         );
       });
@@ -396,10 +396,10 @@ describe('should wear and use weapon', () => {
 
       const currentNpcHealth = await page.evaluate(async () => {
         try {
-          const currentNpc = globalWebaverse.npcManager.npcs.filter(
-            npc => npc.name == 'NPC03',
+          const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+            npc => npc.name === 'NPC03',
           )[0];
-          const npcApp = globalWebaverse.npcManager.getAppByNpc(currentNpc);
+          const npcApp = window.globalWebaverse.npcManager.getAppByNpc(currentNpc);
           return npcApp.hitTracker.hp;
         } catch (error) {
           return 0;
@@ -414,61 +414,59 @@ describe('should wear and use weapon', () => {
       await page.keyboard.up('KeyC');
       await page.waitForTimeout(100);
 
-      const playerCrouchFactor = await page.evaluate(async () => {
-        const avatar = globalWebaverse.playersManager.localPlayer.avatar;
-        const crouchFactor = avatar.crouchFactor;
-        return crouchFactor;
+      const playerCrouchAction = await page.evaluate(async () => {
+        return window.globalWebaverse.playersManager.localPlayer.hasAction("crouch");
       });
 
-      //attack
+      // attack
       displayLog('step', 'should wear and use pistol: ', 'attack')
       // await page.mouse.down({button: "right"});
       await page.evaluate(async () => {
-        //ToDo: we should try run mouse down manually because of this issue.
-        //https://github.com/puppeteer/puppeteer/issues/4562
-        globalWebaverse.game.menuAim();
+        // ToDo: we should try run mouse down manually because of this issue.
+        // https://github.com/puppeteer/puppeteer/issues/4562
+        window.globalWebaverse.game.menuAim();
       });
 
       for (let i = 0; i < 10; i++) {
         await page.mouse.down({button: 'left'});
         await page.evaluate(async () => {
-          //ToDo: we should try run mouse down manually because of this issue.
-          //https://github.com/puppeteer/puppeteer/issues/4562
-          globalWebaverse.game.menuMouseDown();
+          // ToDo: we should try run mouse down manually because of this issue.
+          // https://github.com/puppeteer/puppeteer/issues/4562
+          window.globalWebaverse.game.menuMouseDown();
         });
         await page.waitForTimeout(200);
         await page.evaluate(async () => {
-          globalWebaverse.game.menuMouseUp();
+          window.globalWebaverse.game.menuMouseUp();
         });
         await page.mouse.up({button: 'left'});
         await page.waitForTimeout(300);
       }
 
       const attackResult = await page.evaluate(async () => {
-        //Todo: check player attack animation work
-        //Todo: check npc health damaged
-        //Todo: we might have more option to validation
+        // Todo: check player attack animation work
+        // Todo: check npc health damaged
+        // Todo: we might have more option to validation
         const aimState =
-          globalWebaverse.playersManager.localPlayer.avatar.aimState;
-        const aimTime =
-          globalWebaverse.playersManager.localPlayer.avatar.aimTime;
-        const currentNpc = globalWebaverse.npcManager.npcs.filter(
-          npc => npc.name == 'NPC03',
+          window.globalWebaverse.playersManager.localPlayer.avatar.aimState;
+        const aimAction =
+          window.globalWebaverse.playersManager.localPlayer.hasAction("aim");
+        const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+          npc => npc.name === 'NPC03',
         )[0];
-        const npcApp = globalWebaverse.npcManager.getAppByNpc(currentNpc);
+        const npcApp = window.globalWebaverse.npcManager.getAppByNpc(currentNpc);
         const npcHealth = npcApp.hitTracker.hp;
         return {
           aimState,
-          aimTime,
+          aimAction,
           npcHealth,
         };
       });
 
       // await page.mouse.up({button: "right"});
       await page.evaluate(async () => {
-        //ToDo: we should try run mouse down manually because of this issue.
-        //https://github.com/puppeteer/puppeteer/issues/4562
-        globalWebaverse.game.menuUnaim();
+        // ToDo: we should try run mouse down manually because of this issue.
+        // https://github.com/puppeteer/puppeteer/issues/4562
+        window.globalWebaverse.game.menuUnaim();
       });
 
       await page.waitForTimeout(2000);
@@ -481,44 +479,44 @@ describe('should wear and use weapon', () => {
       await page.keyboard.up('KeyC');
       await page.waitForTimeout(100);
 
-      //move to sword position
+      // move to sword position
       displayLog('step', 'should wear and use pistol: ', 'move to pistol position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 4, y: 1.5, z: 1.5},
         );
       });
       await page.waitForTimeout(5000);
 
-      //ungrab the pistol
+      // ungrab the pistol
       displayLog('step', 'should wear and use pistol: ', 'ungrab the pistol')
       await page.keyboard.press('KeyR');
       await page.evaluate(async () => {
-        globalWebaverse.game.dropSelectedApp();
+        window.globalWebaverse.game.dropSelectedApp();
       });
       await page.waitForTimeout(1000);
 
       const isWeaponUnAttached = await page.evaluate(async () => {
-        //Todo: check player attack animation work
-        //Todo: check npc health damaged
-        //Todo: we might have more option to validation
-        //Todo: check pistol is attached on the hand
+        // Todo: check player attack animation work
+        // Todo: check npc health damaged
+        // Todo: we might have more option to validation
+        // Todo: check pistol is attached on the hand
         try {
           const swordApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-              app => app.name == 'pistol',
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+              app => app.name === 'pistol',
             );
-          return swordApp.length == 0;
+          return swordApp.length === 0;
         } catch (error) {
           return false;
         }
       });
 
       await page.waitForTimeout(2000);
-      //goto zero position
+      // goto zero position
       displayLog('step', 'should wear and use pistol: ', 'goto zero position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 0, y: 1.5, z: 0},
         );
       });
@@ -528,17 +526,17 @@ describe('should wear and use weapon', () => {
 
       displayLog(isWeaponAttached ? 'success' : 'error', 'should wear and use pistol: ', 'grab the weapon');
 
-      displayLog(playerCrouchFactor > 0 ? 'success' : 'error', 'should wear and use pistol: ', 'crounch');
+      displayLog(playerCrouchAction ? 'success' : 'error', 'should wear and use pistol: ', 'crounch');
 
-      displayLog(attackResult.aimState && attackResult.aimTime > 0  ? 'success' : 'error', 'should wear and use pistol: ', 'weapon aim');
+      displayLog(attackResult.aimState && attackResult.aimAction  ? 'success' : 'error', 'should wear and use pistol: ', 'weapon aim');
 
       displayLog(isWeaponUnAttached ? 'success' : 'error', 'should wear and use pistol: ', 'ungrab the weapon');
 
       displayLog(attackResult.npcHealth <  currentNpcHealth ? 'success' : 'error', 'should wear and use pistol: health changed');
 
       const isSuccess = isWeaponAttached 
-                          && playerCrouchFactor > 0 
-                          && attackResult.aimState && attackResult.aimTime > 0
+                          && playerCrouchAction 
+                          && attackResult.aimState && attackResult.aimAction
                           && isWeaponUnAttached
                           && attackResult.npcHealth <  currentNpcHealth
 
@@ -554,43 +552,43 @@ describe('should wear and use weapon', () => {
     async () => {
       displayLog('section', 'should wear and use weapon: ', 'machine-gun');
       const page = getCurrentPage();
-      //move to silsword position and rotate
+      // move to silsword position and rotate
       displayLog('step', 'should wear and use machine-gun: ', 'move to machine-gun position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 6, y: 1.5, z: 1.9},
         );
       });
       await page.waitForTimeout(2000);
 
-      //grab the pistol
+      // grab the pistol
       displayLog('step', 'should wear and use machine-gun: ', 'grab the machine-gun')
       await page.keyboard.down('KeyE');
       await page.waitForTimeout(4000);
       await page.keyboard.up('KeyE');
       await page.waitForTimeout(2000);
       const isWeaponAttached = await page.evaluate(async () => {
-        //Todo: check machine-gun is attached
+        // Todo: check machine-gun is attached
         try {
           const swordApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-              app => app.name == 'Thompson',
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+              app => app.name === 'Thompson',
             );
-          if (swordApp.length != 1) return false;
+          if (swordApp.length !== 1) return false;
           const instanceId =
-            globalWebaverse.playersManager.localPlayer.getAction(
+            window.globalWebaverse.playersManager.localPlayer.getAction(
               'wear',
             ).instanceId;
-          return swordApp[0].instanceId == instanceId;
+          return swordApp[0].instanceId === instanceId;
         } catch (error) {
           return false;
         }
       });
 
-      //move to front of target //NPC04
+      // move to front of target //NPC04
       displayLog('step', 'should wear and use machine-gun: ', 'move to front of target')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 5.85, y: 1.5, z: 8.5},
         );
       });
@@ -598,10 +596,10 @@ describe('should wear and use weapon', () => {
 
       const currentNpcHealth = await page.evaluate(async () => {
         try {
-          const currentNpc = globalWebaverse.npcManager.npcs.filter(
-            npc => npc.name == 'NPC04',
+          const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+            npc => npc.name === 'NPC04',
           )[0];
-          const npcApp = globalWebaverse.npcManager.getAppByNpc(currentNpc);
+          const npcApp = window.globalWebaverse.npcManager.getAppByNpc(currentNpc);
           return npcApp.hitTracker.hp;
         } catch (error) {
           return 0;
@@ -616,58 +614,56 @@ describe('should wear and use weapon', () => {
       await page.keyboard.up('KeyC');
       await page.waitForTimeout(100);
 
-      const playerCrouchFactor = await page.evaluate(async () => {
-        const avatar = globalWebaverse.playersManager.localPlayer.avatar;
-        const crouchFactor = avatar.crouchFactor;
-        return crouchFactor;
+      const playerCrouchAction = await page.evaluate(async () => {
+        return window.globalWebaverse.playersManager.localPlayer.hasAction("crouch");
       });
 
-      //attack
+      // attack
       displayLog('step', 'should wear and use machine-gun: ', 'attack')
       // await page.mouse.down({button: "right"});
       await page.evaluate(async () => {
-        //ToDo: we should try run mouse down manually because of this issue.
-        //https://github.com/puppeteer/puppeteer/issues/4562
-        globalWebaverse.game.menuAim();
+        // ToDo: we should try run mouse down manually because of this issue.
+        // https://github.com/puppeteer/puppeteer/issues/4562
+        window.globalWebaverse.game.menuAim();
       });
 
       await page.mouse.down();
       await page.evaluate(async () => {
-        //ToDo: we should try run mouse down manually because of this issue.
-        //https://github.com/puppeteer/puppeteer/issues/4562
-        globalWebaverse.game.menuMouseDown();
+        // ToDo: we should try run mouse down manually because of this issue.
+        // https://github.com/puppeteer/puppeteer/issues/4562
+        window.globalWebaverse.game.menuMouseDown();
       });
       await page.waitForTimeout(5000);
       await page.evaluate(async () => {
-        globalWebaverse.game.menuMouseUp();
+        window.globalWebaverse.game.menuMouseUp();
       });
       await page.mouse.up();
 
       const attackResult = await page.evaluate(async () => {
-        //Todo: check player attack animation work
-        //Todo: check npc health damaged
-        //Todo: we might have more option to validation
+        // Todo: check player attack animation work
+        // Todo: check npc health damaged
+        // Todo: we might have more option to validation
         const aimState =
-          globalWebaverse.playersManager.localPlayer.avatar.aimState;
-        const aimTime =
-          globalWebaverse.playersManager.localPlayer.avatar.aimTime;
-        const currentNpc = globalWebaverse.npcManager.npcs.filter(
-          npc => npc.name == 'NPC04',
+          window.globalWebaverse.playersManager.localPlayer.avatar.aimState;
+        const aimAction =
+          window.globalWebaverse.playersManager.localPlayer.hasAction("aim");
+        const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+          npc => npc.name === 'NPC04',
         )[0];
-        const npcApp = globalWebaverse.npcManager.getAppByNpc(currentNpc);
+        const npcApp = window.globalWebaverse.npcManager.getAppByNpc(currentNpc);
         const npcHealth = npcApp.hitTracker.hp;
         return {
           aimState,
-          aimTime,
+          aimAction,
           npcHealth,
         };
       });
 
       // await page.mouse.up({button: "right"});
       await page.evaluate(async () => {
-        //ToDo: we should try run mouse down manually because of this issue.
-        //https://github.com/puppeteer/puppeteer/issues/4562
-        globalWebaverse.game.menuUnaim();
+        // ToDo: we should try run mouse down manually because of this issue.
+        // https://github.com/puppeteer/puppeteer/issues/4562
+        window.globalWebaverse.game.menuUnaim();
       });
 
       await page.waitForTimeout(2000);
@@ -680,44 +676,44 @@ describe('should wear and use weapon', () => {
       await page.keyboard.up('KeyC');
       await page.waitForTimeout(100);
 
-      //move to sword position
+      // move to sword position
       displayLog('step', 'should wear and use machine-gun: ', 'move to machine-gun position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 6, y: 1.5, z: 1.5},
         );
       });
       await page.waitForTimeout(5000);
 
-      //ungrab the machine-gun
+      // ungrab the machine-gun
       displayLog('step', 'should wear and use machine-gun: ', 'ungrab the machine-gun')
       await page.keyboard.press('KeyR');
       await page.evaluate(async () => {
-        globalWebaverse.game.dropSelectedApp();
+        window.globalWebaverse.game.dropSelectedApp();
       });
       await page.waitForTimeout(1000);
 
       const isWeaponUnAttached = await page.evaluate(async () => {
-        //Todo: check player attack animation work
-        //Todo: check npc health damaged
-        //Todo: we might have more option to validation
-        //Todo: check machine-gun is attached on the hand
+        // Todo: check player attack animation work
+        // Todo: check npc health damaged
+        // Todo: we might have more option to validation
+        // Todo: check machine-gun is attached on the hand
         try {
           const swordApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-              app => app.name == 'Thompson',
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+              app => app.name === 'Thompson',
             );
-          return swordApp.length == 0;
+          return swordApp.length === 0;
         } catch (error) {
           return false;
         }
       });
 
       await page.waitForTimeout(2000);
-      //goto zero position
+      // goto zero position
       displayLog('step', 'should wear and use machine-gun: ', 'goto zero position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 0, y: 1.5, z: 0},
         );
       });
@@ -727,17 +723,17 @@ describe('should wear and use weapon', () => {
 
       displayLog(isWeaponAttached ? 'success' : 'error', 'should wear and use  machine-gun: ', 'grab the weapon');
 
-      displayLog(playerCrouchFactor > 0 ? 'success' : 'error', 'should wear and use  machine-gun: ', 'crounch');
+      displayLog(playerCrouchAction ? 'success' : 'error', 'should wear and use  machine-gun: ', 'crounch');
 
-      displayLog(attackResult.aimState && attackResult.aimTime > 0  ? 'success' : 'error', 'should wear and use  machine-gun: ', 'weapon aim');
+      displayLog(attackResult.aimState && attackResult.aimAction  ? 'success' : 'error', 'should wear and use  machine-gun: ', 'weapon aim');
 
       displayLog(isWeaponUnAttached ? 'success' : 'error', 'should wear and use machine-gun: ', 'ungrab the weapon');
 
       displayLog(attackResult.npcHealth <  currentNpcHealth ? 'success' : 'error', 'should wear and use  machine-gun: health changed');
 
       const isSuccess = isWeaponAttached 
-                          && playerCrouchFactor > 0 
-                          && attackResult.aimState && attackResult.aimTime > 0
+                          && playerCrouchAction 
+                          && attackResult.aimState && attackResult.aimAction
                           && isWeaponUnAttached
                           && attackResult.npcHealth <  currentNpcHealth
 
@@ -753,43 +749,43 @@ describe('should wear and use weapon', () => {
     async () => {
       displayLog('section', 'should wear and use weapon: ', 'uzi');
       const page = getCurrentPage();
-      //move to silsword position and rotate
+      // move to silsword position and rotate
       displayLog('step', 'should wear and use uzi: ', 'move to uzi position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 8, y: 1.5, z: 1.9},
         );
       });
       await page.waitForTimeout(2000);
 
-      //grab the pistol
+      // grab the pistol
       displayLog('step', 'should wear and use uzi: ', 'grab the uzi')
       await page.keyboard.down('KeyE');
       await page.waitForTimeout(4000);
       await page.keyboard.up('KeyE');
       await page.waitForTimeout(2000);
       const isWeaponAttached = await page.evaluate(async () => {
-        //Todo: check uzi is attached
+        // Todo: check uzi is attached
         try {
           const swordApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-              app => app.name == 'Uzi',
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+              app => app.name === 'Uzi',
             );
-          if (swordApp.length != 1) return false;
+          if (swordApp.length !== 1) return false;
           const instanceId =
-            globalWebaverse.playersManager.localPlayer.getAction(
+            window.globalWebaverse.playersManager.localPlayer.getAction(
               'wear',
             ).instanceId;
-          return swordApp[0].instanceId == instanceId;
+          return swordApp[0].instanceId === instanceId;
         } catch (error) {
           return false;
         }
       });
 
-      //move to front of target //NPC05
+      // move to front of target //NPC05
       displayLog('step', 'should wear and use uzi: ', 'move to front of target')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 7.85, y: 1.5, z: 8.5},
         );
       });
@@ -797,10 +793,10 @@ describe('should wear and use weapon', () => {
 
       const currentNpcHealth = await page.evaluate(async () => {
         try {
-          const currentNpc = globalWebaverse.npcManager.npcs.filter(
-            npc => npc.name == 'NPC05',
+          const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+            npc => npc.name === 'NPC05',
           )[0];
-          const npcApp = globalWebaverse.npcManager.getAppByNpc(currentNpc);
+          const npcApp = window.globalWebaverse.npcManager.getAppByNpc(currentNpc);
           return npcApp.hitTracker.hp;
         } catch (error) {
           return 0;
@@ -815,58 +811,56 @@ describe('should wear and use weapon', () => {
       await page.keyboard.up('KeyC');
       await page.waitForTimeout(100);
 
-      const playerCrouchFactor = await page.evaluate(async () => {
-        const avatar = globalWebaverse.playersManager.localPlayer.avatar;
-        const crouchFactor = avatar.crouchFactor;
-        return crouchFactor;
+      const playerCrouchAction = await page.evaluate(async () => {
+        return window.globalWebaverse.playersManager.localPlayer.hasAction("crouch");
       });
 
-      //attack
+      // attack
       displayLog('step', 'should wear and use uzi: ', 'attack')
       // await page.mouse.down({button: "right"});
       await page.evaluate(async () => {
-        //ToDo: we should try run mouse down manually because of this issue.
-        //https://github.com/puppeteer/puppeteer/issues/4562
-        globalWebaverse.game.menuAim();
+        // ToDo: we should try run mouse down manually because of this issue.
+        // https://github.com/puppeteer/puppeteer/issues/4562
+        window.globalWebaverse.game.menuAim();
       });
 
       await page.mouse.down();
       await page.evaluate(async () => {
-        //ToDo: we should try run mouse down manually because of this issue.
-        //https://github.com/puppeteer/puppeteer/issues/4562
-        globalWebaverse.game.menuMouseDown();
+        // ToDo: we should try run mouse down manually because of this issue.
+        // https://github.com/puppeteer/puppeteer/issues/4562
+        window.globalWebaverse.game.menuMouseDown();
       });
       await page.waitForTimeout(5000);
       await page.evaluate(async () => {
-        globalWebaverse.game.menuMouseUp();
+        window.globalWebaverse.game.menuMouseUp();
       });
       await page.mouse.up();
 
       const attackResult = await page.evaluate(async () => {
-        //Todo: check player attack animation work
-        //Todo: check npc health damaged
-        //Todo: we might have more option to validation
+        // Todo: check player attack animation work
+        // Todo: check npc health damaged
+        // Todo: we might have more option to validation
         const aimState =
-          globalWebaverse.playersManager.localPlayer.avatar.aimState;
-        const aimTime =
-          globalWebaverse.playersManager.localPlayer.avatar.aimTime;
-        const currentNpc = globalWebaverse.npcManager.npcs.filter(
-          npc => npc.name == 'NPC05',
+          window.globalWebaverse.playersManager.localPlayer.avatar.aimState;
+        const aimAction =
+          window.globalWebaverse.playersManager.localPlayer.hasAction("aim");
+        const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+          npc => npc.name === 'NPC05',
         )[0];
-        const npcApp = globalWebaverse.npcManager.getAppByNpc(currentNpc);
+        const npcApp = window.globalWebaverse.npcManager.getAppByNpc(currentNpc);
         const npcHealth = npcApp.hitTracker.hp;
         return {
           aimState,
-          aimTime,
+          aimAction,
           npcHealth,
         };
       });
 
       // await page.mouse.up({button: "right"});
       await page.evaluate(async () => {
-        //ToDo: we should try run mouse down manually because of this issue.
-        //https://github.com/puppeteer/puppeteer/issues/4562
-        globalWebaverse.game.menuUnaim();
+        // ToDo: we should try run mouse down manually because of this issue.
+        // https://github.com/puppeteer/puppeteer/issues/4562
+        window.globalWebaverse.game.menuUnaim();
       });
 
       await page.waitForTimeout(2000);
@@ -879,44 +873,44 @@ describe('should wear and use weapon', () => {
       await page.keyboard.up('KeyC');
       await page.waitForTimeout(100);
 
-      //move to sword position
+      // move to sword position
       displayLog('step', 'should wear and use uzi: ', 'move to uzi position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 8, y: 1.5, z: 1.5},
         );
       });
       await page.waitForTimeout(5000);
 
-      //ungrab the uzi
+      // ungrab the uzi
       displayLog('step', 'should wear and use uzi: ', 'ungrab the uzi')
       await page.keyboard.press('KeyR');
       await page.evaluate(async () => {
-        globalWebaverse.game.dropSelectedApp();
+        window.globalWebaverse.game.dropSelectedApp();
       });
       await page.waitForTimeout(1000);
 
       const isWeaponUnAttached = await page.evaluate(async () => {
-        //Todo: check player attack animation work
-        //Todo: check npc health damaged
-        //Todo: we might have more option to validation
-        //Todo: check uzi is attached on the hand
+        // Todo: check player attack animation work
+        // Todo: check npc health damaged
+        // Todo: we might have more option to validation
+        // Todo: check uzi is attached on the hand
         try {
           const swordApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-              app => app.name == 'Uzi',
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+              app => app.name === 'Uzi',
             );
-          return swordApp.length == 0;
+          return swordApp.length === 0;
         } catch (error) {
           return false;
         }
       });
 
       await page.waitForTimeout(2000);
-      //goto zero position
+      // goto zero position
       displayLog('step', 'should wear and use uzi: ', 'goto zero position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 0, y: 1.5, z: 0},
         );
       });
@@ -926,17 +920,17 @@ describe('should wear and use weapon', () => {
 
       displayLog(isWeaponAttached ? 'success' : 'error', 'should wear and use  uzi: ', 'grab the weapon');
 
-      displayLog(playerCrouchFactor > 0 ? 'success' : 'error', 'should wear and use uzi: ', 'crounch');
+      displayLog(playerCrouchAction ? 'success' : 'error', 'should wear and use uzi: ', 'crounch');
 
-      displayLog(attackResult.aimState && attackResult.aimTime > 0  ? 'success' : 'error', 'should wear and use uzi: ', 'weapon aim');
+      displayLog(attackResult.aimState && attackResult.aimAction  ? 'success' : 'error', 'should wear and use uzi: ', 'weapon aim');
 
       displayLog(isWeaponUnAttached ? 'success' : 'error', 'should wear and use uzi: ', 'ungrab the weapon');
 
       displayLog(attackResult.npcHealth <  currentNpcHealth ? 'success' : 'error', 'should wear and use uzi: health changed');
 
       const isSuccess = isWeaponAttached 
-                          && playerCrouchFactor > 0 
-                          && attackResult.aimState && attackResult.aimTime > 0
+                          && playerCrouchAction
+                          && attackResult.aimState && attackResult.aimAction
                           && isWeaponUnAttached
                           && attackResult.npcHealth <  currentNpcHealth
 
@@ -952,43 +946,43 @@ describe('should wear and use weapon', () => {
     async () => {
       displayLog('section', 'should wear and use weapon: ', 'bow');
       const page = getCurrentPage();
-      //move to silsword position and rotate
+      // move to silsword position and rotate
       displayLog('step', 'should wear and use bow: ', 'move to bow position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: -2, y: 1.5, z: 1.9},
         );
       });
       await page.waitForTimeout(2000);
 
-      //grab the bow
+      // grab the bow
       displayLog('step', 'should wear and use bow: ', 'grab the bow')
       await page.keyboard.down('KeyE');
       await page.waitForTimeout(4000);
       await page.keyboard.up('KeyE');
       await page.waitForTimeout(2000);
       const isWeaponAttached = await page.evaluate(async () => {
-        //Todo: check bow is attached
+        // Todo: check bow is attached
         try {
           const swordApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-              app => app.name == 'bow',
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+              app => app.name === 'bow',
             );
-          if (swordApp.length != 1) return false;
+          if (swordApp.length !== 1) return false;
           const instanceId =
-            globalWebaverse.playersManager.localPlayer.getAction(
+            window.globalWebaverse.playersManager.localPlayer.getAction(
               'wear',
             ).instanceId;
-          return swordApp[0].instanceId == instanceId;
+          return swordApp[0].instanceId === instanceId;
         } catch (error) {
           return false;
         }
       });
 
-      //move to front of target //NPC01
+      // move to front of target //NPC01
       displayLog('step', 'should wear and use bow: ', 'move to front of target')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: -2.15, y: 1.5, z: 8.8},
         );
       });
@@ -996,10 +990,10 @@ describe('should wear and use weapon', () => {
 
       const currentNpcHealth = await page.evaluate(async () => {
         try {
-          const currentNpc = globalWebaverse.npcManager.npcs.filter(
-            npc => npc.name == 'NPC06',
+          const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+            npc => npc.name === 'NPC06',
           )[0];
-          const npcApp = globalWebaverse.npcManager.getAppByNpc(currentNpc);
+          const npcApp = window.globalWebaverse.npcManager.getAppByNpc(currentNpc);
           return npcApp.hitTracker.hp;
         } catch (error) {
           return 0;
@@ -1014,61 +1008,59 @@ describe('should wear and use weapon', () => {
       await page.keyboard.up('KeyC');
       await page.waitForTimeout(100);
 
-      const playerCrouchFactor = await page.evaluate(async () => {
-        const avatar = globalWebaverse.playersManager.localPlayer.avatar;
-        const crouchFactor = avatar.crouchFactor;
-        return crouchFactor;
+      const playerCrouchAction = await page.evaluate(async () => {
+        return window.globalWebaverse.playersManager.localPlayer.hasAction("crouch");
       });
 
-      //attack
+      // attack
       displayLog('step', 'should wear and use bow: ', 'attack')
       // await page.mouse.down({button: "right"});
       await page.evaluate(async () => {
-        //ToDo: we should try run mouse down manually because of this issue.
-        //https://github.com/puppeteer/puppeteer/issues/4562
-        globalWebaverse.game.menuAim();
+        // ToDo: we should try run mouse down manually because of this issue.
+        // https://github.com/puppeteer/puppeteer/issues/4562
+        window.globalWebaverse.game.menuAim();
       });
 
       for (let i = 0; i < 3; i++) {
         await page.mouse.down({button: 'left'});
         await page.evaluate(async () => {
-          //ToDo: we should try run mouse down manually because of this issue.
-          //https://github.com/puppeteer/puppeteer/issues/4562
-          globalWebaverse.game.menuMouseDown();
+          // ToDo: we should try run mouse down manually because of this issue.
+          // https://github.com/puppeteer/puppeteer/issues/4562
+          window.globalWebaverse.game.menuMouseDown();
         });
         await page.waitForTimeout(8000);
         await page.evaluate(async () => {
-          globalWebaverse.game.menuMouseUp();
+          window.globalWebaverse.game.menuMouseUp();
         });
         await page.mouse.up({button: 'left'});
         await page.waitForTimeout(300);
       }
 
       const attackResult = await page.evaluate(async () => {
-        //Todo: check player attack animation work
-        //Todo: check npc health damaged
-        //Todo: we might have more option to validation
+        // Todo: check player attack animation work
+        // Todo: check npc health damaged
+        // Todo: we might have more option to validation
         const aimState =
-          globalWebaverse.playersManager.localPlayer.avatar.aimState;
-        const aimTime =
-          globalWebaverse.playersManager.localPlayer.avatar.aimTime;
-        const currentNpc = globalWebaverse.npcManager.npcs.filter(
-          npc => npc.name == 'NPC06',
+          window.globalWebaverse.playersManager.localPlayer.avatar.aimState;
+        const aimAction =
+          window.globalWebaverse.playersManager.localPlayer.hasAction("aim");
+        const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+          npc => npc.name === 'NPC06',
         )[0];
-        const npcApp = globalWebaverse.npcManager.getAppByNpc(currentNpc);
+        const npcApp = window.globalWebaverse.npcManager.getAppByNpc(currentNpc);
         const npcHealth = npcApp.hitTracker.hp;
         return {
           aimState,
-          aimTime,
+          aimAction,
           npcHealth,
         };
       });
 
       // await page.mouse.up({button: "right"});
       await page.evaluate(async () => {
-        //ToDo: we should try run mouse down manually because of this issue.
-        //https://github.com/puppeteer/puppeteer/issues/4562
-        globalWebaverse.game.menuUnaim();
+        // ToDo: we should try run mouse down manually because of this issue.
+        // https://github.com/puppeteer/puppeteer/issues/4562
+        window.globalWebaverse.game.menuUnaim();
       });
 
       await page.waitForTimeout(2000);
@@ -1081,44 +1073,44 @@ describe('should wear and use weapon', () => {
       await page.keyboard.up('KeyC');
       await page.waitForTimeout(100);
 
-      //move to sword position
+      // move to sword position
       displayLog('step', 'should wear and use bow: ', 'move to bow position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: -2, y: 1.5, z: 1.5},
         );
       });
       await page.waitForTimeout(5000);
 
-      //ungrab the bow
+      // ungrab the bow
       displayLog('step', 'should wear and use bow: ', 'ungrab the bow')
       await page.keyboard.press('KeyR');
       await page.evaluate(async () => {
-        globalWebaverse.game.dropSelectedApp();
+        window.globalWebaverse.game.dropSelectedApp();
       });
       await page.waitForTimeout(1000);
 
       const isWeaponUnAttached = await page.evaluate(async () => {
-        //Todo: check player attack animation work
-        //Todo: check npc health damaged
-        //Todo: we might have more option to validation
-        //Todo: check bow is attached on the hand
+        // Todo: check player attack animation work
+        // Todo: check npc health damaged
+        // Todo: we might have more option to validation
+        // Todo: check bow is attached on the hand
         try {
           const swordApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-              app => app.name == 'bow',
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+              app => app.name === 'bow',
             );
-          return swordApp.length == 0;
+          return swordApp.length === 0;
         } catch (error) {
           return false;
         }
       });
 
       await page.waitForTimeout(2000);
-      //goto zero position
+      // goto zero position
       displayLog('step', 'should wear and use bow: ', 'goto zero position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 0, y: 1.5, z: 0},
         );
       });
@@ -1128,17 +1120,17 @@ describe('should wear and use weapon', () => {
 
       displayLog(isWeaponAttached ? 'success' : 'error', 'should wear and use  bow: ', 'grab the weapon');
 
-      displayLog(playerCrouchFactor > 0 ? 'success' : 'error', 'should wear and use bow: ', 'crounch');
+      displayLog(playerCrouchAction ? 'success' : 'error', 'should wear and use bow: ', 'crounch');
 
-      displayLog(attackResult.aimState && attackResult.aimTime > 0  ? 'success' : 'error', 'should wear and use bow: ', 'weapon aim');
+      displayLog(attackResult.aimState && attackResult.aimAction  ? 'success' : 'error', 'should wear and use bow: ', 'weapon aim');
 
       displayLog(isWeaponUnAttached ? 'success' : 'error', 'should wear and use bow: ', 'ungrab the weapon');
 
       displayLog(attackResult.npcHealth <  currentNpcHealth ? 'success' : 'error', 'should wear and use bow: health changed');
 
       const isSuccess = isWeaponAttached 
-                          && playerCrouchFactor > 0 
-                          && attackResult.aimState && attackResult.aimTime > 0
+                          && playerCrouchAction 
+                          && attackResult.aimState && attackResult.aimAction
                           && isWeaponUnAttached
                           && attackResult.npcHealth <  currentNpcHealth
 
@@ -1154,43 +1146,43 @@ describe('should wear and use weapon', () => {
     async () => {
       displayLog('section', 'should wear and use weapon: ', 'rpg');
       const page = getCurrentPage();
-      //move to silsword position and rotate
+      // move to silsword position and rotate
       displayLog('step', 'should wear and use rpg: ', 'move to rpg position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: -4, y: 1.5, z: 1.9},
         );
       });
       await page.waitForTimeout(2000);
 
-      //grab the rpg
+      // grab the rpg
       displayLog('step', 'should wear and use rpg: ', 'grab the rpg')
       await page.keyboard.down('KeyE');
       await page.waitForTimeout(4000);
       await page.keyboard.up('KeyE');
       await page.waitForTimeout(2000);
       const isWeaponAttached = await page.evaluate(async () => {
-        //Todo: check rpg is attached
+        // Todo: check rpg is attached
         try {
           const swordApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-              app => app.name == 'rpg',
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+              app => app.name === 'rpg',
             );
-          if (swordApp.length != 1) return false;
+          if (swordApp.length !== 1) return false;
           const instanceId =
-            globalWebaverse.playersManager.localPlayer.getAction(
+            window.globalWebaverse.playersManager.localPlayer.getAction(
               'wear',
             ).instanceId;
-          return swordApp[0].instanceId == instanceId;
+          return swordApp[0].instanceId === instanceId;
         } catch (error) {
           return false;
         }
       });
 
-      //move to front of target //NPC01
+      // move to front of target //NPC01
       displayLog('step', 'should wear and use rpg: ', 'move to front of target')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: -4.15, y: 1.5, z: 12},
         );
       });
@@ -1198,106 +1190,106 @@ describe('should wear and use weapon', () => {
 
       const currentNpcHealth = await page.evaluate(async () => {
         try {
-          const currentNpc = globalWebaverse.npcManager.npcs.filter(
-            npc => npc.name == 'NPC07',
+          const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+            npc => npc.name === 'NPC07',
           )[0];
-          const npcApp = globalWebaverse.npcManager.getAppByNpc(currentNpc);
+          const npcApp = window.globalWebaverse.npcManager.getAppByNpc(currentNpc);
           return npcApp.hitTracker.hp;
         } catch (error) {
           return 0;
         }
       });
 
-      //attack
+      // attack
       displayLog('step', 'should wear and use rpg: ', 'attack')
       // await page.mouse.down({button: "right"});
       await page.evaluate(async () => {
-        //ToDo: we should try run mouse down manually because of this issue.
-        //https://github.com/puppeteer/puppeteer/issues/4562
-        globalWebaverse.game.menuAim();
+        // ToDo: we should try run mouse down manually because of this issue.
+        // https://github.com/puppeteer/puppeteer/issues/4562
+        window.globalWebaverse.game.menuAim();
       });
 
       for (let i = 0; i < 3; i++) {
         await page.mouse.down({button: 'left'});
         await page.evaluate(async () => {
-          //ToDo: we should try run mouse down manually because of this issue.
-          //https://github.com/puppeteer/puppeteer/issues/4562
-          globalWebaverse.game.menuMouseDown();
+          // ToDo: we should try run mouse down manually because of this issue.
+          // https://github.com/puppeteer/puppeteer/issues/4562
+          window.globalWebaverse.game.menuMouseDown();
         });
         await page.waitForTimeout(5000);
         await page.evaluate(async () => {
-          globalWebaverse.game.menuMouseUp();
+          window.globalWebaverse.game.menuMouseUp();
         });
         await page.mouse.up({button: 'left'});
         await page.waitForTimeout(1000);
       }
 
       const attackResult = await page.evaluate(async () => {
-        //Todo: check player attack animation work
-        //Todo: check npc health damaged
-        //Todo: we might have more option to validation
+        // Todo: check player attack animation work
+        // Todo: check npc health damaged
+        // Todo: we might have more option to validation
         const aimState =
-          globalWebaverse.playersManager.localPlayer.avatar.aimState;
-        const aimTime =
-          globalWebaverse.playersManager.localPlayer.avatar.aimTime;
-        const currentNpc = globalWebaverse.npcManager.npcs.filter(
-          npc => npc.name == 'NPC07',
+          window.globalWebaverse.playersManager.localPlayer.avatar.aimState;
+        const aimAction =
+          window.globalWebaverse.playersManager.localPlayer.hasAction("aim");
+        const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+          npc => npc.name === 'NPC07',
         )[0];
-        const npcApp = globalWebaverse.npcManager.getAppByNpc(currentNpc);
+        const npcApp = window.globalWebaverse.npcManager.getAppByNpc(currentNpc);
         const npcHealth = npcApp.hitTracker.hp;
         return {
           aimState,
-          aimTime,
+          aimAction,
           npcHealth,
         };
       });
 
       // await page.mouse.up({button: "right"});
       await page.evaluate(async () => {
-        //ToDo: we should try run mouse down manually because of this issue.
-        //https://github.com/puppeteer/puppeteer/issues/4562
-        globalWebaverse.game.menuUnaim();
+        // ToDo: we should try run mouse down manually because of this issue.
+        // https://github.com/puppeteer/puppeteer/issues/4562
+        window.globalWebaverse.game.menuUnaim();
       });
       await page.waitForTimeout(2000);
 
-      //move to sword position
+      // move to sword position
       displayLog('step', 'should wear and use rpg: ', 'move to rpg position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: -4, y: 1.5, z: 1.5},
         );
       });
       await page.waitForTimeout(5000);
 
-      //ungrab the rpg
+      // ungrab the rpg
       displayLog('step', 'should wear and use rpg: ', 'ungrab the rpg')
       await page.keyboard.press('KeyR');
       await page.evaluate(async () => {
-        globalWebaverse.game.dropSelectedApp();
+        window.globalWebaverse.game.dropSelectedApp();
       });
       await page.waitForTimeout(1000);
 
       const isWeaponUnAttached = await page.evaluate(async () => {
-        //Todo: check player attack animation work
-        //Todo: check npc health damaged
-        //Todo: we might have more option to validation
-        //Todo: check rpg is attached on the hand
+        // Todo: check player attack animation work
+        // Todo: check npc health damaged
+        // Todo: we might have more option to validation
+        // Todo: check rpg is attached on the hand
         try {
           const swordApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-              app => app.name == 'rpg',
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+              app => app.name === 'rpg',
             );
-          return swordApp.length == 0;
+          return swordApp.length === 0;
         } catch (error) {
           return false;
         }
       });
 
       await page.waitForTimeout(2000);
-      //goto zero position
+      // goto zero position
       displayLog('step', 'should wear and use rpg: ', 'goto zero position')
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 0, y: 1.5, z: 0},
         );
       });
@@ -1308,14 +1300,14 @@ describe('should wear and use weapon', () => {
       displayLog(isWeaponAttached ? 'success' : 'error', 'should wear and use rpg: ', 'grab the weapon');
 
 
-      displayLog(attackResult.aimState && attackResult.aimTime > 0  ? 'success' : 'error', 'should wear and use rpg: ', 'weapon aim');
+      displayLog(attackResult.aimState && attackResult.aimAction  ? 'success' : 'error', 'should wear and use rpg: ', 'weapon aim');
 
       displayLog(isWeaponUnAttached ? 'success' : 'error', 'should wear and use rpg: ', 'ungrab the weapon');
 
       // displayLog(attackResult.npcHealth <  currentNpcHealth ? 'success' : 'error', 'should wear and use rpg: health changed');
 
       const isSuccess = isWeaponAttached 
-                          && attackResult.aimState && attackResult.aimTime > 0
+                          && attackResult.aimState && attackResult.aimAction
                           && isWeaponUnAttached
                           // && attackResult.npcHealth <  currentNpcHealth
 

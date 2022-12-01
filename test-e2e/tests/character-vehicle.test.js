@@ -10,7 +10,7 @@ const {
   describe('should ride vehicle', () => {
     beforeAll(async () => {
         await launchBrowser();
-        //Todo: define custom functions here
+        // Todo: define custom functions here
         // await page.evaluate(async () => {
         // 	window.todo = () => {}
         // })
@@ -32,41 +32,41 @@ const {
       async () => {
         displayLog('section', 'should ride vehicle: ', 'hovercraft');
         const page = getCurrentPage();
-        //move to sword position and rotate
+        // move to sword position and rotate
         displayLog('step', 'should ride vehicle: ', 'move to hovercraft position');
         await page.evaluate(async () => {
-            globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+            window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
             {x: 2, y: 1.5, z: -12},
             );
         });
         await page.waitForTimeout(2000);
 
-        //ride the hovercraft
+        // ride the hovercraft
         displayLog('step', 'should ride vehicle: ', 'ride the hovercraft');
         await page.keyboard.down('KeyE');
         await page.waitForTimeout(4000);
         await page.keyboard.up('KeyE');
         await page.waitForTimeout(2000);
         const vehicleInfo = await page.evaluate(async () => {
-            //Todo: check hovercraft is attached
+            // Todo: check hovercraft is attached
             try {
                 const attachedApp =
-                    globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-                    app => app.name == 'hovercraft',
+                    window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+                    app => app.name === 'hovercraft',
                     );
-                if (attachedApp.length != 1) return false;
+                if (attachedApp.length !== 1) return false;
                 const instanceId =
-                    globalWebaverse.playersManager.localPlayer.getAction(
+                    window.globalWebaverse.playersManager.localPlayer.getAction(
                     'wear',
                     ).instanceId;
                 return {
-                    isVehicleRided: attachedApp[0].instanceId == instanceId,
-                    position: attachedApp[0].position
+                    isVehicleRided: attachedApp[0].instanceId === instanceId,
+                    position: attachedApp[0].position,
                 }
             } catch (error) {
                 return {
-                    isVehicleRided: attachedApp[0].instanceId == instanceId,
-                    position: {x: 0, y: 0, z: 0}
+                    isVehicleRided: false,
+                    position: {x: 0, y: 0, z: 0},
                 }
             }
         });
@@ -82,18 +82,18 @@ const {
             async ({firstPosition, key}) => {
                 try {
                     const attachedApp =
-                        globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-                            app => app.name == 'hovercraft',
+                        window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+                            app => app.name === 'hovercraft',
                         );
                     const currentPosition = attachedApp[0].position;
                     // let isCorrectMove = true;
-                    // if (key == 'KeyW') {
+                    // if (key === 'KeyW') {
                     // if (currentPosition.x <= firstPosition.x) isCorrectMove = false;
-                    // } else if (key == 'KeyA') {
+                    // } else if (key === 'KeyA') {
                     // if (currentPosition.z >= firstPosition.z) isCorrectMove = false;
-                    // } else if (key == 'KeyS') {
+                    // } else if (key === 'KeyS') {
                     // if (currentPosition.x >= firstPosition.x) isCorrectMove = false;
-                    // } else if (key == 'KeyD') {
+                    // } else if (key === 'KeyD') {
                     // if (currentPosition.z <= firstPosition.z) isCorrectMove = false;
                     // }
                     return {
@@ -103,7 +103,7 @@ const {
                 } catch (error) {
                     return {
                         currentPosition: {x: 0, y: 0, z: 0},
-                        isCorrectMove: false
+                        isCorrectMove: false,
                     }
                 }
             },
@@ -112,20 +112,20 @@ const {
         await page.keyboard.up(key);
         await page.waitForTimeout(1000);
 
-        //unride the hovercraft
+        // unride the hovercraft
         displayLog('step', 'should ride vehicle: ', 'unride the hovercraft');
         await page.keyboard.press('KeyR');
         await page.evaluate(async () => {
-            globalWebaverse.game.dropSelectedApp();
+            window.globalWebaverse.game.dropSelectedApp();
         });
 
         const isVehicleUnRided = await page.evaluate(async () => {
             try {
             const attachedApp =
-                globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-                app => app.name == 'hovercraft',
+                window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+                app => app.name === 'hovercraft',
                 );
-            return attachedApp.length == 0;
+            return attachedApp.length === 0;
             } catch (error) {
             return false;
             }
@@ -134,7 +134,7 @@ const {
 
         displayLog('step', 'should ride vehicle: ', 'move to zero position');
         await page.evaluate(async () => {
-            globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+            window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
             {x: 0, y: 1.5, z: 0},
             );
         });
@@ -157,41 +157,41 @@ const {
         async () => {
             displayLog('section', 'should ride vehicle: ', 'dragon');
             const page = getCurrentPage();
-            //move to sword position and rotate
+            // move to sword position and rotate
             displayLog('step', 'should ride vehicle: ', 'move to dragon position');
             await page.evaluate(async () => {
-                globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+                window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
                 {x: 2, y: 1.5, z: 12},
                 );
             });
             await page.waitForTimeout(2000);
 
-            //ride the dragon
+            // ride the dragon
             displayLog('step', 'should ride vehicle: ', 'ride the dragon');
             await page.keyboard.down('KeyE');
             await page.waitForTimeout(4000);
             await page.keyboard.up('KeyE');
             await page.waitForTimeout(2000);
             const vehicleInfo = await page.evaluate(async () => {
-                //Todo: check dragon is attached
+                // Todo: check dragon is attached
                 try {
                     const attachedApp =
-                        globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-                        app => app.name == 'dragon-mount',
+                        window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+                        app => app.name === 'dragon-mount',
                         );
-                    if (attachedApp.length != 1) return false;
+                    if (attachedApp.length !== 1) return false;
                     const instanceId =
-                        globalWebaverse.playersManager.localPlayer.getAction(
+                        window.globalWebaverse.playersManager.localPlayer.getAction(
                         'wear',
                         ).instanceId;
                     return {
-                        isVehicleRided: attachedApp[0].instanceId == instanceId,
-                        position: attachedApp[0].position
+                        isVehicleRided: attachedApp[0].instanceId === instanceId,
+                        position: attachedApp[0].position,
                     }
                 } catch (error) {
                     return {
-                        isVehicleRided: attachedApp[0].instanceId == instanceId,
-                        position: {x: 0, y: 0, z: 0}
+                        isVehicleRided: false,
+                        position: {x: 0, y: 0, z: 0},
                     }
                 }
             });
@@ -208,18 +208,18 @@ const {
                 async ({firstPosition, key}) => {
                     try {
                         const attachedApp =
-                            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-                                app => app.name == 'dragon-mount',
+                            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+                                app => app.name === 'dragon-mount',
                             );
                         const currentPosition = attachedApp[0].position;
                         // let isCorrectMove = true;
-                        // if (key == 'KeyW') {
+                        // if (key === 'KeyW') {
                         // if (currentPosition.x <= firstPosition.x) isCorrectMove = false;
-                        // } else if (key == 'KeyA') {
+                        // } else if (key === 'KeyA') {
                         // if (currentPosition.z >= firstPosition.z) isCorrectMove = false;
-                        // } else if (key == 'KeyS') {
+                        // } else if (key === 'KeyS') {
                         // if (currentPosition.x >= firstPosition.x) isCorrectMove = false;
-                        // } else if (key == 'KeyD') {
+                        // } else if (key === 'KeyD') {
                         // if (currentPosition.z <= firstPosition.z) isCorrectMove = false;
                         // }
                         return {
@@ -229,7 +229,7 @@ const {
                     } catch (error) {
                         return {
                             currentPosition: {x: 0, y: 0, z: 0},
-                            isCorrectMove: false
+                            isCorrectMove: false,
                         }
                     }
                 },
@@ -238,20 +238,20 @@ const {
             await page.keyboard.up(key);
             await page.waitForTimeout(1000);
 
-            //unride the dragon
+            // unride the dragon
             displayLog('step', 'should ride vehicle: ', 'unride the dragon');
             await page.keyboard.press('KeyR');
             await page.evaluate(async () => {
-                globalWebaverse.game.dropSelectedApp();
+                window.globalWebaverse.game.dropSelectedApp();
             });
 
             const isVehicleUnRided = await page.evaluate(async () => {
                 try {
                 const attachedApp =
-                    globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-                    app => app.name == 'dragon-mount',
+                    window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+                    app => app.name === 'dragon-mount',
                     );
-                return attachedApp.length == 0;
+                return attachedApp.length === 0;
                 } catch (error) {
                 return false;
                 }
@@ -260,7 +260,7 @@ const {
 
             displayLog('step', 'should ride vehicle: ', 'move to zero position');
             await page.evaluate(async () => {
-                globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+                window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
                 {x: 0, y: 1.5, z: 0},
                 );
             });

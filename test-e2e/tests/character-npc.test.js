@@ -10,7 +10,7 @@ const {
 describe('should npc player works', () => {
   beforeAll(async () => {
     await launchBrowser();
-    //Todo: define custom functions here
+    // Todo: define custom functions here
     // await page.evaluate(async () => {
     // 	window.todo = () => {}
     // })
@@ -34,10 +34,10 @@ describe('should npc player works', () => {
       const page = getCurrentPage();
       displayLog('step', 'should npc player works: ', 'go to npc position');
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 0, y: 1.5, z: -24.5},
         );
-        globalWebaverse.playersManager.localPlayer.characterPhysics.character.lookAt(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.character.lookAt(
           0,
           0,
           -30,
@@ -51,11 +51,11 @@ describe('should npc player works', () => {
       await page.keyboard.up('KeyE');
       await page.waitForTimeout(2000);
       const isNpcAttached = await page.evaluate(async () => {
-        //Todo: check npc is attached
+        // Todo: check npc is attached
         try {
           const attachedApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-              app => app.name == 'application/npc',
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+              app => app.name === 'application/npc',
             );
           return attachedApp.length > 0;
         } catch (error) {
@@ -65,8 +65,8 @@ describe('should npc player works', () => {
 
       const firstWalkPosition = await page.evaluate(async () => {
         try {
-          const currentNpc = globalWebaverse.npcManager.npcs.filter(
-            npc => npc.name == 'NPC01',
+          const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+            npc => npc.name === 'NPC01',
           )[0];
           return currentNpc.position;
         } catch (error) {
@@ -74,15 +74,15 @@ describe('should npc player works', () => {
         }
       });
 
-      //Todo: simulate walk
+      // Todo: simulate walk
       displayLog('step', 'should npc player works: ', 'player start walk');
       await page.keyboard.down('KeyS');
       await page.waitForTimeout(3000);
 
       const npcWalk = await page.evaluate(async () => {
         try {
-          const currentNpc = globalWebaverse.npcManager.npcs.filter(
-            npc => npc.name == 'NPC01',
+          const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+            npc => npc.name === 'NPC01',
           )[0];
           const avatar = currentNpc.avatar;
           const currentSpeed = avatar.velocity.length();
@@ -105,11 +105,11 @@ describe('should npc player works', () => {
       await page.keyboard.up('KeyS');
       await page.waitForTimeout(1000);
 
-      //run npc
+      // run npc
       const firstRunPosition = await page.evaluate(async () => {
         try {
-          const currentNpc = globalWebaverse.npcManager.npcs.filter(
-            npc => npc.name == 'NPC01',
+          const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+            npc => npc.name === 'NPC01',
           )[0];
           return currentNpc.position;
         } catch (error) {
@@ -117,7 +117,7 @@ describe('should npc player works', () => {
         }
       });
 
-      //Todo: simulate run
+      // Todo: simulate run
       displayLog('step', 'should npc player works: ', 'player start run');
       await page.keyboard.down('ShiftRight');
       await page.waitForTimeout(500);
@@ -126,8 +126,8 @@ describe('should npc player works', () => {
 
       const npcRun = await page.evaluate(async () => {
         try {
-          const currentNpc = globalWebaverse.npcManager.npcs.filter(
-            npc => npc.name == 'NPC01',
+          const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+            npc => npc.name === 'NPC01',
           )[0];
           const avatar = currentNpc.avatar;
           const currentSpeed = avatar.velocity.length();
@@ -151,12 +151,12 @@ describe('should npc player works', () => {
       await page.keyboard.up('ShiftRight');
       await page.waitForTimeout(5000);
 
-      //unuse npc
+      // unuse npc
       displayLog('step', 'should npc player works: ', 'move to near position');
       const currentNpcPosition = await page.evaluate(async () => {
         try {
-          const currentNpc = globalWebaverse.npcManager.npcs.filter(
-            npc => npc.name == 'NPC01',
+          const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+            npc => npc.name === 'NPC01',
           )[0];
           return currentNpc.position;
         } catch (error) {
@@ -165,7 +165,7 @@ describe('should npc player works', () => {
       });
 
       await page.evaluate(async currentNpcPosition => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: currentNpcPosition.x, y: 1.5, z: currentNpcPosition.z - 0.5},
         );
       }, currentNpcPosition);
@@ -178,17 +178,17 @@ describe('should npc player works', () => {
       await page.keyboard.up('KeyE');
       await page.waitForTimeout(2000);
       // await page.evaluate(async () => {
-      //     globalWebaverse.game.dropSelectedApp();
+      //     window.globalWebaverse.game.dropSelectedApp();
       // });
       await page.waitForTimeout(1000);
 
       const isNpcUnAttached = await page.evaluate(async () => {
         try {
           const attachedApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-              app => app.name == 'application/npc',
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+              app => app.name === 'application/npc',
             );
-          return attachedApp.length == 0;
+          return attachedApp.length === 0;
         } catch (error) {
           return false;
         }
@@ -196,7 +196,7 @@ describe('should npc player works', () => {
 
       displayLog('step', 'should npc player works: ', 'move to zero position');
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 0, y: 1.5, z: 0},
         );
       });
@@ -245,8 +245,8 @@ describe('should npc player works', () => {
 
       let currentNpcPosition = await page.evaluate(async () => {
         try {
-          const currentNpc = globalWebaverse.npcManager.npcs.filter(
-            npc => npc.name == 'NPC01',
+          const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+            npc => npc.name === 'NPC01',
           )[0];
           return currentNpc.position;
         } catch (error) {
@@ -258,7 +258,7 @@ describe('should npc player works', () => {
 
       displayLog('step', 'should npc player works: ', 'go to npc position');
       await page.evaluate(async currentNpcPosition => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: currentNpcPosition.x, y: 1.5, z: currentNpcPosition.z},
         );
       }, currentNpcPosition);
@@ -270,11 +270,11 @@ describe('should npc player works', () => {
       await page.keyboard.up('KeyE');
       await page.waitForTimeout(2000);
       const isNpcAttached = await page.evaluate(async () => {
-        //Todo: check npc is attached
+        // Todo: check npc is attached
         try {
           const attachedApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-              app => app.name == 'application/npc',
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+              app => app.name === 'application/npc',
             );
           return attachedApp.length > 0;
         } catch (error) {
@@ -283,7 +283,7 @@ describe('should npc player works', () => {
       });
 
       const currentAvatarName = await page.evaluate(async () => {
-        return globalWebaverse.playersManager.localPlayer.name;
+        return window.globalWebaverse.playersManager.localPlayer.name;
       });
 
       displayLog('step', 'should npc player works: ', 'switch the avatars');
@@ -291,7 +291,7 @@ describe('should npc player works', () => {
       await page.waitForTimeout(2000);
 
       const switchedAvatarName = await page.evaluate(async () => {
-        return globalWebaverse.playersManager.localPlayer.name;
+        return window.globalWebaverse.playersManager.localPlayer.name;
       });
 
       displayLog('step', 'should npc player works: ', 'switch the avatars');
@@ -299,15 +299,15 @@ describe('should npc player works', () => {
       await page.waitForTimeout(2000);
 
       const reSwitchedAvatarName = await page.evaluate(async () => {
-        return globalWebaverse.playersManager.localPlayer.name;
+        return window.globalWebaverse.playersManager.localPlayer.name;
       });
 
-      //unuse npc
+      // unuse npc
       displayLog('step', 'should npc player works: ', 'move to near position');
       currentNpcPosition = await page.evaluate(async () => {
         try {
-          const currentNpc = globalWebaverse.npcManager.npcs.filter(
-            npc => npc.name == 'NPC01',
+          const currentNpc = window.globalWebaverse.npcManager.npcs.filter(
+            npc => npc.name === 'NPC01',
           )[0];
           return currentNpc.position;
         } catch (error) {
@@ -316,7 +316,7 @@ describe('should npc player works', () => {
       });
 
       await page.evaluate(async currentNpcPosition => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: currentNpcPosition.x, y: 1.5, z: currentNpcPosition.z - 0.5},
         );
       }, currentNpcPosition);
@@ -329,17 +329,17 @@ describe('should npc player works', () => {
       await page.keyboard.up('KeyE');
       await page.waitForTimeout(2000);
       // await page.evaluate(async () => {
-      //     globalWebaverse.game.dropSelectedApp();
+      //     window.globalWebaverse.game.dropSelectedApp();
       // });
       await page.waitForTimeout(1000);
 
       const isNpcUnAttached = await page.evaluate(async () => {
         try {
           const attachedApp =
-            globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
-              app => app.name == 'application/npc',
+            window.globalWebaverse.playersManager.localPlayer.appManager.apps.filter(
+              app => app.name === 'application/npc',
             );
-          return attachedApp.length == 0;
+          return attachedApp.length === 0;
         } catch (error) {
           return false;
         }
@@ -347,7 +347,7 @@ describe('should npc player works', () => {
 
       displayLog('step', 'should npc player works: ', 'move to zero position');
       await page.evaluate(async () => {
-        globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
+        window.globalWebaverse.playersManager.localPlayer.characterPhysics.setPosition(
           {x: 0, y: 1.5, z: 0},
         );
       });
@@ -355,11 +355,11 @@ describe('should npc player works', () => {
 
       displayLog(isNpcAttached ? 'success' : 'error', 'should npc player works: use the NPC');
       displayLog(switchedAvatarName !== currentAvatarName ? 'success' : 'error', 'should npc player works: switch the NPC');
-      displayLog(reSwitchedAvatarName == currentAvatarName ? 'success' : 'error', 'should npc player works: switch the NPC');
+      displayLog(reSwitchedAvatarName === currentAvatarName ? 'success' : 'error', 'should npc player works: switch the NPC');
       displayLog(isNpcUnAttached ? 'success' : 'error', 'should npc player works: unuse the NPC');
 
       const isSuccess = isNpcAttached && switchedAvatarName !== currentAvatarName
-                          && reSwitchedAvatarName == currentAvatarName && isNpcUnAttached
+                          && reSwitchedAvatarName === currentAvatarName && isNpcUnAttached
 
       displayLog(isSuccess ? 'passed' : 'fail', 'should npc player works: ', 'switch');
     },

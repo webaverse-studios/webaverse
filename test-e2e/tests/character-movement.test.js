@@ -13,7 +13,7 @@ describe.only(
   () => {
     beforeAll(async () => {
       await launchBrowser();
-      //Todo: define custom functions here
+      // Todo: define custom functions here
       // await page.evaluate(async () => {
       // 	window.todo = () => {}
       // })
@@ -31,7 +31,7 @@ describe.only(
       async () => {
         displayLog('section', 'should character loaded: start');
         const avatarFlag = await getCurrentPage().evaluate(async () => {
-          const localPlayer = globalWebaverse.playersManager.localPlayer;
+          const localPlayer = window.globalWebaverse.playersManager.localPlayer;
           const isPlayerAvatarApp = !!localPlayer.getAvatarApp();
           const isBound = localPlayer.isBound();
           // const isLocalPlayer = localPlayer.isLocalPlayer;
@@ -90,7 +90,7 @@ describe.only(
         displayLog('section', 'should character movement: ', 'walk');
         const page = getCurrentPage();
         const firstPosition = await page.evaluate(async () => {
-          return globalWebaverse.playersManager.localPlayer.position;
+          return window.globalWebaverse.playersManager.localPlayer.position;
         });
 
         displayLog('step', 'should character movement: ', 'moving');
@@ -100,10 +100,10 @@ describe.only(
         await page.waitForTimeout(1000);
         const playerMove = await page.evaluate(
           async ({firstPosition, key}) => {
-            const avatar = globalWebaverse.playersManager.localPlayer.avatar;
+            const avatar = window.globalWebaverse.playersManager.localPlayer.avatar;
             const currentSpeed = avatar.velocity.length();
             const idleWalkFactor = avatar.idleWalkFactor;
-            const currentPosition = globalWebaverse.playersManager.localPlayer.position;
+            const currentPosition = window.globalWebaverse.playersManager.localPlayer.position;
             // let isCorrectMove = true;
             // if (key === 'KeyW') {
             //   if (currentPosition.x <= firstPosition.x) isCorrectMove = false;
@@ -146,7 +146,7 @@ describe.only(
         displayLog('section', 'should character movement: ', 'run');
         const page = getCurrentPage();
         const lastPosition = await page.evaluate(async () => {
-          return globalWebaverse.playersManager.localPlayer.position;
+          return window.globalWebaverse.playersManager.localPlayer.position;
         });
 
         displayLog('step', 'should character movement: ', 'running');
@@ -157,10 +157,10 @@ describe.only(
         await page.keyboard.down(key);
         await page.waitForTimeout(1000);
         const playerRun = await page.evaluate(async () => {
-          const avatar = globalWebaverse.playersManager.localPlayer.avatar;
+          const avatar = window.globalWebaverse.playersManager.localPlayer.avatar;
           const currentSpeed = avatar.velocity.length();
           const walkRunFactor = avatar.walkRunFactor;
-          const currentPosition = globalWebaverse.playersManager.localPlayer.position;
+          const currentPosition = window.globalWebaverse.playersManager.localPlayer.position;
           return {
             currentSpeed,
             walkRunFactor,
@@ -195,8 +195,8 @@ describe.only(
         await page.waitForTimeout(3000);
 
         const narutoRun = await page.evaluate(async () => {
-          const avatar = globalWebaverse.playersManager.localPlayer.avatar;
-          const narutoRunAction = globalWebaverse.playersManager.localPlayer.hasAction("narutoRun");
+          const avatar = window.globalWebaverse.playersManager.localPlayer.avatar;
+          const narutoRunAction = window.globalWebaverse.playersManager.localPlayer.hasAction("narutoRun");
           const narutoRunState = avatar.narutoRunState;
           return {
             narutoRunAction,
@@ -225,19 +225,19 @@ describe.only(
         displayLog('step', 'should character movement: ', 'jump start');
         const page = getCurrentPage();
         const lastPosition = await page.evaluate(async () => {
-          return globalWebaverse.playersManager.localPlayer.position;
+          return window.globalWebaverse.playersManager.localPlayer.position;
         });
         const isJumpFlags = [];
-        //ToDO: need to repeat for get average because sometimes page.evaluate takes a few sec
+        // ToDO: need to repeat for get average because sometimes page.evaluate takes a few sec
         for (let i = 0; i < 3; i++) {
           await page.keyboard.press('Space');
           await page.waitForTimeout(100);
           const isJump = await page.evaluate(async lastPosition => {
             const avatar =
-              globalWebaverse.playersManager?.localPlayer?.avatar;
+              window.globalWebaverse.playersManager?.localPlayer?.avatar;
             const jumpState = avatar.jumpState;
-            const jumpAction = globalWebaverse.playersManager?.localPlayer?.hasAction("jump");
-            const currentPosition = globalWebaverse.playersManager.localPlayer.position;
+            const jumpAction = window.globalWebaverse.playersManager?.localPlayer?.hasAction("jump");
+            const currentPosition = window.globalWebaverse.playersManager.localPlayer.position;
             return (
               jumpAction &&
               jumpState &&
@@ -264,20 +264,20 @@ describe.only(
         displayLog('step', 'should character movement: ', 'double jump start');
         const page = getCurrentPage();
         const lastPosition = await page.evaluate(async () => {
-          return globalWebaverse.playersManager.localPlayer.position;
+          return window.globalWebaverse.playersManager.localPlayer.position;
         });
         const isDoubleJumpFlags = [];
-        //ToDO: need to repeat for get average because sometimes page.evaluate takes a few sec
+        // ToDO: need to repeat for get average because sometimes page.evaluate takes a few sec
         for (let i = 0; i < 3; i++) {
           await page.keyboard.press('Space');
           await page.waitForTimeout(100);
           await page.keyboard.press('Space');
           await page.waitForTimeout(100);
           const isDoubleJump = await page.evaluate(async lastPosition => {
-            const avatar = globalWebaverse.playersManager.localPlayer.avatar;
+            const avatar = window.globalWebaverse.playersManager.localPlayer.avatar;
             const doubleJumpState = avatar.doubleJumpState;
-            const doubleJumpAction = globalWebaverse.playersManager.localPlayer.hasAction('doubleJump');
-            const currentPosition = globalWebaverse.playersManager.localPlayer.position;
+            const doubleJumpAction = window.globalWebaverse.playersManager.localPlayer.hasAction('doubleJump');
+            const currentPosition = window.globalWebaverse.playersManager.localPlayer.position;
             return (
               doubleJumpAction &&
               doubleJumpState &&
@@ -303,7 +303,7 @@ describe.only(
         displayLog('section', 'should character movement: ', 'crouch');
         const page = getCurrentPage();
         const lastPosition = await page.evaluate(async () => {
-          return globalWebaverse.playersManager.localPlayer.position;
+          return window.globalWebaverse.playersManager.localPlayer.position;
         });
         displayLog('step', 'should character movement: ', 'crouch and move');
         await page.keyboard.down('ControlLeft');
@@ -315,10 +315,10 @@ describe.only(
         await page.keyboard.down('KeyW');
         await page.waitForTimeout(2000);
         const playerCrouch = await page.evaluate(async () => {
-          const avatar = globalWebaverse.playersManager.localPlayer.avatar;
+          const avatar = window.globalWebaverse.playersManager.localPlayer.avatar;
           const currentSpeed = avatar.velocity.length();
-          const crouchAction = globalWebaverse.playersManager.localPlayer.hasAction("crouch");
-          const currentPosition = globalWebaverse.playersManager.localPlayer.position;
+          const crouchAction = window.globalWebaverse.playersManager.localPlayer.hasAction("crouch");
+          const currentPosition = window.globalWebaverse.playersManager.localPlayer.position;
           return {
             currentSpeed,
             crouchAction,
@@ -354,9 +354,9 @@ describe.only(
         await page.keyboard.down('KeyW');
         await page.waitForTimeout(1000);
         const playerFly = await page.evaluate(async () => {
-          const avatar = globalWebaverse.playersManager.localPlayer.avatar;
+          const avatar = window.globalWebaverse.playersManager.localPlayer.avatar;
           const flyState = avatar.flyState;
-          const flyAction = globalWebaverse.playersManager.localPlayer.hasAction("fly");
+          const flyAction = window.globalWebaverse.playersManager.localPlayer.hasAction("fly");
           return {
             flyAction,
             flyState,
@@ -385,8 +385,7 @@ describe.only(
         await page.keyboard.down('KeyV');
         await page.waitForTimeout(2000);
         const playerDance = await page.evaluate(async () => {
-          const avatar = globalWebaverse.playersManager.localPlayer.avatar;
-          const danceAction = globalWebaverse.playersManager.localPlayer.hasAction("dance");;
+          const danceAction = window.globalWebaverse.playersManager.localPlayer.hasAction("dance");;
           return {
             danceAction,
           };
@@ -407,4 +406,3 @@ describe.only(
   },
   totalTimeout,
 );
-

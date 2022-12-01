@@ -14,7 +14,7 @@ describe(
 	() => {
 		beforeAll(async () => {
 			await launchBrowser(true);
-			//Todo: define custom functions here
+			// Todo: define custom functions here
 			// await page.evaluate(async () => {
 			// 	window.todo = () => {}
 			// })
@@ -32,7 +32,7 @@ describe(
 				for(let i = 0; i < 2; i++) {
 					displayLog('section', `multiplayer: should character loaded: player ${i}: `, 'start');
 					const avatarFlag = await getCurrentPage(i).evaluate(async () => {
-						const localPlayer = globalWebaverse.playersManager.localPlayer;
+						const localPlayer = window.globalWebaverse.playersManager.localPlayer;
 						const isPlayerAvatarApp = !!localPlayer.getAvatarApp();
 						const isBound = localPlayer.isBound();
 						// const isLocalPlayer = localPlayer.isLocalPlayer;
@@ -187,7 +187,7 @@ describe(
 				displayLog('step', 'multiplayer: should character movement: ', 'double jump start');
 				const pageA = getCurrentPage(0);
 				const pageB = getCurrentPage(1);
-				//ToDO: need to repeat for get average because sometimes page.evaluate takes a few sec
+				// ToDO: need to repeat for get average because sometimes page.evaluate takes a few sec
 				for (let i = 0; i < 3; i++) {
 					await pageA.keyboard.press('Space');
 					await pageA.waitForTimeout(100);

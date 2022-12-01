@@ -10,7 +10,7 @@ const {
 describe('should all ui element on the profile view works', () => {
   beforeAll(async () => {
     await launchBrowser();
-    //Todo: define custom functions here
+    // Todo: define custom functions here
     // await page.evaluate(async () => {
     // 	window.todo = () => {}
     // })
@@ -25,9 +25,9 @@ describe('should all ui element on the profile view works', () => {
     'should change character on profile view',
     async () => {
       printLog('should profile ui view works');
-      //Todo: example
-      //https://www.tabnine.com/code/javascript/functions/puppeteer/Page/click
-      //more details: https://www.tutorialspoint.com/puppeteer/puppeteer_quick_guide.htm
+      // Todo: example
+      // https://www.tabnine.com/code/javascript/functions/puppeteer/Page/click
+      // more details: https://www.tutorialspoint.com/puppeteer/puppeteer_quick_guide.htm
       const page = getCurrentPage();
       await page.keyboard.press('Tab');
       await page.waitForSelector('._bigButton_116zf_51', {
@@ -54,7 +54,7 @@ describe('should all ui element on the profile view works', () => {
       let characterChangedCount = 0;
 
       for (let index = 0; index < characterLength; index++) {
-        if (index != 0) {
+        if (index !== 0) {
           await page.keyboard.press('Tab');
           await page.waitForSelector('._bigButton_116zf_51', {
             visible: true,
@@ -72,11 +72,11 @@ describe('should all ui element on the profile view works', () => {
         }
 
         const currentAvatarId = await page.evaluate(async () => {
-          return globalWebaverse?.playersManager?.localPlayer?.avatar?.app
+          return window.globalWebaverse?.playersManager?.localPlayer?.avatar?.app
             ?.uuid;
         });
 
-        //Todo: find the button position
+        // Todo: find the button position
         const mousePos = await page.evaluate(async index => {
           const nodeLists = document.querySelectorAll(
             'li._item_148no_119:not(._disabled_148no_169)',
@@ -93,7 +93,7 @@ describe('should all ui element on the profile view works', () => {
 
         await page.mouse.move(mousePos.x, mousePos.y);
         await page.waitForTimeout(500);
-        //await preview canvas
+        // await preview canvas
         await page.evaluate(async () => {
           return await window.waitForUntil(() => {
             return document.querySelector(
@@ -107,15 +107,15 @@ describe('should all ui element on the profile view works', () => {
         const isAvatarChanged = await page.evaluate(async currentAvatarId => {
           return await window.waitForUntil(() => {
             const appId =
-              globalWebaverse?.playersManager?.localPlayer?.avatar?.app?.uuid;
-            return appId != currentAvatarId;
+              window.globalWebaverse?.playersManager?.localPlayer?.avatar?.app?.uuid;
+            return appId !== currentAvatarId;
           }, 180000);
         }, currentAvatarId);
         if (isAvatarChanged) characterChangedCount++;
         await page.waitForTimeout(500);
       }
 
-      expect(characterChangedCount == characterLength).toBeTruthy();
+      expect(characterChangedCount === characterLength).toBeTruthy();
     },
     totalTimeout,
   );

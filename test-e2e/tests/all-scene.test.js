@@ -35,7 +35,7 @@ describe.only('should load scene works', () => {
     async sceneUrl => {
       let isSuccess = false
       try {
-        //Todo: check timeout case
+        // Todo: check timeout case
         if (recentTestPassed !== currntTest) {
           displayLog('fail', 'Scene loaded failed timeout: ', `${currntTest}`)
           saveExcel(currntTest)
@@ -54,7 +54,7 @@ describe.only('should load scene works', () => {
           // @ts-ignore
           try {
             const loadedApps =
-              window.globalWebaverse.world.appManager.getApps();
+              window.window.globalWebaverse.world.appManager.getApps();
             const loadedAppCount = loadedApps.length;
           // add some validation code here
             return {
@@ -75,7 +75,7 @@ describe.only('should load scene works', () => {
         await page.waitForTimeout(2000);
 
         const firstPosition = await page.evaluate(async () => {
-          return globalWebaverse.playersManager.localPlayer.position;
+          return window.globalWebaverse.playersManager.localPlayer.position;
         });
 
         const keys = ['KeyW', 'KeyA', 'KeyS', 'KeyD'];
@@ -84,10 +84,10 @@ describe.only('should load scene works', () => {
         await page.waitForTimeout(1000);
         const playerMove = await page.evaluate(
           async ({firstPosition, key}) => {
-            const avatar = globalWebaverse.playersManager.localPlayer.avatar;
+            const avatar = window.globalWebaverse.playersManager.localPlayer.avatar;
             const currentSpeed = avatar.velocity.length();
             const idleWalkFactor = avatar.idleWalkFactor;
-            const currentPosition = globalWebaverse.playersManager.localPlayer.position;
+            const currentPosition = window.globalWebaverse.playersManager.localPlayer.position;
             return {
               currentSpeed,
               idleWalkFactor,
@@ -125,7 +125,7 @@ describe.only('should load scene works', () => {
       saveExcel(sceneUrl)
       recentTestPassed = sceneUrl
 
-      if (currntTest == sceneUrl) {
+      if (currntTest === sceneUrl) {
         if (isSuccess) {
           displayLog('passed', 'Scene loaded successfully: ', `${sceneUrl}`);
         } else {
@@ -199,10 +199,10 @@ describe.only('should load scene works', () => {
 //       const result = await page.evaluate(async () => {
 //         // @ts-ignore
 //         try {
-//           await window.globalWebaverse.webaverse?.waitForLoad();
-//           await window.globalWebaverse.universe?.waitForSceneLoaded();
+//           await window.window.globalWebaverse.webaverse?.waitForLoad();
+//           await window.window.globalWebaverse.universe?.waitForSceneLoaded();
 //           const loadedApps =
-//             window.globalWebaverse.world.appManager.getApps();
+//             window.window.globalWebaverse.world.appManager.getApps();
 //           const loadedAppCount = loadedApps.length;
 //           // add some validation code here
 //           return {

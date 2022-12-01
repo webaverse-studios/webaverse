@@ -1,6 +1,6 @@
 /* global require module */
 
-const { DefaultReporter } = require("@jest/reporters");
+const {DefaultReporter} = require("@jest/reporters");
 
 /**
  * Overrides Jest's default reporter to filter out known console messages,
@@ -32,7 +32,7 @@ class CustomReporter extends DefaultReporter {
     );
   }
 
-  testFinished( testPath, config, result ) {
+  testFinished(testPath, config, result) {
     debugger
     result.testResults = []
     DefaultReporter.prototype.testFinished.call(
@@ -43,7 +43,7 @@ class CustomReporter extends DefaultReporter {
     );
   }
 	
-  onTestResult( testPath, config, result ) {
+  onTestResult(testPath, config, result) {
     debugger
     result.testResults = []
     DefaultReporter.prototype.onTestResult.call(

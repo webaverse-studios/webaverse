@@ -9,9 +9,9 @@ const height = 400;
 // const width = 2400;
 // const height = 1200;
 let browsers = [];
-let pages = [];
+const pages = [];
 let errorLists = []
-let totalTimeout = 5 * 60 * 1000
+const totalTimeout = 5 * 60 * 1000
 let retryCount = 0
 let isReConnectionNeeded = false
 
@@ -19,7 +19,7 @@ const isdebug = true;
 
 let csvWriter = null
 let csvRecords = []
-let isWriteCSV = true
+const isWriteCSV = true
 
 let currentScene
 
@@ -44,25 +44,25 @@ const setupExcel = async () => {
     csvWriter = createCsvWriter({
       path: testFilePath,
       header: [
-        { title: 'Scene', id: 'scene'},
-        { title: 'type', id: 'type'},
-        { title: 'Message', id: 'message'},
-        { title: 'Message', id: 'message2'}
-      ]
+        {title: 'Scene', id: 'scene'},
+        {title: 'type', id: 'type'},
+        {title: 'Message', id: 'message'},
+        {title: 'Message', id: 'message2'},
+      ],
     });
   } catch (error) {
     console.error(error)
   }
 }
 
-const setCurrentScene = async (str) => {
+const setCurrentScene = async str => {
   currentScene = str
   resetErrorList();
 }
 
-const saveExcel = async (str) => {
+const saveExcel = async str => {
   try {
-    if (currentScene != str) return
+    if (currentScene !== str) return
     if (isWriteCSV) await csvWriter.writeRecords(csvRecords)
     csvRecords = []
   } catch (error) {
@@ -72,18 +72,18 @@ const saveExcel = async (str) => {
 
 const updateExcelRow = (type, message, message2) => {
   if (csvWriter
-    && (type == 'section'
-      || type == 'error'
-      || type == 'success'
-      || type == 'passed'
-      || type == 'fail')
+    && (type === 'section'
+      || type === 'error'
+      || type === 'success'
+      || type === 'passed'
+      || type === 'fail')
   ) {
     try {
       csvRecords.push({
         scene: currentScene,
         type,
         message,
-        message2
+        message2,
       })
     } catch (error) {
       console.error(error)
@@ -137,10 +137,10 @@ const resetErrorList = () => {
   errorLists = []
 }
 
-const setupErrorList = async (page) => {
+const setupErrorList = async page => {
   const cdp = await page.target().createCDPSession();
   await cdp.send('Log.enable');
-  cdp.on('Log.entryAdded', async ({ entry }) => {
+  cdp.on('Log.entryAdded', async ({entry}) => {
     if (entry.level === 'error') {
       const errorMsg = `${entry.text} ${entry.url}`
       const tempMsg = errorMsg.replace(/\s/g, '').toLowerCase()
@@ -180,6 +180,7 @@ const setupErrorList = async (page) => {
         return true;
       }
     } catch (error) {
+      console.error(error)
     }
   });
   
@@ -192,10 +193,10 @@ const getDimensions = () => {
   };
 };
 
-const launchBrowser = async (isMulti) => {
+const launchBrowser = async isMulti => {
   jest.setTimeout(totalTimeout);
   displayLog('action', 'Start launch browsers');
-  let browserCount = isMulti ? 2 : 1
+  const browserCount = isMulti ? 2 : 1
   for (let i = 0; i < browserCount; i++) {
     const browser = await puppeteer.launch({
       // headless: !isdebug,
@@ -217,14 +218,14 @@ const launchBrowser = async (isMulti) => {
     browsers.push(browser)
 
     const page = (await browser.pages())[0];
-    await page.setViewport({ width, height });
+    await page.setViewport({width, height});
     setupErrorList(page)
     pages.push(page)
   }
 };
 
 const closeBrowser = async () => {
-  browsers.forEach(async (browser) => {
+  browsers.forEach(async browser => {
     await browser.close();
   })
   browsers = []
@@ -249,7 +250,7 @@ const navigate = async (url, playerIndex = 0) => {
 
     displayLog('action', `Going to url: ${url}`);
 
-    await page.goto(url, { waitUntil: 'load', timeout: totalTimeout });
+    await page.goto(url, {waitUntil: 'load', timeout: totalTimeout});
     // printLog('Complete to ' + url);
 
     // const granted = await page.evaluate(async () => {
@@ -270,14 +271,14 @@ const navigate = async (url, playerIndex = 0) => {
 };
 
 const reConnection = async (url, playerIndex) => {
-  while(isReConnectionNeeded == true && retryCount < 10)
+  while(isReConnectionNeeded === true && retryCount < 10)
   {
     const isConnected = await navigate(url, playerIndex);
     retryCount += 1;
     isReConnectionNeeded = !isConnected
     if (!isConnected) {
       // Wait a few seconds, also a good idea to swap proxy here*
-      await new Promise((resolve) => setTimeout(resolve, 5000));
+      await new Promise(resolve => setTimeout(resolve, 5000));
     }
   }
   return !isReConnectionNeeded
@@ -291,7 +292,7 @@ const enterScene = async (url, playerIndex = 0) => {
     isReConnectionNeeded = false
     await throwErrors('Cannot load the current scene!', false);
   } else {
-    const isSceneLoaded = await page.evaluate(async (totalTimeout) => {
+    const isSceneLoaded = await page.evaluate(async totalTimeout => {
       // @ts-ignore
       try {
         await window.waitForUntil(() => {
@@ -316,7 +317,7 @@ const enterScene = async (url, playerIndex = 0) => {
   displayLog('action', `Scene Loaded url: ${url}`);
 };
 
-const defineFunctions = async (page) => {
+const defineFunctions = async page => {
   // exposeFunction function does not work well
   // await page.exposeFunction('getAngle', getAngle)
   await page.evaluate(async () => {
@@ -334,7 +335,7 @@ const defineFunctions = async (page) => {
             if (currentTime - startTime > timeout) {
               console.error('wait for until - failed 180s');
               clearInterval(timer);
-              reject(false);
+              resolve(false);
             }
           }
         }, 100);
@@ -343,7 +344,7 @@ const defineFunctions = async (page) => {
   });
 };
 
-const getAppCountFromScene = async (sceneUrl) => {
+const getAppCountFromScene = async sceneUrl => {
   let appCount = 0
   try {
     const data = await fs.readFileSync(path.resolve(__dirname, `../../scenes/${sceneUrl}`))
@@ -371,5 +372,5 @@ module.exports = {
   getAppCountFromScene,
   displayLog,
   getErrorList,
-  resetErrorList
+  resetErrorList,
 };
