@@ -6,12 +6,13 @@ import {MegaHotBox} from '../../play-mode/mega-hotbox';
 import {CachedLoader} from '../../../CachedLoader.jsx';
 import {Spritesheet} from '../spritesheet/';
 import {createLandIcon} from '../../../../land-iconer.js';
-import game from '../../../../game.js';
+// import game from '../../../../game.js';
 import {transparentPngUrl} from '../../../../constants.js';
 import * as sounds from '../../../../sounds.js';
 import {mod} from '../../../../util.js';
 import dropManager from '../../../../drop-manager';
 import cardsManager from '../../../../cards-manager.js';
+import {EngineContext} from '../../../contexts/engine';
 
 //
 
@@ -109,20 +110,21 @@ const ObjectItem = ({
 
             <div className={styles.background} />
             <div className={styles.highlight} />
-
+            {object &&
             <Spritesheet
                 className={styles.canvas}
-                startUrl={object?.start_url}
+                startUrl={object.start_url}
                 enabled={enabled}
                 size={size}
                 numFrames={numFrames}
             />
-
-            <div className={styles.row}>
-                <div className={styles.name}>{object?.name}</div>
-                <div className={styles.level}>Lv. {object?.level}</div>
-            </div>
-
+            }
+            {object &&
+                <div className={styles.row}>
+                    <div className={styles.name}>{object.name}</div>
+                    <div className={styles.level}>Lv. {object.level}</div>
+                </div>
+            }
             {/* selected && loading ? <EquipmentPopover /> : null */}
 
         </div>
@@ -319,7 +321,7 @@ export const Equipment = () => {
 
     const selectedMenuIndex = mod(faceIndex, 4);
 
-    const open = state.openedPanel === 'CharacterPanel';
+    const {interfaceManager} = useContext(EngineContext);
 
     const onMouseEnter = object => () => {
         setHoverObject(object);
@@ -349,8 +351,8 @@ export const Equipment = () => {
         setSelectObject(object);
     };
     const onDoubleClick = object => () => {
-        game.handleDropJsonToPlayer(object);
-        
+        // game.handleDropJsonToPlayer(object);
+        interfaceManager.handleDropJsonToPlayer(object);
         setSelectObject(object);
     };
     const menuLeft = () => {
@@ -389,7 +391,6 @@ export const Equipment = () => {
     }, [cachedLoader]);
 
     useEffect(() => {
-        if (open) {
             const start_url = selectObject ? selectObject.start_url : '';
             if (start_url) {
                 const abortController = new AbortController();
@@ -406,12 +407,14 @@ export const Equipment = () => {
                     abortController.abort();
                 };
             }
-        } else {
-            if (selectObject) {
-                setSelectObject(null);
-            }
-        }
-    }, [open, selectObject]);
+
+            return (() => {
+                if (selectObject) {
+                    setSelectObject(null);
+                }
+            })
+
+    }, [selectObject]);
 
     useEffect(() => {
         setSelectObject(null);
@@ -421,7 +424,6 @@ export const Equipment = () => {
         <div className={styles.equipment}>
             <div className={classnames(
                 styles.menus,
-                open ? styles.open : null,
                 selectClassName,
             )}>
                 <div
@@ -524,10 +526,9 @@ export const Equipment = () => {
                     />
                 </div>
             </div>
-
+            {open && 
             <div className={classnames(
                 styles.menuFooter,
-                open ? styles.open : null,
                 selectClassName,
             )}>
                 <div className={styles.menuFooterWrap}>
@@ -553,7 +554,7 @@ export const Equipment = () => {
                     <div className={styles.bar} />
                 </div>
             </div>
-
+                }
             <MegaHotBox
                 open={!!selectObject}
                 loading={loading}

@@ -5,7 +5,6 @@ import classnames from 'classnames';
 
 async function getSVG(iconName) {
   const icon = IconCollection.find(item => item.name === iconName);
-  console.log('ICON: ', icon);
   return await fetch(icon.file)
     .then(res => res.text())
     .then(res => {
@@ -23,10 +22,12 @@ export default function CustomButton(props) {
   useEffect(() => {
     if (icon) {
       getSVG(icon).then(res => {
-        svgRef.current.innerHTML = '';
-        if (res) {
-          res.classList.add(styles.icon);
-          svgRef.current.append(res);
+        if (svgRef.current) {
+          svgRef.current.innerHTML = '';
+          if (res) {
+            res.classList.add(styles.icon);
+            svgRef.current.append(res);
+          }
         }
       });
     }

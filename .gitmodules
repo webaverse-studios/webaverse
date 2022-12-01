@@ -28,3 +28,6 @@
 [submodule "packages/compiler"]
 	path = packages/compiler
 	url = https://github.com/webaverse/compiler.git
+[submodule "packages/automated-tests"]
+	path = packages/automated-tests
+	url = https://github.com/webaverse/automated-tests

@@ -49,8 +49,8 @@ export const ZoneTitleCard = () => {
     const description = 'Zone Description';
     const comment = 'This is a zone comment.';
 
-    return (
-        <div className={ classnames(styles.zoneTitleCard, open ? styles.open : null) } >
+    return open ? (
+        <div className={ classnames(styles.zoneTitleCard) } >
             <div className={ styles.leftWing }>
                 <div className={ styles.block }>
                     {/* <div className={ styles.title }>Webaverse</div> */}
@@ -80,6 +80,6 @@ export const ZoneTitleCard = () => {
 
             <RainFx enabled={open} />
         </div>
-    );
+    ) : null;
 
 };

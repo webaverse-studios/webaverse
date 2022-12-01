@@ -34,41 +34,15 @@ export const Settings = () => {
     };
 
     const handleTabClick = (event) => {
-
         const tabName = event.currentTarget.getAttribute('data-tab-name');
         setActiveTab(tabName);
-
     };
-
-    //
-
-    useEffect(() => {
-
-        const handleKeyUp = (event) => {
-
-            if (state.openedPanel === 'SettingsPanel' && event.which === 27) { // esc key
-
-                setState({openedPanel: null});
-
-            }
-
-        };
-
-        registerIoEventHandler('keyup', handleKeyUp);
-
-        return () => {
-
-            unregisterIoEventHandler('keyup', handleKeyUp);
-
-        };
-
-    }, [ state.openedPanel ]);
 
     //
 
     return (
 
-        <div className={ classNames(styles.settings, state.openedPanel === 'SettingsPanel' ? styles.open : null) } onClick={ stopPropagation } >
+        <div className={ classNames(styles.settings) } onClick={ stopPropagation } >
 
             <div className={ styles.closeBtn } onClick={ handleCloseBtnClick } >X</div>
 
@@ -85,11 +59,11 @@ export const Settings = () => {
                 </div>
 
                 <div className={ styles.tabContentWrapper }>
-                    <TabGeneral active={ activeTab === 'general' } />
-                    <TabControls active={ activeTab === 'controls' } />
-                    <TabAudio active={ activeTab === 'audio' } />
-                    <TabGraphics active={ activeTab === 'graphics' } />
-                    <TabAi active={ activeTab === 'ai' } />
+                    {activeTab === 'general' && <TabGeneral /> }
+                    {activeTab === 'controls' && <TabControls /> }
+                    {activeTab === 'audio' && <TabAudio /> }
+                    {activeTab === 'graphics' && <TabGraphics /> }
+                    {activeTab === 'ai' && <TabAi active={ activeTab === 'ai' } />}
                 </div>
 
             </div>

@@ -35,10 +35,6 @@
   letter-spacing: 1px;
   align-items: center;
   cursor: pointer;
-  transition: transform 0.5s cubic-bezier(0, 1, 0, 1);
-}
-.claimsNotification.open {
-  transform: translateY(-110px);
 }
 .claimsNotification:hover {
   background-image: linear-gradient(to bottom, #444, #222);

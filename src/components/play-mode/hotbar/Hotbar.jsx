@@ -8,13 +8,12 @@ import game from '../../../../game.js';
 import loadoutManager from '../../../../loadout-manager.js';
 import {registerIoEventHandler, unregisterIoEventHandler} from '../../general/io-handler/IoHandler.jsx';
 import {hotbarSize, numLoadoutSlots} from '../../../../constants.js';
+import {ResourcesBox} from '../resources-box';
 
 export const Hotbar = ({className}) => {
-    const {state, setState} = useContext(AppContext);
-    const open =  state.openedPanel === 'CharacterPanel';
+    const {setState} = useContext(AppContext);
 
     useEffect(() => {
-        if (open) {
             const keydown = e => {
                 if (!e.ctrlKey) {
                     switch (e.which) {
@@ -34,8 +33,7 @@ export const Hotbar = ({className}) => {
             return () => {
                 unregisterIoEventHandler('keydown', keydown);
             };
-        }
-    }, [open]);
+    }, []);
 
     const onDragOver = index => e => {
         e.preventDefault();
@@ -60,7 +58,7 @@ export const Hotbar = ({className}) => {
 
     return (
         <div
-            className={ classnames(className, styles.hotbar, open ? styles.open : null) }
+            className={ classnames(className, styles.hotbar) }
             onClick={onTopClick}
         >
 
@@ -89,7 +87,8 @@ export const Hotbar = ({className}) => {
                 })()
             }
 
+            <ResourcesBox />
+
         </div>
     );
-
 };

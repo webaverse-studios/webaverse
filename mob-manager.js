@@ -2025,7 +2025,7 @@ class MobGenerator {
       }
       else{
         geoId = Math.floor(rng() * meshes.length);
-        pos = [rng()*100, 400, 200+rng()*100];
+        pos = [rng()*100, 250, 200+rng()*100];
         quat = new Quaternion().setFromEuler(new Euler(0, rng()*Math.PI*2, 0)).toArray();
       }
 

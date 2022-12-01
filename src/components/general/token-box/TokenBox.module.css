@@ -1,0 +1,93 @@
+.tokenBoxWrap {
+    position: relative !important;
+    cursor: pointer;
+}
+
+.tokenBoxWrap .mask {
+    width: 91%;
+    height: 80%;
+    overflow: hidden;
+    -webkit-mask-image: url("/assets/backgrounds/token-frame-empty.svg");
+    mask-image: url("/assets/backgrounds/token-frame-empty.svg");
+    -webkit-mask-size: 100%;
+    mask-size: 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+    position: absolute;
+    z-index: 10;
+}
+
+.tokenBoxWrap .mask canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.tokenBoxWrap .level {
+    position: absolute;
+    bottom: 0;
+    right: 2px;
+    padding: 2px 4px;
+    background-color: #091218;
+    color: #efefef;
+    font-size: 7px;
+}
+
+.tokenBoxWrap .value {
+    position: absolute;
+    top: 0;
+    left: 0px;
+    padding: 2px 4px;
+    background-color: #091218;
+    color: #efefef;
+    font-size: 7px;
+}
+
+.tokenBoxWrap .frame {
+    background-size: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100%;
+    width: 100%;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+    position: absolute;
+    display: block;
+}
+.tokenBoxWrap .badge {
+    width: 20%;
+    top: 1px;
+    right: -1px;
+    position: absolute;
+
+}
+
+.tokenBoxWrap .frameActive {
+    background-image: url('/assets/backgrounds/token-frame-active.svg');
+    height: 116%;
+    width: 116%;
+}
+
+.tokenBoxWrap .frameEmptyNotToken {
+    background-image: url('/assets/backgrounds/token-frame-empty.svg');
+}
+
+.tokenBoxWrap .frameNotClaimed {
+    background-image: url('/assets/backgrounds/token-frame-not-claimed.svg');
+    z-index: 1;
+}
+
+.tokenBoxWrap .frameCopy {
+    background-image: url('/assets/backgrounds/token-frame-spawn-copy.svg');
+}
+
+.tokenBoxWrap .frameDefault {
+    background-image: url('/assets/backgrounds/token-frame.svg');
+}

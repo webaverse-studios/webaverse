@@ -8,11 +8,8 @@
   background-image: linear-gradient(to bottom, #222, #000);
   color: #FFF;
   flex-direction: column;
-  /* transform: translateY(100vh); */
-  transition: transform 1s cubic-bezier(0, 1, 0, 1);
-}
-.characterSelect .menu.open {
   transform: translateY(calc(-100vh + 200px));
+
 }
 .characterSelect .menu .heading {
   padding: 15px 20px;

@@ -95,8 +95,8 @@ export const Tokens = ({userOpen, loginFrom, hacks, address}) => {
 
     //
 
-    return (
-        <section className={classnames(styles.sidebar, state.openedPanel === 'UserPanel' ? styles.open : null)}
+    return state.openedPanel === 'UserPanel' ? (
+        <section className={classnames(styles.sidebar)}
             onClick={e => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -123,6 +123,5 @@ export const Tokens = ({userOpen, loginFrom, hacks, address}) => {
                     </div>;
                 })}
         </section>
-    );
-
+    ) : null;
 };

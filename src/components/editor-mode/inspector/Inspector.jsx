@@ -27,9 +27,7 @@ export const Inspector = () => {
 
         const hoverchange = (event) => {
 
-            const worldOpen = state.openedPanel === 'WorldPanel';
-
-            if (worldOpen && ! selectedApp && ! dragging) {
+            if (! selectedApp && ! dragging) {
 
                 const {position} = event.data;
 
@@ -60,7 +58,7 @@ export const Inspector = () => {
 
         };
 
-    }, [ state.openedPanel, selectedApp, dragging, hoverPosition ]);
+    }, [ selectedApp, dragging, hoverPosition ]);
 
     useEffect(() => {
 
@@ -93,16 +91,16 @@ export const Inspector = () => {
 
     useEffect(() => {
 
-        const worldOpen = state.openedPanel === 'WorldPanel';
-        game.setHoverEnabled(worldOpen);
+        game.setHoverEnabled(true);
 
-        if (! worldOpen) {
+        return () => {
+            game.setHoverEnabled(false);
 
             game.setMouseSelectedObject(null);
-
+            game.setMouseHoverObject(null);
         }
 
-    }, [ state.openedPanel ]);
+    }, [ ]);
 
     let localEpoch = epoch;
 
@@ -151,14 +149,14 @@ export const Inspector = () => {
 
         };
 
-    }, [ selectedApp, selectPosition ]);
+    }, [ ]);
 
     const bindPosition = selectPosition || hoverPosition || null;
 
     //
 
-    return (
-        <div className={ classnames(styles.inspector, bindPosition ? styles.open : null) } style={ bindPosition ? {
+    return bindPosition ? (
+        <div className={ classnames(styles.inspector) } style={ bindPosition ? {
             transform: `translateX(${bindPosition.x*100}vw) translateY(${bindPosition.y*100}vh)`,
         } : null}>
             <img src="/images/popup.svg" style={bindPosition ? {
@@ -166,6 +164,6 @@ export const Inspector = () => {
                 transformOrigin: '0 100%',
             } : null} />
         </div>
-    );
+    ) : null;
 
 };
