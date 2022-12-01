@@ -33,8 +33,8 @@
     "maxrects-packer": "^2.7.3",
     "metaversefile": "./packages/metaversefile",
     "openai-api": "^1.3.1",
-    "path-type": "^5.0.0",
     "parse-json": "^5.2.0",
+    "path-type": "^5.0.0",
     "progress": "^2.0.3",
     "proxy-from-env": "^1.1.0",
     "puppeteer": "^19.0.0",
@@ -80,6 +80,7 @@
     "supertest": "^6.2.4",
     "swc": "^1.0.11",
     "trace-unhandled": "2.0.1",
+    "uuid": "^9.0.0",
     "wiki": "./packages/wiki"
   },
   "repository": {
