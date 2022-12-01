@@ -172,6 +172,8 @@ const _logProcess = childProcess => {
       open(`https://local.webaverse.com:${WIKI_PORT}/map`);
     } else if (key === 'p') {
       open(`http://127.0.0.1:${PREVIEWER_PORT}/`);
+    } else if (key === 't') {
+      _startE2eTest()
     } else if (key === 'd') {
       logging = !logging;
       console.log('logging', logging);
@@ -186,6 +188,17 @@ const _logProcess = childProcess => {
     }
   };
   process.stdin.on('data', data);
+}
+
+const _startE2eTest = () => {
+  const cp = child_process.spawn('npm', ['run', 'test-e2e'], {
+    env: process.env,
+    cwd: dirname,
+    stdio: 'inherit'
+  });
+  cp.on('error', err => {
+    console.warn(err);
+  });
 }
 
 const _startDevServer = async () => {
@@ -301,7 +314,7 @@ const _startPreviewer = async () => {
   console.log(`Welcome to the Webaverse!`);
   console.log(`  > Local: https://${SERVER_NAME}:${DEVSERVER_PORT}/`);
   console.log('You have some options...');
-  console.log(`[A] App  [W] Wiki  [M] Multiplayer  [P] Previewer  [U] Map  [D] Debug logging  [Q] Quit`);
+  console.log(`[A] App  [W] Wiki  [M] Multiplayer  [P] Previewer [T] Automated Tests [U] Map  [D] Debug logging  [Q] Quit`);
   
   /* const wsServer = (() => {
     if (isHttps) {

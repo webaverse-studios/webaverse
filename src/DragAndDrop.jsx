@@ -5,13 +5,21 @@ import style from './DragAndDrop.module.css';
 import {world} from '../world.js';
 import {getRandomString, handleUpload} from '../util.js';
 import {registerIoEventHandler, unregisterIoEventHandler} from './components/general/io-handler/IoHandler.jsx';
-import {registerLoad} from './LoadingBox.jsx';
 import {ObjectPreview} from './ObjectPreview.jsx';
 import game from '../game.js';
 import {getRenderer} from '../renderer.js';
 import cameraManager from '../camera-manager.js';
 import metaversefile from 'metaversefile';
 import {AppContext} from './components/app';
+import CustomButton from './components/general/custom-button';
+import useNFTContract from './hooks/useNFTContract';
+import {
+  GenericLoadingMessage,
+  LoadingIndicator,
+  registerLoad,
+} from './LoadingBox.jsx';
+
+const timeCount = 6000;
 
 const _upload = () => new Promise((accept, reject) => {
   const input = document.createElement('input');
@@ -85,9 +93,13 @@ const uploadCreateApp = async (item, {
 };
 
 const DragAndDrop = () => {
-  const {state, setState,} = useContext(AppContext)
+  const {state, setState, account} = useContext(AppContext)
   const [queue, setQueue] = useState([]);
   const [currentApp, setCurrentApp] = useState(null);
+  const {mintNFT, minting, error, setError, WebaversecontractAddress} = useNFTContract(account.currentAddress);
+  const [mintComplete, setMintComplete] = useState(false);
+  const [pendingTx, setPendingTx] = useState(false);
+
 
   useEffect(() => {
     function keydown(e) {
@@ -123,6 +135,7 @@ const DragAndDrop = () => {
     const drop = async e => {
       console.log('drop', e);
 
+<<<<<<< HEAD
       e.preventDefault();
       /* const renderer = getRenderer();
       const rect = renderer.domElement.getBoundingClientRect();
@@ -143,6 +156,15 @@ const DragAndDrop = () => {
                   localVector4.set(0, 1, 0)
                 ))
             )
+=======
+      const renderer = getRenderer();
+      if (e.target === renderer?.domElement) {
+        /* const renderer = getRenderer();
+        const rect = renderer.domElement.getBoundingClientRect();
+        localVector2D.set(
+          ( e.clientX / rect.width ) * 2 - 1,
+          - ( e.clientY / rect.height ) * 2 + 1
+>>>>>>> dc876353481926176df2ae026c3f6fba11b96d0f
         );
       const quaternion = camera.quaternion.clone(); */
 
@@ -231,11 +253,26 @@ const DragAndDrop = () => {
       setCurrentApp(null);
     }
   };
-  const _mint = e => {
+  const _mint = async e => {
     e.preventDefault();
     e.stopPropagation();
 
-    console.log('mint', currentApp);
+    if(!account.isConnected) {
+      setError("You are not logged in");
+      return;
+    }
+
+    if (currentApp) {
+      const app = currentApp;
+      await mintNFT(app, () => {
+        setCurrentApp(null);
+        setPendingTx(true)
+      }, () => {
+        setMintComplete(true);
+        setPendingTx(false)
+      });
+    }
+    setCurrentApp(null);
   };
   const _cancel = e => {
     e.preventDefault();
@@ -244,46 +281,102 @@ const DragAndDrop = () => {
     setCurrentApp(null);
   };
 
+  useEffect(() => {
+    if (mintComplete) {
+      const timer = setTimeout(() => {
+        setMintComplete(false);
+      }, timeCount);
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [mintComplete]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError('');
+      }, timeCount);
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [error]);
+
   const name = currentApp ? currentApp.name : '';
   const appType = currentApp ? currentApp.appType : '';
 
+  
   return currentApp ? (
     <div className={style.dragAndDrop}>
-      <div className={classnames(style.currentApp)} onClick={_currentAppClick}>
-        <h1 className={style.heading}>Upload object</h1>
-        <div className={style.body}>
-          <ObjectPreview object={currentApp} className={style.canvas} />
-          <div className={style.wrap}>
-            <div className={style.row}>
-              <div className={style.label}>Name: </div>
-              <div className={style.value}>{name}</div>
-            </div>
-            <div className={style.row}>
-              <div className={style.label}>Type: </div>
-              <div className={style.value}>{appType}</div>
+      <GenericLoadingMessage
+        open={minting}
+        name={'Minting'}
+        detail={'Creating NFT...'}
+      ></GenericLoadingMessage>
+      <GenericLoadingMessage
+        open={mintComplete}
+        name={'Minting Complete'}
+        detail={'Press [Tab] to use your inventory.'}
+      ></GenericLoadingMessage>
+      <GenericLoadingMessage
+        open={error}
+        name={'Error'}
+        detail={error}
+      ></GenericLoadingMessage>
+      <div
+        className={classnames(style.modalWrap)}
+        onClick={_currentAppClick}
+      >
+        <div className={style.modalTitle}>Upload Object</div>
+        <div className={style.modalContentWrap}>
+          <div className={style.itemPreviewBoxWrap}>
+            <div className={style.itemPreviewBox}>
+              <div className={style.bg} />
+              <div className={style.mask}>
+                <ObjectPreview object={currentApp} className={style.canvas} />
+              </div>
             </div>
           </div>
-        </div>
-        <div className={style.footer}>
-          <div className={style.buttons}>
-            <div className={style.button} onClick={_drop}>
-              <span>Drop</span>
-              <sub>to world</sub>
+          <div className={style.info}>
+            <h2>{name}</h2>
+            <div className={style.type}>
+              <span className={style.label}>Item type:</span> {appType}
             </div>
-            <div className={style.button} onClick={_equip}>
-              <span>Equip</span>
-              <sub>to self</sub>
-            </div>
-            <div className={style.button} disabled onClick={_mint}>
-              <span>Mint</span>
-              <sub>on chain</sub>
-            </div>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam
+              quis tellus commodo, sodales orci id, euismod massa.
+            </p>
           </div>
-          <div className={style.buttons}>
-            <div className={classnames(style.button, style.small)} onClick={_cancel}>
-              <span>Cancel</span>
-              <sub>back to game</sub>
-            </div>
+          <div className={style.actions}>
+            <CustomButton
+              theme="light"
+              text="Drop"
+              size={14}
+              className={style.button}
+              onClick={_drop}
+            />
+            <CustomButton
+              theme="light"
+              text="Equip"
+              size={14}
+              className={style.button}
+              onClick={_equip}
+            />
+            <CustomButton
+              theme="light"
+              text="Mint"
+              size={14}
+              className={style.button}
+              onClick={_mint}
+            />
+            <CustomButton
+              theme="dark"
+              text="Cancel"
+              size={14}
+              className={style.button}
+              onClick={_cancel}
+            />
           </div>
         </div>
       </div>
