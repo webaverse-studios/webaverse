@@ -344,6 +344,7 @@ class IoManager extends EventTarget {
       case 68: { // D
         ioManager.keys.right = true;
         game.setMovements();
+
         const now = performance.now();
         const timeDiff = now - this.lastKeysDownTime.keyD;
         if (timeDiff < doubleTapTime && ioManager.keys.shift) {
@@ -568,8 +569,9 @@ class IoManager extends EventTarget {
       case 16: { // shift
         ioManager.keys.shift = false;
         ioManager.keys.doubleTap = false;
-        game.setSprint(false);
+       
         game.menuUnDoubleTap();
+        game.setSprint(false);
         break;
       }
       case 46: { // delete
