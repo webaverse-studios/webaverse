@@ -20,7 +20,7 @@ const soundFiles = {
   // menuOpen: _getSoundFiles(/PauseMenu_Open/),
   // menuOpen: _getSoundFiles(/ff8_save/),
   
-  //mobs sounds todo: implement sound bank package in app
+  // mobs sounds todo: implement sound bank package in app
   worm_bloaterattack: _getSoundFiles(/worm_bloaterattack/),
   worm_slasherattack: _getSoundFiles(/worm_slasherattack/),
   worm_runnerattack:  _getSoundFiles(/worm_runnerattack/),
@@ -29,7 +29,7 @@ const soundFiles = {
   worm_slasherdie: _getSoundFiles(/worm_slasherdie/),
   worm_runnerdie:  _getSoundFiles(/worm_runnerdie/),
   worm_die:  _getSoundFiles(/worm_die/),
-  //end mob sounds
+  // end mob sounds
   
   // menuOpen: _getSoundFiles(/ff8_menu_open\.wav/),
   // menuClose: _getSoundFiles(/PauseMenu_Close/),

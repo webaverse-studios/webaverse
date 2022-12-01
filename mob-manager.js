@@ -55,21 +55,21 @@ const soundsDB = new Map([
   ["https://webaverse.github.io/silkworm-bloater/silkworm-bloater.glbattack.001", "worm_bloaterattack"],
   ["https://webaverse.github.io/silkworm-bloater/silkworm-bloater.glbattack.002", "worm_bloaterattack"],
   ["https://webaverse.github.io/silkworm-bloater/silkworm-bloater.glbdeath",      "worm_bloaterdie"],
-  //["https://webaverse.github.io/silkworm-bloater/silkworm-bloater.glbidle",       ""],
-  //["https://webaverse.github.io/silkworm-bloater/silkworm-bloater.glbwalk",       ""],
+  // ["https://webaverse.github.io/silkworm-bloater/silkworm-bloater.glbidle",       ""],
+  // ["https://webaverse.github.io/silkworm-bloater/silkworm-bloater.glbwalk",       ""],
   ["https://webaverse.github.io/silkworm-slasher/silkworm-slasher.glbattack",     "worm_slasherattack"],
   ["https://webaverse.github.io/silkworm-slasher/silkworm-slasher.glbattack.001", "worm_slasherattack"],
   ["https://webaverse.github.io/silkworm-slasher/silkworm-slasher.glbattack.002", "worm_slasherattack"],
   ["https://webaverse.github.io/silkworm-slasher/silkworm-slasher.glbdeath",      "worm_slasherdie"],
-  //["https://webaverse.github.io/silkworm-slasher/silkworm-slasher.glbidle",       ""],
-  //["https://webaverse.github.io/silkworm-slasher/silkworm-slasher.glbjump",       ""],
-  //["https://webaverse.github.io/silkworm-slasher/silkworm-slasher.glbwalk",       ""],
+  // ["https://webaverse.github.io/silkworm-slasher/silkworm-slasher.glbidle",       ""],
+  // ["https://webaverse.github.io/silkworm-slasher/silkworm-slasher.glbjump",       ""],
+  // ["https://webaverse.github.io/silkworm-slasher/silkworm-slasher.glbwalk",       ""],
   ["https://webaverse.github.io/silkworm-runner/silkworm-runner.glbattack",       "worm_runnerattack"],
   ["https://webaverse.github.io/silkworm-runner/silkworm-runner.glbattack.001",   "worm_runnerattack"],
   ["https://webaverse.github.io/silkworm-runner/silkworm-runner.glbattack.002",   "worm_runnerattack"],
   ["https://webaverse.github.io/silkworm-runner/silkworm-runner.glbdeath",        "worm_runnerdie"],
-  //["https://webaverse.github.io/silkworm-runner/silkworm-runner.glbidle",         ""],
-  //["https://webaverse.github.io/silkworm-runner/silkworm-runner.glbwalk",         ""]
+  // ["https://webaverse.github.io/silkworm-runner/silkworm-runner.glbidle",         ""],
+  // ["https://webaverse.github.io/silkworm-runner/silkworm-runner.glbwalk",         ""]
   ["attack", "worm_attack"],
   ["death", "worm_die"]
 ]);
@@ -708,7 +708,7 @@ class MobAIControllerPrototype {
 
     window.mobsAttackInPlace = (id)=>{
       let mobs;
-      if(id == -1){
+      if(id === -1){
         mobs = this.mobs;
       }
       else{
