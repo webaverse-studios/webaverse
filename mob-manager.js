@@ -12,7 +12,7 @@ import {InstancedBatchedMesh, InstancedGeometryAllocator} from './geometry-batch
 import {createTextureAtlas} from './atlasing.js';
 import {Matrix4,Quaternion,Vector3,Euler} from 'three';
 import * as sounds from './sounds.js';
-import { ConstructorFragment } from 'ethers/lib/utils.js';
+import {ConstructorFragment} from 'ethers/lib/utils.js';
 import hitManager from './character-hitter.js'
 import {scene, camera} from './renderer.js';
 import * as coreModules from './core-modules.js';
@@ -62,6 +62,7 @@ const defaultMobLifePoint = 5;
 const animationEasing = 16;
 const defaultAggroDistance = 3;
 const debugMobActions = true;
+const debugShader = false;
 
 export const MobStates = {
   idle: 0,
@@ -71,7 +72,7 @@ export const MobStates = {
   attackTarget: 4,
 };
 
-//const MAXSOUNDSSAMETIME = 2;
+// const MAXSOUNDSSAMETIME = 2;
 // window.THREE = THREE;
 
 const _zeroY = v => {
@@ -491,7 +492,7 @@ class Mob {
   }
 }
 
-/*class MobSoundsPlayer{
+/* class MobSoundsPlayer{
   constructor(){
     this.soundsRequests = 0;
   }
@@ -507,7 +508,7 @@ class Mob {
   }
 }
 
-const mobSoundsPlayer = new MobSoundsPlayer();*/
+const mobSoundsPlayer = new MobSoundsPlayer(); */
 
 /*
   Action to be attached to AI controlled entities
@@ -670,7 +671,7 @@ class MobAIControllerPrototype {
     this.mobs = [];
     window.mobsAttack = (id)=>{
       let mobs;
-      if(id == -1){
+      if(id === -1){
         mobs = this.mobs;
       }
       else{
@@ -684,7 +685,7 @@ class MobAIControllerPrototype {
 
     window.mobsIdle = (id)=>{
       let mobs;
-      if(id == -1){
+      if(id === -1){
         mobs = this.mobs;
       }
       else{
@@ -700,7 +701,7 @@ class MobAIControllerPrototype {
 
     window.mobsfollowTarget = (id)=>{
       let mobs;
-      if(id == -1){
+      if(id === -1){
         mobs = this.mobs;
       }
       else{
@@ -712,6 +713,7 @@ class MobAIControllerPrototype {
       }
     }
   }
+
   addMob(mob){
     this.mobs.push(mob);
     mob.killEvents.push(()=>{
@@ -723,7 +725,7 @@ class MobAIControllerPrototype {
   }
 }
 
-/*class RagdollSpawner{
+/* class RagdollSpawner{
   constructor(addToScene){
     this.addToScene = addToScene;
   }
@@ -738,7 +740,7 @@ class MobAIControllerPrototype {
   }
 }
 
-let ragdollSpawner;*/
+let ragdollSpawner; */
 /*
   class for mob instances. integrate the action system, performing actions through action components
   pos: mob position
@@ -752,7 +754,7 @@ let ragdollSpawner;*/
 export class MobInstance {
   constructor(pos, quat, geometryIndex, timeOffset, radius, height, velocity, idleAction) {
     this.actions = [];
-    this.target;
+    this.target = undefined;
     this.life = defaultMobLifePoint;
     this.actionsQueue = [];
     this.position = new Vector3().fromArray(pos);
@@ -791,7 +793,7 @@ export class MobInstance {
     if(!hitData.args.physicsId || hitData.args.physicsId !== this.controller.physicsId)
       return;
 
-    //damage and death
+    // damage and death
     switch(hitData.type){
       case 'sword':
         this.life -= 2;
@@ -862,7 +864,7 @@ export class MobInstance {
 
   _createActions(){
     for(let [key, value] of this.animations){
-      if(key == 'idle'){
+      if(key === 'idle'){
         this.actions.push(new DefaultIdleAction(value.duration));
         continue;
       }
@@ -872,7 +874,7 @@ export class MobInstance {
         continue;
       }
 
-      if(key == 'death'){
+      if(key === 'death'){
         this.actions.push(new DieAction(value.duration * 0.99));
         continue;
       }
@@ -894,7 +896,7 @@ export class MobInstance {
 
   hasAction(type){
     for(const a of this.actions){
-      if (a.type == type)
+      if (a.type === type)
         return true;
     }
     return false;
@@ -902,8 +904,8 @@ export class MobInstance {
 
   startAction(actionId){
     for(const a of this.actions){
-      if(a.actionId == actionId){
-        if(this.life <= 0 && a.type != DIEACTIONTYPE && a.type != VANISHACTIONTYPE)
+      if(a.actionId === actionId){
+        if(this.life <= 0 && a.type !== DIEACTIONTYPE && a.type !== VANISHACTIONTYPE)
           return;
         this.actionsQueue.push(a);
       }
@@ -941,7 +943,7 @@ export class MobInstance {
   }
 
   debugAction(timeDiffS){
-    if(this.actionsQueue.length == 0){
+    if(this.actionsQueue.length === 0){
       this.startAction('attack');
       this.actionsQueue.push(this.idleAction);
     }
@@ -962,7 +964,7 @@ export class MobInstance {
   */
   manageActions(timeDiffS){
     
-    if(this.actionsQueue.length == 0){
+    if(this.actionsQueue.length === 0){
       if(this.dead)
         return;
       
@@ -988,8 +990,9 @@ export class MobInstance {
   }
 
   followTarget(attack){
-    /*if(this.life <= 0 || !this.target)
+    if(this.life <= 0 || !this.target)
       return;
+    /*
     if(!this.target && this.askForTarget){
       this.target = this.askForTarget();
       if(!this.target)
@@ -999,14 +1002,14 @@ export class MobInstance {
     if(this.target.life <= 0){
       this.target = undefined;
       return;
-    }*/
+    } */
 
     this.animatedLookAt(this.target.position);
     const targetVector = this.target.position.clone().sub(this.position);
     if(targetVector.length() < this.aggroDistance*1.1){
       if(targetVector.length() < this.aggroDistance*0.8){
         this.followTargetOutOfRange = false;
-        if(this.currentAnimation == this.animations.get('walk').id){
+        if(this.currentAnimation === this.animations.get('walk').id){
           this.playAnimation('idle', false);
         }
       }
@@ -1014,7 +1017,7 @@ export class MobInstance {
       if(attack){
         let isAttacking = false;
         for(const a of this.actionsQueue){
-          if(a.type == ATTACKACTIONTYPE){
+          if(a.type === ATTACKACTIONTYPE){
             isAttacking = true;
             break;
           }
@@ -1053,7 +1056,7 @@ export class MobInstance {
     this.manageActions(timeDiffS);
 
     if(!this.grounded){
-      //15 seconds it reach terminal velocity in air
+      // 15 seconds it reach terminal velocity in air
       this.fallTime = this.fallTime >= 15 ? this.fallTime : this.fallTime + timeDiffS;
       const gravity = physicsManager.getScene().getGravity().clone();
       this.movement.add(gravity.multiplyScalar(this.fallTime * this.fallTime));
@@ -1071,7 +1074,7 @@ export class MobInstance {
       this.updateRotation = true;
     }
 
-    //manage position
+    // manage position
     if(this.movement.length() > 0)
       this.moveMobInternal(timeDiffS);
   }
@@ -1089,7 +1092,7 @@ export class MobInstance {
     );
     // const collided = flags !== 0;
     this.grounded = !!(flags & 0x1);
-    if(this.controller.position.distanceTo(this.position) > 0.01 ){
+    if(this.controller.position.distanceTo(this.position) > 0.01){
       this.position.copy(this.controller.position);
       this.updatePosition = true;
     }
@@ -1117,62 +1120,15 @@ export class MobInstance {
       return;
     
     const anim = this.animations.get(animationName);
-    if(this.currentAnimation != anim.id){
+    if(this.currentAnimation !== anim.id){
       this.currentAnimation = anim.id;
       this.updateAnimation = true;
     }
     if(restart){
-      //this.timeOffset = -((this.uTime % anim.frameCount) / anim.frameCount);
+      // this.timeOffset = -((this.uTime % anim.frameCount) / anim.frameCount);
       this.timeOffset = 0;
       this.updateTimeOffset = true;
     }
-  }
-
-  /*
-    animation debug function. Contains hardcoded value interally to not pollute external code
-  */
-  debugAnimation(playerLocation, timeDiff){
-    const selfToPlayer   = playerLocation.clone().sub(this.position);
-    const playerDistance = selfToPlayer.length();
-    const attackID       = this.animations.get('attack');
-    const walkID         = this.animations.get('walk');
-    const idleID         = this.animations.get('idle');
-    const movement       = new Vector3(0, 0, 0);
-    // player is in sight
-    if(playerDistance < 8){
-      this.animatedLookAt(playerLocation);
-      if(playerDistance > 4){
-        // update position
-        this.locationTarget =
-          playerLocation.clone().add(
-            selfToPlayer.clone().negate().normalize().multiplyScalar(3)
-          );
-      } else if(this.currentAnimation == idleID) { // attack the player
-        if(attackID !== undefined && this.currentAnimation != attackID){
-          playAnimation('attack');
-        }
-      }
-    }
-    else if(this.currentAnimation != idleID){
-      this.locationTarget.copy(this.position);
-      playAnimation('idle');
-    }
-
-    // manage Position
-    if(this.locationTarget.clone().sub(this.position).length() > 0.5){
-      if(this.currentAnimation != walkID){
-        this.playAnimation('walk');
-      }
-
-      const t = this.locationTarget.clone().sub(this.position).normalize();
-      movement.add(t)
-    }
-    else{
-      if(this.currentAnimation == walkID){
-        playAnimation('idle');
-      }
-    }
-    return movement;
   }
 }
 
@@ -1678,7 +1634,7 @@ if(vanish > 0.){
         `);
         
         // put true to debug shader
-        if(false)
+        if(debugShader)
           shader.fragmentShader = `\
 #define DEBUG_SHADER
 #if ( defined( USE_UV ) && ! defined( UVS_VERTEX_ONLY ) )
@@ -1910,7 +1866,7 @@ void main() {
       pTexture[pOffset + instanceIndex * pPadding + 1] = pTexture[pOffset + lastInstanceIndex * pPadding + 1];
       pTexture[pOffset + instanceIndex * pPadding + 2] = pTexture[pOffset + lastInstanceIndex * pPadding + 2];
 
-      //sets position of last instance to 0
+      // sets position of last instance to 0
       for(const i of [0, 1, 2]){
         pTexture[pOffset + lastInstanceIndex * pPadding + i] = 0;
       }
@@ -2049,18 +2005,18 @@ class MobGenerator {
     const rng = alea(seed);
     let mobCount = 256;
     for(let i = 0; i < mobCount; i++){
-      //const size = new Vector3();
-      //new THREE.Box3().setFromObject(meshes[geoId]).getSize(size);
+      // const size = new Vector3();
+      // new THREE.Box3().setFromObject(meshes[geoId]).getSize(size);
       
       let geoId;
       let pos;
       let quat;
       if(debugMob){
-        //animation debug
-        //geoId = i%meshes.length;
-        //pos = [i*4 - 2*2,  2, -10];
+        // animation debug
+        // geoId = i%meshes.length;
+        // pos = [i*4 - 2*2,  2, -10];
         // mobCount = 5
-        //massive count debug
+        // massive count debug
         const n = 30;
         mobCount = n*n;
         geoId = Math.floor(rng() * meshes.length);
@@ -2101,8 +2057,8 @@ class MobGenerator {
 
   update(timestamp, timeDiff) {
     const localPlayer = playersManager.getLocalPlayer();
-    /*this.mixer.update(1. / bakeFps);
-    this.mixer.updateMatrixWorld();*/
+    /* this.mixer.update(1. / bakeFps);
+    this.mixer.updateMatrixWorld(); */
     for(const m of this.mobs){
       m.update(localPlayer.position, timeDiff);
     }
@@ -2170,7 +2126,7 @@ class Mobber {
   }
 
   async waitForUpdate() {
-    await trackerCreated;
+    await this.trackerCreated;
     await new Promise((accept, reject) => {
       this.tracker.onPostUpdate(() => {
         accept();
