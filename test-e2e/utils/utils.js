@@ -19,7 +19,7 @@ const isdebug = true;
 
 let csvWriter = null
 let csvRecords = []
-const isWriteCSV = true
+const isWriteCSV = false
 
 let currentScene
 
@@ -32,6 +32,7 @@ const printLog = (text, error) => {
 };
 
 const setupExcel = async () => {
+  if (!isWriteCSV) return
   const testFilePath = `test-${Math.floor(Date.now() / 1000)}.csv`
   try {
     if (fs.existsSync(testFilePath)) {
@@ -61,9 +62,10 @@ const setCurrentScene = async str => {
 }
 
 const saveExcel = async str => {
+  if (!isWriteCSV) return
   try {
     if (currentScene !== str) return
-    if (isWriteCSV) await csvWriter.writeRecords(csvRecords)
+    await csvWriter.writeRecords(csvRecords)
     csvRecords = []
   } catch (error) {
     console.error(error)
@@ -71,6 +73,7 @@ const saveExcel = async str => {
 }
 
 const updateExcelRow = (type, message, message2) => {
+  if (!isWriteCSV) return
   if (csvWriter
     && (type === 'section'
       || type === 'error'
@@ -173,7 +176,6 @@ const setupErrorList = async page => {
   });
 
   await page.evaluate(async () => {
-    // @ts-ignore
     try {
       window.onerror=function(msg, url, line){
         window.browserError({msg, url, line})
@@ -254,7 +256,6 @@ const navigate = async (url, playerIndex = 0) => {
     // printLog('Complete to ' + url);
 
     // const granted = await page.evaluate(async () => {
-    // 	// @ts-ignore
     // 	return (await navigator.permissions.query({ name: 'camera' })).state
     // })
     // printLog('Granted:', granted)
@@ -293,7 +294,6 @@ const enterScene = async (url, playerIndex = 0) => {
     await throwErrors('Cannot load the current scene!', false);
   } else {
     const isSceneLoaded = await page.evaluate(async totalTimeout => {
-      // @ts-ignore
       try {
         await window.waitForUntil(() => {
           return window?.globalWebaverse

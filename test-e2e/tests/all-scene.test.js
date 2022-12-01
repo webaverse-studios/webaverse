@@ -35,7 +35,6 @@ describe.only('should load scene works', () => {
     async sceneUrl => {
       let isSuccess = false
       try {
-        // Todo: check timeout case
         if (recentTestPassed !== currntTest) {
           displayLog('fail', 'Scene loaded failed timeout: ', `${currntTest}`)
           saveExcel(currntTest)
@@ -51,7 +50,6 @@ describe.only('should load scene works', () => {
         await enterScene(`https://local.webaverse.com/?src=/packages/scenes/${sceneUrl}`);
 
         const result = await page.evaluate(async () => {
-          // @ts-ignore
           try {
             const loadedApps =
               window.globalWebaverse.world.appManager.getApps();
@@ -197,7 +195,6 @@ describe.only('should load scene works', () => {
 //       await page.waitForTimeout(500);
 
 //       const result = await page.evaluate(async () => {
-//         // @ts-ignore
 //         try {
 //           await window.globalWebaverse.webaverse?.waitForLoad();
 //           await window.globalWebaverse.universe?.waitForSceneLoaded();
