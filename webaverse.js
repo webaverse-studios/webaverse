@@ -3,7 +3,7 @@ this file bootstraps the webaverse engine.
 it uses the help of various managers and stores, and executes the render loop.
 */
 
-import './metaversefile-api.js';
+import metaversefileApi from './metaversefile-api.js';
 import {playersManager} from './players-manager.js';
 import cameraManager from './camera-manager.js';
 import ioManager from './io-manager.js';

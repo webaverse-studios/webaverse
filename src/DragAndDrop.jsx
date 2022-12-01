@@ -133,41 +133,6 @@ const DragAndDrop = () => {
     }
     window.addEventListener('dragover', dragover);
     const drop = async e => {
-      console.log('drop', e);
-
-<<<<<<< HEAD
-      e.preventDefault();
-      /* const renderer = getRenderer();
-      const rect = renderer.domElement.getBoundingClientRect();
-      localVector2D.set(
-        ( e.clientX / rect.width ) * 2 - 1,
-        - ( e.clientY / rect.height ) * 2 + 1
-      );
-      localRaycaster.setFromCamera(localVector2D, camera);
-      const dropZOffset = 2;
-      const position = localRaycaster.ray.origin.clone()
-        .add(
-          localVector2.set(0, 0, -dropZOffset)
-            .applyQuaternion(
-              localQuaternion
-                .setFromRotationMatrix(localMatrix.lookAt(
-                  localVector3.set(0, 0, 0),
-                  localRaycaster.ray.direction,
-                  localVector4.set(0, 1, 0)
-                ))
-            )
-=======
-      const renderer = getRenderer();
-      if (e.target === renderer?.domElement) {
-        /* const renderer = getRenderer();
-        const rect = renderer.domElement.getBoundingClientRect();
-        localVector2D.set(
-          ( e.clientX / rect.width ) * 2 - 1,
-          - ( e.clientY / rect.height ) * 2 + 1
->>>>>>> dc876353481926176df2ae026c3f6fba11b96d0f
-        );
-      const quaternion = camera.quaternion.clone(); */
-
       const items = Array.from(e.dataTransfer.items);
       await Promise.all(items.map(async item => {
         const drop = _isJsonItem(item);
