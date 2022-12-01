@@ -13,7 +13,7 @@
     "build": "vite build",
     "serve": "vite preview",
     "setup:test": "cd test && npm i",
-    "test": "npm run test-e2e",
+    "test": "concurrently \"npm run start\" \"npm run test-e2e\"",
     "test-e2e": "cd test-e2e && jest -i",
     "start-pm2": "pm2-runtime index.mjs -p --secret $PM2_SECRET_KEY --public $PM2_PUBLIC_KEY --no-auto-exit --instances 1 --restart-delay 60000",
     "lint": "eslint --fix --quiet --ext .js,.jsx ."
@@ -61,6 +61,7 @@
     "chalk": "^4.1.2",
     "child_process": "^1.0.2",
     "compiler": "./packages/compiler",
+    "concurrently": "^7.6.0",
     "csv-writer": "^1.6.0",
     "eslint": "^8.26.0",
     "eslint-config-prettier": "^8.5.0",
