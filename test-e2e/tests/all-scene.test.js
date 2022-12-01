@@ -54,7 +54,7 @@ describe.only('should load scene works', () => {
           // @ts-ignore
           try {
             const loadedApps =
-              window.window.globalWebaverse.world.appManager.getApps();
+              window.globalWebaverse.world.appManager.getApps();
             const loadedAppCount = loadedApps.length;
           // add some validation code here
             return {
@@ -199,10 +199,10 @@ describe.only('should load scene works', () => {
 //       const result = await page.evaluate(async () => {
 //         // @ts-ignore
 //         try {
-//           await window.window.globalWebaverse.webaverse?.waitForLoad();
-//           await window.window.globalWebaverse.universe?.waitForSceneLoaded();
+//           await window.globalWebaverse.webaverse?.waitForLoad();
+//           await window.globalWebaverse.universe?.waitForSceneLoaded();
 //           const loadedApps =
-//             window.window.globalWebaverse.world.appManager.getApps();
+//             window.globalWebaverse.world.appManager.getApps();
 //           const loadedAppCount = loadedApps.length;
 //           // add some validation code here
 //           return {
