@@ -70,6 +70,21 @@ const _cloneChunkResult = chunkResult => {
     }
   };
 
+  const _getVegetationInstancesSize = instancesResult => {
+    if (instancesResult) {
+      const {geometries} = instancesResult;
+      let size = 0;
+      for (let i = 0; i < geometries.length; i++) {
+        const geometry = geometries[i];
+        const instances = geometry.instances;
+        size += _getPQIInstancesSize(instances);
+      }
+      return size;
+    } else {
+      return 0;
+    }
+  };
+
   const _getPQMIInstancesSize = instancesResult => {
     if (instancesResult) {
       const {instances} = instancesResult;
@@ -129,7 +144,8 @@ const _cloneChunkResult = chunkResult => {
   const terrainGeometrySize = _getTerrainGeometrySize();
   const waterGeometrySize = _getWaterGeometrySize();
   // const barrierGeometrySize = _getBarrierGeometrySize();
-  const treeInstancesSize = _getPQIInstancesSize(treeInstances);
+  // const treeInstancesSize = _getPQIInstancesSize(treeInstances);
+  const treeInstancesSize = _getVegetationInstancesSize(treeInstances);
   const bushInstancesSize = _getPQIInstancesSize(bushInstances);
   const rockInstancesSize = _getPQIInstancesSize(rockInstances);
   const stoneInstancesSize = _getPQIInstancesSize(stoneInstances);
@@ -333,6 +349,25 @@ const _cloneChunkResult = chunkResult => {
     }
   };
 
+  const _cloneVegetationInstances = instancesResult => {
+    if (instancesResult) {
+      const {geometries} = instancesResult;
+      const geometries2 = Array(geometries.length);
+      for (let i = 0; i < geometries.length; i++) {
+        const geometry = geometries[i];
+        const {instances} = geometry;
+        const instances2 = _clonePQIInstances(instances);
+        geometries2[i] = {
+          instances: instances2
+        };
+      }
+      return geometries2;
+    } else {
+      return null;
+    }
+  };
+
+
   const _clonePQMIInstances = instancesResult => {
     if (instancesResult) {
       const {instances} = instancesResult;
@@ -448,7 +483,7 @@ const _cloneChunkResult = chunkResult => {
 
   const terrainGeometry2 = _cloneTerrainGeometry();
   const waterGeometry2 = _cloneWaterGeometry();
-  const treeInstances2 = _clonePQIInstances(treeInstances);
+  const treeInstances2 = _cloneVegetationInstances(treeInstances);
   const bushInstances2 = _clonePQIInstances(bushInstances);
   const rockInstances2 = _clonePQIInstances(rockInstances);
   const stoneInstances2 = _clonePQIInstances(stoneInstances);
