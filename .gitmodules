@@ -28,9 +28,6 @@
 [submodule "packages/three-vrm"]
 	path = packages/three-vrm
 	url = https://github.com/webaverse/three-vrm.git
-[submodule "packages/three-vrm-core"]
-	path = packages/three-vrm-core
-	url = https://github.com/webaverse/three-vrm-core.git
 [submodule "packages/three-vrm-springbone"]
 	path = packages/three-vrm-springbone
 	url = https://github.com/webaverse/three-vrm-springbone.git
