@@ -416,7 +416,9 @@ metaversefile.setApi({
       const m = await import(s);
       return m;
     } catch(err) {
-      console.warn('error loading', JSON.stringify(s), err.stack);
+      // console.warn('error loading', JSON.stringify(s), err.stack);
+      // Todo: need to output as an error for automated tests
+      console.error(err)
       return null;
     }
   },
@@ -659,6 +661,9 @@ metaversefile.setApi({
   },
   useRemotePlayers() {
     return Array.from(playersManager.getRemotePlayers().values());
+  },
+  usePlayersManager() {
+    return playersManager;
   },
   usePartyManager() {
     return partyManager;
