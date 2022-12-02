@@ -114,6 +114,5 @@ export class DioramaManagerProxy {
 
     getDiorama(opts) {
         return this.createDiorama(opts);
-      }
-      
+    }
 }

@@ -3,12 +3,12 @@ const postToSelf = true; // set to false for cross iframe comms with interface
 // add a custom setter that logs the value of the listeners variable when it is changed
 const listenersSet = new Set();
 const listeners = new Proxy(listenersSet, {
-    set(messageType, key, value) {
-        messageType[key] = value;
+    set(listeners, messageType, value) {
+        listeners[messageType] = value;
         return true;
     },
-    get(messageType, key) {
-        return messageType[key];
+    get(listeners, messageType) {
+        return listeners[messageType];
     },
 });
 
