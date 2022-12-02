@@ -15,21 +15,13 @@ const totalTimeout = 5 * 60 * 1000
 let retryCount = 0
 let isReConnectionNeeded = false
 
-const isdebug = true;
+const isdebug = false;
 
 let csvWriter = null
 let csvRecords = []
 const isWriteCSV = false
 
 let currentScene
-
-const printLog = (text, error) => {
-  if (isdebug) {
-    if (!error) error = '';
-    console.log(text, error.toString());
-    // process.stderr.write(`${text}\n`);
-  }
-};
 
 const setupExcel = async () => {
   if (!isWriteCSV) return
@@ -95,35 +87,34 @@ const updateExcelRow = (type, message, message2) => {
 }
 
 const displayLog = async (type, message, message2 = '') => {
+  if (!isdebug) return
   if (!chalk.supportsColor) {
     console.log(type, message, message2);
   }
-  if (isdebug) {
-    let output = '';
-    if (type === 'action') {
-      output = `${chalk.reset.white.bgGreen.bold(' ACTION ')} ${message} ${chalk.underline.greenBright(message2)}`;
-    } else if (type === 'section') {
-      output = `${chalk.reset.black.bgYellowBright.bold(' START ')} ${message} ${chalk.underline.yellowBright(message2)}`;
-    } else if (type === 'step') {
-      output = `${chalk.reset.white.bold(' STEP ')} ${message} ${chalk.reset.white(message2)}`;
-    } else if (type === 'error') {
-      output = `${chalk.reset.redBright.bold(' ERROR ')} ${message} ${chalk.reset.white(message2)}`;
-    } else if (type === 'browsererror') {
-      output = `${chalk.reset.redBright.bold(' BROWSER ERROR ')} ${message} ${chalk.reset.white(message2)}`;
-    } else if (type === 'success') {
-      output = `${chalk.reset.greenBright.bold(' SUCCESS ')} ${message} ${chalk.reset.white(message2)}`;
-    } else if (type === 'info') {
-      output = `${chalk.reset.whiteBright.bold(' INFO ')} ${message} ${chalk.underline.greenBright(message2)}`;
-    } else if (type === 'log') {
-      output = `${chalk.reset.gray.bold(' LOG ')} ${message} ${chalk.underline.greenBright(message2)}`;
-    } else if (type === 'passed') {
-      output = `${chalk.reset.white.bgGreenBright.bold(' PASSED ')} ${message} ${chalk.underline.greenBright(message2)}`;
-    } else if (type === 'fail') {
-      output = `${chalk.reset.white.bgRedBright.bold(' FAILED ')} ${message} ${chalk.underline.redBright(message2)}`;
-    }
-    process.stderr.write(`${output}\n`);
-    updateExcelRow(type, message, message2)
+  let output = '';
+  if (type === 'action') {
+    output = `${chalk.reset.white.bgGreen.bold(' ACTION ')} ${message} ${chalk.underline.greenBright(message2)}`;
+  } else if (type === 'section') {
+    output = `${chalk.reset.black.bgYellowBright.bold(' START ')} ${message} ${chalk.underline.yellowBright(message2)}`;
+  } else if (type === 'step') {
+    output = `${chalk.reset.white.bold(' STEP ')} ${message} ${chalk.reset.white(message2)}`;
+  } else if (type === 'error') {
+    output = `${chalk.reset.redBright.bold(' ERROR ')} ${message} ${chalk.reset.white(message2)}`;
+  } else if (type === 'browsererror') {
+    output = `${chalk.reset.redBright.bold(' BROWSER ERROR ')} ${message} ${chalk.reset.white(message2)}`;
+  } else if (type === 'success') {
+    output = `${chalk.reset.greenBright.bold(' SUCCESS ')} ${message} ${chalk.reset.white(message2)}`;
+  } else if (type === 'info') {
+    output = `${chalk.reset.whiteBright.bold(' INFO ')} ${message} ${chalk.underline.greenBright(message2)}`;
+  } else if (type === 'log') {
+    output = `${chalk.reset.gray.bold(' LOG ')} ${message} ${chalk.underline.greenBright(message2)}`;
+  } else if (type === 'passed') {
+    output = `${chalk.reset.white.bgGreenBright.bold(' PASSED ')} ${message} ${chalk.underline.greenBright(message2)}`;
+  } else if (type === 'fail') {
+    output = `${chalk.reset.white.bgRedBright.bold(' FAILED ')} ${message} ${chalk.underline.redBright(message2)}`;
   }
+  process.stderr.write(`${output}\n`);
+  updateExcelRow(type, message, message2)
 }
 
 const throwErrors = async (text, isQuit) => {
@@ -196,7 +187,6 @@ const getDimensions = () => {
 };
 
 const launchBrowser = async isMulti => {
-  jest.setTimeout(totalTimeout);
   displayLog('action', 'Start launch browsers');
   const browserCount = isMulti ? 2 : 1
   for (let i = 0; i < browserCount; i++) {
@@ -215,7 +205,7 @@ const launchBrowser = async isMulti => {
         '--disable-web-security=1',
         '--mute-audio',
       ],
-      devtools: true,
+      devtools: isdebug,
     });
     browsers.push(browser)
 
@@ -253,12 +243,10 @@ const navigate = async (url, playerIndex = 0) => {
     displayLog('action', `Going to url: ${url}`);
 
     await page.goto(url, {waitUntil: 'load', timeout: totalTimeout});
-    // printLog('Complete to ' + url);
 
     // const granted = await page.evaluate(async () => {
     // 	return (await navigator.permissions.query({ name: 'camera' })).state
     // })
-    // printLog('Granted:', granted)
     return true
   } catch (error) {
     console.error(error)
@@ -368,7 +356,6 @@ module.exports = {
   setCurrentScene,
   saveExcel,
   setupExcel,
-  printLog,
   getAppCountFromScene,
   displayLog,
   getErrorList,

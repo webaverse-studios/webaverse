@@ -1,11 +1,12 @@
-const {
+import {afterAll, beforeAll, describe, expect, test} from 'vitest'
+import {
   launchBrowser,
   enterScene,
   closeBrowser,
   displayLog,
   totalTimeout,
   getCurrentPage,
-} = require('../utils/utils');
+} from '../utils/utils'
 
 describe('should npc player works', () => {
   beforeAll(async () => {
@@ -227,9 +228,16 @@ describe('should npc player works', () => {
 
       displayLog(isSuccess ? 'passed' : 'fail', 'should npc player works: ', 'movement');
 
-      expect(isSuccess).toBeTruthy();
+      expect(isNpcAttached).toBeTruthy();
+      expect(npcWalk.currentSpeed).toBeGreaterThan(0);
+      expect(npcWalk.idleWalkFactor).toBeGreaterThan(0);
+      expect(npcWalk.currentPosition !== firstWalkPosition).toBeTruthy();
+      expect(npcRun.currentSpeed).toBeGreaterThan(0.5);
+      expect(npcRun.walkRunFactor).toBeGreaterThan(0.5);
+      expect(npcRun.currentPosition !== firstRunPosition).toBeTruthy();
+      expect(isNpcUnAttached).toBeTruthy();
+      // expect(isSuccess).toBeTruthy();
 
-      
     },
     totalTimeout,
   );
@@ -362,6 +370,12 @@ describe('should npc player works', () => {
                           && reSwitchedAvatarName === currentAvatarName && isNpcUnAttached
 
       displayLog(isSuccess ? 'passed' : 'fail', 'should npc player works: ', 'switch');
+
+      expect(isNpcAttached).toBeTruthy();
+      expect(switchedAvatarName !== currentAvatarName).toBeTruthy();
+      expect(reSwitchedAvatarName === currentAvatarName).toBeTruthy();
+      expect(isNpcUnAttached).toBeTruthy();
+      // expect(isSuccess).toBeTruthy();
     },
     totalTimeout,
   );

@@ -1,11 +1,12 @@
-const {
+import {afterAll, beforeAll, describe, expect, test} from 'vitest'
+import {
   launchBrowser,
   enterScene,
   closeBrowser,
   displayLog,
   totalTimeout,
   getCurrentPage,
-} = require('../utils/utils');
+} from '../utils/utils'
 
 describe('should eat and drink', () => {
   beforeAll(async () => {
@@ -74,12 +75,12 @@ describe('should eat and drink', () => {
       });
       await page.waitForTimeout(5000);
       const feedResult = await page.evaluate(async () => {
-        const useTime =
-            window.globalWebaverse.playersManager.localPlayer.avatar.useTime;
+        const useAction =
+            window.globalWebaverse.playersManager.localPlayer.hasAction("use");
         const useAnimation =
             window.globalWebaverse.playersManager.localPlayer.avatar.useAnimation;
         return {
-          useTime,
+          useAction,
           useAnimation,
         };
       });
@@ -115,15 +116,19 @@ describe('should eat and drink', () => {
 
       displayLog(isFoodAttached ? 'success' : 'error', 'should eat and drink: grab the fruit');
 
-      displayLog(feedResult.useTime > 0 && feedResult.useAnimation === 'eat' ? 'success' : 'error', 'should eat and drink: eat animation');
+      displayLog(feedResult.useAction && feedResult.useAnimation === 'eat' ? 'success' : 'error', 'should eat and drink: eat animation');
 
       displayLog(isFoodUnAttached ? 'success' : 'error', 'should eat and drink: ungrab the fruit');
 
-      const isSuccess = isFoodAttached && feedResult.useTime > 0 && feedResult.useAnimation === 'eat' && isFoodUnAttached
+      const isSuccess = isFoodAttached && feedResult.useAction && feedResult.useAnimation === 'eat' && isFoodUnAttached
 
       displayLog(isSuccess ? 'passed' : 'fail', 'should eat and drink: ', 'fruit');
 
-      expect(isSuccess).toBeTruthy();
+      expect(isFoodAttached).toBeTruthy();
+      expect(feedResult.useAction).toBeTruthy();
+      expect(feedResult.useAnimation).toBe("eat");
+      expect(isFoodUnAttached).toBeTruthy();
+      // expect(isSuccess).toBeTruthy();
     },
     totalTimeout,
   );
@@ -175,12 +180,12 @@ describe('should eat and drink', () => {
       });
       await page.waitForTimeout(5000);
       const feedResult = await page.evaluate(async () => {
-        const useTime =
-        window.globalWebaverse.playersManager.localPlayer.avatar.useTime;
+        const useAction =
+        window.globalWebaverse.playersManager.localPlayer.hasAction("use");
         const useAnimation =
         window.globalWebaverse.playersManager.localPlayer.avatar.useAnimation;
         return {
-          useTime,
+          useAction,
           useAnimation,
         };
       });
@@ -223,15 +228,19 @@ describe('should eat and drink', () => {
 
       displayLog(isFoodAttached ? 'success' : 'error', 'should eat and drink: grab the potion');
 
-      displayLog(feedResult.useTime > 0 && feedResult.useAnimation === 'drink' ? 'success' : 'error', 'should eat and drink: eat animation');
+      displayLog(feedResult.useAction && feedResult.useAnimation === 'drink' ? 'success' : 'error', 'should eat and drink: eat animation');
 
       displayLog(isFoodUnAttached ? 'success' : 'error', 'should eat and drink: ungrab the potion');
 
-      const isSuccess = isFoodAttached && feedResult.useTime > 0 && feedResult.useAnimation === 'drink' && isFoodUnAttached
+      const isSuccess = isFoodAttached && feedResult.useAction && feedResult.useAnimation === 'drink' && isFoodUnAttached
 
       displayLog(isSuccess ? 'passed' : 'fail', 'should eat and drink: ', 'potion');
 
-      expect(isSuccess).toBeTruthy();
+      expect(isFoodAttached).toBeTruthy();
+      expect(feedResult.useAction).toBeTruthy();
+      expect(feedResult.useAnimation).toBe("drink");
+      expect(isFoodUnAttached).toBeTruthy();
+      // expect(isSuccess).toBeTruthy();
     },
     totalTimeout,
   );
