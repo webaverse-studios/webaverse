@@ -1,12 +1,12 @@
-const {
+import {afterAll, beforeAll, describe, expect, test} from 'vitest'
+import {
   launchBrowser,
   enterScene,
   closeBrowser,
   displayLog,
   totalTimeout,
   getCurrentPage,
-  getDimensions,
-} = require('../utils/utils');
+} from '../utils/utils'
 
 describe('should wear and use weapon', () => {
   beforeAll(async () => {
@@ -183,7 +183,12 @@ describe('should wear and use weapon', () => {
 
       displayLog(isSuccess ? 'passed' : 'fail', 'should wear and use weapon: ', 'sword');
 
-      expect(isSuccess).toBeTruthy();
+      expect(isWeaponAttached).toBeTruthy();
+      expect(attackResult.useAction).toBeTruthy();
+      expect(attackResult.useAnimation).toBe('combo');
+      expect(isWeaponUnAttached).toBeTruthy();
+      expect(attackResult.npcHealth).toBeLessThan(currentNpcHealth);
+      // expect(isSuccess).toBeTruthy();
     },
     totalTimeout,
   );
@@ -342,7 +347,11 @@ describe('should wear and use weapon', () => {
 
       displayLog(isSuccess ? 'passed' : 'fail', 'should wear and use weapon: ', 'silsword');
 
-      expect(isSuccess).toBeTruthy();
+      expect(isWeaponAttached).toBeTruthy();
+      expect(attackResult.useAnimationCombo.length).toBeGreaterThan(0);
+      expect(isWeaponUnAttached).toBeTruthy();
+      expect(attackResult.npcHealth).toBeLessThan(currentNpcHealth);
+      // expect(isSuccess).toBeTruthy();
     },
     totalTimeout,
   );
@@ -542,7 +551,13 @@ describe('should wear and use weapon', () => {
 
       displayLog(isSuccess ? 'passed' : 'fail', 'should wear and use weapon: ', 'pistol');
 
-      expect(isSuccess).toBeTruthy();
+      expect(isWeaponAttached).toBeTruthy();
+      expect(playerCrouchAction).toBeTruthy();
+      expect(attackResult.aimState).toBeTruthy();
+      expect(attackResult.aimAction).toBeTruthy();
+      expect(isWeaponUnAttached).toBeTruthy();
+      expect(attackResult.npcHealth).toBeLessThan(currentNpcHealth);
+      // expect(isSuccess).toBeTruthy();
     },
     totalTimeout,
   );
@@ -739,7 +754,13 @@ describe('should wear and use weapon', () => {
 
       displayLog(isSuccess ? 'passed' : 'fail', 'should wear and use weapon: ', ' machine-gun');
 
-      expect(isSuccess).toBeTruthy();
+      expect(isWeaponAttached).toBeTruthy();
+      expect(playerCrouchAction).toBeTruthy();
+      expect(attackResult.aimState).toBeTruthy();
+      expect(attackResult.aimAction).toBeTruthy();
+      expect(isWeaponUnAttached).toBeTruthy();
+      expect(attackResult.npcHealth).toBeLessThan(currentNpcHealth);
+      // expect(isSuccess).toBeTruthy();
     },
     totalTimeout,
   );
@@ -936,7 +957,13 @@ describe('should wear and use weapon', () => {
 
       displayLog(isSuccess ? 'passed' : 'fail', 'should wear and use weapon: ', 'uzi');
 
-      expect(isSuccess).toBeTruthy();
+      expect(isWeaponAttached).toBeTruthy();
+      expect(playerCrouchAction).toBeTruthy();
+      expect(attackResult.aimState).toBeTruthy();
+      expect(attackResult.aimAction).toBeTruthy();
+      expect(isWeaponUnAttached).toBeTruthy();
+      expect(attackResult.npcHealth).toBeLessThan(currentNpcHealth);
+      // expect(isSuccess).toBeTruthy();
     },
     totalTimeout,
   );
@@ -1136,7 +1163,13 @@ describe('should wear and use weapon', () => {
 
       displayLog(isSuccess ? 'passed' : 'fail', 'should wear and use weapon: ', 'bow');
 
-      expect(isSuccess).toBeTruthy();
+      expect(isWeaponAttached).toBeTruthy();
+      expect(playerCrouchAction).toBeTruthy();
+      expect(attackResult.aimState).toBeTruthy();
+      expect(attackResult.aimAction).toBeTruthy();
+      expect(isWeaponUnAttached).toBeTruthy();
+      expect(attackResult.npcHealth).toBeLessThan(currentNpcHealth);
+      // expect(isSuccess).toBeTruthy();
     },
     totalTimeout,
   );
@@ -1313,7 +1346,12 @@ describe('should wear and use weapon', () => {
 
       displayLog(isSuccess ? 'passed' : 'fail', 'should wear and use weapon: ', 'rpg');
 
-      expect(isSuccess).toBeTruthy();
+      expect(isWeaponAttached).toBeTruthy();
+      expect(attackResult.aimState).toBeTruthy();
+      expect(attackResult.aimAction).toBeTruthy();
+      expect(isWeaponUnAttached).toBeTruthy();
+      // expect(attackResult.npcHealth).toBeLessThan(currentNpcHealth);
+      // expect(isSuccess).toBeTruthy();
     },
     totalTimeout,
   );

@@ -2,7 +2,6 @@ const {
   launchBrowser,
   enterScene,
   closeBrowser,
-  printLog,
   totalTimeout,
   getCurrentPage,
 } = require('../utils/utils');
@@ -24,7 +23,6 @@ describe('should all ui element on the profile view works', () => {
   test(
     'should change character on profile view',
     async () => {
-      printLog('should profile ui view works');
       // Todo: example
       // https://www.tabnine.com/code/javascript/functions/puppeteer/Page/click
       // more details: https://www.tutorialspoint.com/puppeteer/puppeteer_quick_guide.htm

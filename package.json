@@ -27,7 +27,7 @@
     "serve": "vite preview",
     "setup:test": "cd test && npm i",
     "test": "start-server-and-test start https://local.webaverse.com test-e2e",
-    "test-e2e": "cd test-e2e && jest -i",
+    "test-e2e": "cd test-e2e && vitest --silent",
     "start-pm2": "pm2-runtime index.mjs -p --secret $PM2_SECRET_KEY --public $PM2_PUBLIC_KEY --no-auto-exit --instances 1 --restart-delay 60000",
     "lint": "eslint --fix --quiet --ext .js,.jsx ."
   },
@@ -108,6 +108,7 @@
     "swc": "^1.0.11",
     "trace-unhandled": "2.0.1",
     "uuid": "^9.0.0",
+    "vitest": "^0.25.3",
     "wiki": "./packages/wiki"
   },
   "preset": "jest-puppeteer"

@@ -1,11 +1,12 @@
-const {
-    launchBrowser,
-    enterScene,
-    closeBrowser,
-    displayLog,
-    totalTimeout,
-    getCurrentPage,
-  } = require('../utils/utils');
+import {afterAll, beforeAll, describe, expect, test} from 'vitest'
+import {
+  launchBrowser,
+  enterScene,
+  closeBrowser,
+  displayLog,
+  totalTimeout,
+  getCurrentPage,
+} from '../utils/utils'
 
   describe('should ride vehicle', () => {
     beforeAll(async () => {
@@ -147,7 +148,11 @@ const {
 
         const isSuccess = isVehicleRided && vehicleMove.currentPosition !== firstPosition && isVehicleUnRided
         displayLog(isSuccess ? 'passed' : 'fail', 'should ride vehicle: ', 'hovercraft');
-        expect(isSuccess).toBeTruthy();
+        
+        expect(isVehicleRided).toBeTruthy();
+        expect(vehicleMove.currentPosition !== firstPosition).toBeTruthy();
+        expect(isVehicleUnRided).toBeTruthy();
+        // expect(isSuccess).toBeTruthy();
       },
       totalTimeout,
     );
@@ -273,7 +278,11 @@ const {
 
             const isSuccess = isVehicleRided && vehicleMove.currentPosition !== firstPosition && isVehicleUnRided
             displayLog(isSuccess ? 'passed' : 'fail', 'should ride vehicle: ', 'hovercraft');
-            expect(isSuccess).toBeTruthy();
+
+            expect(isVehicleRided).toBeTruthy();
+            expect(vehicleMove.currentPosition !== firstPosition).toBeTruthy();
+            expect(isVehicleUnRided).toBeTruthy();
+            // expect(isSuccess).toBeTruthy();
         },
     totalTimeout,
     );
