@@ -1,8 +1,8 @@
 name: remote ssh command
-on: [push]
+on:  [workflow_dispatch, push]
 jobs:
-
   build:
+    if: ${{false}} # disable until we figure out deployments workflow after merging
     name: Build
     runs-on: ubuntu-latest
     environment: Production

@@ -53,7 +53,7 @@ class ProcGenInstance {
     this.pgWorkerManager.setCamera(worldPosition, cameraPosition, cameraQuaternion, projectionMatrix);
   }
 
-  setClipRange() {
+  setClipRange(range) {
     this.pgWorkerManager.setClipRange(range);
   }
 

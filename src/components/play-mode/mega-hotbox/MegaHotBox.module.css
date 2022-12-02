@@ -54,9 +54,6 @@
   justify-content: center;
   align-items: center;
 }
-.megaHotBox .card .placeholderImgWrap:not(.loading) {
-  visibility: hidden;
-}
 .megaHotBox .card .placeholderImgWrap .placeholderImg {
   width: 100px;
   height: 100px;

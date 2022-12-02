@@ -73,7 +73,7 @@ const MegaHup = function({
   }, [canvasRef, npcPlayer]);
 
   return (
-    <div className={classnames(styles.megaHup, open ? styles.open : null)}>
+    <div className={classnames(styles.megaHup)}>
       {/* <RpgText className={styles.text} styles={styles} text={text} textSpeed={chatTextSpeed} /> */}
       {npcPlayer ? (
         <canvas
