@@ -3,7 +3,6 @@ const {
 	launchBrowser,
 	enterScene,
 	closeBrowser,
-	printLog,
 	displayLog,
 	totalTimeout,
 	getCurrentPage,

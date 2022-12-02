@@ -348,7 +348,7 @@ describe('should wear and use weapon', () => {
       displayLog(isSuccess ? 'passed' : 'fail', 'should wear and use weapon: ', 'silsword');
 
       expect(isWeaponAttached).toBeTruthy();
-      expect(attackResult.useAnimationCombo.length).toBeGreaterThan();
+      expect(attackResult.useAnimationCombo.length).toBeGreaterThan(0);
       expect(isWeaponUnAttached).toBeTruthy();
       expect(attackResult.npcHealth).toBeLessThan(currentNpcHealth);
       // expect(isSuccess).toBeTruthy();
