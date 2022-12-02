@@ -1,11 +1,17 @@
-const {
-    launchBrowser,
-    enterScene,
-    closeBrowser,
-    displayLog,
-    totalTimeout,
-    getCurrentPage,
-  } = require('../utils/utils');
+import {afterAll, beforeAll, describe, expect, test} from 'vitest'
+import {
+  launchBrowser,
+  enterScene,
+  closeBrowser,
+  displayLog,
+  setupExcel,
+  saveExcel,
+  setCurrentScene,
+  getAppCountFromScene,
+  getErrorList,
+  totalTimeout,
+  getCurrentPage,
+} from '../utils/utils'
 
   describe('should ride vehicle', () => {
     beforeAll(async () => {

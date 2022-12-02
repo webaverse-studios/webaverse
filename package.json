@@ -82,6 +82,7 @@
     "swc": "^1.0.11",
     "trace-unhandled": "2.0.1",
     "uuid": "^9.0.0",
+    "vitest": "^0.25.3",
     "wiki": "./packages/wiki"
   },
   "repository": {

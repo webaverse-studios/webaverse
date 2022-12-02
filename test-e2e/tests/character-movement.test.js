@@ -1,12 +1,17 @@
-const {
+import {afterAll, beforeAll, describe, expect, test} from 'vitest'
+import {
   launchBrowser,
   enterScene,
   closeBrowser,
-  printLog,
   displayLog,
+  setupExcel,
+  saveExcel,
+  setCurrentScene,
+  getAppCountFromScene,
+  getErrorList,
   totalTimeout,
   getCurrentPage,
-} = require('../utils/utils');
+} from '../utils/utils'
 
 describe.only(
   'should character movement',

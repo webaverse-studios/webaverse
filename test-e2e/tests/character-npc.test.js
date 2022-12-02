@@ -1,11 +1,17 @@
-const {
+import {afterAll, beforeAll, describe, expect, test} from 'vitest'
+import {
   launchBrowser,
   enterScene,
   closeBrowser,
   displayLog,
+  setupExcel,
+  saveExcel,
+  setCurrentScene,
+  getAppCountFromScene,
+  getErrorList,
   totalTimeout,
   getCurrentPage,
-} = require('../utils/utils');
+} from '../utils/utils'
 
 describe('should npc player works', () => {
   beforeAll(async () => {

@@ -196,7 +196,6 @@ const getDimensions = () => {
 };
 
 const launchBrowser = async isMulti => {
-  jest.setTimeout(totalTimeout);
   displayLog('action', 'Start launch browsers');
   const browserCount = isMulti ? 2 : 1
   for (let i = 0; i < browserCount; i++) {
