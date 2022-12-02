@@ -1,8 +1,8 @@
 
-name: Run Automated Tests
+name: 'Lint checks'
 on: [workflow_dispatch, push]
 jobs:
-  test:
+  lint:
     name: 'Node.js v${{ matrix.node }}'
     runs-on: ubuntu-latest
     strategy:
@@ -24,10 +24,7 @@ jobs:
           key: ${{ runner.os }}-node-v${{ matrix.node }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-v${{ matrix.node }}-
-      - name: APT Update
-        run: sudo apt update -y
-      - name: Install Node.js Dependencies
+      - name: Install Dependencies
         run: npm install -y
-      - name: Run Node.js Tests
-        run: npm run test && echo "Exited with '$?'"
-
+      - name: Lint code
+        run: npm run lint

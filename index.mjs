@@ -142,7 +142,8 @@ const _logProcess = childProcess => {
   });
 };
 {
-  process.stdin.setRawMode(true);
+  if(process.stdin.setRawMode)
+    process.stdin.setRawMode(true);
   process.stdin.resume();
   process.stdin.setEncoding('utf8');
   const killall = async () => {
@@ -193,7 +194,7 @@ const _logProcess = childProcess => {
 const _startE2eTest = () => {
   const cp = child_process.spawn('npm', ['run', 'test-e2e'], {
     env: process.env,
-    cwd: './packages/automated-tests/',
+    cwd: dirname,
     stdio: 'inherit'
   });
   cp.on('error', err => {
