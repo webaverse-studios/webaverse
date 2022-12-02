@@ -36,7 +36,6 @@ export class CharacterHitter {
     hitAttemptEventData.type = type;
     hitAttemptEventData.args = args;
     hitManager.dispatchEvent(hitAttemptEvent);
-
     switch (type) {
       case 'sword': {
         const {
@@ -54,10 +53,15 @@ export class CharacterHitter {
         );
         if (collision) {
           const collisionId = collision.objectId;
+          const timeDiff = timestamp - this.lastHitTime;
+          if (timeDiff > 1000){
+            hitAttemptEventData.args.physicsId = collisionId;
+            hitManager.dispatchEvent(hitAttemptEvent);
+            this.lastHitTime = timestamp;
+          }
           const result = metaversefile.getPairByPhysicsId(collisionId);
           if (result) {
             const [app, physicsObject] = result;
-            const timeDiff = timestamp - this.lastHitTime;
             if (timeDiff > 1000) {
               const useAction = this.character.getAction('use');
               const damage = typeof useAction.damage === 'number' ? useAction.damage : 10;
@@ -97,6 +101,8 @@ export class CharacterHitter {
       case 'bullet': {
         const result = physicsManager.raycast(args.position, args.quaternion);
         if (result) {
+          hitAttemptEventData.args.physicsId = result.objectId;
+          hitManager.dispatchEvent(hitAttemptEvent);
           const _performHit = () => {
             const targetApp = metaversefile.getAppByPhysicsId(result.objectId);
             if (targetApp) {
