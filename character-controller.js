@@ -910,9 +910,11 @@ class AvatarCharacter extends StateCharacter {
           app.removeEventListener('activate', activate);
         });
 
+        const widthPadding = 0.25; // we calculate width from shoulders, but we need a little padding
+
         this.characterPhysics.loadCharacterController(
-          this.avatar.shoulderWidth,
-          this.avatar.height
+          this.avatar.shoulderWidth + widthPadding,
+          this.avatar.height,
         );
 
         this.updatePhysicsStatus();
