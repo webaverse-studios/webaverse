@@ -4,6 +4,19 @@
   "description": "",
   "main": "index.mjs",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webaverse/app.git"
+  },
+  "author": "Webaverse",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/webaverse/app/issues"
+  },
+  "homepage": "https://github.com/webaverse/app",
+  "browserslist": [
+    "last 1 chrome version"
+  ],
   "scripts": {
     "install-libs": "bash scripts/npm-preinstall.sh",
     "start": "npm run prod",
@@ -21,6 +34,9 @@
   "dependencies": {
     "@babel/preset-react": "^7.17.12",
     "@pixiv/three-vrm": "./packages/three-vrm",
+    "@pixiv/three-vrm-core": "./packages/three-vrm/three-vrm-core",
+    "@pixiv/three-vrm-springbone": "./packages/three-vrm/three-vrm-springbone",
+    "@pixiv/three-vrm-materials-mtoon": "./packages/three-vrm/three-vrm-materials-mtoon",
     "@shaderfrog/glsl-parser": "^0.1.23",
     "@vitejs/plugin-react": "^2.1.0",
     "classnames": "^2.3.1",
@@ -39,8 +55,8 @@
     "proxy-from-env": "^1.1.0",
     "puppeteer": "^19.0.0",
     "puppeteer-core": "^19.3.0",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "smile2emoji": "^1.1.6",
     "stats.js": "^0.17.0",
     "three": "./packages/three",
@@ -51,6 +67,15 @@
     "wsrtc": "./packages/wsrtc",
     "xhr2": "^0.2.1",
     "zjs": "./packages/zjs"
+  },
+  "peerDependencies": {
+    "three": "./packages/three",
+    "@pixiv/three-vrm": "./packages/three-vrm",
+    "@pixiv/three-vrm-core": "./packages/three-vrm/three-vrm-core",
+    "@pixiv/three-vrm-springbone": "./packages/three-vrm/three-vrm-springbone",
+    "@pixiv/three-vrm-materials-mtoon": "./packages/three-vrm/three-vrm-materials-mtoon",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/expect-puppeteer": "^5.0.1",
@@ -85,18 +110,5 @@
     "uuid": "^9.0.0",
     "wiki": "./packages/wiki"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/webaverse/app.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/webaverse/app/issues"
-  },
-  "homepage": "https://github.com/webaverse/app",
-  "browserslist": [
-    "last 1 chrome version"
-  ],
   "preset": "jest-puppeteer"
 }
