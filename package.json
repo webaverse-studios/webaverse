@@ -34,9 +34,9 @@
   "dependencies": {
     "@babel/preset-react": "^7.17.12",
     "@pixiv/three-vrm": "./packages/three-vrm",
-    "@pixiv/three-vrm-core": "./packages/three-vrm-core",
-    "@pixiv/three-vrm-springbone": "./packages/three-vrm-springbone",
-    "@pixiv/three-vrm-materials-mtoon": "./packages/three-vrm-materials-mtoon",
+    "@pixiv/three-vrm-core": "./packages/three-vrm/three-vrm-core",
+    "@pixiv/three-vrm-springbone": "./packages/three-vrm/three-vrm-springbone",
+    "@pixiv/three-vrm-materials-mtoon": "./packages/three-vrm/three-vrm-materials-mtoon",
     "@shaderfrog/glsl-parser": "^0.1.23",
     "@vitejs/plugin-react": "^2.1.0",
     "classnames": "^2.3.1",
@@ -71,9 +71,9 @@
   "peerDependencies": {
     "three": "./packages/three",
     "@pixiv/three-vrm": "./packages/three-vrm",
-    "@pixiv/three-vrm-core": "./packages/three-vrm-core",
-    "@pixiv/three-vrm-springbone": "./packages/three-vrm-springbone",
-    "@pixiv/three-vrm-materials-mtoon": "./packages/three-vrm-materials-mtoon",
+    "@pixiv/three-vrm-core": "./packages/three-vrm/three-vrm-core",
+    "@pixiv/three-vrm-springbone": "./packages/three-vrm/three-vrm-springbone",
+    "@pixiv/three-vrm-materials-mtoon": "./packages/three-vrm/three-vrm-materials-mtoon",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
