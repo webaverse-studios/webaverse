@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         node:
-          - 16
+          - 18
     steps:
       - uses: actions/checkout@v3
         with:
@@ -29,7 +29,5 @@ jobs:
       - name: Install Node.js Dependencies
         run: npm install -y
       - name: Run Node.js Tests
-        run:
-              npm run test
-              echo "Exited with '$?'"
+        run: npm run test && echo "Exited with '$?'"
 

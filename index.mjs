@@ -142,7 +142,8 @@ const _logProcess = childProcess => {
   });
 };
 {
-  process.stdin.setRawMode(true);
+  if(process.stdin.setRawMode)
+    process.stdin.setRawMode(true);
   process.stdin.resume();
   process.stdin.setEncoding('utf8');
   const killall = async () => {
