@@ -4,11 +4,6 @@ import {
   enterScene,
   closeBrowser,
   displayLog,
-  setupExcel,
-  saveExcel,
-  setCurrentScene,
-  getAppCountFromScene,
-  getErrorList,
   totalTimeout,
   getCurrentPage,
 } from '../utils/utils'
