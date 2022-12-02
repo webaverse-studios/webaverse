@@ -148,7 +148,11 @@ import {
 
         const isSuccess = isVehicleRided && vehicleMove.currentPosition !== firstPosition && isVehicleUnRided
         displayLog(isSuccess ? 'passed' : 'fail', 'should ride vehicle: ', 'hovercraft');
-        expect(isSuccess).toBeTruthy();
+        
+        expect(isVehicleRided).toBeTruthy();
+        expect(vehicleMove.currentPosition !== firstPosition).toBeTruthy();
+        expect(isVehicleUnRided).toBeTruthy();
+        // expect(isSuccess).toBeTruthy();
       },
       totalTimeout,
     );
@@ -274,7 +278,11 @@ import {
 
             const isSuccess = isVehicleRided && vehicleMove.currentPosition !== firstPosition && isVehicleUnRided
             displayLog(isSuccess ? 'passed' : 'fail', 'should ride vehicle: ', 'hovercraft');
-            expect(isSuccess).toBeTruthy();
+
+            expect(isVehicleRided).toBeTruthy();
+            expect(vehicleMove.currentPosition !== firstPosition).toBeTruthy();
+            expect(isVehicleUnRided).toBeTruthy();
+            // expect(isSuccess).toBeTruthy();
         },
     totalTimeout,
     );

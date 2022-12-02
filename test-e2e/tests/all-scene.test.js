@@ -118,6 +118,12 @@ describe.only('should load scene works', () => {
         displayLog(playerMove.currentPosition !== firstPosition? 'success' : 'error', 'Should scene load works: ', 'Test player avatar movement');
 
         isSuccess = result.isSceneLoaded && result.loadedAppCount === appCount && errorLists.length === 0 && playerMove.currentPosition !== firstPosition;
+        if (currntTest === sceneUrl) {
+          expect(result.isSceneLoaded).toBeTruthy();
+          expect(result.loadedAppCount).toEqual(appCount);
+          expect(errorLists.length).toEqual(0);
+          expect(playerMove.currentPosition !== firstPosition).toBeTruthy();
+        }
       } catch (error) {
         console.error(error)
       }
@@ -131,7 +137,7 @@ describe.only('should load scene works', () => {
         } else {
           displayLog('fail', 'Scene loaded failed: ', `${sceneUrl}`);
         }
-        expect(isSuccess).toBeTruthy();
+        // expect(isSuccess).toBeTruthy();
       }
     },
     totalTimeout,

@@ -79,7 +79,16 @@ describe.only(
                           && avatarFlag.isCharacterFace && avatarFlag.isCharacterPhysic
 
         displayLog(isSuccess ? 'passed' : 'fail', 'should character loaded: ', 'avatar');
-        expect(isSuccess).toBeTruthy();
+        
+        expect(avatarFlag.isPlayerAvatarApp).toBeTruthy();
+        expect(avatarFlag.isBound).toBeTruthy();
+        expect(avatarFlag.isCharacterSfx).toBeTruthy();
+        expect(avatarFlag.isCharacterHups).toBeTruthy();
+        expect(avatarFlag.isCharacterFx).toBeTruthy();
+        expect(avatarFlag.isCharacterHitter).toBeTruthy();
+        expect(avatarFlag.isCharacterFace).toBeTruthy();
+        expect(avatarFlag.isCharacterPhysic).toBeTruthy();
+        // expect(isSuccess).toBeTruthy();
       },
       totalTimeout,
     );
@@ -135,7 +144,11 @@ describe.only(
         const isSuccess = playerMove.currentSpeed > 0 && playerMove.idleWalkFactor > 0.5 && playerMove.currentPosition !== firstPosition
         // expect(playerMove.isCorrectMove).toBeTruthy();
         displayLog(isSuccess ? 'passed' : 'fail', 'should character movement: ', 'walk');
-        expect(isSuccess).toBeTruthy();
+        
+        expect(playerMove.currentSpeed).toBeGreaterThan(0);
+        expect(playerMove.idleWalkFactor).toBeGreaterThan(0.5);
+        expect(playerMove.currentPosition !== firstPosition).toBeTruthy();
+        // expect(isSuccess).toBeTruthy();
       },
       totalTimeout,
     );
@@ -178,7 +191,11 @@ describe.only(
         
         const isSuccess = playerRun.currentSpeed > 0.5 && playerRun.walkRunFactor > 0.5 && playerRun.currentPosition !== lastPosition
         displayLog(isSuccess ? 'passed' : 'fail', 'should character movement: ', 'run');
-        expect(isSuccess).toBeTruthy();
+
+        expect(playerRun.currentSpeed).toBeGreaterThan(0.5);
+        expect(playerRun.walkRunFactor).toBeGreaterThan(0.5);
+        expect(playerRun.currentPosition !== lastPosition).toBeTruthy();
+        // expect(isSuccess).toBeTruthy();
       },
       totalTimeout,
     );
@@ -213,7 +230,10 @@ describe.only(
         const isSuccess = narutoRun.narutoRunAction && narutoRun.narutoRunState
         // expect(playerMove.isCorrectMove).toBeTruthy();
         displayLog(isSuccess ? 'passed' : 'fail', 'should character movement: ', 'naruto run');
-        expect(isSuccess).toBeTruthy();
+        
+        expect(narutoRun.narutoRunAction).toBeTruthy();
+        expect(narutoRun.narutoRunState).toBeTruthy();
+        // expect(isSuccess).toBeTruthy();
       },
       totalTimeout,
     );
@@ -340,7 +360,11 @@ describe.only(
         
         const isSuccess = playerCrouch.currentSpeed > 0 && playerCrouch.crouchAction && playerCrouch.currentPosition !== lastPosition
         displayLog(isSuccess ? 'passed' : 'fail', 'should character movement: ', 'crouch');
-        expect(isSuccess).toBeTruthy();
+
+        expect(playerCrouch.currentSpeed).toBeGreaterThan(0);
+        expect(playerCrouch.crouchAction).toBeTruthy();
+        expect(playerCrouch.currentPosition !== lastPosition).toBeTruthy();
+        // expect(isSuccess).toBeTruthy();
       },
       totalTimeout,
     );
@@ -372,7 +396,10 @@ describe.only(
  
         const isSuccess = playerFly.flyAction && playerFly.flyState
         displayLog(isSuccess ? 'passed' : 'fail', 'should character movement: ', 'fly');
-        expect(isSuccess).toBeTruthy();
+        
+        expect(playerFly.flyAction).toBeTruthy();
+        expect(playerFly.flyState).toBeTruthy();
+        // expect(isSuccess).toBeTruthy();
       },
       totalTimeout,
     );
@@ -399,7 +426,9 @@ describe.only(
  
         const isSuccess = playerDance.danceAction
         displayLog(isSuccess ? 'passed' : 'fail', 'should character movement: ', 'dance');
-        expect(isSuccess).toBeTruthy();
+        
+        expect(playerDance.danceAction).toBeTruthy();
+        // expect(isSuccess).toBeTruthy();
       },
       totalTimeout,
     );
