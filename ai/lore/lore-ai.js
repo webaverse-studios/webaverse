@@ -34,9 +34,17 @@ import {
   parseCharacterIntroResponse,
 } from './lore-model.js'
 
-const numGenerateTries = 5;
+const numGenerateTries = 2;
 const temperature = 1;
 const top_p = 1;
+
+const ApiTypes = [ 'NONE', 'AI21', 'GOOSEAI', 'OPENAI' ];
+const DefaultSettings = {
+    apiType: ApiTypes[0],
+    apiKey: '',
+};
+const authenticatedApiName = 'ai';
+
 
 class AICharacter extends EventTarget {
   constructor({
@@ -246,7 +254,6 @@ class AIScene {
       name,
       description,
     });
-    console.log('select target prompt', {prompt});
     const stop = makeSelectTargetStop();
     let response = await this.generateFn(prompt, stop);
     console.log('select target response', {prompt, response});
@@ -315,7 +322,66 @@ class AIScene {
 class LoreAI {
   constructor() {
     this.endpointFn = null;
+
+    if(typeof window === 'undefined')
+      return; // don't load this in workers
+
+    const _loadSettings = () => {
+              // load local storage
+              const settingsString = localStorage.getItem('AiSettings');
+              let settings;
+      
+              try {
+      
+                  settings = JSON.parse(settingsString);
+      
+              } catch (err) {
+                  console.warn('could not parse AiSettings', err);
+                  settings = DefaultSettings;
+      
+              }
+      
+              settings = settings ?? DefaultSettings;
+      
+              const apiType = settings.apiType ?? DefaultSettings.apiType;
+              const apiKey = settings.apiKey ?? '';
+      
+              const newSettings = {
+                apiType:        apiType,
+                apiKey:         apiKey,
+            };
+
+            localStorage.setItem('AiSettings', JSON.stringify(newSettings));
+
+              this.updateLoreEndpoint(apiType);
+    }
+
+    _loadSettings();
   }
+
+  updateLoreEndpoint(apiType) {
+    const _getApiUrl = apiType => {
+      switch (apiType) {
+          case 'NONE': return null;
+          case 'AI21': return `https://ai.webaverse.com/ai21/v1/engines/j1-large/completions`;
+          case 'GOOSEAI': return `https://ai.webaverse.com/gooseai/v1/engines/gpt-neo-20b/completions`;
+          case 'OPENAI': return `https://api.openai.com/v1/engines/text-davinci-002/completions`;
+          default: return null;
+      }
+    };
+    const _apiTypeNeedsApiKey = apiType => apiType === 'OPENAI';
+
+      const url = _getApiUrl(apiType);
+      if (_apiTypeNeedsApiKey(apiType)) {
+          this.setEndpoint(async query => {
+            const preauthenticatorModule = await import('../../preauthenticator');              
+              const preauthenticator = preauthenticatorModule.default;        
+              return await preauthenticator.callAuthenticatedApi(authenticatedApiName, url, query);
+          });
+      } else {
+        this.setEndpointUrl(url);
+      }
+  };
 
   async generate(prompt, {
     stop,
@@ -366,6 +432,7 @@ class LoreAI {
     if (this.endpointFn) {
       return await this.endpointFn(query);
     } else {
+      console.warn('no endpoint function set');
       return {
         choices: [{
           text: '',
@@ -394,6 +461,7 @@ class LoreAI {
       this.setEndpoint(endpointFn);
     } else {
       this.setEndpoint(null);
+      throw new Error('url is required');
     }
   }
 
@@ -404,8 +472,8 @@ class LoreAI {
         return this.generate(prompt, {
           stop,
           temperature: 1,
-          presence_penalty: 2,
-          frequency_penalty: 2,
+          presence_penalty: .2,
+          frequency_penalty: .2,
           // top_p,
         });
       },
