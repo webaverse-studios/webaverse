@@ -8,6 +8,7 @@ import game from '../../../../game.js';
 import loadoutManager from '../../../../loadout-manager.js';
 import {registerIoEventHandler, unregisterIoEventHandler} from '../../general/io-handler/IoHandler.jsx';
 import {hotbarSize, numLoadoutSlots} from '../../../../constants.js';
+import {ResourcesBox} from '../resources-box';
 
 export const Hotbar = ({className}) => {
     const {state, setState} = useContext(AppContext);
@@ -88,6 +89,8 @@ export const Hotbar = ({className}) => {
 
                 })()
             }
+
+            <ResourcesBox />
 
         </div>
     );
