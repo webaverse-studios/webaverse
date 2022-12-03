@@ -789,16 +789,13 @@ const _handleMethod = async ({method, args, instance: instanceKey, taskId}) => {
       const chunkResult2 = _cloneChunkResult(chunkResult);
 
       const _freeChunkResult = chunkResult => {
-        chunkResult.terrainGeometry && pg.free(chunkResult.terrainGeometry.bufferAddress);
-        chunkResult.waterGeometry && pg.free(chunkResult.waterGeometry.bufferAddress);
-        chunkResult.treeInstances && pg.free(chunkResult.treeInstances.bufferAddress);
-        chunkResult.bushInstances && pg.free(chunkResult.bushInstances.bufferAddress);
-        chunkResult.rockInstances && pg.free(chunkResult.rockInstances.bufferAddress);
-        chunkResult.stoneInstances && pg.free(chunkResult.stoneInstances.bufferAddress);
-        chunkResult.grassInstances && pg.free(chunkResult.grassInstances.bufferAddress);
-        chunkResult.poiInstances && pg.free(chunkResult.poiInstances.bufferAddress);
-        chunkResult.heightfields && pg.free(chunkResult.heightfields.bufferAddress);
-        pg.free(chunkResult.bufferAddress);
+        const freeList = chunkResult.freeList;
+        for (let i = 0; i < freeList.length; i++) {
+          const freeAddress = freeList[i];
+          if(freeAddress) {
+            pg.free(freeAddress);
+          }
+        }
       };
       _freeChunkResult(chunkResult);
 

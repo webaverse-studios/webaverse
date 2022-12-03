@@ -137,11 +137,16 @@ class BufferView {
 }
 
 const _parseChunkResult = (arrayBuffer, bufferAddress) => {
+  const freeList = [];
+  freeList.push(bufferAddress);
+
   const chunkResultBufferView = new BufferView(arrayBuffer, bufferAddress);
 
   const _parseTerrainVertexBuffer = bufferView => {
     const bufferAddress = bufferView.dataView.getUint32(bufferView.index, true);
     bufferView.index += Uint32Array.BYTES_PER_ELEMENT;
+
+    freeList.push(bufferAddress);
 
     if (bufferAddress) {
       const terrainVertexBufferView = new BufferView(
@@ -300,7 +305,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
       // terrainVertexBufferView.index += Uint32Array.BYTES_PER_ELEMENT * numPeeks;
 
       return {
-        bufferAddress,
+        freeList,
         positions,
         normals,
         biomes,
@@ -322,6 +327,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
   const _parseWaterVertexBuffer = bufferView => {
     const bufferAddress = bufferView.dataView.getUint32(bufferView.index, true);
     bufferView.index += Uint32Array.BYTES_PER_ELEMENT;
+    freeList.push(bufferAddress);
 
     if (bufferAddress) {
       const bufferViewer = new BufferView(arrayBuffer, bufferAddress);
@@ -392,6 +398,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
   const _parsePQIInstances = bufferView => {
     const bufferAddress = bufferView.dataView.getUint32(bufferView.index, true);
     bufferView.index += Uint32Array.BYTES_PER_ELEMENT;
+    freeList.push(bufferAddress);
 
     if (bufferAddress) {
       const bufferViewer = new BufferView(arrayBuffer, bufferAddress);
@@ -452,6 +459,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
   const _parseVegetationInstances = bufferView => {
     const bufferAddress = bufferView.dataView.getUint32(bufferView.index, true);
     bufferView.index += Uint32Array.BYTES_PER_ELEMENT;
+    freeList.push(bufferAddress);
 
     if (bufferAddress) {
       const bufferViewer = new BufferView(arrayBuffer, bufferAddress);
@@ -483,6 +491,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
   const _parsePQMIInstances = bufferView => {
     const bufferAddress = bufferView.dataView.getUint32(bufferView.index, true);
     bufferView.index += Uint32Array.BYTES_PER_ELEMENT;
+    freeList.push(bufferAddress);
 
     if (bufferAddress) {
       const bufferViewer = new BufferView(arrayBuffer, bufferAddress);
@@ -572,6 +581,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
   const _parseGrassInstances = bufferView => {
     const bufferAddress = bufferView.dataView.getUint32(bufferView.index, true);
     bufferView.index += Uint32Array.BYTES_PER_ELEMENT;
+    freeList.push(bufferAddress);
 
     if (bufferAddress) {
       const bufferViewer = new BufferView(arrayBuffer, bufferAddress);
@@ -674,6 +684,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
   const _parsePIInstances = bufferView => {
     const bufferAddress = bufferView.dataView.getUint32(bufferView.index, true);
     bufferView.index += Uint32Array.BYTES_PER_ELEMENT;
+    freeList.push(bufferAddress);
 
     if (bufferAddress) {
       const bufferViewer = new BufferView(arrayBuffer, bufferAddress);
@@ -711,6 +722,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
   const _parseHeightfields = bufferView => {
     const bufferAddress = bufferView.dataView.getUint32(bufferView.index, true);
     bufferView.index += Uint32Array.BYTES_PER_ELEMENT;
+    freeList.push(bufferAddress);
 
     // console.log('buffer address', bufferAddress);
 
@@ -753,7 +765,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
   const heightfields = _parseHeightfields(chunkResultBufferView);
 
   return {
-    bufferAddress,
+    freeList,
     terrainGeometry,
     waterGeometry,
     treeInstances,
