@@ -3,12 +3,12 @@ import {
   defaultPlayerBio,
   defaultObjectName,
   defaultObjectDescription,
-  
+
   makeLorePrompt,
   makeLoreStop,
   postProcessResponse,
   parseLoreResponses,
-  
+
   makeCommentPrompt,
   makeCommentStop,
   parseCommentResponse,
@@ -36,12 +36,14 @@ import {
 
 const numGenerateTries = 2;
 const temperature = 1;
+const frequency_penalty = 0.2;
+const presence_penalty = 0.2;
 const top_p = 1;
 
-const ApiTypes = [ 'NONE', 'AI21', 'GOOSEAI', 'OPENAI' ];
+const ApiTypes = ['NONE', 'AI21', 'GOOSEAI', 'OPENAI'];
 const DefaultSettings = {
-    apiType: ApiTypes[0],
-    apiKey: '',
+  apiType: ApiTypes[0],
+  apiKey: '',
 };
 const authenticatedApiName = 'ai';
 
@@ -144,7 +146,7 @@ class AIScene {
             const mentionedCharacter = this.characters[mentionedCharacterIndex];
             await _pushRequestMessage(message);
             for (let i = 0; i < numGenerateTries; i++) {
-              let response = await this.generate(mentionedCharacter);
+              const response = await this.generate(mentionedCharacter);
               if (response) {
                 const a = parseLoreResponses(response);
                 if (a.length > 0) {
@@ -164,11 +166,11 @@ class AIScene {
           }
         } else { // middle of conversation
           await _pushRequestMessage(message);
-          
+
           for (let i = 0; i < numGenerateTries; i++) {
             // const nextCharacterIndex = 1 + Math.floor(Math.random() * (this.characters.length - 1)); // skip over local character
             // const nextCharacter = this.characters[nextCharacterIndex];
-            let response = await this.generate();
+            const response = await this.generate();
             const a = parseLoreResponses(response);
             if (a.length > 0) {
               for (const o of a) {
@@ -247,7 +249,7 @@ class AIScene {
     // console.log('got comment', {prompt, response});
     return response;
   }
-  
+
   // XXX needs better API
   async generateSelectTargetComment(name, description) {
     const prompt = makeSelectTargetPrompt({
@@ -269,7 +271,7 @@ class AIScene {
     });
     console.log('select character prompt', {prompt});
     const stop = makeSelectCharacterStop();
-    let response = await this.generateFn(prompt, stop);
+    const response = await this.generateFn(prompt, stop);
     console.log('select character response', {prompt, response});
     const response2 = parseSelectCharacterResponse(response);
     console.log('select character parsed', {response2});
@@ -283,7 +285,7 @@ class AIScene {
     });
     console.log('chat prompt', {prompt});
     const stop = makeChatStop();
-    let response = await this.generateFn(prompt, stop);
+    const response = await this.generateFn(prompt, stop);
     console.log('chat response', {prompt, response});
     const response2 = parseChatResponse(response);
     console.log('chat parsed', {response2});
@@ -297,7 +299,7 @@ class AIScene {
     });
     console.log('dialogue options prompt', {prompt});
     const stop = makeOptionsStop();
-    let response = await this.generateFn(prompt, stop);
+    const response = await this.generateFn(prompt, stop);
     console.log('dialogue options response', {prompt, response});
     const response2 = parseOptionsResponse(response);
     console.log('dialogue options parsed', {response2});
@@ -311,7 +313,7 @@ class AIScene {
     });
     console.log('dialogue options prompt', {prompt});
     const stop = makeCharacterIntroStop();
-    let response = await this.generateFn(prompt, stop);
+    const response = await this.generateFn(prompt, stop);
     console.log('dialogue options response', {prompt, response});
     const response2 = parseCharacterIntroResponse(response);
     console.log('dialogue options parsed', {response2});
@@ -323,37 +325,37 @@ class LoreAI {
   constructor() {
     this.endpointFn = null;
 
-    if(typeof window === 'undefined')
+    if (typeof window === 'undefined')
       return; // don't load this in workers
 
     const _loadSettings = () => {
-              // load local storage
-              const settingsString = localStorage.getItem('AiSettings');
-              let settings;
-      
-              try {
-      
-                  settings = JSON.parse(settingsString);
-      
-              } catch (err) {
-                  console.warn('could not parse AiSettings', err);
-                  settings = DefaultSettings;
-      
-              }
-      
-              settings = settings ?? DefaultSettings;
-      
-              const apiType = settings.apiType ?? DefaultSettings.apiType;
-              const apiKey = settings.apiKey ?? '';
-      
-              const newSettings = {
-                apiType:        apiType,
-                apiKey:         apiKey,
-            };
+      // load local storage
+      const settingsString = localStorage.getItem('AiSettings');
+      let settings;
 
-            localStorage.setItem('AiSettings', JSON.stringify(newSettings));
+      try {
 
-              this.updateLoreEndpoint(apiType);
+        settings = JSON.parse(settingsString);
+
+      } catch (err) {
+        console.warn('could not parse AiSettings', err);
+        settings = DefaultSettings;
+
+      }
+
+      settings = settings ?? DefaultSettings;
+
+      const apiType = settings.apiType ?? DefaultSettings.apiType;
+      const apiKey = settings.apiKey ?? '';
+
+      const newSettings = {
+        apiType: apiType,
+        apiKey: apiKey,
+      };
+
+      localStorage.setItem('AiSettings', JSON.stringify(newSettings));
+
+      this.updateLoreEndpoint(apiType);
     }
 
     _loadSettings();
@@ -362,25 +364,25 @@ class LoreAI {
   updateLoreEndpoint(apiType) {
     const _getApiUrl = apiType => {
       switch (apiType) {
-          case 'NONE': return null;
-          case 'AI21': return `https://ai.webaverse.com/ai21/v1/engines/j1-large/completions`;
-          case 'GOOSEAI': return `https://ai.webaverse.com/gooseai/v1/engines/gpt-neo-20b/completions`;
-          case 'OPENAI': return `https://api.openai.com/v1/engines/text-davinci-002/completions`;
-          default: return null;
+        case 'NONE': return null;
+        case 'AI21': return `https://ai.webaverse.com/ai21/v1/engines/j1-large/completions`;
+        case 'GOOSEAI': return `https://ai.webaverse.com/gooseai/v1/engines/gpt-neo-20b/completions`;
+        case 'OPENAI': return `https://api.openai.com/v1/engines/text-davinci-002/completions`;
+        default: return null;
       }
     };
     const _apiTypeNeedsApiKey = apiType => apiType === 'OPENAI';
 
-      const url = _getApiUrl(apiType);
-      if (_apiTypeNeedsApiKey(apiType)) {
-          this.setEndpoint(async query => {
-            const preauthenticatorModule = await import('../../preauthenticator');              
-              const preauthenticator = preauthenticatorModule.default;        
-              return await preauthenticator.callAuthenticatedApi(authenticatedApiName, url, query);
-          });
-      } else {
-        this.setEndpointUrl(url);
-      }
+    const url = _getApiUrl(apiType);
+    if (_apiTypeNeedsApiKey(apiType)) {
+      this.setEndpoint(async query => {
+        const preauthenticatorModule = await import('../../preauthenticator');
+        const preauthenticator = preauthenticatorModule.default;
+        return await preauthenticator.callAuthenticatedApi(authenticatedApiName, url, query);
+      });
+    } else {
+      this.setEndpointUrl(url);
+    }
   };
 
   async generate(prompt, {
@@ -391,7 +393,7 @@ class LoreAI {
     presence_penalty,
     // top_p,
   } = {}) {
-    if (prompt) {    
+    if (prompt) {
       const query = {};
       query.prompt = prompt;
       query.max_tokens = max_tokens;
@@ -407,7 +409,7 @@ class LoreAI {
       if (presence_penalty !== undefined) {
         query.presence_penalty = presence_penalty;
       }
-      
+
       query.temperature = temperature;
       query.top_p = top_p;
 
@@ -471,10 +473,10 @@ class LoreAI {
       generateFn: (prompt, stop) => {
         return this.generate(prompt, {
           stop,
-          temperature: 1,
-          presence_penalty: .2,
-          frequency_penalty: .2,
-          // top_p,
+          temperature,
+          presence_penalty,
+          frequency_penalty,
+          top_p,
         });
       },
     });
