@@ -32,7 +32,7 @@ const _upload = () => new Promise((accept, reject) => {
     // const name = 'Loading';
     // const description = e.target.files ? e.target.files[0].name : `${e.target.files.length} files`;
     // const load = registerLoad(name, description, 0);
-    const o = await uploadCreateApp(e.target.files,);
+    const o = await uploadCreateApp(e.target.files);
     // load.end();
   });
 });

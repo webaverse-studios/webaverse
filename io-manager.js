@@ -488,7 +488,10 @@ class IoManager extends EventTarget {
     if (storyManager.handleWheel(e)) {
       // nothing
     } else {
-      cameraManager.handleWheelEvent(e);
+      const physicsScene = physicsManager.getScene();
+      if (physicsScene.getPhysicsEnabled() && getRenderer()) {
+        cameraManager.handleWheelEvent(e);
+      }
     }
   }
 
