@@ -16,9 +16,21 @@ const soundFiles = {
   gulp: _getSoundFiles(/^food\/gulp/),
   enemyDeath: _getSoundFiles(/ff7_enemy_death/),
   enemyCut: _getSoundFiles(/ff7_cut/),
+  menuOpen: _getSoundFiles(/ff7_save/),
   // menuOpen: _getSoundFiles(/PauseMenu_Open/),
   // menuOpen: _getSoundFiles(/ff8_save/),
-  menuOpen: _getSoundFiles(/ff7_save/),
+  
+  // mobs sounds todo: implement sound bank package in app
+  worm_bloaterattack: _getSoundFiles(/worm_bloaterattack/),
+  worm_slasherattack: _getSoundFiles(/worm_slasherattack/),
+  worm_runnerattack:  _getSoundFiles(/worm_runnerattack/),
+  worm_attack:  _getSoundFiles(/worm_attack/),
+  worm_bloaterdie: _getSoundFiles(/worm_bloaterdie/),
+  worm_slasherdie: _getSoundFiles(/worm_slasherdie/),
+  worm_runnerdie:  _getSoundFiles(/worm_runnerdie/),
+  worm_die:  _getSoundFiles(/worm_die/),
+  // end mob sounds
+  
   // menuOpen: _getSoundFiles(/ff8_menu_open\.wav/),
   // menuClose: _getSoundFiles(/PauseMenu_Close/),
   menuClose: _getSoundFiles(/ff8_menu_back/),

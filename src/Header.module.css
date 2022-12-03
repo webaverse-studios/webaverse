@@ -301,9 +301,6 @@ body {
 .selected-panel-1 .panels-wrap {
   transform: none;
 }
-.selected-panel-2 .panels-wrap {
-  transform: translateX(-100%);
-}
 .selected-panel-2 .panels {
   max-height: 100vh;
   overflow: hidden !important;
@@ -360,28 +357,11 @@ body {
   top: 0;
   right: 0;
   height: 100%;
-  transform: translateX(-100%) scale(1, 2);
-  transition: transform 0.3s cubic-bezier(0, 1, 0, 1);
 }
 .header .tab .objects .object:hover .background-inner,
 .header .tab .objects .object.selected .background-inner
 {
   height: 100%;
-  transform: translateX(50px) scale(1, 2);
-}
-.header .tab.open {
-  z-index: 1;
-}
-.header .tab.open .panels {
-  background-color: #000;
-  color: #FFF;
-  /* padding-top: 36px; */
-}
-.header .tab.top.left.open {
-  transform: translateX(400px);
-}
-.header .tab.bottom.left.open {
-  transform: translateY(-400px);
 }
 .header .tab.bottom.left {
   position: absolute;
@@ -398,26 +378,9 @@ body {
 .header .tab.bottom.left .label {
   transform: skew(-20deg) translate(-10px, -10px);
 }
-.header .tab.bottom.left.open .slide {
-  width: 300px;
-  height: 300px;
-}
 .header .tab.bottom.left .transparent-panel {
   opacity: 0;
   transition: opacity 1s cubic-bezier(0, 1, 0, 1);
-}
-.header .tab.bottom.left.open .transparent-panel {
-  opacity: 1;
-}
-.header .tab.bottom.left.open .slide .buttons {
-}
-.header .tab.bottom.left.open .slide .buttons .button {
-}
-.header .tab.top.right.open {
-  transform: translateX(-400px);
-}
-.header .tab.top.right.index-1.open {
-  transform: translateX(-400px) translateY(55px);
 }
 .header .tab .label .background {
   position: absolute;
@@ -428,11 +391,9 @@ body {
 }
 .header .tab.left .label .background {
   left: 0;
-  transform: rotateZ(180deg) translateX(-100%);
 }
 .header .tab.right .label .background {
   right: 0;
-  transform: translateX(-100%);
 }
 .background.blue {
   filter: invert(50%) sepia(99%) saturate(514%) hue-rotate(177deg) brightness(99%) contrast(94%);
@@ -449,33 +410,8 @@ body {
 .background.violet {
   filter: invert(61%) sepia(14%) saturate(1642%) hue-rotate(219deg) brightness(82%) contrast(95%);
 }
-.header .tab:not(.disabled):hover .label,
-.header .tab.open .label
-{
-  color: #000;
-}
-.header .tab.top.left:not(.disabled):hover .background,
-.header .tab.top.left.open .background {
-  transform: rotateZ(180deg) translateX(50px);
-}
-.header .tab.top.right:not(.disabled):hover .background,
-.header .tab.top.right.open .background {
-  transform: translateX(50px);
-}
-.header .tab.bottom.right:not(.disabled):hover .background,
-.header .tab.bottom.right.open .background {
-  transform: translateX(50px);
-}
 .header .tab.top.right.index-1 {
   transform: translateY(55px);
-}
-.header .tab.bottom.left:not(.disabled):hover .background,
-.header .tab.bottom.left.open .background {
-  transform: rotateZ(180deg) translateX(50px);
-}
-.header .tab:not(.disabled):hover .key,
-.header .tab.open .key {
-  border-color: #000;
 }
 .header .tab.top.left {
   left: 0;
@@ -516,13 +452,8 @@ body {
   width: 400px;
   padding-top: 50px;
   background-color: #FFF;
-  transform: translateX(400px);
   overflow: auto;
   z-index: 3;
-  transition: transform 0.3s cubic-bezier(0, 1, 0, 1);
-}
-.sidebar.open {
-  transform: none;
 }
 
 .sidebar .nft {

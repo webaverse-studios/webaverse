@@ -86,8 +86,8 @@ export const Stats = () => {
 		}
 	}, [enabled]);
 
-  return (
-		<div className={classnames(style.statsContainer, enabled ? style.open : null)}>
+  return enabled ? (
+		<div className={classnames(style.statsContainer)}>
 			<div className={style.stats}>
 			  <h3>CPU</h3>
 			  {cpuResults.map(result => (
@@ -155,5 +155,5 @@ export const Stats = () => {
 				</div>
 			</div>
 		</div>
-	);
+	) : null;
 };

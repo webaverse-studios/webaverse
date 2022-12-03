@@ -4,7 +4,6 @@ import styles from './Inventory.module.css';
 import CustomButton from '../custom-button';
 import {TokenBox} from '../token-box/TokenBox';
 import {AppContext} from '../../app';
-import {MegaHotBox} from '../../play-mode/mega-hotbox';
 import {CachedLoader} from '../../../CachedLoader.jsx';
 import {Spritesheet} from '../spritesheet/';
 import {createLandIcon} from '../../../../land-iconer.js';
@@ -14,6 +13,7 @@ import * as sounds from '../../../../sounds.js';
 import {mod} from '../../../../util.js';
 import dropManager from '../../../../drop-manager';
 import cardsManager from '../../../../cards-manager.js';
+import useNFTContract from '../../../../src/hooks/useNFTContract';
 
 //
 
@@ -54,95 +54,7 @@ const objects = {
       level: 3,
     },
   ],
-  upstreet: [
-    {
-      name: 'Glavie',
-      start_url: 'https://webaverse.github.io/glaive/',
-      description: 'A sword of greascascascascat lore.',
-      params: [
-        {
-          label: 'Token type',
-          value: 'Seasonal NFT ( ERC-20 )',
-        },
-        {
-          label: 'Status',
-          value: 'Unequipped',
-        },
-        {
-          label: 'Item Type',
-          value: 'Weapon',
-        },
-        {
-          label: 'Rarity',
-          value: 'Common',
-        },
-        {
-          label: 'Durability',
-          value: '720 / 1000',
-        },
-      ],
-      claimed: true,
-      level: 3,
-    },
-    {
-      name: 'Lantern',
-      start_url: 'https://webaverse.github.io/lantern/',
-      description: 'A lantern.',
-      params: [
-        {
-          label: 'Token type',
-          value: 'Seasonal NFT ( ERC-20 )',
-        },
-        {
-          label: 'Status',
-          value: 'Unequipped',
-        },
-        {
-          label: 'Item Type',
-          value: 'Weapon',
-        },
-        {
-          label: 'Rarity',
-          value: 'Common',
-        },
-        {
-          label: 'Durability',
-          value: '720 / 1000',
-        },
-      ],
-      claimed: true,
-      level: 2,
-    },
-    {
-      name: 'Dragon',
-      start_url: 'https://webaverse.github.io/dragon-mount/',
-      description: 'A cute dragon. But something is wrong with it...',
-      params: [
-        {
-          label: 'Token type',
-          value: 'Seasonal NFT ( ERC-20 )',
-        },
-        {
-          label: 'Status',
-          value: 'Unequipped',
-        },
-        {
-          label: 'Item Type',
-          value: 'Weapon',
-        },
-        {
-          label: 'Rarity',
-          value: 'Common',
-        },
-        {
-          label: 'Durability',
-          value: '720 / 1000',
-        },
-      ],
-      claimed: true,
-      level: 5,
-    },
-  ],
+  upstreet: [],
 
   resources: [
     {
@@ -163,7 +75,7 @@ const objects = {
 };
 
 
-const Token = ({object, enabled}) => {
+const Token = ({object}) => {
   const [rendered, setRendered] = useState(false);
   const canvasRef = useRef();
 
@@ -171,7 +83,7 @@ const Token = ({object, enabled}) => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (canvas && enabled && !rendered) {
+    if (canvas && !rendered) {
       (async () => {
         const {seed, renderPosition, lods, minLodRange, clipRange} = object;
 
@@ -191,21 +103,20 @@ const Token = ({object, enabled}) => {
 
       setRendered(true);
     }
-  }, [canvasRef.current, enabled, rendered]);
+  }, [canvasRef.current, rendered]);
 
-  return (
+  return object ? (
     <TokenBox
       size={size}
       object={object}
-      level={object?.level}
-      claimed={object?.claimed}
-      url={object?.start_url}
-      enabled={enabled}
+      level={object.level}
+      claimed={object.claimed}
+      url={object.start_url}
       resolution={resolution}
-      value={object?.value}
+      value={object.value}
       numFrames={numFrames}
     />
-  );
+  ) : null;
 };
 
 const TokenList = ({
@@ -218,7 +129,6 @@ const TokenList = ({
   onMouseEnter,
   onMouseDown,
   onDragStart,
-  onDoubleClick,
   onClick,
   highlights,
   ItemClass,
@@ -234,16 +144,16 @@ const TokenList = ({
               {tokens.map((object, i) => (
                 <li
                   draggable
-                  hovered={hoverObject}
                   selected={selectObject}
                   onMouseEnter={onMouseEnter(object)}
                   onMouseDown={onMouseDown(object)}
                   onDragStart={onDragStart(object)}
-                  onDoubleClick={onDoubleClick(object)}
                   onClick={onClick(object)}
                   key={i}
                 >
-                  <Token object={object} enabled={open} />
+                {open &&
+                  <Token object={object} />
+                }
                 </li>
               ))}
             </React.Fragment>
@@ -255,35 +165,25 @@ const TokenList = ({
 };
 
 export const Inventory = () => {
-  const {state, setState} = useContext(AppContext);
+  const {state, setState, account} = useContext(AppContext);
   const [hoverObject, setHoverObject] = useState(null);
   const [selectObject, setSelectObject] = useState(null);
-  // const [ spritesheet, setSpritesheet ] = useState(null);
   const [faceIndex, setFaceIndex] = useState(1);
   const [claims, setClaims] = useState([]);
-  const [cachedLoader, setCachedLoader] = useState(
-    () =>
-      new CachedLoader({
-        async loadFn(url, value, {signal}) {
-          const {start_url} = value;
-          const imageBitmap = await cardsManager.getCardsImage(start_url, {
-            width,
-            signal,
-          });
-          return imageBitmap;
-        },
-      }),
-  );
+  const [inventoryItems, setInventoryItems] = useState(objects);
+
   const [loading, setLoading] = useState(false);
   const [imageBitmap, setImageBitmap] = useState(null);
 
   const selectedMenuIndex = mod(faceIndex, 4);
 
-  const open =
-    state.openedPanel === 'CharacterPanel' || state.openedPanel === 'Inventory';
-
   const [openPreview, setOpenPreview] = useState(false);
   const [previewObject, setPreviewObject] = useState(undefined);
+
+  const {getTokens, mintfromVoucher, WebaversecontractAddress} = useNFTContract(account.currentAddress);
+
+  const open = state.openedPanel === 'CharacterPanel' || state.openedPanel === 'Inventory';
+
 
   const onMouseEnter = object => () => {
     setHoverObject(object);
@@ -310,7 +210,7 @@ export const Inventory = () => {
     transparentPng.src = transparentPngUrl;
     e.dataTransfer.setDragImage(transparentPng, 0, 0);
 
-    setSelectObject(object);
+    // setSelectObject(object);
   };
   const onClick = object => () => {
     setOpenPreview(true);
@@ -336,81 +236,117 @@ export const Inventory = () => {
 
     sounds.playSoundName('menuNext');
   };
+  const onEquip = object => () => {
+    game.handleDropJsonToPlayer(object);
+  };
+  const onSpawn = object => () => {
+    game.handleDropJsonForSpawn(object);
+  };
+  const onDrop = object => () => {
+    game.handleDropJsonForDrop(object, account.currentAddress, WebaversecontractAddress, (isclaimed) => {
+      if(isclaimed) { // NFT
+        closePreview(); // will add time counter
+      } else {
+        dropManager.removeClaim(object);
+        closePreview();
+      }
+    });
+  };
+  const mintClaim = async (e) => {
+    if(!account.currentAddress) {
+      alert("Make sure wallet connected");
+      return false;
+    }
+
+    await mintfromVoucher(e, () => {
+    }, () => {
+        dropManager.removeClaim(e);
+        closePreview();
+    });
+  }
+
   const selectClassName = styles[`select-${selectedMenuIndex}`];
 
   useEffect(() => {
-    const claimschange = e => {
-      const {claims} = e.data;
-      setClaims(claims.slice());
+    const claimschange = async (e) => {
+        const {claims, addedClaim} = e.data;
+            const claimableItem = claims.map(({name, start_url, type, voucher, serverDrop, level}) => ({
+              name,
+              start_url: start_url.split("index.js")[0],
+              description: "This is not-claimed drops",
+              params: [
+                  {
+                      label: 'Token type',
+                      value: 'Seasonal NFT ( ERC-1155 )',
+                  },
+              ],
+              type,
+              voucher,
+              serverDrop,
+              claimed: false,
+              level
+            }))
+
+            setInventoryItems({
+              notClaimed: claimableItem,
+              upstreet: inventoryItems.upstreet,
+              resources: inventoryItems.resources
+            });
+            // inventoryItems.notClaimed.push(addedClaim)
+        // }
     };
     dropManager.addEventListener('claimschange', claimschange);
     return () => {
       dropManager.removeEventListener('claimschange', claimschange);
     };
-  }, [claims]);
+  }, [inventoryItems]);
+
 
   useEffect(() => {
-    if (cachedLoader) {
-      const loadingchange = e => {
-        setLoading(e.data.loading);
-      };
-      cachedLoader.addEventListener('loadingchange', loadingchange);
-      return () => {
-        cachedLoader.removeEventListener('loadingchange', loadingchange);
-      };
-    }
-  }, [cachedLoader]);
+    if (account && account.currentAddress) {
+        async function queryGetNFTFromContract() {
+          const nftList = await getTokens();
+          const nftData = nftList.map(({tokenId, url}) => (
+                {
+                    tokenId,
+                    name: "",
+                    start_url: url,
+                    description: "",
+                    params: [
+                    ],
+                    claimed: true,
+                    type: "major",
+                }
+            ))
 
-  useEffect(() => {
-    if (open) {
-      const start_url = selectObject ? selectObject.start_url : '';
-      if (start_url) {
-        const abortController = new AbortController();
-        (async () => {
-          const imageBitmap = await cachedLoader.loadItem(
-            start_url,
-            selectObject,
-            {
-              signal: abortController.signal,
-            },
-          );
-          if (imageBitmap !== null) {
-            setImageBitmap(imageBitmap);
-          }
-        })();
-        setImageBitmap(null);
-        return () => {
-          abortController.abort();
-        };
-      }
+          setInventoryItems({
+              notClaimed: inventoryItems.notClaimed,
+              upstreet: nftData,
+              resources: inventoryItems.resources
+          })
+        }
+        queryGetNFTFromContract();
     } else {
-      if (selectObject) {
-        setSelectObject(null);
-      }
+        console.log('could not query NFT collections')
     }
-  }, [open, selectObject]);
+}, [open, account])
 
-  useEffect(() => {
-    if (open !== 'CharacterPanel') {
-      if (open) {
-        sounds.playSoundName('menuOpen');
-      } else {
-        sounds.playSoundName('menuClose');
-        setOpenPreview(false);
-      }
+useEffect(() => {
+  if (open !== 'CharacterPanel') {
+    if (open) {
+      sounds.playSoundName('menuOpen');
+    } else {
+      sounds.playSoundName('menuClose');
+      setOpenPreview(false);
     }
-  }, [open]);
+  }
+}, [open]);
 
-  useEffect(() => {
-    setSelectObject(null);
-  }, [faceIndex]);
-
-  return (
+  return open ? (
     <>
       <div
         className={classnames(
           styles.inventoryPanelWrap,
-          open ? styles.opened : null,
         )}
       >
         <div className={styles.inventoryPanel}>
@@ -422,7 +358,7 @@ export const Inventory = () => {
               sections={[
                 {
                   name: 'Resources',
-                  tokens: objects.resources,
+                  tokens: inventoryItems.resources,
                 },
               ]}
               open={faceIndex === 1}
@@ -443,11 +379,11 @@ export const Inventory = () => {
               sections={[
                 {
                   name: 'Not Claimed',
-                  tokens: objects.notClaimed,
+                  tokens: inventoryItems.notClaimed,
                 },
                 {
                   name: 'From Upstreet',
-                  tokens: objects.upstreet,
+                  tokens: inventoryItems.upstreet,
                 },
               ]}
               open={faceIndex === 1}
@@ -475,10 +411,10 @@ export const Inventory = () => {
         </div>
       </div>
       {/** Item Preview Panel */}
+      {openPreview && previewObject && 
       <div
         className={classnames(
           styles.inventoryPanelWrap,
-          openPreview && previewObject ? styles.opened : null,
         )}
       >
         <div className={styles.inventoryPanel}>
@@ -494,15 +430,14 @@ export const Inventory = () => {
             <>
               <div className={styles.sep} />
               <div className={styles.infoWrap}>
-                <h2>{previewObject?.name}</h2>
+                <h2>{previewObject.name}</h2>
                 <div className={styles.itemPreviewBoxWrap}>
                   <div className={styles.itemPreviewBox}>
                     <div className={styles.bg} />
                     <div className={styles.mask}>
                       <Spritesheet
                         className={styles.canvas}
-                        startUrl={previewObject?.start_url}
-                        enabled={true}
+                        startUrl={previewObject.start_url}
                         size={resolution}
                         numFrames={numFrames}
                         animationLoop={true}
@@ -510,35 +445,86 @@ export const Inventory = () => {
                     </div>
                   </div>
                 </div>
-                {previewObject?.params &&
+                {previewObject && previewObject.params &&
                   previewObject.params.map((param, i) => {
-                    return (
+                    return param ? (
                       <div className={styles.stat} key={i}>
-                        <span className={styles.label}>{param?.label}</span>
-                        {param?.value}
+                        <span className={styles.label}>{param.label}</span>
+                        {param.value}
                       </div>
-                    );
+                    ) : null;
                   })}
-                <p>{previewObject?.description}</p>
+                <p>{previewObject.description}</p>
               </div>
               <div className={styles.actionsWrap}>
-                <CustomButton
-                  theme="light"
-                  text="Claim"
-                  size={14}
-                  className={styles.button}
-                />
-                <CustomButton
-                  theme="dark"
-                  text="Drop"
-                  size={14}
-                  className={styles.button}
-                />
+                { previewObject.claimed ?
+                    <>
+                      <CustomButton
+                        theme="light"
+                        text="SPAWN"
+                        onClick={
+                          onSpawn(previewObject)
+                        }
+                        size={14}
+                        className={styles.button}
+                      />
+                      <CustomButton
+                        theme="light"
+                        text="EQUIP"
+                        onClick={
+                          onEquip(previewObject)
+                        }
+                        size={14}
+                        className={styles.button}
+                      />
+                      <CustomButton
+                        theme="dark"
+                        text="DROP"
+                        onClick={
+                          onDrop(previewObject)
+                        }
+                        size={14}
+                        className={styles.button}
+                      />
+                    </>
+                  :
+                    <>
+                      <CustomButton
+                        theme="light"
+                        text="Claim"
+                        onClick={() => {
+                          console.log("preview", previewObject)
+                          mintClaim(previewObject)
+                        }}
+                        size={14}
+                        className={styles.button}
+                      />
+                      <CustomButton
+                        theme="light"
+                        text="EQUIP"
+                        onClick={
+                          onEquip(previewObject)
+                        }
+                        size={14}
+                        className={styles.button}
+                      />
+                      <CustomButton
+                        theme="dark"
+                        text="DROP"
+                        onClick={
+                          onDrop(previewObject)
+                        }
+                        size={14}
+                        className={styles.button}
+                      />
+                    </>
+                }
               </div>
             </>
           )}
         </div>
       </div>
+      }
     </>
-  );
+  ) : null;
 };

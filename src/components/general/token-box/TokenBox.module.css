@@ -59,13 +59,8 @@
     -webkit-transform: translateX(-50%) translateY(-50%);
     transform: translateX(-50%) translateY(-50%);
     position: absolute;
-    display: none;
-}
-
-.tokenBoxWrap .frame.open {
     display: block;
 }
-
 .tokenBoxWrap .badge {
     width: 20%;
     top: 1px;
