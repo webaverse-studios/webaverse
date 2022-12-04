@@ -31,6 +31,7 @@ let highlightedPhysicsObject = null;
 let highlightedPhysicsId = 0;
 let transformIndicators = null;
 
+
 const getPhysicalPosition = box => {
   return localVector7.set(
     (box.min.x + box.max.x) / 2,

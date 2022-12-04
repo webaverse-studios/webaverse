@@ -5,7 +5,6 @@ usually, code starts here and is migrated to an appropriate manager.
 */
 
 import * as THREE from 'three';
-import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import physx from './physx.js';
 import cameraManager from './camera-manager.js';
 import ioManager from './io-manager.js';
@@ -13,9 +12,9 @@ import dioramaManager from './diorama/diorama-manager.js';
 import {world} from './world.js';
 import {buildMaterial, highlightMaterial, selectMaterial, hoverMaterial, hoverEquipmentMaterial} from './shaders.js';
 import {getRenderer, sceneLowPriority, camera} from './renderer.js';
-import {downloadFile, snapPosition, getDropUrl, handleDropJsonItem,makeId} from './util.js';
+import {downloadFile, snapPosition, getDropUrl, handleDropJsonItem, makeId} from './util.js';
 import {maxGrabDistance, throwReleaseTime, throwAnimationDuration, walkSpeed, crouchSpeed, flySpeed} from './constants.js';
-import metaversefileApi from './metaversefile-api.js';
+import metaversefileApi from 'metaversefile';
 import loadoutManager from './loadout-manager.js';
 import * as sounds from './sounds.js';
 import {playersManager} from './players-manager.js';
@@ -34,922 +33,419 @@ const localVector3 = new THREE.Vector3();
 const localVector4 = new THREE.Vector3();
 const localVector5 = new THREE.Vector3();
 const localVector6 = new THREE.Vector3();
+const localVector7 = new THREE.Vector3();
 const localQuaternion = new THREE.Quaternion();
 const localEuler = new THREE.Euler();
 const localMatrix2 = new THREE.Matrix4();
-const localMatrix3 = new THREE.Matrix4();
+const localBox = new THREE.Box3();
 const localRay = new THREE.Ray();
-
-//
-
-let isMouseUp = false;
-
-const _unwearAppIfHasSitComponent = (player) => {
-  const wearActions = player.getActionsByType('wear');
-  for (const wearAction of wearActions) {
-    const instanceId = wearAction.instanceId;
-    const app = metaversefileApi.getAppByInstanceId(instanceId);
-    const hasSitComponent = app.hasComponent('sit');
-    if (hasSitComponent) {
-      app.unwear();
-    }
-  }
-}
-
-const _getCurrentGrabAnimation = () => {
-  let currentAnimation = '';
-  const localPlayer = playersManager.getLocalPlayer();
-
-  const wearComponent = grabUseMesh.targetApp.getComponent('wear');
-  if (wearComponent && wearComponent.grabAnimation === 'pick_up') {
-    currentAnimation = wearComponent.grabAnimation;
-  } else {
-    const grabUseMeshPosition = grabUseMesh.position;
-    let currentDistance = 100;
-
-    // Forward
-    {
-      localVector.set(0, -0.5, -0.5).applyQuaternion(localPlayer.quaternion)
-        .add(localPlayer.position);
-      const distance = grabUseMeshPosition.distanceTo(localVector);
-      currentDistance = distance;
-      currentAnimation = 'grab_forward';
-    }
-
-    // Down
-    {
-      localVector.set(0, -1.2, -0.5).applyQuaternion(localPlayer.quaternion)
-        .add(localPlayer.position);
-      const distance = grabUseMeshPosition.distanceTo(localVector);
-      if (distance < currentDistance) {
-        currentDistance = distance;
-        currentAnimation = 'grab_down';
-      }
-    }
-
-    // Up
-    {
-      localVector.set(0, 0.0, -0.5).applyQuaternion(localPlayer.quaternion)
-        .add(localPlayer.position);
-      const distance = grabUseMeshPosition.distanceTo(localVector);
-      if (distance < currentDistance) {
-        currentDistance = distance;
-        currentAnimation = 'grab_up';
-      }
-    }
-
-    // Left
-    {
-      localVector.set(-0.8, -0.5, -0.5).applyQuaternion(localPlayer.quaternion)
-        .add(localPlayer.position);
-      const distance = grabUseMeshPosition.distanceTo(localVector);
-      if (distance < currentDistance) {
-        currentDistance = distance;
-        currentAnimation = 'grab_left';
-      }
-    }
-    
-    // Right
-    {
-      localVector.set(0.8, -0.5, -0.5).applyQuaternion(localPlayer.quaternion)
-        .add(localPlayer.position);
-      const distance = grabUseMeshPosition.distanceTo(localVector);
-      if (distance < currentDistance) {
-        currentDistance = distance;
-        currentAnimation = 'grab_right';
-      }
-    }
-  }
-
-  return currentAnimation;
-};
-
-const _makeTargetMesh = (() => {
-  const targetMeshGeometry = (() => {
-    const targetGeometry = BufferGeometryUtils.mergeBufferGeometries([
-      new THREE.BoxBufferGeometry(0.03, 0.2, 0.03)
-        .applyMatrix4(new THREE.Matrix4().makeTranslation(0, -0.1, 0)),
-      new THREE.BoxBufferGeometry(0.03, 0.2, 0.03)
-        .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, -1, 0), new THREE.Vector3(0, 0, 1))))
-        .applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, 0.1)),
-      new THREE.BoxBufferGeometry(0.03, 0.2, 0.03)
-        .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, -1, 0), new THREE.Vector3(1, 0, 0))))
-        .applyMatrix4(new THREE.Matrix4().makeTranslation(0.1, 0, 0)),
-    ]);
-    return BufferGeometryUtils.mergeBufferGeometries([
-      targetGeometry.clone()
-        .applyMatrix4(new THREE.Matrix4().makeTranslation(-0.5, 0.5, -0.5)),
-      targetGeometry.clone()
-        .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, -1), new THREE.Vector3(0, -1, 0))))
-        .applyMatrix4(new THREE.Matrix4().makeTranslation(-0.5, -0.5, -0.5)),
-      targetGeometry.clone()
-        .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1))))
-        .applyMatrix4(new THREE.Matrix4().makeTranslation(-0.5, 0.5, 0.5)),
-      targetGeometry.clone()
-        .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(1, 0, 0))))
-        .applyMatrix4(new THREE.Matrix4().makeTranslation(0.5, 0.5, -0.5)),
-      targetGeometry.clone()
-        .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(1, 0, 0))))
-        .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1))))
-        .applyMatrix4(new THREE.Matrix4().makeTranslation(0.5, 0.5, 0.5)),
-      targetGeometry.clone()
-        .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1))))
-        .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(-1, 0, 0), new THREE.Vector3(0, -1, 0))))
-        .applyMatrix4(new THREE.Matrix4().makeTranslation(-0.5, -0.5, 0.5)),
-      targetGeometry.clone()
-        .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(1, 0, 0))))
-        .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, -1, 0))))
-        .applyMatrix4(new THREE.Matrix4().makeTranslation(0.5, -0.5, -0.5)),
-      targetGeometry.clone()
-        .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(-1, 1, 0).normalize(), new THREE.Vector3(1, 1, 0).normalize())))
-        .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, -1, 0).normalize(), new THREE.Vector3(0, 0, -1).normalize())))
-        .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(-1, 0, 0).normalize(), new THREE.Vector3(0, 1, 0).normalize())))
-        .applyMatrix4(new THREE.Matrix4().makeTranslation(0.5, -0.5, 0.5)),
-    ])// .applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0.5, 0));
-  })();
-  const targetVsh = `
-    #define M_PI 3.1415926535897932384626433832795
-    uniform float uTime;
-    // varying vec2 vUv;
-    void main() {
-      float f = 1.0 + sign(uTime) * pow(sin(abs(uTime) * M_PI), 0.5) * 0.2;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position * f, 1.);
-    }
-  `;
-  const targetFsh = `
-    uniform float uHighlight;
-    uniform float uTime;
-    
-    const vec3 c = vec3(${new THREE.Color(0x29b6f6).toArray().join(', ')});
-    
-    void main() {
-      float f = max(1.0 - sign(uTime) * pow(abs(uTime), 0.5), 0.1);
-      gl_FragColor = vec4(vec3(c * f * uHighlight), 1.0);
-    }
-  `;
-  return p => {
-    const geometry = targetMeshGeometry;
-    const material = new THREE.ShaderMaterial({
-      uniforms: {
-        uHighlight: {
-          value: 0,
-          needsUpdate: true,
-        },
-        uTime: {
-          value: 0,
-          needsUpdate: true,
-        },
-      },
-      vertexShader: targetVsh,
-      fragmentShader: targetFsh,
-      // transparent: true,
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.frustumCulled = false;
-    return mesh;
-  };
-})();
-const _makeHighlightPhysicsMesh = material => {
-  const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
-  material = material.clone();
-  const mesh = new THREE.Mesh(geometry, material);
-  mesh.frustumCulled = false;
-  mesh.physicsId = 0;
-  return mesh;
-};
-
-/* const highlightMesh = _makeTargetMesh();
-highlightMesh.visible = false;
-sceneLowPriority.add(highlightMesh);
-let highlightedObject = null; */
-
-const grabHighlightPhysicsMesh = _makeHighlightPhysicsMesh(buildMaterial);
-grabManager.setHighlightPhysicsMesh(grabHighlightPhysicsMesh);
-
-const mouseHighlightPhysicsMesh = _makeHighlightPhysicsMesh(highlightMaterial);
-mouseHighlightPhysicsMesh.visible = false;
-sceneLowPriority.add(mouseHighlightPhysicsMesh);
-let mouseHoverObject = null;
-let mouseHoverPhysicsId = 0;
-let mouseHoverPosition = null;
-
-const mouseSelectPhysicsMesh = _makeHighlightPhysicsMesh(selectMaterial);
-mouseSelectPhysicsMesh.visible = false;
-sceneLowPriority.add(mouseSelectPhysicsMesh);
-let mouseSelectedObject = null;
-let mouseSelectedPhysicsId = 0;
-let mouseSelectedPosition = null;
-
-const mouseDomHoverPhysicsMesh = _makeHighlightPhysicsMesh(hoverMaterial);
-mouseDomHoverPhysicsMesh.visible = false;
-sceneLowPriority.add(mouseDomHoverPhysicsMesh);
-let mouseDomHoverObject = null;
-let mouseDomHoverPhysicsId = 0;
-
-const mouseDomEquipmentHoverPhysicsMesh = _makeHighlightPhysicsMesh(hoverEquipmentMaterial);
-mouseDomEquipmentHoverPhysicsMesh.visible = false;
-sceneLowPriority.add(mouseDomEquipmentHoverPhysicsMesh);
-let mouseDomEquipmentHoverObject = null;
-let mouseDomEquipmentHoverPhysicsId = 0;
-
-// let selectedLoadoutIndex = -1;
-
-// const _use = () => {
-//   if (gameManager.getMenu() === 3) {
-//     const itemSpec = itemSpecs3[selectedItemIndex];
-//     let {start_url, filename, content} = itemSpec;
-
-//     if (start_url) {
-//       // start_url = new URL(start_url, srcUrl).href;
-//       // filename = start_url;
-//     } else if (filename && content) {
-//       const blob = new Blob([content], {
-//         type: 'application/octet-stream',
-//       });
-//       start_url = URL.createObjectURL(blob);
-//       start_url += '/' + filename;
-//     }
-//     world.appManager.addTrackedApp(start_url, null, deployMesh.position, deployMesh.quaternion, deployMesh.scale);
-
-//     gameManager.setMenu(0);
-//     cameraManager.requestPointerLock();
-//   } else if (highlightedObject /* && !editedObject */) {
-//     grabManager.grab(highlightedObject);
-//     highlightedObject = null;
-    
-//     gameManager.setMenu(0);
-//     cameraManager.requestPointerLock();
-//   } else if (gameManager.getMenu() === 1) {
-//     const itemSpec = itemSpecs1[selectedItemIndex];
-//     itemSpec.cb();
-//   } else if (gameManager.getMenu() === 2) {
-//     const inventory = loginManager.getInventory();
-//     const itemSpec = inventory[selectedItemIndex];
-
-//     world.appManager.addTrackedApp(itemSpec.id, null, deployMesh.position, deployMesh.quaternion, deployMesh.scale);
-
-//     gameManager.setMenu(0);
-//     cameraManager.requestPointerLock();
-//   }
-// };
-const _delete = () => {
-  if (mouseSelectedObject) {
-    world.appManager.removeTrackedApp(mouseSelectedObject.instanceId);
-    
-    if (mouseHoverObject === mouseSelectedObject) {
-      gameManager.setMouseHoverObject(null);
-    }
-    gameManager.setMouseSelectedObject(null);
-  }
-};
-
-let lastUseIndex = 0;
-const _getNextUseIndex = animationCombo => {
-  if (Array.isArray(animationCombo)) {
-    return (lastUseIndex++) % animationCombo.length;
-  } else {
-    return 0;
-  }
-}
-const _startUse = () => {
-  const wearApp = loadoutManager.getSelectedApp();
-  if (wearApp) {
-    const useComponent = wearApp.getComponent('use');
-    if (useComponent) {
-      const localPlayer = playersManager.getLocalPlayer();
-      const useAction = localPlayer.getAction('use');
-      if (!useAction) {
-        const {instanceId} = wearApp;
-        const {boneAttachment, animation, animationCombo, animationEnvelope, ik, behavior, position, quaternion, scale} = useComponent;
-        const index = _getNextUseIndex(animationCombo);
-        const newUseAction = {
-          type: 'use',
-          instanceId,
-          animation,
-          animationCombo,
-          animationEnvelope,
-          ik,
-          behavior,
-          boneAttachment,
-          index,
-          position,
-          quaternion,
-          scale,
-        };
-        // console.log('new use action', newUseAction, useComponent, {animation, animationCombo, animationEnvelope});
-        localPlayer.addAction(newUseAction);
-
-        wearApp.use();
-      }
-    }
-  }
-};
-const _endUse = () => {
-  const localPlayer = playersManager.getLocalPlayer();
-  const useAction = localPlayer.getAction('use');
-  if (useAction) {
-    const app = metaversefileApi.getAppByInstanceId(useAction.instanceId);
-    app.dispatchEvent({
-      type: 'use',
-      use: false,
-    });
-    localPlayer.removeAction('use');
-  }
-};
-const _mousedown = () => {
-  _startUse();
-};
-const _mouseup = () => {
-  isMouseUp = true;
-};
 
 const hitRadius = 1;
 const hitHeight = 0.2;
 const hitHalfHeight = hitHeight * 0.5;
 const hitboxOffsetDistance = 0.3;
-/* const cylinderMesh = (() => {
-  const radius = 1;
-  const height = 0.2;
-  const halfHeight = height/2;
-  const cylinderMesh = new THREE.Mesh(
-    new THREE.CylinderBufferGeometry(radius, radius, height),
-    new THREE.MeshBasicMaterial({
-      color: 0x00FFFF,
-    })
-  );
-  cylinderMesh.radius = radius;
-  cylinderMesh.halfHeight = halfHeight;
-  return cylinderMesh;
-})(); */
-
-let grabUseMesh = null;
-const _gameInit = () => {
-  grabUseMesh = metaversefileApi.createApp();
-  (async () => {
-    const {importModule} = metaversefileApi.useDefaultModules();
-    const m = await importModule('button');
-    await grabUseMesh.addModule(m);
-  })();
-  grabUseMesh.targetApp = null;
-  grabUseMesh.targetPhysicsId = -1;
-  sceneLowPriority.add(grabUseMesh);
-};
-Promise.resolve()
-  .then(_gameInit);
-
-let lastActivated = false;
-let lastThrowing = false;
-const _gameUpdate = (timestamp, timeDiff) => {
-  const now = timestamp;
-  const renderer = getRenderer();
-  const localPlayer = playersManager.getLocalPlayer();
-
-  const _updateGrabUseMesh = () => {
-    const renderer = getRenderer();
-    const _isWear = o => localPlayer.findAction(action => action.type === 'wear' && action.instanceId === o.instanceId);
-
-    grabUseMesh.visible = false;
-    if (!grabManager.editMode) {
-      const avatarHeight = localPlayer.avatar ? localPlayer.avatar.height : 0;
-      localVector.copy(localPlayer.position)
-        .add(localVector2.set(0, avatarHeight * (1 - localPlayer.getCrouchFactor()) * 0.5, -0.3).applyQuaternion(localPlayer.quaternion));
-        
-      const radius = 1;
-      const halfHeight = 0.1;
-      const physicsScene = physicsManager.getScene();
-      const collision = physicsScene.getCollisionObject(radius, halfHeight, localVector, localPlayer.quaternion);
-      if (collision) {
-        const physicsId = collision.objectId;
-        const object = metaversefileApi.getAppByPhysicsId(physicsId);
-        // console.log('got collision', physicsId, object);
-        const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(physicsId);
-        if (object && !_isWear(object) && physicsObject) {
-          grabUseMesh.position.setFromMatrixPosition(physicsObject.physicsMesh.matrixWorld);
-          grabUseMesh.quaternion.copy(camera.quaternion);
-          grabUseMesh.updateMatrixWorld();
-          grabUseMesh.targetApp = object;
-          grabUseMesh.targetPhysicsId = physicsId;
-          grabUseMesh.setComponent('value', physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'activate', 1));
-          
-          grabUseMesh.visible = true;
-        }
-      }
-    }
-
-  };
-  _updateGrabUseMesh();
-
-  zTargeting.update(timestamp, timeDiff);
-
-  const _handlePickUp = () => {
-    const pickUpAction = localPlayer.getAction('pickUp');
-    if (pickUpAction) {
-      const {instanceId} = pickUpAction;
-      const app = metaversefileApi.getAppByInstanceId(instanceId);
-
-      const _removeApp = () => {
-        if (app.parent) {
-          app.oldParent = app.parent;
-          app.parent.remove(app);
-        }
-      };
-      const _addApp = () => {
-        app.oldParent.add(app);
-        app.oldParent = null;
-      };
-
-      _removeApp();
-
-      const animations = Avatar.getAnimations();
-      const pickUpZeldaAnimation = animations.find(a => a.name === 'pick_up_zelda.fbx');
-      const pickUpTime = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'pickUp', 0);
-      const pickUpTimeS = pickUpTime / 1000;
-      if (pickUpTimeS < pickUpZeldaAnimation.duration) {
-        // still playing the pick up animation
-      } else {
-        // idling
-
-        _addApp();
-
-        const handsAveragePosition = localVector.setFromMatrixPosition(localPlayer.avatar.modelBones.Left_wrist.matrixWorld)
-          .add(localVector2.setFromMatrixPosition(localPlayer.avatar.modelBones.Right_wrist.matrixWorld))
-          .divideScalar(2)
-          .add(localVector2.set(0, 0.2, 0));
-        app.position.copy(handsAveragePosition);
-        localEuler.setFromQuaternion(localPlayer.quaternion, 'YXZ');
-        localEuler.x = 0;
-        localEuler.y += Math.PI;
-        localEuler.z = 0;
-        app.quaternion.setFromEuler(localEuler);
-        app.updateMatrixWorld();
-
-        // console.log('got pickUpTime', pickUpTime, animations);
-        // debugger;
-      }
-    } /* else {
-
-    } */
-    ioManager.setMovementEnabled(!pickUpAction);
-  }
-  _handlePickUp();
-
-  const _updateMouseHighlight = () => {
-    mouseHighlightPhysicsMesh.visible = false;
-
-    if (gameManager.hoverEnabled) {
-      const collision = raycastManager.getCollision();
-      if (collision) {
-        const {physicsObject/*, physicsId */} = collision;
-        const {physicsMesh} = physicsObject;
-        mouseHighlightPhysicsMesh.geometry = physicsMesh.geometry;
-        localMatrix2.copy(physicsMesh.matrixWorld)
-          // .premultiply(localMatrix3.copy(mouseHoverObject.matrixWorld).invert())
-          .decompose(mouseHighlightPhysicsMesh.position, mouseHighlightPhysicsMesh.quaternion, mouseHighlightPhysicsMesh.scale);
-        mouseHighlightPhysicsMesh.material.uniforms.uTime.value = (now%1500)/1500;
-        mouseHighlightPhysicsMesh.material.uniforms.uTime.needsUpdate = true;
-        mouseHighlightPhysicsMesh.updateMatrixWorld();
-
-        mouseHighlightPhysicsMesh.visible = true;
-        gameManager.setMouseHoverObject(collision.app, collision.physicsId, collision.point);
-      }
-    }
-  };
-  _updateMouseHighlight();
-  
-  const _updateMouseSelect = () => {
-    mouseSelectPhysicsMesh.visible = false;
-
-    const o = mouseSelectedObject;
-    if (o) {
-      const physicsId = mouseSelectedPhysicsId;
-
-      const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(physicsId);
-      if (physicsObject) {
-        const {physicsMesh} = physicsObject;
-        mouseSelectPhysicsMesh.geometry = physicsMesh.geometry;
-        
-        // update matrix
-        {
-          localMatrix2.copy(physicsMesh.matrixWorld)
-            // .premultiply(localMatrix3.copy(mouseSelectedObject.matrixWorld).invert())
-            .decompose(mouseSelectPhysicsMesh.position, mouseSelectPhysicsMesh.quaternion, mouseSelectPhysicsMesh.scale);
-          // console.log('decompose', mouseSelectPhysicsMesh.position.toArray().join(','), mouseSelectPhysicsMesh.quaternion.toArray().join(','), mouseSelectPhysicsMesh.scale.toArray().join(','));
-          // debugger;
-          // mouseSelectPhysicsMesh.position.set(0, 0, 0);
-          // mouseSelectPhysicsMesh.quaternion.identity();
-          // mouseSelectPhysicsMesh.scale.set(1, 1, 1);
-          mouseSelectPhysicsMesh.visible = true;
-          mouseSelectPhysicsMesh.updateMatrixWorld();
-
-        }
-        // update uniforms
-        {
-          mouseSelectPhysicsMesh.material.uniforms.uTime.value = (now%1500)/1500;
-          mouseSelectPhysicsMesh.material.uniforms.uTime.needsUpdate = true;
-          
-        }
-      } /* else {
-        console.warn('no physics transform for object', o, physicsId, physicsTransform);
-      } */
-    }
-  };
-  _updateMouseSelect();
-  
-  const _updateMouseDomHover = () => {
-    mouseDomHoverPhysicsMesh.visible = false;
-
-    if (mouseDomHoverObject && !mouseSelectedObject) {
-      const physicsId = mouseDomHoverPhysicsId;
-
-      const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(physicsId);
-      if (physicsObject) {
-        const {physicsMesh} = physicsObject;
-        mouseDomHoverPhysicsMesh.geometry = physicsMesh.geometry;
-        localMatrix2.copy(physicsMesh.matrixWorld)
-          // .premultiply(localMatrix3.copy(mouseHoverObject.matrixWorld).invert())
-          .decompose(mouseDomHoverPhysicsMesh.position, mouseDomHoverPhysicsMesh.quaternion, mouseDomHoverPhysicsMesh.scale);
-        mouseDomHoverPhysicsMesh.material.uniforms.uTime.value = (now%1500)/1500;
-        mouseDomHoverPhysicsMesh.material.uniforms.uTime.needsUpdate = true;
-        mouseDomHoverPhysicsMesh.visible = true;
-        mouseDomHoverPhysicsMesh.updateMatrixWorld();
-      }
-    }
-  };
-  _updateMouseDomHover();
-  
-  const _updateMouseDomEquipmentHover = () => {
-    mouseDomEquipmentHoverPhysicsMesh.visible = false;
-
-    if (mouseDomEquipmentHoverObject && !mouseSelectedObject) {
-      const physicsId = mouseDomEquipmentHoverPhysicsId;
-
-      const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(physicsId);
-      if (physicsObject) {
-        const {physicsMesh} = physicsObject;
-        mouseDomEquipmentHoverPhysicsMesh.geometry = physicsMesh.geometry;
-        localMatrix2.copy(physicsMesh.matrixWorld)
-          // .premultiply(localMatrix3.copy(mouseHoverObject.matrixWorld).invert())
-          .decompose(mouseDomEquipmentHoverPhysicsMesh.position, mouseDomEquipmentHoverPhysicsMesh.quaternion, mouseDomEquipmentHoverPhysicsMesh.scale);
-        mouseDomEquipmentHoverPhysicsMesh.material.uniforms.uTime.value = (now%1500)/1500;
-        mouseDomEquipmentHoverPhysicsMesh.material.uniforms.uTime.needsUpdate = true;
-        mouseDomEquipmentHoverPhysicsMesh.visible = true;
-        mouseDomEquipmentHoverPhysicsMesh.updateMatrixWorld();
-      }
-    }
-  };
-  _updateMouseDomEquipmentHover();
-
-  const _handleClosestObject = () => {
-    const apps = world.appManager.apps;
-    if (apps.length > 0) {
-      let closestObject;
-      
-      if (!gameManager.getMouseSelectedObject() && !gameManager.contextMenu) {
-        if (/* controlsManager.isPossessed() && */ cameraManager.getMode() !== 'firstperson') {
-          localPlayer.matrixWorld.decompose(
-            localVector,
-            localQuaternion,
-            localVector2
-          );
-          const avatarHeight = localPlayer.avatar ? localPlayer.avatar.height : 0;
-          localVector.y -= avatarHeight / 2;
-          const distanceSpecs = apps.map(object => {
-            let distance = object.position.distanceTo(localVector);
-            if (distance > 30) {
-              distance = Infinity;
-            }
-            return {
-              distance,
-              object,
-            };
-          }).sort((a, b) => a.distance - b.distance);
-          const closestDistanceSpec = distanceSpecs[0];
-          if (isFinite(closestDistanceSpec.distance)) {
-            closestObject = closestDistanceSpec.object;
-          }
-        } else {
-          if ((!!localPlayer.avatar && /* controlsManager.isPossessed() && */ cameraManager.getMode()) === 'firstperson' /* || gameManager.dragging */) {
-            localRay.set(
-              camera.position,
-              localVector.set(0, 0, -1)
-                .applyQuaternion(camera.quaternion)
-            );
-            
-            const distanceSpecs = apps.map(object => {
-              const distance =
-                object.position.distanceTo(camera.position) < 8 ?
-                  localRay.distanceToPoint(object.position)
-                :
-                  Infinity;
-              return {
-                distance,
-                object,
-              };
-            }).sort((a, b) => a.distance - b.distance);
-            const closestDistanceSpec = distanceSpecs[0];
-            if (isFinite(closestDistanceSpec.distance)) {
-              closestObject = closestDistanceSpec.object;
-            }
-          } else {
-            closestObject = gameManager.getMouseHoverObject();
-          }
-        }
-      } else {
-        closestObject = null;
-      }
-      
-      gameManager.closestObject = closestObject;
-    }
-  };
-  _handleClosestObject();
-  
-  const _handleUsableObject = () => {
-    const apps = world.appManager.apps;
-    if (apps.length > 0) {
-      let usableObject;
-      
-      if (
-        !gameManager.getMouseSelectedObject() &&
-        !gameManager.contextMenu /* &&
-        controlsManager.isPossessed() */
-      ) {
-        localPlayer.matrixWorld.decompose(
-          localVector,
-          localQuaternion,
-          localVector2
-        );
-        const avatarHeight = localPlayer.avatar ? localPlayer.avatar.height : 0;
-        localVector.y -= avatarHeight / 2;
-        const distanceSpecs = apps.map(object => {
-          let distance = object.position.distanceTo(localVector);
-          if (distance > 3) {
-            distance = Infinity;
-          }
-          return {
-            distance,
-            object,
-          };
-        }).sort((a, b) => a.distance - b.distance);
-        const closestDistanceSpec = distanceSpecs[0];
-        if (isFinite(closestDistanceSpec.distance)) {
-          usableObject = closestDistanceSpec.object;
-        }
-      } else {
-        usableObject = null;
-      }
-      
-      gameManager.usableObject = usableObject;
-    }
-  };
-  _handleUsableObject();
-  
-  /* const _updateDrags = () => {
-    const {draggingRight} = gameManager;
-    if (draggingRight !== lastDraggingRight) {
-      if (draggingRight) {
-        const e = gameManager.getLastMouseEvent();
-        if (e) {
-          const {clientX, clientY} = e;
-          const cameraStartPosition = camera.position.clone();
-          
-          dragRightSpec = {
-            clientX,
-            clientY,
-            cameraStartPosition,
-          };
-        } else {
-          dragRightSpec = null;
-        }
-      } else {
-        dragRightSpec = null;
-      }
-    }
-    lastDraggingRight = draggingRight;
-  };
-  _updateDrags(); */
-  
-  const _updateActivate = () => {
-    const v = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'activate', 1);
-    const currentActivated = v >= 1;
-    
-    if (currentActivated && !lastActivated) {
-      if (grabUseMesh.targetApp) {
-        grabUseMesh.targetApp.activate({
-          physicsId: grabUseMesh.targetPhysicsId,
-        });
-      }
-      localPlayer.removeAction('activate');
-    }
-    lastActivated = currentActivated;
-  };
-  _updateActivate();
-
-  const _updateThirdPerson = () => {
-    const firstPerson = cameraManager.getMode() === 'firstperson';
-    if (firstPerson !== lastFirstPerson) {
-      _setFirstPersonAction(firstPerson);
-      lastFirstPerson = firstPerson;
-    }
-  };
-  _updateThirdPerson();
-
-  const _updateThrow = () => {
-    const useAction = localPlayer.getAction('use');
-    if (useAction && useAction.behavior === 'throw') {
-      const v = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'use', 0) / throwReleaseTime;
-      const currentThrowing = v >= 1;
-
-      if (currentThrowing && !lastThrowing) {
-        // console.log('got throw action', useAction, localPlayer);
-
-        const app = metaversefileApi.getAppByInstanceId(useAction.instanceId);
-        localPlayer.unwear(app, {
-          dropStartPosition: localVector.copy(localPlayer.position)
-            .add(localVector2.set(0, 0.5, -1).applyQuaternion(localPlayer.quaternion)),
-          dropDirection: localVector2.set(0, 0.2, -1).normalize().applyQuaternion(localPlayer.quaternion),
-        });
-      }
-      lastThrowing = currentThrowing;
-    }
-  };
-  _updateThrow();
-
-  const _updateBehavior = () => {
-    const useAction = localPlayer.getAction('use');
-    if (useAction) {
-      const _handleSword = () => {
-        localVector.copy(localPlayer.position)
-          .add(localVector2.set(0, 0, -hitboxOffsetDistance).applyQuaternion(localPlayer.quaternion));
-
-        localPlayer.characterHitter.attemptHit({
-          type: 'sword',
-          args: {
-            hitRadius,
-            hitHalfHeight,
-            position: localVector,
-            quaternion: localPlayer.quaternion,
-          },
-          timestamp,
-        });
-      };
-
-      switch (useAction.behavior) {
-        case 'sword': {
-          _handleSword();
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-    }
-  };
-  _updateBehavior();
-  
-  const _updateLook = () => {
-    if (localPlayer.avatar) {
-      if (mouseSelectedObject && mouseSelectedPosition) {
-        // console.log('got', mouseSelectedObject.position.toArray().join(','));
-        localPlayer.headTarget.copy(mouseSelectedPosition);
-        localPlayer.headTargetInverted = true;
-        localPlayer.headTargetEnabled = true;
-      } else if (!cameraManager.pointerLockElement && !cameraManager.target && raycastManager.lastMouseEvent) {
-        const renderer = getRenderer();
-        const size = renderer.getSize(localVector);
-        
-        localPlayer.headTarget.set(-(raycastManager.lastMouseEvent.clientX/size.x-0.5), (raycastManager.lastMouseEvent.clientY/size.y-0.5), 1)
-          .unproject(camera);
-        localPlayer.headTargetInverted = false;
-        localPlayer.headTargetEnabled = true;
-      } else if (zTargeting?.focusTargetReticle?.position) {
-        localPlayer.setTarget(zTargeting.focusTargetReticle.position);
-      } else {
-        localPlayer.setTarget(null);
-      }
-    }
-  };
-  _updateLook();
-
-  const crosshairEl = document.getElementById('crosshair');
-  if (crosshairEl) {
-    const visible = !!cameraManager.pointerLockElement &&
-      (['camera', 'firstperson', 'thirdperson'].includes(cameraManager.getMode()) || localPlayer.hasAction('aim')) &&
-      !grabManager.getGrabbedObject(0);
-    crosshairEl.style.visibility = visible ? null : 'hidden';
-  }
-
-  const _updateUse = () => {
-    const useAction = localPlayer.getAction('use');
-    if (useAction) {
-      if (useAction.animation === 'pickUpThrow') {
-        const useTime = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'use', 0);
-        if (useTime / 1000 >= throwAnimationDuration) {
-          _endUse();
-        }
-      } else if (isMouseUp) {
-        _endUse();
-      }
-
-    }
-    isMouseUp = false;
-  };
-  _updateUse();
-};
-const _pushAppUpdates = () => {
-  world.appManager.pushAppUpdates();
-  
-  for (const remotePlayer in playersManager.getRemotePlayers()) {
-    remotePlayer.appManager.pushAppUpdates();
-  }
-};
-const _pushPlayerUpdates = () => {
-  const localPlayer = playersManager.getLocalPlayer();
-  localPlayer.pushPlayerUpdates();
-};
-
-/* const metaverseUi = {
-  makeArrowLoader() {
-    const app = metaversefileApi.createApp();
-    (async () => {
-      await coreModules.waitForLoad();
-      const m = coreModules.importModule('arrowLoader');
-      await app.addModule(m);
-    })();
-    return app;
-  },
-}; */
-
-const _bindPointerLock = () => {
-  cameraManager.addEventListener('pointerlockchange', e => {
-    const {pointerLockElement} = e.data;
-
-    gameManager.setMouseHoverObject(null);
-    if (!pointerLockElement) {
-      grabManager.editMode = false;
-    }
-  });
-};
-_bindPointerLock();
-
-const _setFirstPersonAction = firstPerson => {
-  const localPlayer = playersManager.getLocalPlayer();
-  if (firstPerson) {
-    if (!localPlayer.hasAction('firstperson')) {
-      const aimAction = {
-        type: 'firstperson',
-      };
-      localPlayer.addAction(aimAction);
-    }
-  } else {
-    localPlayer.removeAction('firstperson');
-  }
-};
-let lastFirstPerson = cameraManager.getMode() === 'firstperson';
-_setFirstPersonAction(lastFirstPerson);
-/* cameraManager.addEventListener('modechange', e => {
-  // XXX need to do this in the frame loop instead
-  const {mode} = e.data;
-  const firstPerson = mode === 'firstperson';
-  _setFirstPersonAction(firstPerson);
-}); */
 
 class GameManager extends EventTarget {
+  menuOpen = 0;
+  gridSnap = 0;
+  editMode = false;
+  contextMenu = false;
+  contextMenuObject = null;
+  inventoryHack = false;
+  closestObject = null;
+  usableObject = null;
+  hoverEnabled = false;
+  lastFirstPerson = cameraManager.getMode() === 'firstperson';
+  lastActivated = false;
+  lastThrowing = false;
+  grabUseMesh = null;
+  isMouseUp = false;
+  lastUseIndex = 0;
+
+  highlightedPhysicsObject = null;
+  highlightedPhysicsId = 0;
+  mouseHoverObject = null;
+  mouseHoverPhysicsId = 0;
+  mouseHoverPosition = null;
+  mouseSelectedObject = null;
+  mouseSelectedPhysicsId = 0;
+  mouseSelectedPosition = null;
+  mouseDomHoverObject = null;
+  mouseDomHoverPhysicsId = 0;
+  mouseDomEquipmentHoverObject = null;
+  mouseDomEquipmentHoverPhysicsId = 0;
+
   constructor() {
     super();
-
-    this.menuOpen = 0;
-    // this.dragging = false;
-    // this.draggingRight = false;
-    this.contextMenu = false;
-    this.contextMenuObject = null;
-    this.inventoryHack = false;
-    this.closestObject = null;
-    this.usableObject = null;
-    this.hoverEnabled = false;
+    this.bindEvents();
+    this.setFirstPersonAction(this.lastFirstPerson);
+    this.bindPointerLock();
+    this.registerHighlightMeshes();
+    this.init()
   }
+
+  registerHighlightMeshes() {
+    this.highlightPhysicsMesh = this.makeHighlightPhysicsMesh(buildMaterial);
+    grabManager.setHighlightPhysicsMesh(this.highlightPhysicsMesh);
+
+    this.mouseHighlightPhysicsMesh = this.makeHighlightPhysicsMesh(highlightMaterial);
+    this.mouseHighlightPhysicsMesh.visible = false;
+    sceneLowPriority.add(this.mouseHighlightPhysicsMesh);
+
+    this.mouseSelectPhysicsMesh = this.makeHighlightPhysicsMesh(selectMaterial);
+    this.mouseSelectPhysicsMesh.visible = false;
+    sceneLowPriority.add(this.mouseSelectPhysicsMesh);
+
+    this.mouseDomHoverPhysicsMesh = this.makeHighlightPhysicsMesh(hoverMaterial);
+    this.mouseDomHoverPhysicsMesh.visible = false;
+    sceneLowPriority.add(this.mouseDomHoverPhysicsMesh);
+
+    this.mouseDomEquipmentHoverPhysicsMesh = this.makeHighlightPhysicsMesh(hoverEquipmentMaterial);
+    this.mouseDomEquipmentHoverPhysicsMesh.visible = false;
+    sceneLowPriority.add(this.mouseDomEquipmentHoverPhysicsMesh);
+  }
+
+  init() {
+    // check if metaversefileApi.createApp exists
+    // if not, delay and try again
+    if (!metaversefileApi.createApp) {
+      setTimeout(() => {
+        this.init();
+      }, 1000);
+      return;
+    }
+
+    this.grabUseMesh = metaversefileApi.createApp();
+    (async () => {
+      const {importModule} = metaversefileApi.useDefaultModules();
+      const m = await importModule('button');
+      await this.grabUseMesh.addModule(m);
+    })();
+    this.grabUseMesh.targetApp = null;
+    this.grabUseMesh.targetPhysicsId = -1;
+    sceneLowPriority.add(this.grabUseMesh);
+  };
+
+  delete() {
+    if (this.mouseSelectedObject) {
+      world.appManager.removeTrackedApp(this.mouseSelectedObject.instanceId);
+
+      if (this.mouseHoverObject === this.mouseSelectedObject) {
+        gameManager.setMouseHoverObject(null);
+      }
+      gameManager.setMouseSelectedObject(null);
+    }
+  };
+
+  getNextUseIndex = animationCombo => {
+    if (Array.isArray(animationCombo)) {
+      return (this.lastUseIndex++) % animationCombo.length;
+    } else {
+      return 0;
+    }
+  }
+
+  startUse() {
+    const wearApp = loadoutManager.getSelectedApp();
+    if (wearApp) {
+      const useComponent = wearApp.getComponent('use');
+      if (useComponent) {
+        const localPlayer = playersManager.getLocalPlayer();
+        const useAction = localPlayer.getAction('use');
+        if (!useAction) {
+          const {instanceId} = wearApp;
+          const {boneAttachment, animation, animationCombo, animationEnvelope, ik, behavior, position, quaternion, scale} = useComponent;
+          const index = this.getNextUseIndex(animationCombo);
+          const newUseAction = {
+            type: 'use',
+            instanceId,
+            animation,
+            animationCombo,
+            animationEnvelope,
+            ik,
+            behavior,
+            boneAttachment,
+            index,
+            position,
+            quaternion,
+            scale,
+          };
+          localPlayer.addAction(newUseAction);
+
+          wearApp.use();
+        }
+      }
+    }
+  };
+
+  endUse() {
+    const localPlayer = playersManager.getLocalPlayer();
+    const useAction = localPlayer.getAction('use');
+    if (useAction) {
+      const app = metaversefileApi.getAppByInstanceId(useAction.instanceId);
+      app.dispatchEvent({
+        type: 'use',
+        use: false,
+      });
+      localPlayer.removeAction('use');
+    }
+  };
+
+  mousedown() {
+    this.startUse();
+  };
+
+  mouseup() {
+    this.isMouseUp = true;
+  };
+
+  grab(object) {
+    const localPlayer = playersManager.getLocalPlayer();
+    localPlayer.grab(object);
+
+    gameManager.gridSnap = 0;
+    gameManager.editMode = false;
+  };
+
+  getGrabAction(i) {
+    const targetHand = i === 0 ? 'left' : 'right';
+    const localPlayer = playersManager.getLocalPlayer();
+    const grabAction = localPlayer.findAction(action => action.type === 'grab' && action.hand === targetHand);
+    return grabAction;
+  };
+
+  getGrabbedObject(i) {
+    const grabAction = this.getGrabAction(i);
+    const grabbedObjectInstanceId = grabAction?.instanceId;
+    const result = grabbedObjectInstanceId ? metaversefileApi.getAppByInstanceId(grabbedObjectInstanceId) : null;
+    return result;
+  };
+
+  unwearAppIfHasSitComponent(player) {
+    const wearActions = player.getActionsByType('wear');
+    for (const wearAction of wearActions) {
+      const instanceId = wearAction.instanceId;
+      const app = metaversefileApi.getAppByInstanceId(instanceId);
+      const hasSitComponent = app.hasComponent('sit');
+      if (hasSitComponent) {
+        app.unwear();
+      }
+    }
+  }
+
+  // returns whether we actually snapped
+  updateGrabbedObject(
+    o,
+    grabMatrix,
+    offsetMatrix,
+    {collisionEnabled, handSnapEnabled, physx, gridSnap},
+  ) {
+    grabMatrix.decompose(localVector, localQuaternion, localVector2);
+    offsetMatrix.decompose(localVector3, localQuaternion2, localVector4);
+    const offset = localVector3.length();
+    localMatrix
+      .multiplyMatrices(grabMatrix, offsetMatrix)
+      .decompose(localVector5, localQuaternion3, localVector6);
+
+    const _getPhysicalPosition = box => {
+      return localVector7.set(
+        (box.min.x + box.max.x) / 2,
+        box.min.y,
+        (box.min.z + box.max.z) / 2,
+      );
+    }
+
+    let physicalOffset = null;
+    const grabbedPhysicsObjects = o.getPhysicsObjects();
+
+    // Compute physical local bounding box and it's position offset from app.position.
+    // THREE.Box3.getCenter() has a console error, so I calculate manually.
+    if (grabbedPhysicsObjects) {
+      localBox.makeEmpty();
+      for (const physicsObject of grabbedPhysicsObjects) {
+        const geometry = physicsObject.physicsMesh.geometry;
+        geometry.computeBoundingBox();
+        localBox.union(geometry.boundingBox);
+      }
+      physicalOffset = _getPhysicalPosition(localBox);
+    }
+
+    const physicsScene = physicsManager.getScene();
+    const collision = collisionEnabled && physicsScene.raycast(localVector, localQuaternion);
+    localQuaternion2.setFromAxisAngle(localVector2.set(1, 0, 0), -Math.PI * 0.5);
+    const downCollision = collisionEnabled && physicsScene.raycast(localVector5, localQuaternion2);
+
+    if (collision) {
+      const {point} = collision;
+      localVector6.fromArray(point);
+    }
+
+    if (downCollision) {
+      const {point} = downCollision;
+      localVector4.fromArray(point);
+      if (ioManager.keys.shift) {
+        o.position.copy(localVector5.setY(localVector4.y));
+      } else {
+        // if collision point is closer to the player than the grab offset and collisionDown point
+        // is below collision point then place the object at collision point
+        if (
+          localVector.distanceTo(localVector6) < offset &&
+          localVector4.y < localVector6.y
+        )
+          localVector5.copy(localVector6);
+
+        // if grabbed object would go below another object then place object at downCollision point
+        if (localVector5.y < localVector4.y) localVector5.setY(localVector4.y);
+        o.position.copy(localVector5);
+      }
+    }
+
+    const collisionIsWithinOffset = localVector.distanceTo(localVector6) < offset;
+    const collisionIsAboveGround = localVector4.y < localVector6.y;
+
+    // Did the ray collide with any other object than the grabbed object? Need this check because on the first frame
+    // it collides with the grabbed object, although physical actors are being disabled. This caused teleport issue.
+    const collNonGrabbedObj = !!collision && !o.physicsObjects.some(obj => obj.physicsId === collision.objectId);
+
+    // if collision point is closer to the player than the grab offset and collisionDown point
+    // is below collision point then place the object at collision point
+    if (collNonGrabbedObj && !!downCollision && collisionIsWithinOffset && collisionIsAboveGround) {
+      localVector5.copy(localVector6).sub(physicalOffset);
+    }
+
+    const objectOverlapsVertically = localVector7.copy(localVector5).add(physicalOffset).y < localVector4.y;
+
+    // if grabbed object would overlap vertically then place object at downCollision point
+    if (!!downCollision && objectOverlapsVertically) {
+      localVector5.setY(localVector4.sub(physicalOffset).y);
+    }
+
+    o.position.copy(localVector5);
+
+    const handSnap =
+      !handSnapEnabled ||
+      offset >= maxGrabDistance ||
+      !!collision ||
+      !!downCollision;
+    if (handSnap) {
+      snapPosition(o, gridSnap);
+      o.quaternion.setFromEuler(o.savedRotation);
+    } else {
+      o.quaternion.copy(localQuaternion3);
+    }
+
+    o.updateMatrixWorld();
+
+    return {
+      handSnap,
+    };
+  }
+
+  getCurrentGrabAnimation() {
+    let currentAnimation = '';
+    const localPlayer = playersManager.getLocalPlayer();
+
+    const wearComponent = this.grabUseMesh.targetApp.getComponent('wear');
+    if (wearComponent && wearComponent.grabAnimation === 'pick_up') {
+      currentAnimation = wearComponent.grabAnimation;
+    } else {
+      const grabUseMeshPosition = this.grabUseMesh.position;
+      let currentDistance = 100;
+
+      // Forward
+      {
+        localVector.set(0, -0.5, -0.5).applyQuaternion(localPlayer.quaternion)
+          .add(localPlayer.position);
+        const distance = grabUseMeshPosition.distanceTo(localVector);
+        currentDistance = distance;
+        currentAnimation = 'grab_forward';
+      }
+
+      // Down
+      {
+        localVector.set(0, -1.2, -0.5).applyQuaternion(localPlayer.quaternion)
+          .add(localPlayer.position);
+        const distance = grabUseMeshPosition.distanceTo(localVector);
+        if (distance < currentDistance) {
+          currentDistance = distance;
+          currentAnimation = 'grab_down';
+        }
+      }
+
+      // Up
+      {
+        localVector.set(0, 0.0, -0.5).applyQuaternion(localPlayer.quaternion)
+          .add(localPlayer.position);
+        const distance = grabUseMeshPosition.distanceTo(localVector);
+        if (distance < currentDistance) {
+          currentDistance = distance;
+          currentAnimation = 'grab_up';
+        }
+      }
+
+      // Left
+      {
+        localVector.set(-0.8, -0.5, -0.5).applyQuaternion(localPlayer.quaternion)
+          .add(localPlayer.position);
+        const distance = grabUseMeshPosition.distanceTo(localVector);
+        if (distance < currentDistance) {
+          currentDistance = distance;
+          currentAnimation = 'grab_left';
+        }
+      }
+
+      // Right
+      {
+        localVector.set(0.8, -0.5, -0.5).applyQuaternion(localPlayer.quaternion)
+          .add(localPlayer.position);
+        const distance = grabUseMeshPosition.distanceTo(localVector);
+        if (distance < currentDistance) {
+          currentDistance = distance;
+          currentAnimation = 'grab_right';
+        }
+      }
+    }
+
+    return currentAnimation;
+  };
+
+  makeHighlightPhysicsMesh(material) {
+    const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+    material = material.clone();
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.frustumCulled = false;
+    mesh.physicsId = 0;
+    return mesh;
+  };
+
+  setFirstPersonAction(firstPerson) {
+    const localPlayer = playersManager.getLocalPlayer();
+    if (firstPerson) {
+      if (!localPlayer.hasAction('firstperson')) {
+        const aimAction = {
+          type: 'firstperson',
+        };
+        localPlayer.addAction(aimAction);
+      }
+    } else {
+      localPlayer.removeAction('firstperson');
+    }
+  };
+
+  bindPointerLock() {
+    cameraManager.addEventListener('pointerlockchange', e => {
+      const {pointerLockElement} = e.data;
+
+      gameManager.setMouseHoverObject(null);
+      if (!pointerLockElement) {
+        gameManager.editMode = false;
+      }
+    });
+  };
 
   getMenu() {
     return this.menuOpen;
   }
-
-  // setMenu(newOpen) {
-  //   this.menuOpen = newOpen;
-  //   if (newOpen) {
-  //     _selectItem(0);
-  //   }
-  // }
-
-  // menuVertical(offset) {
-  //   if (this.menuOpen) {
-  //     _selectItemDelta(offset);
-  //   }
-  // }
-
-  // menuHorizontal(offset) {
-  //   if (this.menuOpen) {
-  //     _selectTabDelta(offset);
-  //   }
-  // }
 
   setContextMenu(contextMenu) {
     this.contextMenu = contextMenu;
@@ -963,25 +459,20 @@ class GameManager extends EventTarget {
     this.contextMenuObject = contextMenuObject;
   }
 
-  menuUse() {
-    throw new Error('not implemented - code has been commented out because it has errors');
-    // _use();
-  }
-
   menuDelete() {
-    _delete();
+    this.delete();
   }
 
   menuClick(e) {
-    _click(e);
+    this.click(e);
   }
 
   menuMouseDown() {
-    _mousedown();
+    this.mousedown();
   }
 
   menuMouseUp() {
-    _mouseup();
+    this.mouseup();
   }
 
   menuAim() {
@@ -1025,39 +516,14 @@ class GameManager extends EventTarget {
 
   menuMiddleDown() {
     zTargeting.handleDown();
-
-    // zTargetCenter
-    // zTargetObject
-    // zTargetEnemy
-    // zTargetCancel
   }
 
   menuMiddle() {
-    /* const {movementX, movementY} = e;
-    if (Math.abs(movementX) < 100 && Math.abs(movementY) < 100) { // hack around a Chrome bug
-      camera.position.add(localVector.copy(cameraManager.getCameraOffset()).applyQuaternion(camera.quaternion));
-  
-      camera.rotation.y -= movementX * Math.PI * 2 * 0.0005;
-      camera.rotation.x -= movementY * Math.PI * 2 * 0.0005;
-      camera.rotation.x = Math.min(Math.max(camera.rotation.x, -Math.PI / 2), Math.PI / 2);
-      camera.quaternion.setFromEuler(camera.rotation);
-
-      camera.position.sub(localVector.copy(cameraManager.getCameraOffset()).applyQuaternion(camera.quaternion));
-
-      camera.updateMatrixWorld();
-    } */
+    // nothing
   }
 
   menuMiddleUp() {
     zTargeting.handleUp();
-
-    // this.dragging = false;
-    
-    /* world.appManager.dispatchEvent(new MessageEvent('dragchange', {
-      data: {
-        dragging: this.dragging,
-      },
-    })); */
   }
 
   menuMiddleToggle() {
@@ -1065,7 +531,7 @@ class GameManager extends EventTarget {
   }
 
   menuDragdownRight(e) {
-    // this.draggingRight = true;
+    // nothing
   }
 
   menuDragRight(e) {
@@ -1073,20 +539,8 @@ class GameManager extends EventTarget {
   }
 
   menuDragupRight() {
-    // this.draggingRight = false;
+    // nothing
   }
-
-  // menuKey(c) {
-  //   menuMesh.key(c);
-  // }
-
-  // menuSelectAll() {
-  //   menuMesh.selectAll();
-  // }
-
-  // menuPaste(s) {
-  //   menuMesh.paste(s);
-  // }
 
   inputFocused() {
     return !!document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.nodeName);
@@ -1096,12 +550,8 @@ class GameManager extends EventTarget {
     const app = loadoutManager.getSelectedApp();
     if (app) {
       const localPlayer = playersManager.getLocalPlayer();
-      localPlayer.unwear(app, {
-        /* dropStartPosition: localVector.copy(localPlayer.position)
-          .add(localVector2.set(0, 0.5, -1).applyQuaternion(localPlayer.quaternion)),
-        dropDirection: zeroVector, */
-      });
-      _endUse();
+      localPlayer.unwear(app, {});
+      this.endUse();
     }
   }
 
@@ -1152,24 +602,17 @@ class GameManager extends EventTarget {
       const newDanceAction = {
         type: 'dance',
         animation: 'powerup',
-        // time: 0,
       };
       localPlayer.addAction(newDanceAction);
     } else {
       localPlayer.removeAction('sss');
       localPlayer.removeAction('dance');
     }
-
-    /* if (e.ctrlKey) {
-      universe.reload();
-    } */
   }
 
   menuBUp() {
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.removeAction('dance');
-    
-    // physicsManager.setThrowState(null);
   }
 
   menuDoubleTap() {
@@ -1179,7 +622,6 @@ class GameManager extends EventTarget {
       if (!narutoRunAction) {
         const newNarutoRunAction = {
           type: 'narutoRun',
-          // time: 0,
         };
         localPlayer.addAction(newNarutoRunAction);
       }
@@ -1220,7 +662,7 @@ class GameManager extends EventTarget {
         time: 0,
       };
 
-      _unwearAppIfHasSitComponent(localPlayer);
+      this.unwearAppIfHasSitComponent(localPlayer);
 
       localPlayer.setControlAction(flyAction);
     }
@@ -1242,7 +684,7 @@ class GameManager extends EventTarget {
     if (crouchAction) {
       localPlayer.removeAction('crouch');
     } else {
-      const crouchAction = {
+      crouchAction = {
         type: 'crouch',
       };
       localPlayer.addAction(crouchAction);
@@ -1267,12 +709,11 @@ class GameManager extends EventTarget {
   async handleDropUrlToPlayer(u, index, position) {
     const app = await metaversefileApi.createAppAsync({
       start_url: u,
-      position: position
+      position: position,
     });
     app.instanceId = makeId(5);
     world.appManager.importApp(app);
     app.activate();
-    // XXX set to index
   }
 
   selectLoadout(index) {
@@ -1280,7 +721,7 @@ class GameManager extends EventTarget {
   }
 
   canToggleAxis() {
-    return false; // !!world.appManager.grabbedObjects[0]; // || (editedObject && editedObject.isBuild);
+    return false;
   }
 
   toggleAxis() {
@@ -1300,30 +741,25 @@ class GameManager extends EventTarget {
   ensureJump(trigger) {
     const localPlayer = playersManager.getLocalPlayer();
 
-    _unwearAppIfHasSitComponent(localPlayer);
+    this.unwearAppIfHasSitComponent(localPlayer);
 
-    if (!localPlayer.hasAction('jump') && !localPlayer.hasAction('fly') && !localPlayer.hasAction('fallLoop') && !localPlayer.hasAction('swim')) {
+    if (!localPlayer.hasAction('jump') &&
+      !localPlayer.hasAction('fly') &&
+      !localPlayer.hasAction('fallLoop') &&
+      !localPlayer.hasAction('swim') &&
+      !!localPlayer.characterPhysics.characterController
+    ) {
       const newJumpAction = {
         type: 'jump',
-        trigger:trigger,
+        trigger: trigger,
         startPositionY: localPlayer.characterPhysics.characterController.position.y,
-        // time: 0,
       };
       localPlayer.setControlAction(newJumpAction);
     }
   }
 
   jump(trigger) {
-    // add jump action
     this.ensureJump(trigger);
-
-    // update velocity
-    // const localPlayer = playersManager.getLocalPlayer();
-    // localPlayer.characterPhysics.velocity.y += 6; // currently using aesthetic jump movement
-    
-    // play sound
-    // soundManager.play('jump');
-
   }
 
   doubleJump() {
@@ -1336,13 +772,7 @@ class GameManager extends EventTarget {
 
   isMovingBackward() {
     const localPlayer = playersManager.getLocalPlayer();
-    // return ioManager.keysDirection.z > 0 && this.isAiming();
     return localPlayer.avatar?.direction.z > 0.1; // If check > 0 will cause glitch when move left/right;
-    /*
-      return localPlayer.avatar.direction.z > 0.1;
-      // If check > 0 will cause glitch when move left/right.
-      // Has a little lag after release backward key.
-    */
   }
 
   isAiming() {
@@ -1361,15 +791,15 @@ class GameManager extends EventTarget {
   }
 
   getMouseHoverObject() {
-    return mouseHoverObject;
+    return this.mouseHoverObject;
   }
 
   getMouseHoverPhysicsId() {
-    return mouseHoverPhysicsId;
+    return this.mouseHoverPhysicsId;
   }
 
   getMouseHoverPosition() {
-    return mouseHoverPosition;
+    return this.mouseHoverPosition;
   }
 
   setHoverEnabled(hoverEnabled) {
@@ -1377,70 +807,69 @@ class GameManager extends EventTarget {
   }
 
   setMouseHoverObject(o, physicsId, position) { // XXX must be triggered
-    mouseHoverObject = o;
-    mouseHoverPhysicsId = physicsId;
-    if (mouseHoverObject && position) {
-      mouseHoverPosition = position.clone();
+    this.mouseHoverObject = o;
+    this.mouseHoverPhysicsId = physicsId;
+    if (this.mouseHoverObject && position) {
+      this.mouseHoverPosition = position.clone();
     } else {
-      mouseHoverPosition = null;
+      this.mouseHoverPosition = null;
     }
-    
-    // console.log('set mouse hover', !!mouseHoverObject);
+
     world.appManager.dispatchEvent(new MessageEvent('hoverchange', {
       data: {
-        app: mouseHoverObject,
-        physicsId: mouseHoverPhysicsId,
-        position: mouseHoverPosition,
+        app: this.mouseHoverObject,
+        physicsId: this.mouseHoverPhysicsId,
+        position: this.mouseHoverPosition,
       },
     }));
   }
 
   getMouseSelectedObject() {
-    return mouseSelectedObject;
+    return this.mouseSelectedObject;
   }
 
   getMouseSelectedPhysicsId() {
-    return mouseSelectedPhysicsId;
+    return this.mouseSelectedPhysicsId;
   }
 
   getMouseSelectedPosition() {
-    return mouseSelectedPosition;
+    return this.mouseSelectedPosition;
   }
 
   setMouseSelectedObject(o, physicsId, position) {
-    mouseSelectedObject = o;
-    mouseSelectedPhysicsId = physicsId;
-    if (mouseSelectedObject && position) {
-      mouseSelectedPosition = position.clone();
+    this.mouseSelectedObject = o;
+    this.mouseSelectedPhysicsId = physicsId;
+    if (this.mouseSelectedObject && position) {
+      this.mouseSelectedPosition = position.clone();
     } else {
-      mouseSelectedPosition = null;
+      this.mouseSelectedPosition = null;
     }
-    
+
     world.appManager.dispatchEvent(new MessageEvent('selectchange', {
       data: {
-        app: mouseSelectedObject,
-        physicsId: mouseSelectedPhysicsId,
-        position: mouseSelectedPosition,
+        app: this.mouseSelectedObject,
+        physicsId: this.mouseSelectedPhysicsId,
+        position: this.mouseSelectedPosition,
       },
     }));
   }
 
   getMouseDomHoverObject() {
-    return mouseDomHoverObject;
+    return this.mouseDomHoverObject;
   }
 
   setMouseDomHoverObject(o, physicsId) {
-    mouseDomHoverObject = o;
-    mouseDomHoverPhysicsId = physicsId;
+    this.mouseDomHoverObject = o;
+    this.mouseDomHoverPhysicsId = physicsId;
   }
 
-  getMouseDomEquipmentHoverObject(o, physicsId) {
-    return mouseDomEquipmentHoverObject;
+  getMouseDomEquipmentHoverObject() {
+    return this.mouseDomEquipmentHoverObject;
   }
 
   setMouseDomEquipmentHoverObject(o, physicsId) {
-    mouseDomEquipmentHoverObject = o;
-    mouseDomEquipmentHoverPhysicsId = physicsId;
+    this.mouseDomEquipmentHoverObject = o;
+    this.mouseDomEquipmentHoverPhysicsId = physicsId;
   }
 
   setMovements() {
@@ -1467,7 +896,7 @@ class GameManager extends EventTarget {
 
   getSpeed() {
     let speed = 0;
-    
+
     const isCrouched = gameManager.isCrouched();
     const isSwimming = gameManager.isSwimming();
     const isFlying = gameManager.isFlying();
@@ -1483,13 +912,13 @@ class GameManager extends EventTarget {
     const localPlayer = playersManager.getLocalPlayer();
     const sprintMultiplier = isRunning ?
       (localPlayer.hasAction('narutoRun') ? 20 : 3)
-    :
-    ((isSwimming && !isFlying) ? 5 - localPlayer.getAction('swim').swimDamping : 1);
+      :
+      ((isSwimming && !isFlying) ? 5 - localPlayer.getAction('swim').swimDamping : 1);
     speed *= sprintMultiplier;
-    
+
     const backwardMultiplier = isMovingBackward ? (isRunning ? 0.8 : 0.7) : 1;
     speed *= backwardMultiplier;
-    
+
     return speed;
   }
 
@@ -1501,16 +930,12 @@ class GameManager extends EventTarget {
     return gameManager.usableObject;
   }
 
-  // getDragRightSpec() {
-  //   return dragRightSpec;
-  // }
-
   menuActivateDown() {
-    if (grabUseMesh.visible) {
+    if (this.grabUseMesh.visible) {
       const localPlayer = playersManager.getLocalPlayer();
       const activateAction = localPlayer.getAction('activate');
       if (!activateAction) {
-        const animationName = _getCurrentGrabAnimation();
+        const animationName = this.getCurrentGrabAnimation();
         const newActivateAction = {
           type: 'activate',
           animationName,
@@ -1561,8 +986,6 @@ class GameManager extends EventTarget {
       } = e.data;
 
       const playerDiorama = this.getPlayerDiorama();
-      // console.log('playerSelectedFn', player);
-      // debugger;
       const localPlayer = player;
       playerDiorama.setTarget(localPlayer);
       playerDiorama.setObjects([
@@ -1584,10 +1007,8 @@ class GameManager extends EventTarget {
   getPlayerDiorama() {
     if (!this.#playerDiorama) {
       this.#playerDiorama = dioramaManager.createPlayerDiorama({
-        // label: true,
         outline: true,
         grassBackground: true,
-        // glyphBackground: true,
       });
     }
     return this.#playerDiorama;
@@ -1610,13 +1031,459 @@ class GameManager extends EventTarget {
       type: 'application/json',
     });
     downloadFile(blob, 'scene.scn');
-    // console.log('got scene', scene);
   }
 
-  update = _gameUpdate;
-  pushAppUpdates = _pushAppUpdates;
-  pushPlayerUpdates = _pushPlayerUpdates;
+  pushAppUpdates() {
+    world.appManager.pushAppUpdates();
+
+    for (const remotePlayer in playersManager.getRemotePlayers()) {
+      remotePlayer.appManager.pushAppUpdates();
+    }
+  };
+
+  pushPlayerUpdates() {
+    const localPlayer = playersManager.getLocalPlayer();
+    localPlayer.pushPlayerUpdates();
+  };
+
+  update(timestamp, timeDiff) {
+    const now = timestamp;
+    const renderer = getRenderer();
+    const localPlayer = playersManager.getLocalPlayer();
+
+    const _updateGrab = () => {
+      const renderer = getRenderer();
+      const _isWear = o => localPlayer.findAction(action => action.type === 'wear' && action.instanceId === o.instanceId);
+
+      this.grabUseMesh.visible = false;
+      if (!grabManager.editMode) {
+        const avatarHeight = localPlayer.avatar ? localPlayer.avatar.height : 0;
+        localVector.copy(localPlayer.position)
+          .add(localVector2.set(0, avatarHeight * (1 - localPlayer.getCrouchFactor()) * 0.5, -0.3).applyQuaternion(localPlayer.quaternion));
+
+        const radius = 1;
+        const halfHeight = 0.1;
+        const physicsScene = physicsManager.getScene();
+        const collision = physicsScene.getCollisionObject(radius, halfHeight, localVector, localPlayer.quaternion);
+        if (collision) {
+          const physicsId = collision.objectId;
+          const object = metaversefileApi.getAppByPhysicsId(physicsId);
+          // console.log('got collision', physicsId, object);
+          const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(physicsId);
+          if (object && !_isWear(object) && physicsObject) {
+            this.grabUseMesh.position.setFromMatrixPosition(physicsObject.physicsMesh.matrixWorld);
+            this.grabUseMesh.quaternion.copy(camera.quaternion);
+            this.grabUseMesh.updateMatrixWorld();
+            this.grabUseMesh.targetApp = object;
+            this.grabUseMesh.targetPhysicsId = physicsId;
+            this.grabUseMesh.setComponent('value', physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'activate', 1));
+
+            this.grabUseMesh.visible = true;
+          }
+        }
+      }
+    };
+    _updateGrab();
+
+    zTargeting.update(timestamp, timeDiff);
+
+    const _handlePickUp = () => {
+      const pickUpAction = localPlayer.getAction('pickUp');
+      if (pickUpAction) {
+        const {instanceId} = pickUpAction;
+        const app = metaversefileApi.getAppByInstanceId(instanceId);
+
+        const _removeApp = () => {
+          if (app.parent) {
+            app.oldParent = app.parent;
+            app.parent.remove(app);
+          }
+        };
+        const _addApp = () => {
+          app.oldParent.add(app);
+          app.oldParent = null;
+        };
+
+        _removeApp();
+
+        const animations = Avatar.getAnimations();
+        const pickUpZeldaAnimation = animations.find(a => a.name === 'pick_up_zelda.fbx');
+        const pickUpTime = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'pickUp', 0);
+        const pickUpTimeS = pickUpTime / 1000;
+        if (pickUpTimeS < pickUpZeldaAnimation.duration) {
+          // still playing the pick up animation
+        } else {
+          // idling
+
+          _addApp();
+
+          const handsAveragePosition = localVector.setFromMatrixPosition(localPlayer.avatar.modelBones.Left_wrist.matrixWorld)
+            .add(localVector2.setFromMatrixPosition(localPlayer.avatar.modelBones.Right_wrist.matrixWorld))
+            .divideScalar(2)
+            .add(localVector2.set(0, 0.2, 0));
+          app.position.copy(handsAveragePosition);
+          localEuler.setFromQuaternion(localPlayer.quaternion, 'YXZ');
+          localEuler.x = 0;
+          localEuler.y += Math.PI;
+          localEuler.z = 0;
+          app.quaternion.setFromEuler(localEuler);
+          app.updateMatrixWorld();
+        }
+      }
+      ioManager.setMovementEnabled(!pickUpAction);
+    }
+    _handlePickUp();
+
+    const _updatePhysicsHighlight = () => {
+      this.highlightPhysicsMesh.visible = false;
+
+      if (this.highlightedPhysicsObject) {
+        const physicsId = this.highlightedPhysicsId;
+
+        this.highlightedPhysicsObject.updateMatrixWorld();
+
+        const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(physicsId);
+        if (physicsObject) {
+          const {physicsMesh} = physicsObject;
+          this.highlightPhysicsMesh.geometry = physicsMesh.geometry;
+          this.highlightPhysicsMesh.matrixWorld.copy(physicsMesh.matrixWorld)
+            .decompose(this.highlightPhysicsMesh.position, this.highlightPhysicsMesh.quaternion, this.highlightPhysicsMesh.scale);
+
+          this.highlightPhysicsMesh.material.uniforms.uTime.value = (now % 1500) / 1500;
+          this.highlightPhysicsMesh.material.uniforms.uTime.needsUpdate = true;
+          this.highlightPhysicsMesh.material.uniforms.uColor.value.setHex(buildMaterial.uniforms.uColor.value.getHex());
+          this.highlightPhysicsMesh.material.uniforms.uColor.needsUpdate = true;
+          this.highlightPhysicsMesh.visible = true;
+          this.highlightPhysicsMesh.updateMatrixWorld();
+        }
+      }
+    };
+    _updatePhysicsHighlight();
+
+    const _updateMouseHighlight = () => {
+      this.mouseHighlightPhysicsMesh.visible = false;
+
+      if (gameManager.hoverEnabled) {
+        const collision = raycastManager.getCollision();
+        if (collision) {
+          const {physicsObject/*, physicsId */} = collision;
+          const {physicsMesh} = physicsObject;
+          this.mouseHighlightPhysicsMesh.geometry = physicsMesh.geometry;
+          localMatrix2.copy(physicsMesh.matrixWorld)
+            .decompose(this.mouseHighlightPhysicsMesh.position, this.mouseHighlightPhysicsMesh.quaternion, this.mouseHighlightPhysicsMesh.scale);
+          this.mouseHighlightPhysicsMesh.material.uniforms.uTime.value = (now % 1500) / 1500;
+          this.mouseHighlightPhysicsMesh.material.uniforms.uTime.needsUpdate = true;
+          this.mouseHighlightPhysicsMesh.updateMatrixWorld();
+
+          this.mouseHighlightPhysicsMesh.visible = true;
+          gameManager.setMouseHoverObject(collision.app, collision.physicsId, collision.point);
+        }
+      }
+    };
+    _updateMouseHighlight();
+
+    const _updateMouseSelect = () => {
+      this.mouseSelectPhysicsMesh.visible = false;
+
+      const o = this.mouseSelectedObject;
+      if (o) {
+        const physicsId = this.mouseSelectedPhysicsId;
+
+        const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(physicsId);
+        if (physicsObject) {
+          const {physicsMesh} = physicsObject;
+          this.mouseSelectPhysicsMesh.geometry = physicsMesh.geometry;
+
+          // update matrix
+          {
+            localMatrix2.copy(physicsMesh.matrixWorld)
+              .decompose(this.mouseSelectPhysicsMesh.position, this.mouseSelectPhysicsMesh.quaternion, this.mouseSelectPhysicsMesh.scale);
+            this.mouseSelectPhysicsMesh.visible = true;
+            this.mouseSelectPhysicsMesh.updateMatrixWorld();
+
+          }
+          // update uniforms
+          {
+            this.mouseSelectPhysicsMesh.material.uniforms.uTime.value = (now % 1500) / 1500;
+            this.mouseSelectPhysicsMesh.material.uniforms.uTime.needsUpdate = true;
+
+          }
+        }
+      }
+    };
+    _updateMouseSelect();
+
+    const _updateMouseDomHover = () => {
+      this.mouseDomHoverPhysicsMesh.visible = false;
+
+      if (this.mouseDomHoverObject && !this.mouseSelectedObject) {
+        const physicsId = this.mouseDomHoverPhysicsId;
+
+        const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(physicsId);
+        if (physicsObject) {
+          const {physicsMesh} = physicsObject;
+          this.mouseDomHoverPhysicsMesh.geometry = physicsMesh.geometry;
+          localMatrix2.copy(physicsMesh.matrixWorld)
+            .decompose(this.mouseDomHoverPhysicsMesh.position, this.mouseDomHoverPhysicsMesh.quaternion, this.mouseDomHoverPhysicsMesh.scale);
+          this.mouseDomHoverPhysicsMesh.material.uniforms.uTime.value = (now % 1500) / 1500;
+          this.mouseDomHoverPhysicsMesh.material.uniforms.uTime.needsUpdate = true;
+          this.mouseDomHoverPhysicsMesh.visible = true;
+          this.mouseDomHoverPhysicsMesh.updateMatrixWorld();
+        }
+      }
+    };
+    _updateMouseDomHover();
+
+    const _updateMouseDomEquipmentHover = () => {
+      this.mouseDomEquipmentHoverPhysicsMesh.visible = false;
+
+      if (this.mouseDomEquipmentHoverObject && !this.mouseSelectedObject) {
+        const physicsId = this.mouseDomEquipmentHoverPhysicsId;
+
+        const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(physicsId);
+        if (physicsObject) {
+          const {physicsMesh} = physicsObject;
+          this.mouseDomEquipmentHoverPhysicsMesh.geometry = physicsMesh.geometry;
+          localMatrix2.copy(physicsMesh.matrixWorld)
+            .decompose(this.mouseDomEquipmentHoverPhysicsMesh.position, this.mouseDomEquipmentHoverPhysicsMesh.quaternion, this.mouseDomEquipmentHoverPhysicsMesh.scale);
+          this.mouseDomEquipmentHoverPhysicsMesh.material.uniforms.uTime.value = (now % 1500) / 1500;
+          this.mouseDomEquipmentHoverPhysicsMesh.material.uniforms.uTime.needsUpdate = true;
+          this.mouseDomEquipmentHoverPhysicsMesh.visible = true;
+          this.mouseDomEquipmentHoverPhysicsMesh.updateMatrixWorld();
+        }
+      }
+    };
+    _updateMouseDomEquipmentHover();
+
+    const _handleClosestObject = () => {
+      const apps = world.appManager.apps;
+      if (apps.length > 0) {
+        let closestObject;
+
+        if (!gameManager.getMouseSelectedObject() && !gameManager.contextMenu) {
+          if (cameraManager.getMode() !== 'firstperson') {
+            localPlayer.matrixWorld.decompose(
+              localVector,
+              localQuaternion,
+              localVector2,
+            );
+            const avatarHeight = localPlayer.avatar ? localPlayer.avatar.height : 0;
+            localVector.y -= avatarHeight / 2;
+            const distanceSpecs = apps.map(object => {
+              let distance = object.position.distanceTo(localVector);
+              if (distance > 30) {
+                distance = Infinity;
+              }
+              return {
+                distance,
+                object,
+              };
+            }).sort((a, b) => a.distance - b.distance);
+            const closestDistanceSpec = distanceSpecs[0];
+            if (isFinite(closestDistanceSpec.distance)) {
+              closestObject = closestDistanceSpec.object;
+            }
+          } else {
+            if ((!!localPlayer.avatar && cameraManager.getMode()) === 'firstperson') {
+              localRay.set(
+                camera.position,
+                localVector.set(0, 0, -1)
+                  .applyQuaternion(camera.quaternion),
+              );
+
+              const distanceSpecs = apps.map(object => {
+                const distance =
+                  object.position.distanceTo(camera.position) < 8 ?
+                    localRay.distanceToPoint(object.position)
+                    :
+                    Infinity;
+                return {
+                  distance,
+                  object,
+                };
+              }).sort((a, b) => a.distance - b.distance);
+              const closestDistanceSpec = distanceSpecs[0];
+              if (isFinite(closestDistanceSpec.distance)) {
+                closestObject = closestDistanceSpec.object;
+              }
+            } else {
+              closestObject = gameManager.getMouseHoverObject();
+            }
+          }
+        } else {
+          closestObject = null;
+        }
+
+        gameManager.closestObject = closestObject;
+      }
+    };
+    _handleClosestObject();
+
+    const _handleUsableObject = () => {
+      const apps = world.appManager.apps;
+      if (apps.length > 0) {
+        let usableObject;
+
+        if (
+          !gameManager.getMouseSelectedObject() &&
+          !gameManager.contextMenu
+        ) {
+          localPlayer.matrixWorld.decompose(
+            localVector,
+            localQuaternion,
+            localVector2,
+          );
+          const avatarHeight = localPlayer.avatar ? localPlayer.avatar.height : 0;
+          localVector.y -= avatarHeight / 2;
+          const distanceSpecs = apps.map(object => {
+            let distance = object.position.distanceTo(localVector);
+            if (distance > 3) {
+              distance = Infinity;
+            }
+            return {
+              distance,
+              object,
+            };
+          }).sort((a, b) => a.distance - b.distance);
+          const closestDistanceSpec = distanceSpecs[0];
+          if (isFinite(closestDistanceSpec.distance)) {
+            usableObject = closestDistanceSpec.object;
+          }
+        } else {
+          usableObject = null;
+        }
+
+        gameManager.usableObject = usableObject;
+      }
+    };
+    _handleUsableObject();
+
+    const _updateActivate = () => {
+      const v = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'activate', 1);
+      const currentActivated = v >= 1;
+
+      if (currentActivated && !this.lastActivated) {
+        if (this.grabUseMesh.targetApp) {
+          this.grabUseMesh.targetApp.activate({
+            physicsId: this.grabUseMesh.targetPhysicsId,
+          });
+        }
+        localPlayer.removeAction('activate');
+      }
+      this.lastActivated = currentActivated;
+    };
+
+    _updateActivate();
+
+    const _updateThirdPerson = () => {
+      const firstPerson = cameraManager.getMode() === 'firstperson';
+      if (firstPerson !== this.lastFirstPerson) {
+        this.setFirstPersonAction(firstPerson);
+        this.lastFirstPerson = firstPerson;
+      }
+    };
+    _updateThirdPerson();
+
+    const _updateThrow = () => {
+      const useAction = localPlayer.getAction('use');
+      if (useAction && useAction.behavior === 'throw') {
+        const v = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'use', 0) / throwReleaseTime;
+        const currentThrowing = v >= 1;
+
+        if (currentThrowing && !this.lastThrowing) {
+          const app = metaversefileApi.getAppByInstanceId(useAction.instanceId);
+          localPlayer.unwear(app, {
+            dropStartPosition: localVector.copy(localPlayer.position)
+              .add(localVector2.set(0, 0.5, -1).applyQuaternion(localPlayer.quaternion)),
+            dropDirection: localVector2.set(0, 0.2, -1).normalize().applyQuaternion(localPlayer.quaternion),
+          });
+        }
+        this.lastThrowing = currentThrowing;
+      }
+    };
+    _updateThrow();
+
+    const _updateBehavior = () => {
+      const useAction = localPlayer.getAction('use');
+      if (useAction) {
+        const _handleSword = () => {
+          localVector.copy(localPlayer.position)
+            .add(localVector2.set(0, 0, -hitboxOffsetDistance).applyQuaternion(localPlayer.quaternion));
+
+          localPlayer.characterHitter.attemptHit({
+            type: 'sword',
+            args: {
+              hitRadius,
+              hitHalfHeight,
+              position: localVector,
+              quaternion: localPlayer.quaternion,
+            },
+            timestamp,
+          });
+        };
+
+        switch (useAction.behavior) {
+          case 'sword': {
+            _handleSword();
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+      }
+    };
+    _updateBehavior();
+
+    const _updateLook = () => {
+      if (localPlayer.avatar) {
+        if (this.mouseSelectedObject && this.mouseSelectedPosition) {
+          localPlayer.headTarget.copy(this.mouseSelectedPosition);
+          localPlayer.headTargetInverted = true;
+          localPlayer.headTargetEnabled = true;
+        } else if (!cameraManager.pointerLockElement && !cameraManager.target && raycastManager.lastMouseEvent) {
+          const renderer = getRenderer();
+          const size = renderer.getSize(localVector);
+
+          localPlayer.headTarget.set(-(raycastManager.lastMouseEvent.clientX / size.x - 0.5), (raycastManager.lastMouseEvent.clientY / size.y - 0.5), 1)
+            .unproject(camera);
+          localPlayer.headTargetInverted = false;
+          localPlayer.headTargetEnabled = true;
+        } else if (zTargeting?.focusTargetReticle?.position) {
+          localPlayer.setTarget(zTargeting.focusTargetReticle.position);
+        } else {
+          localPlayer.setTarget(null);
+        }
+      }
+    };
+    _updateLook();
+
+    const crosshairEl = document.getElementById('crosshair');
+    if (crosshairEl) {
+      const visible = !!cameraManager.pointerLockElement &&
+        (['camera', 'firstperson', 'thirdperson'].includes(cameraManager.getMode()) || localPlayer.hasAction('aim')) &&
+        !grabManager.getGrabbedObject(0);
+      crosshairEl.style.visibility = visible ? null : 'hidden';
+    }
+
+    const _updateUse = () => {
+      const useAction = localPlayer.getAction('use');
+      if (useAction) {
+        if (useAction.animation === 'pickUpThrow') {
+          const useTime = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'use', 0);
+          if (useTime / 1000 >= throwAnimationDuration) {
+            this.endUse();
+          }
+        } else if (this.isMouseUp) {
+          this.endUse();
+        }
+
+      }
+      this.isMouseUp = false;
+    };
+    _updateUse();
+  };
 }
+
 const gameManager = new GameManager();
-gameManager.bindEvents();
 export default gameManager;

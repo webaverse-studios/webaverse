@@ -7,10 +7,10 @@ import {parseQuery} from '../../../util.js'
 import Webaverse from '../../../webaverse.js';
 import universe from '../../../universe.js';
 import cameraManager from '../../../camera-manager';
+
 import {world} from '../../../world';
 
 import {Crosshair} from '../general/crosshair';
-import {Settings} from '../general/settings';
 import {WorldObjectsList} from '../general/world-objects-list';
 import {IoHandler, registerIoEventHandler, unregisterIoEventHandler} from '../general/io-handler';
 import {ZoneTitleCard} from '../general/zone-title-card';
@@ -26,7 +26,6 @@ import {EditorMode} from '../editor-mode';
 import { GrabKeyIndicators } from '../../GrabKeyIndicators.jsx'
 import Header from '../../Header.jsx';
 import QuickMenu from '../../QuickMenu.jsx';
-import {ClaimsNotification} from '../../ClaimsNotification.jsx';
 import {DomRenderer} from '../../DomRenderer.jsx';
 import {BuildVersion} from '../general/build-version/BuildVersion.jsx';
 import {handleStoryKeyControls} from '../../../story';
@@ -41,6 +40,7 @@ import {AccountContext} from '../../hooks/web3AccountProvider';
 import {ChainContext} from '../../hooks/chainProvider';
 import loadoutManager from '../../../loadout-manager';
 import {partyManager} from '../../../party-manager';
+import Modals from '../modals';
 
 //
 
@@ -48,8 +48,6 @@ const _startApp = async (weba, canvas) => {
 
     weba.setContentLoaded();
 
-    weba.bindInput();
-    weba.bindInterface();
     weba.bindCanvas(canvas);
 
     await weba.waitForLoad();
@@ -102,7 +100,7 @@ let appStarted = false;
 
 export const App = () => {
 
-    const [ state, setState ] = useState({openedPanel: null});
+    const [ state, setState ] = useState({openedPanel: null, openedModal: null});
     const [ uiMode, setUIMode ] = useState('normal');
 
     const canvasRef = useRef(null);
@@ -117,8 +115,6 @@ export const App = () => {
     //
     
     useEffect(() => {
-        console.log('app started', appStarted);
-        console.log('app && canvasRef.current', app, canvasRef.current);
         if(canvasRef.current && !appStarted) {
 
             _startApp(app, canvasRef.current);
@@ -318,12 +314,11 @@ export const App = () => {
             onDragOver={onDragOver}
         >
             <AppContext.Provider value={{state, setState, app, setSelectedApp, selectedApp, uiMode, account, chain}}>
+                <Modals />
                 <Header setSelectedApp={ setSelectedApp } selectedApp={ selectedApp } />
                 <DomRenderer />
                 <canvas className={ classnames(styles.canvas, domHover ? styles.domHover : null) } ref={ canvasRef } />
                 <Crosshair />
-                <Settings />
-                <ClaimsNotification />
                 <WorldObjectsList
                     setSelectedApp={ setSelectedApp }
                     selectedApp={ selectedApp }
