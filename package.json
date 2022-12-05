@@ -27,7 +27,7 @@
     "serve": "vite preview",
     "setup:test": "cd test && npm i",
     "test": "start-server-and-test start https://local.webaverse.com test-e2e",
-    "test-e2e": "cd test-e2e && vitest --silen --threads=false",
+    "test-e2e": "cd test-e2e && vitest --silent --threads=false",
     "start-pm2": "pm2-runtime index.mjs -p --secret $PM2_SECRET_KEY --public $PM2_PUBLIC_KEY --no-auto-exit --instances 1 --restart-delay 60000",
     "lint": "eslint --fix --quiet --ext .js,.jsx ."
   },
