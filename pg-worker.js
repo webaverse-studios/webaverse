@@ -1,5 +1,5 @@
 import pg from './pg-binding.js';
-import {makePromise} from './util.js';
+import { makePromise } from './util.js';
 
 //
 
@@ -8,6 +8,7 @@ const _cloneChunkResult = chunkResult => {
     terrainGeometry,
     waterGeometry,
     treeInstances,
+    flowerInstances,
     bushInstances,
     rockInstances,
     stoneInstances,
@@ -36,6 +37,8 @@ const _cloneChunkResult = chunkResult => {
       const size = waterGeometry.positions.length * waterGeometry.positions.constructor.BYTES_PER_ELEMENT +
         waterGeometry.normals.length * waterGeometry.normals.constructor.BYTES_PER_ELEMENT +
         waterGeometry.factors.length * waterGeometry.factors.constructor.BYTES_PER_ELEMENT +
+        waterGeometry.liquids.length * waterGeometry.liquids.constructor.BYTES_PER_ELEMENT +
+        waterGeometry.liquidsWeights.length * waterGeometry.liquidsWeights.constructor.BYTES_PER_ELEMENT +
         waterGeometry.indices.length * waterGeometry.indices.constructor.BYTES_PER_ELEMENT;
       return size;
     } else {
@@ -146,6 +149,7 @@ const _cloneChunkResult = chunkResult => {
   // const barrierGeometrySize = _getBarrierGeometrySize();
   // const treeInstancesSize = _getPQIInstancesSize(treeInstances);
   const treeInstancesSize = _getVegetationInstancesSize(treeInstances);
+  const flowerInstancesSize = _getVegetationInstancesSize(flowerInstances);
   const bushInstancesSize = _getPQIInstancesSize(bushInstances);
   const rockInstancesSize = _getPQIInstancesSize(rockInstances);
   const stoneInstancesSize = _getPQIInstancesSize(stoneInstances);
@@ -157,6 +161,7 @@ const _cloneChunkResult = chunkResult => {
     waterGeometrySize +
     // barrierGeometrySize +
     treeInstancesSize +
+    flowerInstancesSize +
     bushInstancesSize +
     rockInstancesSize +
     stoneInstancesSize +
@@ -272,6 +277,26 @@ const _cloneChunkResult = chunkResult => {
       factors.set(waterGeometry.factors);
       index += waterGeometry.factors.length * waterGeometry.factors.constructor.BYTES_PER_ELEMENT;
 
+      const liquids = new waterGeometry.liquids.constructor(
+        arrayBuffer,
+        index,
+        waterGeometry.liquids.length
+      );
+      liquids.set(waterGeometry.liquids);
+      index +=
+        waterGeometry.liquids.length *
+        waterGeometry.liquids.constructor.BYTES_PER_ELEMENT;
+
+      const liquidsWeights = new waterGeometry.liquidsWeights.constructor(
+        arrayBuffer,
+        index,
+        waterGeometry.liquidsWeights.length
+      );
+      liquidsWeights.set(waterGeometry.liquidsWeights);
+      index +=
+        waterGeometry.liquidsWeights.length *
+        waterGeometry.liquidsWeights.constructor.BYTES_PER_ELEMENT;
+
       const indices = new waterGeometry.indices.constructor(arrayBuffer, index, waterGeometry.indices.length);
       indices.set(waterGeometry.indices);
       index += waterGeometry.indices.length * waterGeometry.indices.constructor.BYTES_PER_ELEMENT;
@@ -280,6 +305,8 @@ const _cloneChunkResult = chunkResult => {
         positions,
         normals,
         factors,
+        liquids,
+        liquidsWeights,
         indices,
       };
     } else {
@@ -484,6 +511,7 @@ const _cloneChunkResult = chunkResult => {
   const terrainGeometry2 = _cloneTerrainGeometry();
   const waterGeometry2 = _cloneWaterGeometry();
   const treeInstances2 = _cloneVegetationInstances(treeInstances);
+  const flowerInstances2 = _cloneVegetationInstances(flowerInstances);
   const bushInstances2 = _clonePQIInstances(bushInstances);
   const rockInstances2 = _clonePQIInstances(rockInstances);
   const stoneInstances2 = _clonePQIInstances(stoneInstances);
@@ -498,15 +526,16 @@ const _cloneChunkResult = chunkResult => {
 
   return {
     arrayBuffer,
-    terrainGeometry: terrainGeometry2 /* null */,
-    waterGeometry: waterGeometry2 /* null */,
-    treeInstances: treeInstances2 /* null */,
-    bushInstances: bushInstances2 /* null */,
-    rockInstances: rockInstances2 /* null */,
-    stoneInstances: stoneInstances2 /* null */,
-    grassInstances: grassInstances2 /* null */,
-    poiInstances: poiInstances2 /* null */,
-    heightfields: heightfields2 /* null */,
+    terrainGeometry: terrainGeometry2,
+    waterGeometry: waterGeometry2,
+    treeInstances: treeInstances2,
+    flowerInstances: flowerInstances2,
+    bushInstances: bushInstances2,
+    rockInstances: rockInstances2,
+    stoneInstances: stoneInstances2,
+    grassInstances: grassInstances2,
+    poiInstances: poiInstances2,
+    heightfields: heightfields2,
   };
 };
 const _cloneBarrierResult = barrierResult => {
