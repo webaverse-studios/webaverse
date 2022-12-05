@@ -149,121 +149,121 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
     freeList.push(bufferAddress);
 
     if (bufferAddress) {
-      const terrainVertexBufferView = new BufferView(
+      const bufferViewer = new BufferView(
         arrayBuffer,
         bufferAddress,
       );
 
       // positions
-      const numPositions = terrainVertexBufferView.dataView.getUint32(
-        terrainVertexBufferView.index,
+      const numPositions = bufferViewer.dataView.getUint32(
+        bufferViewer.index,
         true,
       );
-      terrainVertexBufferView.index += Uint32Array.BYTES_PER_ELEMENT;
+      bufferViewer.index += Uint32Array.BYTES_PER_ELEMENT;
       const positions = new Float32Array(
         arrayBuffer,
-        bufferAddress + terrainVertexBufferView.index,
+        bufferAddress + bufferViewer.index,
         numPositions * 3,
       );
-      terrainVertexBufferView.index +=
+      bufferViewer.index +=
         Float32Array.BYTES_PER_ELEMENT * numPositions * 3;
 
       // normals
-      const numNormals = terrainVertexBufferView.dataView.getUint32(
-        terrainVertexBufferView.index,
+      const numNormals = bufferViewer.dataView.getUint32(
+        bufferViewer.index,
         true,
       );
-      terrainVertexBufferView.index += Uint32Array.BYTES_PER_ELEMENT;
+      bufferViewer.index += Uint32Array.BYTES_PER_ELEMENT;
       const normals = new Float32Array(
         arrayBuffer,
-        bufferAddress + terrainVertexBufferView.index,
+        bufferAddress + bufferViewer.index,
         numNormals * 3,
       );
-      terrainVertexBufferView.index +=
+      bufferViewer.index +=
         Float32Array.BYTES_PER_ELEMENT * numNormals * 3;
 
       // biomes
-      const numBiomes = terrainVertexBufferView.dataView.getUint32(
-        terrainVertexBufferView.index,
+      const numBiomes = bufferViewer.dataView.getUint32(
+        bufferViewer.index,
         true,
       );
-      terrainVertexBufferView.index += Uint32Array.BYTES_PER_ELEMENT;
+      bufferViewer.index += Uint32Array.BYTES_PER_ELEMENT;
       const biomes = new Int32Array(
         arrayBuffer,
-        bufferAddress + terrainVertexBufferView.index,
+        bufferAddress + bufferViewer.index,
         numBiomes * 4,
       );
-      terrainVertexBufferView.index +=
+      bufferViewer.index +=
         Int32Array.BYTES_PER_ELEMENT * numBiomes * 4;
 
       // biomes weights
-      const numBiomesWeights = terrainVertexBufferView.dataView.getUint32(
-        terrainVertexBufferView.index,
+      const numBiomesWeights = bufferViewer.dataView.getUint32(
+        bufferViewer.index,
         true,
       );
-      terrainVertexBufferView.index += Uint32Array.BYTES_PER_ELEMENT;
+      bufferViewer.index += Uint32Array.BYTES_PER_ELEMENT;
       const biomesWeights = new Float32Array(
         arrayBuffer,
-        bufferAddress + terrainVertexBufferView.index,
+        bufferAddress + bufferViewer.index,
         numBiomesWeights * 4,
       );
-      terrainVertexBufferView.index +=
+      bufferViewer.index +=
         Float32Array.BYTES_PER_ELEMENT * numBiomesWeights * 4;
 
       // biomes uvs 1
-      const numBiomesUvs1 = terrainVertexBufferView.dataView.getUint32(
-        terrainVertexBufferView.index,
+      const numBiomesUvs1 = bufferViewer.dataView.getUint32(
+        bufferViewer.index,
         true,
       );
-      terrainVertexBufferView.index += Uint32Array.BYTES_PER_ELEMENT;
+      bufferViewer.index += Uint32Array.BYTES_PER_ELEMENT;
       const biomesUvs1 = new Float32Array(
         arrayBuffer,
-        bufferAddress + terrainVertexBufferView.index,
+        bufferAddress + bufferViewer.index,
         numBiomesUvs1 * 4,
       );
-      terrainVertexBufferView.index +=
+      bufferViewer.index +=
         Float32Array.BYTES_PER_ELEMENT * numBiomesUvs1 * 4;
 
       // biomes uvs 2
-      const numBiomesUvs2 = terrainVertexBufferView.dataView.getUint32(
-        terrainVertexBufferView.index,
+      const numBiomesUvs2 = bufferViewer.dataView.getUint32(
+        bufferViewer.index,
         true,
       );
-      terrainVertexBufferView.index += Uint32Array.BYTES_PER_ELEMENT;
+      bufferViewer.index += Uint32Array.BYTES_PER_ELEMENT;
       const biomesUvs2 = new Float32Array(
         arrayBuffer,
-        bufferAddress + terrainVertexBufferView.index,
+        bufferAddress + bufferViewer.index,
         numBiomesUvs2 * 4,
       );
-      terrainVertexBufferView.index +=
+      bufferViewer.index +=
         Float32Array.BYTES_PER_ELEMENT * numBiomesUvs2 * 4;
 
       // materials
-      const numMaterials = terrainVertexBufferView.dataView.getUint32(
-        terrainVertexBufferView.index,
+      const numMaterials = bufferViewer.dataView.getUint32(
+        bufferViewer.index,
         true,
       );
-      terrainVertexBufferView.index += Uint32Array.BYTES_PER_ELEMENT;
+      bufferViewer.index += Uint32Array.BYTES_PER_ELEMENT;
       const materials = new Int32Array(
         arrayBuffer,
-        bufferAddress + terrainVertexBufferView.index,
+        bufferAddress + bufferViewer.index,
         numMaterials * 4,
       );
-      terrainVertexBufferView.index +=
+      bufferViewer.index +=
         Int32Array.BYTES_PER_ELEMENT * numMaterials * 4;
 
       // materials weights
-      const numMaterialsWeights = terrainVertexBufferView.dataView.getUint32(
-        terrainVertexBufferView.index,
+      const numMaterialsWeights = bufferViewer.dataView.getUint32(
+        bufferViewer.index,
         true,
       );
-      terrainVertexBufferView.index += Uint32Array.BYTES_PER_ELEMENT;
+      bufferViewer.index += Uint32Array.BYTES_PER_ELEMENT;
       const materialsWeights = new Float32Array(
         arrayBuffer,
-        bufferAddress + terrainVertexBufferView.index,
+        bufferAddress + bufferViewer.index,
         numMaterialsWeights * 4,
       );
-      terrainVertexBufferView.index +=
+      bufferViewer.index +=
         Float32Array.BYTES_PER_ELEMENT * numMaterialsWeights * 4;
       // seeds
       // const numSeeds = terrainVertexBufferView.dataView.getUint32(terrainVertexBufferView.index, true);
@@ -272,17 +272,17 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
       // terrainVertexBufferView.index += Float32Array.BYTES_PER_ELEMENT * numSeeds;
 
       // indices
-      const numIndices = terrainVertexBufferView.dataView.getUint32(
-        terrainVertexBufferView.index,
+      const numIndices = bufferViewer.dataView.getUint32(
+        bufferViewer.index,
         true,
       );
-      terrainVertexBufferView.index += Uint32Array.BYTES_PER_ELEMENT;
+      bufferViewer.index += Uint32Array.BYTES_PER_ELEMENT;
       const indices = new Uint32Array(
         arrayBuffer,
-        bufferAddress + terrainVertexBufferView.index,
+        bufferAddress + bufferViewer.index,
         numIndices,
       );
-      terrainVertexBufferView.index +=
+      bufferViewer.index +=
         Uint32Array.BYTES_PER_ELEMENT * numIndices;
 
       // skylights
@@ -371,6 +371,34 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
       );
       bufferViewer.index += Int32Array.BYTES_PER_ELEMENT * numFactors;
 
+      // liquids
+      const numLiquids = bufferViewer.dataView.getUint32(
+        bufferViewer.index,
+        true,
+      );
+      bufferViewer.index += Uint32Array.BYTES_PER_ELEMENT;
+      const liquids = new Int32Array(
+        arrayBuffer,
+        bufferAddress + bufferViewer.index,
+        numLiquids * 4,
+      );
+      bufferViewer.index +=
+        Int32Array.BYTES_PER_ELEMENT * numLiquids * 4;
+
+      // liquids weights
+      const numLiquidsWeights = bufferViewer.dataView.getUint32(
+        bufferViewer.index,
+        true,
+      );
+      bufferViewer.index += Uint32Array.BYTES_PER_ELEMENT;
+      const liquidsWeights = new Float32Array(
+        arrayBuffer,
+        bufferAddress + bufferViewer.index,
+        numLiquidsWeights * 4,
+      );
+      bufferViewer.index +=
+        Float32Array.BYTES_PER_ELEMENT * numLiquidsWeights * 4;
+
       // indices
       const numIndices = bufferViewer.dataView.getUint32(
         bufferViewer.index,
@@ -389,6 +417,8 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
         positions,
         normals,
         factors,
+        liquids,
+        liquidsWeights,
         indices,
       };
     } else {
@@ -757,6 +787,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
   const waterGeometry = _parseWaterVertexBuffer(chunkResultBufferView);
   // const treeInstances = _parsePQIInstances(chunkResultBufferView);
   const treeInstances = _parseVegetationInstances(chunkResultBufferView);
+  const flowerInstances = _parseVegetationInstances(chunkResultBufferView);
   const bushInstances = _parsePQIInstances(chunkResultBufferView);
   const rockInstances = _parsePQIInstances(chunkResultBufferView);
   const stoneInstances = _parsePQIInstances(chunkResultBufferView);
@@ -769,6 +800,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
     terrainGeometry,
     waterGeometry,
     treeInstances,
+    flowerInstances,
     bushInstances,
     rockInstances,
     stoneInstances,
