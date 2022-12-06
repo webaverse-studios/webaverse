@@ -452,6 +452,8 @@ export class AvatarCharacterSfx {
   playGrunt(type) {
     if (this.character.voicePack) { // ensure voice pack loaded
       const voiceFiles = this.character.voicePack.voiceFiles.actionVoices[type];
+
+      if (voiceFiles.length === 0) return
       
       // if (index === undefined) {
         let voice = selectVoice(voiceFiles);
