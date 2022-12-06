@@ -149,7 +149,7 @@ export const infoboxSize = 100;
 export const startTextureAtlasSize = 512;
 export const maxTextureAtlasSize = 4096;
 
-export const numLoadoutSlots = 8;
+export const numLoadoutSlots = 6;
 
 export const defaultDioramaSize = 512;
 export const defaultChunkSize = 16;

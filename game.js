@@ -1007,11 +1007,11 @@ class GameManager extends EventTarget {
     });
   }
 
-  getPlayerDiorama() {
+  getPlayerDiorama(outline, background) {
     if (!this.#playerDiorama) {
       this.#playerDiorama = dioramaManager.createPlayerDiorama({
-        outline: true,
-        grassBackground: true,
+        outline: outline ? true : false,
+        grassBackground: background ? true : false,
       });
     }
     return this.#playerDiorama;
