@@ -140,6 +140,20 @@
       "type": "event"
     },
     {
+      "inputs": [],
+      "name": "_proxyAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
       "inputs": [
         {
           "components": [
@@ -150,7 +164,7 @@
             },
             {
               "internalType": "string",
-              "name": "metadataurl",
+              "name": "contentURL",
               "type": "string"
             },
             {
@@ -489,7 +503,7 @@
             },
             {
               "internalType": "string",
-              "name": "metadataurl",
+              "name": "contentURL",
               "type": "string"
             },
             {
@@ -570,6 +584,19 @@
       "inputs": [
         {
           "internalType": "address",
+          "name": "_webaverseContractAddress",
+          "type": "address"
+        }
+      ],
+      "name": "setProxyAddress",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
           "name": "to",
           "type": "address"
         },
@@ -605,7 +632,7 @@
             },
             {
               "internalType": "string",
-              "name": "metadataurl",
+              "name": "contentURL",
               "type": "string"
             },
             {
@@ -706,7 +733,7 @@
             },
             {
               "internalType": "string",
-              "name": "metadataurl",
+              "name": "contentURL",
               "type": "string"
             },
             {
@@ -767,7 +794,7 @@
             },
             {
               "internalType": "string",
-              "name": "metadataurl",
+              "name": "contentURL",
               "type": "string"
             },
             {
