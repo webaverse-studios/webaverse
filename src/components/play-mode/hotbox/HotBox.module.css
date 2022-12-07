@@ -27,7 +27,7 @@
 .hotBox .label {
     position: relative;
     display: flex;
-    margin: 2px auto;
+    margin: 0px auto;
     justify-content: center;
     align-items: center;
     width: 20px;
@@ -36,7 +36,9 @@
     color: #FFF;
     user-select: none;
 }
-.hotBox:not(.selected) .label {
+.hotBox.selected .background,
+.hotBox.selected .label {
+    background: #EEB601 !important;
 }
 .hotBox .background {
     position: absolute;
