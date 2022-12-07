@@ -1,8 +1,8 @@
-import React, {useEffect, useState, useContext} from 'react';
-import classnames from 'classnames';
+import React, { useEffect, useState, useContext } from "react";
+import classnames from "classnames";
 
-import {defaultPlayerName} from '../../../../ai/lore/lore-model.js';
-import * as sounds from '../../../../sounds.js';
+import { defaultPlayerName } from "../../../../ai/lore/lore-model.js";
+import * as sounds from "../../../../sounds.js";
 
 import {
     hp,
@@ -14,206 +14,196 @@ import {
     dex,
     lck,
     xp,
-} from '../../../../player-stats.js';
+} from "../../../../player-stats.js";
 
-import {AppContext} from '../../app';
+import { AppContext } from "../../app";
 
-import styles from './character.module.css';
-import CustomButton from '../custom-button/index.jsx';
-import {TokenBox} from '../token-box/TokenBox.jsx';
+import styles from "./character.module.css";
+import CustomButton from "../custom-button/index.jsx";
+import { TokenBox } from "../token-box/TokenBox.jsx";
 
 const mainStatSpecs = [
     {
-        imgSrc: 'assets/icons/health.svg',
-        name: 'Health',
-        className: 'hp',
+        imgSrc: "assets/icons/health.svg",
+        name: "Health",
+        className: "hp",
         progress: hp,
     },
     {
-        imgSrc: 'assets/icons/mana.svg',
-        name: 'Mana',
-        className: 'mp',
+        imgSrc: "assets/icons/mana.svg",
+        name: "Mana",
+        className: "mp",
         progress: mp,
     },
     {
-        imgSrc: 'assets/icons/exp.svg',
-        name: 'Exp.',
-        className: 'xp',
+        imgSrc: "assets/icons/exp.svg",
+        name: "Exp.",
+        className: "xp",
         progress: xp,
-      },
-      {
-        imgSrc: 'assets/icons/limit.svg',
-        name: 'Limit',
-        className: 'lm',
+    },
+    {
+        imgSrc: "assets/icons/limit.svg",
+        name: "Limit",
+        className: "lm",
         progress: 67,
-      },
+    },
 ];
 const statSpecs = [
     {
-        imgSrc: 'images/stats/noun-skill-sword-swing-2360242.svg',
-        name: 'Attack',
+        imgSrc: "images/stats/noun-skill-sword-swing-2360242.svg",
+        name: "Attack",
         value: atk,
     },
     {
-        imgSrc: 'images/stats/noun-abnormal-burned-2359995.svg',
-        name: 'Defence',
+        imgSrc: "images/stats/noun-abnormal-burned-2359995.svg",
+        name: "Defence",
         value: def,
     },
     {
-        imgSrc: 'images/stats/noun-skill-dna-2360269.svg',
-        name: 'Vitality',
+        imgSrc: "images/stats/noun-skill-dna-2360269.svg",
+        name: "Vitality",
         value: vit,
     },
     {
-        imgSrc: 'images/stats/noun-skill-magic-chain-lightning-2360268.svg',
-        name: 'Sprint',
+        imgSrc: "images/stats/noun-skill-magic-chain-lightning-2360268.svg",
+        name: "Sprint",
         value: spr,
     },
     {
-        imgSrc: 'images/stats/noun-skill-speed-down-2360205.svg',
-        name: 'Dexterity',
+        imgSrc: "images/stats/noun-skill-speed-down-2360205.svg",
+        name: "Dexterity",
         value: dex,
     },
     {
-        imgSrc: 'images/stats/noun-effect-circle-strike-2360022.svg',
-        name: 'Luck',
+        imgSrc: "images/stats/noun-effect-circle-strike-2360022.svg",
+        name: "Luck",
         value: lck,
     },
 ];
 
-const Stat2 = ({statSpec}) => {
+const Stat2 = ({ statSpec }) => {
     return (
-      <div className={classnames(styles.stat, styles[statSpec.className])}>
-        <div className={styles.name}>
-          {statSpec?.name}
-          <img className={styles.icon} src={statSpec.imgSrc} />
+        <div className={classnames(styles.stat, styles[statSpec.className])}>
+            <div className={styles.name}>
+                {statSpec?.name}
+                <img className={styles.icon} src={statSpec.imgSrc} />
+            </div>
+            <div className={styles.progressBar}>
+                <div style={{ width: `${statSpec?.progress}%` }} />
+            </div>
+            <div className={styles.value}>
+                {statSpec?.progress}
+                {statSpec.className === "lm" && "%"}
+            </div>
         </div>
-        <div className={styles.progressBar}>
-          <div style={{width: `${statSpec?.progress}%`}} />
-        </div>
-        <div className={styles.value}>
-          {statSpec?.progress}
-          {statSpec.className === 'lm' && '%'}
-        </div>
-      </div>
     );
 };
 
-const Stat = ({statSpec}) => {
+const Stat = ({ statSpec }) => {
     return (
-      <div className={classnames(styles.stat, styles.columns)}>
-        <div className={styles.name}>{statSpec.name}</div>
-        <div className={styles.value}>{statSpec.value}</div>
-      </div>
+        <div className={classnames(styles.stat, styles.columns)}>
+            <div className={styles.name}>{statSpec.name}</div>
+            <div className={styles.value}>{statSpec.value}</div>
+        </div>
     );
 };
 
-const AvatarPreviewBox = ({dioramaCanvasRef, onClick}) => {
-    const sideSize = 160;
+const AvatarPreviewBox = ({ dioramaCanvasRef, onClick }) => {
+    const width = 160;
+    const height = 330;
     return (
-      <div className={styles.avatarPreviewWrap}>
-        <div className={styles.bg} />
-        <div className={styles.mask}>
-          <canvas
-            className={styles.avatar}
-            ref={dioramaCanvasRef}
-            width={sideSize}
-            height={sideSize}
-            onClick={onClick}
-          />
+        <div className={styles.avatarPreviewWrap}>
+            <div className={styles.bg} />
+            <div className={styles.mask}>
+                <canvas
+                    className={styles.avatar}
+                    ref={dioramaCanvasRef}
+                    width={width}
+                    height={height}
+                    onClick={onClick}
+                />
+            </div>
         </div>
-      </div>
     );
-  };
-  
-  //
-  
-  const AvatarEquipBox = ({dioramaCanvasRef, onClick}) => {
+};
+
+//
+
+const AvatarEquipBox = ({ dioramaCanvasRef, onClick }) => {
     const sideSize = 48;
     return (
-      <div className={styles.avatarEquipBoxWrap}>
-        <div className={styles.bg} />
-        <div className={styles.mask}>
-          <canvas
-            className={styles.item}
-            ref={dioramaCanvasRef}
-            width={sideSize}
-            height={sideSize}
-            onClick={onClick}
-          />
+        <div className={styles.avatarEquipBoxWrap}>
+            <div className={styles.bg} />
+            <div className={styles.mask}>
+                <canvas
+                    className={styles.item}
+                    ref={dioramaCanvasRef}
+                    width={sideSize}
+                    height={sideSize}
+                    onClick={onClick}
+                />
+            </div>
         </div>
-      </div>
     );
-  };
+};
 
-
-export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
-
-    const {state, setState} = useContext(AppContext);
-    const [ open, setOpen ] = useState(false);
-    const [ characterSelectOpen, setCharacterSelectOpen ] = useState(false);
+export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
+    const { state, setState } = useContext(AppContext);
+    const [open, setOpen] = useState(false);
+    const [characterSelectOpen, setCharacterSelectOpen] = useState(false);
 
     const sideSize = 400;
 
     useEffect(() => {
-
         const canvas = dioramaCanvasRef.current;
 
-        if (canvas && state.openedPanel === 'CharacterPanel') {
-
+        if (canvas && state.openedPanel === "CharacterPanel") {
             const playerDiorama = game.getPlayerDiorama();
 
             playerDiorama.addCanvas(canvas);
 
             return () => {
-
                 playerDiorama.removeCanvas(canvas);
-
             };
-
         }
-
-    }, [ dioramaCanvasRef, state.openedPanel ]);
-
+    }, [dioramaCanvasRef, state.openedPanel]);
 
     useEffect(() => {
-
         const lastOpen = open;
         const lastCharacterSelectOpen = characterSelectOpen;
 
-        const newOpen = state.openedPanel === 'CharacterPanel';
-        const newCharacterSelectOpen = state.openedPanel === 'CharacterSelect';
+        const newOpen = state.openedPanel === "CharacterPanel";
+        const newCharacterSelectOpen = state.openedPanel === "CharacterSelect";
 
         if (!lastOpen && newOpen) {
-
-            sounds.playSoundName('menuOpen');
-
+            sounds.playSoundName("menuOpen");
         } else if (lastOpen && !newOpen) {
-
-            sounds.playSoundName('menuClose');
-
+            sounds.playSoundName("menuClose");
         }
 
         setOpen(newOpen);
         setCharacterSelectOpen(newCharacterSelectOpen);
+    }, [state.openedPanel]);
 
-    }, [ state.openedPanel ]);
-
-    function onCanvasClick () {
-
+    function onCanvasClick() {
         const playerDiorama = game.getPlayerDiorama();
         playerDiorama.toggleShader();
 
         const soundFiles = sounds.getSoundFiles();
-        const audioSpec = soundFiles.menuNext[Math.floor(Math.random() * soundFiles.menuNext.length)];
+        const audioSpec =
+            soundFiles.menuNext[
+                Math.floor(Math.random() * soundFiles.menuNext.length)
+            ];
         sounds.playSound(audioSpec);
-
-    };
+    }
 
     function onCharacterSelectClick(e) {
-
-        setState({openedPanel: (state.openedPanel === 'CharacterSelect' ? null : 'CharacterSelect')});
-
+        setState({
+            openedPanel:
+                state.openedPanel === "CharacterSelect"
+                    ? null
+                    : "CharacterSelect",
+        });
     }
     function onDrop(e) {
         e.preventDefault();
@@ -224,17 +214,27 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
 
     //
 
-    return (
-        <div
-        className={ classnames(styles.characterPanelWrap, open ? styles.opened : null) }
-            onDrop={onDrop}
-        >
-            <div className={ styles.characterPanel } >
-                <div className={styles.characterTitleBox}>Character Details</div>
+    return state.openedPanel === "CharacterPanel" ? (
+        <div className={classnames(styles.characterPanelWrap)} onDrop={onDrop}>
+            <div className={styles.characterPanel}>
+                <div className={styles.characterTitleBox}>
+                    Character Details
+                </div>
                 <div className={styles.avatarWrap}>
                     <div className={styles.avatarName}>
-                    {defaultPlayerName}
-                    <span>The Drop Hunter</span>
+                        <img
+                            src="/assets/icons/crown.svg"
+                            className={styles.crownIcon}
+                        />
+                        {defaultPlayerName}
+
+                        <span>
+                            <img
+                                src="/assets/icons/class-drop-hunter.svg"
+                                className={styles.classIcon}
+                            />
+                            Drop Hunter
+                        </span>
                     </div>
                     <div className={styles.previewBoxWrap}>
                         <AvatarPreviewBox
@@ -242,25 +242,82 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
                             onClick={onCanvasClick}
                         />
                         <ul className={styles.leftEquipColumn}>
+                            <li className={styles.columnTitle}>Party</li>
                             <li>
-                            <TokenBox size={48} resolution={2048} numFrames={128} />
+                                <TokenBox
+                                    size={48}
+                                    resolution={2048}
+                                    numFrames={128}
+                                    level={12}
+                                    active={true}
+                                    type={"common"}
+                                />
                             </li>
                             <li>
-                            <TokenBox size={48} resolution={2048} numFrames={128} />
+                                <TokenBox
+                                    size={48}
+                                    resolution={2048}
+                                    numFrames={128}
+                                    type={"common"}
+                                />
                             </li>
                             <li>
-                            <TokenBox size={48} resolution={2048} numFrames={128} />
+                                <TokenBox
+                                    size={48}
+                                    resolution={2048}
+                                    numFrames={128}
+                                    type={"common"}
+                                />
                             </li>
                         </ul>
                         <ul className={styles.rightEquipColumn}>
+                            <li className={styles.columnTitle}>Equipment</li>
                             <li>
-                            <TokenBox size={48} resolution={2048} numFrames={128} />
+                                <TokenBox
+                                    size={48}
+                                    resolution={2048}
+                                    numFrames={128}
+                                    type={"mythic"}
+                                />
                             </li>
                             <li>
-                            <TokenBox size={48} resolution={2048} numFrames={128} />
+                                <TokenBox
+                                    size={48}
+                                    resolution={2048}
+                                    numFrames={128}
+                                    type={"epic"}
+                                />
                             </li>
                             <li>
-                            <TokenBox size={48} resolution={2048} numFrames={128} />
+                                <TokenBox
+                                    size={48}
+                                    resolution={2048}
+                                    numFrames={128}
+                                    type={"rare"}
+                                />
+                            </li>
+                            <li>
+                                <TokenBox
+                                    size={48}
+                                    resolution={2048}
+                                    numFrames={128}
+                                    type={"uncommon"}
+                                />
+                            </li>
+                            <li>
+                                <TokenBox
+                                    size={48}
+                                    resolution={2048}
+                                    numFrames={128}
+                                    type={"common"}
+                                />
+                            </li>
+                            <li>
+                                <TokenBox
+                                    size={48}
+                                    resolution={2048}
+                                    numFrames={128}
+                                />
                             </li>
                         </ul>
                     </div>
@@ -268,19 +325,19 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
 
                 <div className={styles.infoWrap}>
                     <div className={styles.row}>
-                    {mainStatSpecs.map((statSpec, i) => {
-                        return <Stat2 statSpec={statSpec} key={i} />;
-                    })}
+                        {mainStatSpecs.map((statSpec, i) => {
+                            return <Stat2 statSpec={statSpec} key={i} />;
+                        })}
                     </div>
                     <div className={styles.row}>
-                    {statSpecs.map((statSpec, i) => {
-                        return <Stat statSpec={statSpec} key={i} />;
-                    })}
+                        {statSpecs.map((statSpec, i) => {
+                            return <Stat statSpec={statSpec} key={i} />;
+                        })}
                     </div>
                     <div className={styles.row}>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
-                    lacinia rutrum scelerisque. Vivamus sem ipsum, pellentesque nec
-                    augue sed, molestie dapibus libero.
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Quisque lacinia rutrum scelerisque. Vivamus sem ipsum,
+                        pellentesque nec augue sed, molestie dapibus libero.
                     </div>
                 </div>
             </div>
@@ -294,6 +351,5 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
                 />
             </div>
         </div>
-    );
-
+    ) : null;
 };

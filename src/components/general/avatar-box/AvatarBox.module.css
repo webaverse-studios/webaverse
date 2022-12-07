@@ -48,11 +48,6 @@
     height: calc(var(--canvas-size) - 20px * 2);
     z-index: 2;
 }
-
-.avatarBoxWrap .avatarBox.loaded .placeholderImg {
-    display: none;
-}
-
 .avatarBoxWrap .avatarBox .meta {
     display: block;
     position: absolute;
@@ -182,30 +177,33 @@
 }
 
 .avatarBoxWrap .avatarBox .meta .stat.hp .progressBar {
-    background: #730319;
+    background: #800B2F;
     transform: skewX(4deg);
 }
 .avatarBoxWrap .avatarBox .meta .stat.hp .progressBar > div {
-    background: #fe364b;
+    background: rgb(205,76,128);
+    background: linear-gradient(90deg, rgba(205,76,128,1) 0%, rgba(241,137,172,1) 100%);
 }
 
 .avatarBoxWrap .avatarBox .meta .stat.mp .progressBar {
-    background: #031f3b;
+    background: #457C0A;
     transform: skewX(12deg);
 }
 .avatarBoxWrap .avatarBox .meta .stat.mp .progressBar > div {
-    background: #00caf5;
+    background: rgb(125,179,67);
+    background: linear-gradient(90deg, rgba(125,179,67,1) 0%, rgba(178,235,133,1) 100%);
 }
 
 .avatarBoxWrap .avatarBox .meta .stat.xp .icon {
     margin-left: -1px;
 }
 .avatarBoxWrap .avatarBox .meta .stat.xp .progressBar {
-    background: #280847;
+    background: #3D106C;
     transform: skewX(14deg);
 }
 .avatarBoxWrap .avatarBox .meta .stat.xp .progressBar > div {
-    background: #bc2ce4;
+    background: rgb(128,76,214);
+    background: linear-gradient(90deg, rgba(128,76,214,1) 0%, rgba(164,133,235,1) 100%);
 }
 
 .avatarBoxWrap .avatarBox .meta .limitBar {
@@ -216,8 +214,13 @@
     width: 250px;
 }
 
+.avatarBoxWrap .avatarBox .meta .limitBar .icon  {
+    height: 13px !important;
+    margin-top: -4px;
+}
+
 .avatarBoxWrap .avatarBox .meta .limitBar .progressBar {
-    background: #3B1315;
+    background: rgb(65, 49, 19);
     -webkit-mask-image: url("/assets/backgrounds/limit-mask.svg");
     mask-image: url("/assets/backgrounds/limit-mask.svg");
     -webkit-mask-size: 100%;
@@ -226,6 +229,7 @@
     mask-repeat: no-repeat;
     height: 6px;
     width: 160px;
+    margin-left: 14px !important;
 }
 
 .avatarBoxWrap .avatarBox .meta .limitBar .value {
@@ -236,7 +240,8 @@
 }
 
 .avatarBoxWrap .avatarBox .meta .limitBar .progressBar > div {
-    background: #dbcb08;
+    background: rgb(203,163,84);
+    background: linear-gradient(90deg, rgba(203,163,84,1) 0%, rgba(227,192,122,1) 100%);
     height: 6px;
     transform: skewX(7deg);
 }

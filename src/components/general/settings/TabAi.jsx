@@ -6,11 +6,13 @@ import {Switch} from './switch';
 import loreAI from '../../../../ai/lore/lore-ai';
 import debug from '../../../../debug';
 
+import preauthenticator from '../../../../preauthenticator';
+
 import styles from './settings.module.css';
 
 //
 
-const ApiTypes = [ 'NONE', 'AI21', 'GOOSEAI', 'OPENAI', 'CONVAI' ];
+const ApiTypes = [ 'NONE', 'AI21', 'GOOSEAI', 'OPENAI' ];
 const DefaultSettings = {
     apiType: ApiTypes[0],
     apiKey: '',
@@ -63,11 +65,10 @@ export const TabAi = ({active}) => {
             case 'AI21': return `https://ai.webaverse.com/ai21/v1/engines/j1-large/completions`;
             case 'GOOSEAI': return `https://ai.webaverse.com/gooseai/v1/engines/gpt-neo-20b/completions`;
             case 'OPENAI': return `https://api.openai.com/v1/engines/text-davinci-002/completions`;
-            case 'CONVAI': return `https://api.convai.com/webaverse`
             default: return null;
         }
     };
-    const _apiTypeNeedsApiKey = apiType => apiType === 'OPENAI' || apiType === 'CONVAI';
+    const _apiTypeNeedsApiKey = apiType => apiType === 'OPENAI';
 
     function updateLoreEndpoint(apiType) {
         const url = _getApiUrl(apiType);
@@ -129,7 +130,7 @@ export const TabAi = ({active}) => {
             settings = JSON.parse(settingsString);
 
         } catch (err) {
-
+            console.warn('could not parse AiSettings', err);
             settings = DefaultSettings;
 
         }

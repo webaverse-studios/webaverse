@@ -11,11 +11,9 @@ import {hotbarSize, numLoadoutSlots} from '../../../../constants.js';
 import {ResourcesBox} from '../resources-box';
 
 export const Hotbar = ({className}) => {
-    const {state, setState} = useContext(AppContext);
-    const open =  state.openedPanel === 'CharacterPanel';
+    const {setState} = useContext(AppContext);
 
     useEffect(() => {
-        if (open) {
             const keydown = e => {
                 if (!e.ctrlKey) {
                     switch (e.which) {
@@ -35,8 +33,7 @@ export const Hotbar = ({className}) => {
             return () => {
                 unregisterIoEventHandler('keydown', keydown);
             };
-        }
-    }, [open]);
+    }, []);
 
     const onDragOver = index => e => {
         e.preventDefault();
@@ -61,9 +58,18 @@ export const Hotbar = ({className}) => {
 
     return (
         <div
-            className={ classnames(className, styles.hotbar, open ? styles.open : null) }
+            className={ classnames(className, styles.hotbar) }
             onClick={onTopClick}
         >
+            <div className={styles.leftSlot}>
+                <div className={styles.background} />
+                <div className={styles.phone}>
+                    <img src="/assets/icons/phone.svg" />
+                    <span>~</span>
+                </div>
+            </div>
+
+            <div className={styles.rightSlot}></div>
 
             {
                 (() => {
@@ -94,5 +100,4 @@ export const Hotbar = ({className}) => {
 
         </div>
     );
-
 };

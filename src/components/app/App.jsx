@@ -1,5 +1,5 @@
 
-import React, {useState, useEffect, useRef, useContext, createContext} from 'react';
+import React, {useState, useEffect, useRef, useContext, createContext, Fragment} from 'react';
 import classnames from 'classnames';
 
 import game from '../../../game';
@@ -15,7 +15,6 @@ import {IoHandler, registerIoEventHandler, unregisterIoEventHandler} from '../ge
 import {ZoneTitleCard} from '../general/zone-title-card';
 import {Quests} from '../play-mode/quests';
 import {MapGen} from '../general/map-gen/MapGen.jsx';
-import {UIMode} from '../general/ui-mode';
 import {LoadingBox} from '../../LoadingBox.jsx';
 import {FocusBar} from '../../FocusBar.jsx';
 import {DragAndDrop} from '../../DragAndDrop.jsx';
@@ -100,7 +99,7 @@ let appStarted = false;
 export const App = () => {
 
     const [ state, setState ] = useState({openedPanel: null, openedModal: null});
-    const [ uiMode, setUIMode ] = useState('normal');
+    const [ showUI, setShowUI ] = useState('normal');
 
     const canvasRef = useRef(null);
     const app = useWebaverseApp();
@@ -164,7 +163,7 @@ export const App = () => {
 
         if (state.openedPanel) {
 
-            setUIMode('normal');
+            setShowUI(true);
 
         }
 
@@ -191,7 +190,7 @@ export const App = () => {
 
     useEffect(() => {
 
-        if (uiMode === 'none') {
+        if (showUI === 'none') {
 
             setState({openedPanel: null});
 
@@ -201,7 +200,7 @@ export const App = () => {
 
             if (event.ctrlKey && event.code === 'KeyH') {
 
-                setUIMode(uiMode === 'normal' ? 'none' : 'normal');
+                setShowUI(!showUI);
                 return false;
 
             }
@@ -218,7 +217,7 @@ export const App = () => {
 
         };
 
-    }, [ uiMode ]);
+    }, [ showUI ]);
 
     useEffect(() => {
 
@@ -305,6 +304,7 @@ export const App = () => {
     };
 
     return (
+        <AppContext.Provider value={{state, setState, app, setSelectedApp, selectedApp, showUI, account, chain}}>
         <div
             className={ styles.App }
             id="app"
@@ -312,24 +312,28 @@ export const App = () => {
             onDragEnd={onDragEnd}
             onDragOver={onDragOver}
         >
-            <AppContext.Provider value={{state, setState, app, setSelectedApp, selectedApp, uiMode, account, chain}}>
+        <DomRenderer />
+        <canvas className={ classnames(styles.canvas, domHover ? styles.domHover : null) } ref={ canvasRef } />
+        <DragAndDrop />
+        <IoHandler />
+        <WorldObjectsList
+            setSelectedApp={ setSelectedApp }
+            selectedApp={ selectedApp }
+        />
+        {showUI &&
+            <Fragment>
                 <Modals />
                 <Header setSelectedApp={ setSelectedApp } selectedApp={ selectedApp } />
-                <DomRenderer />
-                <canvas className={ classnames(styles.canvas, domHover ? styles.domHover : null) } ref={ canvasRef } />
                 <Crosshair />
-                <WorldObjectsList
-                    setSelectedApp={ setSelectedApp }
-                    selectedApp={ selectedApp }
-                />
-                <PlayMode />
+                {state.openedPanel !== 'CharacterSelect' &&
+                    <PlayMode />
+                }
                 <EditorMode
                     selectedScene={ selectedScene }
                     setSelectedScene={ setSelectedScene }
                     selectedRoom={ selectedRoom }
                     setSelectedRoom={ setSelectedRoom }
                 />
-                <IoHandler />
                 <QuickMenu />
                 <ZoneTitleCard />
                 <MapGen />
@@ -340,8 +344,10 @@ export const App = () => {
                 <GrabKeyIndicators />
                 <BuildVersion />
                 <Stats app={ app } />
-            </AppContext.Provider>
-        </div>
+            </Fragment>
+        }
+            </div>
+        </AppContext.Provider>
     );
 
 };

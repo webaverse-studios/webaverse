@@ -1,4 +1,5 @@
 import {getAudioContext} from 'wsrtc/ws-audio-context.js';
+import microphoneWorkletUrl from "./avatars/microphone-worklet.js?url";
 
 class AudioManager {
   constructor() {
@@ -10,7 +11,7 @@ class AudioManager {
       this.audioContext = getAudioContext();
       this.audioContext.gain = this.audioContext.createGain();
       this.audioContext.gain.connect(this.audioContext.destination);
-      this.audioContext.audioWorklet.addModule('avatars/microphone-worklet.js');
+      this.audioContext.audioWorklet.addModule(microphoneWorkletUrl);
     }
     return this.audioContext;
   }

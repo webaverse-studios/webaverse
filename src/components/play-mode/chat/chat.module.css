@@ -15,14 +15,9 @@
     bottom: 200px;
     right: 0;
     width: 300px;
-    transform: translateX(300px);
-    transition: transform 0.3s cubic-bezier(0, 1, 0, 1);
+    transform: none;
     overflow: hidden;
     z-index: 1;
-}
-
-.chat.open {
-    transform: none;
 }
 
 .chat .input {

@@ -23,7 +23,6 @@ export const Tab = ({className, type, left, right, top, bottom, index, disabled,
       bottom ? styles.bottom : null,
       index !== undefined ? styles['index-' + index] : null,
       disabled ? styles.disabled : null,
-      open === type ? styles.open : null,
     )} onClick={onclick}>
       {left ? <>
         {before}

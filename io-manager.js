@@ -294,6 +294,7 @@ class IoManager extends EventTarget {
         }
       case 87: { // W
         ioManager.keys.up = true;
+        game.setMovements();
 
         const now = performance.now();
         const timeDiff = now - this.lastKeysDownTime.keyW;
@@ -307,6 +308,7 @@ class IoManager extends EventTarget {
       }
       case 65: { // A
         ioManager.keys.left = true;
+        game.setMovements();
 
         const now = performance.now();
         const timeDiff = now - this.lastKeysDownTime.keyA;
@@ -326,6 +328,7 @@ class IoManager extends EventTarget {
           game.saveScene();
         } else {
           ioManager.keys.down = true;
+          game.setMovements();
 
           const now = performance.now();
           const timeDiff = now - this.lastKeysDownTime.keyS;
@@ -340,6 +343,7 @@ class IoManager extends EventTarget {
       }
       case 68: { // D
         ioManager.keys.right = true;
+        game.setMovements();
 
         const now = performance.now();
         const timeDiff = now - this.lastKeysDownTime.keyD;
@@ -427,12 +431,12 @@ class IoManager extends EventTarget {
             grabManager.menuRotate(1);
           } else {
             game.dropSelectedApp();
-          }
         }
         break;
       }
       case 16: { // shift
         ioManager.keys.shift = true;
+        game.setSprint(true);
         break;
       }
       case 32: { // space
@@ -516,18 +520,22 @@ class IoManager extends EventTarget {
     switch (e.which) {
       case 87: { // W
         ioManager.keys.up = false;
+        game.setMovements();
         break;
       }
       case 65: { // A
         ioManager.keys.left = false;
+        game.setMovements();
         break;
       }
       case 83: { // S
         ioManager.keys.down = false;
+        game.setMovements();
         break;
       }
       case 68: { // D
         ioManager.keys.right = false;
+        game.setMovements();
         break;
       }
       case 32: { // space
@@ -564,8 +572,9 @@ class IoManager extends EventTarget {
       case 16: { // shift
         ioManager.keys.shift = false;
         ioManager.keys.doubleTap = false;
-
+       
         game.menuUnDoubleTap();
+        game.setSprint(false);
         break;
       }
       case 46: { // delete
