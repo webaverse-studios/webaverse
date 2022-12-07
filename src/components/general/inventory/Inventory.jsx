@@ -132,7 +132,6 @@ const TokenList = ({
             <ul className={styles.tokenList}>
                 {sections.map((section, i) => {
                     const { name, tokens, type } = section;
-                    console.log(tokens);
                     return (
                         <React.Fragment key={i}>
                             {tokens.map((object, i) => (
@@ -299,8 +298,6 @@ export const Inventory = () => {
                 upstreet: inventoryItems.upstreet,
                 resources: inventoryItems.resources,
             });
-            // inventoryItems.notClaimed.push(addedClaim)
-            // }
         };
         dropManager.addEventListener("claimschange", claimschange);
         return () => {
