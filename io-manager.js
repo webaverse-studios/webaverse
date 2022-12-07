@@ -431,6 +431,7 @@ class IoManager extends EventTarget {
             grabManager.menuRotate(1);
           } else {
             game.dropSelectedApp();
+          }
         }
         break;
       }
