@@ -27,6 +27,8 @@ const localMatrix3 = new THREE.Matrix4();
 const localBox = new THREE.Box3();
 
 const rotationSnap = Math.PI / 6;
+const maxGridSnap = 32;
+const minGridSnap = 0
 let highlightedPhysicsObject = null;
 let highlightedPhysicsId = 0;
 
@@ -152,7 +154,7 @@ const _click = (e) => {
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.ungrab();
     grabManager.hideUi();
-    grabManager.setGridSnap(0);
+    grabManager.setGridSnap(minGridSnap);
   } else {
     if (highlightedPhysicsObject) {
       grabManager.grab(highlightedPhysicsObject);
@@ -163,14 +165,14 @@ const _click = (e) => {
 class Grabmanager extends EventTarget {
   constructor() {
     super();
-    this.gridSnap = 0;
+    this.gridSnap = minGridSnap;
     this.editMode = false;
   }
 
   grab(object) {
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.grab(object);
-    this.gridSnap = 0;
+    this.gridSnap = minGridSnap;
     this.editMode = false;
   }
 
@@ -194,7 +196,7 @@ class Grabmanager extends EventTarget {
 
   async toggleEditMode() {
     this.editMode = !this.editMode;
-    this.setGridSnap(0);
+    this.setGridSnap(minGridSnap);
     if (this.editMode) {
       if (!cameraManager.pointerLockElement) {
         await cameraManager.requestPointerLock();
@@ -235,12 +237,12 @@ class Grabmanager extends EventTarget {
   }
 
   menuGridSnap() {
-    if (this.gridSnap === 0) {
-      this.setGridSnap(32);
+    if (this.gridSnap === minGridSnap) {
+      this.setGridSnap(maxGridSnap);
     } else if (this.gridSnap > 1) {
       this.setGridSnap(this.gridSnap / 2);
     } else {
-      this.setGridSnap(0);
+      this.setGridSnap(minGridSnap);
     }
   }
 
