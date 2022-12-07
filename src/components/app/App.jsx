@@ -21,6 +21,7 @@ import {DragAndDrop} from '../../DragAndDrop.jsx';
 import {Stats} from '../../Stats.jsx';
 import {PlayMode} from '../play-mode';
 import {EditorMode} from '../editor-mode';
+import {GrabKeyIndicators} from '../../GrabKeyIndicators.jsx'
 import Header from '../../Header.jsx';
 import QuickMenu from '../../QuickMenu.jsx';
 import {DomRenderer} from '../../DomRenderer.jsx';
@@ -339,6 +340,8 @@ export const App = () => {
                 <Quests />
                 <LoadingBox />
                 <FocusBar />
+                <DragAndDrop />
+                <GrabKeyIndicators />
                 <BuildVersion />
                 <Stats app={ app } />
             </Fragment>

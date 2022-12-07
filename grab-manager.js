@@ -27,6 +27,8 @@ const localMatrix3 = new THREE.Matrix4();
 const localBox = new THREE.Box3();
 
 const rotationSnap = Math.PI / 6;
+const maxGridSnap = 32;
+const minGridSnap = 0
 let highlightedPhysicsObject = null;
 let highlightedPhysicsId = 0;
 
@@ -151,6 +153,8 @@ const _click = (e) => {
   if (grabManager.getGrabbedObject(0)) {
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.ungrab();
+    grabManager.hideUi();
+    grabManager.setGridSnap(minGridSnap);
   } else {
     if (highlightedPhysicsObject) {
       grabManager.grab(highlightedPhysicsObject);
@@ -161,14 +165,14 @@ const _click = (e) => {
 class Grabmanager extends EventTarget {
   constructor() {
     super();
-    this.gridSnap = 0;
+    this.gridSnap = minGridSnap;
     this.editMode = false;
   }
 
   grab(object) {
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.grab(object);
-    this.gridSnap = 0;
+    this.gridSnap = minGridSnap;
     this.editMode = false;
   }
 
@@ -192,6 +196,7 @@ class Grabmanager extends EventTarget {
 
   async toggleEditMode() {
     this.editMode = !this.editMode;
+    this.setGridSnap(minGridSnap);
     if (this.editMode) {
       if (!cameraManager.pointerLockElement) {
         await cameraManager.requestPointerLock();
@@ -203,6 +208,9 @@ class Grabmanager extends EventTarget {
         const localPlayer = playersManager.getLocalPlayer();
         localPlayer.ungrab();
       }
+      this.showUi();
+    } else {
+      this.hideUi();
     }
   }
 
@@ -210,6 +218,14 @@ class Grabmanager extends EventTarget {
     this.highlightPhysicsMesh = mesh;
     this.highlightPhysicsMesh.visible = false;
     sceneLowPriority.add(this.highlightPhysicsMesh);
+  }
+
+  showUi() {
+    this.dispatchEvent(new MessageEvent('showui'));
+  }
+
+  hideUi() {
+    this.dispatchEvent(new MessageEvent('hideui'));
   }
 
   menuClick(e) {
@@ -221,13 +237,22 @@ class Grabmanager extends EventTarget {
   }
 
   menuGridSnap() {
-    if (this.gridSnap === 0) {
-      this.gridSnap = 32;
+    if (this.gridSnap === minGridSnap) {
+      this.setGridSnap(maxGridSnap);
     } else if (this.gridSnap > 1) {
-      this.gridSnap /= 2;
+      this.setGridSnap(this.gridSnap / 2);
     } else {
-      this.gridSnap = 0;
+      this.setGridSnap(minGridSnap);
     }
+  }
+
+  setGridSnap(gridSnap) {
+    this.gridSnap = gridSnap;
+    this.dispatchEvent(
+      new MessageEvent('setgridsnap', {
+        data: {gridSnap: this.gridSnap},
+      })
+    );
   }
 
   getGridSnap() {
@@ -276,13 +301,14 @@ class Grabmanager extends EventTarget {
     const _updateGrab = () => {
       const _isWear = (o) =>
         localPlayer.findAction(
-          (action) => action.type === 'wear' && action.instanceId === o.instanceId);
+          action => action.type === 'wear' && action.instanceId === o.instanceId);
 
       for (let i = 0; i < 2; i++) {
         const grabAction = this.getGrabAction(i);
         const grabbedObject = this.getGrabbedObject(i);
         if (grabbedObject && !_isWear(grabbedObject)) {
-          let position = null; let quaternion = null;
+          let position = null;
+          let quaternion = null;
           if (renderer.xr.getSession()) {
             const h = localPlayer[grabAction.hand === 'left' ? 'leftHand' : 'rightHand'];
             position = h.position;
@@ -358,9 +384,9 @@ class Grabmanager extends EventTarget {
               this.highlightPhysicsMesh.scale
             );
 
-            this.highlightPhysicsMesh.material.uniforms.uTime.value = (timestamp % 1500) / 1500;
-            this.highlightPhysicsMesh.material.uniforms.uTime.needsUpdate = true;
-            this.highlightPhysicsMesh.material.uniforms.uColor.value.setHex(
+          this.highlightPhysicsMesh.material.uniforms.uTime.value = (timestamp % 1500) / 1500;
+          this.highlightPhysicsMesh.material.uniforms.uTime.needsUpdate = true;
+          this.highlightPhysicsMesh.material.uniforms.uColor.value.setHex(
             buildMaterial.uniforms.uColor.value.getHex()
           );
           this.highlightPhysicsMesh.material.uniforms.uColor.needsUpdate = true;

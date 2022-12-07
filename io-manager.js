@@ -427,7 +427,11 @@ class IoManager extends EventTarget {
       }
       case 82: { // R
         if (cameraManager.pointerLockElement) {
+          if (grabManager.canRotate()) {
+            grabManager.menuRotate(1);
+          } else {
             game.dropSelectedApp();
+          }
         }
         break;
       }
