@@ -32,13 +32,13 @@ const objects = {
             claimed: true,
         },
         {
-          name: "Silsword",
-          start_url: "https://webaverse.github.io/silsword/",
-          description: "A sword from lore.",
-          type: "common",
-          timerTimestamp: 1704454645000,
-          claimed: false,
-      },
+            name: "Silsword",
+            start_url: "https://webaverse.github.io/silsword/",
+            description: "A sword from lore.",
+            type: "common",
+            timerTimestamp: 1704454645000,
+            claimed: false,
+        },
     ],
     upstreet: [],
 
@@ -56,20 +56,31 @@ const objects = {
             value: 12,
         },
         {
-          name: "Silk",
-          start_url: "https://webaverse.github.io/silk/",
-          claimed: true,
-          value: 12,
-      },
+            name: "Silk",
+            start_url: "https://webaverse.github.io/silk/",
+            claimed: true,
+            value: 12,
+        },
     ],
 };
 
-const Token = ({ object }) => {
+const Token = ({
+    object,
+    onMouseEnter,
+    onMouseDown,
+    onDragStart,
+    onDoubleClick,
+    onClick,
+    showTokenDropDown,
+    closeTokenDropDown,
+    onEquip,
+    onSpawn,
+    onDrop,
+    mintClaim,
+}) => {
     const [rendered, setRendered] = useState(false);
     const canvasRef = useRef();
-
     const pixelRatio = window.devicePixelRatio;
-
     useEffect(() => {
         const canvas = canvasRef.current;
         if (canvas && !rendered) {
@@ -96,18 +107,62 @@ const Token = ({ object }) => {
     }, [canvasRef.current, rendered]);
 
     return object ? (
-        <TokenBox
-            size={size}
-            object={object}
-            level={object.level}
-            claimed={object.claimed}
-            url={object.start_url}
-            resolution={resolution}
-            value={object.value}
-            numFrames={numFrames}
-            type={object.type}
-            timerTimestamp={object.timerTimestamp}
-        />
+        <div
+            draggable
+            onMouseEnter={onMouseEnter(object)}
+            onMouseDown={onMouseDown(object)}
+            onDragStart={onDragStart(object)}
+            onClick={(e) => onClick(e)}
+            onContextMenu={(e) => onClick(e, object)}
+            onDoubleClick={onDoubleClick(object)}
+        >
+            <TokenBox
+                size={size}
+                object={object}
+                level={object.level}
+                claimed={object.claimed}
+                url={object.start_url}
+                resolution={resolution}
+                value={object.value}
+                numFrames={numFrames}
+                type={object.type}
+                timerTimestamp={object.timerTimestamp}
+            />
+            <div className={styles.tokenDropdown}>
+                {showTokenDropDown && showTokenDropDown === object && (
+                    <>
+                        <CustomButton
+                            theme="dark"
+                            text="Spawn"
+                            size={10}
+                            className={styles.button}
+                            onClick={onSpawn(object)}
+                        />
+                        <CustomButton
+                            theme="dark"
+                            text="Equip"
+                            size={10}
+                            className={styles.button}
+                            onClick={onEquip(object)}
+                        />
+                        <CustomButton
+                            theme="dark"
+                            text="Drop"
+                            size={10}
+                            className={styles.button}
+                            onClick={onDrop(object)}
+                        />
+                        <CustomButton
+                            theme="dark"
+                            text="Mint"
+                            size={10}
+                            className={styles.button}
+                            onClick={() => mintClaim()}
+                        />
+                    </>
+                )}
+            </div>
+        </div>
     ) : null;
 };
 
@@ -115,16 +170,18 @@ const TokenList = ({
     title,
     sections,
     open,
-    hoverObject,
     selectObject,
-    loading,
     onMouseEnter,
     onMouseDown,
     onDragStart,
     onDoubleClick,
     onClick,
-    highlights,
-    ItemClass,
+    showTokenDropDown,
+    closeTokenDropDown,
+    onEquip,
+    onSpawn,
+    onDrop,
+    mintClaim,
 }) => {
     return (
         <div className={styles.section} key={title}>
@@ -132,21 +189,30 @@ const TokenList = ({
             <ul className={styles.tokenList}>
                 {sections.map((section, i) => {
                     const { name, tokens, type } = section;
-                    console.log(tokens);
                     return (
                         <React.Fragment key={i}>
                             {tokens.map((object, i) => (
-                                <li
-                                    draggable
-                                    selected={selectObject}
-                                    onMouseEnter={onMouseEnter(object)}
-                                    onMouseDown={onMouseDown(object)}
-                                    onDragStart={onDragStart(object)}
-                                    onClick={onClick(object)}
-                                    onDoubleClick={onDoubleClick(object)}
-                                    key={i}
-                                >
-                                    {open && <Token object={object} />}
+                                <li selected={selectObject} key={i}>
+                                    {open && (
+                                        <Token
+                                            object={object}
+                                            onMouseEnter={onMouseEnter}
+                                            onMouseDown={onMouseDown}
+                                            onDragStart={onDragStart}
+                                            onClick={onClick}
+                                            onEquip={onEquip}
+                                            onSpawn={onSpawn}
+                                            onDrop={onDrop}
+                                            mintClaim={mintClaim}
+                                            closeTokenDropDown={
+                                                closeTokenDropDown
+                                            }
+                                            onDoubleClick={onDoubleClick}
+                                            showTokenDropDown={
+                                                showTokenDropDown
+                                            }
+                                        />
+                                    )}
                                 </li>
                             ))}
                         </React.Fragment>
@@ -166,14 +232,12 @@ export const Inventory = () => {
     const [inventoryItems, setInventoryItems] = useState(objects);
 
     const [loading, setLoading] = useState(false);
-    const [imageBitmap, setImageBitmap] = useState(null);
 
     const [expand, setExpand] = useState(false);
 
     const selectedMenuIndex = mod(faceIndex, 4);
 
-    const [openPreview, setOpenPreview] = useState(false);
-    const [previewObject, setPreviewObject] = useState(undefined);
+    const [showTokenDropDown, setShowTokenDropDown] = useState(false);
 
     const { getTokens, mintfromVoucher, WebaversecontractAddress } =
         useNFTContract(account.currentAddress);
@@ -202,19 +266,26 @@ export const Inventory = () => {
         e.dataTransfer.setData("application/json", JSON.stringify(object));
         e.dataTransfer.effectAllowed = "all";
         e.dataTransfer.dropEffect = "move";
-
-        const transparentPng = new Image();
-        transparentPng.src = transparentPngUrl;
-        e.dataTransfer.setDragImage(transparentPng, 0, 0);
-
-        // setSelectObject(object);
+        // Do not remove
+        /*const transparentPng = new Image();
+        const image = e.target.getElementsByTagName("canvas")[0].toDataURL();
+        transparentPng.src = image;
+        console.log(transparentPng)
+        e.dataTransfer.setDragImage(transparentPng, 0, 0);*/
     };
-    const onClick = (object) => () => {
-        //setOpenPreview(true);
-        //setPreviewObject(object);
+    const onClick = (e, object) => {
+        e.preventDefault();
+        if (e.type == "click") {
+            // console.log("Left Click");
+        } else if (e.type == "contextmenu") {
+            // console.log("Right Click");
+            setShowTokenDropDown(object);
+        }
+    };
+    const closeTokenDropDown = () => {
+        setShowTokenDropDown();
     };
     const closePreview = () => {
-        sounds.playSoundName("menuNext");
         setOpenPreview(false);
         setPreviewObject();
     };
@@ -229,14 +300,15 @@ export const Inventory = () => {
     };
     const menuRight = () => {
         setFaceIndex(faceIndex + 1);
-
         sounds.playSoundName("menuNext");
     };
     const onEquip = (object) => () => {
         game.handleDropJsonToPlayer(object);
+        setShowTokenDropDown();
     };
     const onSpawn = (object) => () => {
         game.handleDropJsonForSpawn(object);
+        setShowTokenDropDown();
     };
     const onDrop = (object) => () => {
         game.handleDropJsonForDrop(
@@ -253,6 +325,7 @@ export const Inventory = () => {
                 }
             }
         );
+        setShowTokenDropDown();
     };
     const mintClaim = async (e) => {
         if (!account.currentAddress) {
@@ -270,7 +343,7 @@ export const Inventory = () => {
         );
     };
 
-    const selectClassName = styles[`select-${selectedMenuIndex}`];
+    // const selectClassName = styles[`select-${selectedMenuIndex}`];
 
     useEffect(() => {
         const claimschange = async (e) => {
@@ -385,10 +458,16 @@ export const Inventory = () => {
                             onMouseDown={onMouseDown}
                             onDragStart={onDragStart}
                             onClick={onClick}
+                            closeTokenDropDown={closeTokenDropDown}
                             onDoubleClick={onDoubleClick}
                             menuLeft={menuLeft}
                             menuRight={menuRight}
+                            onEquip={onEquip}
+                            onSpawn={onSpawn}
+                            onDrop={onDrop}
+                            mintClaim={mintClaim}
                             highlights={true}
+                            showTokenDropDown={showTokenDropDown}
                         />
                         <TokenList
                             title="Backpack"
@@ -413,7 +492,12 @@ export const Inventory = () => {
                             onDoubleClick={onDoubleClick}
                             menuLeft={menuLeft}
                             menuRight={menuRight}
+                            onEquip={onEquip}
+                            onSpawn={onSpawn}
+                            onDrop={onDrop}
+                            mintClaim={mintClaim}
                             highlights={false}
+                            showTokenDropDown={showTokenDropDown}
                         />
                     </div>
                     <div className={styles.actionsWrap}>
