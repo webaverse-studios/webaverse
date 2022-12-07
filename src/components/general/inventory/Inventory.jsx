@@ -326,8 +326,6 @@ export const Inventory = () => {
                 });
             }
             queryGetNFTFromContract();
-        } else {
-            console.log("could not query NFT collections");
         }
     }, [open, account]);
 
