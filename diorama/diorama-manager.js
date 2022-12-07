@@ -739,7 +739,7 @@ class Diorama {
 
 //
 
-const createPlayerDiorama = (opts = { cameraOffset }) => {
+const createPlayerDiorama = (opts = {}) => {
   // _ensureSideSceneCompiled();
 
   let {
