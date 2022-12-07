@@ -151,6 +151,8 @@ const _click = (e) => {
   if (grabManager.getGrabbedObject(0)) {
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.ungrab();
+    grabManager.hideUi();
+    grabManager.setGridSnap(0);
   } else {
     if (highlightedPhysicsObject) {
       grabManager.grab(highlightedPhysicsObject);
@@ -192,6 +194,7 @@ class Grabmanager extends EventTarget {
 
   async toggleEditMode() {
     this.editMode = !this.editMode;
+    this.setGridSnap(0);
     if (this.editMode) {
       if (!cameraManager.pointerLockElement) {
         await cameraManager.requestPointerLock();
@@ -203,6 +206,9 @@ class Grabmanager extends EventTarget {
         const localPlayer = playersManager.getLocalPlayer();
         localPlayer.ungrab();
       }
+      this.showUi();
+    } else {
+      this.hideUi();
     }
   }
 
@@ -210,6 +216,14 @@ class Grabmanager extends EventTarget {
     this.highlightPhysicsMesh = mesh;
     this.highlightPhysicsMesh.visible = false;
     sceneLowPriority.add(this.highlightPhysicsMesh);
+  }
+
+  showUi() {
+    this.dispatchEvent(new MessageEvent('showui'));
+  }
+
+  hideUi() {
+    this.dispatchEvent(new MessageEvent('hideui'));
   }
 
   menuClick(e) {
@@ -222,12 +236,21 @@ class Grabmanager extends EventTarget {
 
   menuGridSnap() {
     if (this.gridSnap === 0) {
-      this.gridSnap = 32;
+      this.setGridSnap(32);
     } else if (this.gridSnap > 1) {
-      this.gridSnap /= 2;
+      this.setGridSnap(this.gridSnap / 2);
     } else {
-      this.gridSnap = 0;
+      this.setGridSnap(0);
     }
+  }
+
+  setGridSnap(gridSnap) {
+    this.gridSnap = gridSnap;
+    this.dispatchEvent(
+      new MessageEvent('setgridsnap', {
+        data: {gridSnap: this.gridSnap},
+      })
+    );
   }
 
   getGridSnap() {
