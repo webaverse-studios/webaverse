@@ -154,7 +154,11 @@ class CharacterPhysics {
             doubleJumpAction.startPositionY -
             this.lastCharacterControllerY;
           if (doubleJumpTime >= flatGroundJumpAirTime) {
-            this.character.actionsManager.set('fallLoopFromJump', true);
+            const newFallLoopFromJumpAction = {
+              type: 'fallLoop',
+              from: 'jump',
+            }
+            this.character.actionsManager.tryAddAction(newFallLoopFromJumpAction);
           }
         } else {
           const jumpTime = physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'jump', 0);
@@ -164,7 +168,11 @@ class CharacterPhysics {
             jumpAction.startPositionY -
             this.lastCharacterControllerY;
           if (jumpTime >= flatGroundJumpAirTime) {
-            this.character.actionsManager.set('fallLoopFromJump', true);
+            const newFallLoopFromJumpAction = {
+              type: 'fallLoop',
+              from: 'jump',
+            }
+            this.character.actionsManager.tryAddAction(newFallLoopFromJumpAction);
           }
         }
       }

@@ -23,16 +23,29 @@ class FallLoop extends b3.Action {
     }
   }
 }
-class FallLoopFromJump extends b3.Action {
+class StartFallLoopFromJump extends b3.Action {
   tick(tick) {
     const results = tick.blackboard.get('results');
+    const tickTryActions = tick.blackboard.get('tickTryActions');
     const localPlayer = tick.target;
-    if (tick.blackboard.get('fallLoopFromJump') && !localPlayer.characterPhysics.grounded) {
+    if (tickTryActions.fallLoop?.from === 'jump' && !localPlayer.characterPhysics.grounded) {
       results.fallLoopFromJump = true;
       return b3.SUCCESS;
     } else {
-      tick.blackboard.set('fallLoopFromJump', false);
       return b3.FAILURE;
+    }
+  }
+}
+class FallLoopFromJump extends b3.Action {
+  tick(tick) {
+    const results = tick.blackboard.get('results');
+    // const tickTryStopActions = tick.blackboard.get('tickTryStopActions');
+    const localPlayer = tick.target;
+    if (localPlayer.characterPhysics.grounded) {
+      return b3.FAILURE;
+    } else {
+      results.fallLoopFromJump = true;
+      return b3.RUNNING;
     }
   }
 }
@@ -154,7 +167,10 @@ tree.root = new b3.MemSequence({title:'root',children: [
           new Fly({title:'Fly'}),
           new b3.Succeedor({child: new NarutoRun({title:'NarutoRun'})}),
         ]}),
-        new FallLoopFromJump({title:'FallLoopFromJump'}),
+        new b3.MemSequence({title:'fallLoopFromJump',children:[
+          new StartFallLoopFromJump({title:'StartFallLoopFromJump'}),
+          new FallLoopFromJump({title:'FallLoopFromJump'}),
+        ]}),
         new b3.MemSequence({title:'jump & doubleJump',children:[
           new StartJump({title:'StartJump'}),
           new WaitOneTick({title:'WaitOneTick'}), // note: wait leave ground.
@@ -224,10 +240,7 @@ const postTickSettings = (localPlayer, blackboard) => {
     if (!results.fallLoop && lastResults.fallLoop) localPlayer.removeActionReal('fallLoop');
   
     if (results.fallLoopFromJump && !lastResults.fallLoopFromJump) {
-      localPlayer.addActionReal({
-        type: 'fallLoop',
-        from: 'jump',
-      });
+      localPlayer.addActionReal(tickTryActions.fallLoop);
     }
     if (!results.fallLoopFromJump && lastResults.fallLoopFromJump) {
       localPlayer.removeActionReal('fallLoop');
