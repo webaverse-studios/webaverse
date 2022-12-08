@@ -453,7 +453,8 @@ export class AvatarCharacterSfx {
     if (this.character.voicePack) { // ensure voice pack loaded
       const voiceFiles = this.character.voicePack.voiceFiles.actionVoices[type];
 
-      if (voiceFiles.length === 0) return
+      if (voiceFiles.length === 0)
+        return console.warn('No voicepack file was found for ', type);
       
       // if (index === undefined) {
         let voice = selectVoice(voiceFiles);
