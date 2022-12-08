@@ -63,7 +63,6 @@ class Fly extends b3.Action {
 class StartJump extends b3.Action {
   tick(tick) {
     const results = tick.blackboard.get('results');
-    const tickInfos = tick.blackboard.get('tickInfos');
     const tickTryActions = tick.blackboard.get('tickTryActions');
     const localPlayer = tick.target;
     if (
@@ -80,12 +79,12 @@ class StartJump extends b3.Action {
 class Jump extends b3.Action {
   tick(tick) {
     const results = tick.blackboard.get('results');
-    const tickInfos = tick.blackboard.get('tickInfos');
     const tickTryActions = tick.blackboard.get('tickTryActions');
     const localPlayer = tick.target;
     if (localPlayer.characterPhysics.grounded) {
       return b3.FAILURE;
-    } else if (tickTryActions.jump) { // todo: don't need this else if ?
+    } else if (tickTryActions.jump) { // note: for trigger doubleJump.
+      results.jump = true; // note: doubleJump need jump in parallel.
       return b3.SUCCESS;
     } else {
       results.jump = true;
@@ -100,7 +99,7 @@ class DoubleJump extends b3.Action {
     if (localPlayer.characterPhysics.grounded) {
       return b3.FAILURE;
     } else {
-      results.jump = true;
+      results.jump = true; // note: doubleJump need jump in parallel.
       results.doubleJump = true;
       return b3.RUNNING;
     }
@@ -186,14 +185,14 @@ tree.root = new b3.MemSequence({title:'root',children: [
   }), // end: loaded
 ]}); // end: root
 
-const preTickSettings = (localPlayer, blackboard) => {
-}
+// const preTickSettings = (localPlayer, blackboard) => {
+// }
 
 const postTickSettings = (localPlayer, blackboard) => {
   const setActions = () => {
     const results = blackboard.get('results');
     const lastResults = blackboard.get('lastResults');
-    const tickInfos = blackboard.get('tickInfos');
+    // const tickInfos = blackboard.get('tickInfos');
     const tickTryActions = blackboard.get('tickTryActions');
     const longTryActions = blackboard.get('longTryActions');
   
@@ -266,10 +265,10 @@ const postTickSettings = (localPlayer, blackboard) => {
   resetResults();
 
   const resetTickInfos = () => {
-    const tickInfos = blackboard.get('tickInfos');
-    for (const key in tickInfos) {
-      tickInfos[key] = null;
-    }
+    // const tickInfos = blackboard.get('tickInfos');
+    // for (const key in tickInfos) {
+    //   tickInfos[key] = null;
+    // }
     const tickTryActions = blackboard.get('tickTryActions');
     for (const key in tickTryActions) {
       tickTryActions[key] = null;
@@ -284,7 +283,7 @@ class ActionsManager {
     this.blackboard = new b3.Blackboard(); // todo: make blackboard private.
     this.blackboard.set('results', {}); // tick results
     this.blackboard.set('lastResults', {});
-    this.blackboard.set('tickInfos', {});
+    // this.blackboard.set('tickInfos', {});
     this.blackboard.set('tickTryActions', {});
     this.blackboard.set('longTryActions', {});
     this.blackboard.set('tickTryStopActions', {});
