@@ -1,6 +1,6 @@
 import * as b3 from './lib/behavior3js/index.js';
 
-// note: results are tickResults, will all reset to false every frame/tick, so don't need set `results.xxx = false`.
+// note: tickResults will all reset to false after every tick, so don't need set `tickResults.xxx = false`.
 
 class Loading extends b3.Action {
   tick(tick) {
@@ -13,10 +13,10 @@ class Loading extends b3.Action {
 }
 class FallLoop extends b3.Action {
   tick(tick) {
-    const results = tick.blackboard.get('results');
+    const tickResults = tick.blackboard.get('tickResults');
     const localPlayer = tick.target;
     if (!localPlayer.characterPhysics.grounded && ((tick.blackboard.get('now') - localPlayer.characterPhysics.lastGroundedTime) > 200)) {
-      results.fallLoop = true;
+      tickResults.fallLoop = true;
       return b3.SUCCESS;
     } else {
       return b3.FAILURE;
@@ -25,11 +25,11 @@ class FallLoop extends b3.Action {
 }
 class StartFallLoopFromJump extends b3.Action {
   tick(tick) {
-    const results = tick.blackboard.get('results');
+    const tickResults = tick.blackboard.get('tickResults');
     const tickTryActions = tick.blackboard.get('tickTryActions');
     const localPlayer = tick.target;
     if (tickTryActions.fallLoop?.from === 'jump' && !localPlayer.characterPhysics.grounded) {
-      results.fallLoopFromJump = true;
+      tickResults.fallLoopFromJump = true;
       return b3.SUCCESS;
     } else {
       return b3.FAILURE;
@@ -38,22 +38,22 @@ class StartFallLoopFromJump extends b3.Action {
 }
 class FallLoopFromJump extends b3.Action {
   tick(tick) {
-    const results = tick.blackboard.get('results');
+    const tickResults = tick.blackboard.get('tickResults');
     const localPlayer = tick.target;
     if (localPlayer.characterPhysics.grounded) {
       return b3.FAILURE;
     } else {
-      results.fallLoopFromJump = true;
+      tickResults.fallLoopFromJump = true;
       return b3.RUNNING;
     }
   }
 }
 class Fly extends b3.Action {
   tick(tick) {
-    const results = tick.blackboard.get('results');
+    const tickResults = tick.blackboard.get('tickResults');
     const longTryActions = tick.blackboard.get('longTryActions');
     if (longTryActions.fly) {
-      results.fly = true;
+      tickResults.fly = true;
       return b3.SUCCESS;
     } else {
       return b3.FAILURE;
@@ -62,14 +62,14 @@ class Fly extends b3.Action {
 }
 class StartJump extends b3.Action {
   tick(tick) {
-    const results = tick.blackboard.get('results');
+    const tickResults = tick.blackboard.get('tickResults');
     const tickTryActions = tick.blackboard.get('tickTryActions');
     const localPlayer = tick.target;
     if (
       (tickTryActions.jump && localPlayer.characterPhysics.grounded) ||
       localPlayer.hasAction('sit')
     ) {
-      results.jump = true;
+      tickResults.jump = true;
       return b3.SUCCESS;
     } else {
       return b3.FAILURE;
@@ -78,29 +78,29 @@ class StartJump extends b3.Action {
 }
 class Jump extends b3.Action {
   tick(tick) {
-    const results = tick.blackboard.get('results');
+    const tickResults = tick.blackboard.get('tickResults');
     const tickTryActions = tick.blackboard.get('tickTryActions');
     const localPlayer = tick.target;
     if (localPlayer.characterPhysics.grounded) {
       return b3.FAILURE;
     } else if (tickTryActions.jump) { // note: for trigger doubleJump.
-      results.jump = true; // note: doubleJump need jump in parallel.
+      tickResults.jump = true; // note: doubleJump need jump in parallel.
       return b3.SUCCESS;
     } else {
-      results.jump = true;
+      tickResults.jump = true;
       return b3.RUNNING;
     }
   }
 }
 class DoubleJump extends b3.Action {
   tick(tick) {
-    const results = tick.blackboard.get('results');
+    const tickResults = tick.blackboard.get('tickResults');
     const localPlayer = tick.target;
     if (localPlayer.characterPhysics.grounded) {
       return b3.FAILURE;
     } else {
-      results.jump = true; // note: doubleJump need jump in parallel.
-      results.doubleJump = true;
+      tickResults.jump = true; // note: doubleJump need jump in parallel.
+      tickResults.doubleJump = true;
       return b3.RUNNING;
     }
   }
@@ -108,10 +108,10 @@ class DoubleJump extends b3.Action {
 
 class Land extends b3.Action {
   tick(tick) {
-    const results = tick.blackboard.get('results');
+    const tickResults = tick.blackboard.get('tickResults');
     const localPlayer = tick.target;
     if (localPlayer.characterPhysics.grounded) {
-      results.land = true;
+      tickResults.land = true;
       return b3.SUCCESS;
     } else {
       return b3.FAILURE;
@@ -120,10 +120,10 @@ class Land extends b3.Action {
 }
 class Crouch extends b3.Action {
   tick(tick) {
-    const results = tick.blackboard.get('results');
+    const tickResults = tick.blackboard.get('tickResults');
     const longTryActions = tick.blackboard.get('longTryActions');
     if (longTryActions.crouch) {
-      results.crouch = true;
+      tickResults.crouch = true;
       return b3.SUCCESS;
     } else {
       return b3.FAILURE;
@@ -144,11 +144,11 @@ class WaitOneTick extends b3.Action {
 }
 class NarutoRun extends b3.Action {
   tick(tick) {
-    const results = tick.blackboard.get('results');
+    const tickResults = tick.blackboard.get('tickResults');
     // const tickTryActions = tick.blackboard.get('tickTryActions');
     const longTryActions = tick.blackboard.get('longTryActions');
     if (longTryActions.narutoRun) {
-      results.narutoRun = true;
+      tickResults.narutoRun = true;
       return b3.SUCCESS;
     } else {
       return b3.FAILURE;
@@ -190,79 +190,71 @@ tree.root = new b3.MemSequence({title:'root',children: [
 
 const postTickSettings = (localPlayer, blackboard) => {
   const setActions = () => {
-    const results = blackboard.get('results');
-    const lastResults = blackboard.get('lastResults');
+    const tickResults = blackboard.get('tickResults');
+    const lastTickResults = blackboard.get('lastTickResults');
     // const tickInfos = blackboard.get('tickInfos');
     const tickTryActions = blackboard.get('tickTryActions');
     const longTryActions = blackboard.get('longTryActions');
   
-    if (results.crouch && !lastResults.crouch) {
+    if (tickResults.crouch && !lastTickResults.crouch) {
       localPlayer.addActionReal(longTryActions.crouch); // todo: auto-check tick or long ?
     }
-    if (!results.crouch && lastResults.crouch) localPlayer.removeActionReal('crouch');
+    if (!tickResults.crouch && lastTickResults.crouch) localPlayer.removeActionReal('crouch');
   
-    if (results.land && !lastResults.land) {
+    if (tickResults.land && !lastTickResults.land) {
         localPlayer.addActionReal({
           type: 'land',
           time: blackboard.get('now'),
           isMoving: localPlayer.avatar.idleWalkFactor > 0,
         });
     }
-    if (!results.land && lastResults.land) localPlayer.removeActionReal('land');
+    if (!tickResults.land && lastTickResults.land) localPlayer.removeActionReal('land');
   
-    if (results.narutoRun && !lastResults.narutoRun) localPlayer.addActionReal(longTryActions.narutoRun);
-    if (!results.narutoRun && lastResults.narutoRun) localPlayer.removeActionReal('narutoRun');
+    if (tickResults.narutoRun && !lastTickResults.narutoRun) localPlayer.addActionReal(longTryActions.narutoRun);
+    if (!tickResults.narutoRun && lastTickResults.narutoRun) localPlayer.removeActionReal('narutoRun');
   
-    if (results.fly && !lastResults.fly) localPlayer.addActionReal(longTryActions.fly); // todo: just tryActions is ok, don't need tick/long ?
-    if (!results.fly && lastResults.fly) localPlayer.removeActionReal('fly');
+    if (tickResults.fly && !lastTickResults.fly) localPlayer.addActionReal(longTryActions.fly); // todo: just tryActions is ok, don't need tick/long ?
+    if (!tickResults.fly && lastTickResults.fly) localPlayer.removeActionReal('fly');
   
-    if (results.jump && !lastResults.jump) {
+    if (tickResults.jump && !lastTickResults.jump) {
       localPlayer.addActionReal(tickTryActions.jump);
     }
-    if (!results.jump && lastResults.jump) {
+    if (!tickResults.jump && lastTickResults.jump) {
       localPlayer.removeActionReal('jump');
     }
   
-    if (results.doubleJump && !lastResults.doubleJump) {
+    if (tickResults.doubleJump && !lastTickResults.doubleJump) {
       localPlayer.addActionReal({
         type: 'doubleJump',
         startPositionY: localPlayer.characterPhysics.characterController.position.y,
       });
     }
-    if (!results.doubleJump && lastResults.doubleJump) {
+    if (!tickResults.doubleJump && lastTickResults.doubleJump) {
       localPlayer.removeActionReal('doubleJump');
     }
   
-    if (results.fallLoop && !lastResults.fallLoop) {
+    if (tickResults.fallLoop && !lastTickResults.fallLoop) {
       localPlayer.addActionReal({type: 'fallLoop'});
     }
-    if (!results.fallLoop && lastResults.fallLoop) localPlayer.removeActionReal('fallLoop');
+    if (!tickResults.fallLoop && lastTickResults.fallLoop) localPlayer.removeActionReal('fallLoop');
   
-    if (results.fallLoopFromJump && !lastResults.fallLoopFromJump) {
+    if (tickResults.fallLoopFromJump && !lastTickResults.fallLoopFromJump) {
       localPlayer.addActionReal(tickTryActions.fallLoop);
     }
-    if (!results.fallLoopFromJump && lastResults.fallLoopFromJump) {
+    if (!tickResults.fallLoopFromJump && lastTickResults.fallLoopFromJump) {
       localPlayer.removeActionReal('fallLoop');
     }
   }
   setActions();
 
-  const setLastResults = () => {
-    const results = blackboard.get('results');
-    const lastResults = blackboard.get('lastResults');
-    for (const key in results) {
-      lastResults[key] = results[key];
+  const setLastTickResults = () => {
+    const tickResults = blackboard.get('tickResults');
+    const lastTickResults = blackboard.get('lastTickResults');
+    for (const key in tickResults) {
+      lastTickResults[key] = tickResults[key];
     }
   }
-  setLastResults();
-
-  const resetResults = () => {
-    const results = blackboard.get('results');
-    for (const key in results) {
-      results[key] = false;
-    }
-  }
-  resetResults();
+  setLastTickResults();
 
   const resetTickInfos = () => {
     // const tickInfos = blackboard.get('tickInfos');
@@ -273,6 +265,10 @@ const postTickSettings = (localPlayer, blackboard) => {
     for (const key in tickTryActions) {
       tickTryActions[key] = null;
     }
+    const tickResults = blackboard.get('tickResults');
+    for (const key in tickResults) {
+      tickResults[key] = false;
+    }
   }
   resetTickInfos();
 }
@@ -281,8 +277,8 @@ class ActionsManager {
   constructor(localPlayer) {
     this.localPlayer = localPlayer;
     this.blackboard = new b3.Blackboard(); // todo: make blackboard private.
-    this.blackboard.set('results', {}); // tick results
-    this.blackboard.set('lastResults', {});
+    this.blackboard.set('tickResults', {});
+    this.blackboard.set('lastTickResults', {});
     // this.blackboard.set('tickInfos', {});
     this.blackboard.set('tickTryActions', {});
     this.blackboard.set('longTryActions', {});
