@@ -703,17 +703,7 @@ class StateCharacter extends Character {
   }
 
   addAction(action) {
-    return;
-    action = clone(action);
-    action.actionId = makeId(5);
-    this.getActionsState().push([action]);
-    if (this.avatar) {
-      physx.physxWorker.addActionAnimationAvatar(this.avatar.animationAvatarPtr, action);
-    }
-    return action;
-  }
-
-  addActionReal(action) {
+    // return;
     action = clone(action);
     action.actionId = makeId(5);
     this.getActionsState().push([action]);
@@ -724,23 +714,7 @@ class StateCharacter extends Character {
   }
 
   removeAction(type) {
-    return;
-    const actions = this.getActionsState();
-    const actionsArray = this.getActionsArray();
-    let i = 0;
-    for (const action of actions) {
-      if (action.type === type) {
-        actions.delete(i);
-        if (this.avatar) {
-          physx.physxWorker.removeActionAnimationAvatar(this.avatar.animationAvatarPtr, actionsArray[i]);
-        }
-        break;
-      }
-      i++;
-    }
-  }
-
-  removeActionReal(type) {
+    // return;
     const actions = this.getActionsState();
     const actionsArray = this.getActionsArray();
     let i = 0;
@@ -757,15 +731,7 @@ class StateCharacter extends Character {
   }
 
   removeActionIndex(index) {
-    return;
-    const actionsArray = this.getActionsArray();
-    this.getActionsState().delete(index);
-    if (this.avatar) {
-      physx.physxWorker.removeActionAnimationAvatar(this.avatar.animationAvatarPtr, actionsArray[index]);
-    }
-  }
-
-  removeActionIndexReal(index) {
+    // return;
     const actionsArray = this.getActionsArray();
     this.getActionsState().delete(index);
     if (this.avatar) {
@@ -782,7 +748,7 @@ class StateCharacter extends Character {
   }
 
   setControlAction(action) {
-    return;
+    // return;
     const actions = this.getActionsState();
     const actionsArray = this.getActionsArray();
     for (let i = 0; i < actions.length; i++) {

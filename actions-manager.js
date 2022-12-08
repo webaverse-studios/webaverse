@@ -145,7 +145,6 @@ class WaitOneTick extends b3.Action {
 class NarutoRun extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
-    // const tickTryActions = tick.blackboard.get('tickTryActions');
     const longTryActions = tick.blackboard.get('longTryActions');
     if (longTryActions.narutoRun) {
       tickResults.narutoRun = true;
@@ -155,6 +154,18 @@ class NarutoRun extends b3.Action {
     }
   }
 }
+// class Sit extends b3.Action {
+//   tick(tick) {
+//     const tickTryActions = tick.blackboard.get('tickTryActions');
+//     const longTryActions = tick.blackboard.get('longTryActions');
+//     const localPlayer = tick.target;
+//     if (localPlayer.hasAction('sit') && !tickTryActions.jump && !longTryActions.fly) {
+//       return b3.SUCCESS;
+//     } else {
+//       return b3.FAILURE;
+//     }
+//   }
+// }
 
 const tree = new b3.BehaviorTree();
 tree.root = new b3.MemSequence({title:'root',children: [
@@ -162,6 +173,7 @@ tree.root = new b3.MemSequence({title:'root',children: [
   new b3.Runnor({title:'loaded',child:
     new b3.Parallel({title:'main',children:[
       new b3.Priority({title:'base',children:[
+        // new Sit({title:'sit'}), // note: just used for prevent bugs in this first partially PR, not really handle sit action.
         new b3.Sequence({title:'fly & narutoRun',children:[
           new Fly({title:'Fly'}),
           new b3.Succeedor({child: new NarutoRun({title:'NarutoRun'})}),
@@ -197,52 +209,52 @@ const postTickSettings = (localPlayer, blackboard) => {
     const longTryActions = blackboard.get('longTryActions');
   
     if (tickResults.crouch && !lastTickResults.crouch) {
-      localPlayer.addActionReal(longTryActions.crouch); // todo: auto-check tick or long ?
+      localPlayer.addAction(longTryActions.crouch); // todo: auto-check tick or long ?
     }
-    if (!tickResults.crouch && lastTickResults.crouch) localPlayer.removeActionReal('crouch');
+    if (!tickResults.crouch && lastTickResults.crouch) localPlayer.removeAction('crouch');
   
     if (tickResults.land && !lastTickResults.land) {
-        localPlayer.addActionReal({
+        localPlayer.addAction({
           type: 'land',
           time: blackboard.get('now'),
           isMoving: localPlayer.avatar.idleWalkFactor > 0,
         });
     }
-    if (!tickResults.land && lastTickResults.land) localPlayer.removeActionReal('land');
+    if (!tickResults.land && lastTickResults.land) localPlayer.removeAction('land');
   
-    if (tickResults.narutoRun && !lastTickResults.narutoRun) localPlayer.addActionReal(longTryActions.narutoRun);
-    if (!tickResults.narutoRun && lastTickResults.narutoRun) localPlayer.removeActionReal('narutoRun');
+    if (tickResults.narutoRun && !lastTickResults.narutoRun) localPlayer.addAction(longTryActions.narutoRun);
+    if (!tickResults.narutoRun && lastTickResults.narutoRun) localPlayer.removeAction('narutoRun');
   
-    if (tickResults.fly && !lastTickResults.fly) localPlayer.addActionReal(longTryActions.fly); // todo: just tryActions is ok, don't need tick/long ?
-    if (!tickResults.fly && lastTickResults.fly) localPlayer.removeActionReal('fly');
+    if (tickResults.fly && !lastTickResults.fly) localPlayer.addAction(longTryActions.fly); // todo: just tryActions is ok, don't need tick/long ?
+    if (!tickResults.fly && lastTickResults.fly) localPlayer.removeAction('fly');
   
     if (tickResults.jump && !lastTickResults.jump) {
-      localPlayer.addActionReal(tickTryActions.jump);
+      localPlayer.addAction(tickTryActions.jump);
     }
     if (!tickResults.jump && lastTickResults.jump) {
-      localPlayer.removeActionReal('jump');
+      localPlayer.removeAction('jump');
     }
   
     if (tickResults.doubleJump && !lastTickResults.doubleJump) {
-      localPlayer.addActionReal({
+      localPlayer.addAction({
         type: 'doubleJump',
         startPositionY: localPlayer.characterPhysics.characterController.position.y,
       });
     }
     if (!tickResults.doubleJump && lastTickResults.doubleJump) {
-      localPlayer.removeActionReal('doubleJump');
+      localPlayer.removeAction('doubleJump');
     }
   
     if (tickResults.fallLoop && !lastTickResults.fallLoop) {
-      localPlayer.addActionReal({type: 'fallLoop'});
+      localPlayer.addAction({type: 'fallLoop'});
     }
-    if (!tickResults.fallLoop && lastTickResults.fallLoop) localPlayer.removeActionReal('fallLoop');
+    if (!tickResults.fallLoop && lastTickResults.fallLoop) localPlayer.removeAction('fallLoop');
   
     if (tickResults.fallLoopFromJump && !lastTickResults.fallLoopFromJump) {
-      localPlayer.addActionReal(tickTryActions.fallLoop);
+      localPlayer.addAction(tickTryActions.fallLoop);
     }
     if (!tickResults.fallLoopFromJump && lastTickResults.fallLoopFromJump) {
-      localPlayer.removeActionReal('fallLoop');
+      localPlayer.removeAction('fallLoop');
     }
   }
   setActions();
