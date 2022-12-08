@@ -66,8 +66,8 @@ class StartJump extends b3.Action {
     const tickTryActions = tick.blackboard.get('tickTryActions');
     const localPlayer = tick.target;
     if (
-      (tickTryActions.jump && localPlayer.characterPhysics.grounded) ||
-      localPlayer.hasAction('sit')
+      tickTryActions.jump &&
+      (localPlayer.characterPhysics.grounded || localPlayer.hasAction('sit'))
     ) {
       tickResults.jump = true;
       return b3.SUCCESS;
@@ -154,18 +154,51 @@ class NarutoRun extends b3.Action {
     }
   }
 }
-// class Sit extends b3.Action {
-//   tick(tick) {
-//     const tickTryActions = tick.blackboard.get('tickTryActions');
-//     const longTryActions = tick.blackboard.get('longTryActions');
-//     const localPlayer = tick.target;
-//     if (localPlayer.hasAction('sit') && !tickTryActions.jump && !longTryActions.fly) {
-//       return b3.SUCCESS;
-//     } else {
-//       return b3.FAILURE;
-//     }
-//   }
-// }
+class StartSit extends b3.Action {
+  tick(tick) {
+    const tickResults = tick.blackboard.get('tickResults');
+    const tickTryActions = tick.blackboard.get('tickTryActions');
+    if (tickTryActions.sit) {
+      tickResults.sit = true;
+      return b3.SUCCESS;
+    } else {
+      return b3.FAILURE;
+    }
+  }
+}
+class Sit extends b3.Action {
+  tick(tick) {
+    const tickResults = tick.blackboard.get('tickResults');
+    const tickTryStopActions = tick.blackboard.get('tickTryStopActions');
+    if (tickTryStopActions.sit) {
+      return b3.FAILURE;
+    } else {
+      tickResults.sit = true;
+      return b3.RUNNING;
+    }
+  }
+}
+class HaltSit extends b3.Condition {
+  tick(tick) {
+    const tickTryActions = tick.blackboard.get('tickTryActions');
+    const localPlayer = tick.target;
+    if (tickTryActions.jump || tickTryActions.fly) {
+      tick.blackboard.set('needReTick', true);
+      const wearActions = localPlayer.getActionsByType('wear');
+      for (const wearAction of wearActions) {
+        const instanceId = wearAction.instanceId;
+        const app = metaversefileApi.getAppByInstanceId(instanceId);
+        const hasSitComponent = app.hasComponent('sit');
+        if (hasSitComponent) {
+          app.unwear();
+        }
+      }
+      return b3.SUCCESS;
+    } else {
+      return b3.FAILURE;
+    }
+  }
+}
 
 const tree = new b3.BehaviorTree();
 tree.root = new b3.MemSequence({title:'root',children: [
@@ -173,7 +206,13 @@ tree.root = new b3.MemSequence({title:'root',children: [
   new b3.Runnor({title:'loaded',child:
     new b3.Parallel({title:'main',children:[
       new b3.Priority({title:'base',children:[
-        // new Sit({title:'sit'}), // note: just used for prevent bugs in this first partially PR, not really handle sit action.
+        new b3.MemSequence({title:'sit',children:[
+          new StartSit(),
+          new b3.Priority({children:[
+            new HaltSit(),
+            new Sit(),
+          ]}),
+        ]}),
         new b3.Sequence({title:'fly & narutoRun',children:[
           new Fly({title:'Fly'}),
           new b3.Succeedor({child: new NarutoRun({title:'NarutoRun'})}),
@@ -256,6 +295,13 @@ const postTickSettings = (localPlayer, blackboard) => {
     if (!tickResults.fallLoopFromJump && lastTickResults.fallLoopFromJump) {
       localPlayer.removeAction('fallLoop');
     }
+  
+    if (tickResults.sit && !lastTickResults.sit) {
+      localPlayer.addAction(tickTryActions.sit);
+    }
+    if (!tickResults.sit && lastTickResults.sit) {
+      localPlayer.removeAction('sit');
+    }
   }
   setActions();
 
@@ -276,6 +322,10 @@ const postTickSettings = (localPlayer, blackboard) => {
     const tickTryActions = blackboard.get('tickTryActions');
     for (const key in tickTryActions) {
       tickTryActions[key] = null;
+    }
+    const tickTryStopActions = blackboard.get('tickTryStopActions');
+    for (const key in tickTryStopActions) {
+      tickTryStopActions[key] = null;
     }
     const tickResults = blackboard.get('tickResults');
     for (const key in tickResults) {
@@ -307,6 +357,8 @@ class ActionsManager {
     if (isLong) {
       const longTryActions = this.blackboard.get('longTryActions');
       longTryActions[action.type] = action; // todo: how to handle multiple same actionType long try ?
+      const tickTryActions = this.blackboard.get('tickTryActions');
+      tickTryActions[action.type] = action; // note: long try also trigger tick try.
     } else {
       const tickTryActions = this.blackboard.get('tickTryActions');
       tickTryActions[action.type] = action;
@@ -329,6 +381,10 @@ class ActionsManager {
     this.blackboard.set('now', timestamp);
     // preTickSettings(this.localPlayer, this.blackboard);
     tree.tick(this.localPlayer, this.blackboard);
+    if (this.blackboard.get('needReTick')) {
+      this.blackboard.set('needReTick', false);
+      tree.tick(this.localPlayer, this.blackboard); // note: will and needed to use the same `tickInfos` as first tree.tick(), because of called before `postTickSettings()`.
+    }
     postTickSettings(this.localPlayer, this.blackboard);
   }
 }
