@@ -32,13 +32,13 @@ const objects = {
             claimed: true,
         },
         {
-          name: "Silsword",
-          start_url: "https://webaverse.github.io/silsword/",
-          description: "A sword from lore.",
-          type: "common",
-          timerTimestamp: 1704454645000,
-          claimed: false,
-      },
+            name: "Silsword",
+            start_url: "https://webaverse.github.io/silsword/",
+            description: "A sword from lore.",
+            type: "common",
+            timerTimestamp: 1704454645000,
+            claimed: false,
+        },
     ],
     upstreet: [],
 
@@ -56,20 +56,31 @@ const objects = {
             value: 12,
         },
         {
-          name: "Silk",
-          start_url: "https://webaverse.github.io/silk/",
-          claimed: true,
-          value: 12,
-      },
+            name: "Silk",
+            start_url: "https://webaverse.github.io/silk/",
+            claimed: true,
+            value: 12,
+        },
     ],
 };
 
-const Token = ({ object }) => {
+const Token = ({
+    object,
+    onMouseEnter,
+    onMouseDown,
+    onDragStart,
+    onDoubleClick,
+    onClick,
+    showTokenDropDown,
+    closeTokenDropDown,
+    onEquip,
+    onSpawn,
+    onDrop,
+    mintClaim,
+}) => {
     const [rendered, setRendered] = useState(false);
     const canvasRef = useRef();
-
     const pixelRatio = window.devicePixelRatio;
-
     useEffect(() => {
         const canvas = canvasRef.current;
         if (canvas && !rendered) {
@@ -96,18 +107,62 @@ const Token = ({ object }) => {
     }, [canvasRef.current, rendered]);
 
     return object ? (
-        <TokenBox
-            size={size}
-            object={object}
-            level={object.level}
-            claimed={object.claimed}
-            url={object.start_url}
-            resolution={resolution}
-            value={object.value}
-            numFrames={numFrames}
-            type={object.type}
-            timerTimestamp={object.timerTimestamp}
-        />
+        <div
+            draggable
+            onMouseEnter={onMouseEnter(object)}
+            onMouseDown={onMouseDown(object)}
+            onDragStart={onDragStart(object)}
+            onClick={(e) => onClick(e)}
+            onContextMenu={(e) => onClick(e, object)}
+            onDoubleClick={onDoubleClick(object)}
+        >
+            <TokenBox
+                size={size}
+                object={object}
+                level={object.level}
+                claimed={object.claimed}
+                url={object.start_url}
+                resolution={resolution}
+                value={object.value}
+                numFrames={numFrames}
+                type={object.type}
+                timerTimestamp={object.timerTimestamp}
+            />
+            <div className={styles.tokenDropdown}>
+                {showTokenDropDown && showTokenDropDown === object && (
+                    <>
+                        <CustomButton
+                            theme="dark"
+                            text="Spawn"
+                            size={10}
+                            className={styles.button}
+                            onClick={onSpawn(object)}
+                        />
+                        <CustomButton
+                            theme="dark"
+                            text="Equip"
+                            size={10}
+                            className={styles.button}
+                            onClick={onEquip(object)}
+                        />
+                        <CustomButton
+                            theme="dark"
+                            text="Drop"
+                            size={10}
+                            className={styles.button}
+                            onClick={onDrop(object)}
+                        />
+                        {!object.claimed && <CustomButton
+                            theme="dark"
+                            text="Claim"
+                            size={10}
+                            className={styles.button}
+                            onClick={mintClaim(object)}
+                        />}
+                    </>
+                )}
+            </div>
+        </div>
     ) : null;
 };
 
@@ -115,16 +170,18 @@ const TokenList = ({
     title,
     sections,
     open,
-    hoverObject,
     selectObject,
-    loading,
     onMouseEnter,
     onMouseDown,
     onDragStart,
     onDoubleClick,
     onClick,
-    highlights,
-    ItemClass,
+    showTokenDropDown,
+    closeTokenDropDown,
+    onEquip,
+    onSpawn,
+    onDrop,
+    mintClaim,
 }) => {
     return (
         <div className={styles.section} key={title}>
@@ -135,17 +192,27 @@ const TokenList = ({
                     return (
                         <React.Fragment key={i}>
                             {tokens.map((object, i) => (
-                                <li
-                                    draggable
-                                    selected={selectObject}
-                                    onMouseEnter={onMouseEnter(object)}
-                                    onMouseDown={onMouseDown(object)}
-                                    onDragStart={onDragStart(object)}
-                                    onClick={onClick(object)}
-                                    onDoubleClick={onDoubleClick(object)}
-                                    key={i}
-                                >
-                                    {open && <Token object={object} />}
+                                <li selected={selectObject} key={i}>
+                                    {open && (
+                                        <Token
+                                            object={object}
+                                            onMouseEnter={onMouseEnter}
+                                            onMouseDown={onMouseDown}
+                                            onDragStart={onDragStart}
+                                            onClick={onClick}
+                                            onEquip={onEquip}
+                                            onSpawn={onSpawn}
+                                            onDrop={onDrop}
+                                            mintClaim={mintClaim}
+                                            closeTokenDropDown={
+                                                closeTokenDropDown
+                                            }
+                                            onDoubleClick={onDoubleClick}
+                                            showTokenDropDown={
+                                                showTokenDropDown
+                                            }
+                                        />
+                                    )}
                                 </li>
                             ))}
                         </React.Fragment>
@@ -157,22 +224,14 @@ const TokenList = ({
 };
 
 export const Inventory = () => {
-    const { state, setState, account } = useContext(AppContext);
+    const { state, setState, account, claimableToken, setClaimableToken, mintedToken, setMintedToken, getWalletItems } = useContext(AppContext);
     const [hoverObject, setHoverObject] = useState(null);
     const [selectObject, setSelectObject] = useState(null);
-    const [faceIndex, setFaceIndex] = useState(1);
-    const [claims, setClaims] = useState([]);
-    const [inventoryItems, setInventoryItems] = useState(objects);
-
     const [loading, setLoading] = useState(false);
-    const [imageBitmap, setImageBitmap] = useState(null);
 
     const [expand, setExpand] = useState(false);
 
-    const selectedMenuIndex = mod(faceIndex, 4);
-
-    const [openPreview, setOpenPreview] = useState(false);
-    const [previewObject, setPreviewObject] = useState(undefined);
+    const [showTokenDropDown, setShowTokenDropDown] = useState(false);
 
     const { getTokens, mintfromVoucher, WebaversecontractAddress } =
         useNFTContract(account.currentAddress);
@@ -201,41 +260,36 @@ export const Inventory = () => {
         e.dataTransfer.setData("application/json", JSON.stringify(object));
         e.dataTransfer.effectAllowed = "all";
         e.dataTransfer.dropEffect = "move";
-
-        const transparentPng = new Image();
-        transparentPng.src = transparentPngUrl;
-        e.dataTransfer.setDragImage(transparentPng, 0, 0);
-
-        // setSelectObject(object);
+        // Do not remove
+        /*const transparentPng = new Image();
+        const image = e.target.getElementsByTagName("canvas")[0].toDataURL();
+        transparentPng.src = image;
+        console.log(transparentPng)
+        e.dataTransfer.setDragImage(transparentPng, 0, 0);*/
     };
-    const onClick = (object) => () => {
-        //setOpenPreview(true);
-        //setPreviewObject(object);
+    const onClick = (e, object) => {
+        e.preventDefault();
+        if (e.type == "click") {
+            // console.log("Left Click");
+        } else if (e.type == "contextmenu") {
+            // console.log("Right Click");
+            setShowTokenDropDown(object);
+        }
     };
-    const closePreview = () => {
-        sounds.playSoundName("menuNext");
-        setOpenPreview(false);
-        setPreviewObject();
+    const closeTokenDropDown = () => {
+        setShowTokenDropDown();
     };
     const onDoubleClick = (object) => () => {
         game.handleDropJsonToPlayer(object);
         setSelectObject(object);
     };
-    const menuLeft = () => {
-        setFaceIndex(faceIndex - 1);
-
-        sounds.playSoundName("menuNext");
-    };
-    const menuRight = () => {
-        setFaceIndex(faceIndex + 1);
-
-        sounds.playSoundName("menuNext");
-    };
     const onEquip = (object) => () => {
         game.handleDropJsonToPlayer(object);
+        setShowTokenDropDown();
     };
     const onSpawn = (object) => () => {
         game.handleDropJsonForSpawn(object);
+        setShowTokenDropDown();
     };
     const onDrop = (object) => () => {
         game.handleDropJsonForDrop(
@@ -244,90 +298,31 @@ export const Inventory = () => {
             WebaversecontractAddress,
             (isclaimed) => {
                 if (isclaimed) {
-                    // NFT
-                    closePreview(); // will add time counter
                 } else {
                     dropManager.removeClaim(object);
-                    closePreview();
                 }
             }
         );
+        setShowTokenDropDown();
     };
-    const mintClaim = async (e) => {
+    const mintClaim = (object) => async () => {
         if (!account.currentAddress) {
             alert("Make sure wallet connected");
             return false;
         }
 
         await mintfromVoucher(
-            e,
-            () => {},
+            object,
             () => {
-                dropManager.removeClaim(e);
-                closePreview();
+                dropManager.removeClaim(object);
+                getWalletItems();
             }
         );
     };
 
-    const selectClassName = styles[`select-${selectedMenuIndex}`];
-
-    useEffect(() => {
-        const claimschange = async (e) => {
-            const { claims, addedClaim } = e.data;
-            const claimableItem = claims.map(
-                ({ name, start_url, type, voucher, serverDrop, level }) => ({
-                    name,
-                    start_url: start_url.split("index.js")[0],
-                    description: "This is not-claimed drops",
-                    params: [
-                        {
-                            label: "Token type",
-                            value: "Seasonal NFT ( ERC-1155 )",
-                        },
-                    ],
-                    type,
-                    voucher,
-                    serverDrop,
-                    claimed: false,
-                    level,
-                })
-            );
-
-            setInventoryItems({
-                notClaimed: claimableItem,
-                upstreet: inventoryItems.upstreet,
-                resources: inventoryItems.resources,
-            });
-        };
-        dropManager.addEventListener("claimschange", claimschange);
-        return () => {
-            dropManager.removeEventListener("claimschange", claimschange);
-        };
-    }, [inventoryItems]);
-
-    useEffect(() => {
-        if (account && account.currentAddress) {
-            async function queryGetNFTFromContract() {
-                const nftList = await getTokens();
-                const nftData = nftList.map(({ tokenId, url }) => ({
-                    tokenId,
-                    name: "",
-                    start_url: url,
-                    description: "",
-                    params: [],
-                    claimed: true,
-                    type: "major",
-                }));
-
-                setInventoryItems({
-                    notClaimed: inventoryItems.notClaimed,
-                    upstreet: nftData,
-                    resources: inventoryItems.resources,
-                });
-            }
-            queryGetNFTFromContract();
-        }
-    }, [open, account]);
+    const onInventoryPanelClick = () => {
+      setShowTokenDropDown()
+    }
 
     useEffect(() => {
         if (open !== "CharacterPanel") {
@@ -335,7 +330,6 @@ export const Inventory = () => {
                 sounds.playSoundName("menuOpen");
             } else {
                 sounds.playSoundName("menuClose");
-                setOpenPreview(false);
             }
         }
     }, [open]);
@@ -347,6 +341,7 @@ export const Inventory = () => {
                     styles.inventoryPanelWrap,
                     expand && styles.expanded
                 )}
+                onClick={() => onInventoryPanelClick()}
             >
                 <div className={styles.inventoryPanel}>
                     <div
@@ -369,10 +364,10 @@ export const Inventory = () => {
                             sections={[
                                 {
                                     name: "Resources",
-                                    tokens: inventoryItems.resources,
+                                    tokens: objects.resources,
                                 },
                             ]}
-                            open={faceIndex === 1}
+                            open={true}
                             hoverObject={hoverObject}
                             selectObject={selectObject}
                             loading={loading}
@@ -380,24 +375,28 @@ export const Inventory = () => {
                             onMouseDown={onMouseDown}
                             onDragStart={onDragStart}
                             onClick={onClick}
+                            closeTokenDropDown={closeTokenDropDown}
                             onDoubleClick={onDoubleClick}
-                            menuLeft={menuLeft}
-                            menuRight={menuRight}
+                            onEquip={onEquip}
+                            onSpawn={onSpawn}
+                            onDrop={onDrop}
+                            mintClaim={mintClaim}
                             highlights={true}
+                            showTokenDropDown={showTokenDropDown}
                         />
                         <TokenList
                             title="Backpack"
                             sections={[
                                 {
                                     name: "Not Claimed",
-                                    tokens: inventoryItems.notClaimed,
+                                    tokens: claimableToken,
                                 },
                                 {
                                     name: "From Upstreet",
-                                    tokens: inventoryItems.upstreet,
+                                    tokens: mintedToken,
                                 },
                             ]}
-                            open={faceIndex === 1}
+                            open={true}
                             hoverObject={hoverObject}
                             selectObject={selectObject}
                             loading={loading}
@@ -406,9 +405,12 @@ export const Inventory = () => {
                             onDragStart={onDragStart}
                             onClick={onClick}
                             onDoubleClick={onDoubleClick}
-                            menuLeft={menuLeft}
-                            menuRight={menuRight}
+                            onEquip={onEquip}
+                            onSpawn={onSpawn}
+                            onDrop={onDrop}
+                            mintClaim={mintClaim}
                             highlights={false}
+                            showTokenDropDown={showTokenDropDown}
                         />
                     </div>
                     <div className={styles.actionsWrap}>
