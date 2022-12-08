@@ -13,7 +13,7 @@ import {world} from './world.js';
 import {buildMaterial, highlightMaterial, selectMaterial, hoverMaterial, hoverEquipmentMaterial} from './shaders.js';
 import {getRenderer, sceneLowPriority, camera} from './renderer.js';
 import {downloadFile, snapPosition, getDropUrl, handleDropJsonItem, makeId} from './util.js';
-import {maxGrabDistance, throwReleaseTime, throwAnimationDuration, walkSpeed, crouchSpeed, flySpeed} from './constants.js';
+import {maxGrabDistance, throwReleaseTime, throwAnimationDuration, walkSpeed, crouchSpeed, flySpeed, IS_NARUTO_RUN_ENABLED} from './constants.js';
 import metaversefileApi from 'metaversefile';
 import loadoutManager from './loadout-manager.js';
 import * as sounds from './sounds.js';
@@ -619,28 +619,28 @@ class GameManager extends EventTarget {
   }
 
   menuDoubleTap() {
-    // ! XXX : Disable naruto run for now (for the release-v0.6.0)
-
-    // if (!this.isCrouched()) {
-    //   const localPlayer = playersManager.getLocalPlayer();
-    //   const narutoRunAction = localPlayer.getAction('narutoRun');
-    //   if (!narutoRunAction) {
-    //     const newNarutoRunAction = {
-    //       type: 'narutoRun',
-    //     };
-    //     localPlayer.addAction(newNarutoRunAction);
-    //   }
-    // }
+    if(IS_NARUTO_RUN_ENABLED) {
+      if (!this.isCrouched()) {
+        const localPlayer = playersManager.getLocalPlayer();
+        const narutoRunAction = localPlayer.getAction('narutoRun');
+        if (!narutoRunAction) {
+          const newNarutoRunAction = {
+            type: 'narutoRun',
+          };
+          localPlayer.addAction(newNarutoRunAction);
+        }
+      }
+    }
   }
 
   menuUnDoubleTap() {
-    // ! XXX : Disable naruto run for now (for the release-v0.6.0)
-
-    // const localPlayer = playersManager.getLocalPlayer();
-    // const narutoRunAction = localPlayer.getAction('narutoRun');
-    // if (narutoRunAction) {
-    //   localPlayer.removeAction('narutoRun');
-    // }
+    if(IS_NARUTO_RUN_ENABLED) {
+      const localPlayer = playersManager.getLocalPlayer();
+      const narutoRunAction = localPlayer.getAction('narutoRun');
+      if (narutoRunAction) {
+        localPlayer.removeAction('narutoRun');
+      }
+    }
   }
 
   menuSwitchCharacter() {
