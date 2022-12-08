@@ -445,8 +445,12 @@ class IoManager extends EventTarget {
       }
       case 32: { // space
         ioManager.keys.space = true;
-        const tickInfos = localPlayer.actionsManager.get('tickInfos');
-        tickInfos.keySpace = true;
+        
+        const newJumpAction = {
+          type: 'jump',
+          startPositionY: localPlayer.characterPhysics.characterController.position.y,
+        }
+        localPlayer.actionsManager.tryAddAction(newJumpAction);
         break;
       }
       case 81: { // Q
