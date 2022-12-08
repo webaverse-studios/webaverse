@@ -619,24 +619,28 @@ class GameManager extends EventTarget {
   }
 
   menuDoubleTap() {
-    if (!this.isCrouched()) {
-      const localPlayer = playersManager.getLocalPlayer();
-      const narutoRunAction = localPlayer.getAction('narutoRun');
-      if (!narutoRunAction) {
-        const newNarutoRunAction = {
-          type: 'narutoRun',
-        };
-        localPlayer.addAction(newNarutoRunAction);
-      }
-    }
+    // ! XXX : Disable naruto run for now (for the release-v0.6.0)
+
+    // if (!this.isCrouched()) {
+    //   const localPlayer = playersManager.getLocalPlayer();
+    //   const narutoRunAction = localPlayer.getAction('narutoRun');
+    //   if (!narutoRunAction) {
+    //     const newNarutoRunAction = {
+    //       type: 'narutoRun',
+    //     };
+    //     localPlayer.addAction(newNarutoRunAction);
+    //   }
+    // }
   }
 
   menuUnDoubleTap() {
-    const localPlayer = playersManager.getLocalPlayer();
-    const narutoRunAction = localPlayer.getAction('narutoRun');
-    if (narutoRunAction) {
-      localPlayer.removeAction('narutoRun');
-    }
+    // ! XXX : Disable naruto run for now (for the release-v0.6.0)
+
+    // const localPlayer = playersManager.getLocalPlayer();
+    // const narutoRunAction = localPlayer.getAction('narutoRun');
+    // if (narutoRunAction) {
+    //   localPlayer.removeAction('narutoRun');
+    // }
   }
 
   menuSwitchCharacter() {
