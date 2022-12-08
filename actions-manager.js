@@ -111,7 +111,8 @@ class Land extends b3.Action {
 class Crouch extends b3.Action {
   tick(tick) {
     const results = tick.blackboard.get('results');
-    if (tick.blackboard.get('crouch')) {
+    const longTryActions = tick.blackboard.get('longTryActions');
+    if (longTryActions.crouch) {
       results.crouch = true;
       return b3.SUCCESS;
     } else {
@@ -178,10 +179,10 @@ const postTickSettings = (localPlayer, blackboard) => {
     const lastResults = blackboard.get('lastResults');
     const tickInfos = blackboard.get('tickInfos');
     const tickTryActions = blackboard.get('tickTryActions');
+    const longTryActions = blackboard.get('longTryActions');
   
     if (results.crouch && !lastResults.crouch) {
-      const crouchAction = blackboard.get('crouchAction');
-      localPlayer.addActionReal(crouchAction);
+      localPlayer.addActionReal(longTryActions.crouch); // todo: auto-check tick or long ?
     }
     if (!results.crouch && lastResults.crouch) localPlayer.removeActionReal('crouch');
   
@@ -267,12 +268,13 @@ const postTickSettings = (localPlayer, blackboard) => {
 class ActionsManager {
   constructor(localPlayer) {
     this.localPlayer = localPlayer;
-    this.blackboard = new b3.Blackboard();
+    this.blackboard = new b3.Blackboard(); // todo: make blackboard private.
     this.blackboard.set('results', {}); // tick results
     this.blackboard.set('lastResults', {});
     this.blackboard.set('tickInfos', {});
     this.blackboard.set('tickTryActions', {});
     this.blackboard.set('longTryActions', {});
+    this.blackboard.set('tickTryStopActions', {});
     this.blackboard.set('loaded', true);
   }
   get() {
@@ -289,6 +291,19 @@ class ActionsManager {
       const tickTryActions = this.blackboard.get('tickTryActions');
       tickTryActions[action.type] = action;
     }
+  }
+  tryRemoveAction(actionType, isLong = false) {
+    if (isLong) {
+      const longTryActions = this.blackboard.get('longTryActions');
+      longTryActions[actionType] = null;
+    } else {
+      const tickTryStopActions = this.blackboard.get('tickTryStopActions');
+      tickTryStopActions[actionType] = true;
+    }
+  }
+  isLongTrying(actionType) {
+    const longTryActions = this.blackboard.get('longTryActions');
+    return !!longTryActions[actionType];
   }
   update(timestamp) {
     this.blackboard.set('now', timestamp);

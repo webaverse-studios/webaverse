@@ -373,12 +373,12 @@ class IoManager extends EventTarget {
           ioManager.keys.backward = true;
         } else {
           ioManager.keys.ctrl = true;
-          if (localPlayer.actionsManager.get('crouch')) {
-            localPlayer.actionsManager.set('crouch', false);
+
+          if (localPlayer.actionsManager.isLongTrying('crouch')) {
+            localPlayer.actionsManager.tryRemoveAction('crouch', true);
           } else {
             const newCrouchAction = {type: 'crouch'};
-            localPlayer.actionsManager.set('crouch', true);
-            localPlayer.actionsManager.set('crouchAction', newCrouchAction);
+            localPlayer.actionsManager.tryAddAction(newCrouchAction, true);
           }
         }
         break;
