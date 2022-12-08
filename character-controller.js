@@ -46,6 +46,7 @@ import musicManager from './music-manager.js';
 import {makeId, clone} from './util.js';
 import overrides from './overrides.js';
 import physx from './physx.js';
+import {ActionsManager} from './actions-manager.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -702,6 +703,17 @@ class StateCharacter extends Character {
   }
 
   addAction(action) {
+    return;
+    action = clone(action);
+    action.actionId = makeId(5);
+    this.getActionsState().push([action]);
+    if (this.avatar) {
+      physx.physxWorker.addActionAnimationAvatar(this.avatar.animationAvatarPtr, action);
+    }
+    return action;
+  }
+
+  addActionReal(action) {
     action = clone(action);
     action.actionId = makeId(5);
     this.getActionsState().push([action]);
@@ -712,6 +724,23 @@ class StateCharacter extends Character {
   }
 
   removeAction(type) {
+    return;
+    const actions = this.getActionsState();
+    const actionsArray = this.getActionsArray();
+    let i = 0;
+    for (const action of actions) {
+      if (action.type === type) {
+        actions.delete(i);
+        if (this.avatar) {
+          physx.physxWorker.removeActionAnimationAvatar(this.avatar.animationAvatarPtr, actionsArray[i]);
+        }
+        break;
+      }
+      i++;
+    }
+  }
+
+  removeActionReal(type) {
     const actions = this.getActionsState();
     const actionsArray = this.getActionsArray();
     let i = 0;
@@ -728,6 +757,15 @@ class StateCharacter extends Character {
   }
 
   removeActionIndex(index) {
+    return;
+    const actionsArray = this.getActionsArray();
+    this.getActionsState().delete(index);
+    if (this.avatar) {
+      physx.physxWorker.removeActionAnimationAvatar(this.avatar.animationAvatarPtr, actionsArray[index]);
+    }
+  }
+
+  removeActionIndexReal(index) {
     const actionsArray = this.getActionsArray();
     this.getActionsState().delete(index);
     if (this.avatar) {
@@ -744,6 +782,7 @@ class StateCharacter extends Character {
   }
 
   setControlAction(action) {
+    return;
     const actions = this.getActionsState();
     const actionsArray = this.getActionsArray();
     for (let i = 0; i < actions.length; i++) {
@@ -1096,6 +1135,8 @@ class LocalPlayer extends UninterpolatedPlayer {
       this.controlMode = 'controlled';
     }
     this.detached = opts.detached ?? false;
+
+    this.actionsManager = new ActionsManager(this);
   }
 
   async setPlayerSpec(playerSpec) {
@@ -1333,6 +1374,7 @@ class LocalPlayer extends UninterpolatedPlayer {
     if (this.avatar) {
       const timeDiffS = timeDiff / 1000;
       this.characterPhysics.update(timestamp, timeDiffS);
+      this.actionsManager.update(timestamp);
     }
   }
 

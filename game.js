@@ -618,24 +618,12 @@ class GameManager extends EventTarget {
     localPlayer.removeAction('dance');
   }
 
-  menuDoubleTap() {
-    if (!this.isCrouched()) {
-      const localPlayer = playersManager.getLocalPlayer();
-      const narutoRunAction = localPlayer.getAction('narutoRun');
-      if (!narutoRunAction) {
-        const newNarutoRunAction = {
-          type: 'narutoRun',
-        };
-        localPlayer.addAction(newNarutoRunAction);
-      }
-    }
-  }
-
   menuUnDoubleTap() {
     const localPlayer = playersManager.getLocalPlayer();
     const narutoRunAction = localPlayer.getAction('narutoRun');
     if (narutoRunAction) {
-      localPlayer.removeAction('narutoRun');
+      // localPlayer.removeActionOld('narutoRun');
+      localPlayer.actionsManager.set('narutoRun', false);
     }
   }
 
@@ -653,21 +641,12 @@ class GameManager extends EventTarget {
 
   toggleFly() {
     const localPlayer = playersManager.getLocalPlayer();
-    const flyAction = localPlayer.getAction('fly');
-    if (flyAction) {
-      localPlayer.removeAction('fly');
-      if (!localPlayer.characterPhysics.lastGrounded) {
-        localPlayer.setControlAction({type: 'fallLoop'});
-      }
+    if (localPlayer.hasAction('fly')) {
+      localPlayer.actionsManager.set('fly', false);
     } else {
-      const flyAction = {
-        type: 'fly',
-        time: 0,
-      };
-
-      this.unwearAppIfHasSitComponent(localPlayer);
-
-      localPlayer.setControlAction(flyAction);
+      localPlayer.actionsManager.set('fly', true);
+      const tickInfos = localPlayer.actionsManager.get('tickInfos');
+      tickInfos.tryFly = true;
     }
   }
 
@@ -679,19 +658,6 @@ class GameManager extends EventTarget {
   isSwimming() {
     const localPlayer = playersManager.getLocalPlayer();
     return localPlayer.hasAction('swim');
-  }
-
-  toggleCrouch() {
-    const localPlayer = playersManager.getLocalPlayer();
-    let crouchAction = localPlayer.getAction('crouch');
-    if (crouchAction) {
-      localPlayer.removeAction('crouch');
-    } else {
-      crouchAction = {
-        type: 'crouch',
-      };
-      localPlayer.addAction(crouchAction);
-    }
   }
 
   async handleDropJsonItemToPlayer(item, index) {
@@ -739,38 +705,6 @@ class GameManager extends EventTarget {
   isDoubleJumping() {
     const localPlayer = playersManager.getLocalPlayer();
     return localPlayer.hasAction('doubleJump');
-  }
-
-  ensureJump(trigger) {
-    const localPlayer = playersManager.getLocalPlayer();
-
-    this.unwearAppIfHasSitComponent(localPlayer);
-
-    if (!localPlayer.hasAction('jump') &&
-      !localPlayer.hasAction('fly') &&
-      !localPlayer.hasAction('fallLoop') &&
-      !localPlayer.hasAction('swim') &&
-      !!localPlayer.characterPhysics.characterController
-    ) {
-      const newJumpAction = {
-        type: 'jump',
-        trigger: trigger,
-        startPositionY: localPlayer.characterPhysics.characterController.position.y,
-      };
-      localPlayer.setControlAction(newJumpAction);
-    }
-  }
-
-  jump(trigger) {
-    this.ensureJump(trigger);
-  }
-
-  doubleJump() {
-    const localPlayer = playersManager.getLocalPlayer();
-    localPlayer.addAction({
-      type: 'doubleJump',
-      startPositionY: localPlayer.characterPhysics.characterController.position.y,
-    });
   }
 
   isMovingBackward() {

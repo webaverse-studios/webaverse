@@ -133,7 +133,7 @@ export class AvatarCharacterSfx {
         sounds.playSoundName('jump');
 
         // play jump grunt 
-        if(this.character.hasAction('jump') && this.character.getAction('jump').trigger === 'jump'){
+        if(this.character.hasAction('jump')){
           this.playGrunt('jump'); 
         }
       } /* else if (this.lastJumpState && !this.player.avatar.jumpState) {
