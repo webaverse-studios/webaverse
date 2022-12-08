@@ -724,7 +724,7 @@ class GameManager extends EventTarget {
     const localPlayer = playersManager.getLocalPlayer();
     localVector.copy(localPlayer.position);
     if (localPlayer.avatar) {
-      localVector.y -= 1;
+      localVector.y -= localPlayer.avatar.height;
     }
 
     const position = localPlayer.position
@@ -743,8 +743,7 @@ class GameManager extends EventTarget {
         afterDrop(false)
     }
 
-    localVector.set(0, 0, -1);
-    const velocity = localVector.applyQuaternion(localPlayer.quaternion)
+    const velocity = localVector.set(0, 0, -1).applyQuaternion(localPlayer.quaternion)
     .normalize()
     .multiplyScalar(2.5);
     world.appManager.importAddedUserVoucherApp(position, quaternion, object, velocity);
@@ -754,7 +753,7 @@ class GameManager extends EventTarget {
     const localPlayer = playersManager.getLocalPlayer();
     localVector.copy(localPlayer.position);
     if (localPlayer.avatar) {
-      localVector.y -= 1;
+      localVector.y -= localPlayer.avatar.height;
     }
     console.log("localvector", localVector)
 
