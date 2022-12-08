@@ -25,7 +25,7 @@ export const TokenBox = (props) => {
 
     useEffect(() => {
         if (timerTimestamp) {
-            var countDownDate = new Date(parseInt(timerTimestamp)).getTime();
+            var countDownDate = new Date(parseInt(timerTimestamp)).getTime() * 1000;
             var x = setInterval(function () {
                 var now = new Date().getTime();
                 var distance = countDownDate - now;
