@@ -1,6 +1,7 @@
 import {bindCanvas} from './renderer.js';
 
 import physx from './physx.js';
+import metaversefileApi from './metaversefile-api.js';
 import metaversefile from 'metaversefile';
 
 import physxWorkerManager from './physx-worker-manager.js';
@@ -10,9 +11,9 @@ const _waitForLoad = async () => {
   const canvas = document.getElementById('canvas');
   bindCanvas(canvas);
 
-  await Avatar.waitForLoad();
   await physx.waitForLoad();
   await physxWorkerManager.waitForLoad();
+  await Avatar.waitForLoad();
 };
 
 (async () => {
