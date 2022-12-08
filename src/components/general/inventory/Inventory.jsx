@@ -152,13 +152,13 @@ const Token = ({
                             className={styles.button}
                             onClick={onDrop(object)}
                         />
-                        <CustomButton
+                        {!object.claimed && <CustomButton
                             theme="dark"
                             text="Mint"
                             size={10}
                             className={styles.button}
                             onClick={() => mintClaim()}
-                        />
+                        />}
                     </>
                 )}
             </div>
@@ -224,18 +224,12 @@ const TokenList = ({
 };
 
 export const Inventory = () => {
-    const { state, setState, account } = useContext(AppContext);
+    const { state, setState, account, claimableToken, setClaimableToken, mintedToken, setMintedToken, getWalletItems } = useContext(AppContext);
     const [hoverObject, setHoverObject] = useState(null);
     const [selectObject, setSelectObject] = useState(null);
-    const [faceIndex, setFaceIndex] = useState(1);
-    const [claims, setClaims] = useState([]);
-    const [inventoryItems, setInventoryItems] = useState(objects);
-
     const [loading, setLoading] = useState(false);
 
     const [expand, setExpand] = useState(false);
-
-    const selectedMenuIndex = mod(faceIndex, 4);
 
     const [showTokenDropDown, setShowTokenDropDown] = useState(false);
 
@@ -285,22 +279,9 @@ export const Inventory = () => {
     const closeTokenDropDown = () => {
         setShowTokenDropDown();
     };
-    const closePreview = () => {
-        setOpenPreview(false);
-        setPreviewObject();
-    };
     const onDoubleClick = (object) => () => {
         game.handleDropJsonToPlayer(object);
         setSelectObject(object);
-    };
-    const menuLeft = () => {
-        setFaceIndex(faceIndex - 1);
-
-        sounds.playSoundName("menuNext");
-    };
-    const menuRight = () => {
-        setFaceIndex(faceIndex + 1);
-        sounds.playSoundName("menuNext");
     };
     const onEquip = (object) => () => {
         game.handleDropJsonToPlayer(object);
@@ -317,11 +298,8 @@ export const Inventory = () => {
             WebaversecontractAddress,
             (isclaimed) => {
                 if (isclaimed) {
-                    // NFT
-                    closePreview(); // will add time counter
                 } else {
                     dropManager.removeClaim(object);
-                    closePreview();
                 }
             }
         );
@@ -335,77 +313,16 @@ export const Inventory = () => {
 
         await mintfromVoucher(
             e,
-            () => {},
             () => {
                 dropManager.removeClaim(e);
-                closePreview();
+                getWalletItems();
             }
         );
     };
 
-    // const selectClassName = styles[`select-${selectedMenuIndex}`];
-
-    useEffect(() => {
-        const claimschange = async (e) => {
-            const { claims, addedClaim } = e.data;
-            const claimableItem = claims.map(
-                ({ name, start_url, type, voucher, serverDrop, level }) => ({
-                    name,
-                    start_url: start_url.split("index.js")[0],
-                    description: "This is not-claimed drops",
-                    params: [
-                        {
-                            label: "Token type",
-                            value: "Seasonal NFT ( ERC-1155 )",
-                        },
-                    ],
-                    type,
-                    voucher,
-                    serverDrop,
-                    claimed: false,
-                    level,
-                })
-            );
-
-            setInventoryItems({
-                notClaimed: claimableItem,
-                upstreet: inventoryItems.upstreet,
-                resources: inventoryItems.resources,
-            });
-            // inventoryItems.notClaimed.push(addedClaim)
-            // }
-        };
-        dropManager.addEventListener("claimschange", claimschange);
-        return () => {
-            dropManager.removeEventListener("claimschange", claimschange);
-        };
-    }, [inventoryItems]);
-
-    useEffect(() => {
-        if (account && account.currentAddress) {
-            async function queryGetNFTFromContract() {
-                const nftList = await getTokens();
-                const nftData = nftList.map(({ tokenId, url }) => ({
-                    tokenId,
-                    name: "",
-                    start_url: url,
-                    description: "",
-                    params: [],
-                    claimed: true,
-                    type: "major",
-                }));
-
-                setInventoryItems({
-                    notClaimed: inventoryItems.notClaimed,
-                    upstreet: nftData,
-                    resources: inventoryItems.resources,
-                });
-            }
-            queryGetNFTFromContract();
-        } else {
-            console.log("could not query NFT collections");
-        }
-    }, [open, account]);
+    const onInventoryPanelClick = () => {
+      setShowTokenDropDown()
+    }
 
     useEffect(() => {
         if (open !== "CharacterPanel") {
@@ -413,7 +330,6 @@ export const Inventory = () => {
                 sounds.playSoundName("menuOpen");
             } else {
                 sounds.playSoundName("menuClose");
-                setOpenPreview(false);
             }
         }
     }, [open]);
@@ -425,6 +341,7 @@ export const Inventory = () => {
                     styles.inventoryPanelWrap,
                     expand && styles.expanded
                 )}
+                onClick={() => onInventoryPanelClick()}
             >
                 <div className={styles.inventoryPanel}>
                     <div
@@ -447,10 +364,10 @@ export const Inventory = () => {
                             sections={[
                                 {
                                     name: "Resources",
-                                    tokens: inventoryItems.resources,
+                                    tokens: objects.resources,
                                 },
                             ]}
-                            open={faceIndex === 1}
+                            open={true}
                             hoverObject={hoverObject}
                             selectObject={selectObject}
                             loading={loading}
@@ -460,8 +377,6 @@ export const Inventory = () => {
                             onClick={onClick}
                             closeTokenDropDown={closeTokenDropDown}
                             onDoubleClick={onDoubleClick}
-                            menuLeft={menuLeft}
-                            menuRight={menuRight}
                             onEquip={onEquip}
                             onSpawn={onSpawn}
                             onDrop={onDrop}
@@ -474,14 +389,14 @@ export const Inventory = () => {
                             sections={[
                                 {
                                     name: "Not Claimed",
-                                    tokens: inventoryItems.notClaimed,
+                                    tokens: claimableToken,
                                 },
                                 {
                                     name: "From Upstreet",
-                                    tokens: inventoryItems.upstreet,
+                                    tokens: mintedToken,
                                 },
                             ]}
-                            open={faceIndex === 1}
+                            open={true}
                             hoverObject={hoverObject}
                             selectObject={selectObject}
                             loading={loading}
@@ -490,8 +405,6 @@ export const Inventory = () => {
                             onDragStart={onDragStart}
                             onClick={onClick}
                             onDoubleClick={onDoubleClick}
-                            menuLeft={menuLeft}
-                            menuRight={menuRight}
                             onEquip={onEquip}
                             onSpawn={onSpawn}
                             onDrop={onDrop}
