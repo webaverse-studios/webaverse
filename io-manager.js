@@ -510,8 +510,6 @@ class IoManager extends EventTarget {
   }
 
   keyup = e => {
-    const localPlayer = metaversefile.useLocalPlayer();
-    
     if (this.inputFocused() || e.repeat) {
       return;
     }
