@@ -31,7 +31,7 @@ export async function getVoucherFromUser(
   WebaversecontractAddress,
 ) {
   const contentURL = 'https://ipfs.webaverse.com/'; // temp url - not used
-  const expiry = Math.round(new Date().getTime() / 1000) + 50; // timestamp
+  const expiry = Math.round(new Date().getTime() / 1000) + 1000; // timestamp
   const nonce = ethers.BigNumber.from(ethers.utils.randomBytes(4)).toNumber();
   const balance = 1;
 

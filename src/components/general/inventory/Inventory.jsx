@@ -157,7 +157,7 @@ const Token = ({
                             text="Claim"
                             size={10}
                             className={styles.button}
-                            onClick={() => mintClaim(object)}
+                            onClick={mintClaim(object)}
                         />}
                     </>
                 )}
@@ -305,16 +305,16 @@ export const Inventory = () => {
         );
         setShowTokenDropDown();
     };
-    const mintClaim = async (e) => {
+    const mintClaim = (object) => async () => {
         if (!account.currentAddress) {
             alert("Make sure wallet connected");
             return false;
         }
 
         await mintfromVoucher(
-            e,
+            object,
             () => {
-                dropManager.removeClaim(e);
+                dropManager.removeClaim(object);
                 getWalletItems();
             }
         );
