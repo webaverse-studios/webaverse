@@ -157,7 +157,7 @@ const Token = ({
                             text="Mint"
                             size={10}
                             className={styles.button}
-                            onClick={() => mintClaim()}
+                            onClick={() => mintClaim(object)}
                         />}
                     </>
                 )}
