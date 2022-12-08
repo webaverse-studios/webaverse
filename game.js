@@ -618,13 +618,15 @@ class GameManager extends EventTarget {
     localPlayer.removeAction('dance');
   }
 
+  menuDoubleTap() {
+    const localPlayer = playersManager.getLocalPlayer();
+    const newNarutoRunAction = {type: 'narutoRun'};
+    localPlayer.actionsManager.tryAddAction(newNarutoRunAction, true);
+  }
+
   menuUnDoubleTap() {
     const localPlayer = playersManager.getLocalPlayer();
-    const narutoRunAction = localPlayer.getAction('narutoRun');
-    if (narutoRunAction) {
-      // localPlayer.removeActionOld('narutoRun');
-      localPlayer.actionsManager.set('narutoRun', false);
-    }
+    localPlayer.actionsManager.tryRemoveAction('narutoRun', true);
   }
 
   menuSwitchCharacter() {

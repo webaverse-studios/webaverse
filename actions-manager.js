@@ -148,7 +148,9 @@ class WaitOneTick extends b3.Action {
 class NarutoRun extends b3.Action {
   tick(tick) {
     const results = tick.blackboard.get('results');
-    if (tick.blackboard.get('narutoRun')) {
+    // const tickTryActions = tick.blackboard.get('tickTryActions');
+    const longTryActions = tick.blackboard.get('longTryActions');
+    if (longTryActions.narutoRun) {
       results.narutoRun = true;
       return b3.SUCCESS;
     } else {
@@ -211,7 +213,7 @@ const postTickSettings = (localPlayer, blackboard) => {
     }
     if (!results.land && lastResults.land) localPlayer.removeActionReal('land');
   
-    if (results.narutoRun && !lastResults.narutoRun) localPlayer.addActionReal({type: 'narutoRun'});
+    if (results.narutoRun && !lastResults.narutoRun) localPlayer.addActionReal(longTryActions.narutoRun);
     if (!results.narutoRun && lastResults.narutoRun) localPlayer.removeActionReal('narutoRun');
   
     if (results.fly && !lastResults.fly) localPlayer.addActionReal({type: 'fly'});
@@ -299,7 +301,7 @@ class ActionsManager {
   tryAddAction(action, isLong = false) {
     if (isLong) {
       const longTryActions = this.blackboard.get('longTryActions');
-      longTryActions[action.type] = action;
+      longTryActions[action.type] = action; // todo: how to handle multiple same actionType long try ?
     } else {
       const tickTryActions = this.blackboard.get('tickTryActions');
       tickTryActions[action.type] = action;

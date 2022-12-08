@@ -296,7 +296,7 @@ class IoManager extends EventTarget {
         const timeDiff = now - this.lastKeysDownTime.keyW;
         if (timeDiff < doubleTapTime && ioManager.keys.shift) {
           ioManager.keys.doubleTap = true;
-          localPlayer.actionsManager.set('narutoRun', true);
+          game.menuDoubleTap();
         }
         this.lastKeysDownTime.keyW = now;
         this.lastKeysDownTime.keyS = 0;
@@ -310,7 +310,7 @@ class IoManager extends EventTarget {
         const timeDiff = now - this.lastKeysDownTime.keyA;
         if (timeDiff < doubleTapTime && ioManager.keys.shift) {
           ioManager.keys.doubleTap = true;
-          localPlayer.actionsManager.set('narutoRun', true);
+          game.menuDoubleTap();
         }
         this.lastKeysDownTime.keyA = now;
         this.lastKeysDownTime.keyD = 0;
@@ -330,7 +330,7 @@ class IoManager extends EventTarget {
           const timeDiff = now - this.lastKeysDownTime.keyS;
           if (timeDiff < doubleTapTime && ioManager.keys.shift) {
             ioManager.keys.doubleTap = true;
-            localPlayer.actionsManager.set('narutoRun', true);
+            game.menuDoubleTap();
           }
           this.lastKeysDownTime.keyS = now;
           this.lastKeysDownTime.keyW = 0;
@@ -345,7 +345,7 @@ class IoManager extends EventTarget {
         const timeDiff = now - this.lastKeysDownTime.keyD;
         if (timeDiff < doubleTapTime && ioManager.keys.shift) {
           ioManager.keys.doubleTap = true;
-          localPlayer.actionsManager.set('narutoRun', true);
+          game.menuDoubleTap();
         }
         this.lastKeysDownTime.keyD = now;
         this.lastKeysDownTime.keyA = 0;
@@ -577,7 +577,6 @@ class IoManager extends EventTarget {
       case 16: { // shift
         ioManager.keys.shift = false;
         ioManager.keys.doubleTap = false;
-        localPlayer.actionsManager.set('narutoRun', false);
        
         game.menuUnDoubleTap();
         game.setSprint(false);
