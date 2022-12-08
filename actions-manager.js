@@ -39,7 +39,6 @@ class StartFallLoopFromJump extends b3.Action {
 class FallLoopFromJump extends b3.Action {
   tick(tick) {
     const results = tick.blackboard.get('results');
-    // const tickTryStopActions = tick.blackboard.get('tickTryStopActions');
     const localPlayer = tick.target;
     if (localPlayer.characterPhysics.grounded) {
       return b3.FAILURE;
@@ -52,9 +51,8 @@ class FallLoopFromJump extends b3.Action {
 class Fly extends b3.Action {
   tick(tick) {
     const results = tick.blackboard.get('results');
-    if (
-      tick.blackboard.get('fly')
-    ) {
+    const longTryActions = tick.blackboard.get('longTryActions');
+    if (longTryActions.fly) {
       results.fly = true;
       return b3.SUCCESS;
     } else {
@@ -216,7 +214,7 @@ const postTickSettings = (localPlayer, blackboard) => {
     if (results.narutoRun && !lastResults.narutoRun) localPlayer.addActionReal(longTryActions.narutoRun);
     if (!results.narutoRun && lastResults.narutoRun) localPlayer.removeActionReal('narutoRun');
   
-    if (results.fly && !lastResults.fly) localPlayer.addActionReal({type: 'fly'});
+    if (results.fly && !lastResults.fly) localPlayer.addActionReal(longTryActions.fly); // todo: just tryActions is ok, don't need tick/long ?
     if (!results.fly && lastResults.fly) localPlayer.removeActionReal('fly');
   
     if (results.jump && !lastResults.jump) {

@@ -560,11 +560,11 @@ class Character extends THREE.Object3D {
 }
 
 const controlActionTypes = [
-  'jump',
-  'fallLoop',
-  'land',
-  'crouch',
-  'fly',
+  // 'jump',
+  // 'fallLoop',
+  // 'land',
+  // 'crouch',
+  // 'fly',
   'sit',
   'swim',
 ];

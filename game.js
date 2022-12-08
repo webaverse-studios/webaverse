@@ -643,12 +643,11 @@ class GameManager extends EventTarget {
 
   toggleFly() {
     const localPlayer = playersManager.getLocalPlayer();
-    if (localPlayer.hasAction('fly')) {
-      localPlayer.actionsManager.set('fly', false);
+    if (localPlayer.actionsManager.isLongTrying('fly')) {
+      localPlayer.actionsManager.tryRemoveAction('fly', true);
     } else {
-      localPlayer.actionsManager.set('fly', true);
-      const tickInfos = localPlayer.actionsManager.get('tickInfos');
-      tickInfos.tryFly = true;
+      const newFlyAction = {type: 'fly'};
+      localPlayer.actionsManager.tryAddAction(newFlyAction, true);
     }
   }
 
