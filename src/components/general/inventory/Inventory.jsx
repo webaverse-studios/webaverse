@@ -154,7 +154,7 @@ const Token = ({
                         />
                         {!object.claimed && <CustomButton
                             theme="dark"
-                            text="Mint"
+                            text="Claim"
                             size={10}
                             className={styles.button}
                             onClick={() => mintClaim(object)}
