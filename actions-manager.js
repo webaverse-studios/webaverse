@@ -1,4 +1,5 @@
 import * as b3 from './lib/behavior3js/index.js';
+import metaversefileApi from 'metaversefile';
 
 // note: tickResults will all reset to false after every tick, so don't need set `tickResults.xxx = false`.
 
