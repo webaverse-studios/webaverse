@@ -15,10 +15,14 @@ class Loading extends b3.Action {
 class FallLoop extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
+    const tickTryActions = tick.blackboard.get('tickTryActions');
     const localPlayer = tick.target;
-    if (!localPlayer.characterPhysics.grounded && ((tick.blackboard.get('now') - localPlayer.characterPhysics.lastGroundedTime) > 200)) {
-      tickResults.fallLoop = true;
+    if (tickTryActions.glider) { // todo: use another node put in Priority instead of check glider directly here ?
+      tickResults.glider = true;
       return b3.SUCCESS;
+    } else if (!localPlayer.characterPhysics.grounded && ((tick.blackboard.get('now') - localPlayer.characterPhysics.lastGroundedTime) > 200)) {
+      tickResults.fallLoop = true;
+      return b3.RUNNING;
     } else {
       return b3.FAILURE;
     }
@@ -135,7 +139,7 @@ class WaitOneTick extends b3.Action {
   tick(tick) {
     const ticked = tick.blackboard.get('ticked', tick.tree.id, this.id)
     if (ticked) {
-      tick.blackboard.set('ticked', false, tick.tree.id, this.id)
+      tick.blackboard.set('ticked', false, tick.tree.id, this.id) // todo: need reset if be halted ?
       return b3.SUCCESS
     } else {
       tick.blackboard.set('ticked', true, tick.tree.id, this.id)
@@ -200,6 +204,18 @@ class HaltSit extends b3.Condition {
     }
   }
 }
+class Glider extends b3.Action {
+  tick(tick) {
+    const tickResults = tick.blackboard.get('tickResults');
+    const tickTryStopActions = tick.blackboard.get('tickTryStopActions');
+    if (tickTryStopActions.glider) {
+      return b3.FAILURE;
+    } else {
+      tickResults.glider = true;
+      return b3.RUNNING;
+    }
+  }
+}
 
 const tree = new b3.BehaviorTree();
 tree.root = new b3.MemSequence({title:'root',children: [
@@ -228,7 +244,11 @@ tree.root = new b3.MemSequence({title:'root',children: [
           new Jump({title:'Jump'}),
           new DoubleJump({title:'DoubleJump'}),
         ]}),
-        new FallLoop({title:'FallLoop'}),
+        new b3.MemSequence({title:'fallLoop & glider',children:[
+          new FallLoop({title:'FallLoop'}),
+          new WaitOneTick({title:'WaitOneTick'}), // note: prevent remove glider immediately, because add/remove glider all triggered by space key.
+          new Glider({title:'Glider'}),
+        ]}),
         new Crouch({title:'Crouch'}),
         new NarutoRun({title:'NarutoRun'}),
       ]}), // end: base
@@ -303,6 +323,13 @@ const postTickSettings = (localPlayer, blackboard) => {
     if (!tickResults.sit && lastTickResults.sit) {
       localPlayer.removeAction('sit');
     }
+  
+    if (tickResults.glider && !lastTickResults.glider) {
+      localPlayer.addAction(tickTryActions.glider);
+    }
+    if (!tickResults.glider && lastTickResults.glider) {
+      localPlayer.removeAction('glider');
+    }
   }
   setActions();
 
@@ -343,9 +370,9 @@ class ActionsManager {
     this.blackboard.set('tickResults', {});
     this.blackboard.set('lastTickResults', {});
     // this.blackboard.set('tickInfos', {});
-    this.blackboard.set('tickTryActions', {});
-    this.blackboard.set('longTryActions', {});
-    this.blackboard.set('tickTryStopActions', {});
+    this.blackboard.set('tickTryActions', {}); // todo: rename: tickTryAddActions.
+    this.blackboard.set('longTryActions', {}); // todo: rename: longTryAddActions.
+    this.blackboard.set('tickTryStopActions', {}); // todo: rename: tickTryRemoveActions.
     this.blackboard.set('loaded', true);
   }
 

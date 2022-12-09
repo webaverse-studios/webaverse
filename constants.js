@@ -163,4 +163,4 @@ export const characterSelectAvatarQuality = 4;
 export const minCanvasSize = 512;
 export const offscreenCanvasSize = 2048;
 
-export const IS_NARUTO_RUN_ENABLED = false;
+export const IS_NARUTO_RUN_ENABLED = true;

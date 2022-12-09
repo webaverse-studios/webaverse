@@ -784,6 +784,13 @@ class GameManager extends EventTarget {
       startPositionY: localPlayer.characterPhysics.characterController.position.y,
     }
     localPlayer.actionsManager.tryAddAction(newJumpAction);
+    
+    const newGliderAction = {
+      type: 'glider',
+    }
+    localPlayer.actionsManager.tryAddAction(newGliderAction);
+
+    localPlayer.actionsManager.tryRemoveAction('glider');
   }
 
   isMovingBackward() {
