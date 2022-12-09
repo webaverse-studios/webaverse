@@ -11,6 +11,9 @@ export default defineConfig(({command, mode, ssrBuild}) => {
     build: {
       minify: process.env.NODE_ENV === 'production',
     },
+    worker:{
+      format: 'esm',
+    },
     /* optimizeDeps: {
       entries: [
         'src/*.js',

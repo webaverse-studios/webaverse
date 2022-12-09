@@ -61,6 +61,15 @@ export const Hotbar = ({className}) => {
             className={ classnames(className, styles.hotbar) }
             onClick={onTopClick}
         >
+            <div className={styles.leftSlot}>
+                <div className={styles.background} />
+                <div className={styles.phone}>
+                    <img src="/assets/icons/phone.svg" />
+                    <span>~</span>
+                </div>
+            </div>
+
+            <div className={styles.rightSlot}></div>
 
             {
                 (() => {
