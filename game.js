@@ -668,11 +668,11 @@ class GameManager extends EventTarget {
 
   toggleCrouch() {
     const localPlayer = playersManager.getLocalPlayer();
-    if (localPlayer.actionsManager.isLongTrying('crouch')) {
-      localPlayer.actionsManager.tryRemoveAction('crouch', true);
+    if (localPlayer.hasAction('crouch')) {
+      localPlayer.actionsManager.tryRemoveAction('crouch');
     } else {
       const newCrouchAction = {type: 'crouch'};
-      localPlayer.actionsManager.tryAddAction(newCrouchAction, true);
+      localPlayer.actionsManager.tryAddAction(newCrouchAction);
     }
   }
 
