@@ -78,7 +78,6 @@ export const App = () => {
     const [ apps, setApps ] = useState(world.appManager.getApps().slice());
     const account = useContext(AccountContext);
     const chain = useContext(ChainContext);
-
     const {getTokens} = useNFTContract(account.currentAddress);
 
     const [domHover, setDomHover] = useState(null)
