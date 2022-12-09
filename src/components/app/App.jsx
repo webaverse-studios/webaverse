@@ -340,6 +340,7 @@ export const App = () => {
               params: [
               ],
               claimed: true,
+              rarity: "common",
               type: "major",
               level: 15
           }

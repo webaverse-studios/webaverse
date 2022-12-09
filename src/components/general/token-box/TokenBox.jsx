@@ -103,6 +103,7 @@ export const TokenBox = (props) => {
                         styles.level,
                         rarity && styles[rarity]
                     )}
+                    style={{ opacity: timerTimestamp ? 0.6 : 1 }}
                 >
                     Lv.{level}
                 </div>

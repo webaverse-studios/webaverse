@@ -127,7 +127,7 @@ const Token = ({
                 numFrames={numFrames}
                 type={object.type}
                 rarity={"none"}
-                timerTimestamp={object.timerTimestamp}
+                timerTimestamp={object.voucher ? object.voucher.expiry : false}
             />
             <div className={styles.tokenDropdown}>
                 {showTokenDropDown && showTokenDropDown === object && (
