@@ -3,19 +3,22 @@ this file bootstraps the webaverse engine.
 it uses the help of various managers and stores, and executes the render loop.
 */
 
+import metaversefileApi from './metaversefile-api.js';
+import {playersManager} from './players-manager.js';
+import cameraManager from './camera-manager.js';
+import ioManager from './io-manager.js';
+import game from './game.js';
+
 import * as THREE from 'three';
+import npcManager from './npc-manager.js';
 import Avatar from './avatars/avatars.js';
 import * as sounds from './sounds.js';
 import physx from './physx.js';
-import ioManager from './io-manager.js';
 import physicsManager from './physics-manager.js';
 import physxWorkerManager from './physx-worker-manager.js';
 import {world} from './world.js';
 // import * as blockchain from './blockchain.js';
-import cameraManager from './camera-manager.js';
-import game from './game.js';
 import hpManager from './hp-manager.js';
-import {playersManager} from './players-manager.js';
 import minimapManager from './minimap.js';
 import postProcessing from './post-processing.js';
 import particleSystemManager from './particle-system.js';
@@ -31,22 +34,23 @@ import {
   camera,
   bindCanvas,
   getComposer,
+  offscreenCanvas,
+  canvas
 } from './renderer.js';
 import transformControls from './transform-controls.js';
 import dioramaManager from './diorama/diorama-manager.js';
 import * as voices from './voices.js';
 import performanceTracker from './performance-tracker.js';
 import renderSettingsManager from './rendersettings-manager.js';
-import metaversefileApi from 'metaversefile';
 import musicManager from './music-manager.js';
 import story from './story.js';
 import zTargeting from './z-targeting.js';
 import raycastManager from './raycast-manager.js';
 import universe from './universe.js';
-import npcManager from './npc-manager.js';
 import settingsManager from './settings-manager.js';
 import grabManager from './grab-manager.js';
 import backgroundFx from './background-fx/background-fx.js';
+import {partyManager} from './party-manager';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -76,10 +80,24 @@ export default class Webaverse extends EventTarget {
   constructor() {
     super();
 
+    const canvas = document.createElement('canvas');
+    canvas.style.position = 'fixed';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.margin = '0';
+    canvas.style.padding = '0';
+    canvas.style.zIndex = '-1';
+
+    // add the canvas to the engine container
+    document.body.appendChild(canvas);
+    this.bindCanvas(canvas);
+
     story.listenHack();
 
     this.loadPromise = (async () => {
-      await physx.waitForLoad();
+      await physx.waitForLoad();      
       await Promise.all([
         Avatar.waitForLoad(),
         physxWorkerManager.waitForLoad(),
@@ -91,6 +109,14 @@ export default class Webaverse extends EventTarget {
         voices.waitForLoad(),
         musicManager.waitForLoad(),
       ]);
+
+      await npcManager.initDefaultPlayer();
+      loadoutManager.initDefault();
+      await universe.handleUrlUpdate();
+      partyManager.inviteDefaultPlayer();
+
+      await this.startLoop();
+      this.contentLoaded = true;
     })();
     this.contentLoaded = false;
     const self = this
@@ -281,19 +307,25 @@ export default class Webaverse extends EventTarget {
   render(timestamp, timeDiff) {
     // console.log('frame 1');
 
-    const renderer = getRenderer();
     frameEvent.data.timestamp = timestamp;
     frameEvent.data.timeDiff = timeDiff;
     game.dispatchEvent(frameEvent);
 
     getComposer().render();
+    
+    // call transferimagebitmap to move the contents of offscreencanvas to canvas
+  
+    const context = canvas.getContext('bitmaprenderer');
+    const imageBitmap = offscreenCanvas.transferToImageBitmap();
+    context.transferFromImageBitmap(imageBitmap);
 
-    this.dispatchEvent(new MessageEvent('frameend', {
-      data: {
-        canvas: renderer.domElement,
-        context: renderer.getContext(),
-      }
-    }));
+    // TODO: reenable for mirror
+    // this.dispatchEvent(new MessageEvent('frameend', {
+    //   data: {
+    //     canvas: renderer.domElement,
+    //     context: renderer.getContext(),
+    //   }
+    // }));
 
     // console.log('frame 2');
   }
@@ -388,7 +420,7 @@ export default class Webaverse extends EventTarget {
 
 // import {MMDLoader} from 'three/examples/jsm/loaders/MMDLoader.js';
 const _startHacks = webaverse => {
-  const localPlayer = metaversefileApi.useLocalPlayer();
+  const localPlayer = playersManager.getLocalPlayer();
   const vpdAnimations = Avatar.getAnimations().filter(animation => animation.name.endsWith('.vpd'));
 
   // press R to debug current state in console
@@ -609,3 +641,5 @@ const _startHacks = webaverse => {
     }
   });
 };
+
+export const webaverse = new Webaverse();

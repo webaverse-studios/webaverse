@@ -149,7 +149,7 @@ export const infoboxSize = 100;
 export const startTextureAtlasSize = 512;
 export const maxTextureAtlasSize = 4096;
 
-export const numLoadoutSlots = 8;
+export const numLoadoutSlots = 6;
 
 export const defaultDioramaSize = 512;
 export const defaultChunkSize = 16;
@@ -164,3 +164,5 @@ export const minCanvasSize = 512;
 export const offscreenCanvasSize = 2048;
 
 export const realmSize = 256;
+
+export const IS_NARUTO_RUN_ENABLED = false;
