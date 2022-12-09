@@ -33,7 +33,6 @@ function bindCanvas(c) {
 
   renderer = new THREE.WebGLRenderer({
     canvas: offscreenCanvas,
-    context,
     antialias: true,
     alpha: true,
     rendererExtensionFragDepth: true,

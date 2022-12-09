@@ -33,7 +33,8 @@ import raycastManager from '../../../raycast-manager';
 import {AccountContext} from '../../hooks/web3AccountProvider';
 import {ChainContext} from '../../hooks/chainProvider';
 import Modals from '../modals';
-
+import dropManager from '../../../drop-manager';
+import useNFTContract from '../../../src/hooks/useNFTContract';
 //
 
 const _getCurrentSceneSrc = () => {
@@ -72,9 +73,13 @@ export const App = () => {
     const [ selectedApp, setSelectedApp ] = useState(null);
     const [ selectedScene, setSelectedScene ] = useState(_getCurrentSceneSrc());
     const [ selectedRoom, setSelectedRoom ] = useState(_getCurrentRoom());
+    const [ claimableToken, setClaimableToken ] = useState([]);
+    const [ mintedToken, setMintedToken ] = useState([]);
     const [ apps, setApps ] = useState(world.appManager.getApps().slice());
     const account = useContext(AccountContext);
     const chain = useContext(ChainContext);
+
+    const {getTokens} = useNFTContract(account.currentAddress);
 
     const [domHover, setDomHover] = useState(null)
 
@@ -90,7 +95,6 @@ export const App = () => {
             raycastManager.removeEventListener('domhoverchange', domhoverchange);
         };
     }, []);
-
 
     const selectApp = (app, physicsId, position) => {
 
@@ -245,6 +249,61 @@ export const App = () => {
 
     useEffect(_loadUrlState, []);
 
+    useEffect(() => {
+        const claimschange = async (e) => {
+            const {claims, addedClaim} = e.data;
+            const claimableItem = claims.map(({name, start_url, type, voucher, serverDrop, level}) => ({
+                name,
+                start_url: start_url.split("index.js")[0],
+                description: "This is not-claimed drops",
+                params: [
+                    {
+                        label: 'Token type',
+                        value: 'Seasonal NFT ( ERC-1155 )',
+                    },
+                ],
+                type,
+                voucher,
+                serverDrop,
+                claimed: false,
+                level
+            }))
+
+            setClaimableToken(claimableItem);
+        };
+        dropManager.addEventListener('claimschange', claimschange);
+        return () => {
+            dropManager.removeEventListener('claimschange', claimschange);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (account && account.currentAddress) {
+            getWalletItems();
+        } else {
+            setMintedToken([]);
+            console.log('could not query NFT collections')
+        }
+    }, [account])
+
+    const getWalletItems = async () => {
+        const nftList = await getTokens();
+        const nftData = nftList.map(({tokenId, url}) => (
+          {
+              tokenId,
+              name: "Webaverse Drop",
+              start_url: url.split("index.js")[0],
+              description: "",
+              params: [
+              ],
+              claimed: true,
+              type: "major",
+              level: 15
+          }
+        ))
+        setMintedToken(nftData)
+      }
+
     //
 
     const onDragOver = e => {
@@ -259,7 +318,7 @@ export const App = () => {
     };
 
     return (
-        <AppContext.Provider value={{state, setState, setSelectedApp, selectedApp, showUI, account, chain}}>
+        <AppContext.Provider value={{state, setState, setSelectedApp, selectedApp, showUI, account, chain, claimableToken, setClaimableToken, mintedToken, setMintedToken, getWalletItems}}>
         <div
             className={ styles.App }
             id="app"

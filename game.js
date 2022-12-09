@@ -26,6 +26,7 @@ import Avatar from './avatars/avatars.js';
 import {avatarManager} from './avatar-manager.js';
 import npcManager from './npc-manager.js';
 import grabManager from './grab-manager.js';
+import {getVoucherFromUser} from './src/hooks/voucherHelpers'  
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -721,6 +722,60 @@ class GameManager extends EventTarget {
     app.instanceId = makeId(5);
     world.appManager.importApp(app);
     app.activate();
+  }
+
+  async handleDropJsonForDrop(object, currentAddress, WebaversecontractAddress, afterDrop = f => f) { // currentAddress = walletaddress, WebaversecontractAddress= signaddress
+    const localPlayer = playersManager.getLocalPlayer();
+    localVector.copy(localPlayer.position);
+    if (localPlayer.avatar) {
+      localVector.y -= localPlayer.avatar.height;
+    }
+
+    const position = localPlayer.position
+      .clone()
+      .add(new THREE.Vector3(0, 0, -1).applyQuaternion(localPlayer.quaternion));
+    const quaternion = localPlayer.quaternion;
+
+    if (object && object.voucher === undefined) {
+      const {voucher, expiry} = await getVoucherFromUser(object.tokenId, currentAddress, WebaversecontractAddress)
+      if (voucher.signature !== undefined) {
+        object.voucher = voucher
+        // add blacklist and time counter add
+        afterDrop(true)
+      }
+    } else {
+        afterDrop(false)
+    }
+
+    const velocity = localVector.set(0, 0, -1).applyQuaternion(localPlayer.quaternion)
+    .normalize()
+    .multiplyScalar(2.5);
+    world.appManager.importAddedUserVoucherApp(position, quaternion, object, velocity);
+  }
+
+  async handleDropJsonForSpawn(handleDropJsonForSpawn) { // currentAddress = walletaddress, WebaversecontractAddress= signaddress
+    const localPlayer = playersManager.getLocalPlayer();
+    localVector.copy(localPlayer.position);
+    if (localPlayer.avatar) {
+      localVector.y -= localPlayer.avatar.height;
+    }
+    console.log("localvector", localVector)
+
+    const u = getDropUrl(handleDropJsonForSpawn);
+    const app = await metaversefileApi.createAppAsync({
+      start_url: u,
+      localVector,
+    });
+    const position = localPlayer.position
+      .clone()
+      .add(new THREE.Vector3(0, 0, -2).applyQuaternion(localPlayer.quaternion));
+    const quaternion = localPlayer.quaternion;
+
+    app.position.copy(position);
+    app.quaternion.copy(quaternion);
+    app.instanceId = makeId(5);
+    app.updateMatrixWorld();
+    world.appManager.importApp(app);
   }
 
   selectLoadout(index) {

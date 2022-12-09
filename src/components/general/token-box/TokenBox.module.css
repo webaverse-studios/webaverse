@@ -20,7 +20,7 @@
     -webkit-transform: translateX(-50%) translateY(-50%);
     transform: translateX(-50%) translateY(-50%);
     position: absolute;
-    z-index: 10;
+    z-index: 0;
 }
 
 .tokenBoxWrap .mask canvas {
@@ -107,6 +107,18 @@
     display: block;
     background-image: url('/assets/backgrounds/token-box-none.svg');
 }
+
+.tokenBoxWrap .emptyIcon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+    width: auto;
+    height: 28px;
+}
+
 .tokenBoxWrap .badge {
     width: 20%;
     top: 1px;
