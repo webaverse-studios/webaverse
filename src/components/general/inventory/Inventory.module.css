@@ -264,6 +264,16 @@
 .inventoryPanelWrap .section .tokenList li {
     float: left;
     margin: 0 4px 6px 4px;
+    position: relative;
+}
+
+.inventoryPanelWrap .section .tokenList .tokenDropdown {
+    position: absolute;
+    z-index: 10;
+}
+.inventoryPanelWrap .section .tokenList .tokenDropdown .button {
+    display: block;
+    width: 96px;
 }
 
 .inventoryPanelWrap .itemPreviewBoxWrap {

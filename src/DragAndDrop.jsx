@@ -230,9 +230,6 @@ const DragAndDrop = () => {
     if (currentApp) {
       const app = currentApp;
       await mintNFT(app, () => {
-        setCurrentApp(null);
-        setPendingTx(true)
-      }, () => {
         setMintComplete(true);
         setPendingTx(false)
       });
