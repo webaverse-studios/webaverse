@@ -777,14 +777,15 @@ class GameManager extends EventTarget {
     return localPlayer.hasAction('doubleJump');
   }
 
-   jump() {
+  jump() {
     const localPlayer = playersManager.getLocalPlayer();
     const newJumpAction = {
       type: 'jump',
       startPositionY: localPlayer.characterPhysics.characterController.position.y,
     }
     localPlayer.actionsManager.tryAddAction(newJumpAction);
-   }
+  }
+
   isMovingBackward() {
     const localPlayer = playersManager.getLocalPlayer();
     return localPlayer.avatar?.direction.z > 0.1; // If check > 0 will cause glitch when move left/right;
