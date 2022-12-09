@@ -260,8 +260,6 @@ class IoManager extends EventTarget {
   };
 
   keydown(e) {
-    const localPlayer = metaversefile.useLocalPlayer();
-
     if (this.inputFocused() || e.repeat) {
       return;
     }
@@ -373,13 +371,7 @@ class IoManager extends EventTarget {
           ioManager.keys.backward = true;
         } else {
           ioManager.keys.ctrl = true;
-
-          if (localPlayer.actionsManager.isLongTrying('crouch')) {
-            localPlayer.actionsManager.tryRemoveAction('crouch', true);
-          } else {
-            const newCrouchAction = {type: 'crouch'};
-            localPlayer.actionsManager.tryAddAction(newCrouchAction, true);
-          }
+          game.toggleCrouch();
         }
         break;
       }
@@ -445,12 +437,7 @@ class IoManager extends EventTarget {
       }
       case 32: { // space
         ioManager.keys.space = true;
-        
-        const newJumpAction = {
-          type: 'jump',
-          startPositionY: localPlayer.characterPhysics.characterController.position.y,
-        }
-        localPlayer.actionsManager.tryAddAction(newJumpAction);
+        game.jump();
         break;
       }
       case 81: { // Q
