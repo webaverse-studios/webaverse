@@ -703,7 +703,6 @@ class StateCharacter extends Character {
   }
 
   addAction(action) {
-    // return;
     action = clone(action);
     action.actionId = makeId(5);
     this.getActionsState().push([action]);
@@ -714,7 +713,6 @@ class StateCharacter extends Character {
   }
 
   removeAction(type) {
-    // return;
     const actions = this.getActionsState();
     const actionsArray = this.getActionsArray();
     let i = 0;
@@ -731,7 +729,6 @@ class StateCharacter extends Character {
   }
 
   removeActionIndex(index) {
-    // return;
     const actionsArray = this.getActionsArray();
     this.getActionsState().delete(index);
     if (this.avatar) {
@@ -748,7 +745,6 @@ class StateCharacter extends Character {
   }
 
   setControlAction(action) {
-    // return;
     const actions = this.getActionsState();
     const actionsArray = this.getActionsArray();
     for (let i = 0; i < actions.length; i++) {

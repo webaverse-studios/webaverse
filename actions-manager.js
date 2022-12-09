@@ -248,7 +248,7 @@ const postTickSettings = (localPlayer, blackboard) => {
     const longTryActions = blackboard.get('longTryActions');
   
     if (tickResults.crouch && !lastTickResults.crouch) {
-      localPlayer.addAction(longTryActions.crouch); // todo: auto-check tick or long ?
+      localPlayer.addAction(longTryActions.crouch);
     }
     if (!tickResults.crouch && lastTickResults.crouch) localPlayer.removeAction('crouch');
   
@@ -264,7 +264,7 @@ const postTickSettings = (localPlayer, blackboard) => {
     if (tickResults.narutoRun && !lastTickResults.narutoRun) localPlayer.addAction(longTryActions.narutoRun);
     if (!tickResults.narutoRun && lastTickResults.narutoRun) localPlayer.removeAction('narutoRun');
   
-    if (tickResults.fly && !lastTickResults.fly) localPlayer.addAction(longTryActions.fly); // todo: just tryActions is ok, don't need tick/long ?
+    if (tickResults.fly && !lastTickResults.fly) localPlayer.addAction(longTryActions.fly);
     if (!tickResults.fly && lastTickResults.fly) localPlayer.removeAction('fly');
   
     if (tickResults.jump && !lastTickResults.jump) {
@@ -338,7 +338,7 @@ const postTickSettings = (localPlayer, blackboard) => {
 class ActionsManager {
   constructor(localPlayer) {
     this.localPlayer = localPlayer;
-    this.blackboard = new b3.Blackboard(); // todo: make blackboard private.
+    this.blackboard = new b3.Blackboard();
     this.blackboard.set('tickResults', {});
     this.blackboard.set('lastTickResults', {});
     // this.blackboard.set('tickInfos', {});
@@ -356,7 +356,7 @@ class ActionsManager {
   tryAddAction(action, isLong = false) {
     if (isLong) {
       const longTryActions = this.blackboard.get('longTryActions');
-      longTryActions[action.type] = action; // todo: how to handle multiple same actionType long try ?
+      longTryActions[action.type] = action;
       const tickTryActions = this.blackboard.get('tickTryActions');
       tickTryActions[action.type] = action; // note: long try also trigger tick try.
     } else {
