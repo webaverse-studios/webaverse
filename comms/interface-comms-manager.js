@@ -6,11 +6,8 @@ export class InterfaceCommsManager {
     this.messageInterface = messageInterface;
     this.messageInterface.addListener('setInterfaceEnabled', this.setInterfaceEnabled.bind(this));
 
-    // subscribe to the loadProgress event on webaverse object (from webavberse.js)
-    // and send it to the interface
     webaverse.addEventListener('loadProgress', (progress) => {
       this.messageInterface.send('loadProgress', progress);
-      console.log('sending update progress to frontend', progress);
     });
   }
 
