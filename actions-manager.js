@@ -119,15 +119,27 @@ class Land extends b3.Action {
     }
   }
 }
-class Crouch extends b3.Action {
+class StartCrouch extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
-    const longTryActions = tick.blackboard.get('longTryActions');
-    if (longTryActions.crouch) {
+    const tickTryActions = tick.blackboard.get('tickTryActions');
+    if (tickTryActions.crouch) {
       tickResults.crouch = true;
       return b3.SUCCESS;
     } else {
       return b3.FAILURE;
+    }
+  }
+}
+class Crouch extends b3.Action {
+  tick(tick) {
+    const tickResults = tick.blackboard.get('tickResults');
+    const tickTryStopActions = tick.blackboard.get('tickTryStopActions');
+    if (tickTryStopActions.crouch) {
+      return b3.FAILURE;
+    } else {
+      tickResults.crouch = true;
+      return b3.RUNNING;
     }
   }
 }
@@ -229,7 +241,10 @@ tree.root = new b3.MemSequence({title:'root',children: [
           new DoubleJump({title:'DoubleJump'}),
         ]}),
         new FallLoop({title:'FallLoop'}),
-        new Crouch({title:'Crouch'}),
+        new b3.MemSequence({title:'crouch',children:[
+          new StartCrouch({title:'StartCrouch'}),
+          new Crouch({title:'Crouch'}),
+        ]}),
         new NarutoRun({title:'NarutoRun'}),
       ]}), // end: base
       new Land({title:'Land'}),
@@ -249,7 +264,7 @@ const postTickSettings = (localPlayer, blackboard) => {
     const longTryActions = blackboard.get('longTryActions');
   
     if (tickResults.crouch && !lastTickResults.crouch) {
-      localPlayer.addAction(longTryActions.crouch); // todo: auto-check tick or long ?
+      localPlayer.addAction(tickTryActions.crouch); // todo: auto-check tick or long ?
     }
     if (!tickResults.crouch && lastTickResults.crouch) localPlayer.removeAction('crouch');
   
