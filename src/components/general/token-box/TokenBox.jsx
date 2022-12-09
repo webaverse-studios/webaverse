@@ -18,6 +18,7 @@ export const TokenBox = (props) => {
         value,
         type,
         timerTimestamp,
+        emptyIcon
     } = props;
 
     const [timeLeft, setTimeLeft] = useState("");
@@ -55,6 +56,7 @@ export const TokenBox = (props) => {
                 <div className={classnames(styles.frame, styles.frameActive)} />
             )}
             <div className={classnames(styles.frame, type && styles[type])} />
+            <img src={emptyIcon} className={styles.emptyIcon} />
             {!claimed && object && (
                 <img
                     src="/assets/icons/notClaimed.svg"

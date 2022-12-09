@@ -13,7 +13,7 @@ import {world} from './world.js';
 import {buildMaterial, highlightMaterial, selectMaterial, hoverMaterial, hoverEquipmentMaterial} from './shaders.js';
 import {getRenderer, sceneLowPriority, camera} from './renderer.js';
 import {downloadFile, snapPosition, getDropUrl, handleDropJsonItem, makeId} from './util.js';
-import {maxGrabDistance, throwReleaseTime, throwAnimationDuration, walkSpeed, crouchSpeed, flySpeed} from './constants.js';
+import {maxGrabDistance, throwReleaseTime, throwAnimationDuration, walkSpeed, crouchSpeed, flySpeed, IS_NARUTO_RUN_ENABLED} from './constants.js';
 import metaversefileApi from 'metaversefile';
 import loadoutManager from './loadout-manager.js';
 import * as sounds from './sounds.js';
@@ -26,6 +26,7 @@ import Avatar from './avatars/avatars.js';
 import {avatarManager} from './avatar-manager.js';
 import npcManager from './npc-manager.js';
 import grabManager from './grab-manager.js';
+import {getVoucherFromUser} from './src/hooks/voucherHelpers'  
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -619,14 +620,18 @@ class GameManager extends EventTarget {
   }
 
   menuDoubleTap() {
-    const localPlayer = playersManager.getLocalPlayer();
-    const newNarutoRunAction = {type: 'narutoRun'};
-    localPlayer.actionsManager.tryAddAction(newNarutoRunAction, true);
+    if(IS_NARUTO_RUN_ENABLED) {
+      const localPlayer = playersManager.getLocalPlayer();
+      const newNarutoRunAction = {type: 'narutoRun'};
+      localPlayer.actionsManager.tryAddAction(newNarutoRunAction, true);
+    }
   }
 
   menuUnDoubleTap() {
-    const localPlayer = playersManager.getLocalPlayer();
-    localPlayer.actionsManager.tryRemoveAction('narutoRun', true);
+    if(IS_NARUTO_RUN_ENABLED) {
+      const localPlayer = playersManager.getLocalPlayer();
+      localPlayer.actionsManager.tryRemoveAction('narutoRun', true);
+    }
   }
 
   menuSwitchCharacter() {
@@ -684,6 +689,60 @@ class GameManager extends EventTarget {
     app.instanceId = makeId(5);
     world.appManager.importApp(app);
     app.activate();
+  }
+
+  async handleDropJsonForDrop(object, currentAddress, WebaversecontractAddress, afterDrop = f => f) { // currentAddress = walletaddress, WebaversecontractAddress= signaddress
+    const localPlayer = playersManager.getLocalPlayer();
+    localVector.copy(localPlayer.position);
+    if (localPlayer.avatar) {
+      localVector.y -= localPlayer.avatar.height;
+    }
+
+    const position = localPlayer.position
+      .clone()
+      .add(new THREE.Vector3(0, 0, -1).applyQuaternion(localPlayer.quaternion));
+    const quaternion = localPlayer.quaternion;
+
+    if (object && object.voucher === undefined) {
+      const {voucher, expiry} = await getVoucherFromUser(object.tokenId, currentAddress, WebaversecontractAddress)
+      if (voucher.signature !== undefined) {
+        object.voucher = voucher
+        // add blacklist and time counter add
+        afterDrop(true)
+      }
+    } else {
+        afterDrop(false)
+    }
+
+    const velocity = localVector.set(0, 0, -1).applyQuaternion(localPlayer.quaternion)
+    .normalize()
+    .multiplyScalar(2.5);
+    world.appManager.importAddedUserVoucherApp(position, quaternion, object, velocity);
+  }
+
+  async handleDropJsonForSpawn(handleDropJsonForSpawn) { // currentAddress = walletaddress, WebaversecontractAddress= signaddress
+    const localPlayer = playersManager.getLocalPlayer();
+    localVector.copy(localPlayer.position);
+    if (localPlayer.avatar) {
+      localVector.y -= localPlayer.avatar.height;
+    }
+    console.log("localvector", localVector)
+
+    const u = getDropUrl(handleDropJsonForSpawn);
+    const app = await metaversefileApi.createAppAsync({
+      start_url: u,
+      localVector,
+    });
+    const position = localPlayer.position
+      .clone()
+      .add(new THREE.Vector3(0, 0, -2).applyQuaternion(localPlayer.quaternion));
+    const quaternion = localPlayer.quaternion;
+
+    app.position.copy(position);
+    app.quaternion.copy(quaternion);
+    app.instanceId = makeId(5);
+    app.updateMatrixWorld();
+    world.appManager.importApp(app);
   }
 
   selectLoadout(index) {

@@ -277,7 +277,9 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
                                     size={48}
                                     resolution={2048}
                                     numFrames={128}
-                                    type={"mythic"}
+                                    id="head"
+                                    emptyIcon={"/assets/icons/slotHead.svg"}
+                                    type={"none"}
                                 />
                             </li>
                             <li>
@@ -285,7 +287,9 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
                                     size={48}
                                     resolution={2048}
                                     numFrames={128}
-                                    type={"epic"}
+                                    id="body"
+                                    emptyIcon={"/assets/icons/slotBody.svg"}
+                                    type={"none"}
                                 />
                             </li>
                             <li>
@@ -293,7 +297,9 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
                                     size={48}
                                     resolution={2048}
                                     numFrames={128}
-                                    type={"rare"}
+                                    id="legs"
+                                    emptyIcon={"/assets/icons/slotLegs.svg"}
+                                    type={"none"}
                                 />
                             </li>
                             <li>
@@ -301,7 +307,9 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
                                     size={48}
                                     resolution={2048}
                                     numFrames={128}
-                                    type={"uncommon"}
+                                    id="leftHand"
+                                    emptyIcon={"/assets/icons/slotLeftHand.svg"}
+                                    type={"none"}
                                 />
                             </li>
                             <li>
@@ -309,7 +317,9 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
                                     size={48}
                                     resolution={2048}
                                     numFrames={128}
-                                    type={"common"}
+                                    id="rightHand"
+                                    emptyIcon={"/assets/icons/slotRightHand.svg"}
+                                    type={"none"}
                                 />
                             </li>
                             <li>
@@ -317,6 +327,9 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
                                     size={48}
                                     resolution={2048}
                                     numFrames={128}
+                                    id="mount"
+                                    emptyIcon={"/assets/icons/slotMount.svg"}
+                                    type={"none"}
                                 />
                             </li>
                         </ul>

@@ -44,13 +44,20 @@ export default app => {
       const appUrl = app.getComponent('appUrl');
       const voucher = app.getComponent('voucher');
       if (appName && appUrl && voucher) {
-        dropManager.addClaim(appName, appUrl, voucher);
+        dropManager.addClaim(appName, dropComponent.type, dropComponent.serverDrop, appUrl, voucher);
       } else {
         dropManager.pickupApp(app);
       }
 
+      if (app.subApps && app.subApps.length > 0) {
+        for (const subApp of app.subApps) {
+          const parent = subApp.parent;
+          parent.remove(subApp);
+        }
+      }
+
       world.appManager.removeApp(app);
-      // app.destroy();
+      app.destroy();
     };
 
     const velocity = dropComponent.velocity ? new THREE.Vector3().fromArray(dropComponent.velocity) : new THREE.Vector3();
