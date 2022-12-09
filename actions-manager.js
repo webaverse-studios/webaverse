@@ -347,12 +347,15 @@ class ActionsManager {
     this.blackboard.set('tickTryStopActions', {});
     this.blackboard.set('loaded', true);
   }
+
   get() {
     return this.blackboard.get(...arguments);
   }
+
   set() {
     return this.blackboard.set(...arguments);
   }
+
   tryAddAction(action, isLong = false) {
     if (isLong) {
       const longTryActions = this.blackboard.get('longTryActions');
@@ -364,6 +367,7 @@ class ActionsManager {
       tickTryActions[action.type] = action;
     }
   }
+
   tryRemoveAction(actionType, isLong = false) {
     if (isLong) {
       const longTryActions = this.blackboard.get('longTryActions');
@@ -373,10 +377,12 @@ class ActionsManager {
       tickTryStopActions[actionType] = true;
     }
   }
+
   isLongTrying(actionType) {
     const longTryActions = this.blackboard.get('longTryActions');
     return !!longTryActions[actionType];
   }
+
   update(timestamp) {
     this.blackboard.set('now', timestamp);
     // preTickSettings(this.localPlayer, this.blackboard);
