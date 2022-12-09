@@ -1,7 +1,7 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, {useState, useContext, useEffect} from "react";
 import classnames from "classnames";
 import styles from "./TokenBox.module.css";
-import { Spritesheet } from "../spritesheet";
+import {Spritesheet} from "../spritesheet";
 
 export const TokenBox = (props) => {
     const {
@@ -53,7 +53,7 @@ export const TokenBox = (props) => {
     return (
         <div
             className={styles.tokenBoxWrap}
-            style={{ width: size, height: size }}
+            style={{width: size, height: size}}
             onClick={onClick}
         >
             {active && (
@@ -61,7 +61,7 @@ export const TokenBox = (props) => {
             )}
             <div
                 className={classnames(styles.frame, rarity && styles[rarity])}
-                style={{ opacity: timerTimestamp ? 0.6 : 1 }}
+                style={{opacity: timerTimestamp ? 0.6 : 1}}
             />
             <img src={emptyIcon} className={styles.emptyIcon} />
             {!claimed && object && (
@@ -72,7 +72,7 @@ export const TokenBox = (props) => {
             )}
             <div
                 className={styles.mask}
-                style={{ opacity: timerTimestamp ? 0.6 : 1 }}
+                style={{opacity: timerTimestamp ? 0.6 : 1}}
             >
                 {object && (
                     <Spritesheet
@@ -103,7 +103,7 @@ export const TokenBox = (props) => {
                         styles.level,
                         rarity && styles[rarity]
                     )}
-                    style={{ opacity: timerTimestamp ? 0.6 : 1 }}
+                    style={{opacity: timerTimestamp ? 0.6 : 1}}
                 >
                     Lv.{level}
                 </div>

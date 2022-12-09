@@ -1,16 +1,16 @@
-import React, { useEffect, useState, useRef, useContext } from "react";
+import React, {useEffect, useState, useRef, useContext} from "react";
 import classnames from "classnames";
 import styles from "./Inventory.module.css";
 import CustomButton from "../custom-button";
-import { TokenBox } from "../token-box/TokenBox";
-import { AppContext } from "../../app";
-import { CachedLoader } from "../../../CachedLoader.jsx";
-import { Spritesheet } from "../spritesheet/";
-import { createLandIcon } from "../../../../land-iconer.js";
+import {TokenBox} from "../token-box/TokenBox";
+import {AppContext} from "../../app";
+import {CachedLoader} from "../../../CachedLoader.jsx";
+import {Spritesheet} from "../spritesheet/";
+import {createLandIcon} from "../../../../land-iconer.js";
 import game from "../../../../game.js";
-import { transparentPngUrl } from "../../../../constants.js";
+import {transparentPngUrl} from "../../../../constants.js";
 import * as sounds from "../../../../sounds.js";
-import { mod } from "../../../../util.js";
+import {mod} from "../../../../util.js";
 import dropManager from "../../../../drop-manager";
 import cardsManager from "../../../../cards-manager.js";
 import useNFTContract from "../../../../src/hooks/useNFTContract";
@@ -85,7 +85,7 @@ const Token = ({
         const canvas = canvasRef.current;
         if (canvas && !rendered) {
             (async () => {
-                const { seed, renderPosition, lods, minLodRange, clipRange } =
+                const {seed, renderPosition, lods, minLodRange, clipRange} =
                     object;
 
                 const imageBitmap = await createLandIcon({
@@ -189,7 +189,7 @@ const TokenList = ({
             <div className={styles.sectionTitle}>{title}</div>
             <ul className={styles.tokenList}>
                 {sections.map((section, i) => {
-                    const { name, tokens, type } = section;
+                    const {name, tokens, type} = section;
                     return (
                         <React.Fragment key={i}>
                             {tokens.map((object, i) => (
@@ -225,7 +225,7 @@ const TokenList = ({
 };
 
 export const Inventory = () => {
-    const { state, setState, account, claimableToken, setClaimableToken, mintedToken, setMintedToken, getWalletItems } = useContext(AppContext);
+    const {state, setState, account, claimableToken, setClaimableToken, mintedToken, setMintedToken, getWalletItems} = useContext(AppContext);
     const [hoverObject, setHoverObject] = useState(null);
     const [selectObject, setSelectObject] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -234,7 +234,7 @@ export const Inventory = () => {
 
     const [showTokenDropDown, setShowTokenDropDown] = useState(false);
 
-    const { getTokens, mintfromVoucher, WebaversecontractAddress } =
+    const {getTokens, mintfromVoucher, WebaversecontractAddress} =
         useNFTContract(account.currentAddress);
 
     const open =
@@ -262,11 +262,11 @@ export const Inventory = () => {
         e.dataTransfer.effectAllowed = "all";
         e.dataTransfer.dropEffect = "move";
         // Do not remove
-        /*const transparentPng = new Image();
+        /* const transparentPng = new Image();
         const image = e.target.getElementsByTagName("canvas")[0].toDataURL();
         transparentPng.src = image;
         console.log(transparentPng)
-        e.dataTransfer.setDragImage(transparentPng, 0, 0);*/
+        e.dataTransfer.setDragImage(transparentPng, 0, 0); */
     };
     const onClick = (e, object) => {
         e.preventDefault();
@@ -298,8 +298,7 @@ export const Inventory = () => {
             account.currentAddress,
             WebaversecontractAddress,
             (isclaimed) => {
-                if (isclaimed) {
-                } else {
+                if (!isclaimed) {
                     dropManager.removeClaim(object);
                 }
             }
@@ -347,7 +346,7 @@ export const Inventory = () => {
                 <div className={styles.inventoryPanel}>
                     <div
                         className={styles.expandWrap}
-                        onClick={() => setExpand(expand ? false : true)}
+                        onClick={() => setExpand(!expand)}
                     >
                         <img
                             src={
