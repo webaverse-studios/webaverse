@@ -1,7 +1,7 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, {useState, useContext, useEffect} from "react";
 import classnames from "classnames";
 import styles from "./TokenBox.module.css";
-import { Spritesheet } from "../spritesheet";
+import {Spritesheet} from "../spritesheet";
 
 export const TokenBox = (props) => {
     const {
@@ -9,7 +9,6 @@ export const TokenBox = (props) => {
         resolution,
         active,
         claimed,
-        spawnCopy,
         onClick,
         object,
         canvasRef,
@@ -18,14 +17,16 @@ export const TokenBox = (props) => {
         value,
         type,
         timerTimestamp,
-        emptyIcon
+        emptyIcon,
+        rarity,
     } = props;
 
     const [timeLeft, setTimeLeft] = useState("");
 
     useEffect(() => {
         if (timerTimestamp) {
-            var countDownDate = new Date(parseInt(timerTimestamp)).getTime();
+            var countDownDate =
+                new Date(parseInt(timerTimestamp)).getTime() * 1000;
             var x = setInterval(function () {
                 var now = new Date().getTime();
                 var distance = countDownDate - now;
@@ -36,8 +37,11 @@ export const TokenBox = (props) => {
                     (distance % (1000 * 60 * 60)) / (1000 * 60)
                 );
                 var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                setTimeLeft(hours + ":" + minutes + ":" + seconds);
-
+                if (hours < 1) {
+                    setTimeLeft(minutes + ":" + seconds);
+                } else {
+                    setTimeLeft(hours + ":" + minutes);
+                }
                 if (distance < 0) {
                     clearInterval(x);
                     setTimeLeft("EXPIRED");
@@ -49,13 +53,16 @@ export const TokenBox = (props) => {
     return (
         <div
             className={styles.tokenBoxWrap}
-            style={{ width: size, height: size }}
+            style={{width: size, height: size}}
             onClick={onClick}
         >
             {active && (
                 <div className={classnames(styles.frame, styles.frameActive)} />
             )}
-            <div className={classnames(styles.frame, type && styles[type])} />
+            <div
+                className={classnames(styles.frame, rarity && styles[rarity])}
+                style={{opacity: timerTimestamp ? 0.6 : 1}}
+            />
             <img src={emptyIcon} className={styles.emptyIcon} />
             {!claimed && object && (
                 <img
@@ -63,10 +70,10 @@ export const TokenBox = (props) => {
                     className={styles.badge}
                 />
             )}
-            {spawnCopy && (
-                <div className={classnames(styles.frame, styles.frameCopy)} />
-            )}
-            <div className={styles.mask}>
+            <div
+                className={styles.mask}
+                style={{opacity: timerTimestamp ? 0.6 : 1}}
+            >
                 {object && (
                     <Spritesheet
                         className={styles.item}
@@ -85,11 +92,19 @@ export const TokenBox = (props) => {
                         }}
                     />
                 )}
-                <div className={styles.timer}>{timeLeft}</div>
+                {timerTimestamp && (
+                    <div className={styles.timer}>{timeLeft}</div>
+                )}
                 {value && <div className={styles.value}>{value}</div>}
             </div>
             {level && (
-                <div className={classnames(styles.level, type && styles[type])}>
+                <div
+                    className={classnames(
+                        styles.level,
+                        rarity && styles[rarity]
+                    )}
+                    style={{opacity: timerTimestamp ? 0.6 : 1}}
+                >
                     Lv.{level}
                 </div>
             )}
