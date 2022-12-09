@@ -39,4 +39,7 @@ const o = {
     return loadPromise;
   }, */
 };
-export default o;
+
+export default function usePreauthenticator() {
+  return o;
+}

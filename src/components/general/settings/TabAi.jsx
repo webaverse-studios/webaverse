@@ -6,7 +6,7 @@ import {Switch} from './switch';
 import loreAI from '../../../../ai/lore/lore-ai';
 import debug from '../../../../debug';
 
-import preauthenticator from '../../../../preauthenticator';
+import usePreauthenticator from '../../../hooks/usePreauthenticator';
 
 import styles from './settings.module.css';
 
@@ -33,6 +33,8 @@ export const TabAi = ({active}) => {
     const [ testRunning, setTestRunning ] = useState(false);
 
     //
+
+    const preauthenticator = usePreauthenticator();
 
     useEffect(() => {
         function enabledchange(e) {
