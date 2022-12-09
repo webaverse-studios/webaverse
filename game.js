@@ -666,6 +666,16 @@ class GameManager extends EventTarget {
     return localPlayer.hasAction('swim');
   }
 
+  toggleCrouch() {
+    const localPlayer = playersManager.getLocalPlayer();
+    if (localPlayer.actionsManager.isLongTrying('crouch')) {
+      localPlayer.actionsManager.tryRemoveAction('crouch', true);
+    } else {
+      const newCrouchAction = {type: 'crouch'};
+      localPlayer.actionsManager.tryAddAction(newCrouchAction, true);
+    }
+  }
+
   async handleDropJsonItemToPlayer(item, index) {
     const u = await handleDropJsonItem(item);
     return await this.handleDropUrlToPlayer(u, index);
@@ -767,6 +777,14 @@ class GameManager extends EventTarget {
     return localPlayer.hasAction('doubleJump');
   }
 
+   jump() {
+    const localPlayer = playersManager.getLocalPlayer();
+    const newJumpAction = {
+      type: 'jump',
+      startPositionY: localPlayer.characterPhysics.characterController.position.y,
+    }
+    localPlayer.actionsManager.tryAddAction(newJumpAction);
+   }
   isMovingBackward() {
     const localPlayer = playersManager.getLocalPlayer();
     return localPlayer.avatar?.direction.z > 0.1; // If check > 0 will cause glitch when move left/right;
