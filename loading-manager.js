@@ -1,11 +1,6 @@
-// singleton loading manager
-// creates a full screen loading screen and updates the loader with progress
-// the progress is received from the webaverse object (from webaverse.js)
-// webaverse is an EventTarget that dispatches events, notably the loadProgress event
-
 export class LoadingManager {
     constructor(webaverse) {
-        // create some dev elements to show the loading progress
+
         this.loadingScreen = document.createElement('div');
         this.loadingScreen.style.position = 'fixed';
         this.loadingScreen.style.top = 0;
@@ -28,7 +23,6 @@ export class LoadingManager {
         this.loadingBar.style.transform = 'translate(-50%, -50%)';
         this.loadingScreen.appendChild(this.loadingBar);
 
-        // add a border to the loading bar
         const border = document.createElement('div');
         border.style.position = 'absolute';
         border.style.top = '50%';
@@ -39,7 +33,6 @@ export class LoadingManager {
         border.style.transform = 'translate(-50%, -50%)';
         this.loadingScreen.appendChild(border);
 
-        // add the text LOADING over the loading bar
         const loadingText = document.createElement('div');
         loadingText.style.position = 'absolute';
         loadingText.style.top = 'calc(50% - 20px)';
@@ -49,11 +42,9 @@ export class LoadingManager {
         loadingText.style.color = 'rgba(255, 255, 255, 1.0)';
         loadingText.style.transform = 'translate(-50%, -50%)';
         loadingText.innerHTML = 'LOADING...';
-        // make the text a bit bigger
         loadingText.style.fontSize = '20px';
         this.loadingScreen.appendChild(loadingText);
 
-        // add the backgroundImage images/world.jpg fullscreen and blur it a lot
         const backgroundImage = document.createElement('img');
         backgroundImage.src = 'images/world.jpg';
         backgroundImage.style.position = 'absolute';
@@ -64,17 +55,12 @@ export class LoadingManager {
         backgroundImage.style.filter = 'blur(10px)';
         backgroundImage.style.objectFit = 'cover';
 
-        // put behind all other elements in the loadingScreen
         backgroundImage.style.zIndex = -1;
 
         this.loadingScreen.appendChild(backgroundImage);
 
-
-
         this.webavere = webaverse;
     
-        // subscribe to the loadProgress event on webaverse object (from webavberse.js)
-        // and update the loading bar
         webaverse.addEventListener('loadProgress', e => {
             const progress = e.data.loadProgressPercentage;
             this.loadingBar.style.width = `${progress/2}%`;
@@ -87,7 +73,6 @@ export class LoadingManager {
     }
     
     hide() {
-        // fade out the loading screen, then remove it from the DOM
         const interval = setInterval(() => {
             const opacity = parseFloat(this.loadingScreen.style.opacity);
             if (opacity > 0) {
@@ -98,4 +83,4 @@ export class LoadingManager {
             }
         }, 50);
     }
-    }
+}
