@@ -31,9 +31,9 @@ export class DrawCallBinding {
     );
   }
 
-  // getInstanceCount() {
-  //   return this.allocator.getInstanceCount(this);
-  // }
+  getInstanceCount() {
+    return this.allocator.getInstanceCount(this);
+  }
 
   setInstanceCount(instanceCount) {
     this.allocator.setInstanceCount(this, instanceCount);
@@ -468,9 +468,9 @@ export class InstancedGeometryAllocator {
     this.freeList.free(freeListEntry);
   }
 
-  // getInstanceCount(drawCall) {
-  //   return this.drawInstanceCounts[drawCall.freeListEntry];
-  // }
+  getInstanceCount(drawCall) {
+    return this.drawInstanceCounts[drawCall.freeListEntry];
+  }
 
   setInstanceCount(drawCall, instanceCount) {
     this.drawInstanceCounts[drawCall.freeListEntry] = instanceCount;
