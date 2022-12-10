@@ -26,10 +26,6 @@ Better rank ordering method by Stefan Gustavson in 2012.
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
-const exports = {};
-const module = {exports};
-(function() {
-  'use strict';
 
   const MAX_VERTICES = 256;
   const MAX_VERTICES_MASK = MAX_VERTICES -1;
@@ -491,17 +487,5 @@ const module = {exports};
       return (n >>> 0) * 2.3283064365386963e-10; // 2^-32
     };
   }
-
-  // amd
-  if (typeof define !== 'undefined' && define.amd) define(function() {return SimplexNoise;});
-  // common js
-  if (typeof exports !== 'undefined') exports.SimplexNoise = SimplexNoise;
-  // browser
-  else if (typeof window !== 'undefined') window.SimplexNoise = SimplexNoise;
-  // nodejs
-  if (typeof module !== 'undefined') {
-    module.exports = SimplexNoise;
-  }
-
-})();
-export default module.exports;
+  
+  export default SimplexNoise;
