@@ -13,12 +13,16 @@ export const rarityColors = {
 };
 
 const chainName = (() => {
-  if (typeof globalThis !== 'undefined' && /^test\./.test(location.hostname)) {
-    return 'testnet';
-  } else if (typeof globalThis !== 'undefined' && /^polygon\./.test(location.hostname)) {
-    return 'polygon';
+  if (typeof location !== 'undefined') {
+    if (/^test\./.test(location.hostname)) {
+      return 'testnet';
+    } else if (/^polygon\./.test(location.hostname)) {
+      return 'polygon';
+    } else {
+      return 'mainnet';
+    }
   } else {
-    return 'mainnet';
+    return 'polygon';
   }
 })();
 const otherChainName = /sidechain/.test(chainName) ?
