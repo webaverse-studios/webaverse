@@ -66,15 +66,6 @@
     "zine": "./packages/zine",
     "zjs": "./packages/zjs"
   },
-  "peerDependencies": {
-    "three": "./packages/three",
-    "@pixiv/three-vrm": "./packages/three-vrm",
-    "@pixiv/three-vrm-core": "./packages/three-vrm/three-vrm-core",
-    "@pixiv/three-vrm-springbone": "./packages/three-vrm/three-vrm-springbone",
-    "@pixiv/three-vrm-materials-mtoon": "./packages/three-vrm/three-vrm-materials-mtoon",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
   "devDependencies": {
     "@types/expect-puppeteer": "^5.0.1",
     "@types/jest": "^29.0.0",
