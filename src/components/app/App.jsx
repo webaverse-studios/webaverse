@@ -30,7 +30,7 @@ import {handleStoryKeyControls} from '../../../story';
 import {scenesBaseUrl, defaultSceneName} from '../../../endpoints.js';
 
 import styles from './App.module.css';
-import '../../fonts.css';
+import '../../../styles/globals.css';
 import raycastManager from '../../../raycast-manager';
 import npcManager from '../../../npc-manager';
 
