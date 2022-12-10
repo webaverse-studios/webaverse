@@ -32,7 +32,6 @@
     "lint": "eslint --fix --quiet --ext .js,.jsx ."
   },
   "dependencies": {
-    "@babel/preset-react": "^7.17.12",
     "@pixiv/three-vrm": "./packages/three-vrm",
     "@pixiv/three-vrm-core": "./packages/three-vrm/three-vrm-core",
     "@pixiv/three-vrm-springbone": "./packages/three-vrm/three-vrm-springbone",
