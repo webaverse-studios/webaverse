@@ -2432,6 +2432,9 @@ const physxWorker = (() => {
 
     allocator.freeAll();
   }
+  // w.getAnimationAvatarInfos = () => { // test // todo
+
+  // }
 
   // End AnimationSystem
 

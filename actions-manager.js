@@ -218,9 +218,10 @@ class HaltSit extends b3.Condition {
 }
 class Glider extends b3.Action {
   tick(tick) {
+    const localPlayer = tick.target;
     const tickResults = tick.blackboard.get('tickResults');
     const tickTryStopActions = tick.blackboard.get('tickTryStopActions');
-    if (tickTryStopActions.glider) {
+    if (tickTryStopActions.glider || localPlayer.characterPhysics.grounded) {
       return b3.FAILURE;
     } else {
       tickResults.glider = true;

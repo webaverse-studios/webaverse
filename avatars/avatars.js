@@ -48,6 +48,7 @@ import Looker from './Looker.js';
 import Nodder from './Nodder.js';
 
 import * as wind from './simulation/wind.js';
+import physx from '../physx.js'; // test
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -1822,6 +1823,8 @@ class Avatar {
       const actionsStr = globalThis.localPlayer?.getActionsArray().map(n=>n.type + (n.from ? 'From' + n.from : '')).join(',')
 
       console.log('-actions:', actionsStr)
+
+      // console.log(physx.physxWorker.getActionInterpolantAnimationAvatar(this.animationAvatarPtr, 'land', 0))
 
       // if (actionsStr === 'movements,fallLoop') {
       // if (actionsStr === 'movements,fallLoop,fallLoopFromjump') {
