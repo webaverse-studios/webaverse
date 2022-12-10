@@ -327,6 +327,7 @@ class Universe extends EventTarget {
       if (transform) {
         playersArray.doc.transact(() => {
           playerMap.set('transform', transform);
+          playerMap.set('velocity', [0, 0, 0]);
         });
       }
       const voiceSpec = player.getKeyValue('voiceSpec');
