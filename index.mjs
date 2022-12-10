@@ -201,7 +201,7 @@ const _startE2eTest = () => {
 }
 
 const _startDevServer = async () => {
-  const devServerProcess = child_process.spawn(process.argv[0], ['./dev-server.js'], {
+  const devServerProcess = child_process.spawn(process.argv[0], ['./dev-server.mjs'], {
     cwd: dirname,
     env: {
       ...process.env,

@@ -30,7 +30,7 @@ import {handleStoryKeyControls} from '../../../story';
 import {scenesBaseUrl, defaultSceneName} from '../../../endpoints.js';
 
 import styles from './App.module.css';
-import '../../fonts.css';
+import '../../../styles/globals.css';
 import raycastManager from '../../../raycast-manager';
 import npcManager from '../../../npc-manager';
 
@@ -264,6 +264,7 @@ export const App = () => {
     }, []);
 
     useEffect(() => {
+        if (typeof window === 'undefined') return;
 
         const pushstate = e => {
 
@@ -340,6 +341,7 @@ export const App = () => {
               params: [
               ],
               claimed: true,
+              rarity: "common",
               type: "major",
               level: 15
           }

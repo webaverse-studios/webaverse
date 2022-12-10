@@ -65,8 +65,6 @@ import {lightsManager} from './engine-hooks/lights/lights-manager.js';
 import {skyManager} from './engine-hooks/environment/skybox/sky-manager.js';
 import {compilerBaseUrl} from './endpoints.js';
 import {getDefaultCanvas} from './offscreen-engine/fns/avatar-iconer-fn.js';
-import {encodePNG2KTX} from './basisu/encode.js';
-import {loadKtx2TextureBlob, loadKtx2TextureUrl} from './basisu/decode.js';
 import {isWorker} from './env.js';
 import './metaversefile-binding.js';
 
@@ -402,6 +400,7 @@ let iframeContainer = null;
 let recursion = 0;
 let wasDecapitated = false;
 const mirrors = [];
+const importFn = new Function('u', 'return import(u)');
 metaversefile.setApi({
   async import(s) {
     if (/^[a-zA-Z0-9]+:/.test(s)) {
@@ -413,7 +412,8 @@ metaversefile.setApi({
     // console.log('metaversefile import', {s, oldS});
 
     try {
-      const m = await import(s);
+      // const m = await import(s);
+      const m = await importFn(s);
       return m;
     } catch(err) {
       // console.warn('error loading', JSON.stringify(s), err.stack);
@@ -559,13 +559,6 @@ metaversefile.setApi({
   useSceneCruncher() {
     return sceneCruncher;
   }, */
-  useKtx2Util() {
-    return {
-      encodePNG2KTX,
-      loadKtx2TextureBlob,
-      loadKtx2TextureUrl,
-    };
-  },
   useScenePreviewer() {
     return scenePreviewer;
   },
@@ -1475,121 +1468,6 @@ export default () => {
       _bindDefaultComponents(app);
       
       return app;
-    /*
-    } else if (React.isValidElement(renderSpec)) {
-      const o = new THREE.Object3D();
-      // o.contentId = contentId;
-      // o.getPhysicsIds = () => app.physicsIds;
-      o.destroy = () => {
-        app.destroy();
-        
-        (async () => {
-          const roots = ReactThreeFiber._roots;
-          const root = roots.get(rootDiv);
-          const fiber = root?.fiber
-          if (fiber) {
-            const state = root?.store.getState()
-            if (state) state.internal.active = false
-            await new Promise((accept, reject) => {
-              ReactThreeFiber.reconciler.updateContainer(null, fiber, null, () => {
-                if (state) {
-                  // setTimeout(() => {
-                    state.events.disconnect?.()
-                    // state.gl?.renderLists?.dispose?.()
-                    // state.gl?.forceContextLoss?.()
-                    ReactThreeFiber.dispose(state)
-                    roots.delete(canvas)
-                    // if (callback) callback(canvas)
-                  // }, 500)
-                }
-                accept();
-              });
-            });
-          }
-        })();
-      };
-      app.add(o);
-      
-      const renderer = getRenderer();
-      const sizeVector = renderer.getSize(localVector2D);
-      const rootDiv = document.createElement('div');
-      let rtfScene = null;
-      world.appManager.addEventListener('frame', e => {
-        const renderer2 = Object.create(renderer);
-        renderer2.render = () => {
-          // nothing
-          // console.log('elide render');
-        };
-        renderer2.setSize = () => {
-          // nothing
-        };
-        renderer2.setPixelRatio = () => {
-          // nothing
-        };
-        
-        ReactThreeFiber.render(
-          React.createElement(ErrorBoundary, {}, [
-            React.createElement(fn, {
-              // app: appContextObject,
-              key: 0,
-            }),
-          ]),
-          rootDiv,
-          {
-            gl: renderer2,
-            camera,
-            size: {
-              width: sizeVector.x,
-              height: sizeVector.y,
-            },
-            events: createPointerEvents,
-            onCreated: state => {
-              // state = newState;
-              // scene.add(state.scene);
-              // console.log('got state', state);
-              const {scene: newRtfScene} = state;
-              if (newRtfScene !== rtfScene) {
-                if (rtfScene) {
-                  o.remove(rtfScene);
-                  rtfScene = null;
-                }
-                rtfScene = newRtfScene;
-                o.add(rtfScene);
-              }
-            },
-            frameloop: 'demand',
-          }
-        );
-      });
-      app.addEventListener('destroy', async () => {
-        const roots = ReactThreeFiber._roots;
-        const root = roots.get(rootDiv);
-        const fiber = root?.fiber
-        if (fiber) {
-          const state = root?.store.getState()
-          if (state) state.internal.active = false
-          await new Promise((accept, reject) => {
-            ReactThreeFiber.reconciler.updateContainer(null, fiber, null, () => {
-              if (state) {
-                // setTimeout(() => {
-                  state.events.disconnect?.()
-                  // state.gl?.renderLists?.dispose?.()
-                  // state.gl?.forceContextLoss?.()
-                  ReactThreeFiber.dispose(state)
-                  roots.delete(canvas)
-                  // if (callback) callback(canvas)
-                // }, 500)
-              }
-              accept();
-            });
-          });
-        }
-      });
-
-      _bindDefaultComponents(app);
-      
-      return app;
-    */
     } else if (renderSpec === false || renderSpec === null || renderSpec === undefined) {
       app.destroy();
       return null;
