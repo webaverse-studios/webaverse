@@ -21,18 +21,20 @@ const functionMap = {
   'getSpriteAnimationForAppUrlInternal': getSpriteAnimationForAppUrlInternal,
 };
 
-globalThis.addEventListener('message', async e => {
-  const method = e.data?.method;
-  if (method === 'initializeEngine') {
-    const {port} = e.data;
-    _bindPort(port);
-    await physx.waitForLoad();
-    await Avatar.waitForLoad();
-    port.postMessage({
-      method: 'initialized',
-    });
-  }
-});
+if (typeof window !== 'undefined') {
+  globalThis.window.addEventListener('message', async e => {
+    const method = e.data?.method;
+    if (method === 'initializeEngine') {
+      const {port} = e.data;
+      _bindPort(port);
+      await physx.waitForLoad();
+      await Avatar.waitForLoad();
+      port.postMessage({
+        method: 'initialized',
+      });
+    }
+  });
+}
 
 const isTransferable = o => {
   const ctor = o?.constructor;
@@ -115,8 +117,10 @@ const _bindPort = port => {
   port.start();
 };
 
-const canvas = new OffscreenCanvas(offscreenCanvasSize, offscreenCanvasSize);
-globalThis.innerWidth = canvas.width;
-globalThis.innerHeight = canvas.height;
-globalThis.devicePixelRatio = 1;
-bindCanvas(canvas);
+if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
+  const canvas = new globalThis.OffscreenCanvas(offscreenCanvasSize, offscreenCanvasSize);
+  globalThis.innerWidth = canvas.width;
+  globalThis.innerHeight = canvas.height;
+  globalThis.devicePixelRatio = 1;
+  bindCanvas(canvas);
+}
