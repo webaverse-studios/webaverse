@@ -94,7 +94,7 @@ export default class Webaverse extends EventTarget {
     })();
     this.contentLoaded = false;
     const self = this
-    // Todo: global variable for e2e automatic tests
+    /* // Todo: global variable for e2e automatic tests
     window.globalWebaverse = {
       metaversefileApi,
       playersManager,
@@ -106,7 +106,7 @@ export default class Webaverse extends EventTarget {
       webaverse: self,
       world,
       game,
-    };
+    }; */
   }
   
   waitForLoad() {
