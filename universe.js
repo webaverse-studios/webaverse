@@ -220,7 +220,6 @@ class Universe extends EventTarget {
       const {playerId, player} = e.data;
       console.log('Player joined:', playerId);
 
-      const defaultPlayerSpec = await characterSelectManager.getDefaultSpecAsync();
       const defaultTransform = new Float32Array([0, 0, 0, 0, 0, 0, 1, 1, 1, 1]);
 
       const playersArray = this.state.getArray(playersMapName);
@@ -322,7 +321,7 @@ class Universe extends EventTarget {
         }
       });
 
-      // Handle already present remote players.
+      // Add this player to player map.
       const transform = player.getKeyValue('transform');
       if (transform) {
         playersArray.doc.transact(() => {
