@@ -114,18 +114,26 @@ const _handleMessage = async e => {
     queue.push(e);
   }
 };
-self.onmessage = e => {
-  _handleMessage({
-    data: e.data,
-    port: self,
-  });
-};
+if (typeof self !== 'undefined') {
+  self.onmessage = e => {
+    if (loaded) {
+      _handleMessage({
+        data: e.data,
+        port: self,
+      });
+    } else {
+      queue.push(e);
+    }
+  };
+}
 
-(async () => {
-  await physxLite.waitForLoad();
+if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
+  (async () => {
+    await physxLite.waitForLoad();
 
-  loaded = true;
-  if (queue.length > 0) {
-    _handleMessage(queue.shift());
-  }
-})();
+    loaded = true;
+    if (queue.length > 0) {
+      _handleMessage(queue.shift());
+    }
+  })();
+}
