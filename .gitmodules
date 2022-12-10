@@ -28,3 +28,6 @@
 [submodule "packages/three-vrm"]
 	path = packages/three-vrm
 	url = https://github.com/webaverse/three-vrm.git
+[submodule "packages/zine"]
+	path = packages/zine
+	url = https://github.com/webaverse/zine.git
