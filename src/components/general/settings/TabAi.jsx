@@ -6,7 +6,7 @@ import {Switch} from './switch';
 import loreAI from '../../../../ai/lore/lore-ai';
 import debug from '../../../../debug';
 
-import preauthenticator from '../../../../preauthenticator';
+// import preauthenticator from '../../../../preauthenticator';
 
 import styles from './settings.module.css';
 
