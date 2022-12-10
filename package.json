@@ -63,6 +63,7 @@
     "webm-writer": "^1.0.0",
     "wsrtc": "./packages/wsrtc",
     "xhr2": "^0.2.1",
+    "zine": "./packages/zine",
     "zjs": "./packages/zjs"
   },
   "peerDependencies": {
