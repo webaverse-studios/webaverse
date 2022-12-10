@@ -78,6 +78,7 @@ const _proxyUrl = (req, res, u) => {
 const serveDirectories = [
   '/packages/scenes/',
   '/packages/characters/',
+  // '/packages/wsrtc/',
 ];
 const _proxyFile = (req, res, u) => {
   u = path.join(dirname, u);
