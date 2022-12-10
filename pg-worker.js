@@ -941,24 +941,29 @@ const _handleMessage = async m => {
     );
   }
 };
-self.onmessage = (e) => {
-  const m = {
-    data: e.data,
-    port: self,
+if (typeof self !== 'undefined') {
+  self.onmessage = (e) => {
+    const m = {
+      data: e.data,
+      port: self,
+    };
+    if (loaded) {
+      _handleMessage(m);
+    } else {
+      // throw new Error('not loaded');
+      queue.push(m);
+    }
   };
-  if (loaded) {
-    _handleMessage(m);
-  } else {
-    queue.push(m);
-  }
-};
+}
 
-(async () => {
-  await pg.waitForLoad();
+if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
+  (async () => {
+    await pg.waitForLoad();
 
-  loaded = true;
-  for (let i = 0; i < queue.length; i++) {
-    _handleMessage(queue[i]);
-  }
-  queue.length = 0;
-})();
+    loaded = true;
+    for (let i = 0; i < queue.length; i++) {
+      _handleMessage(queue[i]);
+    }
+    queue.length = 0;
+  })();
+}
