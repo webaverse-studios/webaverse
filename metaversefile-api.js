@@ -53,6 +53,7 @@ import dropManager from './drop-manager.js';
 import hitManager from './character-hitter.js';
 import procGenManager from './procgen-manager.js';
 import cardsManager from './cards-manager.js';
+import zineManager from './zine-manager.js';
 import * as geometryBuffering from './geometry-buffering.js';
 import * as geometryBatching from './geometry-batching.js';
 import * as geometryChunking from './geometry-chunking.js';
@@ -1364,6 +1365,9 @@ export default () => {
   },
   useCardsManager() {
     return cardsManager;
+  },
+  useZine() {
+    return zineManager;
   },
   useDebug() {
     return debug;
