@@ -264,6 +264,7 @@ export const App = () => {
     }, []);
 
     useEffect(() => {
+        if (typeof window === 'undefined') return;
 
         const pushstate = e => {
 
