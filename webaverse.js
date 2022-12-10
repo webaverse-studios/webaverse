@@ -392,7 +392,7 @@ const _startHacks = webaverse => {
   const vpdAnimations = Avatar.getAnimations().filter(animation => animation.name.endsWith('.vpd'));
 
   // press R to debug current state in console
-  window.addEventListener('keydown', event => {
+  (typeof window !== 'undefined') && window.addEventListener('keydown', event => {
     if (event.key === '}') {
       console.log('>>>>> current state');
       console.log(universe.state);
@@ -568,7 +568,7 @@ const _startHacks = webaverse => {
   }; */
   webaverse.titleCardHack = false;
   // let haloMeshApp = null;
-  window.addEventListener('keydown', e => {
+  (typeof window !== 'undefined') && window.addEventListener('keydown', e => {
     if (e.which === 46) { // .
       emotionIndex = -1;
       _updateFacePose();
