@@ -374,15 +374,15 @@ class LoreAI {
     const _apiTypeNeedsApiKey = apiType => apiType === 'OPENAI';
 
     const url = _getApiUrl(apiType);
-    if (_apiTypeNeedsApiKey(apiType)) {
-      this.setEndpoint(async query => {
-        const preauthenticatorModule = await import('../../preauthenticator');
-        const preauthenticator = preauthenticatorModule.default;
-        return await preauthenticator.callAuthenticatedApi(authenticatedApiName, url, query);
-      });
-    } else {
+    // if (_apiTypeNeedsApiKey(apiType)) {
+    //   this.setEndpoint(async query => {
+    //     const preauthenticatorModule = await import('../../preauthenticator');
+    //     const preauthenticator = preauthenticatorModule.default;
+    //     return await preauthenticator.callAuthenticatedApi(authenticatedApiName, url, query);
+    //   });
+    // } else {
       this.setEndpointUrl(url);
-    }
+    // }
   };
 
   async generate(prompt, {
