@@ -78,20 +78,7 @@ export default class Webaverse extends EventTarget {
 
     story.listenHack();
 
-    this.loadPromise = (async () => {
-      await physx.waitForLoad();
-      await Promise.all([
-        Avatar.waitForLoad(),
-        physxWorkerManager.waitForLoad(),
-        sounds.waitForLoad(),
-        zTargeting.waitForLoad(),
-        particleSystemManager.waitForLoad(),
-        transformControls.waitForLoad(),
-        backgroundFx.waitForLoad(),
-        voices.waitForLoad(),
-        musicManager.waitForLoad(),
-      ]);
-    })();
+    this.loadPromise = null;
     this.contentLoaded = false;
     const self = this
     /* // Todo: global variable for e2e automatic tests
@@ -109,8 +96,24 @@ export default class Webaverse extends EventTarget {
     }; */
   }
   
-  waitForLoad() {
-    return this.loadPromise;
+  async waitForLoad() {
+    if (!this.loadPromise) {
+      this.loadPromise = async () => {
+        await physx.waitForLoad();
+        await Promise.all([
+          Avatar.waitForLoad(),
+          physxWorkerManager.waitForLoad(),
+          sounds.waitForLoad(),
+          zTargeting.waitForLoad(),
+          particleSystemManager.waitForLoad(),
+          transformControls.waitForLoad(),
+          backgroundFx.waitForLoad(),
+          voices.waitForLoad(),
+          musicManager.waitForLoad(),
+        ]);
+      };
+    }
+    await this.loadPromise();
   }
 
   getRenderer() {
