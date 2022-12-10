@@ -400,6 +400,7 @@ let iframeContainer = null;
 let recursion = 0;
 let wasDecapitated = false;
 const mirrors = [];
+const importFn = new Function('u', 'return import(u)');
 metaversefile.setApi({
   async import(s) {
     if (/^[a-zA-Z0-9]+:/.test(s)) {
@@ -411,7 +412,8 @@ metaversefile.setApi({
     // console.log('metaversefile import', {s, oldS});
 
     try {
-      const m = await import(s);
+      // const m = await import(s);
+      const m = await importFn(s);
       return m;
     } catch(err) {
       // console.warn('error loading', JSON.stringify(s), err.stack);
