@@ -112,4 +112,6 @@ class VolumeProcessor extends (typeof AudioWorkletProcessor !== 'undefined' ? Au
     return true;
   }
 }
-registerProcessor('volume-processor', VolumeProcessor);
+if (typeof globalThis.registerProcessor !== 'undefined') {
+  registerProcessor('volume-processor', VolumeProcessor);
+}
