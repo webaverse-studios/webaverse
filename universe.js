@@ -43,6 +43,7 @@ class Universe extends EventTarget {
   }
 
   async enterWorld(worldSpec, locationSpec) {
+    this.disconnectSingleplayer();
     this.disconnectMultiplayer();
     this.disconnectRoom();
     
@@ -69,8 +70,7 @@ class Universe extends EventTarget {
       const promises = [];
       const {src, room} = worldSpec;
       if (!this.multiplayerEnabled && !room) {
-        const state = new Z.Doc();
-        this.connectState(state);
+        await this.connectSinglePlayer();
 
         let match;
         if (src === undefined) {
@@ -170,8 +170,6 @@ class Universe extends EventTarget {
 
   getConnection() { return this.wsrtc; }
 
-  // called by enterWorld() in universe.js
-  // This is called in single player mode instead of connectRoom
   connectState(state) {
     this.state = state;
     state.setResolvePriority(1);
@@ -189,6 +187,16 @@ class Universe extends EventTarget {
 
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.bindState(state.getArray(playersMapName));
+  }
+
+  // Called by enterWorld() when a player connects as single-player.
+  async connectSinglePlayer(state = new Z.Doc()) {
+    this.connectState(state);
+  }
+
+  // Called by enterWorld() to ensure we aren't connected as single player.
+  disconnectSingleplayer() {
+    // Nothing to do at present.
   }
 
   // Called by enterWorld() when a player enables multi-player.
@@ -374,6 +382,10 @@ class Universe extends EventTarget {
 
   // Called by enterWorld() to ensure we aren't connected to multi-player.
   disconnectMultiplayer() {
+    if (!this.multiplayerConnected) {
+      return;
+    }
+
     this.multiplayerConnected = false;
 
     for (const cleanupFn of this.actionsCleanupFns) {
