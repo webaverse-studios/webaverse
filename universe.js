@@ -197,12 +197,9 @@ class Universe extends EventTarget {
 
   // Called by enterWorld() to ensure we aren't connected as single player.
   disconnectSingleplayer() {
-    if (this.multiplayerConnected) {
-      return;
-    }
-
     // Nothing to do at present.
   }
+
   // Called by enterWorld() when a player enables multi-player.
   async connectMultiplayer(src, state = new Z.Doc()) {
     this.connectState(state);

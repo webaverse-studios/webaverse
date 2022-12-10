@@ -50,6 +50,9 @@ const maxAnimationFrameLength = 512;
 let unifiedBoneTextureSize = 1024;
 const mobGlobalData = [];
 const MAXSOUNDSSAMETIME = 3;
+
+// hadrcoded sound, loaded from centralized sound bank
+// todo: load sounds from app, from wave file packaged with glb
 const soundsDB = new Map([
   ["https://webaverse.github.io/silkworm-bloater/silkworm-bloater.glbattack",     "worm_bloaterattack"],
   ["https://webaverse.github.io/silkworm-bloater/silkworm-bloater.glbattack.001", "worm_bloaterattack"],
@@ -87,6 +90,7 @@ const animationEasing = 16;
 const defaultAggroDistance = 3;
 const debugMobActions = true;
 const debugShader = false;
+const debugBBox = false;
 
 export const MobStates = {
   idle: 0,
@@ -809,6 +813,7 @@ export class MobInstance {
     this.velocity = velocity;
     this.grounded = false;
     this.movement = new Vector3(0, 0, 0);
+    this.radius = radius;
     this.initPhysics(radius, height);
     this._createActions();
     this.killEvents = [];
@@ -870,6 +875,8 @@ export class MobInstance {
     this.controller.applyQuaternion(this.quaternion);
     physicsManager.getScene().setTransform(this.controller, true);
     this.fallTime = 0;
+    if(debugBBox)
+      this.controller.physicsMesh.visible = true;
   }
 
   getGeometryIndex(){
@@ -1129,6 +1136,8 @@ export class MobInstance {
     this.grounded = !!(flags & 0x1);
     if(this.controller.position.distanceTo(this.position) > 0.01){
       this.position.copy(this.controller.position);
+      if(debugBBox)
+        this.controller.updateMatrixWorld();
       this.updatePosition = true;
     }
     this.movement.x = 0;
@@ -1757,7 +1766,6 @@ void main() {
         if(j >= animations.length) break;
         const clip = animations[j];
         const frameCount = Math.floor(clip.duration * bakeFps);
-        console.log(glb.url+clip.name);
         animKeys.set(clip.name, {id: j, frameCount: frameCount, duration: clip.duration, soundName: soundsDB.get(glb.url+clip.name)});
         const drawCall = this.getDrawCall(i);
         const padding = this.allocator.getTextureBytePadding();
@@ -1811,7 +1819,10 @@ void main() {
       const mob = drawCall.instances[instanceIndex];
       mob.updateDrawTime(uTime, uTimeDiff);
       if(mob.updatePosition){
-        drawCall.getTexture('p').image.data.set(mob.position.toArray(), pOffset + instanceIndex * Math.max(3, padding));
+        // shifts mob rendering position to touch the ground
+        const arr = mob.position.toArray();
+        arr[1] -= mob.radius;
+        drawCall.getTexture('p').image.data.set(arr, pOffset + instanceIndex * Math.max(3, padding));
         mob.updatePosition = false;
         textureToUpdate.add(JSON.stringify({name: 'p', size: 3}));
         this.material.userData.shader.uniforms.pTexture.value.needsUpdate = true;
@@ -2081,13 +2092,15 @@ class MobGenerator {
         quat,
         geoId,
         rng(),
-        0.3,
-        0.1,
+        1,
+        0.01,
         3
       );
       if(debugMobActions)
         this.MobController.addMob(mob);
       mobs.push(mob);
+      if(debugBBox)
+        this.object.add(mob.controller);
     }
     return mobs;
   }

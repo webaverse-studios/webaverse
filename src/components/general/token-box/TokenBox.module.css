@@ -1,6 +1,7 @@
 .tokenBoxWrap {
     position: relative !important;
     cursor: pointer;
+    display: inline-block;
 }
 
 .tokenBoxWrap .mask {
@@ -19,7 +20,7 @@
     -webkit-transform: translateX(-50%) translateY(-50%);
     transform: translateX(-50%) translateY(-50%);
     position: absolute;
-    z-index: 10;
+    z-index: 0;
 }
 
 .tokenBoxWrap .mask canvas {
@@ -27,14 +28,58 @@
     height: 100% !important;
 }
 
+.tokenBoxWrap .timer {
+    color: #ffffff;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    bottom: 2px;
+    left: 0;
+    font-size: 8px;
+    font-family: "TTSC-Bold";
+}
+
 .tokenBoxWrap .level {
     position: absolute;
-    bottom: 0;
-    right: 2px;
-    padding: 2px 4px;
-    background-color: #091218;
-    color: #efefef;
-    font-size: 7px;
+    bottom: -6px;
+    width: 30px;
+    background-color: #303746;
+    padding: 0;
+    font-family: "TTSC-Bold";
+    color: #ededed;
+    text-align: center;
+    font-size: 10px;
+    left: 9px;
+}
+
+.tokenBoxWrap .level.mythic {
+    background-color: #ffb65d;
+    color: #000000;
+}
+
+.tokenBoxWrap .level.epic {
+    background-color: #a885f0;
+    color: #000000;
+}
+
+.tokenBoxWrap .level.rare {
+    background-color: #3b9de3;
+    color: #000000;
+}
+
+.tokenBoxWrap .level.uncommon {
+    background-color: #04e2b9;
+    color: #000000;
+}
+
+.tokenBoxWrap .level.common {
+    background-color: #c5dcd0;
+    color: #000000;
+}
+
+.tokenBoxWrap .level.none {
+    background-color: #303746;
+    color: #ededed;
 }
 
 .tokenBoxWrap .value {
@@ -60,7 +105,20 @@
     transform: translateX(-50%) translateY(-50%);
     position: absolute;
     display: block;
+    background-image: url('/assets/backgrounds/token-box-none.svg');
 }
+
+.tokenBoxWrap .emptyIcon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+    width: auto;
+    height: 28px;
+}
+
 .tokenBoxWrap .badge {
     width: 20%;
     top: 1px;
@@ -73,21 +131,30 @@
     background-image: url('/assets/backgrounds/token-frame-active.svg');
     height: 116%;
     width: 116%;
+    top: 50% !important;
 }
 
-.tokenBoxWrap .frameEmptyNotToken {
-    background-image: url('/assets/backgrounds/token-frame-empty.svg');
+.tokenBoxWrap .frame.mythic {
+    background-image: url('/assets/backgrounds/token-box-mythic.svg');
 }
 
-.tokenBoxWrap .frameNotClaimed {
-    background-image: url('/assets/backgrounds/token-frame-not-claimed.svg');
+.tokenBoxWrap .frame.epic {
+    background-image: url('/assets/backgrounds/token-box-epic.svg');
     z-index: 1;
 }
 
-.tokenBoxWrap .frameCopy {
-    background-image: url('/assets/backgrounds/token-frame-spawn-copy.svg');
+.tokenBoxWrap .frame.rare {
+    background-image: url('/assets/backgrounds/token-box-rare.svg');
 }
 
-.tokenBoxWrap .frameDefault {
-    background-image: url('/assets/backgrounds/token-frame.svg');
+.tokenBoxWrap .frame.uncommon {
+    background-image: url('/assets/backgrounds/token-box-uncommon.svg');
+}
+
+.tokenBoxWrap .frame.common {
+    background-image: url('/assets/backgrounds/token-box-common.svg');
+}
+
+.tokenBoxWrap .frame.default {
+    background-image: url('/assets/backgrounds/token-box-none.svg');
 }

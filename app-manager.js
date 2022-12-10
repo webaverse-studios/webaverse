@@ -637,6 +637,35 @@ class AppManager extends EventTarget {
     });
   }
 
+  importAddedUserVoucherApp(position, quaternion, json, localVelocity) {
+    const dropManager = metaversefile.useDropManager();
+    dropManager.createDropApp({
+      // tokenId: json.tokenId,
+      type: json.type,
+      start_url: json.start_url,
+      components: [
+        {
+          key: 'appName',
+          value: json.name
+        },
+        {
+          key: 'appUrl',
+          value: json.start_url,
+        },
+        {
+          key: 'voucher',
+          value: json.voucher, // fakeVoucher is for ServerDrop, claimVoucher is for UserClaim
+        },
+      ],
+      voucher: "hadVoucher",
+      position: position.clone()
+        .add(new THREE.Vector3(0, 0.7, 0)),
+      quaternion,
+      scale: new THREE.Vector3(1, 1, 1),
+      velocity: localVelocity
+    });
+  }
+
   hasApp(app) {
     return this.apps.includes(app);
   }

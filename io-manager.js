@@ -427,7 +427,11 @@ class IoManager extends EventTarget {
       }
       case 82: { // R
         if (cameraManager.pointerLockElement) {
+          if (grabManager.canRotate()) {
+            grabManager.menuRotate(1);
+          } else {
             game.dropSelectedApp();
+          }
         }
         break;
       }
@@ -494,11 +498,8 @@ class IoManager extends EventTarget {
       // nothing
     } else {
       const physicsScene = physicsManager.getScene();
-      if (physicsScene.getPhysicsEnabled()) {
-        const renderer = getRenderer();
-        if (renderer && (e.target === renderer.domElement || e.target.id === 'app')) {
-          cameraManager.handleWheelEvent(e);
-        }
+      if (physicsScene.getPhysicsEnabled() && getRenderer()) {
+        cameraManager.handleWheelEvent(e);
       }
     }
   }

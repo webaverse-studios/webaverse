@@ -7,13 +7,89 @@
     align-items: center;
     transform: none;
     transition: transform 0.5s cubic-bezier(0, 1, 0, 1);
-    left: 50%;
+    left: 50%; 
     -webkit-transform: translateX(-50%);
     transform: translateX(-50%);
     background-image: url("/assets/backgrounds/claims-bar-background.svg");
     background-position: center;
     background-size: 100%;
     background-repeat: no-repeat;
-    width: 700px;
+    background: #000;
+    padding: 0;
     height: 32px;
+}
+
+.hotbar::before {
+    display: block;
+    content: ' ';
+    position: absolute;
+    top: 0;
+    left: -20px;
+    height: 100%;
+    width: 40px;
+    transform: skewX(-20deg);
+    background-color: #060b0f;
+    z-index: -1;
+}
+
+.hotbar::after {
+    display: block;
+    content: ' ';
+    position: absolute;
+    top: 0;
+    right: -20px;
+    height: 100%;
+    width: 40px;
+    transform: skewX(20deg);
+    background-color: #060b0f;
+    z-index: -1;
+}
+
+.leftSlot {
+    display: block;
+    content: ' ';
+    position: absolute;
+    top: 0;
+    left: -64px;
+    height: 100%;
+    width: 40px;
+    z-index: -1;
+}
+
+.leftSlot .background {
+    height: 100%;
+    width: 40px;
+    transform: skewX(-20deg);
+    background-color: #060b0f;
+}
+
+.leftSlot .phone {
+    position: absolute;
+    bottom: -5px;
+    text-align: center;
+    left: 0px;
+}
+.leftSlot .phone img {
+    height: 40px;
+}
+.leftSlot .phone span {
+    color: #efefef;
+    display: inline-block;
+    width: 16px;
+    text-align: center;
+    height: 20px;
+    background: #000;
+}
+
+.rightSlot {
+    display: block;
+    content: ' ';
+    position: absolute;
+    top: 0;
+    right: -64px;
+    height: 100%;
+    width: 40px;
+    transform: skewX(20deg);
+    background-color: #060b0f;
+    z-index: -1;
 }
