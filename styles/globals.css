@@ -21,6 +21,10 @@ html, body {
   --color3: #42a5f5;
 }
 
+body {
+  --header-height: 50px;
+}
+
 * {
   box-sizing: border-box;
 }
