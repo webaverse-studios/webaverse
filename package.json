@@ -93,10 +93,8 @@
     "puppeteer": "^17.0.0",
     "start-server-and-test": "^1.14.0",
     "supertest": "^6.2.4",
-    "swc": "^1.0.11",
     "trace-unhandled": "2.0.1",
     "uuid": "^9.0.0",
-    "vitest": "^0.25.3",
     "wiki": "./packages/wiki"
   },
   "preset": "jest-puppeteer"
