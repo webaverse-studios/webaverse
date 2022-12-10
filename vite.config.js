@@ -1,12 +1,13 @@
 import {defineConfig} from 'vite'
-import {swcReactRefresh} from "vite-plugin-swc-react-refresh";
+// import {swcReactRefresh} from "vite-plugin-swc-react-refresh";
+import pluginSwc from '@vitejs/plugin-react-swc';
 // import metaversefilePlugin from 'metaversefile/plugins/rollup.js'
 
 // https://vitejs.dev/config/
 export default defineConfig(({command, mode, ssrBuild}) => {
   return {
     plugins: [
-      swcReactRefresh(),
+      pluginSwc(),
     ],
     build: {
       minify: process.env.NODE_ENV === 'production',
