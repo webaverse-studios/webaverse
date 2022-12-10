@@ -167,9 +167,11 @@ const _setCameraSize = (width, height, pixelRatio) => {
   camera.updateProjectionMatrix();
 };
 
-globalThis.addEventListener('resize', e => {
-  _setSizes();
-});
+if (typeof window !== 'undefined') {
+  globalThis.window.addEventListener('resize', e => {
+    _setSizes();
+  });
+}
 
 export {
   waitForLoad,
