@@ -37,29 +37,10 @@ export const polygonVigilKey = `0937c004ab133135c86586b55ca212a6c9ecd224`;
 
 //
 
-const origin = globalThis.location.protocol + '//' + globalThis.location.hostname;
-
-/* let _inappPreviewHost = '';
-
-switch ( origin ) {
-    case 'https://local.webaverse.com': {
-        _inappPreviewHost = `https://local.webaverse.online:${globalThis.location.port}`;
-        break;
-    }
-    case 'https://dev.webaverse.com': {
-        _inappPreviewHost = 'https://dev.webaverse.online';
-        break;
-    }
-    case 'https://staging.webaverse.com': {
-        _inappPreviewHost = 'https://staging.webaverse.online';
-        break;
-    }
-    default: {
-        _inappPreviewHost = 'https://app.webaverse.online';
-    }
-}
-
-export const inappPreviewHost = _inappPreviewHost; */
+const origin = (typeof location !== 'undefined') ?
+  location.protocol + '//' + globalThis.location.hostname
+:
+  'https://local.webaverse.com';
 
 //
 
