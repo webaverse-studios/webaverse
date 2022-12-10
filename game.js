@@ -85,7 +85,7 @@ class GameManager extends EventTarget {
     this.setFirstPersonAction(this.lastFirstPerson);
     this.bindPointerLock();
     this.registerHighlightMeshes();
-    this.init()
+    this.init();
   }
 
   registerHighlightMeshes() {
@@ -110,24 +110,24 @@ class GameManager extends EventTarget {
   }
 
   init() {
-    // check if metaversefileApi.createApp exists
-    // if not, delay and try again
-    if (!metaversefileApi.createApp) {
-      setTimeout(() => {
-        this.init();
-      }, 1000);
-      return;
-    }
+    // // check if metaversefileApi.createApp exists
+    // // if not, delay and try again
+    // if (!metaversefileApi.createApp) {
+    //   setTimeout(() => {
+    //     this.init();
+    //   }, 1000);
+    //   return;
+    // }
 
-    this.grabUseMesh = metaversefileApi.createApp();
-    (async () => {
-      const {importModule} = metaversefileApi.useDefaultModules();
-      const m = await importModule('button');
-      await this.grabUseMesh.addModule(m);
-    })();
-    this.grabUseMesh.targetApp = null;
-    this.grabUseMesh.targetPhysicsId = -1;
-    sceneLowPriority.add(this.grabUseMesh);
+    // this.grabUseMesh = metaversefileApi.createApp();
+    // (async () => {
+    //   const {importModule} = metaversefileApi.useDefaultModules();
+    //   const m = await importModule('button');
+    //   await this.grabUseMesh.addModule(m);
+    // })();
+    // this.grabUseMesh.targetApp = null;
+    // this.grabUseMesh.targetPhysicsId = -1;
+    // sceneLowPriority.add(this.grabUseMesh);
   };
 
   delete() {
