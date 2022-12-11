@@ -23,6 +23,7 @@ import {
 } from 'zine/zine-camera-utils.js';
 import {
   setCameraViewPositionFromOrthographicViewZ,
+  depthFloat32ArrayToOrthographicGeometry,
 } from 'zine/zine-geometry-utils.js';
 import {appsMapName, heightfieldScale} from './constants.js'
 
@@ -111,13 +112,28 @@ class ZineManager {
 
     // add floor heightfield physics
     {
+      const geometry = depthFloat32ArrayToOrthographicGeometry(
+        floorNetDepths,
+        floorNetPixelSize,
+        floorNetPixelSize,
+        floorNetCamera,
+      );
+      const heights = new Int16Array(geometry.attributes.position.array.length / 3);
+      const heightsFloat32 = new Float32Array(geometry.attributes.position.array.length / 3);
+      for (let i = 0; i < heights.length; i++) {
+        const y = geometry.attributes.position.array[i * 3 + 1];
+        heights[i] = Math.round(y / heightfieldScale);
+        heightsFloat32[i] = y;
+      }
+      console.log('got geometry heights', heightsFloat32);
+
       const [width, height] = floorResolution;
       const numRows = width;
       const numColumns = height;
       if (floorNetDepths.length !== width * height) {
         throw new Error('floorNetDepths length mismatch');
       }
-      globalThis.zs = []; // XXX
+      /* globalThis.ys = []; // XXX
       const heights = (() => {
         const heights = new Int16Array(floorNetDepths.length);
         for (let i = 0; i < floorNetDepths.length; i++) {
@@ -128,16 +144,16 @@ class ZineManager {
           const viewZ = floorNetDepths[i];
           const worldPoint = setCameraViewPositionFromOrthographicViewZ(x, y, viewZ, floorNetCamera, localVector);
 
-          globalThis.zs.push(worldPoint.z); // XXX
+          globalThis.ys.push(worldPoint.y); // XXX
 
-          const h = Math.round(worldPoint.z / heightfieldScale);
+          const h = Math.round(worldPoint.y / heightfieldScale);
           if (h < -32768 || h > 32767) { // check that it fits in int16
             throw new Error('height out of range in createInstanceAsync');
           }
           heights[i] = h;
         }
         return heights;
-      })();
+      })(); */
       console.log('add object 1', {
         floorNetMesh,
         numRows,
@@ -146,7 +162,6 @@ class ZineManager {
         heightfieldScale,
         floorNetResolution,
         floorNetDepths,
-        zs,
       });
       const heightfieldPhysicsObject = physics.addHeightFieldGeometry(
         floorNetMesh,
