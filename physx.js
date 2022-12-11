@@ -5,6 +5,7 @@ physx wasm integration.
 import * as THREE from 'three';
 import Module from './public/bin/geometry.js';
 import {Allocator, ScratchStack} from './geometry-util.js';
+import {heightfieldScale} from './constants.js';
 
 const maxNumUpdates = 256;
 const localVector = new THREE.Vector3()
@@ -1682,26 +1683,32 @@ const physxWorker = (() => {
     return shapeAddress;
   };
 
+  w.heightfieldScale = heightfieldScale;
   w.addHeightFieldGeometryPhysics = (physics, numRows, numColumns, heights, heightScale, rowScale, columnScale, dynamic, external, id) => {
-    // numRows, numColumns and heights must be int.
+    // numRows, numColumns are int
+    // heights is array of int16
 
     const numVerts = numRows * numColumns;
     for (let i = 0; i < numVerts; i++) {
-      scratchStack.u32[i] = heights[i];
+      scratchStack.i16[i] = heights[i];
     }
+
+    const heightsOffset = numRows * numColumns;
+    const heightsOffsetBytes = heightsOffset * Int16Array.BYTES_PER_ELEMENT;
 
     Module._cookHeightFieldGeometryPhysics(
       numRows,
       numColumns,
       scratchStack.ptr,
-      scratchStack.u32.byteOffset,
-      scratchStack.u32.byteOffset + Uint32Array.BYTES_PER_ELEMENT,
-      scratchStack.u32.byteOffset + Uint32Array.BYTES_PER_ELEMENT * 2
+      scratchStack.u32.byteOffset + heightsOffsetBytes,
+      scratchStack.u32.byteOffset + heightsOffsetBytes + Uint32Array.BYTES_PER_ELEMENT,
+      scratchStack.u32.byteOffset + heightsOffsetBytes + Uint32Array.BYTES_PER_ELEMENT * 2
     )
 
-    const dataPtr = scratchStack.u32[0]
-    const dataLength = scratchStack.u32[1]
-    const streamPtr = scratchStack.u32[2]
+    const outputU32Offset = heightsOffsetBytes / Uint32Array.BYTES_PER_ELEMENT;
+    const dataPtr = scratchStack.u32[outputU32Offset]
+    const dataLength = scratchStack.u32[outputU32Offset + 1]
+    const streamPtr = scratchStack.u32[outputU32Offset + 2]
 
     const heightField = Module._createHeightFieldPhysics(
       physics,
@@ -1724,6 +1731,73 @@ const physxWorker = (() => {
       +external,
       heightField,
     )
+  }
+
+  w.cookHeightFieldGeometryPhysics = (numRows, numColumns, heights) => {
+    // numRows, numColumns are int16
+    // heights in an array of int16
+
+    const numVerts = numRows * numColumns;
+    for (let i = 0; i < numVerts; i++) {
+      scratchStack.i16[i] = heights[i];
+    }
+
+    const heightsOffset = numRows * numColumns;
+    const heightsOffsetBytes = heightsOffset * Int16Array.BYTES_PER_ELEMENT;
+
+    Module._cookHeightFieldGeometryPhysics(
+      numRows,
+      numColumns,
+      scratchStack.ptr,
+      scratchStack.u32.byteOffset + heightsOffsetBytes,
+      scratchStack.u32.byteOffset + heightsOffsetBytes + Uint32Array.BYTES_PER_ELEMENT,
+      scratchStack.u32.byteOffset + heightsOffsetBytes + Uint32Array.BYTES_PER_ELEMENT * 2
+    )
+
+    const outputU32Offset = heightsOffsetBytes / Uint32Array.BYTES_PER_ELEMENT;
+    const dataPtr = scratchStack.u32[outputU32Offset]
+    const dataLength = scratchStack.u32[outputU32Offset + 1]
+    const streamPtr = scratchStack.u32[outputU32Offset + 2]
+
+    const result = Module.HEAPU8.slice(dataPtr, dataPtr + dataLength);
+    return result
+  }
+  w.addCookedHeightFieldGeometryPhysics = (
+    physics,
+    buffer,
+    heightScale,
+    rowScale,
+    columnScale,
+    dynamic,
+    external,
+    id
+  ) => {
+    const allocator = new Allocator(Module)
+    const buffer2 = allocator.alloc(Uint8Array, buffer.length)
+    buffer2.set(buffer)
+
+    const heightField = Module._createHeightFieldPhysics(
+      physics,
+      buffer2.byteOffset,
+      buffer2.byteLength,
+      0,
+    )
+
+    const materialAddress = w.getDefaultMaterial(physics)
+
+    Module._addHeightFieldGeometryPhysics(
+      physics,
+      heightField,
+      heightScale,
+      rowScale,
+      columnScale,
+      id,
+      materialAddress,
+      +dynamic,
+      +external,
+      0,
+    )
+    allocator.freeAll()
   }
 
   w.getGeometryPhysics = (physics, id) => {

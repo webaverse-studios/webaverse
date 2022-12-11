@@ -38,6 +38,18 @@ const _handleMethod = ({
         transfers: [result.buffer],
       };
     }
+    case 'cookHeightfieldGeometry': {
+      const {numRows, numColumns, heights} = args;
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+      const mesh = new THREE.Mesh(geometry, fakeMaterial);
+      const result = physxLite.cookHeightfieldGeometryPhysics(numRows, numColumns, heights);
+      return {
+        result,
+        transfers: [result.buffer],
+      };
+    }
     case 'meshoptSimplify': {
       const {positions, /* uvs, */ indices, targetRatio, targetError} = args;
       const geometry = new THREE.BufferGeometry();
