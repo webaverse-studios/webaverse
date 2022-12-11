@@ -956,7 +956,7 @@ if (typeof self !== 'undefined') {
   };
 }
 
-if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
+if (typeof self !== 'undefined') {
   (async () => {
     await pg.waitForLoad();
 
