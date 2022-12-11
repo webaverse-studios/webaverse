@@ -1,13 +1,9 @@
-import * as THREE from 'three';
-import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import {
-  getRenderer,
-  rootScene,
-  camera,
-} from './renderer.js';
-import universe from './universe.js';
-import {waitForFrame} from './util.js';
-import metaversefileApi from 'metaversefile';
+import * as THREE from "three";
+// import * as BufferGeometryUtils from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { getRenderer, rootScene, camera } from "./renderer.js";
+import universe from "./universe.js";
+import { waitForFrame } from "./util.js";
+import metaversefileApi from "metaversefile";
 
 const localColor = new THREE.Color();
 const localVector = new THREE.Vector3();
@@ -94,8 +90,8 @@ const reticleFragmentShader = `\
     // angle = min(angle, 1. - angle);
     float angleDistanceToEdge = min(angle, 1. - angle);
     angleDistanceToEdge *= l;
-    gl_FragColor.r = angle;
-    if (angleDistanceToEdge <= 0.04 || l >= 0.95) {
+    gl_FragColor.rgb = vec3(1.);
+    if (angleDistanceToEdge <= 0.03 || l >= 0.98) {
       gl_FragColor.rgb = vec3(1.);
     }
     gl_FragColor.a = 1. - l;
@@ -107,465 +103,742 @@ const compassFragmentShader = `\
   }
 `;
 
-const compassGeometry = (() => {
+const compassRoseBgGeometry = (() => {
   const path = new THREE.Shape();
-  path.moveTo(-0.15, 0.85);
-  path.lineTo(0, 1);
-  path.lineTo(0.15, 0.85);
-  path.lineTo(-0.15, 0.85);
-  const roseGeometry = new THREE.ShapeGeometry(path);
+    path.moveTo(-0.22, 0.78);
+    path.lineTo(-0.22, 0.78);
+    path.lineTo(-0.26, 0.86);
+    path.lineTo(-0.14, 0.90);
+    path.lineTo(0, 1);
+    path.lineTo(0.14, 0.90);
+    path.lineTo(0.26, 0.86);
+    path.lineTo(0.22, 0.78);
+    path.lineTo(0.1, 0.80);
+    path.lineTo(0, 0.81);
+    path.lineTo(-0.1, 0.80);
+    path.lineTo(-0.2, 0.78);
 
-  const ringGeometry = new THREE.RingGeometry(
-    0.825, // innerRadius
-    0.9, // outerRadius
-    32, // thetaSegments
-    1, // phiSegments
+    const roseGeometry = new THREE.ShapeGeometry(path);
+
+    return roseGeometry.applyMatrix4(
+      new THREE.Matrix4().makeRotationX(-Math.PI / 2)
   );
-
-  return BufferGeometryUtils.mergeBufferGeometries([
-    roseGeometry,
-    ringGeometry,
-  ]).applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
 })();
+
+const compassRoseGeometry = (() => {
+  const path = new THREE.Shape();
+    path.moveTo(-0.2, 0.8);
+    path.lineTo(-0.2, 0.8);
+    path.lineTo(-0.23, 0.85);
+    path.lineTo(-0.13, 0.88);
+    path.lineTo(0, 0.975);
+    path.lineTo(0.13, 0.88);
+    path.lineTo(0.23, 0.85);
+    path.lineTo(0.2, 0.8);
+    path.lineTo(0.1, 0.82);
+    path.lineTo(0, 0.83);
+    path.lineTo(-0.1, 0.82);
+    path.lineTo(-0.2, 0.8);
+
+    const roseGeometry = new THREE.ShapeGeometry(path);
+
+    return roseGeometry.applyMatrix4(
+      new THREE.Matrix4().makeRotationX(-Math.PI / 2)
+  );
+})();
+
+const compassNorthGeometry = (() => {
+  const path = new THREE.Shape();
+    path.moveTo(-0.1, 0.82);
+    path.lineTo(-0.1, 0.82);
+    path.lineTo(-0.23, 0.85);
+    path.lineTo(-0.13, 0.88);
+    path.lineTo(0, 0.975);
+    path.lineTo(0.13, 0.88);
+    path.lineTo(0.23, 0.85);
+    path.lineTo(0.2, 0.8);
+    path.lineTo(0.1, 0.82);
+    path.lineTo(0, 0.83);
+    path.lineTo(-0.1, 0.82);
+    path.lineTo(-0.2, 0.8);
+
+    const roseGeometry = new THREE.ShapeGeometry(path);
+
+    return roseGeometry.applyMatrix4(
+      new THREE.Matrix4().makeRotationX(-Math.PI / 2)
+  );
+})();
+
+const compassRingGeometry = (() => {
+    const ringGeometry = new THREE.RingGeometry(
+        0.830, // innerRadius
+        0.865, // outerRadius
+        64, // thetaSegments
+        1 // phiSegments
+    );
+    return ringGeometry.applyMatrix4(
+      new THREE.Matrix4().makeRotationX(-Math.PI / 2)
+  );
+})();
+
 const compassMaterial = new THREE.ShaderMaterial({
-  /* uniforms: {
-    uTex: {
-      value: null,
-      needsUpdate: false,
-    },
-    uUvOffset: {
-      value: new THREE.Vector4(),
-      needsUpdate: true,
-    },
-  }, */
-  vertexShader,
-  fragmentShader: compassFragmentShader,
-  depthTest: false,
-  // transparent: true,
-});
-/* const compassMaterial = new THREE.MeshBasicMaterial({
-  color: 0x000000,
-}); */
-
-const _makeMapRenderTarget = (w, h) => new THREE.WebGLRenderTarget(w, h, {
-  minFilter: THREE.LinearFilter,
-  magFilter: THREE.LinearFilter,
-  format: THREE.RGBAFormat,
+    vertexShader,
+    fragmentShader: compassFragmentShader,
+    depthTest: false,
 });
 
+const compassRoseMaterial = new THREE.MeshBasicMaterial({
+  color: 0x777777,
+  transparent: true,
+});
+
+// Character direction pointer geometry
+const charDirGeometry = (() => {
+    const path = new THREE.Shape();
+    path.moveTo(-0.15, -0.1);
+    path.lineTo(0, 0.2);
+    path.lineTo(0.15, -0.1);
+    path.lineTo(-0.15, -0.1);
+
+    const roseGeometry = new THREE.ShapeGeometry(path);
+
+    return roseGeometry.applyMatrix4(
+        new THREE.Matrix4().makeRotationX(-Math.PI / 2)
+    );
+})();
+
+const charDirMaterial = new THREE.MeshBasicMaterial({
+    color: 0xfcc000,
+    transparent: true,
+});
+
+const charDirBorderMaterial = new THREE.MeshBasicMaterial({
+    color: 0x000000,
+    transparent: true,
+});
+
+const _makeMapRenderTarget = (w, h) =>
+    new THREE.WebGLRenderTarget(w, h, {
+        minFilter: THREE.LinearFilter,
+        magFilter: THREE.LinearFilter,
+        format: THREE.RGBAFormat,
+    });
 
 const _makeCopyScene = () => {
-  const scene = new THREE.Scene();
-  
-  // full screen quad mesh
-  const fullScreenQuadMesh = new THREE.Mesh(
-    new THREE.PlaneBufferGeometry(2, 2),
-    new THREE.ShaderMaterial({
-      uniforms: {
-        uTex: {
-          value: null,
-          needsUpdate: false,
-        },
-        uUvOffset: {
-          value: new THREE.Vector4(),
-          needsUpdate: true,
-        },
-      },
-      vertexShader: fullscreenVertexShader,
-      fragmentShader: fullscreenFragmentShader,
-      depthTest: false,
-    }),
-  );
-  fullScreenQuadMesh.frustumCulled = false;
-  scene.add(fullScreenQuadMesh);
-  scene.fullScreenQuadMesh = fullScreenQuadMesh;
+    const scene = new THREE.Scene();
 
-  return scene;
+    // full screen quad mesh
+    const fullScreenQuadMesh = new THREE.Mesh(
+        new THREE.PlaneBufferGeometry(2, 2),
+        new THREE.ShaderMaterial({
+            uniforms: {
+                uTex: {
+                    value: null,
+                    needsUpdate: false,
+                },
+                uUvOffset: {
+                    value: new THREE.Vector4(),
+                    needsUpdate: true,
+                },
+            },
+            vertexShader: fullscreenVertexShader,
+            fragmentShader: fullscreenFragmentShader,
+            depthTest: false,
+        })
+    );
+    fullScreenQuadMesh.frustumCulled = false;
+    scene.add(fullScreenQuadMesh);
+    scene.fullScreenQuadMesh = fullScreenQuadMesh;
+
+    return scene;
 };
 const _makeScene = (worldWidth, worldHeight, minZoom) => {
-  const scene = new THREE.Scene();
-  
-  // floor map mesh
-  const floorMesh = new THREE.Mesh(
-    new THREE.PlaneBufferGeometry(worldWidth, worldHeight)
-      .applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2)),
-    new THREE.ShaderMaterial({
-      uniforms: {
-        uTex: {
-          value: null,
-          needsUpdate: false,
-        },
-        uScreenSize: {
-          value: new THREE.Vector2(),
-          needsUpdate: true,
-        },
-      },
-      vertexShader,
-      fragmentShader: floorFragmentShader,
-      depthTest: false,
-      // transparent: true,
-    }),
-  );
-  floorMesh.frustumCulled = false;
-  scene.add(floorMesh);
-  scene.floorMesh = floorMesh;
+    const scene = new THREE.Scene();
 
-  // map direction pointer mesh
-  const reticleSize = worldWidth/3/3 * minZoom;
-  const reticleMesh = new THREE.Mesh(
-    new THREE.CircleGeometry(reticleSize, 4, Math.PI/2/2, Math.PI/2)
-      .applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2)),
-    new THREE.ShaderMaterial({
-      uniforms: {
-        /* uTex: {
+    // Character Direction Pointer/Reticle Mesh Group
+    const charDirPointerGroup = new THREE.Group();
+    // Compass Direction Pointer Mesh Group
+    const compassDirPoitnerGroup = new THREE.Group();
+
+    // floor map mesh
+    const floorMesh = new THREE.Mesh(
+        new THREE.PlaneBufferGeometry(worldWidth, worldHeight).applyMatrix4(
+            new THREE.Matrix4().makeRotationX(-Math.PI / 2)
+        ),
+        new THREE.ShaderMaterial({
+            uniforms: {
+                uTex: {
+                    value: null,
+                    needsUpdate: false,
+                },
+                uScreenSize: {
+                    value: new THREE.Vector2(),
+                    needsUpdate: true,
+                },
+            },
+            vertexShader,
+            fragmentShader: floorFragmentShader,
+            depthTest: false,
+        })
+    );
+    floorMesh.frustumCulled = false;
+    scene.add(floorMesh);
+    scene.floorMesh = floorMesh;
+
+    // Reticle direction pointer mesh
+    const reticleSize = (worldWidth / 2.2 / 2.2) * minZoom;
+    const reticleMesh = new THREE.Mesh(
+        new THREE.CircleGeometry(
+            reticleSize,
+            4,
+            Math.PI / 2 / 2,
+            Math.PI / 2
+        ).applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2)),
+        new THREE.ShaderMaterial({
+            uniforms: {
+                /* uTex: {
           value: renderTarget.texture,
           needsUpdate: true,
         }, */
-      },
-      vertexShader,
-      fragmentShader: reticleFragmentShader,
-      transparent: true,
-    })
-  );
-  reticleMesh.scale.setScalar(reticleSize * cameraSafetyFactor);
-  reticleMesh.frustumCulled = false;
-  scene.add(reticleMesh);
-  scene.reticleMesh = reticleMesh;
+            },
+            vertexShader,
+            fragmentShader: reticleFragmentShader,
+            transparent: true,
+            depthTest: false,
+        })
+    );
+    reticleMesh.scale.setScalar(reticleSize * cameraSafetyFactor);
+    reticleMesh.frustumCulled = false;
+    reticleMesh.renderOrder = 0;
 
-  const compassSize = worldWidth/3 * cameraSafetyFactor;
-  const compassMesh = new THREE.Mesh(
-    compassGeometry.clone()
-      .applyMatrix4(new THREE.Matrix4().makeScale(compassSize, compassSize, compassSize)),
-    compassMaterial,
-  );
-  // compassMesh.scale.setScalar(compassSize);
-  compassMesh.updateMatrixWorld();
-  compassMesh.frustumCulled = false;
-  scene.add(compassMesh);
-  scene.compassMesh = compassMesh;
+    // character direction pointer mesh
+    const userDirPointerSize = (worldWidth / 2.2 / 2.2) * minZoom;
+    const charDirMesh = new THREE.Mesh(
+        charDirGeometry
+            .clone()
+            .applyMatrix4(
+                new THREE.Matrix4().makeScale(
+                    userDirPointerSize,
+                    userDirPointerSize,
+                    userDirPointerSize
+                )
+            ),
+        charDirMaterial
+    );
+    // character direction pointer border layer mesh 
+    // Note: did not use outline, not supported on some browsers/versions
+    const charDirBorderMesh = new THREE.Mesh(
+        charDirGeometry
+            .clone()
+            .applyMatrix4(
+                new THREE.Matrix4().makeScale(
+                    userDirPointerSize + 2,
+                    userDirPointerSize + 2,
+                    userDirPointerSize + 2
+                )
+            ),
+        charDirBorderMaterial
+    );
+    
+    charDirPointerGroup.add(reticleMesh, charDirBorderMesh, charDirMesh);
 
-  return scene;
+    charDirPointerGroup.updateMatrixWorld();
+    charDirPointerGroup.frustumCulled = false;
+    // charDirPointerGroup.renderOrder = 1;
+    scene.add(charDirPointerGroup);
+    scene.charDirPointerGroup = charDirPointerGroup;
+
+    // compass/north direction pointer mesh
+    const compassSize = (worldWidth / 3) * cameraSafetyFactor;
+
+    const compassRingMesh = new THREE.Mesh(
+      compassRingGeometry
+            .clone()
+            .applyMatrix4(
+                new THREE.Matrix4().makeScale(
+                    compassSize,
+                    compassSize,
+                    compassSize
+                )
+            ),
+        compassMaterial
+    );
+
+    const compassRoseMesh = new THREE.Mesh(
+      compassRoseBgGeometry
+            .clone()
+            .applyMatrix4(
+                new THREE.Matrix4().makeScale(
+                    compassSize,
+                    compassSize,
+                    compassSize
+                )
+            ),
+        compassMaterial
+    );
+
+    const compassRoseMesh2 = new THREE.Mesh(
+      compassRoseGeometry
+            .clone()
+            .applyMatrix4(
+                new THREE.Matrix4().makeScale(
+                    compassSize,
+                    compassSize,
+                    compassSize
+                )
+            ),
+            compassRoseMaterial
+    );
+
+    const compassNorthMesh = new THREE.Mesh(
+      compassNorthGeometry
+            .clone()
+            .applyMatrix4(
+                new THREE.Matrix4().makeScale(
+                    compassSize,
+                    compassSize,
+                    compassSize
+                )
+            ),
+        compassMaterial
+    );
+
+    compassNorthMesh.renderOrder = 1;
+
+    compassDirPoitnerGroup.add(compassRingMesh, compassRoseMesh, compassRoseMesh2, compassNorthMesh);
+
+    compassDirPoitnerGroup.updateMatrixWorld();
+    compassDirPoitnerGroup.frustumCulled = false;
+    scene.add(compassDirPoitnerGroup);
+    scene.compassDirPoitnerGroup = compassDirPoitnerGroup;
+
+    return scene;
 };
 
 const minimaps = [];
 class MiniMap {
-  constructor(width, height, worldWidth, worldHeight, minZoom, baseSpeed) {
-    this.width = width;
-    this.height = height;
-    this.worldWidthD3 = Math.floor(worldWidth / 3);
-    this.worldHeightD3 = Math.floor(worldHeight / 3);
-    this.worldWidth = this.worldWidthD3 * 3;
-    this.worldHeight = this.worldHeightD3 * 3;
-    this.minZoom = minZoom;
-    this.baseSpeed = baseSpeed;
-    this.canvasWidth = 1;
-    this.canvasHeight = 1;
-    this.enabled = true;
+    constructor(width, height, worldWidth, worldHeight, minZoom, baseSpeed) {
+        this.width = width;
+        this.height = height;
+        this.worldWidthD3 = Math.floor(worldWidth / 3);
+        this.worldHeightD3 = Math.floor(worldHeight / 3);
+        this.worldWidth = this.worldWidthD3 * 3;
+        this.worldHeight = this.worldHeightD3 * 3;
+        this.minZoom = minZoom;
+        this.baseSpeed = baseSpeed;
+        this.canvasWidth = 1;
+        this.canvasHeight = 1;
+        this.enabled = true;
 
-    this.topCamera = new THREE.OrthographicCamera(
-      -this.worldWidthD3*0.5,
-      this.worldWidthD3*0.5,
-      this.worldHeightD3*0.5,
-      -this.worldHeightD3*0.5,
-      0,
-      1000
-    );
-    this.mapRenderTarget = null;
-    this.mapRenderTarget2 = null;
-    this.scene = _makeScene(this.worldWidth, this.worldHeight, this.minZoom);
-    const cameraRadiusBase = this.worldWidthD3 * cameraSafetyFactor;
-    this.camera = new THREE.OrthographicCamera(
-      -cameraRadiusBase,
-      cameraRadiusBase,
-      cameraRadiusBase,
-      -cameraRadiusBase,
-      0,
-      1000
-    );
-    this.camera.setRadiusFactor = f => {
-      const cameraRadius = cameraRadiusBase * f;
-      this.camera.left = -cameraRadius;
-      this.camera.right = cameraRadius;
-      this.camera.top = cameraRadius;
-      this.camera.bottom = -cameraRadius;
-      this.camera.updateProjectionMatrix();
-    };
+        this.topCamera = new THREE.OrthographicCamera(
+            -this.worldWidthD3 * 0.5,
+            this.worldWidthD3 * 0.5,
+            this.worldHeightD3 * 0.5,
+            -this.worldHeightD3 * 0.5,
+            0,
+            1000
+        );
+        this.mapRenderTarget = null;
+        this.mapRenderTarget2 = null;
+        this.scene = _makeScene(
+            this.worldWidth,
+            this.worldHeight,
+            this.minZoom
+        );
+        const cameraRadiusBase = this.worldWidthD3 * cameraSafetyFactor;
+        this.camera = new THREE.OrthographicCamera(
+            -cameraRadiusBase,
+            cameraRadiusBase,
+            cameraRadiusBase,
+            -cameraRadiusBase,
+            0,
+            1000
+        );
+        this.camera.setRadiusFactor = (f) => {
+            const cameraRadius = cameraRadiusBase * f;
+            this.camera.left = -cameraRadius;
+            this.camera.right = cameraRadius;
+            this.camera.top = cameraRadius;
+            this.camera.bottom = -cameraRadius;
+            this.camera.updateProjectionMatrix();
+        };
 
-    this.copyScene = _makeCopyScene();
+        this.copyScene = _makeCopyScene();
 
-    this.canvases = [];
+        this.canvases = [];
 
-    this.worldEpoch = 0;
-    const worldload = e => {
-      this.worldEpoch++;
-    }
-    universe.addEventListener('worldload', worldload);
-    this.cleanup = () => {
-      universe.removeEventListener('worldload', worldload);
-    };
+        this.worldEpoch = 0;
+        const worldload = (e) => {
+            this.worldEpoch++;
+        };
+        universe.addEventListener("worldload", worldload);
+        this.cleanup = () => {
+            universe.removeEventListener("worldload", worldload);
+        };
 
-    this.running = false;
-    this.queued = false;
-    this.lastBase = new THREE.Vector2(NaN, NaN);
-    this.lastWorldEpoch = -1;
+        this.running = false;
+        this.queued = false;
+        this.lastBase = new THREE.Vector2(NaN, NaN);
+        this.lastWorldEpoch = -1;
 
-    this.smoothSpeed = 0;
-  }
-
-  resetCanvases() {
-    this.canvases.length = 0;
-  }
-
-  addCanvas(canvas) {
-    const {width, height} = canvas;
-    this.canvasWidth = Math.max(this.canvasWidth, width);
-    this.canvasHeight = Math.max(this.canvasHeight, height);
-
-    const ctx = canvas.getContext('2d');
-    canvas.ctx = ctx;
-
-    this.canvases.push(canvas);
-  }
-
-  update(timestamp, timeDiff) {
-    const localPlayer = metaversefileApi.useLocalPlayer();
-
-    const renderer = getRenderer();
-    const size = renderer.getSize(localVector2D);
-    const pixelRatio = renderer.getPixelRatio();
-    // a Vector2 representing the largest power of two less than or equal to the current canvas size
-    const sizePowerOfTwo = localVector2D2.set(
-      Math.pow(2, Math.floor(Math.log(size.x) / Math.log(2))),
-      Math.pow(2, Math.floor(Math.log(size.y) / Math.log(2))),
-    );
-    if (sizePowerOfTwo.x < this.canvasWidth || sizePowerOfTwo.y < this.canvasHeight) {
-      console.warn('renderer is too small');
-      return;
+        this.smoothSpeed = 0;
     }
 
-    // push old state
-    const oldRenderTarget = renderer.getRenderTarget();
-    const oldViewport = renderer.getViewport(localVector4D);
-  
-    const _render = (baseX, baseY, dx, dy) => {
-      // set up top camera
-      this.topCamera.position.set((baseX + dx) * this.worldWidthD3, localPlayer.position.y + cameraHeight, (baseY + dy) * this.worldHeightD3);
-      this.topCamera.quaternion.setFromRotationMatrix(
-        localMatrix.lookAt(
-          this.topCamera.position,
-          localVector2.set(this.topCamera.position.x, localPlayer.position.y, this.topCamera.position.z),
-          localVector3.set(0, 0, -1)
-        )
-      );
-      this.topCamera.updateMatrixWorld();
-      
-      renderer.setViewport((dx+1) * this.width/3, (-dy+1) * this.height/3, this.width/3, this.height/3);
-      renderer.render(rootScene, this.topCamera);
-    };
-    const _copy = (srcRenderTarget, px, py, dx, dy) => {
-      // set up copy scene
-      this.copyScene.fullScreenQuadMesh.material.uniforms.uUvOffset.value.set(px, -py, 1/3, 1/3);
-      this.copyScene.fullScreenQuadMesh.material.uniforms.uUvOffset.needsUpdate = true;
-      this.copyScene.fullScreenQuadMesh.material.uniforms.uTex.value = srcRenderTarget.texture;
-      this.copyScene.fullScreenQuadMesh.material.uniforms.uTex.needsUpdate = true;
+    resetCanvases() {
+        this.canvases.length = 0;
+    }
 
-      renderer.setViewport((dx+1) * this.width/3, (-dy+1) * this.height/3, this.width/3, this.height/3);
-      renderer.render(this.copyScene, this.topCamera);
-    };
-    const _swapBuffers = () => {
-      const tempRenderTarget = this.mapRenderTarget;
-      this.mapRenderTarget = this.mapRenderTarget2;
-      this.mapRenderTarget2 = tempRenderTarget;
-    };
-    const _ensureMapRenderTarget = () => {
-      if (this.mapRenderTarget === null) {
-        this.mapRenderTarget = _makeMapRenderTarget(this.width * pixelRatio, this.height * pixelRatio);
-        this.mapRenderTarget2 = _makeMapRenderTarget(this.width * pixelRatio, this.height * pixelRatio);
-      }
-    };
-    const _updateTiles = () => {
-      const baseX = Math.floor(localPlayer.position.x / this.worldWidthD3 + 0.5);
-      const baseY = Math.floor(localPlayer.position.z / this.worldHeightD3 + 0.5);
+    addCanvas(canvas) {
+        const { width, height } = canvas;
+        this.canvasWidth = Math.max(this.canvasWidth, width);
+        this.canvasHeight = Math.max(this.canvasHeight, height);
 
-      const _getPreviousOffset = (ax, ay, target) => {
-        if (this.worldEpoch === this.lastWorldEpoch) {
-          const previousOffset = target.set(ax, ay)
-            .sub(this.lastBase);
-          if (previousOffset.x >= -1 && previousOffset.x <= 1 && previousOffset.y >= -1 && previousOffset.y <= 1) {
-            return target;
-          } else {
-            return null;
-          }
-        } else {
-          return null;
+        const ctx = canvas.getContext("2d");
+        canvas.ctx = ctx;
+
+        this.canvases.push(canvas);
+    }
+
+    update(timestamp, timeDiff) {
+        const localPlayer = metaversefileApi.useLocalPlayer();
+
+        const renderer = getRenderer();
+        const size = renderer.getSize(localVector2D);
+        const pixelRatio = renderer.getPixelRatio();
+        // a Vector2 representing the largest power of two less than or equal to the current canvas size
+        const sizePowerOfTwo = localVector2D2.set(
+            Math.pow(2, Math.floor(Math.log(size.x) / Math.log(2))),
+            Math.pow(2, Math.floor(Math.log(size.y) / Math.log(2)))
+        );
+        if (
+            sizePowerOfTwo.x < this.canvasWidth ||
+            sizePowerOfTwo.y < this.canvasHeight
+        ) {
+            console.warn("renderer is too small");
+            return;
         }
-      };
 
-      if (baseX !== this.lastBase.x || baseY !== this.lastBase.y || this.worldEpoch !== this.lastWorldEpoch) {
-        if (!this.running) {
-          (async () => {
-            this.running = true;
+        // push old state
+        const oldRenderTarget = renderer.getRenderTarget();
+        const oldViewport = renderer.getViewport(localVector4D);
 
-            _ensureMapRenderTarget();
+        const _render = (baseX, baseY, dx, dy) => {
+            // set up top camera
+            this.topCamera.position.set(
+                (baseX + dx) * this.worldWidthD3,
+                localPlayer.position.y + cameraHeight,
+                (baseY + dy) * this.worldHeightD3
+            );
+            this.topCamera.quaternion.setFromRotationMatrix(
+                localMatrix.lookAt(
+                    this.topCamera.position,
+                    localVector2.set(
+                        this.topCamera.position.x,
+                        localPlayer.position.y,
+                        this.topCamera.position.z
+                    ),
+                    localVector3.set(0, 0, -1)
+                )
+            );
+            this.topCamera.updateMatrixWorld();
 
-            renderer.setRenderTarget(this.mapRenderTarget2);
-            renderer.setViewport(0, 0, this.width, this.height);
-            renderer.clear();
+            renderer.setViewport(
+                ((dx + 1) * this.width) / 3,
+                ((-dy + 1) * this.height) / 3,
+                this.width / 3,
+                this.height / 3
+            );
+            renderer.render(rootScene, this.topCamera);
+        };
+        const _copy = (srcRenderTarget, px, py, dx, dy) => {
+            // set up copy scene
+            this.copyScene.fullScreenQuadMesh.material.uniforms.uUvOffset.value.set(
+                px,
+                -py,
+                1 / 3,
+                1 / 3
+            );
+            this.copyScene.fullScreenQuadMesh.material.uniforms.uUvOffset.needsUpdate = true;
+            this.copyScene.fullScreenQuadMesh.material.uniforms.uTex.value =
+                srcRenderTarget.texture;
+            this.copyScene.fullScreenQuadMesh.material.uniforms.uTex.needsUpdate = true;
 
-            this.scene.floorMesh.material.uniforms.uTex.value = this.mapRenderTarget2.texture;
-            this.scene.floorMesh.material.uniforms.uTex.needsUpdate = true;
-            this.scene.floorMesh.position.set(baseX * this.worldWidthD3, localPlayer.position.y, baseY * this.worldHeightD3);
-            this.scene.floorMesh.updateMatrixWorld();
-            
-            // copies
-            for (let dy = -1; dy <= 1; dy++) {
-              for (let dx = -1; dx <= 1; dx++) {
-                const ix = baseX + dx;
-                const iy = baseY + dy;
-
-                const previousOffset = _getPreviousOffset(ix, iy, localVector2D3);
-                if (previousOffset) {
-                  _copy(this.mapRenderTarget, previousOffset.x, previousOffset.y, dx, dy);
-                }
-              }
+            renderer.setViewport(
+                ((dx + 1) * this.width) / 3,
+                ((-dy + 1) * this.height) / 3,
+                this.width / 3,
+                this.height / 3
+            );
+            renderer.render(this.copyScene, this.topCamera);
+        };
+        const _swapBuffers = () => {
+            const tempRenderTarget = this.mapRenderTarget;
+            this.mapRenderTarget = this.mapRenderTarget2;
+            this.mapRenderTarget2 = tempRenderTarget;
+        };
+        const _ensureMapRenderTarget = () => {
+            if (this.mapRenderTarget === null) {
+                this.mapRenderTarget = _makeMapRenderTarget(
+                    this.width * pixelRatio,
+                    this.height * pixelRatio
+                );
+                this.mapRenderTarget2 = _makeMapRenderTarget(
+                    this.width * pixelRatio,
+                    this.height * pixelRatio
+                );
             }
+        };
+        const _updateTiles = () => {
+            const baseX = Math.floor(
+                localPlayer.position.x / this.worldWidthD3 + 0.5
+            );
+            const baseY = Math.floor(
+                localPlayer.position.z / this.worldHeightD3 + 0.5
+            );
 
-            for (let dy = -1; dy <= 1; dy++) {
-              for (let dx = -1; dx <= 1; dx++) {
-                const ix = baseX + dx;
-                const iy = baseY + dy;
-
-                const previousOffset = _getPreviousOffset(ix, iy, localVector2D3);
-                if (!previousOffset) {
-                  // const oldRenderTarget = renderer.getRenderTarget();
-                  // const oldViewport2 = renderer.getViewport(localVector4D2);
-                  
-                  renderer.setRenderTarget(this.mapRenderTarget2);
-                  _render(baseX, baseY, dx, dy);
-                  
-                  renderer.setRenderTarget(oldRenderTarget);
-                  renderer.setViewport(oldViewport);
-                  
-                  await waitForFrame();
+            const _getPreviousOffset = (ax, ay, target) => {
+                if (this.worldEpoch === this.lastWorldEpoch) {
+                    const previousOffset = target
+                        .set(ax, ay)
+                        .sub(this.lastBase);
+                    if (
+                        previousOffset.x >= -1 &&
+                        previousOffset.x <= 1 &&
+                        previousOffset.y >= -1 &&
+                        previousOffset.y <= 1
+                    ) {
+                        return target;
+                    } else {
+                        return null;
+                    }
+                } else {
+                    return null;
                 }
-              }
+            };
+
+            if (
+                baseX !== this.lastBase.x ||
+                baseY !== this.lastBase.y ||
+                this.worldEpoch !== this.lastWorldEpoch
+            ) {
+                if (!this.running) {
+                    (async () => {
+                        this.running = true;
+
+                        _ensureMapRenderTarget();
+
+                        renderer.setRenderTarget(this.mapRenderTarget2);
+                        renderer.setViewport(0, 0, this.width, this.height);
+                        renderer.clear();
+
+                        this.scene.floorMesh.material.uniforms.uTex.value =
+                            this.mapRenderTarget2.texture;
+                        this.scene.floorMesh.material.uniforms.uTex.needsUpdate = true;
+                        this.scene.floorMesh.position.set(
+                            baseX * this.worldWidthD3,
+                            localPlayer.position.y,
+                            baseY * this.worldHeightD3
+                        );
+                        this.scene.floorMesh.updateMatrixWorld();
+
+                        // copies
+                        for (let dy = -1; dy <= 1; dy++) {
+                            for (let dx = -1; dx <= 1; dx++) {
+                                const ix = baseX + dx;
+                                const iy = baseY + dy;
+
+                                const previousOffset = _getPreviousOffset(
+                                    ix,
+                                    iy,
+                                    localVector2D3
+                                );
+                                if (previousOffset) {
+                                    _copy(
+                                        this.mapRenderTarget,
+                                        previousOffset.x,
+                                        previousOffset.y,
+                                        dx,
+                                        dy
+                                    );
+                                }
+                            }
+                        }
+
+                        for (let dy = -1; dy <= 1; dy++) {
+                            for (let dx = -1; dx <= 1; dx++) {
+                                const ix = baseX + dx;
+                                const iy = baseY + dy;
+
+                                const previousOffset = _getPreviousOffset(
+                                    ix,
+                                    iy,
+                                    localVector2D3
+                                );
+                                if (!previousOffset) {
+                                    // const oldRenderTarget = renderer.getRenderTarget();
+                                    // const oldViewport2 = renderer.getViewport(localVector4D2);
+
+                                    renderer.setRenderTarget(
+                                        this.mapRenderTarget2
+                                    );
+                                    _render(baseX, baseY, dx, dy);
+
+                                    renderer.setRenderTarget(oldRenderTarget);
+                                    renderer.setViewport(oldViewport);
+
+                                    await waitForFrame();
+                                }
+                            }
+                        }
+
+                        renderer.setRenderTarget(oldRenderTarget);
+
+                        _swapBuffers();
+
+                        this.lastBase.set(baseX, baseY);
+                        this.lastWorldEpoch = this.worldEpoch;
+
+                        this.running = false;
+
+                        if (this.queued) {
+                            this.queued = false;
+                            _updateTiles();
+                        }
+                    })();
+                } else {
+                    this.queued = true;
+                }
             }
+        };
+        _updateTiles();
+
+        const _renderMiniMap = () => {
+            // window.player = localPlayer;
+            const currentSpeed = localVector
+                .set(
+                    localPlayer.characterPhysics.velocity.x,
+                    0,
+                    localPlayer.characterPhysics.velocity.z
+                )
+                .length();
+            this.smoothSpeed = this.smoothSpeed * 0.95 + currentSpeed * 0.05;
+            const speedFactor = Math.min(
+                Math.max(this.smoothSpeed / this.baseSpeed, this.minZoom),
+                1
+            );
+            this.scene.charDirPointerGroup.position.set(
+                localPlayer.position.x,
+                localPlayer.position.y + cameraHeight,
+                localPlayer.position.z
+            );
+            localEuler.setFromQuaternion(localPlayer.quaternion, "YXZ");
+            localEuler.x = 0;
+            localEuler.z = 0;
+            this.scene.charDirPointerGroup.quaternion.setFromEuler(localEuler);
+            // this.scene.charDirPointerGroup.scale.setScalar(speedFactor);
+            this.scene.charDirPointerGroup.updateMatrixWorld();
+
+            this.scene.compassDirPoitnerGroup.position.copy(
+                this.scene.charDirPointerGroup.position
+            );
+            this.scene.compassDirPoitnerGroup.scale.setScalar(speedFactor);
+            this.scene.compassDirPoitnerGroup.updateMatrixWorld();
+
+            this.scene.floorMesh.material.uniforms.uScreenSize.value.set(
+                this.canvasWidth * pixelRatio,
+                this.canvasHeight * pixelRatio
+            );
+            this.scene.floorMesh.material.uniforms.uScreenSize.needsUpdate = true;
+
+            const oldClearColor = renderer.getClearColor(localColor);
+            const oldClearAlpha = renderer.getClearAlpha();
 
             renderer.setRenderTarget(oldRenderTarget);
+            renderer.setViewport(0, 0, this.canvasWidth, this.canvasHeight);
+            renderer.setClearColor(0x000000, 0);
+            renderer.clear();
 
-            _swapBuffers();
+            this.camera.position
+                .copy(localPlayer.position)
+                .add(localVector.set(0, cameraHeight, 0));
+            this.camera.quaternion.setFromRotationMatrix(
+                localMatrix.lookAt(
+                    this.camera.position,
+                    localPlayer.position,
+                    localVector2
+                        .set(0, 0, -1)
+                        .applyQuaternion(camera.quaternion)
+                )
+            );
+            this.camera.updateMatrixWorld();
+            this.camera.setRadiusFactor(speedFactor);
 
-            this.lastBase.set(baseX, baseY);
-            this.lastWorldEpoch = this.worldEpoch;
+            renderer.render(this.scene, this.camera);
 
-            this.running = false;
+            renderer.setClearColor(oldClearColor, oldClearAlpha);
+        };
+        _renderMiniMap();
 
-            if (this.queued) {
-              this.queued = false;
-              _updateTiles();
+        const _copyToCanvases = () => {
+            for (const canvas of this.canvases) {
+                const { width, height, ctx } = canvas;
+                ctx.clearRect(0, 0, width, height);
+                ctx.drawImage(
+                    renderer.domElement,
+                    0,
+                    size.y * pixelRatio - this.canvasHeight * pixelRatio,
+                    this.canvasWidth * pixelRatio,
+                    this.canvasHeight * pixelRatio,
+                    0,
+                    0,
+                    width,
+                    height
+                );
             }
-          })();
-        } else {
-          this.queued = true;
-        }
-      }
-    };
-    _updateTiles();
+        };
+        _copyToCanvases();
 
-    const _renderMiniMap = () => {
-      // window.player = localPlayer;
-      const currentSpeed = localVector.set(localPlayer.characterPhysics.velocity.x, 0, localPlayer.characterPhysics.velocity.z).length();
-      this.smoothSpeed = this.smoothSpeed * 0.95 + currentSpeed * 0.05;
-      const speedFactor = Math.min(Math.max(this.smoothSpeed / this.baseSpeed, this.minZoom), 1);
+        renderer.clear();
 
-      this.scene.reticleMesh.position.set(localPlayer.position.x, localPlayer.position.y + cameraHeight, localPlayer.position.z);
-      localEuler.setFromQuaternion(localPlayer.quaternion, 'YXZ');
-      localEuler.x = 0;
-      localEuler.z = 0;
-      this.scene.reticleMesh.quaternion.setFromEuler(localEuler);
-      // this.scene.reticleMesh.scale.setScalar(speedFactor);
-      this.scene.reticleMesh.updateMatrixWorld();
-
-      this.scene.compassMesh.position.copy(this.scene.reticleMesh.position);
-      this.scene.compassMesh.scale.setScalar(speedFactor);
-      this.scene.compassMesh.updateMatrixWorld();
-
-      this.scene.floorMesh.material.uniforms.uScreenSize.value.set(this.canvasWidth * pixelRatio, this.canvasHeight * pixelRatio);
-      this.scene.floorMesh.material.uniforms.uScreenSize.needsUpdate = true;
-
-      const oldClearColor = renderer.getClearColor(localColor);
-      const oldClearAlpha = renderer.getClearAlpha();
-
-      renderer.setRenderTarget(oldRenderTarget);
-      renderer.setViewport(0, 0, this.canvasWidth, this.canvasHeight);
-      renderer.setClearColor(0x000000, 0);
-      renderer.clear();
-
-      this.camera.position.copy(localPlayer.position)
-        .add(localVector.set(0, cameraHeight, 0));
-      this.camera.quaternion.setFromRotationMatrix(
-        localMatrix.lookAt(
-          this.camera.position,
-          localPlayer.position,
-          localVector2.set(0, 0, -1)
-            .applyQuaternion(camera.quaternion),
-        )
-      );
-      this.camera.updateMatrixWorld();
-      this.camera.setRadiusFactor(speedFactor);
-      
-      renderer.render(this.scene, this.camera);
-
-      renderer.setClearColor(oldClearColor, oldClearAlpha);
-    };
-    _renderMiniMap();
-
-    const _copyToCanvases = () => {
-      for (const canvas of this.canvases) {
-        const {width, height, ctx} = canvas;
-        ctx.clearRect(0, 0, width, height);
-        ctx.drawImage(
-          renderer.domElement,
-          0,
-          size.y * pixelRatio - this.canvasHeight * pixelRatio,
-          this.canvasWidth * pixelRatio,
-          this.canvasHeight * pixelRatio,
-          0,
-          0,
-          width,
-          height
-        );
-      }
-    };
-    _copyToCanvases();
-
-    renderer.clear();
-
-    // pop old state
-    renderer.setRenderTarget(oldRenderTarget);
-    renderer.setViewport(oldViewport);
-  }
-
-  destroy() {
-    for (const canvas of this.canvases) {
-      canvas.parentNode.removeChild(canvas);
+        // pop old state
+        renderer.setRenderTarget(oldRenderTarget);
+        renderer.setViewport(oldViewport);
     }
-    minimaps.splice(minimaps.indexOf(this), 1);
-    this.cleanup();
-  }
+
+    destroy() {
+        for (const canvas of this.canvases) {
+            canvas.parentNode.removeChild(canvas);
+        }
+        minimaps.splice(minimaps.indexOf(this), 1);
+        this.cleanup();
+    }
 }
 
 const minimapManager = {
-  createMiniMap(width, height, worldWidth, worldHeight, minimapMinZoom, baseSpeed) {
-    const minimap = new MiniMap(width, height, worldWidth, worldHeight, minimapMinZoom, baseSpeed);
-    minimaps.push(minimap);
-    return minimap;
-  },
-  update(timestamp, timeDiff) {
-    for (const minimap of minimaps) {
-      minimap.enabled && minimap.update(timestamp, timeDiff);
-    }
-  }
+    createMiniMap(
+        width,
+        height,
+        worldWidth,
+        worldHeight,
+        minimapMinZoom,
+        baseSpeed
+    ) {
+        const minimap = new MiniMap(
+            width,
+            height,
+            worldWidth,
+            worldHeight,
+            minimapMinZoom,
+            baseSpeed
+        );
+        minimaps.push(minimap);
+        return minimap;
+    },
+    update(timestamp, timeDiff) {
+        for (const minimap of minimaps) {
+            minimap.enabled && minimap.update(timestamp, timeDiff);
+        }
+    },
 };
 
 export default minimapManager;

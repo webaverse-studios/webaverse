@@ -41,7 +41,7 @@ export const Minimap = ({className}) => {
                 <CustomButton
                     type="icon"
                     theme="dark"
-                    icon="microphone"
+                    icon="speechToText"
                     className={styles.button}
                     size={24}
                 />
@@ -68,7 +68,6 @@ export const Minimap = ({className}) => {
                     size={24}
                 />
             </div>
-            <div className={styles.mapBg} />
             <div className={styles.mapWrap}>
                 <canvas
                     width={canvasSize}
