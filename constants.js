@@ -147,3 +147,5 @@ export const characterSelectAvatarQuality = 4;
 
 export const minCanvasSize = 512;
 export const offscreenCanvasSize = 2048;
+
+export const heightfieldScale = 0.1; // must fit heightfield in int16
