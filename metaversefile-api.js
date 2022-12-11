@@ -69,7 +69,7 @@ import {getDefaultCanvas} from './offscreen-engine/fns/avatar-iconer-fn.js';
 import {isWorker} from './env.js';
 import './metaversefile-binding.js';
 
-const localVector2D = new THREE.Vector2();
+// const localVector2D = new THREE.Vector2();
 
 class App extends THREE.Object3D {
   constructor() {
@@ -849,18 +849,24 @@ metaversefile.setApi({
         app.physicsObjects.push(physicsObject);
         return physicsObject;
       })(physicsScene.addConvexShape);
-      physicsScene.addCookedConvexGeometry = (addCookedConvexGeometry => function(buffer, position, quaternion, scale) {
+      physicsScene.addCookedConvexGeometry = (addCookedConvexGeometry => function() {
         const physicsObject = addCookedConvexGeometry.apply(this, arguments);
         // app.add(physicsObject);
         app.physicsObjects.push(physicsObject);
         return physicsObject;
       })(physicsScene.addCookedConvexGeometry);
-      physicsScene.addHeightFieldGeometry = (addHeightFieldGeometry => function(mesh) {
+      physicsScene.addHeightFieldGeometry = (addHeightFieldGeometry => function() {
         const physicsObject = addHeightFieldGeometry.apply(this, arguments);
         // app.add(physicsObject);
         app.physicsObjects.push(physicsObject);
         return physicsObject;
       })(physicsScene.addHeightFieldGeometry);
+      physicsScene.addCookedHeightfieldGeometry = (addCookedHeightfieldGeometry => function() {
+        const physicsObject = addCookedHeightfieldGeometry.apply(this, arguments);
+        // app.add(physicsObject);
+        app.physicsObjects.push(physicsObject);
+        return physicsObject;
+      })(physicsScene.addCookedHeightfieldGeometry);
       physicsScene.removeGeometry = (removeGeometry => function(physicsObject) {
         removeGeometry.apply(this, arguments);
         
