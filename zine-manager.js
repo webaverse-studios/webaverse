@@ -105,7 +105,7 @@ class ZineManager {
     const physicsIds = [];
     instance.physicsIds = physicsIds;
     {
-      const physicsId = physics.addGeometry(scenePhysicsMesh); // XXX geometry is too fat to fit, need to decimate
+      const physicsId = physics.addGeometry(scenePhysicsMesh);
       physicsIds.push(physicsId);
     }
 
