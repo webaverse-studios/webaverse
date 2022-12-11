@@ -31,7 +31,7 @@ physx.waitForLoad =  () => {
 
       Module._initialize();
 
-      const scratchStackSize = 1024 * 1024;
+      const scratchStackSize = 8 * 1024 * 1024;
       scratchStack = new ScratchStack(Module, scratchStackSize);
 
       physx.loaded = true;
