@@ -8,7 +8,7 @@ import {getAudioDataBuffer} from 'wsrtc/ws-util.js';
 
 import * as THREE from 'three';
 import * as Z from 'zjs';
-import {getRenderer, scene, camera} from './renderer.js';
+import {getRenderer, scene, camera, sceneLowPriority} from './renderer.js';
 import physicsManager from './physics-manager.js';
 import {world} from './world.js';
 import audioManager from './audio-manager.js';
@@ -52,6 +52,7 @@ const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
 const localQuaternion = new THREE.Quaternion();
 // const localQuaternion2 = new THREE.Quaternion();
+const localEuler = new THREE.Euler();
 const localMatrix = new THREE.Matrix4();
 const localMatrix2 = new THREE.Matrix4();
 const localArray3 = [0, 0, 0];
@@ -839,6 +840,7 @@ class AvatarCharacter extends StateCharacter {
     this.avatarFace = new AvatarCharacterFace(this);
     this.avatarCharacterFx = new AvatarCharacterFx(this);
     this.avatarCharacterSfx = new AvatarCharacterSfx(this);
+    this.glider = null; // todo: don't put glider module/model here ?
 
     this.leftHand = new AvatarHand();
     this.rightHand = new AvatarHand();
@@ -969,6 +971,11 @@ class AvatarCharacter extends StateCharacter {
     this.avatarFace.destroy();
     this.avatarCharacterSfx.destroy();
     this.avatarCharacterFx.destroy();
+    if (this.glider) {
+      sceneLowPriority.remove(this.glider);
+      this.glider.destroy();
+      this.glider = null;
+    }
 
     super.destroy();
   }
@@ -1361,6 +1368,35 @@ class LocalPlayer extends UninterpolatedPlayer {
       this.avatar.update(timestamp, timeDiff);
 
       this.characterHups.update(timestamp);
+
+      // todo: Also add to npcPlayer or AvatarCharacter.
+      if (!this.glider && this.getControlMode() === 'controlled') {
+        // console.log('create glider');
+        this.glider = metaversefile.createApp();
+        this.glider.setComponent('player', this);
+        (async () => {
+          const {importModule} = metaversefile.useDefaultModules();
+          const m = await importModule('glider');
+          await this.glider.addModule(m);
+        })();
+        this.glider.visible = false;
+        sceneLowPriority.add(this.glider);
+      }
+
+      localEuler.order = 'YZX';
+      localEuler.setFromQuaternion(this.quaternion);
+      localEuler.y += Math.PI;
+      // localQuaternion.setFromAxisAngle(localVector.set(0, 1, 0), Math.PI);
+      // this.glider.quaternion.copy(this.quaternion)/* .premultiply(localQuaternion) */;
+      this.glider.rotation.copy(localEuler);
+      this.glider.rotation.x = 0;
+
+      localVector.set(0, 0.11, 0.25).applyEuler(this.glider.rotation);
+      this.glider.position.copy(this.position).add(localVector);
+
+      this.glider.updateMatrixWorld();
+
+      // console.log('update glider position/rotation');
     }
   }
 

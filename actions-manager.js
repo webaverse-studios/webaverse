@@ -342,9 +342,11 @@ const postTickSettings = (localPlayer, blackboard) => {
   
     if (tickResults.glider && !lastTickResults.glider) {
       localPlayer.addAction(tickTryActions.glider);
+      localPlayer.glider.visible = true; // todo: put this logic in callbakFn or return value from actions-manager ?
     }
     if (!tickResults.glider && lastTickResults.glider) {
       localPlayer.removeAction('glider');
+      localPlayer.glider.visible = false;
     }
   }
   setActions();
