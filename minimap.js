@@ -147,28 +147,6 @@ const compassRoseGeometry = (() => {
   );
 })();
 
-const compassNorthGeometry = (() => {
-  const path = new THREE.Shape();
-    path.moveTo(-0.1, 0.82);
-    path.lineTo(-0.1, 0.82);
-    path.lineTo(-0.23, 0.85);
-    path.lineTo(-0.13, 0.88);
-    path.lineTo(0, 0.975);
-    path.lineTo(0.13, 0.88);
-    path.lineTo(0.23, 0.85);
-    path.lineTo(0.2, 0.8);
-    path.lineTo(0.1, 0.82);
-    path.lineTo(0, 0.83);
-    path.lineTo(-0.1, 0.82);
-    path.lineTo(-0.2, 0.8);
-
-    const roseGeometry = new THREE.ShapeGeometry(path);
-
-    return roseGeometry.applyMatrix4(
-      new THREE.Matrix4().makeRotationX(-Math.PI / 2)
-  );
-})();
-
 const compassRingGeometry = (() => {
     const ringGeometry = new THREE.RingGeometry(
         0.830, // innerRadius
@@ -389,23 +367,7 @@ const _makeScene = (worldWidth, worldHeight, minZoom) => {
             ),
             compassRoseMaterial
     );
-
-    const compassNorthMesh = new THREE.Mesh(
-      compassNorthGeometry
-            .clone()
-            .applyMatrix4(
-                new THREE.Matrix4().makeScale(
-                    compassSize,
-                    compassSize,
-                    compassSize
-                )
-            ),
-        compassMaterial
-    );
-
-    compassNorthMesh.renderOrder = 1;
-
-    compassDirPoitnerGroup.add(compassRingMesh, compassRoseMesh, compassRoseMesh2, compassNorthMesh);
+    compassDirPoitnerGroup.add(compassRingMesh, compassRoseMesh, compassRoseMesh2);
 
     compassDirPoitnerGroup.updateMatrixWorld();
     compassDirPoitnerGroup.frustumCulled = false;
