@@ -1,4 +1,5 @@
 import React, {useEffect, useState, useContext} from "react";
+import { Vector3 } from 'three';
 import classnames from "classnames";
 
 import {defaultPlayerName} from "../../../../ai/lore/lore-model.js";
@@ -21,6 +22,8 @@ import {AppContext} from "../../app";
 import styles from "./character.module.css";
 import CustomButton from "../custom-button/index.jsx";
 import {TokenBox} from "../token-box/TokenBox.jsx";
+
+const localVector3 = new Vector3();
 
 const mainStatSpecs = [
     {
@@ -154,14 +157,13 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
 
     const sideSize = 400;
 
-    useEffect(() => {
+    useEffect(() => { 
         const canvas = dioramaCanvasRef.current;
 
         if (canvas && state.openedPanel === "CharacterPanel") {
             const playerDiorama = game.getPlayerDiorama();
-
+            playerDiorama.setCameraOffset(localVector3.set(0.3, -0.64, -1.9))
             playerDiorama.addCanvas(canvas);
-
             return () => {
                 playerDiorama.removeCanvas(canvas);
             };
@@ -187,6 +189,7 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
 
     function onCanvasClick() {
         const playerDiorama = game.getPlayerDiorama();
+        playerDiorama.setCameraOffset(localVector3.set(0.3, -0.64, -1.9))
         playerDiorama.toggleShader();
 
         const soundFiles = sounds.getSoundFiles();
