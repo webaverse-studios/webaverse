@@ -21,8 +21,8 @@ const functionMap = {
   'getSpriteAnimationForAppUrlInternal': getSpriteAnimationForAppUrlInternal,
 };
 
-if (typeof window !== 'undefined') {
-  globalThis.window.addEventListener('message', async e => {
+if (typeof self !== 'undefined') {
+  self.addEventListener('message', async e => {
     const method = e.data?.method;
     if (method === 'initializeEngine') {
       const {port} = e.data;
@@ -117,8 +117,8 @@ const _bindPort = port => {
   port.start();
 };
 
-if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
-  const canvas = new globalThis.OffscreenCanvas(offscreenCanvasSize, offscreenCanvasSize);
+if (typeof self !== 'undefined') {
+  const canvas = new OffscreenCanvas(offscreenCanvasSize, offscreenCanvasSize);
   globalThis.innerWidth = canvas.width;
   globalThis.innerHeight = canvas.height;
   globalThis.devicePixelRatio = 1;
