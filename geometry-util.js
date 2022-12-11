@@ -43,7 +43,7 @@ export class ScratchStack {
       this.ptr,
       size
     )
-    this.u16 = new Uint32Array(
+    this.u16 = new Uint16Array(
       moduleInstance.HEAP8.buffer,
       this.ptr,
       size / 2
@@ -53,12 +53,12 @@ export class ScratchStack {
       this.ptr,
       size / 4
     )
-    this.i8 = new Int32Array(
+    this.i8 = new Int8Array(
       moduleInstance.HEAP8.buffer,
       this.ptr,
       size
     )
-    this.i16 = new Int32Array(
+    this.i16 = new Int16Array(
       moduleInstance.HEAP8.buffer,
       this.ptr,
       size / 2
