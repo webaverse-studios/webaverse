@@ -76,7 +76,7 @@ class ZineManager {
     const zineRenderer = this.#createRenderer({
       panel,
     });
-    const {sceneMesh, floorNetMesh} = zineRenderer;
+    const {sceneMesh, scenePhysicsMesh, floorNetMesh} = zineRenderer;
     const floorResolution = layer1.getData('floorResolution');
     const floorNetDepths = layer1.getData('floorNetDepths');
     const floorNetCameraJson = layer1.getData('floorNetCameraJson');
@@ -85,6 +85,7 @@ class ZineManager {
       panel,
       zineRenderer,
       sceneMesh,
+      scenePhysicsMesh,
       floorNetMesh,
       floorResolution,
       floorNetCameraJson,
@@ -96,6 +97,7 @@ class ZineManager {
     // add meshes to instance
     {
       instance.add(sceneMesh);
+      instance.add(scenePhysicsMesh);
       instance.add(floorNetMesh);
     }
 
@@ -103,7 +105,7 @@ class ZineManager {
     const physicsIds = [];
     instance.physicsIds = physicsIds;
     {
-      const physicsId = physics.addGeometry(sceneMesh); // XXX geometry is too fat to fit, need to decimate
+      const physicsId = physics.addGeometry(scenePhysicsMesh); // XXX geometry is too fat to fit, need to decimate
       physicsIds.push(physicsId);
     }
 
