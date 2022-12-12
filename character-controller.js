@@ -1378,6 +1378,10 @@ class LocalPlayer extends UninterpolatedPlayer {
           const {importModule} = metaversefile.useDefaultModules();
           const m = await importModule('glider');
           await this.glider.addModule(m);
+          const physicsScene = physicsManager.getScene();
+          this.glider.physicsObjects.forEach(physicsObject => {
+            physicsScene.disableActor(physicsObject); // todo: performance: don't init glider's physics ?
+          })
         })();
         this.glider.visible = false;
         sceneLowPriority.add(this.glider);
