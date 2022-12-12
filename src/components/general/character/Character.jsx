@@ -15,6 +15,7 @@ import {
     dex,
     lck,
     xp,
+    limit
 } from "../../../../player-stats.js";
 
 import {AppContext} from "../../app";
@@ -48,7 +49,7 @@ const mainStatSpecs = [
         imgSrc: "assets/icons/limit.svg",
         name: "Limit",
         className: "lm",
-        progress: 67,
+        progress: limit,
     },
 ];
 const statSpecs = [
