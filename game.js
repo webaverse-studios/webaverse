@@ -616,6 +616,7 @@ class GameManager extends EventTarget {
 
   menuBUp() {
     const localPlayer = playersManager.getLocalPlayer();
+    localPlayer.removeAction('sss');
     localPlayer.removeAction('dance');
   }
 
