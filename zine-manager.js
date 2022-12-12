@@ -64,17 +64,17 @@ class ZineManager {
     const storyboard = await this.#loadUrl(start_url);
 
     const panel = storyboard.getPanel(0);
-    if (!panel) {
-      throw new Error('no panels in zine');
-    }
+    // if (!panel) {
+    //   throw new Error('no panels in zine');
+    // }
     const layer0 = panel.getLayer(0);
-    if (!layer0) {
-      throw new Error('no layer0 in panel0');
-    }
+    // if (!layer0) {
+    //   throw new Error('no layer0 in panel0');
+    // }
     const layer1 = panel.getLayer(1);
-    if (!layer1) {
-      throw new Error('no layer1 in panel0');
-    }
+    // if (!layer1) {
+    //   throw new Error('no layer1 in panel0');
+    // }
 
     const zineRenderer = this.#createRenderer({
       panel,
