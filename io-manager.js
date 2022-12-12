@@ -469,6 +469,10 @@ class IoManager extends EventTarget {
         }
         break;
       }
+      case 85: { // U 
+        cameraManager.toggleCameraLock();
+        break;
+      } 
       case 74: { // J
         game.inventoryHack = !game.inventoryHack;
         break;
