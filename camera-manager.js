@@ -283,7 +283,7 @@ class CameraManager extends EventTarget {
   }
 
   getMode() {
-    if (this.target || this.cinematicScript) {
+    if (this.target || this.cinematicScript || this.cameraLocked) {
       return 'isometric';
     } else {
       return cameraOffset.z > -0.5 ? 'firstperson' : 'isometric';
