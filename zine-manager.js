@@ -100,6 +100,12 @@ class ZineManager {
       instance.add(sceneMesh);
       instance.add(scenePhysicsMesh);
       instance.add(floorNetMesh);
+      // floorNetMesh.visible = true;
+
+      const light = new THREE.DirectionalLight(0xffffff, 2);
+      light.position.set(0, 1, 2);
+      instance.add(light);
+      light.updateMatrixWorld();
     }
 
     // add object physics
