@@ -118,50 +118,59 @@ class ZineManager {
 
     // add floor heightfield physics
     {
+      const [width, height] = floorResolution;
+
+      console.log('got floor resolution', {width, height});
+
       const geometry = depthFloat32ArrayToOrthographicGeometry(
         floorNetDepths,
         floorNetPixelSize,
         floorNetPixelSize,
         floorNetCamera,
       );
+      geometry.computeVertexNormals();
       const heights = new Int16Array(geometry.attributes.position.array.length / 3);
-      const heightsFloat32 = new Float32Array(geometry.attributes.position.array.length / 3);
-      for (let i = 0; i < heights.length; i++) {
-        const y = geometry.attributes.position.array[i * 3 + 1];
-        heights[i] = Math.round(y / heightfieldScale);
-        heightsFloat32[i] = y;
-      }
-      console.log('got geometry heights', heightsFloat32);
+      // const heightsFloat32 = new Float32Array(geometry.attributes.position.array.length / 3);
+      {
+        let writeIndex = 0;
+        for (let dy = 0; dy < height; dy++) {
+          for (let dx = 0; dx < width; dx++) {
+            const ax = dx;
+            const ay = height - 1 - dy;
+            // XXX note that readIndex is WRONG; we should index by ay * width + ax
+            // however, because of some other bug which computes this wrong, we have to do it this way
+            const readIndex = ax * width + ay;
 
-      const [width, height] = floorResolution;
+            const y = geometry.attributes.position.array[readIndex * 3 + 1];
+            heights[writeIndex] = Math.round(y / heightfieldScale);
+            // heightsFloat32[writeIndex] = y;
+
+            writeIndex++;
+          }
+        }
+      }
+      // console.log('got geometry heights', heightsFloat32);
+
+      // shift geometry by half a floorNetWorldSize
+      geometry.translate(floorNetWorldSize/2, 0, floorNetWorldSize/2);
+      // ...but also shift the mesh to compensate
+      // this centering is required for the physics to work and render correctly
+      const material = new THREE.MeshPhongMaterial({
+        color: 0x0000ff,
+        side: THREE.DoubleSide,
+      });
+      const floorNetPhysicsMesh = new THREE.Mesh(geometry, material);
+      floorNetPhysicsMesh.position.set(-floorNetWorldSize/2, 0, -floorNetWorldSize/2);
+      instance.add(floorNetPhysicsMesh);
+      floorNetPhysicsMesh.updateMatrixWorld();
+
       const numRows = width;
       const numColumns = height;
       if (floorNetDepths.length !== width * height) {
         throw new Error('floorNetDepths length mismatch');
       }
-      /* globalThis.ys = []; // XXX
-      const heights = (() => {
-        const heights = new Int16Array(floorNetDepths.length);
-        for (let i = 0; i < floorNetDepths.length; i++) {
-          const x = (i % width) / width;
-          let y = Math.floor(i / width) / height;
-          y = 1 - y;
-        
-          const viewZ = floorNetDepths[i];
-          const worldPoint = setCameraViewPositionFromOrthographicViewZ(x, y, viewZ, floorNetCamera, localVector);
-
-          globalThis.ys.push(worldPoint.y); // XXX
-
-          const h = Math.round(worldPoint.y / heightfieldScale);
-          if (h < -32768 || h > 32767) { // check that it fits in int16
-            throw new Error('height out of range in createInstanceAsync');
-          }
-          heights[i] = h;
-        }
-        return heights;
-      })(); */
       console.log('add object 1', {
-        floorNetMesh,
+        floorNetPhysicsMesh,
         numRows,
         numColumns,
         heights,
@@ -170,7 +179,7 @@ class ZineManager {
         floorNetDepths,
       });
       const heightfieldPhysicsObject = physics.addHeightFieldGeometry(
-        floorNetMesh,
+        floorNetPhysicsMesh,
         numRows,
         numColumns,
         heights,
@@ -181,6 +190,8 @@ class ZineManager {
       console.log('add object 2', heightfieldPhysicsObject);
       physicsIds.push(heightfieldPhysicsObject);
     }
+
+    console.log('create instance done');
 
     instance.updateMatrixWorld();
     return instance;
