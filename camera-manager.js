@@ -188,6 +188,10 @@ class CameraManager extends EventTarget {
     this.cinematicScript = null;
     this.cinematicScriptStartTime = -1;
 
+    this.lockCamera = new THREE.PerspectiveCamera();
+    this.oldCamera = new THREE.PerspectiveCamera();
+    this.cameraLocked = false;
+
     this.bindEvents();
   }
 
@@ -288,6 +292,19 @@ class CameraManager extends EventTarget {
 
   getCameraOffset() {
     return cameraOffset;
+  }
+
+  setLockCamera(camera) {
+    this.lockCamera.copy(camera);
+  }
+  toggleCameraLock() {
+    this.cameraLocked = !this.cameraLocked;
+
+    if (this.cameraLocked) {
+      this.oldCamera.copy(camera);
+    } else {
+      camera.copy(this.oldCamera);
+    }
   }
 
   handleMouseMove(e) {
@@ -499,268 +516,278 @@ class CameraManager extends EventTarget {
     const session = renderer.xr.getSession();
     const localPlayer = playersManager.getLocalPlayer();
 
-    if (this.target) {
-      const _setLerpDelta = (position, quaternion) => {
-        const lerpTime = 2000;
-        const lastTimeFactor = Math.min(Math.max(cubicBezier((this.lastTimestamp - this.lerpStartTime) / lerpTime), 0), 1);
-        const currentTimeFactor = Math.min(Math.max(cubicBezier((timestamp - this.lerpStartTime) / lerpTime), 0), 1);
-        if (lastTimeFactor !== currentTimeFactor) {
-          {
-            const lastLerp = localVector.copy(this.sourcePosition).lerp(this.targetPosition, lastTimeFactor);
-            const currentLerp = localVector2.copy(this.sourcePosition).lerp(this.targetPosition, currentTimeFactor);
-            position.add(currentLerp).sub(lastLerp);
-          }
-          {
-            const lastLerp = localQuaternion.copy(this.sourceQuaternion).slerp(this.targetQuaternion, lastTimeFactor);
-            const currentLerp = localQuaternion2.copy(this.sourceQuaternion).slerp(this.targetQuaternion, currentTimeFactor);
-            quaternion.premultiply(lastLerp.invert()).premultiply(currentLerp);
-          }
-        }
-
-        this.lastTimestamp = timestamp;
-      };
-      _setLerpDelta(camera.position, camera.quaternion);
-      camera.updateMatrixWorld();
-    } else if (this.cinematicScript) {
-      const timeDiff = timestamp - this.cinematicScriptStartTime;
-      // find the line in the script that we are currently on
-      let currentDuration = 0;
-      const currentLineIndex = (() => {
-        let i;
-        for (i = 0; i < this.cinematicScript.length; i++) {
-          const currentLine = this.cinematicScript[i];
-          // const nextLine = this.cinematicScript[i + 1];
-
-          if (currentDuration + currentLine.duration > timeDiff) {
-            // return currentLine;
-            break;
-          } else {
-            currentDuration += currentLine.duration;
-          }
-
-          // const lineDuration = this.cinematicScript[i].duration;
-          // currentDuration += lineDuration;
-        }
-        return i < this.cinematicScript.length ? i : -1;
-      })();
-
-      if (currentLineIndex !== -1) {
-        // calculate how far into the line we are, in 0..1
-        const currentLine = this.cinematicScript[currentLineIndex];
-        const {type} = currentLine;
-        switch (type) {
-          case 'set': {
-            camera.position.copy(currentLine.position);
-            camera.quaternion.copy(currentLine.quaternion);
-            camera.updateMatrixWorld();
-            break;
-          }
-          case 'move': {
-            let factor = Math.min(Math.max((timeDiff - currentDuration) / currentLine.duration, 0), 1);
-            if (factor < 1) {
-              factor = cubicBezier2(factor);
-              const previousLine = this.cinematicScript[currentLineIndex - 1];
-              
-              camera.position.copy(previousLine.position).lerp(currentLine.position, factor);
-              camera.quaternion.copy(previousLine.quaternion).slerp(currentLine.quaternion, factor);
-              camera.updateMatrixWorld();
-
-              // console.log('previous line', previousLine, camera.position.toArray().join(','), camera.quaternion.toArray().join(','), factor);
-              /* if (isNaN(camera.position.x)) {
-                debugger;
-              } */
-            } else {
-              this.cinematicScript = null;
+    const _setUnlocked = () => {
+      if (this.target) {
+        const _setLerpDelta = (position, quaternion) => {
+          const lerpTime = 2000;
+          const lastTimeFactor = Math.min(Math.max(cubicBezier((this.lastTimestamp - this.lerpStartTime) / lerpTime), 0), 1);
+          const currentTimeFactor = Math.min(Math.max(cubicBezier((timestamp - this.lerpStartTime) / lerpTime), 0), 1);
+          if (lastTimeFactor !== currentTimeFactor) {
+            {
+              const lastLerp = localVector.copy(this.sourcePosition).lerp(this.targetPosition, lastTimeFactor);
+              const currentLerp = localVector2.copy(this.sourcePosition).lerp(this.targetPosition, currentTimeFactor);
+              position.add(currentLerp).sub(lastLerp);
             }
-            break;
+            {
+              const lastLerp = localQuaternion.copy(this.sourceQuaternion).slerp(this.targetQuaternion, lastTimeFactor);
+              const currentLerp = localQuaternion2.copy(this.sourceQuaternion).slerp(this.targetQuaternion, currentTimeFactor);
+              quaternion.premultiply(lastLerp.invert()).premultiply(currentLerp);
+            }
           }
-          default: {
-            throw new Error('unknown cinematic script line type: ' + type);
+
+          this.lastTimestamp = timestamp;
+        };
+        _setLerpDelta(camera.position, camera.quaternion);
+        camera.updateMatrixWorld();
+      } else if (this.cinematicScript) {
+        const timeDiff = timestamp - this.cinematicScriptStartTime;
+        // find the line in the script that we are currently on
+        let currentDuration = 0;
+        const currentLineIndex = (() => {
+          let i;
+          for (i = 0; i < this.cinematicScript.length; i++) {
+            const currentLine = this.cinematicScript[i];
+            // const nextLine = this.cinematicScript[i + 1];
+
+            if (currentDuration + currentLine.duration > timeDiff) {
+              // return currentLine;
+              break;
+            } else {
+              currentDuration += currentLine.duration;
+            }
+
+            // const lineDuration = this.cinematicScript[i].duration;
+            // currentDuration += lineDuration;
           }
+          return i < this.cinematicScript.length ? i : -1;
+        })();
+
+        if (currentLineIndex !== -1) {
+          // calculate how far into the line we are, in 0..1
+          const currentLine = this.cinematicScript[currentLineIndex];
+          const {type} = currentLine;
+          switch (type) {
+            case 'set': {
+              camera.position.copy(currentLine.position);
+              camera.quaternion.copy(currentLine.quaternion);
+              camera.updateMatrixWorld();
+              break;
+            }
+            case 'move': {
+              let factor = Math.min(Math.max((timeDiff - currentDuration) / currentLine.duration, 0), 1);
+              if (factor < 1) {
+                factor = cubicBezier2(factor);
+                const previousLine = this.cinematicScript[currentLineIndex - 1];
+                
+                camera.position.copy(previousLine.position).lerp(currentLine.position, factor);
+                camera.quaternion.copy(previousLine.quaternion).slerp(currentLine.quaternion, factor);
+                camera.updateMatrixWorld();
+
+                // console.log('previous line', previousLine, camera.position.toArray().join(','), camera.quaternion.toArray().join(','), factor);
+                /* if (isNaN(camera.position.x)) {
+                  debugger;
+                } */
+              } else {
+                this.cinematicScript = null;
+              }
+              break;
+            }
+            default: {
+              throw new Error('unknown cinematic script line type: ' + type);
+            }
+          }
+        } else {
+          // console.log('no line', timeDiff, this.cinematicScript.slice());
+          this.cinematicScript = null;
         }
       } else {
-        // console.log('no line', timeDiff, this.cinematicScript.slice());
-        this.cinematicScript = null;
-      }
-    } else {
-      const _bumpCamera = () => {
-        const direction = localVector.set(0, 0, 1)
-          .applyQuaternion(camera.quaternion);
-        const backOffset = 1;
-        // const cameraBackThickness = 0.5;
+        const _bumpCamera = () => {
+          const direction = localVector.set(0, 0, 1)
+            .applyQuaternion(camera.quaternion);
+          const backOffset = 1;
+          // const cameraBackThickness = 0.5;
 
-        const sweepDistance = Math.max(-cameraOffsetTargetZ, 0);
+          const sweepDistance = Math.max(-cameraOffsetTargetZ, 0);
 
-        // console.log('offset', cameraOffsetTargetZ);
+          // console.log('offset', cameraOffsetTargetZ);
 
-        cameraOffsetLimitZ = -Infinity;
+          cameraOffsetLimitZ = -Infinity;
 
-        if (sweepDistance > 0) {
-          const halfExtents = localVector2.set(0.5, 0.5, 0.1);
-          const maxHits = 1;
+          if (sweepDistance > 0) {
+            const halfExtents = localVector2.set(0.5, 0.5, 0.1);
+            const maxHits = 1;
 
-          const physicsScene = physicsManager.getScene();
-          const result = physicsScene.sweepBox(
-            localVector3.copy(localPlayer.position)
-              .add(localVector4.copy(direction).multiplyScalar(backOffset)),
-            camera.quaternion,
-            halfExtents,
-            direction,
-            sweepDistance,
-            maxHits,
-          );
-          if (result.length > 0) {
-            const distance = result[0].distance;
-            cameraOffsetLimitZ = distance < 0.5 ? 0 : -distance;
+            const physicsScene = physicsManager.getScene();
+            const result = physicsScene.sweepBox(
+              localVector3.copy(localPlayer.position)
+                .add(localVector4.copy(direction).multiplyScalar(backOffset)),
+              camera.quaternion,
+              halfExtents,
+              direction,
+              sweepDistance,
+              maxHits,
+            );
+            if (result.length > 0) {
+              const distance = result[0].distance;
+              cameraOffsetLimitZ = distance < 0.5 ? 0 : -distance;
+            }
           }
-        }
-      };
-      _bumpCamera();
+        };
+        _bumpCamera();
 
-      const _lerpCameraOffset = () => {
-        const lerpFactor = 0.15;
-        let cameraOffsetZ = Math.max(cameraOffsetTargetZ, cameraOffsetLimitZ);
-        if (cameraOffsetZ > -0.5) {
-          cameraOffsetZ = 0;
-        }
-        cameraOffset.z = cameraOffset.z * (1-lerpFactor) + cameraOffsetZ*lerpFactor;
-      };
-      _lerpCameraOffset();
+        const _lerpCameraOffset = () => {
+          const lerpFactor = 0.15;
+          let cameraOffsetZ = Math.max(cameraOffsetTargetZ, cameraOffsetLimitZ);
+          if (cameraOffsetZ > -0.5) {
+            cameraOffsetZ = 0;
+          }
+          cameraOffset.z = cameraOffset.z * (1-lerpFactor) + cameraOffsetZ*lerpFactor;
+        };
+        _lerpCameraOffset();
 
-      const _setFreeCamera = () => {
-        const avatarCameraOffset = session ? rayVectorZero : this.getCameraOffset();
-        const avatarHeight = localPlayer.avatar ? localPlayer.avatar.height : 0;
-        const crouchOffset = avatarHeight * (1 - localPlayer.getCrouchFactor()) * 0.5;
+        const _setFreeCamera = () => {
+          const avatarCameraOffset = session ? rayVectorZero : this.getCameraOffset();
+          const avatarHeight = localPlayer.avatar ? localPlayer.avatar.height : 0;
+          const crouchOffset = avatarHeight * (1 - localPlayer.getCrouchFactor()) * 0.5;
 
-        switch (this.getMode()) {
-          case 'firstperson': {
-            if (localPlayer.avatar) {
-              const boneNeck = localPlayer.avatar.foundModelBones.Neck;
-              const boneEyeL = localPlayer.avatar.foundModelBones.Eye_L;
-              const boneEyeR = localPlayer.avatar.foundModelBones.Eye_R;
-              const boneHead = localPlayer.avatar.foundModelBones.Head;
+          switch (this.getMode()) {
+            case 'firstperson': {
+              if (localPlayer.avatar) {
+                const boneNeck = localPlayer.avatar.foundModelBones.Neck;
+                const boneEyeL = localPlayer.avatar.foundModelBones.Eye_L;
+                const boneEyeR = localPlayer.avatar.foundModelBones.Eye_R;
+                const boneHead = localPlayer.avatar.foundModelBones.Head;
 
-              boneNeck.quaternion.setFromEuler(localEuler.set(Math.min(camera.rotation.x * -0.5, 0.6), 0, 0, 'XYZ'));
-              boneNeck.updateMatrixWorld();
-        
-              if (boneEyeL && boneEyeR) {
-                boneEyeL.matrixWorld.decompose(localVector2, localQuaternion, localVector4);
-                boneEyeR.matrixWorld.decompose(localVector3, localQuaternion, localVector4);
-                localVector4.copy(localVector2.add(localVector3).multiplyScalar(0.5));
+                boneNeck.quaternion.setFromEuler(localEuler.set(Math.min(camera.rotation.x * -0.5, 0.6), 0, 0, 'XYZ'));
+                boneNeck.updateMatrixWorld();
+          
+                if (boneEyeL && boneEyeR) {
+                  boneEyeL.matrixWorld.decompose(localVector2, localQuaternion, localVector4);
+                  boneEyeR.matrixWorld.decompose(localVector3, localQuaternion, localVector4);
+                  localVector4.copy(localVector2.add(localVector3).multiplyScalar(0.5));
+                } else {
+                  boneHead.matrixWorld.decompose(localVector2, localQuaternion, localVector4);
+                  localVector2.add(localVector3.set(0, 0, 0.1).applyQuaternion(localQuaternion));
+                  localVector4.copy(localVector2);
+                }
               } else {
-                boneHead.matrixWorld.decompose(localVector2, localQuaternion, localVector4);
-                localVector2.add(localVector3.set(0, 0, 0.1).applyQuaternion(localQuaternion));
-                localVector4.copy(localVector2);
+                localVector4.copy(localPlayer.position);
+              }
+
+              this.targetPosition.copy(localVector4)
+                .sub(localVector2.copy(avatarCameraOffset).applyQuaternion(this.targetQuaternion));
+
+              break;
+            }
+            case 'isometric': {
+              this.targetPosition.copy(localPlayer.position)
+                .sub(
+                  localVector2.copy(avatarCameraOffset)
+                    .applyQuaternion(this.targetQuaternion)
+                );
+        
+              break;
+            }
+            default: {
+              throw new Error('invalid camera mode: ' + this.getMode());
+            }
+          }
+
+          const factor = Math.min((timestamp - this.lerpStartTime) / maxFocusTime, 1);
+
+          this.targetPosition.y -= crouchOffset;
+          camera.position.copy(this.sourcePosition)
+            .lerp(this.targetPosition, factor);
+
+          localEuler.setFromQuaternion(this.targetQuaternion, 'YXZ');
+          localEuler.z = 0;
+          camera.quaternion.copy(this.sourceQuaternion)
+            .slerp(localQuaternion.setFromEuler(localEuler), factor);
+        };
+        _setFreeCamera();
+      };
+        
+      const _setCameraFov = () => {
+        if (!renderer.xr.getSession()) {
+          let newFov;
+
+          const focusTime = Math.min((timestamp - this.lerpStartTime) / maxFocusTime, 1);
+          if (focusTime < 1) {
+            this.fovFactor = 0;
+
+            const a = this.sourceFov;
+            const b = this.targetFov;
+            newFov = a * (1 - focusTime) + focusTime * b;
+          } else if (this.focus) {
+            this.fovFactor = 0;
+
+            newFov = midFov;
+          } else {
+            const fovInTime = 3;
+            const fovOutTime = 0.3;
+            
+            const narutoRun = localPlayer.getAction('narutoRun');
+            if (narutoRun) {
+              if (this.lastNonzeroDirectionVector.z < 0) {    
+                this.fovFactor += timeDiff / 1000 / fovInTime;
+              } else {
+                this.fovFactor -= timeDiff / 1000 / fovInTime;
               }
             } else {
-              localVector4.copy(localPlayer.position);
+              this.fovFactor -= timeDiff / 1000 / fovOutTime;
             }
-
-            this.targetPosition.copy(localVector4)
-              .sub(localVector2.copy(avatarCameraOffset).applyQuaternion(this.targetQuaternion));
-
-            break;
+            this.fovFactor = Math.min(Math.max(this.fovFactor, 0), 1);
+            
+            newFov = minFov + Math.pow(this.fovFactor, 0.75) * (maxFov - minFov);
           }
-          case 'isometric': {
-            this.targetPosition.copy(localPlayer.position)
-              .sub(
-                localVector2.copy(avatarCameraOffset)
-                  .applyQuaternion(this.targetQuaternion)
-              );
-      
-            break;
-          }
-          default: {
-            throw new Error('invalid camera mode: ' + this.getMode());
+
+          if (newFov !== camera.fov) {
+            camera.fov = newFov;
+            camera.updateProjectionMatrix();
+
+            this.dispatchEvent(new MessageEvent('fovchange', {
+              data: {
+                fov: newFov,
+              },
+            }));
           }
         }
-
-        const factor = Math.min((timestamp - this.lerpStartTime) / maxFocusTime, 1);
-
-        this.targetPosition.y -= crouchOffset;
-        camera.position.copy(this.sourcePosition)
-          .lerp(this.targetPosition, factor);
-
-        localEuler.setFromQuaternion(this.targetQuaternion, 'YXZ');
-        localEuler.z = 0;
-        camera.quaternion.copy(this.sourceQuaternion)
-          .slerp(localQuaternion.setFromEuler(localEuler), factor);
       };
-      _setFreeCamera();
-    };
-      
-    const _setCameraFov = () => {
-      if (!renderer.xr.getSession()) {
-        let newFov;
+      _setCameraFov();
 
-        const focusTime = Math.min((timestamp - this.lerpStartTime) / maxFocusTime, 1);
-        if (focusTime < 1) {
-          this.fovFactor = 0;
-
-          const a = this.sourceFov;
-          const b = this.targetFov;
-          newFov = a * (1 - focusTime) + focusTime * b;
-        } else if (this.focus) {
-          this.fovFactor = 0;
-
-          newFov = midFov;
-        } else {
-          const fovInTime = 3;
-          const fovOutTime = 0.3;
-          
-          const narutoRun = localPlayer.getAction('narutoRun');
-          if (narutoRun) {
-            if (this.lastNonzeroDirectionVector.z < 0) {    
-              this.fovFactor += timeDiff / 1000 / fovInTime;
-            } else {
-              this.fovFactor -= timeDiff / 1000 / fovInTime;
-            }
-          } else {
-            this.fovFactor -= timeDiff / 1000 / fovOutTime;
-          }
-          this.fovFactor = Math.min(Math.max(this.fovFactor, 0), 1);
-          
-          newFov = minFov + Math.pow(this.fovFactor, 0.75) * (maxFov - minFov);
+      const _shakeCamera = () => {
+        this.flushShakes();
+        const shakeFactor = this.getShakeFactor();
+        if (shakeFactor > 0) {
+          const baseTime = timestamp/1000 * shakeAnimationSpeed;
+          const timeOffset = 1000;
+          const ndc = f => (-0.5 + f) * 2;
+          let index = 0;
+          const randomValue = () => ndc(shakeNoise.noise1D(baseTime + timeOffset * index++));
+          localVector.set(
+            randomValue(),
+            randomValue(),
+            randomValue()
+          )
+            .normalize()
+            .multiplyScalar(shakeFactor * randomValue());
+          camera.position.add(localVector);
         }
+      };
+      _shakeCamera();
 
-        if (newFov !== camera.fov) {
-          camera.fov = newFov;
-          camera.updateProjectionMatrix();
+      camera.updateMatrixWorld();
 
-          this.dispatchEvent(new MessageEvent('fovchange', {
-            data: {
-              fov: newFov,
-            },
-          }));
-        }
-      }
+      this.lastTarget = this.target;
     };
-    _setCameraFov();
-
-    const _shakeCamera = () => {
-      this.flushShakes();
-      const shakeFactor = this.getShakeFactor();
-      if (shakeFactor > 0) {
-        const baseTime = timestamp/1000 * shakeAnimationSpeed;
-        const timeOffset = 1000;
-        const ndc = f => (-0.5 + f) * 2;
-        let index = 0;
-        const randomValue = () => ndc(shakeNoise.noise1D(baseTime + timeOffset * index++));
-        localVector.set(
-          randomValue(),
-          randomValue(),
-          randomValue()
-        )
-          .normalize()
-          .multiplyScalar(shakeFactor * randomValue());
-        camera.position.add(localVector);
-      }
+    const _setLocked = () => {
+      camera.copy(this.lockCamera);
     };
-    _shakeCamera();
-
-    camera.updateMatrixWorld();
-
-    this.lastTarget = this.target;
+    if (!this.cameraLocked) {
+      _setUnlocked();
+    } else {
+      _setLocked();
+    }
   }
 };
 const cameraManager = new CameraManager();
