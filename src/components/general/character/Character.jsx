@@ -24,6 +24,9 @@ import styles from "./character.module.css";
 import CustomButton from "../custom-button/index.jsx";
 import {TokenBox} from "../token-box/TokenBox.jsx";
 
+import {Emotions} from './Emotions';
+import {Poses} from './Poses';
+
 const localVector3 = new Vector3();
 
 const mainStatSpecs = [
@@ -224,6 +227,12 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
                 <div className={styles.characterTitleBox}>
                     Character Details
                 </div>
+                <Poses
+                    parentOpened={true}
+                />
+                <Emotions
+                    parentOpened={true}
+                />
                 <div className={styles.avatarWrap}>
                     <div className={styles.avatarName}>
                         <img
