@@ -782,6 +782,31 @@ class CameraManager extends EventTarget {
     };
     const _setLocked = () => {
       camera.copy(this.lockCamera);
+      const aspect = window.innerWidth / window.innerHeight;
+      setCameraToSquareFovAspect(this.lockCamera.fov, aspect, camera);
+
+      function radToDeg(rad) {
+        return rad * 180 / Math.PI;
+      }
+      function degToRad(deg) {
+        return deg * Math.PI / 180;
+      }
+      // given an ideal square fov (in degrees) and new aspect ratio,
+      // set the camera to be contained within the the original square fov
+      // calculate a new fov and aspect ratio that will fit the original square fov
+      // this requires zooming in and clipping
+      // camera is a THREE.PerspectiveCamera
+      function setCameraToSquareFovAspect(squareFov, aspect, camera) {
+        // first, calculate the new min fov of vertical/horizontal
+        const fovH = radToDeg(2 * Math.atan(Math.tan(degToRad(squareFov) / 2) * aspect));
+        const fovV = radToDeg(2 * Math.atan(Math.tan(degToRad(squareFov) / 2) / aspect));
+        const newFov = Math.min(fovH, fovV);
+        const newAspect = Math.max(fovH, fovV) / Math.min(fovH, fovV);
+
+        camera.fov = newFov;
+        camera.aspect = newAspect;
+        camera.updateProjectionMatrix();
+      }
     };
     if (!this.cameraLocked) {
       _setUnlocked();
