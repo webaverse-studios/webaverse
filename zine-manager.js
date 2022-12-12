@@ -150,7 +150,6 @@ class ZineManager {
       );
       geometry.computeVertexNormals();
       const heights = new Int16Array(geometry.attributes.position.array.length / 3);
-      // const heightsFloat32 = new Float32Array(geometry.attributes.position.array.length / 3);
       {
         let writeIndex = 0;
         for (let dy = 0; dy < height; dy++) {
@@ -163,13 +162,11 @@ class ZineManager {
 
             const y = geometry.attributes.position.array[readIndex * 3 + 1];
             heights[writeIndex] = Math.round(y / heightfieldScale);
-            // heightsFloat32[writeIndex] = y;
 
             writeIndex++;
           }
         }
       }
-      // console.log('got geometry heights', heightsFloat32);
 
       // shift geometry by half a floorNetWorldSize
       geometry.translate(floorNetWorldSize/2, 0, floorNetWorldSize/2);
@@ -189,15 +186,6 @@ class ZineManager {
       if (floorNetDepths.length !== width * height) {
         throw new Error('floorNetDepths length mismatch');
       }
-      console.log('add object 1', {
-        floorNetPhysicsMesh,
-        numRows,
-        numColumns,
-        heights,
-        heightfieldScale,
-        floorNetResolution,
-        floorNetDepths,
-      });
       const heightfieldPhysicsObject = physics.addHeightFieldGeometry(
         floorNetPhysicsMesh,
         numRows,
@@ -207,7 +195,6 @@ class ZineManager {
         floorNetResolution,
         floorNetResolution
       );
-      console.log('add object 2', heightfieldPhysicsObject);
       physicsIds.push(heightfieldPhysicsObject);
     }
 
