@@ -19,6 +19,7 @@ import {
   floorNetPixelSize,
 } from 'zine/zine-constants.js';
 import {
+  setPerspectiveCameraFromJson,
   setOrthographicCameraFromJson,
 } from 'zine/zine-camera-utils.js';
 import {
@@ -29,7 +30,8 @@ import {appsMapName, heightfieldScale} from './constants.js'
 
 //
 
-const localVector = new THREE.Vector3();
+// const localVector = new THREE.Vector3();
+const localCamera = new THREE.PerspectiveCamera();
 const localOrthographicCamera = new THREE.OrthographicCamera();
 
 //
@@ -78,21 +80,25 @@ class ZineManager {
       panel,
     });
     const {sceneMesh, scenePhysicsMesh, floorNetMesh} = zineRenderer;
+    
+    const cameraJson = layer1.getData('cameraJson');
     const floorResolution = layer1.getData('floorResolution');
     const floorNetDepths = layer1.getData('floorNetDepths');
     const floorNetCameraJson = layer1.getData('floorNetCameraJson');
-    console.log('loaded storyboard', {
-      storyboard,
-      panel,
-      zineRenderer,
-      sceneMesh,
-      scenePhysicsMesh,
-      floorNetMesh,
-      floorResolution,
-      floorNetCameraJson,
-      floorNetDepths,
-    });
+    // console.log('loaded storyboard', {
+    //   storyboard,
+    //   panel,
+    //   zineRenderer,
+    //   sceneMesh,
+    //   scenePhysicsMesh,
+    //   cameraJson,
+    //   floorNetMesh,
+    //   floorResolution,
+    //   floorNetCameraJson,
+    //   floorNetDepths,
+    // });
 
+    const camera = setPerspectiveCameraFromJson(localCamera, cameraJson);
     const floorNetCamera = setOrthographicCameraFromJson(localOrthographicCamera, floorNetCameraJson);
 
     // add meshes to instance
