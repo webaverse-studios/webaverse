@@ -32,6 +32,7 @@ export const setFacePoseValue = (emotion, value) => {
 
 export const Emotions = ({
     parentOpened,
+    cameraOffset
 }) => {
     const [ emotionsOpen, setEmotionsOpen ] = useState(false);
     const emotionStates = emotions.map(emotion => {
@@ -137,9 +138,11 @@ export const Emotions = ({
             )}
             onMouseEnter={e => {
                 setEmotionsOpen(true);
+                cameraOffset(true);
             }}
             onMouseLeave={e => {
                 setEmotionsOpen(false);
+                cameraOffset(false);
             }}
             onMouseUp={e => {
                 document.exitPointerLock();

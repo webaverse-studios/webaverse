@@ -204,6 +204,16 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
         sounds.playSound(audioSpec);
     }
 
+    // Zoom in when editing emotions
+    function onEmotionsEdit(isEmotionEdit) {
+        const playerDiorama = game.getPlayerDiorama();
+        if (isEmotionEdit) {
+            playerDiorama.setCameraOffset(localVector3.set(0.3, 0, -0.7))
+        } else {
+            playerDiorama.setCameraOffset(localVector3.set(0.3, -0.64, -1.9))
+        }
+    }
+
     function onCharacterSelectClick(e) {
         setState({
             openedPanel:
@@ -232,6 +242,7 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
                 />
                 <Emotions
                     parentOpened={true}
+                    cameraOffset={onEmotionsEdit}
                 />
                 <div className={styles.avatarWrap}>
                     <div className={styles.avatarName}>
