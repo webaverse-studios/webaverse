@@ -100,6 +100,7 @@ class ZineManager {
 
     const camera = setPerspectiveCameraFromJson(localCamera, cameraJson);
     const floorNetCamera = setOrthographicCameraFromJson(localOrthographicCamera, floorNetCameraJson);
+    instance.camera = camera;
 
     // add meshes to instance
     {
