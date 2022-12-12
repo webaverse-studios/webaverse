@@ -120,8 +120,6 @@ class ZineManager {
     {
       const [width, height] = floorResolution;
 
-      console.log('got floor resolution', {width, height});
-
       const geometry = depthFloat32ArrayToOrthographicGeometry(
         floorNetDepths,
         floorNetPixelSize,
