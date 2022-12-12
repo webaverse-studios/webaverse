@@ -4,7 +4,7 @@ it sets up and ticks the physics loop for our local character */
 import * as THREE from 'three';
 import physicsManager from './physics-manager.js';
 import {applyVelocity} from './util.js';
-import {groundFriction, flyFriction, swimFriction, flatGroundJumpAirTime, jumpHeight} from './constants.js';
+import {groundFriction, flyFriction, swimFriction, flatGroundJumpAirTime, jumpHeight, startSkydiveTimeS} from './constants.js';
 import {getRenderer, camera} from './renderer.js';
 import metaversefileApi from 'metaversefile';
 import physx from './physx.js';
@@ -120,12 +120,20 @@ class CharacterPhysics {
             this.lastGravityH = 0.5 * physicsScene.getGravity().y * previousT * previousT;
           }
         }
-        const t = nowS - this.fallLoopStartTimeS;
-        const h = 0.5 * physicsScene.getGravity().y * t * t;
-        this.wantMoveDistancePerFrame.y = h - this.lastGravityH;
-        this.wantVelocity.y = t * physicsScene.getGravity().y;
-
-        this.lastGravityH = h;
+        let t = nowS - this.fallLoopStartTimeS;
+        if (t > startSkydiveTimeS) {
+          this.character.actionsManager.tryAddAction({type: 'skydive'});
+          t = startSkydiveTimeS;
+          this.wantVelocity.y = t * physicsScene.getGravity().y;
+          this.wantMoveDistancePerFrame.y = this.wantVelocity.y * timeDiffS;
+        } else {
+          const h = 0.5 * physicsScene.getGravity().y * t * t;
+          this.wantMoveDistancePerFrame.y = h - this.lastGravityH;
+          this.wantVelocity.y = t * physicsScene.getGravity().y;
+          
+          this.lastGravityH = h;
+        }
+        // console.log('wantMoveDistancePerFrame', this.wantMoveDistancePerFrame.y, t);
       }
       this.lastFallLoopAction = fallLoopAction;
     // }

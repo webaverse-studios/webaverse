@@ -119,6 +119,8 @@ export const aimTransitionMaxTime = 150;
 export const jumpHeight = 3;
 export const flatGroundJumpAirTime = 666;
 
+export const startSkydiveTimeS = 2;
+
 export const avatarInterpolationFrameRate = 60;
 export const avatarInterpolationTimeDelay = 1000/(avatarInterpolationFrameRate * 0.5);
 export const avatarInterpolationNumFrames = 4;

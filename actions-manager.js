@@ -31,6 +31,19 @@ class FallLoop extends b3.Action {
     }
   }
 }
+class Skydive extends b3.Action {
+  tick(tick) {
+    const tickResults = tick.blackboard.get('tickResults');
+    const tickTryActions = tick.blackboard.get('tickTryActions');
+    const localPlayer = tick.target;
+    if (!localPlayer.characterPhysics.grounded && tickTryActions.skydive) {
+      tickResults.skydive = true;
+      return b3.RUNNING;
+    } else {
+      return b3.FAILURE;
+    }
+  }
+}
 class Fly extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
@@ -246,10 +259,14 @@ tree.root = new b3.MemSequence({title:'root',children: [
           new Jump({title:'Jump'}),
           new DoubleJump({title:'DoubleJump'}),
         ]}),
-        new b3.MemSequence({title:'fallLoop & glider',children:[
+        new b3.MemSequence({title:'fallLoop & skydive & glider',children:[
           new b3.Priority({title:'',children:[
             new StartGlider({title:'StartGlider'}),
-            new FallLoop({title:'FallLoop'}),
+            new b3.Parallel({title:'fallLoop & skydive',children:[
+              new FallLoop({title:'FallLoop'}),
+              // new b3.MaxTime({title:'',maxTime:2000,child:new FallLoop({title:'FallLoop'})}),
+              new Skydive({title:'Skydive'}),
+            ]}),
           ]}),
           new WaitOneTick({title:'WaitOneTick'}), // note: prevent remove glider immediately, because add/remove glider all triggered by space key.
           new Glider({title:'Glider'}),
@@ -321,6 +338,11 @@ const postTickSettings = (localPlayer, blackboard) => {
       }
     }
     if (!tickResults.fallLoop && lastTickResults.fallLoop) localPlayer.removeAction('fallLoop');
+  
+    if (tickResults.skydive && !lastTickResults.skydive) {
+      localPlayer.addAction({type: 'skydive'})
+    }
+    if (!tickResults.skydive && lastTickResults.skydive) localPlayer.removeAction('skydive');
   
     if (tickResults.fallLoopFromJump && !lastTickResults.fallLoopFromJump) {
       localPlayer.addAction(tickTryActions.fallLoop);
