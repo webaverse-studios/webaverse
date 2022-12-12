@@ -50,6 +50,9 @@ import {ActionsManager} from './actions-manager.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
+const localVector3 = new THREE.Vector3();
+const localVector4 = new THREE.Vector3();
+// const localVector2D = new THREE.Vector2();
 const localQuaternion = new THREE.Quaternion();
 // const localQuaternion2 = new THREE.Quaternion();
 const localEuler = new THREE.Euler();
@@ -1395,8 +1398,34 @@ class LocalPlayer extends UninterpolatedPlayer {
       this.glider.rotation.copy(localEuler);
       this.glider.rotation.x = 0;
 
-      localVector.set(0, 0.11, 0.25).applyEuler(this.glider.rotation);
-      this.glider.position.copy(this.position).add(localVector);
+      // localVector.set(0, 0.11, 0.25).applyEuler(this.glider.rotation);;
+      // this.glider.position.copy(this.position).add(localVector);
+      // ---
+      this.avatar.foundModelBones.Left_wrist.matrixWorld.decompose(localVector, localQuaternion, localVector4);
+      this.avatar.foundModelBones.Left_middleFinger1.matrixWorld.decompose(localVector3, localQuaternion, localVector4);
+      localVector.add(localVector3).multiplyScalar(0.5);
+      this.avatar.foundModelBones.Right_wrist.matrixWorld.decompose(localVector2, localQuaternion, localVector4);
+      this.avatar.foundModelBones.Right_middleFinger1.matrixWorld.decompose(localVector3, localQuaternion, localVector4);
+      localVector2.add(localVector3).multiplyScalar(0.5);
+      localVector.add(localVector2).multiplyScalar(0.5);
+      this.glider.position.copy(localVector);
+      //
+      localVector.set(0, 0, 0.032).applyEuler(this.glider.rotation); // todo: calc fingers difference instead of hardcoded value.
+      this.glider.position.add(localVector);
+      // ---
+
+      this.avatar.foundModelBones.Left_wrist.matrixWorld.decompose(localVector, localQuaternion, localVector4); // todo: prevent duplicated decomposes.
+      this.avatar.foundModelBones.Right_wrist.matrixWorld.decompose(localVector2, localQuaternion, localVector4);
+      // localVector2D.set(
+      //   localVector.distanceTo(localVector2) / 2,
+      //   localVector.y - localVector2.y,
+      // )
+      // this.glider.rotation.z = localVector2D.angle();
+      localVector3.subVectors(localVector, localVector2);
+      localVector4.copy(localVector3).setY(0);
+      let angle = localVector3.angleTo(localVector4);
+      if (localVector3.y < 0) angle *= -1;
+      this.glider.rotation.z = angle;
 
       this.glider.updateMatrixWorld();
 
