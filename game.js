@@ -1537,7 +1537,7 @@ class GameManager extends EventTarget {
           if (useTime / 1000 >= throwAnimationDuration) {
             this.endUse();
           }
-        } else if (useAction.behavior === 'sword' && useAction.animationCombo.length > 0) {
+        } else if (useAction.behavior === 'sword' && useAction.animationCombo?.length > 0) {
           const useTime = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'use', 0);
           if (useTime > swordComboAnimationDuration) {
             this.endUse();
