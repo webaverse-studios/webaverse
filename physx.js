@@ -1684,44 +1684,76 @@ const physxWorker = (() => {
   };
 
   w.heightfieldScale = heightfieldScale;
-  w.addHeightFieldGeometryPhysics = (physics, numRows, numColumns, heights, heightScale, rowScale, columnScale, dynamic, external, id) => {
+  w.addHeightFieldGeometryPhysics = (physics, mesh, numRows, numColumns, heights, heightScale, rowScale, columnScale, dynamic, external, id) => {
     // numRows, numColumns are int
     // heights is array of int16
 
+    let index = 0;
     const numVerts = numRows * numColumns;
     for (let i = 0; i < numVerts; i++) {
       scratchStack.i16[i] = heights[i];
+      index += Int16Array.BYTES_PER_ELEMENT;
     }
 
-    const heightsOffset = numRows * numColumns;
-    const heightsOffsetBytes = heightsOffset * Int16Array.BYTES_PER_ELEMENT;
+    const positionOffset = index;
+    const positionBuffer = scratchStack.f32.subarray(
+      index / Float32Array.BYTES_PER_ELEMENT,
+      index / Float32Array.BYTES_PER_ELEMENT + 3
+    );
+    mesh.getWorldPosition(localVector).toArray(positionBuffer);
+    index += Float32Array.BYTES_PER_ELEMENT * 3;
+
+    const quaternionOffset = index;
+    const quaternionBuffer = scratchStack.f32.subarray(
+      index / Float32Array.BYTES_PER_ELEMENT,
+      index / Float32Array.BYTES_PER_ELEMENT + 4
+    );
+    mesh.getWorldQuaternion(localQuaternion).toArray(quaternionBuffer);
+    index += Float32Array.BYTES_PER_ELEMENT * 4;
+
+    const scaleOffset = index;
+    const scaleBuffer = scratchStack.f32.subarray(
+      index / Float32Array.BYTES_PER_ELEMENT,
+      index / Float32Array.BYTES_PER_ELEMENT + 3
+    );
+    mesh.getWorldScale(localVector2).toArray(scaleBuffer);
+    index += Float32Array.BYTES_PER_ELEMENT * 3;
+
+    const dataPtrOffset = index;
+    index += Uint32Array.BYTES_PER_ELEMENT;
+    const dataLengthOffset = index;
+    index += Uint32Array.BYTES_PER_ELEMENT;
+    const streamPtrOffset = index;
+    index += Uint32Array.BYTES_PER_ELEMENT;
 
     Module._cookHeightFieldGeometryPhysics(
       numRows,
       numColumns,
-      scratchStack.ptr,
-      scratchStack.u32.byteOffset + heightsOffsetBytes,
-      scratchStack.u32.byteOffset + heightsOffsetBytes + Uint32Array.BYTES_PER_ELEMENT,
-      scratchStack.u32.byteOffset + heightsOffsetBytes + Uint32Array.BYTES_PER_ELEMENT * 2
-    )
+      scratchStack.i16.byteOffset,
+      scratchStack.u32.byteOffset + dataPtrOffset,
+      scratchStack.u32.byteOffset + dataLengthOffset,
+      scratchStack.u32.byteOffset + streamPtrOffset,
+    );
 
-    const outputU32Offset = heightsOffsetBytes / Uint32Array.BYTES_PER_ELEMENT;
-    const dataPtr = scratchStack.u32[outputU32Offset]
-    const dataLength = scratchStack.u32[outputU32Offset + 1]
-    const streamPtr = scratchStack.u32[outputU32Offset + 2]
+    const dataPtr = scratchStack.u32[dataPtrOffset / Uint32Array.BYTES_PER_ELEMENT];
+    const dataLength = scratchStack.u32[dataLengthOffset / Uint32Array.BYTES_PER_ELEMENT];
+    const streamPtr = scratchStack.u32[streamPtrOffset / Uint32Array.BYTES_PER_ELEMENT];
 
     const heightField = Module._createHeightFieldPhysics(
       physics,
       dataPtr,
       dataLength,
       streamPtr,
-    )
+    );
 
     const materialAddress = w.getDefaultMaterial(physics);
 
     Module._addHeightFieldGeometryPhysics(
       physics,
       heightField,
+      scratchStack.f32.byteOffset + positionOffset,
+      scratchStack.f32.byteOffset + quaternionOffset,
+      scratchStack.f32.byteOffset + scaleOffset,
       heightScale,
       rowScale,
       columnScale,
@@ -1730,7 +1762,7 @@ const physxWorker = (() => {
       +dynamic,
       +external,
       heightField,
-    )
+    );
   }
 
   w.cookHeightFieldGeometryPhysics = (numRows, numColumns, heights) => {
@@ -1765,6 +1797,9 @@ const physxWorker = (() => {
   w.addCookedHeightFieldGeometryPhysics = (
     physics,
     buffer,
+    position,
+    quaternion,
+    scale,
     heightScale,
     rowScale,
     columnScale,
@@ -1785,9 +1820,37 @@ const physxWorker = (() => {
 
     const materialAddress = w.getDefaultMaterial(physics)
 
+    let index = 0;
+    const positionOffset = index;
+    const positionBuffer = scratchStack.f32.subarray(
+      positionOffset / Float32Array.BYTES_PER_ELEMENT,
+      positionOffset / Float32Array.BYTES_PER_ELEMENT + 3
+    );
+    position.toArray(positionBuffer);
+    index += Float32Array.BYTES_PER_ELEMENT * 3;
+    
+    const quaternionOffset = index;
+    const quaternionBuffer = scratchStack.f32.subarray(
+      quaternionOffset / Float32Array.BYTES_PER_ELEMENT,
+      quaternionOffset / Float32Array.BYTES_PER_ELEMENT + 4
+    );
+    quaternion.toArray(quaternionBuffer);
+    index += Float32Array.BYTES_PER_ELEMENT * 4;
+
+    const scaleOffset = index;
+    const scaleBuffer = scratchStack.f32.subarray(
+      scaleOffset / Float32Array.BYTES_PER_ELEMENT,
+      scaleOffset / Float32Array.BYTES_PER_ELEMENT + 3
+    );
+    scale.toArray(scaleBuffer);
+    index += Float32Array.BYTES_PER_ELEMENT * 3;
+
     Module._addHeightFieldGeometryPhysics(
       physics,
       heightField,
+      scratchStack.f32.byteOffset + positionOffset,
+      scratchStack.f32.byteOffset + quaternionOffset,
+      scratchStack.f32.byteOffset + scaleOffset,
       heightScale,
       rowScale,
       columnScale,

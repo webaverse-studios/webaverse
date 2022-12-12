@@ -501,6 +501,7 @@ class PhysicsScene extends EventTarget {
     const physicsId = getNextPhysicsId()
     const heightField = physx.physxWorker.addHeightFieldGeometryPhysics(
       this.scene,
+      mesh,
       numRows,
       numColumns,
       heights,
