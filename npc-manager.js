@@ -19,6 +19,7 @@ import {characterSelectManager} from './characterselect-manager.js';
 import emoteManager from './emotes/emote-manager.js';
 import {getFuzzyEmotionMapping} from './story.js';
 import {runSpeed, walkSpeed} from './constants.js';
+import {idleFn} from './npc-behavior.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -26,29 +27,9 @@ const localVector2 = new THREE.Vector3();
 const updatePhysicsFnMap = new WeakMap();
 const updateAvatarsFnMap = new WeakMap();
 const cancelFnsMap = new WeakMap();
+let targetSpec = null;
 
-const followTarget = (player, target, timeDiff) => {
-  if (target) {
-    const v = localVector.setFromMatrixPosition(target.matrixWorld)
-      .sub(player.position);
-    v.y = 0;
-    const distance = v.length();
-
-    const speed = THREE.MathUtils.clamp(
-      THREE.MathUtils.mapLinear(
-        distance,
-        2, 3.5,
-        walkSpeed, runSpeed,
-      ),
-      0, runSpeed,
-    );
-    const velocity = v.normalize().multiplyScalar(speed);
-    player.characterPhysics.applyWasd(velocity, timeDiff);
-
-    return distance;
-  }
-  return 0;
-};
+const cancelFns = [];
 
 class NpcManager extends EventTarget {
   constructor() {
@@ -153,7 +134,7 @@ class NpcManager extends EventTarget {
     for (const npc of allNpcs) {
       const fn = updatePhysicsFnMap.get(this.getAppByNpc(npc));
       if (fn) {
-        fn(timestamp, timeDiff);
+        fn(npc, timestamp, timeDiff);
       }
     }
   }
@@ -172,7 +153,7 @@ class NpcManager extends EventTarget {
     this.targetMap.set(player, target);
   }
 
-  #getPartyTarget(player) {
+  getPartyTarget(player) {
     return this.targetMap.get(player);
   }
 
@@ -222,11 +203,10 @@ class NpcManager extends EventTarget {
     json,
   }) {
     // cleanFns
-    const cancelFns = [
-      () => {
-        npc.destroy();
-      },
-    ];
+    cancelFns.push(() => {
+      npc.destroy();
+    });
+    
     cancelFnsMap.set(app, () => {
       for (const cancelFn of cancelFns) {
         cancelFn();
@@ -289,7 +269,7 @@ class NpcManager extends EventTarget {
     };
 
     // events
-    let targetSpec = null;
+    
     const _listenEvents = () => {
       const animations = Avatar.getAnimations();
       const hurtAnimation = animations.find(a => a.isHurt);
@@ -334,35 +314,7 @@ class NpcManager extends EventTarget {
         app.removeEventListener('activate', activate);
       });
 
-      const updatePhysicsFn = (timestamp, timeDiff) => {
-        if (player) {
-          if (player.getControlMode() !== 'controlled') {
-            if (player.getControlMode() === 'party') { // if party, follow in a line
-              const target = this.#getPartyTarget(player);
-              followTarget(player, target, timeDiff);
-            } else if (player.getControlMode() === 'npc') {
-              if (targetSpec) { // if npc, look to targetSpec
-                const target = targetSpec.object;
-                const distance = followTarget(player, target, timeDiff);
-
-                if (target) {
-                  if (targetSpec.type === 'moveto' && distance < 2) {
-                    targetSpec = null;
-                  }
-                }
-              }
-            }
-            const localPlayer = playersManager.getLocalPlayer();
-            player.setTarget(localPlayer.position);
-          }
-
-          player.updatePhysics(timestamp, timeDiff);
-        }
-      };
-      updatePhysicsFnMap.set(app, updatePhysicsFn);
-      cancelFns.push(() => {
-        updatePhysicsFnMap.delete(app);
-      });
+      this.setBehaviorFn(app, idleFn);
 
       const updateAvatarFn = (timestamp, timeDiff) => {
         player.updateAvatar(timestamp, timeDiff);
@@ -488,6 +440,11 @@ class NpcManager extends EventTarget {
       await wearablePromises;
     };
     await _updateWearables();
+  }
+
+  setBehaviorFn(app, behaviorFn) {
+    updatePhysicsFnMap.set(app, behaviorFn);
+    cancelFnsMap.set(app, () => updatePhysicsFnMap.delete(app))
   }
 }
 const npcManager = new NpcManager();
