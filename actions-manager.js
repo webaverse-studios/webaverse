@@ -17,36 +17,17 @@ class FallLoop extends b3.Action {
     const tickResults = tick.blackboard.get('tickResults');
     const tickTryActions = tick.blackboard.get('tickTryActions');
     const localPlayer = tick.target;
-    if (!localPlayer.characterPhysics.grounded && ((tick.blackboard.get('now') - localPlayer.characterPhysics.lastGroundedTime) > 200)) {
+    if (
+      !localPlayer.characterPhysics.grounded &&
+      (
+        ((tick.blackboard.get('now') - localPlayer.characterPhysics.lastGroundedTime) > 200) ||
+        tickTryActions.fallLoop
+      )
+    ) {
       tickResults.fallLoop = true;
       return b3.RUNNING;
     } else {
       return b3.FAILURE;
-    }
-  }
-}
-class StartFallLoopFromJump extends b3.Action {
-  tick(tick) {
-    const tickResults = tick.blackboard.get('tickResults');
-    const tickTryActions = tick.blackboard.get('tickTryActions');
-    const localPlayer = tick.target;
-    if (tickTryActions.fallLoop?.from === 'jump' && !localPlayer.characterPhysics.grounded) {
-      tickResults.fallLoopFromJump = true;
-      return b3.SUCCESS;
-    } else {
-      return b3.FAILURE;
-    }
-  }
-}
-class FallLoopFromJump extends b3.Action {
-  tick(tick) {
-    const tickResults = tick.blackboard.get('tickResults');
-    const localPlayer = tick.target;
-    if (localPlayer.characterPhysics.grounded) {
-      return b3.FAILURE;
-    } else {
-      tickResults.fallLoopFromJump = true;
-      return b3.RUNNING;
     }
   }
 }
@@ -82,8 +63,9 @@ class Jump extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
     const tickTryActions = tick.blackboard.get('tickTryActions');
+    const tickTryStopActions = tick.blackboard.get('tickTryStopActions');
     const localPlayer = tick.target;
-    if (localPlayer.characterPhysics.grounded) {
+    if (tickTryStopActions.jump || localPlayer.characterPhysics.grounded) {
       return b3.FAILURE;
     } else if (tickTryActions.jump) { // note: for trigger doubleJump.
       tickResults.jump = true; // note: doubleJump need jump in parallel.
@@ -97,8 +79,9 @@ class Jump extends b3.Action {
 class DoubleJump extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
+    const tickTryStopActions = tick.blackboard.get('tickTryStopActions');
     const localPlayer = tick.target;
-    if (localPlayer.characterPhysics.grounded) {
+    if (tickTryStopActions.doubleJump || localPlayer.characterPhysics.grounded) {
       return b3.FAILURE;
     } else {
       tickResults.jump = true; // note: doubleJump need jump in parallel.
@@ -217,7 +200,7 @@ class StartGlider extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
     const tickTryActions = tick.blackboard.get('tickTryActions');
-    const localPlayer = tick.target;
+    // const localPlayer = tick.target;
     if (tickTryActions.glider) {
       tickResults.glider = true;
       return b3.SUCCESS;
@@ -256,10 +239,6 @@ tree.root = new b3.MemSequence({title:'root',children: [
         new b3.Sequence({title:'fly & narutoRun',children:[
           new Fly({title:'Fly'}),
           new b3.Succeedor({child: new NarutoRun({title:'NarutoRun'})}),
-        ]}),
-        new b3.MemSequence({title:'fallLoopFromJump',children:[
-          new StartFallLoopFromJump({title:'StartFallLoopFromJump'}),
-          new FallLoopFromJump({title:'FallLoopFromJump'}),
         ]}),
         new b3.MemSequence({title:'jump & doubleJump',children:[
           new StartJump({title:'StartJump'}),
@@ -335,7 +314,11 @@ const postTickSettings = (localPlayer, blackboard) => {
     }
   
     if (tickResults.fallLoop && !lastTickResults.fallLoop) {
-      localPlayer.addAction({type: 'fallLoop'});
+      if (tickTryActions.fallLoop) {
+        localPlayer.addAction(tickTryActions.fallLoop)
+      } else {
+        localPlayer.addAction({type: 'fallLoop'});
+      }
     }
     if (!tickResults.fallLoop && lastTickResults.fallLoop) localPlayer.removeAction('fallLoop');
   

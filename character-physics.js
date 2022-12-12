@@ -154,6 +154,8 @@ class CharacterPhysics {
             doubleJumpAction.startPositionY -
             this.lastCharacterControllerY;
           if (doubleJumpTime >= flatGroundJumpAirTime) {
+            this.character.actionsManager.tryRemoveAction('doubleJump');
+            
             const newFallLoopFromJumpAction = {
               type: 'fallLoop',
               from: 'jump',
@@ -168,6 +170,8 @@ class CharacterPhysics {
             jumpAction.startPositionY -
             this.lastCharacterControllerY;
           if (jumpTime >= flatGroundJumpAirTime) {
+            this.character.actionsManager.tryRemoveAction('jump');
+
             const newFallLoopFromJumpAction = {
               type: 'fallLoop',
               from: 'jump',
