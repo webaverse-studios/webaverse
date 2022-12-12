@@ -118,7 +118,23 @@ class ZineManager {
     const physicsIds = [];
     instance.physicsIds = physicsIds;
     {
-      const physicsId = physics.addGeometry(scenePhysicsMesh);
+      const geometry2 = scenePhysicsMesh.geometry.clone();
+      // double-side the geometry
+      const indices = geometry2.index.array;
+      const newIndices = new indices.constructor(indices.length * 2);
+      newIndices.set(indices);
+      // the second set of indices is flipped
+      for (let i = 0; i < indices.length; i += 3) {
+        newIndices[indices.length + i + 0] = indices[i + 2];
+        newIndices[indices.length + i + 1] = indices[i + 1];
+        newIndices[indices.length + i + 2] = indices[i + 0];
+      }
+      geometry2.setIndex(new THREE.BufferAttribute(newIndices, 1));
+
+      const material2 = scenePhysicsMesh.material.clone();
+      const scenePhysicsMesh2 = new THREE.Mesh(geometry2, material2);
+
+      const physicsId = physics.addGeometry(scenePhysicsMesh2);
       physicsIds.push(physicsId);
     }
 
