@@ -296,7 +296,7 @@ export default function useNFTContract(currentAccount) {
     );
   }
 
-  async function getOTtokens(walletAddress = "0xb8aA541850bC792Ce2675C958CaFc100125C2B90") {
+  async function getOTtokens(walletAddress = currentAccount) {
     const network = "ETHEREUM"
     const OTtoken = await fetch(`https://serverless-backend-blue.vercel.app/api/getOpenSeaNFTCollection?walletAddress=${walletAddress}&collectionAddress=${OTCollectionAddress}&network=${network}`,
     {
