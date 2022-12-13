@@ -35,6 +35,7 @@ class PartyManager extends EventTarget {
     world.appManager.transplantApp(app, this.appManager);
 
     this.invitePlayer(player);
+    this.dispatchEvent(new Event("defaultplayerinvited"));
   }
 
   switchCharacter() {
