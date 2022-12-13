@@ -41,14 +41,14 @@ export const Minimap = ({className}) => {
                 <CustomButton
                     type="icon"
                     theme="dark"
-                    icon="speechToText"
+                    icon="microphone"
                     className={styles.button}
                     size={24}
                 />
                 <CustomButton
                     type="icon"
                     theme="dark"
-                    icon="voice"
+                    icon="speechToText"
                     className={styles.button}
                     size={24}
                 />
