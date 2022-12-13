@@ -13,7 +13,7 @@ import {world} from './world.js';
 import {buildMaterial, highlightMaterial, selectMaterial, hoverMaterial, hoverEquipmentMaterial} from './shaders.js';
 import {getRenderer, sceneLowPriority, camera} from './renderer.js';
 import {downloadFile, snapPosition, getDropUrl, handleDropJsonItem, makeId} from './util.js';
-import {maxGrabDistance, throwReleaseTime, throwAnimationDuration, walkSpeed, crouchSpeed, flySpeed, IS_NARUTO_RUN_ENABLED} from './constants.js';
+import {maxGrabDistance, throwReleaseTime, throwAnimationDuration, walkSpeed, crouchSpeed, flySpeed, IS_NARUTO_RUN_ENABLED, gliderSpeed} from './constants.js';
 import metaversefileApi from 'metaversefile';
 import loadoutManager from './loadout-manager.js';
 import * as sounds from './sounds.js';
@@ -642,6 +642,11 @@ class GameManager extends EventTarget {
     }
   }
 
+  isGlidering() {
+    const localPlayer = playersManager.getLocalPlayer();
+    return localPlayer.hasAction('glider');
+  }
+
   isFlying() {
     const localPlayer = playersManager.getLocalPlayer();
     return localPlayer.hasAction('fly');
@@ -931,6 +936,8 @@ class GameManager extends EventTarget {
       speed = crouchSpeed;
     } else if (gameManager.isFlying()) {
       speed = flySpeed;
+    } else if (gameManager.isGlidering()) {
+      speed = gliderSpeed;
     } else {
       speed = walkSpeed;
     }
