@@ -16,6 +16,7 @@ export const Hotbar = ({className}) => {
 
     useEffect(() => {
             const keydown = e => {
+                if (game.inputFocused()) return true;
                 if (!e.ctrlKey) {
                     switch (e.which) {
                         case 82: { // R
