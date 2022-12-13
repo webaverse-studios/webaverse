@@ -15,7 +15,7 @@ export default defineConfig(({command, mode, ssrBuild}) => {
       rollupOptions: {
         input: {
           main: resolve(__dirname, 'index.html'),
-          preview: resolve(__dirname, 'public/preview.html'),
+          preview: resolve(__dirname, 'preview.html'),
         },
       },
     },
