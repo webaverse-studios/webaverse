@@ -826,6 +826,7 @@ export class MobInstance {
       [MobStates.attack, ['attack']]
     ]);
     this.followTargetOutOfRange = false;
+    this.uTimeInt = 0;
     hitManager.addEventListener('hitattempt', (e) => this.hitAction(e.data));
   }
 
@@ -1117,8 +1118,10 @@ export class MobInstance {
     }
 
     // manage position
-    if(this.movement.length() > 0)
+    if(this.movement.length() > 0 || Math.floor(this.uTime) > this.uTimeInt){
+      this.uTimeInt = Math.floor(this.uTime);
       this.moveMobInternal(timeDiffS);
+    }
   }
 
   /*
