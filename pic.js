@@ -226,10 +226,11 @@ export const genPic = async ({
           // let narutoRunTime = 0;
           // const narutoRunIncrementSpeed = 1000 * 4;
 
-          player.actionsManager.tryAddAction({
+          const newNarutoRunAction = {
             type: 'narutoRun',
             // time: 0,
-          }, true);
+          };
+          player.actionsManager.tryAddAction(newNarutoRunAction, true);
 
           return {
             update(timestamp, timeDiff) {

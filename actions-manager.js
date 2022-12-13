@@ -299,11 +299,12 @@ const postTickSettings = (localPlayer, blackboard) => {
     if (!tickResults.crouch && lastTickResults.crouch) localPlayer.removeAction('crouch');
   
     if (tickResults.land && !lastTickResults.land) {
-        localPlayer.addAction({
-          type: 'land',
-          time: blackboard.get('now'),
-          isMoving: localPlayer.avatar.idleWalkFactor > 0,
-        });
+      const newLandAction = {
+        type: 'land',
+        time: blackboard.get('now'),
+        isMoving: localPlayer.avatar.idleWalkFactor > 0,
+      }
+      localPlayer.addAction(newLandAction);
     }
     if (!tickResults.land && lastTickResults.land) localPlayer.removeAction('land');
   
@@ -321,10 +322,11 @@ const postTickSettings = (localPlayer, blackboard) => {
     }
   
     if (tickResults.doubleJump && !lastTickResults.doubleJump) {
-      localPlayer.addAction({
+      const newDoubleJumpAction = {
         type: 'doubleJump',
         startPositionY: localPlayer.characterPhysics.characterController.position.y,
-      });
+      }
+      localPlayer.addAction(newDoubleJumpAction);
     }
     if (!tickResults.doubleJump && lastTickResults.doubleJump) {
       localPlayer.removeAction('doubleJump');
@@ -334,13 +336,14 @@ const postTickSettings = (localPlayer, blackboard) => {
       if (tickTryActions.fallLoop) {
         localPlayer.addAction(tickTryActions.fallLoop)
       } else {
-        localPlayer.addAction({type: 'fallLoop'});
+        const newFallLoopAction = {type: 'fallLoop'};
+        localPlayer.addAction(newFallLoopAction);
       }
     }
     if (!tickResults.fallLoop && lastTickResults.fallLoop) localPlayer.removeAction('fallLoop');
   
     if (tickResults.skydive && !lastTickResults.skydive) {
-      localPlayer.addAction({type: 'skydive'})
+      localPlayer.addAction(tickTryActions.skydive);
     }
     if (!tickResults.skydive && lastTickResults.skydive) localPlayer.removeAction('skydive');
   

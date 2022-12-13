@@ -122,7 +122,8 @@ class CharacterPhysics {
         }
         let t = nowS - this.fallLoopStartTimeS;
         if (t > startSkydiveTimeS) {
-          this.character.actionsManager.tryAddAction({type: 'skydive'});
+          const newSkydiveAction = {type: 'skydive'};
+          this.character.actionsManager.tryAddAction(newSkydiveAction);
           t = startSkydiveTimeS;
           this.wantVelocity.y = t * physicsScene.getGravity().y;
           this.wantMoveDistancePerFrame.y = this.wantVelocity.y * timeDiffS;
