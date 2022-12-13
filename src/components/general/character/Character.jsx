@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, {useEffect, useState, useContext} from "react";
 import classnames from "classnames";
 
-import { defaultPlayerName } from "../../../../ai/lore/lore-model.js";
+import {defaultPlayerName} from "../../../../ai/lore/lore-model.js";
 import * as sounds from "../../../../sounds.js";
 
 import {
@@ -16,11 +16,11 @@ import {
     xp,
 } from "../../../../player-stats.js";
 
-import { AppContext } from "../../app";
+import {AppContext} from "../../app";
 
 import styles from "./character.module.css";
 import CustomButton from "../custom-button/index.jsx";
-import { TokenBox } from "../token-box/TokenBox.jsx";
+import {TokenBox} from "../token-box/TokenBox.jsx";
 
 const mainStatSpecs = [
     {
@@ -81,7 +81,7 @@ const statSpecs = [
     },
 ];
 
-const Stat2 = ({ statSpec }) => {
+const Stat2 = ({statSpec}) => {
     return (
         <div className={classnames(styles.stat, styles[statSpec.className])}>
             <div className={styles.name}>
@@ -89,7 +89,7 @@ const Stat2 = ({ statSpec }) => {
                 <img className={styles.icon} src={statSpec.imgSrc} />
             </div>
             <div className={styles.progressBar}>
-                <div style={{ width: `${statSpec?.progress}%` }} />
+                <div style={{width: `${statSpec?.progress}%`}} />
             </div>
             <div className={styles.value}>
                 {statSpec?.progress}
@@ -99,7 +99,7 @@ const Stat2 = ({ statSpec }) => {
     );
 };
 
-const Stat = ({ statSpec }) => {
+const Stat = ({statSpec}) => {
     return (
         <div className={classnames(styles.stat, styles.columns)}>
             <div className={styles.name}>{statSpec.name}</div>
@@ -108,7 +108,7 @@ const Stat = ({ statSpec }) => {
     );
 };
 
-const AvatarPreviewBox = ({ dioramaCanvasRef, onClick }) => {
+const AvatarPreviewBox = ({dioramaCanvasRef, onClick}) => {
     const width = 160;
     const height = 330;
     return (
@@ -129,7 +129,7 @@ const AvatarPreviewBox = ({ dioramaCanvasRef, onClick }) => {
 
 //
 
-const AvatarEquipBox = ({ dioramaCanvasRef, onClick }) => {
+const AvatarEquipBox = ({dioramaCanvasRef, onClick}) => {
     const sideSize = 48;
     return (
         <div className={styles.avatarEquipBoxWrap}>
@@ -147,8 +147,8 @@ const AvatarEquipBox = ({ dioramaCanvasRef, onClick }) => {
     );
 };
 
-export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
-    const { state, setState } = useContext(AppContext);
+export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
+    const {state, setState} = useContext(AppContext);
     const [open, setOpen] = useState(false);
     const [characterSelectOpen, setCharacterSelectOpen] = useState(false);
 

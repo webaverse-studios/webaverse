@@ -1,7 +1,7 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, {useState, useContext, useEffect} from "react";
 import classnames from "classnames";
 import styles from "./TokenBox.module.css";
-import { Spritesheet } from "../spritesheet";
+import {Spritesheet} from "../spritesheet";
 
 export const TokenBox = (props) => {
     const {
@@ -49,7 +49,7 @@ export const TokenBox = (props) => {
     return (
         <div
             className={styles.tokenBoxWrap}
-            style={{ width: size, height: size }}
+            style={{width: size, height: size}}
             onClick={onClick}
         >
             {active && (
