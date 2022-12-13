@@ -15,7 +15,6 @@ class NpcAiManager {
     const addPlayer = player => {
       if (player.getControlMode() !== 'controlled') {
         this.npcs.push(player);
-        console.log(player);
       }
     };
 
@@ -25,8 +24,7 @@ class NpcAiManager {
         npcBehaviorMap.delete(app);
       }
       const removeIndex = this.npcs.indexOf(player);
-      const removed = this.npcs.splice(removeIndex, 1);
-      console.log(removed);
+      this.npcs.splice(removeIndex, 1);
     };
 
     const handlePlayerAdd = e => {
