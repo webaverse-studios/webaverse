@@ -23,16 +23,37 @@ import {
 } from 'zine/zine-geometry-utils.js';
 import {appsMapName, heightfieldScale} from './constants.js'
 
-//
+// locals
 
-// const localVector = new THREE.Vector3();
 const localCamera = new THREE.PerspectiveCamera();
 const localOrthographicCamera = new THREE.OrthographicCamera();
 
-//
+// utils
+    
+const getGeometryHeights = (geometry, width, height) => {
+  const heights = new Int16Array(geometry.attributes.position.array.length / 3);
+  let writeIndex = 0;
+  for (let dy = 0; dy < height; dy++) {
+    for (let dx = 0; dx < width; dx++) {
+      const ax = dx;
+      const ay = height - 1 - dy;
+      // XXX this is WRONG!
+      // we should index by ay * width + ax
+      // however, because of a bug which computes this wrong, we have to do it this way
+      const readIndex = ax * width + ay;
+
+      const y = geometry.attributes.position.array[readIndex * 3 + 1];
+      heights[writeIndex] = Math.round(y / heightfieldScale);
+
+      writeIndex++;
+    }
+  }
+  return heights;
+};
+
+// main class
 
 class ZineManager {
-  // constructor() {}
   MAGIC_STRING = zineMagicBytes;
   async #loadUrl(u) {
     const response = await fetch(u);
@@ -58,61 +79,85 @@ class ZineManager {
 
     const storyboard = await this.#loadUrl(start_url);
 
+    // panel
     const panel = storyboard.getPanel(0);
-    // if (!panel) {
-    //   throw new Error('no panels in zine');
-    // }
     const layer0 = panel.getLayer(0);
-    // if (!layer0) {
-    //   throw new Error('no layer0 in panel0');
-    // }
     const layer1 = panel.getLayer(1);
-    // if (!layer1) {
-    //   throw new Error('no layer1 in panel0');
-    // }
-
-    const zineRenderer = this.#createRenderer({
-      panel,
-    });
-    const {sceneMesh, scenePhysicsMesh, floorNetMesh} = zineRenderer;
-    
     const cameraJson = layer1.getData('cameraJson');
     const floorResolution = layer1.getData('floorResolution');
     const floorNetDepths = layer1.getData('floorNetDepths');
     const floorNetCameraJson = layer1.getData('floorNetCameraJson');
-    // console.log('loaded storyboard', {
-    //   storyboard,
-    //   panel,
-    //   zineRenderer,
-    //   sceneMesh,
-    //   scenePhysicsMesh,
-    //   cameraJson,
-    //   floorNetMesh,
-    //   floorResolution,
-    //   floorNetCameraJson,
-    //   floorNetDepths,
-    // });
+    
+    // zine renderer
+    const zineRenderer = this.#createRenderer({
+      panel,
+    });
+    const {
+      sceneMesh,
+      scenePhysicsMesh,
+      floorNetMesh,
+    } = zineRenderer;
 
-    const camera = setPerspectiveCameraFromJson(localCamera, cameraJson);
-    const floorNetCamera = setOrthographicCameraFromJson(localOrthographicCamera, floorNetCameraJson);
-    instance.camera = camera;
-
-    // add meshes to instance
+    // transform
+    const floorInverseQuaternion = new THREE.Quaternion()
+      .fromArray(zineRenderer.metadata.floorPlaneLocation.quaternion)
+      .invert();
+    // const floorInverseTransform = new THREE.Matrix4()
+    //   .compose(
+    //     new THREE.Vector3(0, 0, 0),
+    //     floorInverseQuaternion,
+    //     new THREE.Vector3(1, 1, 1)
+    //   );
+    // const floorInverseTransform = floorTransform.clone()
+    //   .invert();
     {
-      instance.add(sceneMesh);
-      instance.add(scenePhysicsMesh);
-      instance.add(floorNetMesh);
-      // floorNetMesh.visible = true;
+      // zineRenderer.scene.matrix.copy(floorInverseTransform)
+      //   .decompose(
+      //     zineRenderer.scene.position,
+      //     zineRenderer.scene.quaternion,
+      //     zineRenderer.scene.scale
+      //   );
+      // zineRenderer.scene.matrixWorld.copy(floorInverseTransform);
+      
+      // zineRenderer.camera.matrix.copy(floorInverseTransform)
+      //   .decompose(
+      //     zineRenderer.camera.position,
+      //     zineRenderer.camera.quaternion,
+      //     zineRenderer.camera.scale
+      //   );
+      // zineRenderer.camera.matrixWorld.copy(floorInverseTransform);
+    
+      zineRenderer.scene.quaternion.copy(floorInverseQuaternion);
+      zineRenderer.scene.updateMatrixWorld();
 
+      zineRenderer.camera.quaternion.copy(floorInverseQuaternion);
+      zineRenderer.camera.updateMatrixWorld();
+    }
+
+    // camera
+    // const camera = setPerspectiveCameraFromJson(localCamera, cameraJson);
+    const floorNetCamera = setOrthographicCameraFromJson(localOrthographicCamera, floorNetCameraJson);
+    // instance.camera = camera;
+    instance.camera = zineRenderer.camera;
+
+    // lights
+    {
       const light = new THREE.DirectionalLight(0xffffff, 2);
       light.position.set(0, 1, 2);
       instance.add(light);
       light.updateMatrixWorld();
     }
 
-    // add object physics
+    // meshes
+    {
+      instance.add(zineRenderer.scene);
+    }
+
+    // physics
     const physicsIds = [];
     instance.physicsIds = physicsIds;
+
+    // object physics
     {
       const geometry2 = scenePhysicsMesh.geometry.clone();
       // double-side the geometry
@@ -129,59 +174,54 @@ class ZineManager {
 
       const material2 = scenePhysicsMesh.material.clone();
       const scenePhysicsMesh2 = new THREE.Mesh(geometry2, material2);
+      scenePhysicsMesh.matrixWorld.decompose(
+        scenePhysicsMesh2.position,
+        scenePhysicsMesh2.quaternion,
+        scenePhysicsMesh2.scale
+      );
+      scenePhysicsMesh2.updateMatrixWorld();
 
       const physicsId = physics.addGeometry(scenePhysicsMesh2);
       physicsIds.push(physicsId);
     }
 
-    // add floor heightfield physics
+    // floor physics
     {
       const [width, height] = floorResolution;
 
-      const geometry = depthFloat32ArrayToOrthographicGeometry(
-        floorNetDepths,
-        floorNetPixelSize,
-        floorNetPixelSize,
-        floorNetCamera,
-      );
-      geometry.computeVertexNormals();
-      const heights = new Int16Array(geometry.attributes.position.array.length / 3);
-      {
-        let writeIndex = 0;
-        for (let dy = 0; dy < height; dy++) {
-          for (let dx = 0; dx < width; dx++) {
-            const ax = dx;
-            const ay = height - 1 - dy;
-            // XXX note that readIndex is WRONG; we should index by ay * width + ax
-            // however, because of some other bug which computes this wrong, we have to do it this way
-            const readIndex = ax * width + ay;
+      const floorNetPhysicsMesh = (() => {
+        const geometry = depthFloat32ArrayToOrthographicGeometry(
+          floorNetDepths,
+          floorNetPixelSize,
+          floorNetPixelSize,
+          floorNetCamera,
+        );
+        geometry.computeVertexNormals();
 
-            const y = geometry.attributes.position.array[readIndex * 3 + 1];
-            heights[writeIndex] = Math.round(y / heightfieldScale);
-
-            writeIndex++;
-          }
-        }
-      }
-
-      // shift geometry by half a floorNetWorldSize
-      geometry.translate(floorNetWorldSize/2, 0, floorNetWorldSize/2);
-      // ...but also shift the mesh to compensate
-      // this centering is required for the physics to work and render correctly
-      const material = new THREE.MeshPhongMaterial({
-        color: 0x0000ff,
-        side: THREE.DoubleSide,
-      });
-      const floorNetPhysicsMesh = new THREE.Mesh(geometry, material);
+        // shift geometry by half a floorNetWorldSize
+        geometry.translate(floorNetWorldSize/2, 0, floorNetWorldSize/2);
+        // ...but also shift the mesh to compensate
+        // this centering is required for the physics to work and render correctly
+        const material = new THREE.MeshPhongMaterial({
+          color: 0x0000ff,
+          side: THREE.DoubleSide,
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        return mesh;
+      })();
       floorNetPhysicsMesh.position.set(-floorNetWorldSize/2, 0, -floorNetWorldSize/2);
-      instance.add(floorNetPhysicsMesh);
-      floorNetPhysicsMesh.updateMatrixWorld();
+      zineRenderer.transformScene.add(floorNetPhysicsMesh);
 
       const numRows = width;
       const numColumns = height;
-      if (floorNetDepths.length !== width * height) {
-        throw new Error('floorNetDepths length mismatch');
-      }
+      // if (floorNetDepths.length !== width * height) {
+      //   throw new Error('floorNetDepths length mismatch');
+      // }
+      const heights = getGeometryHeights(
+        floorNetPhysicsMesh.geometry,
+        width,
+        height
+      );
       const heightfieldPhysicsObject = physics.addHeightFieldGeometry(
         floorNetPhysicsMesh,
         numRows,
@@ -194,9 +234,10 @@ class ZineManager {
       physicsIds.push(heightfieldPhysicsObject);
     }
 
-    console.log('create instance done');
-
+    // update matrix world
     instance.updateMatrixWorld();
+
+    // return
     return instance;
   }
 }
