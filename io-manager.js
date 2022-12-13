@@ -16,6 +16,7 @@ import transformControls from './transform-controls.js';
 import storyManager from './story.js';
 import raycastManager from './raycast-manager.js';
 import grabManager from './grab-manager.js';
+import zineManager from './zine-manager.js';
 
 const localVector = new THREE.Vector3();
 const localEuler = new THREE.Euler();
@@ -382,6 +383,15 @@ class IoManager extends EventTarget {
       }
       case 71: { // G
         game.menuSwitchCharacter();
+        break;
+      }
+      case 78: { // N
+        const zineApp = world.appManager.apps.find(app => !!app.zineInstance);
+        if (zineApp) {
+          zineApp.zineInstance.link();
+        } else {
+          console.warn('no zine app found');
+        }
         break;
       }
       case 86: { // V
