@@ -144,7 +144,7 @@ class WaitOneTick extends b3.Action {
   tick(tick) {
     const ticked = tick.blackboard.get('ticked', tick.tree.id, this.id)
     if (ticked) {
-      tick.blackboard.set('ticked', false, tick.tree.id, this.id) // todo: need reset if be halted ?
+      tick.blackboard.set('ticked', false, tick.tree.id, this.id)
       return b3.SUCCESS
     } else {
       tick.blackboard.set('ticked', true, tick.tree.id, this.id)
@@ -260,11 +260,10 @@ tree.root = new b3.MemSequence({title:'root',children: [
           new DoubleJump({title:'DoubleJump'}),
         ]}),
         new b3.MemSequence({title:'fallLoop & skydive & glider',children:[
-          new b3.Priority({title:'',children:[
+          new b3.Priority({title:'fallLoop & skydive',children:[
             new StartGlider({title:'StartGlider'}),
             new b3.Parallel({title:'fallLoop & skydive',children:[
               new FallLoop({title:'FallLoop'}),
-              // new b3.MaxTime({title:'',maxTime:2000,child:new FallLoop({title:'FallLoop'})}),
               new Skydive({title:'Skydive'}),
             ]}),
           ]}),
@@ -294,7 +293,7 @@ const postTickSettings = (localPlayer, blackboard) => {
     const longTryActions = blackboard.get('longTryActions');
   
     if (tickResults.crouch && !lastTickResults.crouch) {
-      localPlayer.addAction(tickTryActions.crouch); // todo: auto-check tick or long ?
+      localPlayer.addAction(tickTryActions.crouch);
     }
     if (!tickResults.crouch && lastTickResults.crouch) localPlayer.removeAction('crouch');
   
@@ -311,7 +310,7 @@ const postTickSettings = (localPlayer, blackboard) => {
     if (tickResults.narutoRun && !lastTickResults.narutoRun) localPlayer.addAction(longTryActions.narutoRun);
     if (!tickResults.narutoRun && lastTickResults.narutoRun) localPlayer.removeAction('narutoRun');
   
-    if (tickResults.fly && !lastTickResults.fly) localPlayer.addAction(longTryActions.fly); // todo: just tryActions is ok, don't need tick/long ?
+    if (tickResults.fly && !lastTickResults.fly) localPlayer.addAction(longTryActions.fly);
     if (!tickResults.fly && lastTickResults.fly) localPlayer.removeAction('fly');
   
     if (tickResults.jump && !lastTickResults.jump) {
@@ -363,7 +362,7 @@ const postTickSettings = (localPlayer, blackboard) => {
   
     if (tickResults.glider && !lastTickResults.glider) {
       localPlayer.addAction(tickTryActions.glider);
-      localPlayer.glider.visible = true; // todo: put this logic in callbakFn or return value from actions-manager ?
+      localPlayer.glider.visible = true;
     }
     if (!tickResults.glider && lastTickResults.glider) {
       localPlayer.removeAction('glider');
@@ -405,13 +404,13 @@ const postTickSettings = (localPlayer, blackboard) => {
 class ActionsManager {
   constructor(localPlayer) {
     this.localPlayer = localPlayer;
-    this.blackboard = new b3.Blackboard(); // todo: make blackboard private.
+    this.blackboard = new b3.Blackboard();
     this.blackboard.set('tickResults', {});
     this.blackboard.set('lastTickResults', {});
     // this.blackboard.set('tickInfos', {});
-    this.blackboard.set('tickTryActions', {}); // todo: rename: tickTryAddActions.
-    this.blackboard.set('longTryActions', {}); // todo: rename: longTryAddActions.
-    this.blackboard.set('tickTryStopActions', {}); // todo: rename: tickTryRemoveActions.
+    this.blackboard.set('tickTryActions', {});
+    this.blackboard.set('longTryActions', {});
+    this.blackboard.set('tickTryStopActions', {});
     this.blackboard.set('loaded', true);
   }
 
@@ -426,7 +425,7 @@ class ActionsManager {
   tryAddAction(action, isLong = false) {
     if (isLong) {
       const longTryActions = this.blackboard.get('longTryActions');
-      longTryActions[action.type] = action; // todo: how to handle multiple same actionType long try ?
+      longTryActions[action.type] = action;
       const tickTryActions = this.blackboard.get('tickTryActions');
       tickTryActions[action.type] = action; // note: long try also trigger tick try.
     } else {

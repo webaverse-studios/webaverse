@@ -52,7 +52,6 @@ const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
 const localVector3 = new THREE.Vector3();
 const localVector4 = new THREE.Vector3();
-// const localVector2D = new THREE.Vector2();
 const localQuaternion = new THREE.Quaternion();
 // const localQuaternion2 = new THREE.Quaternion();
 const localEuler = new THREE.Euler();
@@ -707,7 +706,6 @@ class StateCharacter extends Character {
   }
 
   addAction(action) {
-    // return;
     action = clone(action);
     action.actionId = makeId(5);
     this.getActionsState().push([action]);
@@ -718,7 +716,6 @@ class StateCharacter extends Character {
   }
 
   removeAction(type) {
-    // return;
     const actions = this.getActionsState();
     const actionsArray = this.getActionsArray();
     let i = 0;
@@ -735,7 +732,6 @@ class StateCharacter extends Character {
   }
 
   removeActionIndex(index) {
-    // return;
     const actionsArray = this.getActionsArray();
     this.getActionsState().delete(index);
     if (this.avatar) {
@@ -752,7 +748,6 @@ class StateCharacter extends Character {
   }
 
   setControlAction(action) {
-    // return;
     const actions = this.getActionsState();
     const actionsArray = this.getActionsArray();
     for (let i = 0; i < actions.length; i++) {
@@ -843,7 +838,7 @@ class AvatarCharacter extends StateCharacter {
     this.avatarFace = new AvatarCharacterFace(this);
     this.avatarCharacterFx = new AvatarCharacterFx(this);
     this.avatarCharacterSfx = new AvatarCharacterSfx(this);
-    this.glider = null; // todo: don't put glider module/model here ?
+    this.glider = null;
 
     this.leftHand = new AvatarHand();
     this.rightHand = new AvatarHand();
@@ -1372,9 +1367,8 @@ class LocalPlayer extends UninterpolatedPlayer {
 
       this.characterHups.update(timestamp);
 
-      // todo: Also add to npcPlayer or AvatarCharacter.
+      // note: Create glider app.
       if (!this.glider && this.getControlMode() === 'controlled') {
-        // console.log('create glider');
         this.glider = metaversefile.createApp();
         this.glider.setComponent('player', this);
         (async () => {
@@ -1383,24 +1377,19 @@ class LocalPlayer extends UninterpolatedPlayer {
           await this.glider.addModule(m);
           const physicsScene = physicsManager.getScene();
           this.glider.physicsObjects.forEach(physicsObject => {
-            physicsScene.disableActor(physicsObject); // todo: performance: don't init glider's physics ?
+            physicsScene.disableActor(physicsObject);
           })
         })();
         this.glider.visible = false;
         sceneLowPriority.add(this.glider);
       }
-
+      // note: Calc/set glider's main rotation.
       localEuler.order = 'YZX';
       localEuler.setFromQuaternion(this.quaternion);
       localEuler.y += Math.PI;
-      // localQuaternion.setFromAxisAngle(localVector.set(0, 1, 0), Math.PI);
-      // this.glider.quaternion.copy(this.quaternion)/* .premultiply(localQuaternion) */;
       this.glider.rotation.copy(localEuler);
       this.glider.rotation.x = 0;
-
-      // localVector.set(0, 0.11, 0.25).applyEuler(this.glider.rotation);;
-      // this.glider.position.copy(this.position).add(localVector);
-      // ---
+      // note: Dynamically calc/set glider's rotation.z by hands positions.
       this.avatar.foundModelBones.Left_wrist.matrixWorld.decompose(localVector, localQuaternion, localVector4);
       this.avatar.foundModelBones.Left_middleFinger1.matrixWorld.decompose(localVector3, localQuaternion, localVector4);
       localVector.add(localVector3).multiplyScalar(0.5);
@@ -1410,26 +1399,18 @@ class LocalPlayer extends UninterpolatedPlayer {
       localVector.add(localVector2).multiplyScalar(0.5);
       this.glider.position.copy(localVector);
       //
-      localVector.set(0, 0, 0.032).applyEuler(this.glider.rotation); // todo: calc fingers difference instead of hardcoded value.
+      localVector.set(0, 0, 0.032).applyEuler(this.glider.rotation);
       this.glider.position.add(localVector);
-      // ---
-
-      this.avatar.foundModelBones.Left_wrist.matrixWorld.decompose(localVector, localQuaternion, localVector4); // todo: prevent duplicated decomposes.
+      //
+      this.avatar.foundModelBones.Left_wrist.matrixWorld.decompose(localVector, localQuaternion, localVector4);
       this.avatar.foundModelBones.Right_wrist.matrixWorld.decompose(localVector2, localQuaternion, localVector4);
-      // localVector2D.set(
-      //   localVector.distanceTo(localVector2) / 2,
-      //   localVector.y - localVector2.y,
-      // )
-      // this.glider.rotation.z = localVector2D.angle();
       localVector3.subVectors(localVector, localVector2);
       localVector4.copy(localVector3).setY(0);
       let angle = localVector3.angleTo(localVector4);
       if (localVector3.y < 0) angle *= -1;
       this.glider.rotation.z = angle;
-
+      // note: Update glider's matrix.
       this.glider.updateMatrixWorld();
-
-      // console.log('update glider position/rotation');
     }
   }
 

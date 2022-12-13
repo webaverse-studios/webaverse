@@ -134,7 +134,6 @@ class CharacterPhysics {
           
           this.lastGravityH = h;
         }
-        // console.log('wantMoveDistancePerFrame', this.wantMoveDistancePerFrame.y, t);
       }
       this.lastFallLoopAction = fallLoopAction;
     // }
