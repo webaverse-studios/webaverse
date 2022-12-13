@@ -377,6 +377,31 @@ class Universe extends EventTarget {
     const onConnect = async position => {
       const localPlayer = playersManager.getLocalPlayer();
 
+      // World app changes.
+      const virtualWorld = this.realms.getVirtualWorld();
+      const onTrackedAppAdd = async e => {
+        // An app has been added to the world.
+        const {trackedApp} = e.data;
+        const {instanceId, contentId, transform, components} = trackedApp.toJSON();
+        const position = [...transform].slice(0, 3);
+        const realm = this.realms.getClosestRealm(position);
+        virtualWorld.worldApps.addEntityAt(instanceId, {instanceId, contentId, transform, components}, realm);
+      };
+      world.appManager.addEventListener('trackedappadd', onTrackedAppAdd);
+      this.playerCleanupFns.push(() => {
+        world.appManager.removeEventListener('trackedappadd', onTrackedAppAdd);
+      });
+      const onTrackedAppRemove = async e => {
+        // An app has been removed from the world.
+        const {instanceId, app} = e.data;
+        // TODO
+        console.warn('onTrackedAppRemove() not implemented');
+      };
+      world.appManager.addEventListener('trackedappremove', onTrackedAppRemove);
+      this.playerCleanupFns.push(() => {
+        world.appManager.removeEventListener('trackedappremove', onTrackedAppRemove);
+      });
+
       // Player app changes.
       const onAppAdd = e => {
         const app = e.data;
