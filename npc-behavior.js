@@ -30,8 +30,8 @@ export const followTarget = (player, target, timeDiff) => {
 
 export const followFn = (player, timestamp, timeDiff) => {
   if (player) {
-    const localPlayer = playersManager.getLocalPlayer();
     if (player.getControlMode() !== 'controlled') {
+      const localPlayer = playersManager.getLocalPlayer();
       if (player.getControlMode() === 'party') { // if party, follow in a line
         const target = npcManager.getPartyTarget(player);
         followTarget(player, target, timeDiff);
