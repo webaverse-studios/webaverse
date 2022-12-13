@@ -315,6 +315,9 @@ class NpcManager extends EventTarget {
       });
 
       this.setBehaviorFn(app, idleFn);
+      if (!app.getComponent('state')) {
+        app.setComponent('state', 0);
+      }
 
       const updateAvatarFn = (timestamp, timeDiff) => {
         player.updateAvatar(timestamp, timeDiff);
