@@ -204,6 +204,12 @@ class Universe extends EventTarget {
   async connectMultiplayer(src, state = new Z.Doc()) {
     this.connectState(state);
 
+    // Use default scene if none specified.
+    if (src === undefined) {
+      const sceneNames = await sceneManager.getSceneNamesAsync();
+      src = sceneManager.getSceneUrl(sceneNames[0]);
+    }
+
     // Set up the network realms.
     const sceneId = murmurhash3(src);
     const localPlayer = playersManager.getLocalPlayer();
@@ -240,7 +246,7 @@ class Universe extends EventTarget {
           playerMap.set(actionsMapName, actionsArray);
         }
         return actionsArray;
-      }
+      };
 
       // Handle remote player updates.
       player.addEventListener('update', e => {
@@ -292,7 +298,7 @@ class Universe extends EventTarget {
                 components: [],
                 transform: defaultTransform.slice(),
                 ...val,
-                }]);
+              }]);
             } else {
               // Remove app from state.
               const appKey = key.slice(this.appsPrefix.length);
@@ -367,21 +373,11 @@ class Universe extends EventTarget {
       }
     });
 
-    // Use default scene if none specified.
-    if (src === undefined) {
-      const sceneNames = await sceneManager.getSceneNamesAsync();
-      src = sceneManager.getSceneUrl(sceneNames[0]);
-    }
 
-    // Load the scene.
-    await metaversefile.createAppAsync({
-      start_url: src,
-    });
-
-    const onConnect = position => {
+    const onConnect = async position => {
       const localPlayer = playersManager.getLocalPlayer();
 
-      // Player apps.
+      // Player app changes.
       const onAppAdd = e => {
         const app = e.data;
         const components = app.components.reduce((acc, val) => {
@@ -392,7 +388,7 @@ class Universe extends EventTarget {
           instanceId: app.instanceId,
           ...components,
         });
-      }
+      };
       localPlayer.appManager.addEventListener('appadd', onAppAdd);
       this.playerCleanupFns.push(() => {
         localPlayer.appManager.removeEventListener('appadd', onAppAdd);
@@ -400,29 +396,29 @@ class Universe extends EventTarget {
       const onAppRemove = e => {
         const app = e.data;
         this.realms.localPlayer.setKeyValue(this.appsPrefix + app.instanceId, null);
-      }
+      };
       localPlayer.appManager.addEventListener('appremove', onAppRemove);
       this.playerCleanupFns.push(() => {
         localPlayer.appManager.removeEventListener('appremove', onAppRemove);
       });
 
-      // Player avatar.
+      // Player avatar changes.
       const onAvatarChange = e => {
         this.realms.localPlayer.setKeyValue('avatar', localPlayer.getAvatarInstanceId());
-      }
+      };
       localPlayer.addEventListener('avatarchange', onAvatarChange);
       this.playerCleanupFns.push(() => {
         localPlayer.appManager.removeEventListener('avatarchange', onAvatarChange);
       });
       const onAvatarUpdate = e => {
         // Nothing to do.
-      }
+      };
       localPlayer.addEventListener('avatarupdate', onAvatarUpdate);
       this.playerCleanupFns.push(() => {
         localPlayer.appManager.removeEventListener('avatarupdate', onAvatarUpdate);
       });
 
-      // Player actions.
+      // Player action changes.
       const onActionAdd = e => {
         universe.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, e.action);
       };
@@ -438,7 +434,7 @@ class Universe extends EventTarget {
         localPlayer.removeEventListener('actionremove', onActionRemove);
       });
 
-      // Initialize player.
+      // Initialize network realms player.
       this.realms.localPlayer.initializePlayer({
         position,
       }, {});
@@ -463,11 +459,16 @@ class Universe extends EventTarget {
         this.realms.enableMic();
       }
 
+      // Load the scene.
+      await metaversefile.createAppAsync({
+        start_url: src,
+      });
+
       console.log('Multiplayer connected');
       this.multiplayerConnected = true;
     };
 
-    this.realms.updatePosition(localPlayer.position.toArray(), realmSize, {
+    await this.realms.updatePosition(localPlayer.position.toArray(), realmSize, {
       onConnect,
     });
   }
