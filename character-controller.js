@@ -1383,34 +1383,36 @@ class LocalPlayer extends UninterpolatedPlayer {
         this.glider.visible = false;
         sceneLowPriority.add(this.glider);
       }
-      // note: Calc/set glider's main rotation.
-      localEuler.order = 'YZX';
-      localEuler.setFromQuaternion(this.quaternion);
-      localEuler.y += Math.PI;
-      this.glider.rotation.copy(localEuler);
-      this.glider.rotation.x = 0;
-      // note: Dynamically calc/set glider's rotation.z by hands positions.
-      this.avatar.foundModelBones.Left_wrist.matrixWorld.decompose(localVector, localQuaternion, localVector4);
-      this.avatar.foundModelBones.Left_middleFinger1.matrixWorld.decompose(localVector3, localQuaternion, localVector4);
-      localVector.add(localVector3).multiplyScalar(0.5);
-      this.avatar.foundModelBones.Right_wrist.matrixWorld.decompose(localVector2, localQuaternion, localVector4);
-      this.avatar.foundModelBones.Right_middleFinger1.matrixWorld.decompose(localVector3, localQuaternion, localVector4);
-      localVector2.add(localVector3).multiplyScalar(0.5);
-      localVector.add(localVector2).multiplyScalar(0.5);
-      this.glider.position.copy(localVector);
-      //
-      localVector.set(0, 0, 0.032).applyEuler(this.glider.rotation);
-      this.glider.position.add(localVector);
-      //
-      this.avatar.foundModelBones.Left_wrist.matrixWorld.decompose(localVector, localQuaternion, localVector4);
-      this.avatar.foundModelBones.Right_wrist.matrixWorld.decompose(localVector2, localQuaternion, localVector4);
-      localVector3.subVectors(localVector, localVector2);
-      localVector4.copy(localVector3).setY(0);
-      let angle = localVector3.angleTo(localVector4);
-      if (localVector3.y < 0) angle *= -1;
-      this.glider.rotation.z = angle;
-      // note: Update glider's matrix.
-      this.glider.updateMatrixWorld();
+      if (this.glider) {
+        // note: Calc/set glider's main rotation.
+        localEuler.order = 'YZX';
+        localEuler.setFromQuaternion(this.quaternion);
+        localEuler.y += Math.PI;
+        this.glider.rotation.copy(localEuler);
+        this.glider.rotation.x = 0;
+        // note: Dynamically calc/set glider's rotation.z by hands positions.
+        this.avatar.foundModelBones.Left_wrist.matrixWorld.decompose(localVector, localQuaternion, localVector4);
+        this.avatar.foundModelBones.Left_middleFinger1.matrixWorld.decompose(localVector3, localQuaternion, localVector4);
+        localVector.add(localVector3).multiplyScalar(0.5);
+        this.avatar.foundModelBones.Right_wrist.matrixWorld.decompose(localVector2, localQuaternion, localVector4);
+        this.avatar.foundModelBones.Right_middleFinger1.matrixWorld.decompose(localVector3, localQuaternion, localVector4);
+        localVector2.add(localVector3).multiplyScalar(0.5);
+        localVector.add(localVector2).multiplyScalar(0.5);
+        this.glider.position.copy(localVector);
+        //
+        localVector.set(0, 0, 0.032).applyEuler(this.glider.rotation);
+        this.glider.position.add(localVector);
+        //
+        this.avatar.foundModelBones.Left_wrist.matrixWorld.decompose(localVector, localQuaternion, localVector4);
+        this.avatar.foundModelBones.Right_wrist.matrixWorld.decompose(localVector2, localQuaternion, localVector4);
+        localVector3.subVectors(localVector, localVector2);
+        localVector4.copy(localVector3).setY(0);
+        let angle = localVector3.angleTo(localVector4);
+        if (localVector3.y < 0) angle *= -1;
+        this.glider.rotation.z = angle;
+        // note: Update glider's matrix.
+        this.glider.updateMatrixWorld();
+      }
     }
   }
 

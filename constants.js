@@ -91,6 +91,7 @@ export const runSpeed = walkSpeed * 3;
 export const narutoRunSpeed = walkSpeed * 20;
 export const crouchSpeed = walkSpeed * 0.7;
 export const flySpeed = walkSpeed * 5;
+export const gliderSpeed = walkSpeed * 3;
 
 export const narutoRunTimeFactor = 2;
 
