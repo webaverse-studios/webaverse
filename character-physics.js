@@ -4,7 +4,7 @@ it sets up and ticks the physics loop for our local character */
 import * as THREE from 'three';
 import physicsManager from './physics-manager.js';
 import {applyVelocity} from './util.js';
-import {groundFriction, flyFriction, swimFriction, flatGroundJumpAirTime, jumpHeight} from './constants.js';
+import {groundFriction, flyFriction, swimFriction, flatGroundJumpAirTime, jumpHeight, startSkydiveTimeS} from './constants.js';
 import {getRenderer, camera} from './renderer.js';
 import metaversefileApi from 'metaversefile';
 import physx from './physx.js';
@@ -46,6 +46,7 @@ class CharacterPhysics {
     this.targetMoveDistancePerFrame = new THREE.Vector3(); // note: see velocity.
     this.lastTargetMoveDistancePerFrame = new THREE.Vector3(); // note: see velocity.
     this.wantMoveDistancePerFrame = new THREE.Vector3(); // note: see velocity.
+    this.grounded = null;
     this.lastGrounded = null;
     this.lastGroundedTime = 0;
     this.lastCharacterControllerY = null;
@@ -119,12 +120,20 @@ class CharacterPhysics {
             this.lastGravityH = 0.5 * physicsScene.getGravity().y * previousT * previousT;
           }
         }
-        const t = nowS - this.fallLoopStartTimeS;
-        const h = 0.5 * physicsScene.getGravity().y * t * t;
-        this.wantMoveDistancePerFrame.y = h - this.lastGravityH;
-        this.wantVelocity.y = t * physicsScene.getGravity().y;
-
-        this.lastGravityH = h;
+        let t = nowS - this.fallLoopStartTimeS;
+        if (t > startSkydiveTimeS) {
+          const newSkydiveAction = {type: 'skydive'};
+          this.character.actionsManager.tryAddAction(newSkydiveAction);
+          t = startSkydiveTimeS;
+          this.wantVelocity.y = t * physicsScene.getGravity().y;
+          this.wantMoveDistancePerFrame.y = this.wantVelocity.y * timeDiffS;
+        } else {
+          const h = 0.5 * physicsScene.getGravity().y * t * t;
+          this.wantMoveDistancePerFrame.y = h - this.lastGravityH;
+          this.wantVelocity.y = t * physicsScene.getGravity().y;
+          
+          this.lastGravityH = h;
+        }
       }
       this.lastFallLoopAction = fallLoopAction;
     // }
@@ -142,7 +151,7 @@ class CharacterPhysics {
 
       // aesthetic jump
       const jumpAction = this.character.getAction('jump');
-      if (jumpAction?.trigger === 'jump') {
+      if (jumpAction) {
         const doubleJumpAction = this.character.getAction('doubleJump');
         if (doubleJumpAction) {
           const doubleJumpTime =
@@ -153,7 +162,13 @@ class CharacterPhysics {
             doubleJumpAction.startPositionY -
             this.lastCharacterControllerY;
           if (doubleJumpTime >= flatGroundJumpAirTime) {
-            this.character.setControlAction({type: 'fallLoop', from: 'jump'});
+            this.character.actionsManager.tryRemoveAction('doubleJump');
+            
+            const newFallLoopFromJumpAction = {
+              type: 'fallLoop',
+              from: 'jump',
+            }
+            this.character.actionsManager.tryAddAction(newFallLoopFromJumpAction);
           }
         } else {
           const jumpTime = physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'jump', 0);
@@ -163,7 +178,13 @@ class CharacterPhysics {
             jumpAction.startPositionY -
             this.lastCharacterControllerY;
           if (jumpTime >= flatGroundJumpAirTime) {
-            this.character.setControlAction({type: 'fallLoop', from: 'jump'});
+            this.character.actionsManager.tryRemoveAction('jump');
+
+            const newFallLoopFromJumpAction = {
+              type: 'fallLoop',
+              from: 'jump',
+            }
+            this.character.actionsManager.tryAddAction(newFallLoopFromJumpAction);
           }
         }
       }
@@ -211,10 +232,10 @@ class CharacterPhysics {
       }
 
       // const collided = flags !== 0;
-      let grounded = !!(flags & 0x1);
+      this.grounded = !!(flags & 0x1);
 
       if (
-        !grounded &&
+        !this.grounded &&
         !this.character.getAction('jump') &&
         !this.character.getAction('fly') &&
         !this.character.hasAction('swim')
@@ -231,12 +252,14 @@ class CharacterPhysics {
         );
         const newGrounded = !!(flags & 0x1);
         if (newGrounded) {
-          grounded = true;
+          this.grounded = true;
           this.characterController.position.copy(localVector4);
         } else {
           this.characterController.position.y = oldY;
         }
       }
+      
+      if (this.grounded) this.lastGroundedTime = now;
 
       this.characterController.updateMatrixWorld();
       this.characterController.matrixWorld.decompose(
@@ -268,37 +291,6 @@ class CharacterPhysics {
           localQuaternion.copy(camera.quaternion);
         }
 
-        if (grounded) {
-          this.lastGroundedTime = now;
-          if (!this.lastGrounded) {
-            if (
-              this.character.hasAction('jump') ||
-              this.character.hasAction('fallLoop')
-            ) {
-              this.character.setControlAction({
-                type: 'land',
-                time: now,
-                isMoving: this.character.avatar.idleWalkFactor > 0,
-              });
-              this.character.removeAction('doubleJump');
-            }
-          }
-
-          // this.velocity.y = -1;
-        } else {
-          const lastGroundedTimeDiff = now - this.lastGroundedTime;
-          if (lastGroundedTimeDiff > 200) {
-            if (
-              !this.character.hasAction('fallLoop') &&
-              !this.character.hasAction('jump') &&
-              !this.character.hasAction('fly') &&
-              !this.character.hasAction('swim')
-            ) {
-              this.character.setControlAction({type: 'fallLoop'});
-              this.velocity.y = 0;
-            }
-          }
-        }
       } else {
         // Outdated vehicle code
         this.velocity.y = 0;
@@ -393,9 +385,9 @@ class CharacterPhysics {
         this.avatar.updateMatrixWorld();
       } */
 
-      this.lastGrounded = grounded;
+      this.lastGrounded = this.grounded;
       this.lastCharacterControllerY =
-        this.characterController.position.y;
+      this.characterController.position.y;
     }
   }
 
