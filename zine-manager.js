@@ -102,31 +102,7 @@ class ZineManager {
     const floorInverseQuaternion = new THREE.Quaternion()
       .fromArray(zineRenderer.metadata.floorPlaneLocation.quaternion)
       .invert();
-    // const floorInverseTransform = new THREE.Matrix4()
-    //   .compose(
-    //     new THREE.Vector3(0, 0, 0),
-    //     floorInverseQuaternion,
-    //     new THREE.Vector3(1, 1, 1)
-    //   );
-    // const floorInverseTransform = floorTransform.clone()
-    //   .invert();
     {
-      // zineRenderer.scene.matrix.copy(floorInverseTransform)
-      //   .decompose(
-      //     zineRenderer.scene.position,
-      //     zineRenderer.scene.quaternion,
-      //     zineRenderer.scene.scale
-      //   );
-      // zineRenderer.scene.matrixWorld.copy(floorInverseTransform);
-      
-      // zineRenderer.camera.matrix.copy(floorInverseTransform)
-      //   .decompose(
-      //     zineRenderer.camera.position,
-      //     zineRenderer.camera.quaternion,
-      //     zineRenderer.camera.scale
-      //   );
-      // zineRenderer.camera.matrixWorld.copy(floorInverseTransform);
-    
       zineRenderer.scene.quaternion.copy(floorInverseQuaternion);
       zineRenderer.scene.updateMatrixWorld();
 
