@@ -377,8 +377,25 @@ export const App = () => {
         // console.log('drag end', e);
     };
 
+    const AppContextValues = {
+        app,
+        state,
+        setState,
+        setSelectedApp,
+        selectedApp,
+        editMode,
+        showUI,
+        account,
+        chain,
+        claimableToken,
+        setClaimableToken,
+        mintedToken,
+        setMintedToken,
+        getWalletItems
+    }
+
     return (
-        <AppContext.Provider value={{state, setState, app, setSelectedApp, selectedApp, editMode, showUI, account, chain, claimableToken, setClaimableToken, mintedToken, setMintedToken, getWalletItems}}>
+        <AppContext.Provider value={AppContextValues}>
         <div
             className={ styles.App }
             id="app"
