@@ -48,6 +48,7 @@ const hitRadius = 1;
 const hitHeight = 0.2;
 const hitHalfHeight = hitHeight * 0.5;
 const hitboxOffsetDistance = 0.3;
+const swordComboAnimationDuration = 600;
 
 class GameManager extends EventTarget {
   menuOpen = 0;
@@ -1534,6 +1535,11 @@ class GameManager extends EventTarget {
         if (useAction.animation === 'pickUpThrow') {
           const useTime = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'use', 0);
           if (useTime / 1000 >= throwAnimationDuration) {
+            this.endUse();
+          }
+        } else if (useAction.behavior === 'sword' && useAction.animationCombo?.length > 0) {
+          const useTime = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'use', 0);
+          if (useTime > swordComboAnimationDuration) {
             this.endUse();
           }
         } else if (this.isMouseUp) {
