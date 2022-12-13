@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {getRenderer, camera} from './renderer.js';
+import {canvas, getRenderer, camera} from './renderer.js';
 import physicsManager from './physics-manager.js';
 import {shakeAnimationSpeed, minFov, maxFov, midFov} from './constants.js';
 import Simplex from './simplex-noise.js';
@@ -195,8 +195,7 @@ class CameraManager extends EventTarget {
     if (!isWorker) {
       document.addEventListener('pointerlockchange', e => {
         let pointerLockElement = document.pointerLockElement;
-        const renderer = getRenderer();
-        if (pointerLockElement !== null && pointerLockElement !== renderer.domElement) {
+        if (pointerLockElement !== null && pointerLockElement !== canvas) {
           pointerLockElement = null;
         }
 
@@ -225,8 +224,7 @@ class CameraManager extends EventTarget {
     ]) {
       try {
         await new Promise((accept, reject) => {
-          const renderer = getRenderer();
-          if (document.pointerLockElement !== renderer.domElement) {
+          if (document.pointerLockElement !== canvas) {
             if (document.activeElement) {
               document.activeElement.blur();
             }
@@ -260,7 +258,7 @@ class CameraManager extends EventTarget {
               document.removeEventListener('pointerlockchange', _pointerlockchange);
               document.removeEventListener('pointerlockerror', _pointerlockerror);
             };
-            renderer.domElement.requestPointerLock(options)
+            canvas.requestPointerLock(options)
               .catch(_pointerlockerror);
           } else {
             accept();

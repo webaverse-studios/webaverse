@@ -1,7 +1,6 @@
 /* this file implements avatar optimization and THREE.js Object management + rendering */
 import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import {VRMMaterialImporter/*, MToonMaterial */} from '@pixiv/three-vrm/lib/three-vrm.module.js';
 import * as avatarSpriter from '../avatar-spriter.js';
 import {getAvatarHeight, getAvatarWidth, getModelBones} from './util.mjs';
 import loaders from '../loaders.js';
@@ -28,7 +27,8 @@ const avatarPlaceholderImagePromise = (async () => {
   const res = await fetch('/images/user.png');
   if (res.ok) {
     const blob = await res.blob();
-    const avatarPlaceholderImage = await createImageBitmap(blob);
+    const options = {imageOrientation: 'flipY'};
+    const avatarPlaceholderImage = await createImageBitmap(blob, options);
     return avatarPlaceholderImage;
   } else {
     throw new Error('failed to load image: ' + res.status);
@@ -228,13 +228,6 @@ const _abortablePromise = async (promise, {
     });
   });
   return await signalPromise;
-};
-
-const _toonShaderify = async (o, {
-  signal = null
-} = {}) => {
-  const promise = new VRMMaterialImporter().convertGLTFMaterials(o);
-  return await _abortablePromise(promise, {signal});
 };
 
 const _loadGlbObject = async (glbData, srcUrl, {
@@ -668,7 +661,6 @@ export class AvatarRenderer /* extends EventTarget */ {
                   const object = await _loadGlbObject(glbData, this.srcUrl, {signal});
                   const glb = object.scene;
 
-                  await _toonShaderify(object, {signal});
                   _forAllMeshes(glb, o => {
                     _addAnisotropy(o, 16);
                     _enableShadows(o);

@@ -1,0 +1,154 @@
+{
+  "objects": [
+    {
+      "type": "application/light",
+      "content": {
+        "lightType": "ambient",
+        "args": [[255, 255, 255], 0.5]
+      }
+    },
+    {
+      "type": "application/light",
+      "content": {
+        "lightType": "directional",
+        "args": [[255, 255, 255], 5],
+        "position": [1, 2, 3],
+        "shadow": [50, 4096, 0.1, 1000, 0, 0.2]
+      }
+    },
+    {
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "start_url": "https://webaverse.github.io/street-contents/"
+    },
+    {
+      "position": [
+        0,
+        0,
+        8
+      ],
+      "type": "application/npc",
+      "content": {
+        "name": "NPC01",
+        "avatarUrl": "/avatars/scillia_drophunter_v15_vian.vrm",
+        "voice": "Sweetie Belle",
+        "bio": "Her nickname is Scilly or SLY. 13/F drop hunter. She is an adventurer, swordfighter and fan of potions. She is exceptionally skilled and can go Super Saiyan."
+      }
+    },
+    {
+      "position": [
+        2,
+        0,
+        8
+      ],
+      "type": "application/npc",
+      "content": {
+        "name": "NPC02",
+        "avatarUrl": "/avatars/jun_engineer_v1_vian.vrm",
+        "voice": "Cadance",
+        "bio": "She is an engineer. 17/F engineer. She is new on the street."
+      }
+    },
+    {
+      "position": [
+        4,
+        0,
+        8
+      ],
+      "type": "application/npc",
+      "content": {
+        "name": "NPC03",
+        "avatarUrl": "/avatars/drake_hacker_v3_vian.vrm",
+        "voice": "Shining Armor",
+        "bio": "His nickname is DRK. 15/M hacker. Loves guns. Likes plotting new hacks. He has the best equipment and is always ready for a fight."
+      }
+    },
+    {
+      "position": [
+        6,
+        0,
+        8
+      ],
+      "type": "application/npc",
+      "content": {
+        "name": "NPC04",
+        "avatarUrl": "/avatars/drake_hacker_v3_vian.vrm",
+        "voice": "Shining Armor",
+        "bio": "His nickname is DRK. 15/M hacker. Loves guns. Likes plotting new hacks. He has the best equipment and is always ready for a fight."
+      }
+    },
+    {
+      "position": [
+        8,
+        0,
+        8
+      ],
+      "type": "application/npc",
+      "content": {
+        "name": "NPC05",
+        "avatarUrl": "/avatars/drake_hacker_v3_vian.vrm",
+        "voice": "Shining Armor",
+        "bio": "His nickname is DRK. 15/M hacker. Loves guns. Likes plotting new hacks. He has the best equipment and is always ready for a fight."
+      }
+    },
+    {
+      "position": [
+        -2,
+        0,
+        8
+      ],
+      "type": "application/npc",
+      "content": {
+        "name": "NPC06",
+        "avatarUrl": "/avatars/drake_hacker_v3_vian.vrm",
+        "voice": "Shining Armor",
+        "bio": "His nickname is DRK. 15/M hacker. Loves guns. Likes plotting new hacks. He has the best equipment and is always ready for a fight."
+      }
+    },
+    {
+      "position": [
+        -4,
+        0,
+        8
+      ],
+      "type": "application/npc",
+      "content": {
+        "name": "NPC07",
+        "avatarUrl": "/avatars/drake_hacker_v3_vian.vrm",
+        "voice": "Shining Armor",
+        "bio": "His nickname is DRK. 15/M hacker. Loves guns. Likes plotting new hacks. He has the best equipment and is always ready for a fight."
+      }
+    },
+    {
+      "position": [0, 0.5, 2],
+      "start_url": "https://webaverse.github.io/sword/"
+    },
+    {
+      "position": [2, 0.5, 2],
+      "start_url": "https://webaverse.github.io/silsword/"
+    },
+    {
+      "position": [4, 0.5, 2],
+      "start_url": "https://webaverse.github.io/pistol/"
+    },
+    {
+      "position": [6, 0.5, 2],
+      "start_url": "https://webaverse.github.io/machine-gun/"
+    },
+    {
+      "position": [8, 0.5, 2],
+      "start_url": "https://webaverse.github.io/uzi/"
+    },
+    {
+      "position": [-2, 0.5, 2],
+      "start_url": "https://webaverse.github.io/bow/"
+    },
+    {
+      "position": [-4, 0.5, 2],
+      "start_url": "https://webaverse.github.io/rocket-launcher/"
+    }
+  ]
+}

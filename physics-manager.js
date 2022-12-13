@@ -9,12 +9,19 @@ import metaversefileApi from 'metaversefile'
 import {getNextPhysicsId, freePhysicsId, convertMeshToPhysicsMesh} from './util.js'
 import {CapsuleGeometry} from './geometries.js'
 import physxWorkerManager from './physx-worker-manager.js';
+import {BoxGeometry} from 'three';
 
 const localVector = new THREE.Vector3()
 
 // fake shared material to prevent shader instantiation
 const redMaterial = new THREE.MeshBasicMaterial({
   color: 0xff0000,
+});
+
+const redAlphaMaterial = new THREE.MeshBasicMaterial({
+  color: 0xff0000,
+  opacity: 0.5,
+  transparent: true
 });
 
 const _makePhysicsObject = (physicsId, position, quaternion, scale) => {
@@ -726,18 +733,21 @@ class PhysicsScene extends EventTarget {
 
     const characterHeight = height + radius * 2;
     const physicsObject = new THREE.Object3D()
+    const {bounds} = this.getGeometryForPhysicsId(physicsId)
+    const box = new THREE.Box3(
+      new THREE.Vector3().fromArray(bounds, 0),
+      new THREE.Vector3().fromArray(bounds, 3)
+    );
+    const dimensions = new THREE.Vector3().subVectors(box.max, box.min);
     const physicsMesh = new THREE.Mesh(
-      new CapsuleGeometry(radius, radius, characterHeight),
-      redMaterial
+      // new CapsuleGeometry(radius, radius, characterHeight),
+      new BoxGeometry(dimensions.x, dimensions.y, dimensions.z),
+      redAlphaMaterial
     )
     physicsMesh.visible = false
     physicsObject.add(physicsMesh)
-    physicsMesh.updateMatrixWorld()
-    const {bounds} = this.getGeometryForPhysicsId(physicsId)
-    physicsMesh.geometry.boundingBox = new THREE.Box3(
-      new THREE.Vector3().fromArray(bounds, 0),
-      new THREE.Vector3().fromArray(bounds, 3)
-    )
+    physicsMesh.updateMatrixWorld();
+    physicsMesh.geometry.boundingBox = box;
     // console.log('character controller bounds', physicsId, physicsMesh.geometry.boundingBox);
     physicsObject.physicsMesh = physicsMesh
     physicsObject.characterControllerId = characterControllerId

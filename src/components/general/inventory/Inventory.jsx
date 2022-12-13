@@ -1,19 +1,19 @@
-import React, {useEffect, useState, useRef, useContext} from 'react';
-import classnames from 'classnames';
-import styles from './Inventory.module.css';
-import CustomButton from '../custom-button';
-import {TokenBox} from '../token-box/TokenBox';
-import {AppContext} from '../../app';
-import {MegaHotBox} from '../../play-mode/mega-hotbox';
-import {CachedLoader} from '../../../CachedLoader.jsx';
-import {Spritesheet} from '../spritesheet/';
-import {createLandIcon} from '../../../../land-iconer.js';
-import game from '../../../../game.js';
-import {transparentPngUrl} from '../../../../constants.js';
-import * as sounds from '../../../../sounds.js';
-import {mod} from '../../../../util.js';
-import dropManager from '../../../../drop-manager';
-import cardsManager from '../../../../cards-manager.js';
+import React, {useEffect, useState, useRef, useContext} from "react";
+import classnames from "classnames";
+import styles from "./Inventory.module.css";
+import CustomButton from "../custom-button";
+import {TokenBox} from "../token-box/TokenBox";
+import {AppContext} from "../../app";
+import {CachedLoader} from "../../../CachedLoader.jsx";
+import {Spritesheet} from "../spritesheet/";
+import {createLandIcon} from "../../../../land-iconer.js";
+import game from "../../../../game.js";
+import {transparentPngUrl} from "../../../../constants.js";
+import * as sounds from "../../../../sounds.js";
+import {mod} from "../../../../util.js";
+import dropManager from "../../../../drop-manager";
+import cardsManager from "../../../../cards-manager.js";
+import useNFTContract from "../../../../src/hooks/useNFTContract";
 
 //
 
@@ -23,522 +23,405 @@ const numFrames = 128;
 const width = 400;
 
 const objects = {
-  notClaimed: [
-    {
-      name: 'Glavie',
-      start_url: 'https://webaverse.github.io/glaive/',
-      description: 'A sword of greascascascascat lore.',
-      params: [
+    notClaimed: [
         {
-          label: 'Token type',
-          value: 'Seasonal NFT ( ERC-20 )',
+            name: "Silsword",
+            start_url: "https://webaverse.github.io/silsword/",
+            description: "A sword from lore.",
+            type: "common",
+            claimed: true,
         },
         {
-          label: 'Status',
-          value: 'Unequipped',
+            name: "Silsword",
+            start_url: "https://webaverse.github.io/silsword/",
+            description: "A sword from lore.",
+            type: "common",
+            timerTimestamp: 1704454645000,
+            claimed: false,
         },
-        {
-          label: 'Item Type',
-          value: 'Weapon',
-        },
-        {
-          label: 'Rarity',
-          value: 'Common',
-        },
-        {
-          label: 'Durability',
-          value: '720 / 1000',
-        },
-      ],
-      claimed: false,
-      level: 3,
-    },
-  ],
-  upstreet: [
-    {
-      name: 'Glavie',
-      start_url: 'https://webaverse.github.io/glaive/',
-      description: 'A sword of greascascascascat lore.',
-      params: [
-        {
-          label: 'Token type',
-          value: 'Seasonal NFT ( ERC-20 )',
-        },
-        {
-          label: 'Status',
-          value: 'Unequipped',
-        },
-        {
-          label: 'Item Type',
-          value: 'Weapon',
-        },
-        {
-          label: 'Rarity',
-          value: 'Common',
-        },
-        {
-          label: 'Durability',
-          value: '720 / 1000',
-        },
-      ],
-      claimed: true,
-      level: 3,
-    },
-    {
-      name: 'Lantern',
-      start_url: 'https://webaverse.github.io/lantern/',
-      description: 'A lantern.',
-      params: [
-        {
-          label: 'Token type',
-          value: 'Seasonal NFT ( ERC-20 )',
-        },
-        {
-          label: 'Status',
-          value: 'Unequipped',
-        },
-        {
-          label: 'Item Type',
-          value: 'Weapon',
-        },
-        {
-          label: 'Rarity',
-          value: 'Common',
-        },
-        {
-          label: 'Durability',
-          value: '720 / 1000',
-        },
-      ],
-      claimed: true,
-      level: 2,
-    },
-    {
-      name: 'Dragon',
-      start_url: 'https://webaverse.github.io/dragon-mount/',
-      description: 'A cute dragon. But something is wrong with it...',
-      params: [
-        {
-          label: 'Token type',
-          value: 'Seasonal NFT ( ERC-20 )',
-        },
-        {
-          label: 'Status',
-          value: 'Unequipped',
-        },
-        {
-          label: 'Item Type',
-          value: 'Weapon',
-        },
-        {
-          label: 'Rarity',
-          value: 'Common',
-        },
-        {
-          label: 'Durability',
-          value: '720 / 1000',
-        },
-      ],
-      claimed: true,
-      level: 5,
-    },
-  ],
+    ],
+    upstreet: [],
 
-  resources: [
-    {
-      name: 'Silk',
-      start_url: 'https://webaverse.github.io/silk/',
-      claimed: false,
-      value: 50,
-      level: 1,
-    },
-    {
-      name: 'Silk',
-      start_url: 'https://webaverse.github.io/silk/',
-      claimed: true,
-      value: 12,
-      level: 1,
-    },
-  ],
+    resources: [
+        {
+            name: "Silk",
+            start_url: "https://webaverse.github.io/silk/",
+            claimed: false,
+            value: 50,
+        },
+        {
+            name: "Silk",
+            start_url: "https://webaverse.github.io/silk/",
+            claimed: true,
+            value: 12,
+        },
+        {
+            name: "Silk",
+            start_url: "https://webaverse.github.io/silk/",
+            claimed: true,
+            value: 12,
+        },
+    ],
 };
 
+const Token = ({
+    object,
+    onMouseEnter,
+    onMouseDown,
+    onDragStart,
+    onDoubleClick,
+    onClick,
+    showTokenDropDown,
+    closeTokenDropDown,
+    onEquip,
+    onSpawn,
+    onDrop,
+    mintClaim,
+}) => {
+    const [rendered, setRendered] = useState(false);
+    const canvasRef = useRef();
+    const pixelRatio = window.devicePixelRatio;
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (canvas && !rendered) {
+            (async () => {
+                const {seed, renderPosition, lods, minLodRange, clipRange} =
+                    object;
 
-const Token = ({object, enabled}) => {
-  const [rendered, setRendered] = useState(false);
-  const canvasRef = useRef();
+                const imageBitmap = await createLandIcon({
+                    seed,
+                    renderPosition,
+                    lods,
+                    minLodRange,
+                    clipRange,
+                    width: 24 * pixelRatio,
+                    height: 24 * pixelRatio,
+                });
 
-  const pixelRatio = window.devicePixelRatio;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(imageBitmap, 0, 0, canvas.width, canvas.height);
+            })();
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (canvas && enabled && !rendered) {
-      (async () => {
-        const {seed, renderPosition, lods, minLodRange, clipRange} = object;
+            setRendered(true);
+        }
+    }, [canvasRef.current, rendered]);
 
-        const imageBitmap = await createLandIcon({
-          seed,
-          renderPosition,
-          lods,
-          minLodRange,
-          clipRange,
-          width: 24 * pixelRatio,
-          height: 24 * pixelRatio,
-        });
-
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(imageBitmap, 0, 0, canvas.width, canvas.height);
-      })();
-
-      setRendered(true);
-    }
-  }, [canvasRef.current, enabled, rendered]);
-
-  return (
-    <TokenBox
-      size={size}
-      object={object}
-      level={object?.level}
-      claimed={object?.claimed}
-      url={object?.start_url}
-      enabled={enabled}
-      resolution={resolution}
-      value={object?.value}
-      numFrames={numFrames}
-    />
-  );
+    return object ? (
+        <div
+            draggable
+            onMouseEnter={onMouseEnter(object)}
+            onMouseDown={onMouseDown(object)}
+            onDragStart={onDragStart(object)}
+            onClick={(e) => onClick(e)}
+            onContextMenu={(e) => onClick(e, object)}
+            onDoubleClick={onDoubleClick(object)}
+        >
+            <TokenBox
+                size={size}
+                object={object}
+                level={object.level}
+                claimed={object.claimed}
+                url={object.start_url}
+                resolution={resolution}
+                value={object.value}
+                numFrames={numFrames}
+                type={object.type}
+                timerTimestamp={object.timerTimestamp}
+            />
+            <div className={styles.tokenDropdown}>
+                {showTokenDropDown && showTokenDropDown === object && (
+                    <>
+                        <CustomButton
+                            theme="dark"
+                            text="Spawn"
+                            size={10}
+                            className={styles.button}
+                            onClick={onSpawn(object)}
+                        />
+                        <CustomButton
+                            theme="dark"
+                            text="Equip"
+                            size={10}
+                            className={styles.button}
+                            onClick={onEquip(object)}
+                        />
+                        <CustomButton
+                            theme="dark"
+                            text="Drop"
+                            size={10}
+                            className={styles.button}
+                            onClick={onDrop(object)}
+                        />
+                        {!object.claimed && <CustomButton
+                            theme="dark"
+                            text="Claim"
+                            size={10}
+                            className={styles.button}
+                            onClick={mintClaim(object)}
+                        />}
+                    </>
+                )}
+            </div>
+        </div>
+    ) : null;
 };
 
 const TokenList = ({
-  title,
-  sections,
-  open,
-  hoverObject,
-  selectObject,
-  loading,
-  onMouseEnter,
-  onMouseDown,
-  onDragStart,
-  onDoubleClick,
-  onClick,
-  highlights,
-  ItemClass,
+    title,
+    sections,
+    open,
+    selectObject,
+    onMouseEnter,
+    onMouseDown,
+    onDragStart,
+    onDoubleClick,
+    onClick,
+    showTokenDropDown,
+    closeTokenDropDown,
+    onEquip,
+    onSpawn,
+    onDrop,
+    mintClaim,
 }) => {
-  return (
-    <div className={styles.section} key={title}>
-      <div className={styles.sectionTitle}>{title}</div>
-      <ul className={styles.tokenList}>
-        {sections.map((section, i) => {
-          const {name, tokens} = section;
-          return (
-            <React.Fragment key={i}>
-              {tokens.map((object, i) => (
-                <li
-                  draggable
-                  hovered={hoverObject}
-                  selected={selectObject}
-                  onMouseEnter={onMouseEnter(object)}
-                  onMouseDown={onMouseDown(object)}
-                  onDragStart={onDragStart(object)}
-                  onDoubleClick={onDoubleClick(object)}
-                  onClick={onClick(object)}
-                  key={i}
-                >
-                  <Token object={object} enabled={open} />
-                </li>
-              ))}
-            </React.Fragment>
-          );
-        })}
-      </ul>
-    </div>
-  );
+    return (
+        <div className={styles.section} key={title}>
+            <div className={styles.sectionTitle}>{title}</div>
+            <ul className={styles.tokenList}>
+                {sections.map((section, i) => {
+                    const {name, tokens, type} = section;
+                    return (
+                        <React.Fragment key={i}>
+                            {tokens.map((object, i) => (
+                                <li selected={selectObject} key={i}>
+                                    {open && (
+                                        <Token
+                                            object={object}
+                                            onMouseEnter={onMouseEnter}
+                                            onMouseDown={onMouseDown}
+                                            onDragStart={onDragStart}
+                                            onClick={onClick}
+                                            onEquip={onEquip}
+                                            onSpawn={onSpawn}
+                                            onDrop={onDrop}
+                                            mintClaim={mintClaim}
+                                            closeTokenDropDown={
+                                                closeTokenDropDown
+                                            }
+                                            onDoubleClick={onDoubleClick}
+                                            showTokenDropDown={
+                                                showTokenDropDown
+                                            }
+                                        />
+                                    )}
+                                </li>
+                            ))}
+                        </React.Fragment>
+                    );
+                })}
+            </ul>
+        </div>
+    );
 };
 
 export const Inventory = () => {
-  const {state, setState} = useContext(AppContext);
-  const [hoverObject, setHoverObject] = useState(null);
-  const [selectObject, setSelectObject] = useState(null);
-  // const [ spritesheet, setSpritesheet ] = useState(null);
-  const [faceIndex, setFaceIndex] = useState(1);
-  const [claims, setClaims] = useState([]);
-  const [cachedLoader, setCachedLoader] = useState(
-    () =>
-      new CachedLoader({
-        async loadFn(url, value, {signal}) {
-          const {start_url} = value;
-          const imageBitmap = await cardsManager.getCardsImage(start_url, {
-            width,
-            signal,
-          });
-          return imageBitmap;
-        },
-      }),
-  );
-  const [loading, setLoading] = useState(false);
-  const [imageBitmap, setImageBitmap] = useState(null);
+    const {state, setState, account, claimableToken, setClaimableToken, mintedToken, setMintedToken, getWalletItems} = useContext(AppContext);
+    const [hoverObject, setHoverObject] = useState(null);
+    const [selectObject, setSelectObject] = useState(null);
+    const [loading, setLoading] = useState(false);
 
-  const selectedMenuIndex = mod(faceIndex, 4);
+    const [expand, setExpand] = useState(false);
 
-  const open =
-    state.openedPanel === 'CharacterPanel' || state.openedPanel === 'Inventory';
+    const [showTokenDropDown, setShowTokenDropDown] = useState(false);
 
-  const [openPreview, setOpenPreview] = useState(false);
-  const [previewObject, setPreviewObject] = useState(undefined);
+    const {getTokens, mintfromVoucher, WebaversecontractAddress} =
+        useNFTContract(account.currentAddress);
 
-  const onMouseEnter = object => () => {
-    setHoverObject(object);
+    const open =
+        state.openedPanel === "CharacterPanel" ||
+        state.openedPanel === "Inventory";
 
-    sounds.playSoundName('menuClick');
-  };
-  const onMouseDown = object => () => {
-    // const newSelectObject = selectObject !== object ? object : null;
-    setSelectObject(object);
+    const onMouseEnter = (object) => () => {
+        setHoverObject(object);
 
-    if (object) {
-      sounds.playSoundName('menuNext');
-    } /* else {
+        sounds.playSoundName("menuClick");
+    };
+    const onMouseDown = (object) => () => {
+        // const newSelectObject = selectObject !== object ? object : null;
+        setSelectObject(object);
+
+        if (object) {
+            sounds.playSoundName("menuNext");
+        } /* else {
               const audioSpec = soundFiles.menuBack[Math.floor(Math.random() * soundFiles.menuBack.length)];
               sounds.playSoundName('menuBack');
           } */
-  };
-  const onDragStart = object => e => {
-    e.dataTransfer.setData('application/json', JSON.stringify(object));
-    e.dataTransfer.effectAllowed = 'all';
-    e.dataTransfer.dropEffect = 'move';
-
-    const transparentPng = new Image();
-    transparentPng.src = transparentPngUrl;
-    e.dataTransfer.setDragImage(transparentPng, 0, 0);
-
-    setSelectObject(object);
-  };
-  const onClick = object => () => {
-    setOpenPreview(true);
-    setPreviewObject(object);
-  };
-  const closePreview = () => {
-    sounds.playSoundName('menuNext');
-    setOpenPreview(false);
-    setPreviewObject();
-  };
-  const onDoubleClick = object => () => {
-    game.handleDropJsonToPlayer(object);
-
-    setSelectObject(object);
-  };
-  const menuLeft = () => {
-    setFaceIndex(faceIndex - 1);
-
-    sounds.playSoundName('menuNext');
-  };
-  const menuRight = () => {
-    setFaceIndex(faceIndex + 1);
-
-    sounds.playSoundName('menuNext');
-  };
-  const selectClassName = styles[`select-${selectedMenuIndex}`];
-
-  useEffect(() => {
-    const claimschange = e => {
-      const {claims} = e.data;
-      setClaims(claims.slice());
     };
-    dropManager.addEventListener('claimschange', claimschange);
-    return () => {
-      dropManager.removeEventListener('claimschange', claimschange);
+    const onDragStart = (object) => (e) => {
+        e.dataTransfer.setData("application/json", JSON.stringify(object));
+        e.dataTransfer.effectAllowed = "all";
+        e.dataTransfer.dropEffect = "move";
+        // Do not remove
+        /* const transparentPng = new Image();
+        const image = e.target.getElementsByTagName("canvas")[0].toDataURL();
+        transparentPng.src = image;
+        console.log(transparentPng)
+        e.dataTransfer.setDragImage(transparentPng, 0, 0); */
     };
-  }, [claims]);
+    const onClick = (e, object) => {
+        e.preventDefault();
+        if (e.type === "click") {
+            // console.log("Left Click");
+        } else if (e.type === "contextmenu") {
+            // console.log("Right Click");
+            setShowTokenDropDown(object);
+        }
+    };
+    const closeTokenDropDown = () => {
+        setShowTokenDropDown();
+    };
+    const onDoubleClick = (object) => () => {
+        game.handleDropJsonToPlayer(object);
+        setSelectObject(object);
+    };
+    const onEquip = (object) => () => {
+        game.handleDropJsonToPlayer(object);
+        setShowTokenDropDown();
+    };
+    const onSpawn = (object) => () => {
+        game.handleDropJsonForSpawn(object);
+        setShowTokenDropDown();
+    };
+    const onDrop = (object) => () => {
+        game.handleDropJsonForDrop(
+            object,
+            account.currentAddress,
+            WebaversecontractAddress,
+            (isclaimed) => {
+                if (!isclaimed) {
+                    dropManager.removeClaim(object);
+                }
+            }
+        );
+        setShowTokenDropDown();
+    };
+    const mintClaim = (object) => async () => {
+        if (!account.currentAddress) {
+            alert("Make sure wallet connected");
+            return false;
+        }
 
-  useEffect(() => {
-    if (cachedLoader) {
-      const loadingchange = e => {
-        setLoading(e.data.loading);
-      };
-      cachedLoader.addEventListener('loadingchange', loadingchange);
-      return () => {
-        cachedLoader.removeEventListener('loadingchange', loadingchange);
-      };
+        await mintfromVoucher(
+            object,
+            () => {
+                dropManager.removeClaim(object);
+                getWalletItems();
+            }
+        );
+    };
+
+    const onInventoryPanelClick = () => {
+      setShowTokenDropDown()
     }
-  }, [cachedLoader]);
 
-  useEffect(() => {
-    if (open) {
-      const start_url = selectObject ? selectObject.start_url : '';
-      if (start_url) {
-        const abortController = new AbortController();
-        (async () => {
-          const imageBitmap = await cachedLoader.loadItem(
-            start_url,
-            selectObject,
-            {
-              signal: abortController.signal,
-            },
-          );
-          if (imageBitmap !== null) {
-            setImageBitmap(imageBitmap);
-          }
-        })();
-        setImageBitmap(null);
-        return () => {
-          abortController.abort();
-        };
-      }
-    } else {
-      if (selectObject) {
-        setSelectObject(null);
-      }
-    }
-  }, [open, selectObject]);
+    useEffect(() => {
+        if (open !== "CharacterPanel") {
+            if (open) {
+                sounds.playSoundName("menuOpen");
+            } else {
+                sounds.playSoundName("menuClose");
+            }
+        }
+    }, [open]);
 
-  useEffect(() => {
-    if (open !== 'CharacterPanel') {
-      if (open) {
-        sounds.playSoundName('menuOpen');
-      } else {
-        sounds.playSoundName('menuClose');
-        setOpenPreview(false);
-      }
-    }
-  }, [open]);
-
-  useEffect(() => {
-    setSelectObject(null);
-  }, [faceIndex]);
-
-  return (
-    <>
-      <div
-        className={classnames(
-          styles.inventoryPanelWrap,
-          open ? styles.opened : null,
-        )}
-      >
-        <div className={styles.inventoryPanel}>
-          <div className={styles.titleBox}>Inventory</div>
-          <div className={styles.sep} />
-          <div className={styles.infoWrap}>
-            <TokenList
-              title="Resources"
-              sections={[
-                {
-                  name: 'Resources',
-                  tokens: objects.resources,
-                },
-              ]}
-              open={faceIndex === 1}
-              hoverObject={hoverObject}
-              selectObject={selectObject}
-              loading={loading}
-              onMouseEnter={onMouseEnter}
-              onMouseDown={onMouseDown}
-              onDragStart={onDragStart}
-              onClick={onClick}
-              onDoubleClick={onDoubleClick}
-              menuLeft={menuLeft}
-              menuRight={menuRight}
-              highlights={true}
-            />
-            <TokenList
-              title="Backpack"
-              sections={[
-                {
-                  name: 'Not Claimed',
-                  tokens: objects.notClaimed,
-                },
-                {
-                  name: 'From Upstreet',
-                  tokens: objects.upstreet,
-                },
-              ]}
-              open={faceIndex === 1}
-              hoverObject={hoverObject}
-              selectObject={selectObject}
-              loading={loading}
-              onMouseEnter={onMouseEnter}
-              onMouseDown={onMouseDown}
-              onDragStart={onDragStart}
-              onClick={onClick}
-              onDoubleClick={onDoubleClick}
-              menuLeft={menuLeft}
-              menuRight={menuRight}
-              highlights={false}
-            />
-          </div>
-          <div className={styles.actionsWrap}>
-            <CustomButton
-              theme="light"
-              text="Claim All"
-              size={14}
-              className={styles.button}
-            />
-          </div>
-        </div>
-      </div>
-      {/** Item Preview Panel */}
-      <div
-        className={classnames(
-          styles.inventoryPanelWrap,
-          openPreview && previewObject ? styles.opened : null,
-        )}
-      >
-        <div className={styles.inventoryPanel}>
-          <div className={styles.titleBox}>
-            <img
-              src={'/assets/icons/arrowBack.svg'}
-              className={styles.back}
-              onClick={closePreview}
-            />
-            Item Info
-          </div>
-          {previewObject && (
-            <>
-              <div className={styles.sep} />
-              <div className={styles.infoWrap}>
-                <h2>{previewObject?.name}</h2>
-                <div className={styles.itemPreviewBoxWrap}>
-                  <div className={styles.itemPreviewBox}>
-                    <div className={styles.bg} />
-                    <div className={styles.mask}>
-                      <Spritesheet
-                        className={styles.canvas}
-                        startUrl={previewObject?.start_url}
-                        enabled={true}
-                        size={resolution}
-                        numFrames={numFrames}
-                        animationLoop={true}
-                      />
+    return open ? (
+        <>
+            <div
+                className={classnames(
+                    styles.inventoryPanelWrap,
+                    expand && styles.expanded
+                )}
+                onClick={() => onInventoryPanelClick()}
+            >
+                <div className={styles.inventoryPanel}>
+                    <div
+                        className={styles.expandWrap}
+                        onClick={() => setExpand(!expand)}
+                    >
+                        <img
+                            src={
+                                expand
+                                    ? "/assets/icons/expandRight.svg"
+                                    : "/assets/icons/expandLeft.svg"
+                            }
+                        />
                     </div>
-                  </div>
+                    <div className={styles.titleBox}>Inventory</div>
+                    <div className={styles.sep} />
+                    <div className={styles.infoWrap}>
+                        <TokenList
+                            title="Resources"
+                            sections={[
+                                {
+                                    name: "Resources",
+                                    tokens: objects.resources,
+                                },
+                            ]}
+                            open={true}
+                            hoverObject={hoverObject}
+                            selectObject={selectObject}
+                            loading={loading}
+                            onMouseEnter={onMouseEnter}
+                            onMouseDown={onMouseDown}
+                            onDragStart={onDragStart}
+                            onClick={onClick}
+                            closeTokenDropDown={closeTokenDropDown}
+                            onDoubleClick={onDoubleClick}
+                            onEquip={onEquip}
+                            onSpawn={onSpawn}
+                            onDrop={onDrop}
+                            mintClaim={mintClaim}
+                            highlights={true}
+                            showTokenDropDown={showTokenDropDown}
+                        />
+                        <TokenList
+                            title="Backpack"
+                            sections={[
+                                {
+                                    name: "Not Claimed",
+                                    tokens: claimableToken,
+                                },
+                                {
+                                    name: "From Upstreet",
+                                    tokens: mintedToken,
+                                },
+                            ]}
+                            open={true}
+                            hoverObject={hoverObject}
+                            selectObject={selectObject}
+                            loading={loading}
+                            onMouseEnter={onMouseEnter}
+                            onMouseDown={onMouseDown}
+                            onDragStart={onDragStart}
+                            onClick={onClick}
+                            onDoubleClick={onDoubleClick}
+                            onEquip={onEquip}
+                            onSpawn={onSpawn}
+                            onDrop={onDrop}
+                            mintClaim={mintClaim}
+                            highlights={false}
+                            showTokenDropDown={showTokenDropDown}
+                        />
+                    </div>
+                    <div className={styles.actionsWrap}>
+                        <CustomButton
+                            theme="light"
+                            text="Claim All"
+                            size={14}
+                            className={styles.button}
+                        />
+                    </div>
                 </div>
-                {previewObject?.params &&
-                  previewObject.params.map((param, i) => {
-                    return (
-                      <div className={styles.stat} key={i}>
-                        <span className={styles.label}>{param?.label}</span>
-                        {param?.value}
-                      </div>
-                    );
-                  })}
-                <p>{previewObject?.description}</p>
-              </div>
-              <div className={styles.actionsWrap}>
-                <CustomButton
-                  theme="light"
-                  text="Claim"
-                  size={14}
-                  className={styles.button}
-                />
-                <CustomButton
-                  theme="dark"
-                  text="Drop"
-                  size={14}
-                  className={styles.button}
-                />
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </>
-  );
+            </div>
+        </>
+    ) : null;
 };

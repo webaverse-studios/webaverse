@@ -80,7 +80,7 @@
 }
 
 .buttonWrap {
-    border: 4px solid #000000;
+    border: 2px solid #000000;
     background: #000000;
     padding: 0;
     margin: 0;
@@ -117,7 +117,7 @@
 }
 
 .buttonWrap.dark .innerWrap {
-    border: 2px solid #FFFFFF;
+    border: 1px solid #FFFFFF;
     font-family: "TTSC-Bold";
     background: #000000;
     color: #FFFFFF;
@@ -126,7 +126,7 @@
 }
 
 .buttonWrap:hover .innerWrap {
-    border: 2px solid #FFC000;
+    border: 1px solid #FFC000;
     font-family: "TTSC-Bold";
     background: #FFC000;
     color: #EFEFEF;
@@ -138,7 +138,7 @@
 }
 
 .buttonWrap:active .innerWrap {
-    border: 2px solid #FFC000;
+    border: 1px solid #FFC000;
     font-family: "TTSC-Bold";
     background: #000000;
     color: #FFC000;

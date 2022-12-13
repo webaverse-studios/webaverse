@@ -1,10 +1,9 @@
 
-import React, {useState, useEffect, useRef, useContext, createContext} from 'react';
+import React, {useState, useEffect, useRef, useContext, createContext, Fragment} from 'react';
 import classnames from 'classnames';
 
 import game from '../../../game';
 import {parseQuery} from '../../../util.js'
-import Webaverse from '../../../webaverse.js';
 import universe from '../../../universe.js';
 import cameraManager from '../../../camera-manager';
 
@@ -13,17 +12,14 @@ import {world} from '../../../world';
 import {Crosshair} from '../general/crosshair';
 import {WorldObjectsList} from '../general/world-objects-list';
 import {IoHandler, registerIoEventHandler, unregisterIoEventHandler} from '../general/io-handler';
-import {ZoneTitleCard} from '../general/zone-title-card';
 import {Quests} from '../play-mode/quests';
 import {MapGen} from '../general/map-gen/MapGen.jsx';
-import {UIMode} from '../general/ui-mode';
 import {LoadingBox} from '../../LoadingBox.jsx';
 import {FocusBar} from '../../FocusBar.jsx';
 import {DragAndDrop} from '../../DragAndDrop.jsx';
-import {Stats} from '../../Stats.jsx';
 import {PlayMode} from '../play-mode';
 import {EditorMode} from '../editor-mode';
-import { GrabKeyIndicators } from '../../GrabKeyIndicators.jsx'
+import {GrabKeyIndicators} from '../../GrabKeyIndicators.jsx'
 import Header from '../../Header.jsx';
 import QuickMenu from '../../QuickMenu.jsx';
 import {DomRenderer} from '../../DomRenderer.jsx';
@@ -34,32 +30,13 @@ import {scenesBaseUrl, defaultSceneName} from '../../../endpoints.js';
 import styles from './App.module.css';
 import '../../fonts.css';
 import raycastManager from '../../../raycast-manager';
-import npcManager from '../../../npc-manager';
 
 import {AccountContext} from '../../hooks/web3AccountProvider';
 import {ChainContext} from '../../hooks/chainProvider';
-import loadoutManager from '../../../loadout-manager';
-import {partyManager} from '../../../party-manager';
 import Modals from '../modals';
-
+import dropManager from '../../../drop-manager';
+import useNFTContract from '../../../src/hooks/useNFTContract';
 //
-
-const _startApp = async (weba, canvas) => {
-
-    weba.setContentLoaded();
-
-    weba.bindCanvas(canvas);
-
-    await weba.waitForLoad();
-
-    await npcManager.initDefaultPlayer();
-    loadoutManager.initDefault();
-    await universe.handleUrlUpdate();
-    partyManager.inviteDefaultPlayer();
-
-    await weba.startLoop();
-
-};
 
 const _getCurrentSceneSrc = () => {
 
@@ -86,42 +63,23 @@ const _getCurrentRoom = () => {
 
 export const AppContext = createContext();
 
-const useWebaverseApp = (() => {
-  let webaverse = null;
-  return () => {
-        if (webaverse === null) {
-            webaverse = new Webaverse();
-        }
-        return webaverse;
-  };
-})();
-
 let appStarted = false;
 
 export const App = () => {
 
     const [ state, setState ] = useState({openedPanel: null, openedModal: null});
-    const [ uiMode, setUIMode ] = useState('normal');
+    const [ showUI, setShowUI ] = useState('normal');
 
     const canvasRef = useRef(null);
-    const app = useWebaverseApp();
     const [ selectedApp, setSelectedApp ] = useState(null);
     const [ selectedScene, setSelectedScene ] = useState(_getCurrentSceneSrc());
     const [ selectedRoom, setSelectedRoom ] = useState(_getCurrentRoom());
+    const [ claimableToken, setClaimableToken ] = useState([]);
+    const [ mintedToken, setMintedToken ] = useState([]);
     const [ apps, setApps ] = useState(world.appManager.getApps().slice());
     const account = useContext(AccountContext);
     const chain = useContext(ChainContext);
-
-    //
-    
-    useEffect(() => {
-        if(canvasRef.current && !appStarted) {
-
-            _startApp(app, canvasRef.current);
-
-            appStarted = true;
-        }
-    }, [ canvasRef ]);
+    const {getTokens} = useNFTContract(account.currentAddress);
 
     const [domHover, setDomHover] = useState(null)
 
@@ -137,7 +95,6 @@ export const App = () => {
             raycastManager.removeEventListener('domhoverchange', domhoverchange);
         };
     }, []);
-
 
     const selectApp = (app, physicsId, position) => {
 
@@ -165,7 +122,7 @@ export const App = () => {
 
         if (state.openedPanel) {
 
-            setUIMode('normal');
+            setShowUI(true);
 
         }
 
@@ -192,7 +149,7 @@ export const App = () => {
 
     useEffect(() => {
 
-        if (uiMode === 'none') {
+        if (showUI === 'none') {
 
             setState({openedPanel: null});
 
@@ -202,7 +159,7 @@ export const App = () => {
 
             if (event.ctrlKey && event.code === 'KeyH') {
 
-                setUIMode(uiMode === 'normal' ? 'none' : 'normal');
+                setShowUI(!showUI);
                 return false;
 
             }
@@ -219,7 +176,7 @@ export const App = () => {
 
         };
 
-    }, [ uiMode ]);
+    }, [ showUI ]);
 
     useEffect(() => {
 
@@ -292,6 +249,61 @@ export const App = () => {
 
     useEffect(_loadUrlState, []);
 
+    useEffect(() => {
+        const claimschange = async (e) => {
+            const {claims, addedClaim} = e.data;
+            const claimableItem = claims.map(({name, start_url, type, voucher, serverDrop, level}) => ({
+                name,
+                start_url: start_url.split("index.js")[0],
+                description: "This is not-claimed drops",
+                params: [
+                    {
+                        label: 'Token type',
+                        value: 'Seasonal NFT ( ERC-1155 )',
+                    },
+                ],
+                type,
+                voucher,
+                serverDrop,
+                claimed: false,
+                level
+            }))
+
+            setClaimableToken(claimableItem);
+        };
+        dropManager.addEventListener('claimschange', claimschange);
+        return () => {
+            dropManager.removeEventListener('claimschange', claimschange);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (account && account.currentAddress) {
+            getWalletItems();
+        } else {
+            setMintedToken([]);
+            console.log('could not query NFT collections')
+        }
+    }, [account])
+
+    const getWalletItems = async () => {
+        const nftList = await getTokens();
+        const nftData = nftList.map(({tokenId, url}) => (
+          {
+              tokenId,
+              name: "Webaverse Drop",
+              start_url: url.split("index.js")[0],
+              description: "",
+              params: [
+              ],
+              claimed: true,
+              type: "major",
+              level: 15
+          }
+        ))
+        setMintedToken(nftData)
+      }
+
     //
 
     const onDragOver = e => {
@@ -306,6 +318,7 @@ export const App = () => {
     };
 
     return (
+        <AppContext.Provider value={{state, setState, setSelectedApp, selectedApp, showUI, account, chain, claimableToken, setClaimableToken, mintedToken, setMintedToken, getWalletItems}}>
         <div
             className={ styles.App }
             id="app"
@@ -313,26 +326,29 @@ export const App = () => {
             onDragEnd={onDragEnd}
             onDragOver={onDragOver}
         >
-            <AppContext.Provider value={{state, setState, app, setSelectedApp, selectedApp, uiMode, account, chain}}>
+        <DomRenderer />
+        <canvas className={ classnames(styles.canvas, domHover ? styles.domHover : null) } ref={ canvasRef } />
+        <DragAndDrop />
+        <IoHandler />
+        <WorldObjectsList
+            setSelectedApp={ setSelectedApp }
+            selectedApp={ selectedApp }
+        />
+        {showUI &&
+            <Fragment>
                 <Modals />
                 <Header setSelectedApp={ setSelectedApp } selectedApp={ selectedApp } />
-                <DomRenderer />
-                <canvas className={ classnames(styles.canvas, domHover ? styles.domHover : null) } ref={ canvasRef } />
                 <Crosshair />
-                <WorldObjectsList
-                    setSelectedApp={ setSelectedApp }
-                    selectedApp={ selectedApp }
-                />
-                <PlayMode />
+                {state.openedPanel !== 'CharacterSelect' &&
+                    <PlayMode />
+                }
                 <EditorMode
                     selectedScene={ selectedScene }
                     setSelectedScene={ setSelectedScene }
                     selectedRoom={ selectedRoom }
                     setSelectedRoom={ setSelectedRoom }
                 />
-                <IoHandler />
                 <QuickMenu />
-                <ZoneTitleCard />
                 <MapGen />
                 <Quests />
                 <LoadingBox />
@@ -340,9 +356,10 @@ export const App = () => {
                 <DragAndDrop />
                 <GrabKeyIndicators />
                 <BuildVersion />
-                <Stats app={ app } />
-            </AppContext.Provider>
-        </div>
+            </Fragment>
+        }
+            </div>
+        </AppContext.Provider>
     );
 
 };

@@ -40,7 +40,6 @@ class IoManager extends EventTarget {
   currentWeaponGrabs = [false, false];
   lastWeaponGrabs = [false, false];
   currentWalked = false;
-  lastCtrlKey = false;
   lastMouseButtons = 0;
   movementEnabled = true;
 
@@ -229,11 +228,6 @@ class IoManager extends EventTarget {
         cameraEuler.x = 0;
         cameraEuler.z = 0;
         this.keysDirection.applyEuler(cameraEuler);
-
-        if (ioManager.keys.ctrl && !ioManager.lastCtrlKey && game.isGrounded()) {
-          game.toggleCrouch();
-        }
-        ioManager.lastCtrlKey = ioManager.keys.ctrl;
       }
       const physicsScene = physicsManager.getScene();
       if (physicsScene.getPhysicsEnabled() && this.movementEnabled) {
@@ -294,6 +288,7 @@ class IoManager extends EventTarget {
         }
       case 87: { // W
         ioManager.keys.up = true;
+        game.setMovements();
 
         const now = performance.now();
         const timeDiff = now - this.lastKeysDownTime.keyW;
@@ -307,6 +302,7 @@ class IoManager extends EventTarget {
       }
       case 65: { // A
         ioManager.keys.left = true;
+        game.setMovements();
 
         const now = performance.now();
         const timeDiff = now - this.lastKeysDownTime.keyA;
@@ -326,6 +322,7 @@ class IoManager extends EventTarget {
           game.saveScene();
         } else {
           ioManager.keys.down = true;
+          game.setMovements();
 
           const now = performance.now();
           const timeDiff = now - this.lastKeysDownTime.keyS;
@@ -340,6 +337,7 @@ class IoManager extends EventTarget {
       }
       case 68: { // D
         ioManager.keys.right = true;
+        game.setMovements();
 
         const now = performance.now();
         const timeDiff = now - this.lastKeysDownTime.keyD;
@@ -374,6 +372,7 @@ class IoManager extends EventTarget {
           ioManager.keys.backward = true;
         } else {
           ioManager.keys.ctrl = true;
+          game.toggleCrouch();
         }
         break;
       }
@@ -424,8 +423,8 @@ class IoManager extends EventTarget {
       }
       case 82: { // R
         if (cameraManager.pointerLockElement) {
-          if (game.grabManager()) {
-            game.grabManager(1);
+          if (grabManager.canRotate()) {
+            grabManager.menuRotate(1);
           } else {
             game.dropSelectedApp();
           }
@@ -434,17 +433,12 @@ class IoManager extends EventTarget {
       }
       case 16: { // shift
         ioManager.keys.shift = true;
+        game.setSprint(true);
         break;
       }
       case 32: { // space
         ioManager.keys.space = true;
-        // if (controlsManager.isPossessed()) {
-        if (!game.isJumping()) {
-          game.jump('jump');
-        } else if (!game.isDoubleJumping()) {
-          game.doubleJump();
-        }
-        // }
+        game.jump();
         break;
       }
       case 81: { // Q
@@ -494,11 +488,8 @@ class IoManager extends EventTarget {
       // nothing
     } else {
       const physicsScene = physicsManager.getScene();
-      if (physicsScene.getPhysicsEnabled()) {
-        const renderer = getRenderer();
-        if (renderer && (e.target === renderer.domElement || e.target.id === 'app')) {
-          cameraManager.handleWheelEvent(e);
-        }
+      if (physicsScene.getPhysicsEnabled() && getRenderer()) {
+        cameraManager.handleWheelEvent(e);
       }
     }
   }
@@ -517,18 +508,22 @@ class IoManager extends EventTarget {
     switch (e.which) {
       case 87: { // W
         ioManager.keys.up = false;
+        game.setMovements();
         break;
       }
       case 65: { // A
         ioManager.keys.left = false;
+        game.setMovements();
         break;
       }
       case 83: { // S
         ioManager.keys.down = false;
+        game.setMovements();
         break;
       }
       case 68: { // D
         ioManager.keys.right = false;
+        game.setMovements();
         break;
       }
       case 32: { // space
@@ -565,8 +560,9 @@ class IoManager extends EventTarget {
       case 16: { // shift
         ioManager.keys.shift = false;
         ioManager.keys.doubleTap = false;
-
+       
         game.menuUnDoubleTap();
+        game.setSprint(false);
         break;
       }
       case 46: { // delete

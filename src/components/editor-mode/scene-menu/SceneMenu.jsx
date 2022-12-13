@@ -264,8 +264,8 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
 
     }, []);
 
-    //
-    const sceneName = selectedScene.replace('.scn', '').replace('./scenes/', '');
+    // remove everything before and including the last slash, remove the extension
+    const sceneName = selectedScene.replace(/^.*[\\\/]/, '').replace(/\.[^/.]+$/, '');
 
     return (
         <div className={ classnames(className, styles.location) } onClick={ stopPropagation } >
@@ -273,7 +273,7 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
             <div className={styles.rightCorner} />
             <div className={styles.row}>
                 <div className={styles.roomName}>
-                    {sceneName.replace(sceneRoot, '')}
+                    {sceneName.replace('./', '/').replace(sceneRoot, '')}
                     {selectedRoom && ` / ${selectedRoom}`}
                 </div>
                 <div className={styles.title}>Your Location</div>

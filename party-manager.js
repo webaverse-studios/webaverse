@@ -24,6 +24,10 @@ class PartyManager extends EventTarget {
     });
   }
 
+  getPartyPlayers() {
+    return this.partyPlayers;
+  }
+
   inviteDefaultPlayer() {
     const player = playersManager.getLocalPlayer();
     const app = npcManager.getAppByNpc(player);
@@ -31,6 +35,7 @@ class PartyManager extends EventTarget {
     world.appManager.transplantApp(app, this.appManager);
 
     this.invitePlayer(player);
+    this.dispatchEvent(new Event("defaultplayerinvited"));
   }
 
   switchCharacter() {

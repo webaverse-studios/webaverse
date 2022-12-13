@@ -166,7 +166,7 @@ function ChatInput () {
 
     //
 
-	return (
+	return state.openedPanel === 'ChatPanel' ? (
         <div className={ classnames(styles.chat, state.openedPanel === 'ChatPanel' ? styles.open : null) } onClick={ stopPropagation } >
             <img src="images/webpencil.svg" className={ styles.background } />
             <input
@@ -177,7 +177,7 @@ function ChatInput () {
                 ref={ inputRef }
             />
         </div>
-    );
+    ) : null;
 
 };
 

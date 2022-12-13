@@ -7,15 +7,6 @@
   color: #FFF;
   transition: transform 1s cubic-bezier(0, 1, 0, 1);
 }
-.loadingBox:not(.open) {
-  transform: translateX(290px);
-}
-.loadingBox:not(.open) .canvas {
-  visibility: hidden;
-}
-.loadingBox .canvas {
-  /* background-color: red; */
-}
 .loadingBox .wrap {
   display: flex;
   width: 200px;

@@ -1,15 +1,15 @@
 import * as THREE from 'three';
 import ioManager from './io-manager.js';
-import { playersManager } from './players-manager.js';
+import {playersManager} from './players-manager.js';
 import physicsManager from './physics-manager.js';
 import metaversefileApi from './metaversefile-api.js';
-import { maxGrabDistance } from './constants.js';
-import { getRenderer, sceneLowPriority, camera } from './renderer.js';
+import {maxGrabDistance} from './constants.js';
+import {getRenderer, sceneLowPriority, camera} from './renderer.js';
 import cameraManager from './camera-manager.js';
 import gameManager from './game.js';
-import { world } from './world.js';
-import { snapPosition } from './util.js';
-import { buildMaterial } from './shaders.js';
+import {world} from './world.js';
+import {snapPosition} from './util.js';
+import {buildMaterial} from './shaders.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -27,6 +27,8 @@ const localMatrix3 = new THREE.Matrix4();
 const localBox = new THREE.Box3();
 
 const rotationSnap = Math.PI / 6;
+const maxGridSnap = 32;
+const minGridSnap = 0
 let highlightedPhysicsObject = null;
 let highlightedPhysicsId = 0;
 let transformIndicators = null;
@@ -45,7 +47,7 @@ const _updateGrabbedObject = (
   grabMatrix,
   offsetMatrix,
   physicsScene,
-  { collisionEnabled, handSnapEnabled, gridSnap }
+  {collisionEnabled, handSnapEnabled, gridSnap}
 ) => {
   grabMatrix.decompose(localVector, localQuaternion, localVector2);
   offsetMatrix.decompose(localVector3, localQuaternion2, localVector4);
@@ -79,12 +81,12 @@ const _updateGrabbedObject = (
   localQuaternion2.setFromAxisAngle(localVector2.set(1, 0, 0), -Math.PI * 0.5);
   const downCollision = collisionEnabled && physicsScene.raycast(localVector5, localQuaternion2);
 
-  if (!!collision) {
+  if (collision) {
     const {point} = collision;
     localVector6.fromArray(point);
   }
 
-  if (!!downCollision) {
+  if (downCollision) {
     const {point} = downCollision;
     localVector4.fromArray(point);
   }
@@ -133,6 +135,7 @@ const _updateGrabbedObject = (
 const _delete = () => {
   const grabbedObject = grabManager.getGrabbedObject(0);
   const mouseSelectedObject = gameManager.getMouseSelectedObject();
+  const mouseHoverObject = gameManager.getMouseHoverObject();
   if (grabbedObject) {
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.ungrab();
@@ -153,8 +156,10 @@ const _click = (e) => {
   if (grabManager.getGrabbedObject(0)) {
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.ungrab();
+
     transformIndicators.targetApp = null;
     grabManager.hideUi();
+    grabManager.setGridSnap(minGridSnap);
   } else {
     if (highlightedPhysicsObject) {
       grabManager.grab(highlightedPhysicsObject);
@@ -176,18 +181,20 @@ const _createTransformIndicators = () => {
 class Grabmanager extends EventTarget {
   constructor() {
     super();
-    this.gridSnap = 0;
+    this.gridSnap = minGridSnap;
     this.editMode = false;
     Promise.resolve()
       .then(_createTransformIndicators);
   }
+
   grab(object) {
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.grab(object);
     transformIndicators.targetApp = object;
-    this.gridSnap = 0;
+    this.gridSnap = minGridSnap;
     this.editMode = false;
   }
+
   getGrabAction(i) {
     const targetHand = i === 0 ? 'left' : 'right';
     const localPlayer = playersManager.getLocalPlayer();
@@ -196,6 +203,7 @@ class Grabmanager extends EventTarget {
     );
     return grabAction;
   }
+
   getGrabbedObject(i) {
     const grabAction = this.getGrabAction(i);
     const grabbedObjectInstanceId = grabAction?.instanceId;
@@ -204,8 +212,10 @@ class Grabmanager extends EventTarget {
       : null;
     return result;
   }
+
   async toggleEditMode() {
     this.editMode = !this.editMode;
+    this.setGridSnap(minGridSnap);
     if (this.editMode) {
       if (!cameraManager.pointerLockElement) {
         await cameraManager.requestPointerLock();
@@ -222,30 +232,36 @@ class Grabmanager extends EventTarget {
       this.hideUi();
     }
   }
+
   setHighlightPhysicsMesh(mesh) {
     this.highlightPhysicsMesh = mesh;
     this.highlightPhysicsMesh.visible = false;
     sceneLowPriority.add(this.highlightPhysicsMesh);
   }
+
   showUi() {
     this.dispatchEvent(new MessageEvent('showui'));
   }
+
   hideUi() {
     this.dispatchEvent(new MessageEvent('hideui'));
   }
+
   menuClick(e) {
     _click(e);
   }
+
   menuDelete() {
     _delete();
   }
+
   menuGridSnap() {
-    if (this.gridSnap === 0) {
-      this.gridSnap = 32;
+    if (this.gridSnap === minGridSnap) {
+      this.setGridSnap(maxGridSnap);
     } else if (this.gridSnap > 1) {
-      this.gridSnap /= 2;
+      this.setGridSnap(this.gridSnap / 2);
     } else {
-      this.gridSnap = 0;
+      this.setGridSnap(minGridSnap);
     }
     this.dispatchEvent(
       new MessageEvent('setgridsnap', {
@@ -253,6 +269,16 @@ class Grabmanager extends EventTarget {
       })
     );
   }
+
+  setGridSnap(gridSnap) {
+    this.gridSnap = gridSnap;
+    this.dispatchEvent(
+      new MessageEvent('setgridsnap', {
+        data: {gridSnap: this.gridSnap},
+      })
+    );
+  }
+
   getGridSnap() {
     if (this.gridSnap === 0) {
       return 0;
@@ -260,16 +286,20 @@ class Grabmanager extends EventTarget {
       return 4 / this.gridSnap;
     }
   }
+
   canRotate() {
     return !!this.getGrabbedObject(0);
   }
+
   menuRotate(direction) {
     const object = this.getGrabbedObject(0);
     object.savedRotation.y -= direction * rotationSnap;
   }
+
   canPush() {
     return !!this.getGrabbedObject(0);
   }
+
   menuPush(direction) {
     const localPlayer = playersManager.getLocalPlayer();
     const grabAction = localPlayer.findAction(
@@ -295,15 +325,16 @@ class Grabmanager extends EventTarget {
     const _updateGrab = () => {
       const _isWear = (o) =>
         localPlayer.findAction(
-          (action) => action.type === 'wear' && action.instanceId === o.instanceId);
+          action => action.type === 'wear' && action.instanceId === o.instanceId);
 
       for (let i = 0; i < 2; i++) {
         const grabAction = this.getGrabAction(i);
         const grabbedObject = this.getGrabbedObject(i);
         if (grabbedObject && !_isWear(grabbedObject)) {
-          let position = null, quaternion = null;
+          let position = null;
+          let quaternion = null;
           if (renderer.xr.getSession()) {
-            const h = localPlayer[hand === 'left' ? 'leftHand' : 'rightHand'];
+            const h = localPlayer[grabAction.hand === 'left' ? 'leftHand' : 'rightHand'];
             position = h.position;
             quaternion = h.quaternion;
           } else {
@@ -344,7 +375,7 @@ class Grabmanager extends EventTarget {
       highlightedPhysicsObject = null;
 
       if (this.editMode) {
-        const { position, quaternion } = renderer.xr.getSession()
+        const {position, quaternion} = renderer.xr.getSession()
           ? localPlayer.leftHand
           : localPlayer;
         const collision = physicsScene.raycast(position, quaternion);
@@ -367,7 +398,7 @@ class Grabmanager extends EventTarget {
 
         const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(physicsId);
         if (physicsObject) {
-          const { physicsMesh } = physicsObject;
+          const {physicsMesh} = physicsObject;
           this.highlightPhysicsMesh.geometry = physicsMesh.geometry;
           this.highlightPhysicsMesh.matrixWorld
             .copy(physicsMesh.matrixWorld)
@@ -377,9 +408,9 @@ class Grabmanager extends EventTarget {
               this.highlightPhysicsMesh.scale
             );
 
-            this.highlightPhysicsMesh.material.uniforms.uTime.value = (timestamp % 1500) / 1500;
-            this.highlightPhysicsMesh.material.uniforms.uTime.needsUpdate = true;
-            this.highlightPhysicsMesh.material.uniforms.uColor.value.setHex(
+          this.highlightPhysicsMesh.material.uniforms.uTime.value = (timestamp % 1500) / 1500;
+          this.highlightPhysicsMesh.material.uniforms.uTime.needsUpdate = true;
+          this.highlightPhysicsMesh.material.uniforms.uColor.value.setHex(
             buildMaterial.uniforms.uColor.value.getHex()
           );
           this.highlightPhysicsMesh.material.uniforms.uColor.needsUpdate = true;

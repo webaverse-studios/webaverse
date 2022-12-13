@@ -31,6 +31,7 @@ const moduleUrls = {
   firedrop: `${baseUrl}firedrop/`,
   meshLodItem: `${baseUrl}mesh-lod-item/`,
   transformIndicators: `${baseUrl}transform-indicators/`,
+  glider: `${baseUrl}glider/`,
 };
 const importModule = async moduleName => {
   const moduleUrl = moduleUrls[moduleName];

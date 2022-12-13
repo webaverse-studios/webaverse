@@ -2,18 +2,9 @@
     position: fixed;
     top: 0px;
     right: 0px;
-    transform: translate(400px, 0px);
-    transition: transform 0.3s cubic-bezier(0, 1, 0, 1);
+    transform: translate( 0%, 0px );
     z-index: 1;
     height: 100vh;
-}
-
-.inventoryPanelWrap.opened {
-    transform: translate( 0%, 0px );
-  }
-
-.inventoryPanelWrap.opened {
-    transform: translate(0%, 0px);
 }
 
 .inventoryPanelWrap .actionsWrap {
@@ -24,6 +15,27 @@
     box-sizing: border-box;
     padding: 12px 24px;
     text-align: center;
+}
+
+.inventoryPanelWrap.expanded .actionsWrap {
+    width: 660px;
+}
+
+.inventoryPanelWrap .expandWrap {
+    width: 40px;
+    background-color: #060b0f;
+    position: absolute;
+    padding: 40px 8px;
+    top: 50%;
+    margin-top: -34px;
+    left: -30px;
+    z-index: -1;
+    cursor: pointer;
+    transform: skewX(3deg);
+}
+
+.inventoryPanelWrap .expandWrap img {
+    height: 24px;
 }
 
 .inventoryPanelWrap .actionsWrap::after {
@@ -55,6 +67,10 @@
     flex-direction: column;
 }
 
+.inventoryPanelWrap.expanded .inventoryPanel {
+    width: 680px;
+}
+
 .inventoryPanel::before {
     position: absolute;
     display: block;
@@ -83,6 +99,10 @@
     padding-left: 34px;
     text-align: center;
     text-transform: uppercase;
+}
+
+.inventoryPanelWrap.expanded .titleBox {
+    width: 664px;
 }
 
 .inventoryPanel .back {
@@ -132,6 +152,10 @@
     overflow-x: hidden;
 }
 
+.inventoryPanelWrap.expanded .infoWrap {
+    width: 648px;
+}
+
 .inventoryPanelWrap .actionsWrap {
     position: absolute;
     bottom: 0;
@@ -166,6 +190,11 @@
     width: 310px;
 }
 
+.inventoryPanelWrap.expanded .sep {
+    width: 640px;
+}
+
+
 .inventoryPanelWrap .section {
     margin-top: 8px;
 }
@@ -183,6 +212,10 @@
   box-sizing: border-box;
   padding-right: 34px;
   margin-bottom: 12px;
+}
+
+.inventoryPanelWrap.expanded .section .sectionTitle {
+    width: 600px;
 }
 
 .inventoryPanelWrap .section .sectionTitle::before {
@@ -231,6 +264,16 @@
 .inventoryPanelWrap .section .tokenList li {
     float: left;
     margin: 0 4px 6px 4px;
+    position: relative;
+}
+
+.inventoryPanelWrap .section .tokenList .tokenDropdown {
+    position: absolute;
+    z-index: 10;
+}
+.inventoryPanelWrap .section .tokenList .tokenDropdown .button {
+    display: block;
+    width: 96px;
 }
 
 .inventoryPanelWrap .itemPreviewBoxWrap {

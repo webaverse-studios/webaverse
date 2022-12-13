@@ -2,18 +2,59 @@
 <html>
 
 <head>
-<title>Webaverse</title>
-<link href="/index.css" rel=stylesheet>
-<!-- webgpu -->
-<meta http-equiv="origin-trial" content="AvnbC2dywh4mcb2RVVjWSoBizD7iOkHmLUUjFl2u1X5pKwLoybNY9AKiIl5vMdMmmhfIR0eVVlZ9WxSBczeAGgAAAABgeyJvcmlnaW4iOiJodHRwczovL3dlYmF2ZXJzZS5jb206NDQzIiwiZmVhdHVyZSI6IldlYkdQVSIsImV4cGlyeSI6MTY0MzE1NTE5OSwiaXNTdWJkb21haW4iOnRydWV9"><!-- *.webaverse.com -->
-<link href="https://fonts.googleapis.com/css2?family=Muli:wght@400;600&display=swap" rel="stylesheet">
+  <title>Webaverse</title>
+  <link href="/index.css" rel=stylesheet>
+  <!-- webgpu -->
+  <meta http-equiv="origin-trial" content="AvnbC2dywh4mcb2RVVjWSoBizD7iOkHmLUUjFl2u1X5pKwLoybNY9AKiIl5vMdMmmhfIR0eVVlZ9WxSBczeAGgAAAABgeyJvcmlnaW4iOiJodHRwczovL3dlYmF2ZXJzZS5jb206NDQzIiwiZmVhdHVyZSI6IldlYkdQVSIsImV4cGlyeSI6MTY0MzE1NTE5OSwiaXNTdWJkb21haW4iOnRydWV9"><!-- *.webaverse.com -->
+  <link href="https://fonts.googleapis.com/css2?family=Muli:wght@400;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
-  <div id=iframe-container></div>
+  <div id="iframe-container"></div>
+
   <div id="root"></div>
-  <script type=module src="/pre.js"></script>
-  <script type=module src="/src/main.jsx"></script>
+  <script type="module" src="/webaverse.js"></script>
+  <script type="module">
+    if (import.meta.env.VITE_SPLIT_UI !== 'true') {
+      console.log("Initializing Webaverse Engine in SINGLE process mode");
+      import('/src/main.jsx');
+    } else {
+      console.log("Initializing Webaverse Engine in SPLIT process mode");
+
+      const tld = import.meta.env.VITE_SPLIT_UI_DOMAIN_TLD || '.online';
+
+      const interfaceContainer = document.createElement('div');
+      interfaceContainer.id = 'interface-container';
+      interfaceContainer.style.width = '100%';
+      interfaceContainer.style.height = '100%';
+      interfaceContainer.style.padding = '0';
+      interfaceContainer.style.margin = '0';
+      interfaceContainer.style.position = 'fixed';
+      interfaceContainer.style.zIndex = '1000';
+
+      // prepend iframe to body before all other children
+      document.body.prepend(interfaceContainer);
+      const interfaceIframe = document.createElement('iframe');
+      interfaceIframe.id = 'interface-iframe';
+      interfaceIframe.style.width = '100%';
+      interfaceIframe.style.height = '100%';
+      interfaceIframe.style.padding = '0';
+      interfaceIframe.style.margin = '0';
+
+      const url = window.location.hostname.replace('.com', tld);
+
+      if(url === window.location.hostname) {
+        console.warn(`*** WARNING:
+        Initialized in split process mode, but your domain is the same as the interface domain.
+        Please change your domain to something else to guarantee process isolation in Chrome.`);
+      }
+
+      interfaceIframe.src = window.location.protocol + '//' + url + "/interface.html";
+
+      interfaceContainer.appendChild(interfaceIframe);
+    }
+
+  </script>
 </body>
 
 </html>

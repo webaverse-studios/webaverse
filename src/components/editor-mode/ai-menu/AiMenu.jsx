@@ -131,9 +131,9 @@ export function AiMenu () {
 
     //
 
-    return (
+    return state.openedPanel === 'AiPanel' ? (
         <div
-            className={classnames(styles.AiMenu, state.openedPanel === 'AiPanel' ? styles.open : '')}
+            className={classnames(styles.AiMenu)}
             onClick={stopPropagation}
         >
             <div className={styles.container}>
@@ -160,5 +160,5 @@ export function AiMenu () {
                 <selectedPanel.component />
             </div>
         </div>
-    );
+    ) : null;
 };
