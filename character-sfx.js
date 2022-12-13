@@ -149,7 +149,7 @@ export class AvatarCharacterSfx {
 
     // step
     const _handleStep = () => {
-      if (idleWalkFactor > 0.5 && !this.character.avatar.jumpState && !this.character.avatar.fallLoopState && !this.character.avatar.flyState && !this.character.hasAction('swim')) {
+      if (idleWalkFactor > 0.5 && !this.character.avatar.jumpState && !this.character.avatar.fallLoopState && !this.character.avatar.flyState && !this.character.hasAction('glider') && !this.character.hasAction('swim')) {
         const isRunning = walkRunFactor > 0.5;
         const isCrouching = crouchFactor > 0.5;
         const isNarutoRun = this.character.avatar.narutoRunState;
