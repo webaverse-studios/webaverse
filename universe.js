@@ -484,10 +484,13 @@ class Universe extends EventTarget {
         this.realms.enableMic();
       }
 
-      // Load the scene.
-      await metaversefile.createAppAsync({
-        start_url: src,
-      });
+      // Load the scene if not already loaded in the multiplayer realms.
+      // TODO: Won't need to load the scene once multiplayer "rooms" are used.
+      if (virtualWorld.worldApps.getSize() === 0) {
+        await metaversefile.createAppAsync({
+          start_url: src,
+        });
+      }
 
       console.log('Multiplayer connected');
       this.multiplayerConnected = true;
