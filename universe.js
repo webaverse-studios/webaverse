@@ -373,6 +373,30 @@ class Universe extends EventTarget {
       }
     });
 
+    // Handle scene updates from network realms.
+    const virtualWorld = this.realms.getVirtualWorld();
+    const onNeedledEntityAdd = e => {
+      const {entityId, needledEntity} = e.data;
+      const {instanceId, contentId, transform, components} = needledEntity.toObject();
+      if (!world.appManager.hasTrackedApp(instanceId)) {
+        const appsArray = state.getArray(appsMapName);
+        appsArray.doc.transact(() => {
+          const appMap = new Z.Map();
+          appMap.set('instanceId', instanceId);
+          appMap.set('contentId', contentId);
+          appMap.set('transform', transform);
+          appMap.set('components', components);
+          appsArray.push([appMap]);
+        });
+      }
+    };
+    virtualWorld.worldApps.addEventListener('needledentityadd', onNeedledEntityAdd);
+    const onNeedledEntityRemove = e => {
+      // TODO
+      console.warn('onNeedledEntityRemove() not implemented');
+    };
+    virtualWorld.worldApps.addEventListener('needledentityremove', onNeedledEntityRemove);
+
 
     const onConnect = async position => {
       const localPlayer = playersManager.getLocalPlayer();
