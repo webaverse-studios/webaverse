@@ -77,6 +77,14 @@ class EntranceExitMesh extends THREE.Mesh {
   }) {
     const baseGeometry = new THREE.BoxGeometry(entranceExitWidth, entranceExitHeight, entranceExitDepth)
       .translate(0, entranceExitHeight / 2, entranceExitDepth / 2);
+    // fill colors
+    const colors = new Float32Array(baseGeometry.attributes.position.array.length);
+    for (let i = 0; i < colors.length; i += 3) {
+      colors[i + 0] = 1;
+      colors[i + 1] = 0;
+      colors[i + 2] = 1;
+    }
+    baseGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     const geometries = entranceExitLocations.map(portalLocation => {
       const g = baseGeometry.clone();
       g.applyMatrix4(
@@ -92,18 +100,23 @@ class EntranceExitMesh extends THREE.Mesh {
 
     const material = new THREE.ShaderMaterial({
       vertexShader: `\
+        attribute vec3 color;
         varying vec2 vUv;
+        varying vec3 vColor;
 
         void main() {
           vUv = uv;
+          vColor = color;
           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }
       `,
       fragmentShader: `\
         varying vec2 vUv;
+        varying vec3 vColor;
 
         void main() {
-          vec3 c = vec3(1., 0., 1.);
+          // vec3 c = vec3(1., 0., 1.);
+          vec3 c = vColor;
           gl_FragColor = vec4(c, 0.5);
           gl_FragColor.rg += vUv * 0.2;
         }
@@ -116,6 +129,22 @@ class EntranceExitMesh extends THREE.Mesh {
 
     const entranceExitMesh = this;
     entranceExitMesh.frustumCulled = false;
+    const blueColor = new THREE.Color(0x8000FF);
+    const purpleColor = new THREE.Color(0xFF00FF);
+    entranceExitMesh.setHighlights = highlights => {
+      for (let i = 0; i < highlights.length; i++) {
+        const highlight = highlights[i];
+        const color = highlight ? blueColor : purpleColor;
+        for (let j = 0; j < baseGeometry.attributes.color.array.length / 3; j++) {
+          const baseJ = i * baseGeometry.attributes.color.array.length + j * 3;
+          // set rgb
+          geometry.attributes.color.array[baseJ + 0] = color.r;
+          geometry.attributes.color.array[baseJ + 1] = color.g;
+          geometry.attributes.color.array[baseJ + 2] = color.b;
+        }
+      }
+      geometry.attributes.color.needsUpdate = true;
+    };
     // entranceExitMesh.enabled = false;
     // entranceExitMesh.visible = false;
     // entranceExitMesh.updateVisibility = () => {
@@ -182,6 +211,9 @@ class ZineManager {
       scenePhysicsMesh,
       floorNetMesh,
     } = zineRenderer;
+    const {
+      entranceExitLocations,
+    } = zineRenderer.metadata;
 
     // camera
     // const camera = setPerspectiveCameraFromJson(localCamera, cameraJson);
@@ -203,11 +235,10 @@ class ZineManager {
     }
 
     // extra meshes
+    let entranceExitMesh;
     {
-      const scale = new THREE.Vector3().fromArray(zineRenderer.metadata.scale);
-      const entranceExitMesh = new EntranceExitMesh({
-        entranceExitLocations: zineRenderer.metadata.entranceExitLocations,
-        // matrixWorld: zineRenderer.transformScene.matrixWorld,
+      entranceExitMesh = new EntranceExitMesh({
+        entranceExitLocations,
       });
       zineRenderer.transformScene.add(entranceExitMesh);
     }
@@ -311,8 +342,7 @@ class ZineManager {
       // extra meshes
       {
         const entranceExitMesh2 = new EntranceExitMesh({
-          entranceExitLocations: zineRenderer2.metadata.entranceExitLocations,
-          // matrixWorld: zineRenderer2.transformScene.matrixWorld,
+          entranceExitLocations,
         });
         zineRenderer2.transformScene.add(entranceExitMesh2);
       }
@@ -336,9 +366,6 @@ class ZineManager {
     instance.updateMatrixWorld();
 
     const getIntersectionIndex = (position, capsuleRadius, capsuleHeight) => {
-      const {
-        entranceExitLocations,
-      } = zineRenderer.metadata;
       for (let i = 0; i < entranceExitLocations.length; i++) {
         const eel = entranceExitLocations[i];
         const boxQuaternion = new THREE.Quaternion().fromArray(eel.quaternion);
@@ -415,7 +442,6 @@ class ZineManager {
           boxQuaternion,
           boxSize,
         )) {
-          console.log('intersect', i);
           return i;
         }
       }
@@ -427,7 +453,12 @@ class ZineManager {
         capsuleWidth: capsuleRadius,
         capsuleHeight,
       } = localPlayer.characterPhysics;
-      getIntersectionIndex(localPlayer.position, capsuleRadius, capsuleHeight);
+      const intersectionIndex = getIntersectionIndex(localPlayer.position, capsuleRadius, capsuleHeight);
+      const highlights = new Uint8Array(entranceExitLocations.length);
+      if (intersectionIndex !== -1) {
+        highlights[intersectionIndex] = 1;
+      }
+      entranceExitMesh.setHighlights(highlights);
     });
 
     // return
