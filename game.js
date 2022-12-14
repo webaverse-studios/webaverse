@@ -14,7 +14,7 @@ import {buildMaterial, highlightMaterial, selectMaterial, hoverMaterial, hoverEq
 import {getRenderer, sceneLowPriority, camera} from './renderer.js';
 import {downloadFile, snapPosition, getDropUrl, handleDropJsonItem, makeId} from './util.js';
 import {maxGrabDistance, throwReleaseTime, throwAnimationDuration, walkSpeed, crouchSpeed, flySpeed} from './constants.js';
-import metaversefileApi from 'metaversefile';
+import metaversefileApi from './metaversefile-api.js';
 import loadoutManager from './loadout-manager.js';
 import * as sounds from './sounds.js';
 import {playersManager} from './players-manager.js';
@@ -85,7 +85,6 @@ class GameManager extends EventTarget {
     this.setFirstPersonAction(this.lastFirstPerson);
     this.bindPointerLock();
     this.registerHighlightMeshes();
-    this.init();
   }
 
   registerHighlightMeshes() {
@@ -110,24 +109,15 @@ class GameManager extends EventTarget {
   }
 
   init() {
-    // // check if metaversefileApi.createApp exists
-    // // if not, delay and try again
-    // if (!metaversefileApi.createApp) {
-    //   setTimeout(() => {
-    //     this.init();
-    //   }, 1000);
-    //   return;
-    // }
-
-    // this.grabUseMesh = metaversefileApi.createApp();
-    // (async () => {
-    //   const {importModule} = metaversefileApi.useDefaultModules();
-    //   const m = await importModule('button');
-    //   await this.grabUseMesh.addModule(m);
-    // })();
-    // this.grabUseMesh.targetApp = null;
-    // this.grabUseMesh.targetPhysicsId = -1;
-    // sceneLowPriority.add(this.grabUseMesh);
+    this.grabUseMesh = metaversefileApi.createApp();
+    (async () => {
+      const {importModule} = metaversefileApi.useDefaultModules();
+      const m = await importModule('button');
+      await this.grabUseMesh.addModule(m);
+    })();
+    this.grabUseMesh.targetApp = null;
+    this.grabUseMesh.targetPhysicsId = -1;
+    sceneLowPriority.add(this.grabUseMesh);
   };
 
   delete() {
@@ -1116,33 +1106,33 @@ class GameManager extends EventTarget {
       const _isWear = o => localPlayer.findAction(action => action.type === 'wear' && action.instanceId === o.instanceId);
 
       // XXX commented to prevent synchronous loading for this.grabUseMesh 
-      // this.grabUseMesh.visible = false;
-      // if (!grabManager.editMode) {
-      //   const avatarHeight = localPlayer.avatar ? localPlayer.avatar.height : 0;
-      //   localVector.copy(localPlayer.position)
-      //     .add(localVector2.set(0, avatarHeight * (1 - localPlayer.getCrouchFactor()) * 0.5, -0.3).applyQuaternion(localPlayer.quaternion));
+      this.grabUseMesh.visible = false;
+      if (!grabManager.editMode) {
+        const avatarHeight = localPlayer.avatar ? localPlayer.avatar.height : 0;
+        localVector.copy(localPlayer.position)
+          .add(localVector2.set(0, avatarHeight * (1 - localPlayer.getCrouchFactor()) * 0.5, -0.3).applyQuaternion(localPlayer.quaternion));
 
-      //   const radius = 1;
-      //   const halfHeight = 0.1;
-      //   const physicsScene = physicsManager.getScene();
-      //   const collision = physicsScene.getCollisionObject(radius, halfHeight, localVector, localPlayer.quaternion);
-      //   if (collision) {
-      //     const physicsId = collision.objectId;
-      //     const object = metaversefileApi.getAppByPhysicsId(physicsId);
-      //     // console.log('got collision', physicsId, object);
-      //     const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(physicsId);
-      //     if (object && !_isWear(object) && physicsObject) {
-      //       this.grabUseMesh.position.setFromMatrixPosition(physicsObject.physicsMesh.matrixWorld);
-      //       this.grabUseMesh.quaternion.copy(camera.quaternion);
-      //       this.grabUseMesh.updateMatrixWorld();
-      //       this.grabUseMesh.targetApp = object;
-      //       this.grabUseMesh.targetPhysicsId = physicsId;
-      //       this.grabUseMesh.setComponent('value', physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'activate', 1));
+        const radius = 1;
+        const halfHeight = 0.1;
+        const physicsScene = physicsManager.getScene();
+        const collision = physicsScene.getCollisionObject(radius, halfHeight, localVector, localPlayer.quaternion);
+        if (collision) {
+          const physicsId = collision.objectId;
+          const object = metaversefileApi.getAppByPhysicsId(physicsId);
+          // console.log('got collision', physicsId, object);
+          const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(physicsId);
+          if (object && !_isWear(object) && physicsObject) {
+            this.grabUseMesh.position.setFromMatrixPosition(physicsObject.physicsMesh.matrixWorld);
+            this.grabUseMesh.quaternion.copy(camera.quaternion);
+            this.grabUseMesh.updateMatrixWorld();
+            this.grabUseMesh.targetApp = object;
+            this.grabUseMesh.targetPhysicsId = physicsId;
+            this.grabUseMesh.setComponent('value', physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'activate', 1));
 
-      //       this.grabUseMesh.visible = true;
-      //     }
-      //   }
-      // }
+            this.grabUseMesh.visible = true;
+          }
+        }
+      }
     };
     _updateGrab();
 
