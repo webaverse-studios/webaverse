@@ -279,10 +279,6 @@ class ZineManager {
 
     // precompute
     const pointCloudArrayBuffer = layer1.getData('pointCloud');
-    if (!pointCloudArrayBuffer) {
-      console.warn('could not get point cloud data', layer1);
-      debugger;
-    }
     const depthFloat32Array = getDepthFloatsFromPointCloud(
       pointCloudArrayBuffer,
       panelSize,
@@ -333,8 +329,6 @@ class ZineManager {
             scale,
             storyTargetMesh.position
           );
-
-          // XXX need to account for scale factor
 
           storyTargetMesh.updateMatrixWorld();
 
