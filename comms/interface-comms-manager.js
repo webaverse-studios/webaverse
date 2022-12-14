@@ -1,9 +1,14 @@
 import cameraManager from '../camera-manager.js';
+import webaverse from '../webaverse.js';
 
 export class InterfaceCommsManager {
   constructor(messageInterface) {
     this.messageInterface = messageInterface;
     this.messageInterface.addListener('setInterfaceEnabled', this.setInterfaceEnabled.bind(this));
+
+    webaverse.addEventListener('loadProgress', (progress) => {
+      this.messageInterface.send('loadProgress', progress);
+    });
   }
 
   setInterfaceEnabled(enable) {
