@@ -143,24 +143,6 @@ function initOffsetRayParams(arrayIndex,originPoint) {
   rayDirectionArray[arrayIndex].copy(rayQuaternion);
 } */
 
-/* const redMesh = (() => {
-  const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-  const material = new THREE.MeshBasicMaterial({color: 0xff0000});
-  const mesh = new THREE.Mesh(geometry, material);
-  // mesh.visible = false;
-  return mesh;
-})();
-scene.add(redMesh);
-
-const blueMesh = (() => {
-  const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-  const material = new THREE.MeshBasicMaterial({color: 0x0000ff});
-  const mesh = new THREE.Mesh(geometry, material);
-  // mesh.visible = false;
-  return mesh;
-})();
-scene.add(blueMesh); */
-
 class CameraManager extends EventTarget {
   constructor() {
     super();
