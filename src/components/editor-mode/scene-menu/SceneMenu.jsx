@@ -202,34 +202,6 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
 
     };
 
-    useEffect(() => {
-
-        refreshRooms();
-
-        function michange (event) {
-
-            setMicEnabled(event.data.enabled);
-
-        };
-
-        function speechchange (event) {
-
-            setSpeechEnabled(event.data.enabled);
-
-        };
-
-        voiceInput.addEventListener('micchange', michange);
-        voiceInput.addEventListener('speechchange', speechchange);
-
-        return () => {
-
-            voiceInput.removeEventListener('micchange', michange);
-            voiceInput.removeEventListener('speechchange', speechchange);
-
-        };
-
-    }, []);
-
     // remove everything before and including the last slash, remove the extension
     const sceneName = selectedScene.replace(/^.*[\\\/]/, '').replace(/\.[^/.]+$/, '');
 
