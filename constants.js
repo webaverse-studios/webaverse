@@ -91,6 +91,7 @@ export const runSpeed = walkSpeed * 3;
 export const narutoRunSpeed = walkSpeed * 20;
 export const crouchSpeed = walkSpeed * 0.7;
 export const flySpeed = walkSpeed * 5;
+export const gliderSpeed = walkSpeed * 3;
 
 export const narutoRunTimeFactor = 2;
 
@@ -118,6 +119,8 @@ export const aimTransitionMaxTime = 150;
 
 export const jumpHeight = 3;
 export const flatGroundJumpAirTime = 666;
+
+export const startSkydiveTimeS = 2;
 
 export const avatarInterpolationFrameRate = 60;
 export const avatarInterpolationTimeDelay = 1000/(avatarInterpolationFrameRate * 0.5);
@@ -162,3 +165,5 @@ export const characterSelectAvatarQuality = 4;
 
 export const minCanvasSize = 512;
 export const offscreenCanvasSize = 2048;
+
+export const IS_NARUTO_RUN_ENABLED = false;

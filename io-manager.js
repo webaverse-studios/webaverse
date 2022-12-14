@@ -40,7 +40,6 @@ class IoManager extends EventTarget {
   currentWeaponGrabs = [false, false];
   lastWeaponGrabs = [false, false];
   currentWalked = false;
-  lastCtrlKey = false;
   lastMouseButtons = 0;
   movementEnabled = true;
 
@@ -229,11 +228,6 @@ class IoManager extends EventTarget {
         cameraEuler.x = 0;
         cameraEuler.z = 0;
         this.keysDirection.applyEuler(cameraEuler);
-
-        if (ioManager.keys.ctrl && !ioManager.lastCtrlKey && game.isGrounded()) {
-          game.toggleCrouch();
-        }
-        ioManager.lastCtrlKey = ioManager.keys.ctrl;
       }
       const physicsScene = physicsManager.getScene();
       if (physicsScene.getPhysicsEnabled() && this.movementEnabled) {
@@ -377,6 +371,7 @@ class IoManager extends EventTarget {
           ioManager.keys.backward = true;
         } else {
           ioManager.keys.ctrl = true;
+          game.toggleCrouch();
         }
         break;
       }
@@ -442,13 +437,7 @@ class IoManager extends EventTarget {
       }
       case 32: { // space
         ioManager.keys.space = true;
-        // if (controlsManager.isPossessed()) {
-        if (!game.isJumping()) {
-          game.jump('jump');
-        } else if (!game.isDoubleJumping()) {
-          game.doubleJump();
-        }
-        // }
+        game.jump();
         break;
       }
       case 81: { // Q
@@ -498,11 +487,8 @@ class IoManager extends EventTarget {
       // nothing
     } else {
       const physicsScene = physicsManager.getScene();
-      if (physicsScene.getPhysicsEnabled()) {
-        const renderer = getRenderer();
-        if (renderer && (e.target === renderer.domElement || e.target.id === 'app')) {
-          cameraManager.handleWheelEvent(e);
-        }
+      if (physicsScene.getPhysicsEnabled() && getRenderer()) {
+        cameraManager.handleWheelEvent(e);
       }
     }
   }

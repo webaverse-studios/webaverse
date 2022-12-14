@@ -4,7 +4,6 @@ import classnames from 'classnames';
 
 import game from '../../../game';
 import {parseQuery} from '../../../util.js'
-import Webaverse from '../../../webaverse.js';
 import universe from '../../../universe.js';
 import cameraManager from '../../../camera-manager';
 import {world} from '../../../world';
@@ -12,13 +11,11 @@ import {world} from '../../../world';
 import {Crosshair} from '../general/crosshair';
 import {WorldObjectsList} from '../general/world-objects-list';
 import {IoHandler, registerIoEventHandler, unregisterIoEventHandler} from '../general/io-handler';
-import {ZoneTitleCard} from '../general/zone-title-card';
 import {Quests} from '../play-mode/quests';
 import {MapGen} from '../general/map-gen/MapGen.jsx';
 import {LoadingBox} from '../../LoadingBox.jsx';
 import {FocusBar} from '../../FocusBar.jsx';
 import {DragAndDrop} from '../../DragAndDrop.jsx';
-import {Stats} from '../../Stats.jsx';
 import {PlayMode} from '../play-mode';
 import {EditorMode} from '../editor-mode';
 import {GrabKeyIndicators} from '../../GrabKeyIndicators.jsx'
@@ -32,33 +29,13 @@ import {scenesBaseUrl, defaultSceneName} from '../../../endpoints.js';
 import styles from './App.module.css';
 import '../../fonts.css';
 import raycastManager from '../../../raycast-manager';
-import npcManager from '../../../npc-manager';
 
 import {AccountContext} from '../../hooks/web3AccountProvider';
 import {ChainContext} from '../../hooks/chainProvider';
-import loadoutManager from '../../../loadout-manager';
-import {partyManager} from '../../../party-manager';
 import Modals from '../modals';
 import dropManager from '../../../drop-manager';
 import useNFTContract from '../../../src/hooks/useNFTContract';
 //
-
-const _startApp = async (weba, canvas) => {
-
-    weba.setContentLoaded();
-
-    weba.bindCanvas(canvas);
-
-    await weba.waitForLoad();
-
-    await npcManager.initDefaultPlayer();
-    loadoutManager.initDefault();
-    await universe.handleUrlUpdate();
-    partyManager.inviteDefaultPlayer();
-
-    await weba.startLoop();
-
-};
 
 const _getCurrentSceneSrc = () => {
 
@@ -85,16 +62,6 @@ const _getCurrentRoom = () => {
 
 export const AppContext = createContext();
 
-const useWebaverseApp = (() => {
-  let webaverse = null;
-  return () => {
-        if (webaverse === null) {
-            webaverse = new Webaverse();
-        }
-        return webaverse;
-  };
-})();
-
 let appStarted = false;
 
 export const App = () => {
@@ -103,7 +70,6 @@ export const App = () => {
     const [ showUI, setShowUI ] = useState('normal');
 
     const canvasRef = useRef(null);
-    const app = useWebaverseApp();
     const [ selectedApp, setSelectedApp ] = useState(null);
     const [ selectedScene, setSelectedScene ] = useState(_getCurrentSceneSrc());
     const [ selectedRoom, setSelectedRoom ] = useState(_getCurrentRoom());
@@ -114,16 +80,6 @@ export const App = () => {
     const account = useContext(AccountContext);
     const chain = useContext(ChainContext);
     const {getTokens, getOTtokens} = useNFTContract(account.currentAddress);
-    //
-    
-    useEffect(() => {
-        if(canvasRef.current && !appStarted) {
-
-            _startApp(app, canvasRef.current);
-
-            appStarted = true;
-        }
-    }, [ canvasRef ]);
 
     const [domHover, setDomHover] = useState(null)
 
@@ -371,7 +327,7 @@ export const App = () => {
     };
 
     return (
-        <AppContext.Provider value={{state, setState, app, setSelectedApp, selectedApp, showUI, account, chain, claimableToken, setClaimableToken, mintedToken, setMintedToken, resourceToken, getWalletItems}}>
+        <AppContext.Provider value={{state, setState, setSelectedApp, selectedApp, showUI, account, chain, claimableToken, setClaimableToken, mintedToken, setMintedToken, resourceToken, getWalletItems}}>
         <div
             className={ styles.App }
             id="app"
@@ -402,7 +358,6 @@ export const App = () => {
                     setSelectedRoom={ setSelectedRoom }
                 />
                 <QuickMenu />
-                <ZoneTitleCard />
                 <MapGen />
                 <Quests />
                 <LoadingBox />
@@ -410,7 +365,6 @@ export const App = () => {
                 <DragAndDrop />
                 <GrabKeyIndicators />
                 <BuildVersion />
-                <Stats app={ app } />
             </Fragment>
         }
             </div>

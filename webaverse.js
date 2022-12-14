@@ -2,20 +2,23 @@
 this file bootstraps the webaverse engine.
 it uses the help of various managers and stores, and executes the render loop.
 */
+import physxWorkerManager from './physx-worker-manager.js';
+
+import metaversefileApi from './metaversefile-api.js';
+import {playersManager} from './players-manager.js';
+import cameraManager from './camera-manager.js';
+import ioManager from './io-manager.js';
+import game from './game.js';
 
 import * as THREE from 'three';
+import npcManager from './npc-manager.js';
 import Avatar from './avatars/avatars.js';
 import * as sounds from './sounds.js';
 import physx from './physx.js';
-import ioManager from './io-manager.js';
 import physicsManager from './physics-manager.js';
-import physxWorkerManager from './physx-worker-manager.js';
 import {world} from './world.js';
 // import * as blockchain from './blockchain.js';
-import cameraManager from './camera-manager.js';
-import game from './game.js';
 import hpManager from './hp-manager.js';
-import {playersManager} from './players-manager.js';
 import minimapManager from './minimap.js';
 import postProcessing from './post-processing.js';
 import particleSystemManager from './particle-system.js';
@@ -31,22 +34,24 @@ import {
   camera,
   bindCanvas,
   getComposer,
+  offscreenCanvas,
+  canvas
 } from './renderer.js';
 import transformControls from './transform-controls.js';
 import dioramaManager from './diorama/diorama-manager.js';
 import * as voices from './voices.js';
 import performanceTracker from './performance-tracker.js';
 import renderSettingsManager from './rendersettings-manager.js';
-import metaversefileApi from 'metaversefile';
 import musicManager from './music-manager.js';
 import story from './story.js';
 import zTargeting from './z-targeting.js';
 import raycastManager from './raycast-manager.js';
 import universe from './universe.js';
-import npcManager from './npc-manager.js';
 import settingsManager from './settings-manager.js';
 import grabManager from './grab-manager.js';
 import backgroundFx from './background-fx/background-fx.js';
+import {partyManager} from './party-manager';
+import {LoadingManager} from './loading-manager';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -76,11 +81,45 @@ export default class Webaverse extends EventTarget {
   constructor() {
     super();
 
+    const loadingManager = new LoadingManager(this);
+
+    const canvas = document.createElement('canvas');
+    canvas.style.position = 'fixed';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.margin = '0';
+    canvas.style.padding = '0';
+    canvas.style.zIndex = '-1';
+
+    // add the canvas to the engine container
+    document.body.appendChild(canvas);
+    this.bindCanvas(canvas);
+
     story.listenHack();
 
     this.loadPromise = (async () => {
-      await physx.waitForLoad();
-      await Promise.all([
+      let index = 0;
+      const totalWaitForLoadFunctions = 14;
+      let loadProgressPercentage = 0;
+
+      const _updateLoadProgress = () => {
+        loadProgressPercentage = Math.round((index++) / totalWaitForLoadFunctions * 100);
+
+        this.dispatchEvent(new MessageEvent('loadProgress', {
+          data: {
+            loadProgressPercentage,
+          },
+        }));
+        console.log('loadProgressPercentage', loadProgressPercentage);
+      }
+
+      // physx needs to be loaded first, before everything else, otherwise we have a race condition
+      await physx.waitForLoad();      
+      _updateLoadProgress();
+
+      const waitForLoadFunctions = [
         Avatar.waitForLoad(),
         physxWorkerManager.waitForLoad(),
         sounds.waitForLoad(),
@@ -90,7 +129,34 @@ export default class Webaverse extends EventTarget {
         backgroundFx.waitForLoad(),
         voices.waitForLoad(),
         musicManager.waitForLoad(),
-      ]);
+      ];
+
+      // update the loading progress
+      _updateLoadProgress();
+
+      // call the waitForLoad functions and update the loading progress
+      // we need to load them simultaneously
+      await Promise.all(waitForLoadFunctions.map(async (waitForLoadFunction, index) => {
+        await waitForLoadFunction;
+        _updateLoadProgress();
+      }));
+
+      await npcManager.initDefaultPlayer();
+      _updateLoadProgress();
+
+      loadoutManager.initDefault();
+      _updateLoadProgress();
+
+      await universe.handleUrlUpdate();
+      _updateLoadProgress();
+
+      partyManager.inviteDefaultPlayer();
+
+      _updateLoadProgress();
+
+      await this.startLoop();
+
+      this.setContentLoaded();
     })();
     this.contentLoaded = false;
     const self = this
@@ -135,6 +201,7 @@ export default class Webaverse extends EventTarget {
   
   setContentLoaded() {
     this.contentLoaded = true;
+    this.dispatchEvent(new MessageEvent('loaded'));
   }
 
   bindCanvas(c) {
@@ -281,19 +348,25 @@ export default class Webaverse extends EventTarget {
   render(timestamp, timeDiff) {
     // console.log('frame 1');
 
-    const renderer = getRenderer();
     frameEvent.data.timestamp = timestamp;
     frameEvent.data.timeDiff = timeDiff;
     game.dispatchEvent(frameEvent);
 
     getComposer().render();
+    
+    // call transferimagebitmap to move the contents of offscreencanvas to canvas
+  
+    const context = canvas.getContext('bitmaprenderer');
+    const imageBitmap = offscreenCanvas.transferToImageBitmap();
+    context.transferFromImageBitmap(imageBitmap);
 
-    this.dispatchEvent(new MessageEvent('frameend', {
-      data: {
-        canvas: renderer.domElement,
-        context: renderer.getContext(),
-      }
-    }));
+    // TODO: reenable for mirror
+    // this.dispatchEvent(new MessageEvent('frameend', {
+    //   data: {
+    //     canvas: renderer.domElement,
+    //     context: renderer.getContext(),
+    //   }
+    // }));
 
     // console.log('frame 2');
   }
@@ -388,7 +461,7 @@ export default class Webaverse extends EventTarget {
 
 // import {MMDLoader} from 'three/examples/jsm/loaders/MMDLoader.js';
 const _startHacks = webaverse => {
-  const localPlayer = metaversefileApi.useLocalPlayer();
+  const localPlayer = playersManager.getLocalPlayer();
   const vpdAnimations = Avatar.getAnimations().filter(animation => animation.name.endsWith('.vpd'));
 
   // press R to debug current state in console
@@ -609,3 +682,5 @@ const _startHacks = webaverse => {
     }
   });
 };
+
+export const webaverse = new Webaverse();
