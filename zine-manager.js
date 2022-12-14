@@ -216,9 +216,7 @@ class ZineManager {
     } = zineRenderer.metadata;
 
     // camera
-    // const camera = setPerspectiveCameraFromJson(localCamera, cameraJson);
     const floorNetCamera = setOrthographicCameraFromJson(localOrthographicCamera, floorNetCameraJson);
-    // instance.camera = camera;
     instance.camera = zineRenderer.camera;
 
     // lights
