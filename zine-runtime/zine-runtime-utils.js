@@ -1,4 +1,57 @@
 import * as THREE from 'three';
+import {
+  entranceExitWidth,
+  entranceExitHeight,
+  entranceExitDepth,
+} from './zine-runtime-constants.js';
+
+//
+
+const localMatrix = new THREE.Matrix4();
+
+//
+
+export const getCapsuleIntersectionIndex = (
+  entranceExitLocations,
+  matrixWorld,
+  position,
+  capsuleRadius,
+  capsuleHeight
+) => {
+  for (let i = 0; i < entranceExitLocations.length; i++) {
+    const eel = entranceExitLocations[i];
+    const boxQuaternion = new THREE.Quaternion().fromArray(eel.quaternion);
+    const boxPosition = new THREE.Vector3().fromArray(eel.position)
+      .add(new THREE.Vector3(0, entranceExitHeight / 2, entranceExitDepth / 2).applyQuaternion(
+        boxQuaternion
+      ));
+    const boxSize = new THREE.Vector3(entranceExitWidth, entranceExitHeight, entranceExitDepth);
+    localMatrix.compose(
+      boxPosition,
+      boxQuaternion,
+      boxSize
+    ).premultiply(matrixWorld).decompose(
+      boxPosition,
+      boxQuaternion,
+      boxSize
+    );
+
+    const capsulePosition = position.clone().add(
+      new THREE.Vector3(0, -capsuleHeight / 2, 0)
+    );
+    if (capsuleIntersectsBox(
+      capsulePosition,
+      capsuleRadius,
+      capsuleHeight,
+      boxPosition,
+      boxQuaternion,
+      boxSize,
+    )) {
+      return i;
+    }
+  }
+  return -1;
+};
 
 // note: total height of the capsule is capsuleHeight + 2 * capsuleRadius
 // the capsule is vertical, with capsulePosition in the center

@@ -1,5 +1,10 @@
 import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import {
+  entranceExitWidth,
+  entranceExitHeight,
+  entranceExitDepth,
+} from '../zine-runtime-constants.js';
 
 //
 
@@ -10,9 +15,6 @@ const localMatrix = new THREE.Matrix4();
 
 //
 
-export const entranceExitHeight = 2;
-export const entranceExitWidth = 2;
-export const entranceExitDepth = 20;
 export class EntranceExitMesh extends THREE.Mesh {
   constructor({
     entranceExitLocations,

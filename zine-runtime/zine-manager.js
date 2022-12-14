@@ -28,12 +28,12 @@ import {
 } from '../players-manager.js';
 
 import {
-  capsuleIntersectsBox,
+  getCapsuleIntersectionIndex,
 } from './zine-runtime-utils.js';
 import {
-  entranceExitHeight,
-  entranceExitWidth,
-  entranceExitDepth,
+  StoryTargetMesh,
+} from './meshes/story-target-mesh.js';
+import {
   EntranceExitMesh,
 } from './meshes/entrance-exit-mesh.js';
 
@@ -156,6 +156,10 @@ class ZineManager {
       zineRenderer.transformScene.add(entranceExitMesh);
     }
 
+    // story target mesh
+    const storyTargetMesh = new StoryTargetMesh();
+    instance.add(storyTargetMesh);
+
     // physics
     const physicsIds = [];
     instance.physicsIds = physicsIds;
@@ -266,48 +270,20 @@ class ZineManager {
     // update matrix world
     instance.updateMatrixWorld();
 
-    const getIntersectionIndex = (position, capsuleRadius, capsuleHeight) => {
-      for (let i = 0; i < entranceExitLocations.length; i++) {
-        const eel = entranceExitLocations[i];
-        const boxQuaternion = new THREE.Quaternion().fromArray(eel.quaternion);
-        const boxPosition = new THREE.Vector3().fromArray(eel.position)
-          .add(new THREE.Vector3(0, entranceExitHeight / 2, entranceExitDepth / 2).applyQuaternion(
-            boxQuaternion
-          ));
-        const boxSize = new THREE.Vector3(entranceExitWidth, entranceExitHeight, entranceExitDepth);
-        localMatrix.compose(
-          boxPosition,
-          boxQuaternion,
-          boxSize
-        ).premultiply(zineRenderer.transformScene.matrixWorld).decompose(
-          boxPosition,
-          boxQuaternion,
-          boxSize
-        );
-
-        const capsulePosition = position.clone().add(
-          new THREE.Vector3(0, -capsuleHeight / 2, 0)
-        );
-        if (capsuleIntersectsBox(
-          capsulePosition,
-          capsuleRadius,
-          capsuleHeight,
-          boxPosition,
-          boxQuaternion,
-          boxSize,
-        )) {
-          return i;
-        }
-      }
-      return -1;
-    };
     world.appManager.addEventListener('frame', e => {
       const localPlayer = playersManager.getLocalPlayer();
       const {
         capsuleWidth: capsuleRadius,
         capsuleHeight,
       } = localPlayer.characterPhysics;
-      const intersectionIndex = getIntersectionIndex(localPlayer.position, capsuleRadius, capsuleHeight);
+      const capsulePosition = localPlayer.position;
+      const intersectionIndex = getCapsuleIntersectionIndex(
+        entranceExitLocations,
+        zineRenderer.transformScene.matrixWorld,
+        capsulePosition,
+        capsuleRadius,
+        capsuleHeight
+      );
       const highlights = new Uint8Array(entranceExitLocations.length);
       if (intersectionIndex !== -1) {
         highlights[intersectionIndex] = 1;
