@@ -32,7 +32,14 @@ class StoryCameraManager extends EventTarget {
 
   handleMouseMove(e) {
     if (this.cameraLocked) {
-      const {movementX, movementY} = e;
+      this.dispatchEvent(new MessageEvent('mousemove', {
+        data: {
+          movementX: e.movementX,
+          movementY: e.movementY,
+        },
+      }));
+
+      // const {movementX, movementY} = e;
 
       // camera.position.add(localVector.copy(this.getCameraOffset()).applyQuaternion(camera.quaternion));
     
