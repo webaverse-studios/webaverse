@@ -188,10 +188,6 @@ class CameraManager extends EventTarget {
     this.cinematicScript = null;
     this.cinematicScriptStartTime = -1;
 
-    this.lockCamera = new THREE.PerspectiveCamera();
-    this.oldCamera = new THREE.PerspectiveCamera();
-    this.cameraLocked = false;
-
     this.bindEvents();
   }
 
@@ -292,19 +288,6 @@ class CameraManager extends EventTarget {
 
   getCameraOffset() {
     return cameraOffset;
-  }
-
-  setLockCamera(camera) {
-    this.lockCamera.copy(camera);
-  }
-  toggleCameraLock() {
-    this.cameraLocked = !this.cameraLocked;
-
-    if (this.cameraLocked) {
-      this.oldCamera.copy(camera);
-    } else {
-      camera.copy(this.oldCamera);
-    }
   }
 
   handleMouseMove(e) {
@@ -780,39 +763,11 @@ class CameraManager extends EventTarget {
 
       this.lastTarget = this.target;
     };
-    const _setLocked = () => {
-      camera.copy(this.lockCamera);
-      const aspect = window.innerWidth / window.innerHeight;
-      setCameraToSquareFovAspect(this.lockCamera.fov, aspect, camera);
-
-      function radToDeg(rad) {
-        return rad * 180 / Math.PI;
-      }
-      function degToRad(deg) {
-        return deg * Math.PI / 180;
-      }
-      // given an ideal square fov (in degrees) and new aspect ratio,
-      // set the camera to be contained within the the original square fov
-      // calculate a new fov and aspect ratio that will fit the original square fov
-      // this requires zooming in and clipping
-      // camera is a THREE.PerspectiveCamera
-      function setCameraToSquareFovAspect(squareFov, aspect, camera) {
-        // first, calculate the new min fov of vertical/horizontal
-        const fovH = radToDeg(2 * Math.atan(Math.tan(degToRad(squareFov) / 2) * aspect));
-        const fovV = radToDeg(2 * Math.atan(Math.tan(degToRad(squareFov) / 2) / aspect));
-        const newFov = Math.min(fovH, fovV);
-        const newAspect = Math.max(fovH, fovV) / Math.min(fovH, fovV);
-
-        camera.fov = newFov;
-        camera.aspect = newAspect;
-        camera.updateProjectionMatrix();
-      }
-    };
-    if (!this.cameraLocked) {
+    // if (!this.cameraLocked) {
       _setUnlocked();
-    } else {
-      _setLocked();
-    }
+    // } else {
+    //   _setLocked();
+    // }
   }
 };
 const cameraManager = new CameraManager();

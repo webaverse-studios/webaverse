@@ -7,6 +7,7 @@ the functionality is implemented in other managers.
 import * as THREE from 'three';
 import metaversefile from 'metaversefile';
 import cameraManager from './camera-manager.js';
+import storyCameraManager from './story-camera-manager.js';
 import game from './game.js';
 import {world} from './world.js';
 import voiceInput from './voice-input/voice-input.js';
@@ -16,7 +17,6 @@ import transformControls from './transform-controls.js';
 import storyManager from './story.js';
 import raycastManager from './raycast-manager.js';
 import grabManager from './grab-manager.js';
-import zineManager from './zine-manager.js';
 
 const localVector = new THREE.Vector3();
 const localEuler = new THREE.Euler();
@@ -480,7 +480,7 @@ class IoManager extends EventTarget {
         break;
       }
       case 85: { // U 
-        cameraManager.toggleCameraLock();
+        storyCameraManager.toggleCameraLock();
         break;
       } 
       case 74: { // J
@@ -609,7 +609,8 @@ class IoManager extends EventTarget {
 
   mousemove = e => {
     if (cameraManager.pointerLockElement) {
-      cameraManager.handleMouseMove(e);
+      storyCameraManager.handleMouseMove(e) ||
+        cameraManager.handleMouseMove(e);
     } else {
       if (game.dragging) {
         game.menuDrag(e);

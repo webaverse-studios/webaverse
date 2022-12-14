@@ -12,6 +12,7 @@ import React from 'react';
 import metaversefile from 'metaversefile';
 import {getRenderer, scene, sceneHighPriority, sceneLowPriority, sceneLowerPriority, sceneLowestPriority, rootScene, camera} from './renderer.js';
 import cameraManager from './camera-manager.js';
+import storyCameraManager from './story-camera-manager.js';
 import physicsManager from './physics-manager.js';
 import Avatar from './avatars/avatars.js';
 import {world} from './world.js';
@@ -893,6 +894,9 @@ metaversefile.setApi({
   },
   useCameraManager() {
     return cameraManager;
+  },
+  useStoryCameraManager() {
+    return storyCameraManager;
   },
   useParticleSystem() {
     return particleSystemManager;
