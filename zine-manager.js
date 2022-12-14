@@ -353,18 +353,6 @@ class ZineManager {
     // update matrix world
     instance.updateMatrixWorld();
 
-    const boxMesh = new THREE.Mesh(
-      new THREE.BoxBufferGeometry(1, 1, 1),
-      new THREE.MeshBasicMaterial({
-        color: 0xFF0000,
-        side: THREE.DoubleSide,
-        trasparent: true,
-      })
-    );
-    boxMesh.frustumCulled = false;
-    instance.add(boxMesh);
-    instance.updateMatrixWorld();
-
     const getIntersectionIndex = (position, capsuleRadius, capsuleHeight) => {
       for (let i = 0; i < entranceExitLocations.length; i++) {
         const eel = entranceExitLocations[i];
@@ -383,13 +371,6 @@ class ZineManager {
           boxQuaternion,
           boxSize
         );
-  
-        if (i === 1) {
-          boxMesh.position.copy(boxPosition);
-          boxMesh.quaternion.copy(boxQuaternion);
-          // boxMesh.scale.copy(boxSize);
-          boxMesh.updateMatrixWorld();
-        }
 
         const capsulePosition = position.clone().add(
           new THREE.Vector3(0, -capsuleHeight / 2, 0)
