@@ -68,29 +68,18 @@ const entranceExitDepth = 20;
 class EntranceExitMesh extends THREE.Mesh {
   constructor({
     entranceExitLocations,
-    matrixWorld,
   }) {
     const baseGeometry = new THREE.BoxGeometry(entranceExitWidth, entranceExitHeight, entranceExitDepth)
       .translate(0, entranceExitHeight / 2, entranceExitDepth / 2);
-    const geometries = entranceExitLocations.map(eel => {
+    const geometries = entranceExitLocations.map(portalLocation => {
       const g = baseGeometry.clone();
-      
-      localMatrix.compose(
-        localVector.fromArray(eel.position),
-        localQuaternion.fromArray(eel.quaternion),
-        localVector2.setScalar(1)
-      ).premultiply(matrixWorld).decompose(
-        localVector,
-        localQuaternion,
-        localVector2
+      g.applyMatrix4(
+        localMatrix.compose(
+          localVector.fromArray(portalLocation.position),
+          localQuaternion.fromArray(portalLocation.quaternion),
+          localVector2.setScalar(1)
+        )
       );
-      // localMatrix.compose(
-      //   localVector,
-      //   localQuaternion,
-      //   oneVector
-      // );
-
-      g.applyMatrix4(localMatrix);
       return g;
     });
     const geometry = geometries.length > 0 ? BufferGeometryUtils.mergeBufferGeometries(geometries) : new THREE.BufferGeometry();
@@ -212,9 +201,9 @@ class ZineManager {
       const scale = new THREE.Vector3().fromArray(zineRenderer.metadata.scale);
       const entranceExitMesh = new EntranceExitMesh({
         entranceExitLocations: zineRenderer.metadata.entranceExitLocations,
-        matrixWorld: zineRenderer.transformScene.matrixWorld,
+        // matrixWorld: zineRenderer.transformScene.matrixWorld,
       });
-      instance.add(entranceExitMesh);
+      zineRenderer.transformScene.add(entranceExitMesh);
     }
 
     // physics
@@ -267,10 +256,10 @@ class ZineManager {
         // ...but also shift the mesh to compensate
         // this centering is required for the physics to work and render correctly
         const material = new THREE.MeshPhongMaterial({
-          color: 0x0000ff,
+          color: 0xFF0000,
           side: THREE.BackSide,
           transparent: true,
-          opacity: 0.2,
+          opacity: 0.5,
         });
         const mesh = new THREE.Mesh(geometry, material);
         return mesh;
@@ -317,9 +306,9 @@ class ZineManager {
       {
         const entranceExitMesh2 = new EntranceExitMesh({
           entranceExitLocations: zineRenderer2.metadata.entranceExitLocations,
-          matrixWorld: zineRenderer2.transformScene.matrixWorld,
+          // matrixWorld: zineRenderer2.transformScene.matrixWorld,
         });
-        instance.add(entranceExitMesh2);
+      zineRenderer2.transformScene.add(entranceExitMesh2);
       }
 
       instance.updateMatrixWorld();
