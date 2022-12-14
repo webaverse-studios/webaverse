@@ -22,7 +22,11 @@ import {
   setCameraViewPositionFromOrthographicViewZ,
   depthFloat32ArrayToOrthographicGeometry,
 } from 'zine/zine-geometry-utils.js';
+import {
+  playersManager,
+} from './players-manager.js';
 import {appsMapName, heightfieldScale} from './constants.js'
+import { world } from './world.js';
 
 // constants
 
@@ -32,6 +36,8 @@ const oneVector = new THREE.Vector3(1, 1, 1);
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
+const localVector3 = new THREE.Vector3();
+const localVector4 = new THREE.Vector3();
 const localQuaternion = new THREE.Quaternion();
 const localMatrix = new THREE.Matrix4();
 // const localCamera = new THREE.PerspectiveCamera();
@@ -293,7 +299,7 @@ class ZineManager {
     instance.link = () => {
       const panel1 = storyboard.getPanel(1);
       const zineRenderer2 = this.#createRenderer(panel1);
-      console.log('link instance', zineRenderer, zineRenderer2);
+      // console.log('link instance', zineRenderer, zineRenderer2);
       
       zineRenderer.connect(zineRenderer2);
       
@@ -308,7 +314,7 @@ class ZineManager {
           entranceExitLocations: zineRenderer2.metadata.entranceExitLocations,
           // matrixWorld: zineRenderer2.transformScene.matrixWorld,
         });
-      zineRenderer2.transformScene.add(entranceExitMesh2);
+        zineRenderer2.transformScene.add(entranceExitMesh2);
       }
 
       instance.updateMatrixWorld();
@@ -316,6 +322,113 @@ class ZineManager {
 
     // update matrix world
     instance.updateMatrixWorld();
+
+    const boxMesh = new THREE.Mesh(
+      new THREE.BoxBufferGeometry(1, 1, 1),
+      new THREE.MeshBasicMaterial({
+        color: 0xFF0000,
+        side: THREE.DoubleSide,
+        trasparent: true,
+      })
+    );
+    boxMesh.frustumCulled = false;
+    instance.add(boxMesh);
+    instance.updateMatrixWorld();
+
+    const getIntersectionIndex = (position, capsuleRadius, capsuleHeight) => {
+      const {
+        entranceExitLocations,
+      } = zineRenderer.metadata;
+      for (let i = 0; i < entranceExitLocations.length; i++) {
+        const eel = entranceExitLocations[i];
+        const boxQuaternion = new THREE.Quaternion().fromArray(eel.quaternion);
+        const boxPosition = new THREE.Vector3().fromArray(eel.position)
+          .add(new THREE.Vector3(0, entranceExitHeight / 2, entranceExitDepth / 2).applyQuaternion(
+            boxQuaternion
+          ));
+        const boxSize = new THREE.Vector3(entranceExitWidth, entranceExitHeight, entranceExitDepth);
+        localMatrix.compose(
+          boxPosition,
+          boxQuaternion,
+          boxSize
+        ).premultiply(zineRenderer.transformScene.matrixWorld).decompose(
+          boxPosition,
+          boxQuaternion,
+          boxSize
+        );
+  
+        if (i === 1) {
+          boxMesh.position.copy(boxPosition);
+          boxMesh.quaternion.copy(boxQuaternion);
+          // boxMesh.scale.copy(boxSize);
+          boxMesh.updateMatrixWorld();
+        }
+
+        const capsulePosition = position.clone().add(
+          new THREE.Vector3(0, -capsuleHeight / 2, 0)
+        );
+  
+        // note: total height of the capsule is capsuleHeight + 2 * capsuleRadius
+        // the capsule is vertical, with capsulePosition in the center
+        // the distance from the center to the top and bottom is capsuleHeight / 2 + capsuleRadius
+        // check whether the given capsule intersects the given transformed box
+        function capsuleIntersectsBox(capsulePosition, capsuleRadius, capsuleHeight, boxPosition, boxQuaternion, boxSize) {
+          // first, transform the capsule line into the box's local space
+          const capsuleLine = new THREE.Line3(
+            capsulePosition.clone().add(
+              new THREE.Vector3(0, capsuleHeight / 2 + capsuleRadius, 0)
+            ),
+            capsulePosition.clone().add(
+              new THREE.Vector3(0, -capsuleHeight / 2 - capsuleRadius, 0)
+            )
+          );
+          capsuleLine.start.sub(boxPosition).applyQuaternion(boxQuaternion.clone().invert());
+          capsuleLine.end.sub(boxPosition).applyQuaternion(boxQuaternion.clone().invert());
+          // then, get the intersection in the box's local space
+          return capsuleIntersectsAABB(
+            capsuleLine,
+            capsuleRadius,
+            boxSize
+          );
+        }
+        function capsuleIntersectsAABB(capsuleLine, capsuleRadius, boxSize) {
+          const closestPointToCenter = capsuleLine.closestPointToPoint(
+            new THREE.Vector3(0, 0, 0),
+            true,
+            new THREE.Vector3()
+          );
+          if (
+            Math.abs(closestPointToCenter.x) <= boxSize.x / 2 + capsuleRadius &&
+            Math.abs(closestPointToCenter.y) <= boxSize.y / 2 + capsuleRadius &&
+            Math.abs(closestPointToCenter.z) <= boxSize.z / 2 + capsuleRadius
+          ) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+        if (capsuleIntersectsBox(
+          capsulePosition,
+          capsuleRadius,
+          capsuleHeight,
+          boxPosition,
+          boxQuaternion,
+          boxSize,
+        )) {
+          console.log('intersect', i);
+          return i;
+        }
+      }
+      return -1;
+    };
+    world.appManager.addEventListener('frame', e => {
+      const localPlayer = playersManager.getLocalPlayer();
+      const {
+        capsuleWidth: capsuleRadius,
+        capsuleHeight,
+      } = localPlayer.characterPhysics;
+      getIntersectionIndex(localPlayer.position, capsuleRadius, capsuleHeight);
+    });
 
     // return
     return instance;
