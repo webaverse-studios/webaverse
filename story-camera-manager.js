@@ -126,6 +126,7 @@ class StoryCameraManager extends EventTarget {
     this.oldCamera = new THREE.PerspectiveCamera();
 
     this.storyTargetMesh = new StoryTargetMesh();
+    this.storyTargetMesh.visible = false;
   }
 
   setLockCamera(camera) {
