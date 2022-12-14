@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {
   ZineStoryboard,
   zineMagicBytes,
@@ -23,9 +24,17 @@ import {
 } from 'zine/zine-geometry-utils.js';
 import {appsMapName, heightfieldScale} from './constants.js'
 
+// constants
+
+const oneVector = new THREE.Vector3(1, 1, 1);
+
 // locals
 
-const localCamera = new THREE.PerspectiveCamera();
+const localVector = new THREE.Vector3();
+const localVector2 = new THREE.Vector3();
+const localQuaternion = new THREE.Quaternion();
+const localMatrix = new THREE.Matrix4();
+// const localCamera = new THREE.PerspectiveCamera();
 const localOrthographicCamera = new THREE.OrthographicCamera();
 
 // utils
@@ -51,6 +60,75 @@ const getGeometryHeights = (geometry, width, height) => {
   return heights;
 };
 
+// helper classes
+
+const entranceExitHeight = 2;
+const entranceExitWidth = 2;
+const entranceExitDepth = 20;
+class EntranceExitMesh extends THREE.Mesh {
+  constructor({
+    entranceExitLocations,
+    matrixWorld,
+  }) {
+    const baseGeometry = new THREE.BoxGeometry(entranceExitWidth, entranceExitHeight, entranceExitDepth)
+      .translate(0, entranceExitHeight / 2, entranceExitDepth / 2);
+    const geometries = entranceExitLocations.map(eel => {
+      const g = baseGeometry.clone();
+      
+      localMatrix.compose(
+        localVector.fromArray(eel.position),
+        localQuaternion.fromArray(eel.quaternion),
+        localVector2.setScalar(1)
+      ).premultiply(matrixWorld).decompose(
+        localVector,
+        localQuaternion,
+        localVector2
+      );
+      // localMatrix.compose(
+      //   localVector,
+      //   localQuaternion,
+      //   oneVector
+      // );
+
+      g.applyMatrix4(localMatrix);
+      return g;
+    });
+    const geometry = geometries.length > 0 ? BufferGeometryUtils.mergeBufferGeometries(geometries) : new THREE.BufferGeometry();
+
+    const material = new THREE.ShaderMaterial({
+      vertexShader: `\
+        varying vec2 vUv;
+
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `\
+        varying vec2 vUv;
+
+        void main() {
+          vec3 c = vec3(1., 0., 1.);
+          gl_FragColor = vec4(c, 0.5);
+          gl_FragColor.rg += vUv * 0.2;
+        }
+      `,
+      transparent: true,
+    });
+    super(geometry, material);
+
+    // const hasGeometry = geometries.length > 0;
+
+    const entranceExitMesh = this;
+    entranceExitMesh.frustumCulled = false;
+    // entranceExitMesh.enabled = false;
+    // entranceExitMesh.visible = false;
+    // entranceExitMesh.updateVisibility = () => {
+    //   entranceExitMesh.visible = entranceExitMesh.enabled && hasGeometry;
+    // };
+  }
+}
+
 // main class
 
 class ZineManager {
@@ -67,8 +145,22 @@ class ZineManager {
     zineStoryboard.load(uint8Array);
     return zineStoryboard;
   }
-  #createRenderer(opts) {
-    const zineRenderer = new ZineRenderer(opts);
+  #createRenderer(panel) {
+    const zineRenderer = new ZineRenderer({
+      panel,
+    });
+
+    const floorInverseQuaternion = new THREE.Quaternion()
+      .fromArray(zineRenderer.metadata.floorPlaneLocation.quaternion)
+      .invert();
+
+    // console.log('floor inverse quaternion', floorInverseQuaternion.toArray());
+    zineRenderer.scene.quaternion.copy(floorInverseQuaternion);
+    zineRenderer.scene.updateMatrixWorld();
+    
+    zineRenderer.camera.quaternion.copy(floorInverseQuaternion);
+    zineRenderer.camera.updateMatrixWorld();
+
     return zineRenderer;
   }
   async createInstanceAsync({
@@ -80,35 +172,21 @@ class ZineManager {
     const storyboard = await this.#loadUrl(start_url);
 
     // panel
-    const panel = storyboard.getPanel(0);
-    const layer0 = panel.getLayer(0);
-    const layer1 = panel.getLayer(1);
+    const panel0 = storyboard.getPanel(0);
+    const layer0 = panel0.getLayer(0);
+    const layer1 = panel0.getLayer(1);
     const cameraJson = layer1.getData('cameraJson');
     const floorResolution = layer1.getData('floorResolution');
     const floorNetDepths = layer1.getData('floorNetDepths');
     const floorNetCameraJson = layer1.getData('floorNetCameraJson');
     
     // zine renderer
-    const zineRenderer = this.#createRenderer({
-      panel,
-    });
+    const zineRenderer = this.#createRenderer(panel0);
     const {
       sceneMesh,
       scenePhysicsMesh,
       floorNetMesh,
     } = zineRenderer;
-
-    // transform
-    const floorInverseQuaternion = new THREE.Quaternion()
-      .fromArray(zineRenderer.metadata.floorPlaneLocation.quaternion)
-      .invert();
-    {
-      zineRenderer.scene.quaternion.copy(floorInverseQuaternion);
-      zineRenderer.scene.updateMatrixWorld();
-
-      zineRenderer.camera.quaternion.copy(floorInverseQuaternion);
-      zineRenderer.camera.updateMatrixWorld();
-    }
 
     // camera
     // const camera = setPerspectiveCameraFromJson(localCamera, cameraJson);
@@ -124,9 +202,19 @@ class ZineManager {
       light.updateMatrixWorld();
     }
 
-    // meshes
+    // scene meshes
     {
       instance.add(zineRenderer.scene);
+    }
+
+    // extra meshes
+    {
+      const scale = new THREE.Vector3().fromArray(zineRenderer.metadata.scale);
+      const entranceExitMesh = new EntranceExitMesh({
+        entranceExitLocations: zineRenderer.metadata.entranceExitLocations,
+        matrixWorld: zineRenderer.transformScene.matrixWorld,
+      });
+      instance.add(entranceExitMesh);
     }
 
     // physics
