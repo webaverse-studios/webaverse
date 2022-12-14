@@ -288,28 +288,11 @@ export class AvatarCharacterFx {
             const m = await importModule('healEffect');
             await this.healEffect.addModule(m);
             this.healEffectInited = true;
-            console.log(123)
             this.healEffect.playEffect(this.character);
             this.character.removeAction('cure');
           })();
           sceneLowPriority.add(this.healEffect);
-          // if (!this.healEffectPromise) {
-          //   this.healEffectPromise = (async () => {
-          //     const {importModule} = metaversefile.useDefaultModules();
-          //     const m = await importModule('healEffect');
-          //     this.healEffect = metaversefile.createApp();
-          //     await this.healEffect.addModule(m);
-          //     console.log(123)
-          //     // debugger
-          //     this.healEffect.playEffect(this.character);
-          //     this.character.removeAction('cure');
-          //     // this.healEffectPromise = null;
-          //   })();
-          //   sceneLowPriority.add(this.healEffect);
-          // }
         } else if (this.healEffectInited) {
-          console.log(456)
-          // debugger
           this.healEffect.playEffect(this.character);
           this.character.removeAction('cure');
         }
