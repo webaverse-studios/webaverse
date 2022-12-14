@@ -20,7 +20,9 @@ import {
 } from 'zine/zine-camera-utils.js';
 import {
   setCameraViewPositionFromOrthographicViewZ,
+  getDepthFloatsFromPointCloud,
   depthFloat32ArrayToOrthographicGeometry,
+  getDepthFloat32ArrayWorldPosition,
 } from 'zine/zine-geometry-utils.js';
 import storyCameraManager from '../story-camera-manager.js';
 import {
@@ -42,7 +44,7 @@ import {world} from '../world.js';
 
 // locals
 
-const localMatrix = new THREE.Matrix4();
+// const localVector = new THREE.Vector3();
 const localOrthographicCamera = new THREE.OrthographicCamera();
 
 // utils
@@ -158,6 +160,8 @@ class ZineManager {
 
     // story target mesh
     const storyTargetMesh = new StoryTargetMesh();
+    storyTargetMesh.frustumCulled = false;
+    storyTargetMesh.visible = false;
     instance.add(storyTargetMesh);
 
     // physics
@@ -243,6 +247,9 @@ class ZineManager {
       physicsIds.push(heightfieldPhysicsObject);
     }
 
+    // mouse tracking
+    const mousePosition = new THREE.Vector2();
+
     // methods
     instance.link = () => {
       const panel1 = storyboard.getPanel(1);
@@ -270,25 +277,77 @@ class ZineManager {
     // update matrix world
     instance.updateMatrixWorld();
 
+    // precompute
+    const pointCloudArrayBuffer = layer1.getData('pointCloud');
+    if (!pointCloudArrayBuffer) {
+      console.warn('could not get point cloud data', layer1);
+      debugger;
+    }
+    const depthFloat32Array = getDepthFloatsFromPointCloud(
+      pointCloudArrayBuffer,
+      panelSize,
+      panelSize
+    );
+
+    // update listeners
     world.appManager.addEventListener('frame', e => {
-      const localPlayer = playersManager.getLocalPlayer();
-      const {
-        capsuleWidth: capsuleRadius,
-        capsuleHeight,
-      } = localPlayer.characterPhysics;
-      const capsulePosition = localPlayer.position;
-      const intersectionIndex = getCapsuleIntersectionIndex(
-        entranceExitLocations,
-        zineRenderer.transformScene.matrixWorld,
-        capsulePosition,
-        capsuleRadius,
-        capsuleHeight
-      );
-      const highlights = new Uint8Array(entranceExitLocations.length);
-      if (intersectionIndex !== -1) {
-        highlights[intersectionIndex] = 1;
-      }
-      entranceExitMesh.setHighlights(highlights);
+      const _updateEntranceExitHighlights = () => {
+        const localPlayer = playersManager.getLocalPlayer();
+        const {
+          capsuleWidth: capsuleRadius,
+          capsuleHeight,
+        } = localPlayer.characterPhysics;
+        const capsulePosition = localPlayer.position;
+        const intersectionIndex = getCapsuleIntersectionIndex(
+          entranceExitLocations,
+          zineRenderer.transformScene.matrixWorld,
+          capsulePosition,
+          capsuleRadius,
+          capsuleHeight
+        );
+        const highlights = new Uint8Array(entranceExitLocations.length);
+        if (intersectionIndex !== -1) {
+          highlights[intersectionIndex] = 1;
+        }
+        entranceExitMesh.setHighlights(highlights);
+      };
+      _updateEntranceExitHighlights();
+
+      const _updateStoryTargetMesh = () => {
+        storyTargetMesh.visible = false;
+        
+        if (storyCameraManager.cameraLocked) {
+          const x = (mousePosition.x + 1) / 2;
+          const y = (mousePosition.y + 1) / 2;
+          const camera = storyCameraManager.lockCamera;
+          
+          getDepthFloat32ArrayWorldPosition(
+            depthFloat32Array,
+            x,
+            y,
+            panelSize,
+            panelSize,
+            camera,
+            storyTargetMesh.position
+          );
+
+          // XXX need to account for scale factor
+
+          storyTargetMesh.updateMatrixWorld();
+
+          storyTargetMesh.visible = true;
+        }
+      };
+      _updateStoryTargetMesh();
+    });
+    storyCameraManager.addEventListener('mousemove', e => {
+      const {movementX, movementY} = e.data;
+      const rate = 0.002;
+      mousePosition.x += movementX * rate;
+      mousePosition.y += movementY * rate;
+
+      mousePosition.x = Math.min(Math.max(mousePosition.x, -1), 1);
+      mousePosition.y = Math.min(Math.max(mousePosition.y, -1), 1);
     });
 
     // return
