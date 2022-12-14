@@ -73,7 +73,7 @@ export const Minimap = ({ className }) => {
         }
 
         function speechchange(event) {
-            setSpeechEnabled(event.data.enabled);
+            setSttEnabled(event.data.enabled);
         }
 
         voiceInput.addEventListener("micchange", michange);
