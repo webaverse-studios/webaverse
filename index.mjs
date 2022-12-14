@@ -315,7 +315,7 @@ const _startPreviewer = async () => {
   console.log(`Welcome to the Webaverse!`);
   console.log(`  > Local: https://${SERVER_NAME}:${DEVSERVER_PORT}/`);
   console.log('You have some options...');
-  console.log(`[A] App [W] Wiki [M] Multiplayer [P] Previewer [T] Automated Tests [U] Map [D] Debug logging [Q] Quit`);  
+  console.log(`[A] App  [W] Wiki  [M] Multiplayer  [P] Previewer [T] Automated Tests [U] Map  [D] Debug logging  [Q] Quit`);
   
   /* const wsServer = (() => {
     if (isHttps) {
@@ -335,7 +335,6 @@ const _startPreviewer = async () => {
     };
     for (const object of objects) {
       let {start_url, type, content, position = [0, 0, 0], quaternion = [0, 0, 0, 1], scale = [1, 1, 1]} = object;
-
       const transform = Float32Array.from([...position, ...quaternion, ...scale]);
       const instanceId = makeId(5);
       if (!start_url && type && content) {
