@@ -1,7 +1,11 @@
-import * as preauthenticator from 'https://preauthenticator.webaverse.online/preauthenticator.js';
+async function dynamicImportPreauthenticator () {
+  const preauthenticator = await import('https://preauthenticator.webaverse.online/preauthenticator.js');
+  return preauthenticator;
+}
 
 let port = null;
 const loadPromise = (async () => {
+  const preauthenticator = await dynamicImportPreauthenticator();
   port = await preauthenticator.connect();
 })();
 

@@ -8,7 +8,7 @@ import {getAudioDataBuffer} from 'wsrtc/ws-util.js';
 
 import * as THREE from 'three';
 import * as Z from 'zjs';
-import {getRenderer, scene, camera} from './renderer.js';
+import {getRenderer, scene, camera, sceneLowPriority} from './renderer.js';
 import physicsManager from './physics-manager.js';
 import {world} from './world.js';
 import audioManager from './audio-manager.js';
@@ -46,11 +46,15 @@ import musicManager from './music-manager.js';
 import {makeId, clone} from './util.js';
 import overrides from './overrides.js';
 import physx from './physx.js';
+import {ActionsManager} from './actions-manager.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
+const localVector3 = new THREE.Vector3();
+const localVector4 = new THREE.Vector3();
 const localQuaternion = new THREE.Quaternion();
 // const localQuaternion2 = new THREE.Quaternion();
+const localEuler = new THREE.Euler();
 const localMatrix = new THREE.Matrix4();
 const localMatrix2 = new THREE.Matrix4();
 const localArray3 = [0, 0, 0];
@@ -561,12 +565,12 @@ class Character extends THREE.Object3D {
 }
 
 const controlActionTypes = [
-  'jump',
-  'fallLoop',
-  'land',
-  'crouch',
-  'fly',
-  'sit',
+  // 'jump',
+  // 'fallLoop',
+  // 'land',
+  // 'crouch',
+  // 'fly',
+  // 'sit',
   'swim',
 ];
 class StateCharacter extends Character {
@@ -836,6 +840,7 @@ class AvatarCharacter extends StateCharacter {
     this.avatarFace = new AvatarCharacterFace(this);
     this.avatarCharacterFx = new AvatarCharacterFx(this);
     this.avatarCharacterSfx = new AvatarCharacterSfx(this);
+    this.glider = null;
 
     this.leftHand = new AvatarHand();
     this.rightHand = new AvatarHand();
@@ -966,6 +971,11 @@ class AvatarCharacter extends StateCharacter {
     this.avatarFace.destroy();
     this.avatarCharacterSfx.destroy();
     this.avatarCharacterFx.destroy();
+    if (this.glider) {
+      sceneLowPriority.remove(this.glider);
+      this.glider.destroy();
+      this.glider = null;
+    }
 
     super.destroy();
   }
@@ -1098,6 +1108,8 @@ class LocalPlayer extends UninterpolatedPlayer {
       this.controlMode = 'controlled';
     }
     this.detached = opts.detached ?? false;
+
+    this.actionsManager = new ActionsManager(this);
   }
 
   async setPlayerSpec(playerSpec) {
@@ -1341,6 +1353,7 @@ class LocalPlayer extends UninterpolatedPlayer {
   updateAvatar(timestamp, timeDiff) {
     if (this.avatar) {
       const timeDiffS = timeDiff / 1000;
+      this.actionsManager.update(timestamp);
       this.avatarCharacterSfx.update(timestamp, timeDiffS);
       this.avatarCharacterFx.update(timestamp, timeDiffS);
       this.characterHitter.update(timestamp, timeDiffS);
@@ -1355,6 +1368,53 @@ class LocalPlayer extends UninterpolatedPlayer {
       this.avatar.update(timestamp, timeDiff);
 
       this.characterHups.update(timestamp);
+
+      // note: Create glider app.
+      if (!this.glider && this.getControlMode() === 'controlled') {
+        this.glider = metaversefile.createApp();
+        this.glider.setComponent('player', this);
+        (async () => {
+          const {importModule} = metaversefile.useDefaultModules();
+          const m = await importModule('glider');
+          await this.glider.addModule(m);
+          const physicsScene = physicsManager.getScene();
+          this.glider.physicsObjects.forEach(physicsObject => {
+            physicsScene.disableActor(physicsObject);
+          })
+        })();
+        this.glider.visible = false;
+        sceneLowPriority.add(this.glider);
+      }
+      if (this.glider) {
+        // note: Calc/set glider's main rotation.
+        localEuler.order = 'YZX';
+        localEuler.setFromQuaternion(this.quaternion);
+        localEuler.y += Math.PI;
+        this.glider.rotation.copy(localEuler);
+        this.glider.rotation.x = 0;
+        // note: Dynamically calc/set glider's rotation.z by hands positions.
+        this.avatar.foundModelBones.Left_wrist.matrixWorld.decompose(localVector, localQuaternion, localVector4);
+        this.avatar.foundModelBones.Left_middleFinger1.matrixWorld.decompose(localVector3, localQuaternion, localVector4);
+        localVector.add(localVector3).multiplyScalar(0.5);
+        this.avatar.foundModelBones.Right_wrist.matrixWorld.decompose(localVector2, localQuaternion, localVector4);
+        this.avatar.foundModelBones.Right_middleFinger1.matrixWorld.decompose(localVector3, localQuaternion, localVector4);
+        localVector2.add(localVector3).multiplyScalar(0.5);
+        localVector.add(localVector2).multiplyScalar(0.5);
+        this.glider.position.copy(localVector);
+        //
+        localVector.set(0, 0, 0.032).applyEuler(this.glider.rotation);
+        this.glider.position.add(localVector);
+        //
+        this.avatar.foundModelBones.Left_wrist.matrixWorld.decompose(localVector, localQuaternion, localVector4);
+        this.avatar.foundModelBones.Right_wrist.matrixWorld.decompose(localVector2, localQuaternion, localVector4);
+        localVector3.subVectors(localVector, localVector2);
+        localVector4.copy(localVector3).setY(0);
+        let angle = localVector3.angleTo(localVector4);
+        if (localVector3.y < 0) angle *= -1;
+        this.glider.rotation.z = angle;
+        // note: Update glider's matrix.
+        this.glider.updateMatrixWorld();
+      }
     }
   }
 

@@ -9,7 +9,7 @@ import metaversefileApi from 'metaversefile'
 import {getNextPhysicsId, freePhysicsId, convertMeshToPhysicsMesh} from './util.js'
 import {CapsuleGeometry} from './geometries.js'
 import physxWorkerManager from './physx-worker-manager.js';
-import { BoxGeometry } from 'three';
+import {BoxGeometry} from 'three';
 
 const localVector = new THREE.Vector3()
 
@@ -738,9 +738,9 @@ class PhysicsScene extends EventTarget {
       new THREE.Vector3().fromArray(bounds, 0),
       new THREE.Vector3().fromArray(bounds, 3)
     );
-    const dimensions = new THREE.Vector3().subVectors( box.max, box.min );
+    const dimensions = new THREE.Vector3().subVectors(box.max, box.min);
     const physicsMesh = new THREE.Mesh(
-      //new CapsuleGeometry(radius, radius, characterHeight),
+      // new CapsuleGeometry(radius, radius, characterHeight),
       new BoxGeometry(dimensions.x, dimensions.y, dimensions.z),
       redAlphaMaterial
     )
