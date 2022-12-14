@@ -180,7 +180,9 @@ class ZineManager {
         // this centering is required for the physics to work and render correctly
         const material = new THREE.MeshPhongMaterial({
           color: 0x0000ff,
-          side: THREE.DoubleSide,
+          side: THREE.BackSide,
+          transparent: true,
+          opacity: 0.2,
         });
         const mesh = new THREE.Mesh(geometry, material);
         return mesh;
