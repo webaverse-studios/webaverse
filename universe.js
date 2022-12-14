@@ -523,6 +523,17 @@ class Universe extends EventTarget {
     await this.realms.updatePosition(localPlayer.position.toArray(), realmSize, {
       onConnect,
     });
+
+    // Wait for world apps to be loaded so that avatar doesn't fall.
+    await new Promise(async resolve => {
+      const TEST_INTERVAL = 100;
+      const MAX_TIMEOUT = 20000;
+      const startTime = Date.now();
+      while (world.appManager.pendingAddPromises.size > 0 && (Date.now() - startTime) < MAX_TIMEOUT) {
+        await new Promise(resolve => setTimeout(resolve, TEST_INTERVAL));
+      }
+      resolve();
+    });
   }
 
   // Called by enterWorld() to ensure we aren't connected to multi-player.
