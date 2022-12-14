@@ -1002,6 +1002,11 @@ class PhysicsScene extends EventTarget {
     })
     return triggerEvents;
   }
+
+  getActionInterpolant(character, actionName, type = 0) { // 0: get(), 1: getNormalized(), 2: getInverse()
+    const interpolantValue = physx.physxWorker.getActionInterpolantAnimationAvatar(character.avatar.animationAvatarPtr, actionName, type);
+    return interpolantValue;
+  }
 }
 
 const physicsManager = {
