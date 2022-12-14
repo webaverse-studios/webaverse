@@ -212,6 +212,31 @@ class ZineManager {
       physicsIds.push(heightfieldPhysicsObject);
     }
 
+    // methods
+    instance.link = () => {
+      const panel1 = storyboard.getPanel(1);
+      const zineRenderer2 = this.#createRenderer(panel1);
+      console.log('link instance', zineRenderer, zineRenderer2);
+      
+      zineRenderer.connect(zineRenderer2);
+      
+      // scene mesh
+      {
+        instance.add(zineRenderer2.scene);
+      }
+
+      // extra meshes
+      {
+        const entranceExitMesh2 = new EntranceExitMesh({
+          entranceExitLocations: zineRenderer2.metadata.entranceExitLocations,
+          matrixWorld: zineRenderer2.transformScene.matrixWorld,
+        });
+        instance.add(entranceExitMesh2);
+      }
+
+      instance.updateMatrixWorld();
+    };
+
     // update matrix world
     instance.updateMatrixWorld();
 
