@@ -305,12 +305,14 @@ export const App = () => {
         setMintedToken(nftData)
 
         const OTTokens = await getOTtokens(); // will add more Resource
-        setResourceToken([{
-            name: "OT",
-            start_url: "https://webaverse.github.io/ot-shard/shard.glb",
-            claimed: true,
-            value: OTTokens.nftList.totalCount
-        }])
+        if(OTTokens.nftList.totalCount) {
+            setResourceToken([{
+                name: "OT",
+                start_url: "https://webaverse.github.io/ot-shard/shard.glb",
+                claimed: true,
+                value: OTTokens.nftList.totalCount
+            }])
+        }
       }
 
     //
