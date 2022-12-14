@@ -101,7 +101,7 @@
     "jest-puppeteer": "^6.1.1",
     "kill-port": "^2.0.1",
     "mocha": "9.2.2",
-    "previewer": "./packages/previewer",
+    "webaverse-previewer": "file:packages/previewer",
     "puppeteer": "^17.0.0",
     "start-server-and-test": "^1.14.0",
     "supertest": "^6.2.4",

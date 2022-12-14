@@ -405,7 +405,7 @@ const mirrors = [];
 metaversefile.setApi({
   async import(s) {
     if (/^[a-zA-Z0-9]+:/.test(s)) {
-      s = `${compilerBaseUrl}${s.replace(/^([a-zA-Z0-9]+:\/)\//, '$1')}`;
+      s = `${s.startsWith(compilerBaseUrl) ? '' : compilerBaseUrl}${s.replace(/^([a-zA-Z0-9]+:\/)\//, '$1')}`; // note: check `s.startsWith(compilerBaseUrl)` in order to prevent multiple addings when making recursive app importing.
     } else {
       s = new URL(s, compilerBaseUrl).href;
     }
