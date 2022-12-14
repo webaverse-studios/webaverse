@@ -6,6 +6,7 @@ import Simplex from './simplex-noise.js';
 import {playersManager} from './players-manager.js';
 import easing from './easing.js';
 import {isWorker} from './env.js';
+import storyCameraManager from './story-camera-manager.js';
 
 const cubicBezier = easing(0, 1, 0, 1);
 const cubicBezier2 = easing(0.5, 0, 0.5, 1);
@@ -261,7 +262,7 @@ class CameraManager extends EventTarget {
   }
 
   getMode() {
-    if (this.target || this.cinematicScript || this.cameraLocked) {
+    if (this.target || this.cinematicScript || storyCameraManager.cameraLocked) {
       return 'isometric';
     } else {
       return cameraOffset.z > -0.5 ? 'firstperson' : 'isometric';
@@ -745,11 +746,7 @@ class CameraManager extends EventTarget {
 
       this.lastTarget = this.target;
     };
-    // if (!this.cameraLocked) {
-      _setUnlocked();
-    // } else {
-    //   _setLocked();
-    // }
+    _setUnlocked();
   }
 };
 const cameraManager = new CameraManager();
