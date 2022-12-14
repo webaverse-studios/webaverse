@@ -1316,6 +1316,9 @@ export default () => {
   useGeometries() {
     return geometries;
   },
+  useThree() {
+    return THREE;
+  },
   useThreeUtils() {
     return {
       BufferGeometryUtils,
