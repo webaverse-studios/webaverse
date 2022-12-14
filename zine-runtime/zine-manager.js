@@ -288,6 +288,8 @@ class ZineManager {
       panelSize,
       panelSize
     );
+    const scaleArray = layer1.getData('scale');
+    const scale = new THREE.Vector3().fromArray(scaleArray);
 
     // update listeners
     world.appManager.addEventListener('frame', e => {
@@ -328,6 +330,7 @@ class ZineManager {
             panelSize,
             panelSize,
             camera,
+            scale,
             storyTargetMesh.position
           );
 
