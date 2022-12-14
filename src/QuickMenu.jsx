@@ -250,7 +250,7 @@ export default function QuickMenu() {
   };
   useEffect(() => {
     _render();
-  }, [canvasRef.current, selectedSlice, selectedDepth, emoteIconImages, chevronImage]);
+  }, [canvasRef.current, selectedSlice, selectedDepth, emoteIconImages, chevronImage, open]);
   
   useEffect(() => {
     localVector2D.fromArray(coords);

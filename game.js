@@ -719,10 +719,11 @@ class GameManager extends EventTarget {
       .add(new THREE.Vector3(0, 0, -1).applyQuaternion(localPlayer.quaternion));
     const quaternion = localPlayer.quaternion;
 
-    if (object && object.voucher === undefined) {
-      const {voucher, expiry} = await getVoucherFromUser(object.tokenId, currentAddress, WebaversecontractAddress)
+    const newObject = {...object}
+    if (newObject && newObject.voucher === undefined) {
+      const {voucher, expiry} = await getVoucherFromUser(newObject.tokenId, currentAddress, WebaversecontractAddress)
       if (voucher.signature !== undefined) {
-        object.voucher = voucher
+        newObject.voucher = voucher
         // add blacklist and time counter add
         afterDrop(true)
       }
@@ -733,7 +734,7 @@ class GameManager extends EventTarget {
     const velocity = localVector.set(0, 0, -1).applyQuaternion(localPlayer.quaternion)
     .normalize()
     .multiplyScalar(2.5);
-    world.appManager.importAddedUserVoucherApp(position, quaternion, object, velocity);
+    world.appManager.importAddedUserVoucherApp(position, quaternion, newObject, velocity);
   }
 
   async handleDropJsonForSpawn(handleDropJsonForSpawn) { // currentAddress = walletaddress, WebaversecontractAddress= signaddress
