@@ -151,7 +151,7 @@ export const Location = () => {
             text="Create Room"
             size={12}
             className={styles.methodButton}
-            onClick={handleMultiplayerBtnClick /*handleRoomCreateBtnClick*/}
+            onClick={handleMultiplayerBtnClick /* handleRoomCreateBtnClick */}
           />
         </div>
         {rooms.map((room, i) => (
