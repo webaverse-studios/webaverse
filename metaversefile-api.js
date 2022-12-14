@@ -12,7 +12,6 @@ import React from 'react';
 import metaversefile from 'metaversefile';
 import {getRenderer, scene, sceneHighPriority, sceneLowPriority, sceneLowerPriority, sceneLowestPriority, rootScene, camera} from './renderer.js';
 import cameraManager from './camera-manager.js';
-import storyCameraManager from './story-camera-manager.js';
 import physicsManager from './physics-manager.js';
 import Avatar from './avatars/avatars.js';
 import {world} from './world.js';
@@ -54,7 +53,7 @@ import dropManager from './drop-manager.js';
 import hitManager from './character-hitter.js';
 import procGenManager from './procgen-manager.js';
 import cardsManager from './cards-manager.js';
-import zineManager from './zine-manager.js';
+import zineManager from './zine-runtime/zine-manager.js';
 import * as geometryBuffering from './geometry-buffering.js';
 import * as geometryBatching from './geometry-batching.js';
 import * as geometryChunking from './geometry-chunking.js';
@@ -894,9 +893,6 @@ metaversefile.setApi({
   },
   useCameraManager() {
     return cameraManager;
-  },
-  useStoryCameraManager() {
-    return storyCameraManager;
   },
   useParticleSystem() {
     return particleSystemManager;
