@@ -37,7 +37,7 @@ import dioramaManager from './diorama/diorama-manager.js';
 import * as voices from './voices.js';
 import performanceTracker from './performance-tracker.js';
 import renderSettingsManager from './rendersettings-manager.js';
-import metaversefileApi from 'metaversefile';
+import metaversefileApi from './metaversefile-api.js';
 import musicManager from './music-manager.js';
 import story from './story.js';
 import zTargeting from './z-targeting.js';
