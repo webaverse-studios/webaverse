@@ -56,7 +56,6 @@ const _startApp = async (weba, canvas) => {
     loadoutManager.initDefault();
     await universe.handleUrlUpdate();
     partyManager.inviteDefaultPlayer();
-    game.init();
 
     await weba.startLoop();
 
