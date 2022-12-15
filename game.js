@@ -86,7 +86,6 @@ class GameManager extends EventTarget {
     this.setFirstPersonAction(this.lastFirstPerson);
     this.bindPointerLock();
     this.registerHighlightMeshes();
-    this.init()
   }
 
   registerHighlightMeshes() {
@@ -111,15 +110,6 @@ class GameManager extends EventTarget {
   }
 
   init() {
-    // check if metaversefileApi.createApp exists
-    // if not, delay and try again
-    if (!metaversefileApi.createApp) {
-      setTimeout(() => {
-        this.init();
-      }, 1000);
-      return;
-    }
-
     this.grabUseMesh = metaversefileApi.createApp();
     (async () => {
       const {importModule} = metaversefileApi.useDefaultModules();
@@ -1103,7 +1093,7 @@ class GameManager extends EventTarget {
           const object = metaversefileApi.getAppByPhysicsId(physicsId);
           // console.log('got collision', physicsId, object);
           const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(physicsId);
-          if (object && !_isWear(object) && physicsObject) {
+          if (object && !_isWear(object) && physicsObject && !object.getComponent('invincible')) {
             this.grabUseMesh.position.setFromMatrixPosition(physicsObject.physicsMesh.matrixWorld);
             this.grabUseMesh.quaternion.copy(camera.quaternion);
             this.grabUseMesh.updateMatrixWorld();
