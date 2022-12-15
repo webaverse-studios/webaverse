@@ -147,9 +147,11 @@ class PanelInstance extends THREE.Object3D {
 
       const material2 = scenePhysicsMesh.material.clone();
       const scenePhysicsMesh2 = new THREE.Mesh(geometry2, material2);
+      scenePhysicsMesh2.name = 'scenePhysicsMesh';
       // scenePhysicsMesh.position.copy(scenePhysicsMesh.position);
       // scenePhysicsMesh.quaternion.copy(scenePhysicsMesh.quaternion);
       // scenePhysicsMesh.scale.copy(scenePhysicsMesh.scale);
+      scenePhysicsMesh2.visible = false;
       zineRenderer.transformScene.add(scenePhysicsMesh2);
       this.scenePhysicsMesh = scenePhysicsMesh2;
 
@@ -184,7 +186,9 @@ class PanelInstance extends THREE.Object3D {
         const mesh = new THREE.Mesh(geometry, material);
         return mesh;
       })();
+      floorNetPhysicsMesh.name = 'floorNetPhysicsMesh';
       floorNetPhysicsMesh.position.set(-floorNetWorldSize/2, 0, -floorNetWorldSize/2);
+      floorNetPhysicsMesh.visible = false;
       zineRenderer.transformScene.add(floorNetPhysicsMesh);
       this.floorNetPhysicsMesh = floorNetPhysicsMesh;
 
