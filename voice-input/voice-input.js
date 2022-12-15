@@ -129,14 +129,16 @@ class VoiceInput extends EventTarget {
   }
 
   disableSpeech() {
-    this.speechRecognition.stop();
-    this.speechRecognition = null;
+    if (this.speechEnabled()) {
+      this.speechRecognition.stop();
+      this.speechRecognition = null;
 
-    this.dispatchEvent(new MessageEvent('speechchange', {
-      data: {
-        enabled: false,
-      }
-    }));
+      this.dispatchEvent(new MessageEvent('speechchange', {
+        data: {
+          enabled: false,
+        }
+      }));
+    }
   }
 
   async toggleSpeech() {

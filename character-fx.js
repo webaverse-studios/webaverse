@@ -110,6 +110,7 @@ export class AvatarCharacterFx {
     this.kiMesh = null;
     this.sonicBoom = null;
     this.healEffect = null;
+    this.healEffectInited = false;
     this.hairMeshes = null;
     this.lastSSS = false;
   }
@@ -286,11 +287,12 @@ export class AvatarCharacterFx {
             const {importModule} = metaversefile.useDefaultModules();
             const m = await importModule('healEffect');
             await this.healEffect.addModule(m);
+            this.healEffectInited = true;
             this.healEffect.playEffect(this.character);
             this.character.removeAction('cure');
           })();
           sceneLowPriority.add(this.healEffect);
-        } else {
+        } else if (this.healEffectInited) {
           this.healEffect.playEffect(this.character);
           this.character.removeAction('cure');
         }

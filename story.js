@@ -482,7 +482,7 @@ story.startLocalPlayerComment = comment => {
 };
 
 story.listenHack = () => {
-  window.document.addEventListener('click', async e => {
+  (typeof window !== 'undefined') && window.document.addEventListener('click', async e => {
     if (cameraManager.pointerLockElement) {
       if (e.button === 0 && (cameraManager.focus && zTargeting.focusTargetReticle)) {
         const app = metaversefile.getAppByPhysicsId(zTargeting.focusTargetReticle.physicsId);

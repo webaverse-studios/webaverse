@@ -6,8 +6,6 @@ import {Switch} from './switch';
 import loreAI from '../../../../ai/lore/lore-ai';
 import debug from '../../../../debug';
 
-import usePreauthenticator from '../../../hooks/usePreauthenticator';
-
 import styles from './settings.module.css';
 
 //
@@ -17,7 +15,6 @@ const DefaultSettings = {
     apiType: ApiTypes[0],
     apiKey: '',
 };
-const authenticatedApiName = 'ai';
 
 export const TabAi = ({active}) => {
 
@@ -34,8 +31,6 @@ export const TabAi = ({active}) => {
 
     //
 
-    const preauthenticator = usePreauthenticator();
-
     useEffect(() => {
         function enabledchange(e) {
             setDebugEnabled(e.data.enabled);
@@ -45,19 +40,6 @@ export const TabAi = ({active}) => {
             debug.removeEventListener('enabledchange', enabledchange);
         };
     }, []);
-
-    /* useEffect(() => {
-        let live = true;
-        (async () => {
-            const hasApiKey = await preauthenticator.hasAuthenticatedApi(authenticatedApiName);
-            // console.log('has api key', hasApiKey);
-            if (!live) return;
-            setApiKeyEnabled( hasApiKey );
-        })();
-        return () => {
-            live = false;
-        }
-    }, []); */
 
     //
 
@@ -77,8 +59,7 @@ export const TabAi = ({active}) => {
         if (_apiTypeNeedsApiKey(apiType)) {
             // console.log('lore ai set endpoint', {authenticatedApiName, url});
             loreAI.setEndpoint(async query => {
-                // console.log('call lore ai endpoint', {authenticatedApiName, url, query});
-                return await preauthenticator.callAuthenticatedApi(authenticatedApiName, url, query);
+                console.log('call lore ai endpoint', query);
             });
         } else {
             loreAI.setEndpointUrl(url);
@@ -100,14 +81,12 @@ export const TabAi = ({active}) => {
                 const origin = new URL(url).origin;
                 
                 (async () => {
-                    await preauthenticator.setAuthenticatedApi(authenticatedApiName, origin, `Bearer ${apiKey}`);
                     setApiKeyEnabled(true);
                 })().catch(err => {
                     console.warn(err);
                 });
             } else {
                 (async () => {
-                    await preauthenticator.deleteAuthenticatedApi(authenticatedApiName);
                     setApiKeyEnabled(false);
                 })().catch(err => {
                     console.warn(err);

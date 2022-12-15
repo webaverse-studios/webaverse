@@ -10,6 +10,7 @@ import {getNextPhysicsId, freePhysicsId, convertMeshToPhysicsMesh} from './util.
 import {CapsuleGeometry} from './geometries.js'
 import physxWorkerManager from './physx-worker-manager.js';
 import {BoxGeometry} from 'three';
+import {GET, GET_NORMALIZED, GET_INVERSE} from './constants.js'
 
 const localVector = new THREE.Vector3()
 
@@ -390,6 +391,53 @@ class PhysicsScene extends EventTarget {
     return physicsObject
   }
 
+  cookHeightfieldGeometry(numRows, numColumns, heights) {
+    const buffer = physx.physxWorker.cookHeightfieldGeometryPhysics(numRows, numColumns, heights);
+    return buffer;
+  }
+
+  async cookHeightfieldGeometryAsync(numRows, numColumns, heights, {
+    signal = null,
+  } = {}) {
+    const buffer = await physxWorkerManager.cookHeightfieldGeometry(numRows, numColumns, heights);
+    signal && signal.throwIfAborted();
+    return buffer;
+  }
+
+  addCookedHeightfieldGeometry(
+    buffer,
+    heightScale,
+    rowScale,
+    columnScale,
+    dynamic = false,
+    external = false,
+  ) {
+    const physicsId = getNextPhysicsId()
+    physx.physxWorker.addCookedHeightfieldGeometryPhysics(
+      this.scene,
+      buffer,
+      heightScale,
+      rowScale,
+      columnScale,
+      dynamic,
+      external,
+      physicsId
+    )
+  
+    const physicsObject = _makePhysicsObject(
+      physicsId,
+      new THREE.Vector3(),
+      new THREE.Quaternion(),
+      new THREE.Vector3(1, 1, 1)
+    )
+    const physicsMesh = new THREE.Mesh(this.extractPhysicsGeometryForId(physicsId), redMaterial)
+    physicsMesh.visible = false
+    physicsObject.add(physicsMesh)
+    physicsObject.physicsMesh = physicsMesh
+    physicsMesh.updateMatrixWorld()
+    return physicsObject
+  }
+
   addShape(shapeAddress, position, quaternion, scale, external) {
     const physicsId = getNextPhysicsId()
   
@@ -456,6 +504,7 @@ class PhysicsScene extends EventTarget {
     const physicsId = getNextPhysicsId()
     const heightField = physx.physxWorker.addHeightFieldGeometryPhysics(
       this.scene,
+      mesh,
       numRows,
       numColumns,
       heights,
@@ -466,6 +515,7 @@ class PhysicsScene extends EventTarget {
       external,
       physicsId
     )
+    // for now, we assume what came in was an accurate heightfield plane for visualization...
     // physicsMesh.geometry = this.extractPhysicsGeometryForId(physicsId)
 
     const physicsObject = _makePhysicsObject(
@@ -954,6 +1004,11 @@ class PhysicsScene extends EventTarget {
       }
     })
     return triggerEvents;
+  }
+
+  getActionInterpolant(character, actionName, type = GET) { // note: type consts: GET, GET_NORMALIZED, GET_INVERSE.
+    const interpolantValue = physx.physxWorker.getActionInterpolantAnimationAvatar(character.avatar.animationAvatarPtr, actionName, type);
+    return interpolantValue;
   }
 }
 

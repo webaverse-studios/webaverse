@@ -3,7 +3,7 @@ import classnames from "classnames";
 
 import {AppContext} from "../../app";
 import {world} from "../../../../world.js";
-import {hp, mp, xp, level} from "../../../../player-stats.js";
+import {hp, mp, xp, level, limit} from "../../../../player-stats.js";
 
 import styles from "./AvatarBox.module.css";
 import {PlaceholderImg} from "../../../PlaceholderImg.jsx";
@@ -35,7 +35,7 @@ const CharacterBox = () => {
                 hp: hp,
                 mp: mp,
                 xp: xp,
-                limit: 67,
+                limit: limit,
             });
         }, 600);
     }, []);
