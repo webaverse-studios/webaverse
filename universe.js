@@ -20,7 +20,6 @@ import voiceInput from './voice-input/voice-input.js';
 import {world} from './world.js';
 import {sceneManager} from './scene-manager.js';
 import physx from './physx.js';
-import {murmurhash3} from './procgen/murmurhash3.js';
 
 class Universe extends EventTarget {
   constructor() {
@@ -30,7 +29,6 @@ class Universe extends EventTarget {
     this.currentWorld = null;
     this.sceneLoadedPromise = null;
 
-    this.multiplayerEnabled = false;
     this.multiplayerConnected = false;
     this.realms = null;
     this.actionsPrefix = 'actions.';
@@ -46,7 +44,9 @@ class Universe extends EventTarget {
   async enterWorld(worldSpec, locationSpec) {
     this.disconnectSingleplayer();
     this.disconnectMultiplayer();
+    /*
     this.disconnectRoom();
+    */
     
     const localPlayer = metaversefile.useLocalPlayer();
     /* localPlayer.teleportTo(new THREE.Vector3(0, 1.5, 0), camera.quaternion, {
@@ -70,7 +70,7 @@ class Universe extends EventTarget {
 
       const promises = [];
       const {src, room} = worldSpec;
-      if (!this.multiplayerEnabled && !room) {
+      if (!room) {
         await this.connectSinglePlayer();
 
         let match;
@@ -94,17 +94,19 @@ class Universe extends EventTarget {
           });
           promises.push(p);
         }
-      } else if (this.multiplayerEnabled) {
+      } else {
         const p = (async () => {
-          await this.connectMultiplayer(src);
+          await this.connectMultiplayer(src, room);
         })();
         promises.push(p);
+      /*
       } else {
         const p = (async () => {
           const roomUrl = this.getWorldsHost() + room;
           await this.connectRoom(roomUrl);
         })();
         promises.push(p);
+      */
       }
       
       this.sceneLoadedPromise = Promise.all(promises)
@@ -138,13 +140,14 @@ class Universe extends EventTarget {
     await this.enterWorld(q);
   }
 
-  toggleMultiplayer() {
-    this.multiplayerEnabled = !this.multiplayerEnabled;
-    console.log(this.multiplayerEnabled ? 'Enter multiplayer' : 'Exit multiplayer');
-    const localPlayer = playersManager.getLocalPlayer();
-    this.enterWorld(this.currentWorld, {
-      position: localPlayer.position,
-    });
+  async enterMultiplayer(url) {
+    history.pushState({}, '', url);
+    window.dispatchEvent(new MessageEvent('pushstate'));
+    const worldSpec = parseQuery(location.search);
+    const locationSpec = {
+      position: playersManager.getLocalPlayer().position,
+    };
+    await this.enterWorld(worldSpec, locationSpec);
   }
 
   isSceneLoaded() {
@@ -201,13 +204,12 @@ class Universe extends EventTarget {
   }
 
   // Called by enterWorld() when a player enables multi-player.
-  async connectMultiplayer(src, state = new Z.Doc()) {
+  async connectMultiplayer(src, room, state = new Z.Doc()) {
     this.connectState(state);
 
     // Set up the network realms.
-    const sceneId = murmurhash3(src);
     const localPlayer = playersManager.getLocalPlayer();
-    this.realms = new NetworkRealms(sceneId, localPlayer.playerId);
+    this.realms = new NetworkRealms(room, localPlayer.playerId);
     await this.realms.initAudioContext();
 
     // Handle remote players joining and leaving the set of realms.
@@ -489,6 +491,8 @@ class Universe extends EventTarget {
       this.realms.disconnect();
       this.realms = null;
     }
+
+    console.log('Multiplayer disconnected');
   }
 
   // called by enterWorld() in universe.js
