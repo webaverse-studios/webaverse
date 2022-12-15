@@ -12,6 +12,7 @@ import game from './game.js';
 
 import * as THREE from 'three';
 import npcManager from './npc-manager.js';
+import npcAiManager from './npc-ai-manager.js';
 import Avatar from './avatars/avatars.js';
 import * as sounds from './sounds.js';
 import physx from './physx.js';
@@ -413,6 +414,7 @@ export default class Webaverse extends EventTarget {
           if (this.contentLoaded && physicsScene.getPhysicsEnabled()) {
             physicsScene.simulatePhysics(timeDiffCapped);
             physicsScene.getTriggerEvents();
+            npcAiManager.update(timestamp, timeDiffCapped);
             npcManager.updatePhysics(timestamp, timeDiffCapped);
           }
 
