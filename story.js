@@ -446,6 +446,58 @@ export const handleStoryKeyControls = async (e) => {
 
 };
 
+export const startConversation = app => {
+  if (!app)
+    return console.warn(
+      'could not find app for physics id', zTargeting.focusTargetReticle.physicsId,
+    );
+  const {appType} = app;
+
+  // cameraManager.setFocus(false);
+  // zTargeting.focusTargetReticle = null;
+  sounds.playSoundName('menuSelect');
+
+  cameraManager.setFocus(false);
+  cameraManager.setDynamicTarget();
+
+  (async () => {
+    const aiScene = metaversefile.useLoreAIScene();
+    if (appType === 'npc') {
+      const {name, description} = app.getLoreSpec();
+      const remotePlayer = npcManager.getNpcByApp(app);
+
+      if (remotePlayer) {
+        const {
+          value: comment,
+          done,
+        } = await aiScene.generateSelectCharacterComment(name, description);
+
+        _startConversation(comment, remotePlayer, done);
+      } else {
+        console.warn('no player associated with app', app);
+      }
+    } else {
+      const {name, description} = app;
+      const comment = await aiScene.generateSelectTargetComment(name, description);
+      const fakePlayer = {
+        avatar: {
+          modelBones: {
+            Head: app,
+          },
+        },
+      };
+      _startConversation(comment, fakePlayer, true);
+    }
+  })();
+}
+
+export const progressConversation = () => {
+if (!currentConversation.progressing) {
+currentConversation.progress();
+sounds.playSoundName('menuNext');
+}
+}
+
 const story = new EventTarget();
 
 let currentConversation = null;
@@ -486,58 +538,12 @@ story.listenHack = () => {
     if (cameraManager.pointerLockElement) {
       if (e.button === 0 && (cameraManager.focus && zTargeting.focusTargetReticle)) {
         const app = metaversefile.getAppByPhysicsId(zTargeting.focusTargetReticle.physicsId);
-        
-        if (app) {
-          const {appType} = app;
-
-          // cameraManager.setFocus(false);
-          // zTargeting.focusTargetReticle = null;
-          sounds.playSoundName('menuSelect');
-
-          cameraManager.setFocus(false);
-          cameraManager.setDynamicTarget();
-
-          (async () => {
-            const aiScene = metaversefile.useLoreAIScene();
-            if (appType === 'npc') {
-              const {name, description} = app.getLoreSpec();
-              const remotePlayer = npcManager.getNpcByApp(app);
-
-              if (remotePlayer) {
-                const {
-                  value: comment,
-                  done,
-                } = await aiScene.generateSelectCharacterComment(name, description);
-
-                _startConversation(comment, remotePlayer, done);
-              } else {
-                console.warn('no player associated with app', app);
-              }
-            } else {
-              const {name, description} = app;
-              const comment = await aiScene.generateSelectTargetComment(name, description);
-              const fakePlayer = {
-                avatar: {
-                  modelBones: {
-                    Head: app,
-                  },
-                },
-              };
-              _startConversation(comment, fakePlayer, true);
-            }
-          })();
-        } else {
-          console.warn('could not find app for physics id', zTargeting.focusTargetReticle.physicsId);
-        }
+        startConversation(app);
       } else if (e.button === 0 && currentConversation) {
-        if (!currentConversation.progressing) {
-          currentConversation.progress();
-
-          sounds.playSoundName('menuNext');
+        progressConversation();
         }
       }
-    }
-  });
+    });
 };
 story.startCinematicIntro = () => {
   const rng = alea('lol' + Math.random());

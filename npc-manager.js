@@ -17,7 +17,7 @@ import {makeId, createRelativeUrl} from './util.js';
 import metaversefile from './metaversefile-api.js';
 import {characterSelectManager} from './characterselect-manager.js';
 import emoteManager from './emotes/emote-manager.js';
-import {getFuzzyEmotionMapping} from './story.js';
+import {startConversation, getFuzzyEmotionMapping} from './story.js';
 import {idleFn} from './npc-behavior.js';
 
 const localVector = new THREE.Vector3();
@@ -294,19 +294,22 @@ class NpcManager extends EventTarget {
       });
 
       const activate = () => {
-        if (player.getControlMode() === 'npc') {
-          this.dispatchEvent(new MessageEvent('playerinvited', {
-            data: {
-              player,
-            }
-          }));
-        } else {
-          this.dispatchEvent(new MessageEvent('playerexpelled', {
-            data: {
-              player,
-            }
-          }));
-        }
+        // check if the npc is a guest giver
+        startConversation(app);
+
+        // if (player.getControlMode() === 'npc') {
+        //   this.dispatchEvent(new MessageEvent('playerinvited', {
+        //     data: {
+        //       player,
+        //     }
+        //   }));
+        // } else {
+        //   this.dispatchEvent(new MessageEvent('playerexpelled', {
+        //     data: {
+        //       player,
+        //     }
+        //   }));
+        // }
       };
       app.addEventListener('activate', activate);
       npc.cancelFns.push(() => {
