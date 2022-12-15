@@ -306,7 +306,7 @@ const _startPreviewer = async () => {
     _startDevServer(),
     _startCompiler(),
     _startMultiplayer(),
-    _startWiki(),
+    // _startWiki(),
     _startPreviewer(),
   ]);
 
