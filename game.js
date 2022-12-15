@@ -50,14 +50,14 @@ const hitHeight = 0.2;
 const hitHalfHeight = hitHeight * 0.5;
 const hitboxOffsetDistance = 0.3;
 
-const testMesh = new THREE.Mesh(
-  new THREE.BoxBufferGeometry(0.01, 0.01, 0.01),
-  new THREE.MeshPhongMaterial({
-    color: 0xff0000,
-  })
-);
-testMesh.frustumCulled = false;
-rootScene.add(testMesh);
+// const testMesh = new THREE.Mesh(
+//   new THREE.BoxBufferGeometry(0.01, 0.01, 0.01),
+//   new THREE.MeshPhongMaterial({
+//     color: 0xff0000,
+//   })
+// );
+// testMesh.frustumCulled = false;
+// rootScene.add(testMesh);
 
 class GameManager extends EventTarget {
   menuOpen = 0;
@@ -504,9 +504,9 @@ class GameManager extends EventTarget {
       )
         .unproject(storyCameraManager.lockCamera);
       
-      // XXX debug mesh
-      testMesh.position.copy(unprojectedNearPoint);
-      testMesh.updateMatrixWorld();
+      // // debug mesh
+      // testMesh.position.copy(unprojectedNearPoint);
+      // testMesh.updateMatrixWorld();
 
       const rayObject = new THREE.Object3D();
       rayObject.position.copy(unprojectedNearPoint);
