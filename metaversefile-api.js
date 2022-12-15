@@ -68,7 +68,6 @@ import {compilerBaseUrl} from './endpoints.js';
 import {getDefaultCanvas} from './offscreen-engine/fns/avatar-iconer-fn.js';
 import {isWorker} from './env.js';
 import './metaversefile-binding.js';
-import {GET, GET_NORMALIZED, GET_INVERSE} from './constants.js';
 
 // const localVector2D = new THREE.Vector2();
 
@@ -882,9 +881,6 @@ metaversefile.setApi({
     } else {
       throw new Error('usePhysics cannot be called outside of render()');
     }
-  },
-  useConstants() {
-    return {GET, GET_NORMALIZED, GET_INVERSE};
   },
   useHpManager() {
     return hpManager;

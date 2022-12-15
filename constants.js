@@ -150,7 +150,7 @@ export const offscreenCanvasSize = 2048;
 
 export const heightfieldScale = 0.1; // must fit heightfield in int16
 
-// note: For WASM/physics useConstants() API.
+// note: For WASM API.
 export const GET = 0;
 export const GET_NORMALIZED = 1;
 export const GET_INVERSE = 2;

@@ -1004,7 +1004,7 @@ class PhysicsScene extends EventTarget {
     return triggerEvents;
   }
 
-  getActionInterpolant(character, actionName, type = GET) { // note: type consts: GET, GET_NORMALIZED, GET_INVERSE. Can get via useConstants().
+  getActionInterpolant(character, actionName, type = GET) { // note: type consts: GET, GET_NORMALIZED, GET_INVERSE.
     const interpolantValue = physx.physxWorker.getActionInterpolantAnimationAvatar(character.avatar.animationAvatarPtr, actionName, type);
     return interpolantValue;
   }
