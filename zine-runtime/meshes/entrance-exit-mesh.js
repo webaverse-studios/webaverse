@@ -15,6 +15,31 @@ const localMatrix = new THREE.Matrix4();
 
 //
 
+const entranceExitMaterial = new THREE.ShaderMaterial({
+  vertexShader: `\
+    attribute vec3 color;
+    varying vec2 vUv;
+    varying vec3 vColor;
+
+    void main() {
+      vUv = uv;
+      vColor = color;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `\
+    varying vec2 vUv;
+    varying vec3 vColor;
+
+    void main() {
+      // vec3 c = vec3(1., 0., 1.);
+      vec3 c = vColor;
+      gl_FragColor = vec4(c, 0.5);
+      gl_FragColor.rg += vUv * 0.2;
+    }
+  `,
+  transparent: true,
+});
 export class EntranceExitMesh extends THREE.Mesh {
   constructor({
     entranceExitLocations,
@@ -42,31 +67,7 @@ export class EntranceExitMesh extends THREE.Mesh {
     });
     const geometry = geometries.length > 0 ? BufferGeometryUtils.mergeBufferGeometries(geometries) : new THREE.BufferGeometry();
 
-    const material = new THREE.ShaderMaterial({
-      vertexShader: `\
-        attribute vec3 color;
-        varying vec2 vUv;
-        varying vec3 vColor;
-
-        void main() {
-          vUv = uv;
-          vColor = color;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragmentShader: `\
-        varying vec2 vUv;
-        varying vec3 vColor;
-
-        void main() {
-          // vec3 c = vec3(1., 0., 1.);
-          vec3 c = vColor;
-          gl_FragColor = vec4(c, 0.5);
-          gl_FragColor.rg += vUv * 0.2;
-        }
-      `,
-      transparent: true,
-    });
+    const material = entranceExitMaterial
     super(geometry, material);
 
     // const hasGeometry = geometries.length > 0;
