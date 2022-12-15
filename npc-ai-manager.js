@@ -58,7 +58,6 @@ class NpcAiManager {
       }
     }
   }
-
 }
 
 const npcAiManager = new NpcAiManager();

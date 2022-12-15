@@ -2,6 +2,7 @@ import npcManager from './npc-manager';
 import {playersManager} from './players-manager';
 import {Vector3, MathUtils} from 'three';
 import {walkSpeed, runSpeed} from './constants';
+
 export const BehaviorType = {
   IDLE: 0,
   FOLLOW: 1,

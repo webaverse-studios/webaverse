@@ -328,6 +328,7 @@ class NpcManager extends EventTarget {
       this.setBehaviorFn(app, idleFn);
       if (!app.getComponent('state')) {
         app.setComponent('state', {behavior: BehaviorType.IDLE, target: null});
+        app.setComponent('state', 0);
       }
 
       const updateAvatarFn = (timestamp, timeDiff) => {
