@@ -177,6 +177,10 @@ class IoManager extends EventTarget {
       this.keysDirection.set(0, 0, 0);
 
       const localPlayer = metaversefile.useLocalPlayer();
+      const transformCamera = storyCameraManager.cameraLocked ?
+        storyCameraManager.lockCamera
+      :
+        camera;
 
       const _updateHorizontal = direction => {
         if (ioManager.keys.left) {
@@ -223,13 +227,13 @@ class IoManager extends EventTarget {
         }
       }
       if (localPlayer.hasAction('fly') || localPlayer.hasAction('swim')) {
-        this.keysDirection.applyQuaternion(camera.quaternion);
+        this.keysDirection.applyQuaternion(transformCamera.quaternion);
         _updateVertical(this.keysDirection);
       } else {
-        const cameraEuler = camera.rotation.clone();
-        cameraEuler.x = 0;
-        cameraEuler.z = 0;
-        this.keysDirection.applyEuler(cameraEuler);
+        localEuler.setFromQuaternion(transformCamera.quaternion, 'YXZ');
+        localEuler.x = 0;
+        localEuler.z = 0;
+        this.keysDirection.applyEuler(localEuler);
 
         if (ioManager.keys.ctrl && !ioManager.lastCtrlKey && game.isGrounded()) {
           game.toggleCrouch();
