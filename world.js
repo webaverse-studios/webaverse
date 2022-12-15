@@ -34,8 +34,12 @@ export class World {
       bindScene.add(app);
       let boundAppManager = this.appManager;
 
+      const isInvincible = app.getComponent('invincible');
+
+      console.log('is invincible', isInvincible)
+
       // regular glb models default to invincible for now
-      if (app.appType !== 'glb') {
+      if (!isInvincible) {
         const hitTracker = hpManager.makeHitTracker();
         hitTracker.bind(app);
         app.dispatchEvent({type: 'hittrackeradded'});
