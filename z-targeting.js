@@ -10,6 +10,7 @@ import {playersManager} from './players-manager.js';
 //
 
 const localVector = new THREE.Vector3();
+const localVector2 = new THREE.Vector3();
 
 // const maxResults = 16;
 
@@ -55,7 +56,7 @@ class QueryResults {
     this.results = [];
   }
 
-  snapshot(object) {
+  snapshotSweep(object) {
     const {position, quaternion} = object;
     const direction = new THREE.Vector3(0, 0, -1)
       .applyQuaternion(quaternion);
@@ -90,7 +91,7 @@ class QueryResults {
         physicsId: reticle.objectId,
         type,
         zoom,
-      }
+      };
     });
     if (object === camera) {
       reticles = reticles.filter(reticle => {
@@ -114,6 +115,68 @@ class QueryResults {
     reticleSpecs.sort((a, b) => a.lengthSq - b.lengthSq);
     reticles = reticleSpecs.map(reticleSpec => reticleSpec.reticle);
     this.results = reticles;
+  }
+  snapshotRay(object) {
+    const physicsScene = physicsManager.getScene();
+    const results = physicsScene.raycast(object.position, object.quaternion);
+    console.log('TODO: snapshot results into reticle', results, object.position.toArray(), object.quaternion.toArray());
+
+    if (results) {
+      const {
+        distance,
+        faceIndex,
+        meshId,
+        normal,
+        objectId,
+        point,
+      } = results;
+
+      const position = new THREE.Vector3().fromArray(point);
+      const physicsId = objectId;
+      const type = (() => {
+        if (distance < 5) {
+          return 'friend';
+        } else if (distance < 10) {
+          return 'enemy';
+        } else {
+          return 'object';
+        }
+      })();
+      const zoom = 0;
+      const reticle = {
+        position,
+        physicsId,
+        type,
+        zoom,
+      };
+      const reticles = [
+        reticle,
+      ];
+      this.results = reticles;
+    } else {
+      this.results = [];
+    }
+    // const distance = reticle.position.distanceTo(position);
+    // const type = (() => {
+    //   if (distance < 5) {
+    //     return 'friend';
+    //   } else if (distance < 10) {
+    //     return 'enemy';
+    //   } else {
+    //     return 'object';
+    //   }
+    // })();
+    // const zoom = 0;
+    // const reticle = {
+    //   position: reticle.position,
+    //   physicsId: reticle.objectId,
+    //   type,
+    //   zoom,
+    // };
+    // const reticles = [
+    //   reticle,
+    // ];
+    // this.results = reticles;
   }
 }
 
@@ -148,7 +211,7 @@ class ZTargeting extends THREE.Object3D {
     let reticles;
     const localPlayer = playersManager.getLocalPlayer();
     if (localPlayer.hasAction('aim')) {
-      this.queryResults.snapshot(camera);
+      this.queryResults.snapshotSweep(camera);
       reticles = this.queryResults.results;
     } else {
       reticles = [];
@@ -181,34 +244,55 @@ class ZTargeting extends THREE.Object3D {
     this.setQueryResult(timestamp);
   }
 
-  handleDown(object = camera) {
-    if (!cameraManager.focus) {
-      this.queryResults.snapshot(object);
-
-      if (this.queryResults.results.length > 0) {
-        this.focusTargetReticle = this.queryResults.results[0];
-        sounds.playSoundName(this.focusTargetReticle.type === 'enemy' ? 'zTargetEnemy' : 'zTargetObject');
-      
-        const naviSoundNames = [
-          'naviHey',
-          'naviWatchout',
-          'naviFriendly',
-          'naviItem',
-          'naviDanger',
-        ];
-        const naviSoundName = naviSoundNames[Math.floor(Math.random() * naviSoundNames.length)];
-        sounds.playSoundName(naviSoundName);
-      } else {
-        sounds.playSoundName('zTargetCenter');
-      }
-
-      cameraManager.setFocus(true);
-      const remoteApp = this.focusTargetReticle ? metaversefile.getAppByPhysicsId(this.focusTargetReticle.physicsId) : null;
-      const localPlayer = playersManager.getLocalPlayer();
-      cameraManager.setStaticTarget(localPlayer.avatar.modelBones.Head, remoteApp);
+  #snapshotSelectSweep(object) {
+    this.queryResults.snapshotSweep(object);
+    this.#updateFocusTargetReticle();
+  }
+  #snapshotSelectRay(object) {
+    this.queryResults.snapshotRay(object);
+    this.#updateFocusTargetReticle();
+  }
+  #updateFocusTargetReticle() {
+    if (this.queryResults.results.length > 0) {
+      this.focusTargetReticle = this.queryResults.results[0];
+    } else {
+      this.focusTargetReticle = null;
+    }
+  }
+  #focusSelectedApp() {
+    cameraManager.setFocus(true);
+    const remoteApp = this.focusTargetReticle ?
+      metaversefile.getAppByPhysicsId(this.focusTargetReticle.physicsId)
+    :
+      null;
+    const localPlayer = playersManager.getLocalPlayer();
+    cameraManager.setStaticTarget(localPlayer.avatar.modelBones.Head, remoteApp);
+  }
+  #playSelectSound() {
+    if (this.focusTargetReticle) {
+      sounds.playSoundName(this.focusTargetReticle.type === 'enemy' ? 'zTargetEnemy' : 'zTargetObject');
+        
+      const naviSoundNames = [
+        'naviHey',
+        'naviWatchout',
+        'naviFriendly',
+        'naviItem',
+        'naviDanger',
+      ];
+      const naviSoundName = naviSoundNames[Math.floor(Math.random() * naviSoundNames.length)];
+      sounds.playSoundName(naviSoundName);
+    } else {
+      sounds.playSoundName('zTargetCenter');
     }
   }
 
+  handleDown(object = camera) {
+    if (!cameraManager.focus) {
+      this.#snapshotSelectSweep(object);
+      this.#focusSelectedApp();
+      this.#playSelectSound();
+    }
+  }
   handleUp() {
     if (cameraManager.focus) {
       cameraManager.setFocus(false);
@@ -232,6 +316,16 @@ class ZTargeting extends THREE.Object3D {
           this.handleUp();
         }, 300);
       }
+    }
+  }
+
+  handleRayFocus(object) {
+    if (!cameraManager.focus) {
+      this.#snapshotSelectRay(object);
+      this.#focusSelectedApp();
+      this.#playSelectSound();
+    } else {
+      this.handleUp();
     }
   }
 }
