@@ -22,8 +22,12 @@ const localVector = new THREE.Vector3();
 const localEuler = new THREE.Euler();
 const localMatrix2 = new THREE.Matrix4();
 const localMatrix3 = new THREE.Matrix4();
-const zeroVector = new THREE.Vector3();
 const localQuaternion = new THREE.Quaternion();
+const localMatrix = new THREE.Matrix4();
+const localPlane = new THREE.Plane();
+
+const zeroVector = new THREE.Vector3(0, 0, 0);
+const upVector = new THREE.Vector3(0, 1, 0);
 
 const doubleTapTime = 200;;
 
@@ -230,10 +234,31 @@ class IoManager extends EventTarget {
         this.keysDirection.applyQuaternion(transformCamera.quaternion);
         _updateVertical(this.keysDirection);
       } else {
-        localEuler.setFromQuaternion(transformCamera.quaternion, 'YXZ');
-        localEuler.x = 0;
-        localEuler.z = 0;
-        this.keysDirection.applyEuler(localEuler);
+        // if we are on the forward side of the camera
+        localPlane.setFromNormalAndCoplanarPoint(
+          localVector.set(0, 0, -1)
+            .applyQuaternion(transformCamera.quaternion),
+          transformCamera.position
+        );
+        const d = localPlane.distanceToPoint(localPlayer.position);
+        const isInFrontOfCamera = d > 0;
+        if (isInFrontOfCamera) {
+          const direction = localVector.copy(localPlayer.position)
+            .sub(transformCamera.position);
+          direction.y = 0;
+          direction.normalize();
+
+          localQuaternion.setFromRotationMatrix(
+            localMatrix.lookAt(zeroVector, direction, upVector)
+          );
+
+          this.keysDirection.applyQuaternion(localQuaternion);
+        } else {
+          localEuler.setFromQuaternion(transformCamera.quaternion, 'YXZ');
+          localEuler.x = 0;
+          localEuler.z = 0;
+          this.keysDirection.applyEuler(localEuler);
+        }
 
         if (ioManager.keys.ctrl && !ioManager.lastCtrlKey && game.isGrounded()) {
           game.toggleCrouch();
