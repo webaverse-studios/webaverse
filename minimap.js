@@ -1,8 +1,8 @@
 import * as THREE from "three";
 // import * as BufferGeometryUtils from "three/examples/jsm/utils/BufferGeometryUtils.js";
-import { getRenderer, rootScene, camera } from "./renderer.js";
+import {getRenderer, rootScene, camera} from "./renderer.js";
 import universe from "./universe.js";
-import { waitForFrame } from "./util.js";
+import {waitForFrame} from "./util.js";
 import metaversefileApi from "metaversefile";
 
 const localColor = new THREE.Color();
@@ -451,7 +451,7 @@ class MiniMap {
     }
 
     addCanvas(canvas) {
-        const { width, height } = canvas;
+        const {width, height} = canvas;
         this.canvasWidth = Math.max(this.canvasWidth, width);
         this.canvasHeight = Math.max(this.canvasHeight, height);
 
@@ -743,7 +743,7 @@ class MiniMap {
 
         const _copyToCanvases = () => {
             for (const canvas of this.canvases) {
-                const { width, height, ctx } = canvas;
+                const {width, height, ctx} = canvas;
                 ctx.clearRect(0, 0, width, height);
                 ctx.drawImage(
                     renderer.domElement,

@@ -960,7 +960,7 @@ export const parseChatResponse = response => {
   response = '"' + response;
 
   let match;
-  if (match = response.match(/\s*"(.*)\(react\s*=\s*([\s\S]*?)\s*\)"\s*(\*END\*)?/) ){
+  if (match = response.match(/\s*"(.*)\(react\s*=\s*([\s\S]*?)\s*\)"\s*(\*END\*)?/)){
     const value = match ? match[1] : '';
     const emote = match ?match[2] : '';
     const done = match ? !!match[3] : true;
@@ -972,7 +972,7 @@ export const parseChatResponse = response => {
       emote,
       done,
     };
-  } else if (match = response.match(/\s*"(.*)\s*"\s*(\*END\*)?/) ){
+  } else if (match = response.match(/\s*"(.*)\s*"\s*(\*END\*)?/)){
     const value = match ? match[1] : '';
     const emote = 'normal';
     const done = match ? !!match[3] : true;

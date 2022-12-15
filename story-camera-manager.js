@@ -20,6 +20,7 @@ class StoryCameraManager extends EventTarget {
   setLockCamera(camera) {
     this.lockCamera.copy(camera);
   }
+
   toggleCameraLock() {
     this.cameraLocked = !this.cameraLocked;
 

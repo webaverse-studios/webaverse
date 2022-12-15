@@ -86,6 +86,7 @@ class ZineManager {
     zineStoryboard.load(uint8Array);
     return zineStoryboard;
   }
+
   #createRenderer(panel) {
     const zineRenderer = new ZineRenderer({
       panel,
@@ -104,6 +105,7 @@ class ZineManager {
 
     return zineRenderer;
   }
+
   async createInstanceAsync({
     start_url,
     physics,
