@@ -49,7 +49,6 @@ class NpcAiManager {
       const {behavior} = state;
       
       if (currentBehavior !== behavior) {
-        console.log('state is', state)
         const targetPlayer = npcManager.getNpcByAppInstanceId(state.target);
         console.log('changed state to', behavior, 'state.target', state.target, 'targetPlayer', targetPlayer)
         npc.target = targetPlayer;
