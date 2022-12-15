@@ -31,12 +31,25 @@ class FallLoop extends b3.Action {
     }
   }
 }
-class Skydive extends b3.Action {
+class StartSkydive extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
     const tickTryActions = tick.blackboard.get('tickTryActions');
     const localPlayer = tick.target;
     if (!localPlayer.characterPhysics.grounded && tickTryActions.skydive) {
+      tickResults.skydive = true;
+      return b3.SUCCESS;
+    } else {
+      return b3.FAILURE;
+    }
+  }
+}
+class Skydive extends b3.Action {
+  tick(tick) {
+    const tickResults = tick.blackboard.get('tickResults');
+    const tickTryActions = tick.blackboard.get('tickTryActions');
+    const localPlayer = tick.target;
+    if (!localPlayer.characterPhysics.grounded) {
       tickResults.skydive = true;
       return b3.RUNNING;
     } else {
@@ -260,9 +273,13 @@ tree.root = new b3.MemSequence({title:'root',children: [
           new DoubleJump({title:'DoubleJump'}),
         ]}),
         new b3.MemSequence({title:'fallLoop & skydive & glider',children:[
-          new b3.Priority({title:'fallLoop & skydive',children:[
+          new b3.Priority({children:[
+            new StartSkydive({title:'StartSkydive'}),
+            new FallLoop({title:'FallLoop'}),
+          ]}),
+          new b3.Priority({children:[
             new StartGlider({title:'StartGlider'}),
-            new b3.Parallel({title:'fallLoop & skydive',children:[
+            new b3.Parallel({children:[
               new FallLoop({title:'FallLoop'}),
               new Skydive({title:'Skydive'}),
             ]}),

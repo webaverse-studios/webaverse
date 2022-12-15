@@ -13,7 +13,7 @@ class WebaverseRenderPass extends Pass {
 
     this.internalDepthPass = null;
     this.internalRenderPass = null;
-    this.onBeforeRender = null;
+    this.onBeforeRenders = [];
     this.onAfterRender = null;
   }
 
@@ -27,7 +27,9 @@ class WebaverseRenderPass extends Pass {
 	}
 
   render(renderer, renderTarget, readBuffer, deltaTime, maskActive) {
-    this.onBeforeRender && this.onBeforeRender();
+    for (const onBeforeRender of this.onBeforeRenders) {
+      onBeforeRender();
+    }
     
     // render
     if (this.internalDepthPass) {
