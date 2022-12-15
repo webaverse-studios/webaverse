@@ -385,7 +385,7 @@ class IoManager extends EventTarget {
         game.menuSwitchCharacter();
         break;
       }
-      case 78: { // N
+      /* case 78: { // N
         const zineApp = world.appManager.apps.find(app => !!app.zineInstance);
         if (zineApp) {
           zineApp.zineInstance.link();
@@ -393,7 +393,7 @@ class IoManager extends EventTarget {
           console.warn('no zine app found');
         }
         break;
-      }
+      } */
       case 86: { // V
         e.preventDefault();
         e.stopPropagation();

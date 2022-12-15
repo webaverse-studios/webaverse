@@ -485,7 +485,7 @@ class ZineManager {
     // mouse tracking
     const mousePosition = new THREE.Vector2();
 
-    // methods
+    /* // methods
     instance.link = () => {
       // XXX this needs to happen automatically during panel instance manager initiailization
       console.log('linking needs to happen in the panel instance manager');
@@ -511,7 +511,7 @@ class ZineManager {
       }
 
       instance.updateMatrixWorld();
-    };
+    }; */
 
     // update matrix world
     instance.updateMatrixWorld();
