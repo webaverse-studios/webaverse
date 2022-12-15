@@ -27,8 +27,9 @@ import {handleStoryKeyControls} from '../../../story';
 import {scenesBaseUrl, defaultSceneName} from '../../../endpoints.js';
 
 import styles from './App.module.css';
-import '../../fonts.css';
+import '../../../styles/globals.css';
 import raycastManager from '../../../raycast-manager';
+import grabManager from '../../../grab-manager';
 
 import {AccountContext} from '../../hooks/web3AccountProvider';
 import {ChainContext} from '../../hooks/chainProvider';
@@ -73,6 +74,7 @@ export const App = () => {
     const [ selectedApp, setSelectedApp ] = useState(null);
     const [ selectedScene, setSelectedScene ] = useState(_getCurrentSceneSrc());
     const [ selectedRoom, setSelectedRoom ] = useState(_getCurrentRoom());
+    const [ editMode, setEditMode ] = useState(false);
     const [ claimableToken, setClaimableToken ] = useState([]);
     const [ mintedToken, setMintedToken ] = useState([]);
     const [ apps, setApps ] = useState(world.appManager.getApps().slice());
@@ -168,7 +170,7 @@ export const App = () => {
         };
 
         registerIoEventHandler('keydown', handleKeyDown);
-
+ 
         return () => {
 
             unregisterIoEventHandler('keydown', handleKeyDown);
@@ -220,6 +222,7 @@ export const App = () => {
     }, []);
 
     useEffect(() => {
+        if (typeof window === 'undefined') return;
 
         const pushstate = e => {
 
@@ -296,12 +299,26 @@ export const App = () => {
               params: [
               ],
               claimed: true,
+              rarity: "common",
               type: "major",
               level: 15
           }
         ))
         setMintedToken(nftData)
       }
+
+    //
+    
+    useEffect(() => {
+        const setEditModeState = async (e) => {
+            const {editMode} = e.target;
+            setEditMode(editMode);
+        };
+        grabManager.addEventListener('setgridsnap', setEditModeState);
+        return () => {
+            grabManager.addEventListener('setgridsnap', setEditModeState);
+        };
+    }, []);
 
     //
 
@@ -316,8 +333,24 @@ export const App = () => {
         // console.log('drag end', e);
     };
 
+    const AppContextValues = {
+        state,
+        setState,
+        setSelectedApp,
+        selectedApp,
+        editMode,
+        showUI,
+        account,
+        chain,
+        claimableToken,
+        setClaimableToken,
+        mintedToken,
+        setMintedToken,
+        getWalletItems
+    }
+
     return (
-        <AppContext.Provider value={{state, setState, setSelectedApp, selectedApp, showUI, account, chain, claimableToken, setClaimableToken, mintedToken, setMintedToken, getWalletItems}}>
+        <AppContext.Provider value={AppContextValues}>
         <div
             className={ styles.App }
             id="app"

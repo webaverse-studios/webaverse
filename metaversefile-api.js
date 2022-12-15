@@ -65,8 +65,6 @@ import {lightsManager} from './engine-hooks/lights/lights-manager.js';
 import {skyManager} from './engine-hooks/environment/skybox/sky-manager.js';
 import {compilerBaseUrl} from './endpoints.js';
 import {getDefaultCanvas} from './offscreen-engine/fns/avatar-iconer-fn.js';
-import {encodePNG2KTX} from './basisu/encode.js';
-import {loadKtx2TextureBlob, loadKtx2TextureUrl} from './basisu/decode.js';
 import {isWorker} from './env.js';
 import './metaversefile-binding.js';
 
@@ -405,7 +403,7 @@ const mirrors = [];
 metaversefile.setApi({
   async import(s) {
     if (/^[a-zA-Z0-9]+:/.test(s)) {
-      s = `${compilerBaseUrl}${s.replace(/^([a-zA-Z0-9]+:\/)\//, '$1')}`;
+      s = `${s.startsWith(compilerBaseUrl) ? '' : compilerBaseUrl}${s.replace(/^([a-zA-Z0-9]+:\/)\//, '$1')}`; // note: check `s.startsWith(compilerBaseUrl)` in order to prevent multiple addings when making recursive app importing.
     } else {
       s = new URL(s, compilerBaseUrl).href;
     }
@@ -559,13 +557,6 @@ metaversefile.setApi({
   useSceneCruncher() {
     return sceneCruncher;
   }, */
-  useKtx2Util() {
-    return {
-      encodePNG2KTX,
-      loadKtx2TextureBlob,
-      loadKtx2TextureUrl,
-    };
-  },
   useScenePreviewer() {
     return scenePreviewer;
   },

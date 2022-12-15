@@ -13,7 +13,7 @@ import {world} from './world.js';
 import {buildMaterial, highlightMaterial, selectMaterial, hoverMaterial, hoverEquipmentMaterial} from './shaders.js';
 import {getRenderer, sceneLowPriority, camera} from './renderer.js';
 import {downloadFile, snapPosition, getDropUrl, handleDropJsonItem, makeId} from './util.js';
-import {maxGrabDistance, throwReleaseTime, throwAnimationDuration, walkSpeed, crouchSpeed, flySpeed, IS_NARUTO_RUN_ENABLED} from './constants.js';
+import {maxGrabDistance, throwReleaseTime, throwAnimationDuration, walkSpeed, crouchSpeed, flySpeed, IS_NARUTO_RUN_ENABLED, gliderSpeed} from './constants.js';
 import metaversefileApi from 'metaversefile';
 import loadoutManager from './loadout-manager.js';
 import * as sounds from './sounds.js';
@@ -48,6 +48,7 @@ const hitRadius = 1;
 const hitHeight = 0.2;
 const hitHalfHeight = hitHeight * 0.5;
 const hitboxOffsetDistance = 0.3;
+const swordComboAnimationDuration = 600;
 
 class GameManager extends EventTarget {
   menuOpen = 0;
@@ -621,26 +622,16 @@ class GameManager extends EventTarget {
 
   menuDoubleTap() {
     if(IS_NARUTO_RUN_ENABLED) {
-      if (!this.isCrouched()) {
-        const localPlayer = playersManager.getLocalPlayer();
-        const narutoRunAction = localPlayer.getAction('narutoRun');
-        if (!narutoRunAction) {
-          const newNarutoRunAction = {
-            type: 'narutoRun',
-          };
-          localPlayer.addAction(newNarutoRunAction);
-        }
-      }
+      const localPlayer = playersManager.getLocalPlayer();
+      const newNarutoRunAction = {type: 'narutoRun'};
+      localPlayer.actionsManager.tryAddAction(newNarutoRunAction, true);
     }
   }
 
   menuUnDoubleTap() {
     if(IS_NARUTO_RUN_ENABLED) {
       const localPlayer = playersManager.getLocalPlayer();
-      const narutoRunAction = localPlayer.getAction('narutoRun');
-      if (narutoRunAction) {
-        localPlayer.removeAction('narutoRun');
-      }
+      localPlayer.actionsManager.tryRemoveAction('narutoRun', true);
     }
   }
 
@@ -651,6 +642,11 @@ class GameManager extends EventTarget {
     }
   }
 
+  isGlidering() {
+    const localPlayer = playersManager.getLocalPlayer();
+    return localPlayer.hasAction('glider');
+  }
+
   isFlying() {
     const localPlayer = playersManager.getLocalPlayer();
     return localPlayer.hasAction('fly');
@@ -658,21 +654,11 @@ class GameManager extends EventTarget {
 
   toggleFly() {
     const localPlayer = playersManager.getLocalPlayer();
-    const flyAction = localPlayer.getAction('fly');
-    if (flyAction) {
-      localPlayer.removeAction('fly');
-      if (!localPlayer.characterPhysics.lastGrounded) {
-        localPlayer.setControlAction({type: 'fallLoop'});
-      }
+    if (localPlayer.actionsManager.isLongTrying('fly')) {
+      localPlayer.actionsManager.tryRemoveAction('fly', true);
     } else {
-      const flyAction = {
-        type: 'fly',
-        time: 0,
-      };
-
-      this.unwearAppIfHasSitComponent(localPlayer);
-
-      localPlayer.setControlAction(flyAction);
+      const newFlyAction = {type: 'fly'};
+      localPlayer.actionsManager.tryAddAction(newFlyAction, true);
     }
   }
 
@@ -688,14 +674,11 @@ class GameManager extends EventTarget {
 
   toggleCrouch() {
     const localPlayer = playersManager.getLocalPlayer();
-    let crouchAction = localPlayer.getAction('crouch');
-    if (crouchAction) {
-      localPlayer.removeAction('crouch');
+    if (localPlayer.hasAction('crouch')) {
+      localPlayer.actionsManager.tryRemoveAction('crouch');
     } else {
-      crouchAction = {
-        type: 'crouch',
-      };
-      localPlayer.addAction(crouchAction);
+      const newCrouchAction = {type: 'crouch'};
+      localPlayer.actionsManager.tryAddAction(newCrouchAction);
     }
   }
 
@@ -736,10 +719,11 @@ class GameManager extends EventTarget {
       .add(new THREE.Vector3(0, 0, -1).applyQuaternion(localPlayer.quaternion));
     const quaternion = localPlayer.quaternion;
 
-    if (object && object.voucher === undefined) {
-      const {voucher, expiry} = await getVoucherFromUser(object.tokenId, currentAddress, WebaversecontractAddress)
+    const newObject = {...object}
+    if (newObject && newObject.voucher === undefined) {
+      const {voucher, expiry} = await getVoucherFromUser(newObject.tokenId, currentAddress, WebaversecontractAddress)
       if (voucher.signature !== undefined) {
-        object.voucher = voucher
+        newObject.voucher = voucher
         // add blacklist and time counter add
         afterDrop(true)
       }
@@ -750,7 +734,7 @@ class GameManager extends EventTarget {
     const velocity = localVector.set(0, 0, -1).applyQuaternion(localPlayer.quaternion)
     .normalize()
     .multiplyScalar(2.5);
-    world.appManager.importAddedUserVoucherApp(position, quaternion, object, velocity);
+    world.appManager.importAddedUserVoucherApp(position, quaternion, newObject, velocity);
   }
 
   async handleDropJsonForSpawn(handleDropJsonForSpawn) { // currentAddress = walletaddress, WebaversecontractAddress= signaddress
@@ -800,36 +784,21 @@ class GameManager extends EventTarget {
     return localPlayer.hasAction('doubleJump');
   }
 
-  ensureJump(trigger) {
+  jump() {
     const localPlayer = playersManager.getLocalPlayer();
 
-    this.unwearAppIfHasSitComponent(localPlayer);
-
-    if (!localPlayer.hasAction('jump') &&
-      !localPlayer.hasAction('fly') &&
-      !localPlayer.hasAction('fallLoop') &&
-      !localPlayer.hasAction('swim') &&
-      !!localPlayer.characterPhysics.characterController
-    ) {
-      const newJumpAction = {
-        type: 'jump',
-        trigger: trigger,
-        startPositionY: localPlayer.characterPhysics.characterController.position.y,
-      };
-      localPlayer.setControlAction(newJumpAction);
-    }
-  }
-
-  jump(trigger) {
-    this.ensureJump(trigger);
-  }
-
-  doubleJump() {
-    const localPlayer = playersManager.getLocalPlayer();
-    localPlayer.addAction({
-      type: 'doubleJump',
+    const newJumpAction = {
+      type: 'jump',
       startPositionY: localPlayer.characterPhysics.characterController.position.y,
-    });
+    }
+    localPlayer.actionsManager.tryAddAction(newJumpAction);
+    
+    const newGliderAction = {
+      type: 'glider',
+    }
+    localPlayer.actionsManager.tryAddAction(newGliderAction);
+
+    localPlayer.actionsManager.tryRemoveAction('glider');
   }
 
   isMovingBackward() {
@@ -968,6 +937,8 @@ class GameManager extends EventTarget {
       speed = crouchSpeed;
     } else if (gameManager.isFlying()) {
       speed = flySpeed;
+    } else if (gameManager.isGlidering()) {
+      speed = gliderSpeed;
     } else {
       speed = walkSpeed;
     }
@@ -1534,6 +1505,11 @@ class GameManager extends EventTarget {
         if (useAction.animation === 'pickUpThrow') {
           const useTime = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'use', 0);
           if (useTime / 1000 >= throwAnimationDuration) {
+            this.endUse();
+          }
+        } else if (useAction.behavior === 'sword' && useAction.animationCombo?.length > 0) {
+          const useTime = physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'use', 0);
+          if (useTime > swordComboAnimationDuration) {
             this.endUse();
           }
         } else if (this.isMouseUp) {

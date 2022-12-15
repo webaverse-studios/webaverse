@@ -1648,21 +1648,23 @@ class Avatar {
             morphTargetInfluences[i] = 0;
           }
 
-          // if (volumeValue !== -1) { // real speech
-          if (aIndex !== -1) {
-            morphTargetInfluences[aIndex] = volumeValue;
-          }
-          if (eIndex !== -1) {
-            morphTargetInfluences[eIndex] = volumeValue * this.vowels[1];
-          }
-          if (iIndex !== -1) {
-            morphTargetInfluences[iIndex] = volumeValue * this.vowels[2];
-          }
-          if (oIndex !== -1) {
-            morphTargetInfluences[oIndex] = volumeValue * this.vowels[3];
-          }
-          if (uIndex !== -1) {
-            morphTargetInfluences[uIndex] = volumeValue * this.vowels[4];
+          if(volumeValue > 0) {
+            // if (volumeValue !== -1) { // real speech
+            if (aIndex !== -1) {
+              morphTargetInfluences[aIndex] = volumeValue;
+            }
+            if (eIndex !== -1) {
+              morphTargetInfluences[eIndex] = volumeValue * this.vowels[1];
+            }
+            if (iIndex !== -1) {
+              morphTargetInfluences[iIndex] = volumeValue * this.vowels[2];
+            }
+            if (oIndex !== -1) {
+              morphTargetInfluences[oIndex] = volumeValue * this.vowels[3];
+            }
+            if (uIndex !== -1) {
+              morphTargetInfluences[uIndex] = volumeValue * this.vowels[4];
+            }
           }
           /* } else { // fake speech
             this.fakeSpeechSmoothed = this.fakeSpeechSmoothed * 0.99 + 0.01 * this.fakeSpeechValue;

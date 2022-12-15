@@ -28,14 +28,14 @@ const objects = {
             name: "Silsword",
             start_url: "https://webaverse.github.io/silsword/",
             description: "A sword from lore.",
-            type: "common",
+            rarity: "common",
             claimed: true,
         },
         {
             name: "Silsword",
             start_url: "https://webaverse.github.io/silsword/",
             description: "A sword from lore.",
-            type: "common",
+            rarity: "common",
             timerTimestamp: 1704454645000,
             claimed: false,
         },
@@ -47,6 +47,7 @@ const objects = {
             name: "Silk",
             start_url: "https://webaverse.github.io/silk/",
             claimed: false,
+            timerTimestamp: 1704454645000,
             value: 50,
         },
         {
@@ -72,7 +73,6 @@ const Token = ({
     onDoubleClick,
     onClick,
     showTokenDropDown,
-    closeTokenDropDown,
     onEquip,
     onSpawn,
     onDrop,
@@ -126,7 +126,8 @@ const Token = ({
                 value={object.value}
                 numFrames={numFrames}
                 type={object.type}
-                timerTimestamp={object.timerTimestamp}
+                rarity={"none"}
+                timerTimestamp={object.voucher ? object.voucher.expiry : false}
             />
             <div className={styles.tokenDropdown}>
                 {showTokenDropDown && showTokenDropDown === object && (

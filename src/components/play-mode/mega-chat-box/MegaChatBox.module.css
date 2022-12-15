@@ -98,6 +98,12 @@
 }
 .megaChatBox .options .option .border {
   pointer-events: none;
+  visibility: hidden;
+}
+.megaChatBox .options:not(.selected) .option:hover .border,
+.megaChatBox .options.selected .option.selected .border
+{
+  visibility: visible;
 }
 .megaChatBox .options .option .border {
   position: absolute;
@@ -162,6 +168,9 @@
   padding: 30px;
   z-index: 1;
   cursor: pointer;
+}
+.megaChatBox .nextBlink:not(.visible) {
+  display: none;
 }
 .megaChatBox .nextBlink .arrow {
   width: 25px;

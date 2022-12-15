@@ -350,13 +350,15 @@ class AppManager extends EventTarget {
       }
     });
     
-    const resize = e => {
-      this.resize(e);
-    };
-    globalThis.addEventListener('resize', resize);
-    this.cleanup = () => {
-      globalThis.removeEventListener('resize', resize);
-    };
+    if (typeof window !== 'undefined') {
+      const resize = e => {
+        this.resize(e);
+      };
+      globalThis.window.addEventListener('resize', resize);
+      this.cleanup = () => {
+        globalThis.window.removeEventListener('resize', resize);
+      };
+    }
   }
 
   getApps() {

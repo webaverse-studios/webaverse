@@ -32,16 +32,19 @@ export class World {
       const app = e.data;
       const bindScene = _getBindSceneForRenderPriority(app.getComponent('renderPriority'));
       bindScene.add(app);
-
-      const hitTracker = hpManager.makeHitTracker();
-      hitTracker.bind(app);
-      app.dispatchEvent({type: 'hittrackeradded'});
-
       let boundAppManager = this.appManager;
-      const die = () => {
-        boundAppManager.removeTrackedApp(app.instanceId);
-      };
-      app.addEventListener('die', die);
+
+      // regular glb models default to invincible for now
+      if (app.appType !== 'glb') {
+        const hitTracker = hpManager.makeHitTracker();
+        hitTracker.bind(app);
+        app.dispatchEvent({type: 'hittrackeradded'});
+
+        const die = () => {
+          boundAppManager.removeTrackedApp(app.instanceId);
+        };
+        app.addEventListener('die', die);
+      }
 
       const migrated = (e) => {
         const {appManager} = e;

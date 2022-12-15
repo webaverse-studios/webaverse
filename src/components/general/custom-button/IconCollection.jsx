@@ -8,6 +8,10 @@ export const IconCollection = [
     file: '/assets/icons/microphone.svg',
   },
   {
+    name: 'speechToText',
+    file: '/assets/icons/speechToText.svg',
+  },
+  {
     name: 'arrowRight',
     file: '/assets/icons/arrowRight.svg',
   },

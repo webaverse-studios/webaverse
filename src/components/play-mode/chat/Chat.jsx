@@ -6,6 +6,7 @@ import {checkText} from 'smile2emoji';
 import game from '../../../../game';
 import {chatManager} from '../../../../chat-manager.js';
 import {registerIoEventHandler, unregisterIoEventHandler} from '../../general/io-handler';
+import voiceInput from '../../../../voice-input/voice-input.js';
 import {AppContext} from '../../app';
 
 import storyManager from '../../../../story.js';
@@ -50,6 +51,9 @@ function ChatInput () {
                 switch (event.which) {
 
                     case 13: { // enter
+
+                        // Disable Speech to text when chatting ( prevent loop )
+                        voiceInput.disableSpeech();
 
                         if (storyManager.getConversation()) {
 
