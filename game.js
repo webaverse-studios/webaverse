@@ -474,14 +474,11 @@ class GameManager extends EventTarget {
     const localPlayer = playersManager.getLocalPlayer();
 
     if (storyCameraManager.cameraLocked) {
-      // this.menuMiddleToggle();
       // get the current mouse transform into an object
       const lastMouseEvent = raycastManager.getLastMouseEvent();
-      // console.log('TODO: set mouse event to rayObject', lastMouseEvent);
 
-      // XXX we can get this from the zine manager
+      // unproject points
       const {mousePosition} = storyCameraManager;
-      // unproject point
       const unprojectedNearPoint = new THREE.Vector3(
         mousePosition.x,
         -mousePosition.y,
