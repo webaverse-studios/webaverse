@@ -24,11 +24,12 @@ export const Poses = ({
         setFacePoseValue(emotion, 0);
     };
 
-    return posesOpen ? (
+    return (
         <div
             className={classnames(
                 styles.poses,
                 parentOpened ? styles.parentOpened : null,
+                posesOpen ? styles.open : null,
             )}
             onMouseEnter={e => {
                 setPosesOpen(true);
@@ -52,5 +53,5 @@ export const Poses = ({
                 );
             })}
         </div>
-    ) : null;
+    );
 };

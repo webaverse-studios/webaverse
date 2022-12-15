@@ -9,9 +9,10 @@ import loadoutManager from '../../../../loadout-manager.js';
 import {registerIoEventHandler, unregisterIoEventHandler} from '../../general/io-handler/IoHandler.jsx';
 import {hotbarSize, numLoadoutSlots} from '../../../../constants.js';
 import {ResourcesBox} from '../resources-box';
+import grabManager from '../../../../grab-manager.js';
 
 export const Hotbar = ({className}) => {
-    const {setState} = useContext(AppContext);
+    const {setState, editMode} = useContext(AppContext);
 
     useEffect(() => {
             const keydown = e => {
@@ -57,15 +58,24 @@ export const Hotbar = ({className}) => {
         loadoutManager.setSelectedIndex(index);
     };
 
+    const toggleEditMode = () => {
+        grabManager.toggleEditMode();
+    }
+
     return (
         <div
             className={ classnames(className, styles.hotbar) }
-            onClick={onTopClick}
         >
             <div className={styles.leftSlot}>
                 <div className={styles.background} />
-                <div className={styles.phone}>
-                    <img src="/assets/icons/phone.svg" />
+                <div className={styles.phone} onClick={toggleEditMode}>
+                    <img
+                        src={
+                            editMode
+                                ? "/assets/icons/phoneActive.svg"
+                                : "/assets/icons/phone.svg"
+                        }
+                    />
                     <span>~</span>
                 </div>
             </div>
@@ -97,7 +107,7 @@ export const Hotbar = ({className}) => {
                 })()
             }
 
-            <ResourcesBox />
+            <ResourcesBox onClick={onTopClick} />
 
         </div>
     );

@@ -9,6 +9,22 @@
   transition: transform 1s cubic-bezier(0, 1, 0, 1);
 }
 
+.emotions:not(.open) .emotion {
+  display: none;
+}
+.emotions:not(.open) .emotion:first-child {
+  display: flex;
+}
+.emotions:not(.open) .emotion:first-child .emotionName,
+.emotions:not(.open) .emotion:first-child .emotionProgress
+{
+  display: none;
+}
+
+.emotions:not(.parentOpened) {
+  transform: translate(-50px, 0px );
+}
+
 .emotions .emotion {
   display: flex;
   position: relative;

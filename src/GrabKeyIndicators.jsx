@@ -1,19 +1,14 @@
 import React, {useEffect, useState, useRef, useContext} from 'react';
 import styles from './GrabKeyIndicators.module.css';
-import grabManager from '../grab-manager.js';
+import {AppContext} from './components/app';
 import {KeyIndicator} from './KeyIndicator';
+import grabManager from '../grab-manager';
 
 export const GrabKeyIndicators = () => {
-  const [isEditMode, setIsEditMode] = useState(false);
+  const {editMode} = useContext(AppContext);
   const [gridSnapEnabled, setGridSnapEnabled] = useState(0);
 
   useEffect(() => {
-    const showUi = e => setIsEditMode(true);
-    const hideUi = e => setIsEditMode(false);
-
-    grabManager.addEventListener('showui', showUi);
-    grabManager.addEventListener('hideui', hideUi);
-
     const setGridSnap = e => {
       setGridSnapEnabled(e.data.gridSnap);
     };
@@ -22,7 +17,7 @@ export const GrabKeyIndicators = () => {
 
   return (
     <div>
-      {isEditMode ? (
+      {editMode ? (
         <ul className={styles.indicatorlist}>
           <li>
             <KeyIndicator
