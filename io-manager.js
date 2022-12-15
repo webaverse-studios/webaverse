@@ -23,6 +23,8 @@ const localEuler = new THREE.Euler();
 const localMatrix2 = new THREE.Matrix4();
 const localMatrix3 = new THREE.Matrix4();
 const localQuaternion = new THREE.Quaternion();
+const localQuaternion2 = new THREE.Quaternion();
+const localQuaternion3 = new THREE.Quaternion();
 const localMatrix = new THREE.Matrix4();
 const localPlane = new THREE.Plane();
 
@@ -241,24 +243,28 @@ class IoManager extends EventTarget {
           transformCamera.position
         );
         const d = localPlane.distanceToPoint(localPlayer.position);
-        const isInFrontOfCamera = d > 0;
-        if (isInFrontOfCamera) {
-          const direction = localVector.copy(localPlayer.position)
-            .sub(transformCamera.position);
-          direction.y = 0;
-          direction.normalize();
 
-          localQuaternion.setFromRotationMatrix(
-            localMatrix.lookAt(zeroVector, direction, upVector)
-          );
+        // front
+        const direction = localVector.copy(localPlayer.position)
+          .sub(transformCamera.position);
+        direction.y = 0;
+        direction.normalize();
+        const frontQuaternion = localQuaternion.setFromRotationMatrix(
+          localMatrix.lookAt(zeroVector, direction, upVector)
+        );
 
-          this.keysDirection.applyQuaternion(localQuaternion);
-        } else {
-          localEuler.setFromQuaternion(transformCamera.quaternion, 'YXZ');
-          localEuler.x = 0;
-          localEuler.z = 0;
-          this.keysDirection.applyEuler(localEuler);
-        }
+        // back
+        localEuler.setFromQuaternion(transformCamera.quaternion, 'YXZ');
+        localEuler.x = 0;
+        localEuler.z = 0;
+        const backQuaternion = localQuaternion2.setFromEuler(localEuler);
+        
+        // smoothed
+        // XXX this can be smoothed by frustum distance instead of single camera plane distance
+        const smoothDistance = 3;
+        const f = Math.min(Math.max(d, 0), smoothDistance) / smoothDistance;
+        const smoothedQuaternion = localQuaternion3.copy(backQuaternion).slerp(frontQuaternion, f);
+        this.keysDirection.applyQuaternion(smoothedQuaternion);
 
         if (ioManager.keys.ctrl && !ioManager.lastCtrlKey && game.isGrounded()) {
           game.toggleCrouch();
