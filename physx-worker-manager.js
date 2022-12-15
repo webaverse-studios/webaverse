@@ -92,6 +92,21 @@ class PhysicsWorkerManager {
     return result;
   }
 
+  async cookHeightfieldGeometry(numRows, numColumns, heights) {
+    await this.waitForLoad();
+
+    const {workers} = this;
+    const worker = workers[this.nextWorker];
+    this.nextWorker = (this.nextWorker + 1) % workers.length;
+
+    const result = await worker.request('cookHeightfieldGeometry', {
+      numRows,
+      numColumns,
+      heights,
+    });
+    return result;
+  }
+
   async meshoptSimplify(mesh, targetRatio, targetError) {
     await this.waitForLoad();
     

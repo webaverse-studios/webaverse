@@ -1,4 +1,5 @@
 import React, {useEffect, useState, useContext} from "react";
+import { Vector3 } from 'three';
 import classnames from "classnames";
 
 import {defaultPlayerName} from "../../../../ai/lore/lore-model.js";
@@ -14,6 +15,7 @@ import {
     dex,
     lck,
     xp,
+    limit
 } from "../../../../player-stats.js";
 
 import {AppContext} from "../../app";
@@ -21,6 +23,11 @@ import {AppContext} from "../../app";
 import styles from "./character.module.css";
 import CustomButton from "../custom-button/index.jsx";
 import {TokenBox} from "../token-box/TokenBox.jsx";
+
+import {Emotions} from './Emotions';
+import {Poses} from './Poses';
+
+const localVector3 = new Vector3();
 
 const mainStatSpecs = [
     {
@@ -45,7 +52,7 @@ const mainStatSpecs = [
         imgSrc: "assets/icons/limit.svg",
         name: "Limit",
         className: "lm",
-        progress: 67,
+        progress: limit,
     },
 ];
 const statSpecs = [
@@ -154,14 +161,13 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
 
     const sideSize = 400;
 
-    useEffect(() => {
+    useEffect(() => { 
         const canvas = dioramaCanvasRef.current;
 
         if (canvas && state.openedPanel === "CharacterPanel") {
             const playerDiorama = game.getPlayerDiorama();
-
+            playerDiorama.setCameraOffset(localVector3.set(0.3, -0.64, -1.9))
             playerDiorama.addCanvas(canvas);
-
             return () => {
                 playerDiorama.removeCanvas(canvas);
             };
@@ -187,6 +193,7 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
 
     function onCanvasClick() {
         const playerDiorama = game.getPlayerDiorama();
+        playerDiorama.setCameraOffset(localVector3.set(0.3, -0.64, -1.9))
         playerDiorama.toggleShader();
 
         const soundFiles = sounds.getSoundFiles();
@@ -195,6 +202,16 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
                 Math.floor(Math.random() * soundFiles.menuNext.length)
             ];
         sounds.playSound(audioSpec);
+    }
+
+    // Zoom in when editing emotions
+    function onEmotionsEdit(isEmotionEdit) {
+        const playerDiorama = game.getPlayerDiorama();
+        if (isEmotionEdit) {
+            playerDiorama.setCameraOffset(localVector3.set(0.3, 0, -0.7))
+        } else {
+            playerDiorama.setCameraOffset(localVector3.set(0.3, -0.64, -1.9))
+        }
     }
 
     function onCharacterSelectClick(e) {
@@ -220,6 +237,13 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
                 <div className={styles.characterTitleBox}>
                     Character Details
                 </div>
+                <Poses
+                    parentOpened={true}
+                />
+                <Emotions
+                    parentOpened={true}
+                    cameraOffset={onEmotionsEdit}
+                />
                 <div className={styles.avatarWrap}>
                     <div className={styles.avatarName}>
                         <img

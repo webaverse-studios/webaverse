@@ -43,8 +43,6 @@ export const HotBox = ({
       };
     }, []);
     
-    const pixelRatio = window.devicePixelRatio;
-
     return (
       <div
         className={ classnames(styles.hotBox, selected ? styles.selected : null) }

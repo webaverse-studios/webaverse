@@ -1,6 +1,7 @@
 export const baseUnit = 4;
 export const previewExt = 'jpg';
 export const maxGrabDistance = 1.5;
+export const heightfieldScale = 0.1;
 
 export const transparentPngUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 

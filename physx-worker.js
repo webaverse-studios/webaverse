@@ -38,6 +38,18 @@ const _handleMethod = ({
         transfers: [result.buffer],
       };
     }
+    case 'cookHeightfieldGeometry': {
+      const {numRows, numColumns, heights} = args;
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+      const mesh = new THREE.Mesh(geometry, fakeMaterial);
+      const result = physxLite.cookHeightfieldGeometryPhysics(numRows, numColumns, heights);
+      return {
+        result,
+        transfers: [result.buffer],
+      };
+    }
     case 'meshoptSimplify': {
       const {positions, /* uvs, */ indices, targetRatio, targetError} = args;
       const geometry = new THREE.BufferGeometry();
@@ -114,18 +126,26 @@ const _handleMessage = async e => {
     queue.push(e);
   }
 };
-self.onmessage = e => {
-  _handleMessage({
-    data: e.data,
-    port: self,
-  });
-};
+if (typeof self !== 'undefined') {
+  self.onmessage = e => {
+    if (loaded) {
+      _handleMessage({
+        data: e.data,
+        port: self,
+      });
+    } else {
+      queue.push(e);
+    }
+  };
+}
 
-(async () => {
-  await physxLite.waitForLoad();
+if (typeof self !== 'undefined') {
+  (async () => {
+    await physxLite.waitForLoad();
 
-  loaded = true;
-  if (queue.length > 0) {
-    _handleMessage(queue.shift());
-  }
-})();
+    loaded = true;
+    if (queue.length > 0) {
+      _handleMessage(queue.shift());
+    }
+  })();
+}
