@@ -35,7 +35,7 @@
     text-align: center;
     bottom: 2px;
     left: 0;
-    font-size: 8px;
+    font-size: 9px;
     font-family: "TTSC-Bold";
 }
 
@@ -121,8 +121,8 @@
 
 .tokenBoxWrap .badge {
     width: 20%;
-    top: 1px;
-    right: -1px;
+    top: 4px;
+    right: 1px;
     position: absolute;
 
 }
