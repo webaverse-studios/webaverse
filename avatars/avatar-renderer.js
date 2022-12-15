@@ -23,31 +23,21 @@ const localFrustum = new THREE.Frustum();
 
 const greenColor = new THREE.Color(0x43a047);
 
-const avatarPlaceholderImagePromise = (async () => {
-  const res = await fetch('/images/user.png');
-  if (res.ok) {
-    const blob = await res.blob();
-    const options = {imageOrientation: 'flipY'};
-    const avatarPlaceholderImage = await createImageBitmap(blob, options);
-    return avatarPlaceholderImage;
-  } else {
-    throw new Error('failed to load image: ' + res.status);
-  }
-})();
-const waitForAvatarPlaceholderImage = () => avatarPlaceholderImagePromise;
-const avatarPlaceholderTexture = new THREE.Texture();
-(async() => {
-  const avatarPlaceholderImage = await waitForAvatarPlaceholderImage();
-  /* avatarPlaceholderImage.style.cssText = `\
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
-  `;
-  document.body.appendChild(avatarPlaceholderImage); */
-  avatarPlaceholderTexture.image = avatarPlaceholderImage;
-  avatarPlaceholderTexture.needsUpdate = true;
-})();
+let avatarPlaceholderImagePromise = null;
+const waitForAvatarPlaceholderImage = () => {
+  avatarPlaceholderImagePromise = (async () => {
+    const res = await fetch('/images/user.png');
+    if (res.ok) {
+      const blob = await res.blob();
+      const options = {imageOrientation: 'flipY'};
+      const avatarPlaceholderImage = await createImageBitmap(blob, options);
+      return avatarPlaceholderImage;
+    } else {
+      throw new Error('failed to load image: ' + res.status);
+    }
+  })();
+  return avatarPlaceholderImagePromise;
+}
 const _makeAvatarPlaceholderMesh = (() => {
   // geometry
   const planeGeometry = new THREE.PlaneBufferGeometry(0.2, 0.2);
@@ -71,6 +61,9 @@ const _makeAvatarPlaceholderMesh = (() => {
     planeGeometry,
     ringGeometry,
   ]);
+
+  const avatarPlaceholderTexture = new THREE.Texture();
+  let textureLoaded = false;
 
   // material
   const material = new WebaverseShaderMaterial({
@@ -178,6 +171,22 @@ const _makeAvatarPlaceholderMesh = (() => {
 
   // make fn
   return () => {
+    if (!textureLoaded) {
+      textureLoaded = true;
+      (async() => {
+        const avatarPlaceholderImage = await waitForAvatarPlaceholderImage();
+        /* avatarPlaceholderImage.style.cssText = `\
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        `;
+        document.body.appendChild(avatarPlaceholderImage); */
+        avatarPlaceholderTexture.image = avatarPlaceholderImage;
+        avatarPlaceholderTexture.needsUpdate = true;
+      })();
+    }
+
     const mesh = new THREE.Mesh(geometry, material);
     let startTime = 0;
     const animationTime = 1000;

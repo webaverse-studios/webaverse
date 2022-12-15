@@ -6,11 +6,143 @@ body {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
+html, body {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  margin: 0;
+  font-family: 'Muli';
+  font-size: 12px;
+
+  --color: #ec407a;
+  --color2: #ffa726;
+  --color3: #42a5f5;
+}
+
+body {
+  --header-height: 50px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 a {
   color: inherit;
   text-decoration: none;
 }
 
-* {
-  box-sizing: border-box;
+::-webkit-scrollbar {
+  width: 0.6em;
+}
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  outline: 1px solid slategrey;
+}
+
+/* ui */
+@font-face {
+  font-family: 'Muli';
+  src: url('/fonts/Muli.ttf');
+}
+@font-face {
+  font-family: 'GeoSans';
+  src: url('/fonts/GeosansLight.woff2') format('woff2'); /* Super Modern Browsers */
+}
+@font-face {
+  font-family: 'PlazaRegular';
+  src:  url('/fonts/Plaza Regular.ttf');
+}
+@font-face {
+  font-family: 'WinchesterCaps';
+  src:  url('/fonts/WinchesterCaps.ttf');
+}
+@font-face {
+  font-family: 'SF Movie Poster';
+  src:  url('/fonts/SF Movie Poster.ttf');
+}
+
+/* cards */
+@font-face {
+  font-family: 'FuturaLT-Condensed';
+  src:  url('/fonts/Futura LT Condensed Medium.ttf');
+}
+@font-face {
+  font-family: 'GillSans-CondensedBold';
+  src:  url('/fonts/gill-cb.ttf');
+}
+@font-face {
+  font-family: 'FuturaStd-Heavy';
+  src:  url('/fonts/Futura Std Heavy.ttf');
+}
+@font-face {
+  font-family: 'PlazaITC-Normal';
+  src:  url('/fonts/Plaza Regular.ttf');
+}
+@font-face {
+  font-family: 'MS-Gothic';
+  src:  url('/fonts/MS Gothic.ttf');
+}
+@font-face {
+  font-family: 'GillSans';
+  src:  url('/fonts/gill-sans.woff');
+}
+@font-face {
+  font-family: 'GillSans-ExtraBoldDisplay';
+  src:  url('/fonts/Gill Sans Extra Bold Display.ttf');
+}
+@font-face {
+  font-family: 'FuturaLT-CondensedBold';
+  src:  url('/fonts/Futura LT Condensed Bold.ttf');
+}
+@font-face {
+  font-family: 'SanvitoPro-Regular';
+  src:  url('/fonts/SanvitoPro-Regular.ttf');
+}
+
+/* New UI: TT Squares Condensed Font */
+@font-face {
+  font-family: 'TTSC-Black-Italic';
+  src:  url('/fonts/tt-squares/TT Squares Condensed Black Italic.otf');
+}
+@font-face {
+  font-family: 'TTSC-Black';
+  src:  url('/fonts/tt-squares/TT Squares Condensed Black.otf');
+}
+@font-face {
+  font-family: 'TTSC-Bold-Italic';
+  src:  url('/fonts/tt-squares/TT Squares Condensed Bold Italic.otf');
+}
+@font-face {
+  font-family: 'TTSC-Bold';
+  src:  url('/fonts/tt-squares/TT Squares Condensed Bold.otf');
+}
+@font-face {
+  font-family: 'TTSC-Light-Italic';
+  src:  url('/fonts/tt-squares/TT Squares Condensed Light Italic.otf');
+}
+@font-face {
+  font-family: 'TTSC-Light';
+  src:  url('/fonts/tt-squares/TT Squares Condensed Light.otf');
+}
+@font-face {
+  font-family: 'TTSC-Regular-Italic';
+  src:  url('/fonts/tt-squares/TT Squares Condensed Regular Italic.otf');
+}
+@font-face {
+  font-family: 'TTSC-Regular';
+  src:  url('/fonts/tt-squares/TT Squares Condensed Regular.otf');
+}
+@font-face {
+  font-family: 'TTSC-Thin-Italic';
+  src:  url('/fonts/tt-squares/TT Squares Condensed Thin italic.otf');
+}
+@font-face {
+  font-family: 'TTSC-Thin';
+  src:  url('/fonts/tt-squares/TT Squares Condensed Thin.otf');
 }

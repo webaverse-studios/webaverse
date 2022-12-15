@@ -1,4 +1,4 @@
-class VolumeProcessor extends AudioWorkletProcessor {
+class VolumeProcessor extends (typeof AudioWorkletProcessor !== 'undefined' ? AudioWorkletProcessor : {}) {
   constructor() {
     super();
 
@@ -112,4 +112,6 @@ class VolumeProcessor extends AudioWorkletProcessor {
     return true;
   }
 }
-registerProcessor('volume-processor', VolumeProcessor);
+if (typeof globalThis.registerProcessor !== 'undefined') {
+  registerProcessor('volume-processor', VolumeProcessor);
+}

@@ -2,6 +2,7 @@ export const hp = 80;
 export const mp = 20;
 export const xp = 40;
 export const level = 6;
+export const limit = 67;
 
 export const atk = 23;
 export const def = 17;

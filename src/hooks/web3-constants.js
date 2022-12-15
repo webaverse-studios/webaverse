@@ -1,4 +1,7 @@
-export const isLocal = window.location.host.includes('local.webaverse.com');
+export const isLocal = typeof location !== 'undefined' ?
+  location.host.includes('local.webaverse.com')
+:
+  '';
 
 export const WEB3_EVENTS = {
   CHAIN_CHANGED: 'chainChanged',

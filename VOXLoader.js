@@ -31,19 +31,19 @@ import * as THREE from "three";
  */
 var vox = {};
 
-(function() {
-  /* if (typeof(window) !== "undefined") {
-    vox.global = window;
-    vox.global.vox = vox;
-  } else {
-    vox.global = global;
-  } */
+// (function() {
+//   /* if (typeof(window) !== "undefined") {
+//     vox.global = window;
+//     vox.global.vox = vox;
+//   } else {
+//     vox.global = global;
+//   } */
 
-  if (typeof(module) !== "undefined") {
-    module.exports = vox;
-  }
+//   if (typeof(module) !== "undefined") {
+//     module.exports = vox;
+//   }
 
-})();
+// })();
 
 (function() {
 
@@ -117,27 +117,27 @@ var vox = {};
       });
   };
 
-  if (typeof(require) !== "undefined") {
-    var fs = require("fs");
-    /**
-     * for node.js
-     * @param {String} path
-     * @param {function} callback
-     */
-    vox.Parser.prototype.parseFile = function(path, callback) {
-      fs.readFile(path, function(error, data) {
-        if (error) {
-          return callback(error);
-        } else {
-          var uint8Array = new Uint8Array(new ArrayBuffer(data.length));
-          for (var i = 0, len = data.length; i < len; i++) {
-            uint8Array[i] = data[i];
-          }
-          this.parseUint8Array(uint8Array, callback);
-        }
-      }.bind(this));
-    };
-  }
+  // if (typeof(require) !== "undefined") {
+  //   var fs = require("fs");
+  //   /**
+  //    * for node.js
+  //    * @param {String} path
+  //    * @param {function} callback
+  //    */
+  //   vox.Parser.prototype.parseFile = function(path, callback) {
+  //     fs.readFile(path, function(error, data) {
+  //       if (error) {
+  //         return callback(error);
+  //       } else {
+  //         var uint8Array = new Uint8Array(new ArrayBuffer(data.length));
+  //         for (var i = 0, len = data.length; i < len; i++) {
+  //           uint8Array[i] = data[i];
+  //         }
+  //         this.parseUint8Array(uint8Array, callback);
+  //       }
+  //     }.bind(this));
+  //   };
+  // }
 
   /**
    * @param {Uint8Array} uint8Array
