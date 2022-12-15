@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 // import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {
+  camera,
+  getRenderer,
+} from '../renderer.js';
+import {
   ZineStoryboard,
   zineMagicBytes,
 } from 'zine/zine-format.js';
@@ -41,9 +45,19 @@ import {
 
 import {heightfieldScale} from '../constants.js'
 import {world} from '../world.js';
+import {makePromise} from '../util.js';
+
+// constants
+
+const oneVector = new THREE.Vector3(1, 1, 1);
 
 // locals
 
+const localVector = new THREE.Vector3();
+const localVector2 = new THREE.Vector3();
+const localQuaternion = new THREE.Quaternion();
+const localMatrix = new THREE.Matrix4();
+const localPlane = new THREE.Plane();
 const localOrthographicCamera = new THREE.OrthographicCamera();
 
 // classes
@@ -54,9 +68,12 @@ class PanelInstance extends THREE.Object3D {
   }) {
     super();
 
+    this.name = 'panelInstance';
+
     this.panel = panel;
     this.physics = physics;
 
+    this.loaded = false;
     this.selected = false;
 
     this.#init();
@@ -81,6 +98,13 @@ class PanelInstance extends THREE.Object3D {
     const {
       entranceExitLocations,
     } = zineRenderer.metadata;
+    zineRenderer.addEventListener('load', e => {
+      this.dispatchEvent({
+        type: 'load',
+      });
+    }, {
+      once: true,
+    });
     this.zineRenderer = zineRenderer;
 
     // camera
@@ -97,6 +121,7 @@ class PanelInstance extends THREE.Object3D {
       entranceExitMesh = new EntranceExitMesh({
         entranceExitLocations,
       });
+      // entranceExitMesh.visible = false;
       zineRenderer.transformScene.add(entranceExitMesh);
     }
     this.entranceExitMesh = entranceExitMesh;
@@ -183,10 +208,12 @@ class PanelInstance extends THREE.Object3D {
       this.floorNetPhysicsObject = floorNetPhysicsObject;
     }
 
+    // hide to start
+    this.visible = false;
     // disable physics to start
     this.setPhysicsEnabled(false);
 
-    // precompute
+    // precompute cache
     const pointCloudArrayBuffer = layer1.getData('pointCloud');
     const depthFloat32Array = getDepthFloatsFromPointCloud(
       pointCloudArrayBuffer,
@@ -218,6 +245,20 @@ class PanelInstance extends THREE.Object3D {
     zineRenderer.camera.updateMatrixWorld();
 
     return zineRenderer;
+  }
+  async waitForLoad() {
+    if (!this.loaded) {
+      const p = makePromise();
+      const onload = () => {
+        cleanup();
+        p.accept();
+      };
+      const cleanup = () => {
+        this.removeEventListener('load', onload);
+      };
+      this.addEventListener('load', onload);
+      await p;
+    }
   }
   setPhysicsEnabled(enabled = true) {
     const fn = enabled ? physicsObject => {
@@ -273,6 +314,7 @@ class PanelInstance extends THREE.Object3D {
         if (intersectionIndex !== -1) {
           this.dispatchEvent({
             type: 'transition',
+            entranceExitIndex: intersectionIndex,
             panelIndexDelta: intersectionIndex === 0 ? -1 : 1,
           });
         }
@@ -289,6 +331,8 @@ class PanelInstanceManager extends THREE.Object3D {
     physics,
   }) {
     super();
+
+    this.name = 'panelInstanceManager';
 
     this.storyboard = storyboard;
     this.physics = physics;
@@ -316,18 +360,26 @@ class PanelInstanceManager extends THREE.Object3D {
     for (let i = 0; i < panels.length; i++) {
       const panel = panels[i];
       const panelInstance = new PanelInstance(panel, panelOpts);
-      panelInstance.visible = false;
       this.add(panelInstance);
       this.panelInstances.push(panelInstance);
     }
 
+    // wait for load
+    (async () => {
+      const panelInstances = this.panelInstances.slice();
+      await Promise.all(panelInstances.map(panelInstance => panelInstance.waitForLoad()));
+
+      this.dispatchEvent({
+        type: 'load',
+      });
+    })();
+
     // connect panels
-    console.log('connect panels', this.panelInstances.length)
+    // console.log('connect panels', this.panelInstances.length)
     for (let i = 0; i < this.panelInstances.length - 1; i++) {
       // connect panels
       const panelInstance = this.panelInstances[i];
       const nextPanelInstance = this.panelInstances[i + 1];
-      console.log('call connect 1', panelInstance.zineRenderer, nextPanelInstance.zineRenderer);
       panelInstance.zineRenderer.connect(nextPanelInstance.zineRenderer);
       // update physics
       // update scene mesh physics
@@ -350,24 +402,51 @@ class PanelInstanceManager extends THREE.Object3D {
     for (const panelInstance of this.panelInstances) {
       panelInstance.addEventListener('transition', e => {
         // attempt to transition panels
-        const {panelIndexDelta} = e;
+        const {
+          entranceExitIndex,
+          panelIndexDelta,
+        } = e;
         let nextPanelIndex = this.panelIndex + panelIndexDelta;
         if (nextPanelIndex >= 0 && nextPanelIndex < panels.length) { // if it leads to a valid panel
-          // XXX check that we are on the opposite side of the exit plane
+          // check that we are on the opposite side of the exit plane
           // this is to prevent glitching back and forth between panels
 
-          // deselect old panel
-          const oldPanelIndex = this.panelIndex;
-          const oldPanelInstance = this.panelInstances[oldPanelIndex];
-          oldPanelInstance.setSelected(false);
+          const currentPanelInstance = this.panelInstances[this.panelIndex];
+          const {entranceExitLocations} = currentPanelInstance.zineRenderer.metadata;
+          const entranceLocation = entranceExitLocations[entranceExitIndex];
+          
+          localMatrix.compose(
+            localVector.fromArray(entranceLocation.position),
+            localQuaternion.fromArray(entranceLocation.quaternion),
+            oneVector
+          ).premultiply(currentPanelInstance.zineRenderer.transformScene.matrixWorld).decompose(
+            localVector,
+            localQuaternion,
+            localVector2
+          );
+          localPlane.setFromNormalAndCoplanarPoint(
+            localVector2.set(0, 0, -1)
+              .applyQuaternion(localQuaternion),
+            localVector
+          );
 
-          // select new panel
-          this.panelIndex = nextPanelIndex;
-          const newPanelInstance = this.panelInstances[nextPanelIndex];
-          newPanelInstance.setSelected(true);
+          const localPlayer = playersManager.getLocalPlayer();
+          const capsulePosition = localPlayer.position;
+          const signedDistance = localPlane.distanceToPoint(capsulePosition);
 
-          // XXX perform the transition animation in the story camera manager
-          console.log('transition to panel', nextPanelIndex);
+          // if we are on the opposite side of the entrance plane
+          if (signedDistance < 0) {
+            // deselect old panel
+            currentPanelInstance.setSelected(false);
+
+            // select new panel
+            this.panelIndex = nextPanelIndex;
+            const newPanelInstance = this.panelInstances[this.panelIndex];
+            newPanelInstance.setSelected(true);
+
+            // XXX perform the transition animation in the story camera manager
+            console.log('transition to panel', nextPanelIndex);
+          }
         }
       });
     }
@@ -463,16 +542,8 @@ class ZineManager {
     start_url,
     physics,
   }) {
-    const instance = new THREE.Object3D();
-
-    // load storyboard
-    const storyboard = await this.#loadUrl(start_url);
-    
-    // panel instance manager
-    const panelInstanceManager = new PanelInstanceManager(storyboard, {
-      physics,
-    });
-    instance.add(panelInstanceManager);
+    const instance = new THREE.Scene();
+    instance.autoUpdate = false;
 
     // lights
     {
@@ -481,6 +552,41 @@ class ZineManager {
       instance.add(light);
       light.updateMatrixWorld();
     }
+
+    // storyboard
+    const storyboard = await this.#loadUrl(start_url);
+    
+    // panel instance manager
+    const panelInstanceManager = new PanelInstanceManager(storyboard, {
+      physics,
+    });
+    {
+      const onload = e => {
+        cleanup();
+
+        const _compile = () => {
+          const {panelInstances} = panelInstanceManager;
+          const renderer = getRenderer();
+          for (let i = 0; i < panelInstances.length; i++) {
+            const panelInstance = panelInstances[i];
+            panelInstance.visible = true;
+          }
+          renderer.render(instance, camera);
+          for (let i = 0; i < panelInstances.length; i++) {
+            const panelInstance = panelInstances[i];
+            panelInstance.visible = i === panelInstanceManager.panelIndex;
+          }
+        };
+        _compile();
+        // globalThis.compile = _compile;
+        // globalThis.instance1 = panelInstanceManager.panelInstances[1];
+      };
+      const cleanup = () => {
+        panelInstanceManager.removeEventListener('load', onload);
+      };
+      panelInstanceManager.addEventListener('load', onload);
+    }
+    instance.add(panelInstanceManager);
 
     // mouse tracking
     const mousePosition = new THREE.Vector2();
