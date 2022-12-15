@@ -615,9 +615,6 @@ class ZineManager {
     }
     instance.add(panelInstanceManager);
 
-    // mouse tracking
-    const mousePosition = new THREE.Vector2();
-
     /* // methods
     instance.link = () => {
       // XXX this needs to happen automatically during panel instance manager initiailization
@@ -650,6 +647,7 @@ class ZineManager {
     instance.updateMatrixWorld();
 
     // update listeners
+    const {mousePosition} = storyCameraManager;
     world.appManager.addEventListener('frame', e => {
       panelInstanceManager.update({
         mousePosition,

@@ -30,7 +30,6 @@ function lerpScalar(a, b, t) {
   return a + (b - a) * t;
 }
 function setAnimatedCamera(camera, srcCamera, srcCameraAnimation) {
-  // console.log('set animated camera', !!camera, !!srcCamera, srcCameraAnimation);
   if (srcCameraAnimation) {
     const {start, end, startTime, endTime} = srcCameraAnimation;
 
@@ -39,7 +38,6 @@ function setAnimatedCamera(camera, srcCamera, srcCameraAnimation) {
 
     if (f < 1) {
       const t = cubicBezier(f);
-      // console.log('lerp', start.position.toArray(), end.position.toArray(), t);
       camera.position.lerpVectors(start.position, end.position, t);
       camera.quaternion.slerpQuaternions(start.quaternion, end.quaternion, t);
       camera.near = lerpScalar(start.near, end.near, t);
@@ -69,6 +67,8 @@ class StoryCameraManager extends EventTarget {
     this.lockCamera = new THREE.PerspectiveCamera();
     this.oldCamera = new THREE.PerspectiveCamera();
     this.lockCameraAnimation = null;
+
+    this.mousePosition = new THREE.Vector2();
   }
 
   setLockCamera(camera) {
