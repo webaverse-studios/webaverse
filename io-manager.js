@@ -27,6 +27,7 @@ const localQuaternion2 = new THREE.Quaternion();
 const localQuaternion3 = new THREE.Quaternion();
 const localMatrix = new THREE.Matrix4();
 const localPlane = new THREE.Plane();
+const localFrustum = new THREE.Frustum();
 
 const zeroVector = new THREE.Vector3(0, 0, 0);
 const upVector = new THREE.Vector3(0, 1, 0);
@@ -236,40 +237,68 @@ class IoManager extends EventTarget {
         this.keysDirection.applyQuaternion(transformCamera.quaternion);
         _updateVertical(this.keysDirection);
       } else {
-        // if we are on the forward side of the camera
-        localPlane.setFromNormalAndCoplanarPoint(
-          localVector.set(0, 0, -1)
-            .applyQuaternion(transformCamera.quaternion),
-          transformCamera.position
-        );
-        const d = localPlane.distanceToPoint(localPlayer.position);
+        const _applyCameraRelativeKeys = () => {
+          // // if we are on the forward side of the camera
+          // localPlane.setFromNormalAndCoplanarPoint(
+          //   localVector.set(0, 0, -1)
+          //     .applyQuaternion(transformCamera.quaternion),
+          //   transformCamera.position
+          // );
+          // const d = localPlane.distanceToPoint(localPlayer.position);
+          
+          // get distance to the camera frustum planes
+          const transformCameraFrustum = localFrustum.setFromProjectionMatrix(
+            transformCamera.projectionMatrix
+          );
+          // transform the planes to the camera
+          for (const plane of transformCameraFrustum.planes) {
+            plane.applyMatrix4(transformCamera.matrixWorld);
+          }
+          // get the closest plane distance
+          let closestDistance = Infinity;
+          for (const plane of transformCameraFrustum.planes) {
+            const distance = plane.distanceToPoint(localPlayer.position);
+            if (distance < closestDistance) {
+              closestDistance = distance;
+            }
+          }
+          // console.log('closest distance', closestDistance);
+          const d = closestDistance;
+          const smoothDistance = 3;
 
-        // front
-        const direction = localVector.copy(localPlayer.position)
-          .sub(transformCamera.position);
-        direction.y = 0;
-        direction.normalize();
-        const frontQuaternion = localQuaternion.setFromRotationMatrix(
-          localMatrix.lookAt(zeroVector, direction, upVector)
-        );
+          // back
+          localEuler.setFromQuaternion(transformCamera.quaternion, 'YXZ');
+          localEuler.x = 0;
+          localEuler.z = 0;
+          const backQuaternion = localQuaternion2.setFromEuler(localEuler);
 
-        // back
-        localEuler.setFromQuaternion(transformCamera.quaternion, 'YXZ');
-        localEuler.x = 0;
-        localEuler.z = 0;
-        const backQuaternion = localQuaternion2.setFromEuler(localEuler);
-        
-        // smoothed
-        // XXX this can be smoothed by frustum distance instead of single camera plane distance
-        const smoothDistance = 3;
-        const f = Math.min(Math.max(d, 0), smoothDistance) / smoothDistance;
-        const smoothedQuaternion = localQuaternion3.copy(backQuaternion).slerp(frontQuaternion, f);
-        this.keysDirection.applyQuaternion(smoothedQuaternion);
+          if (storyCameraManager.cameraLocked) {
+            // front
+            const direction = localVector.copy(localPlayer.position)
+            .sub(transformCamera.position);
+            direction.y = 0;
+            direction.normalize();
+            const frontQuaternion = localQuaternion.setFromRotationMatrix(
+              localMatrix.lookAt(zeroVector, direction, upVector)
+            );
 
-        if (ioManager.keys.ctrl && !ioManager.lastCtrlKey && game.isGrounded()) {
-          game.toggleCrouch();
-        }
-        ioManager.lastCtrlKey = ioManager.keys.ctrl;
+            // smoothed
+            const f = Math.min(Math.max(d, 0), smoothDistance) / smoothDistance;
+            const smoothedQuaternion = localQuaternion3.copy(backQuaternion).slerp(frontQuaternion, f);
+            this.keysDirection.applyQuaternion(smoothedQuaternion);
+          } else {
+            this.keysDirection.applyQuaternion(backQuaternion);
+          }
+        };
+        _applyCameraRelativeKeys();
+
+        const _updateCrouch = () => {
+          if (ioManager.keys.ctrl && !ioManager.lastCtrlKey && game.isGrounded()) {
+            game.toggleCrouch();
+          }
+          ioManager.lastCtrlKey = ioManager.keys.ctrl;
+        };
+        _updateCrouch();
       }
       const physicsScene = physicsManager.getScene();
       if (physicsScene.getPhysicsEnabled() && this.movementEnabled) {
