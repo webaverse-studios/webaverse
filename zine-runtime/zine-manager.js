@@ -49,6 +49,7 @@ import {makePromise} from '../util.js';
 
 // constants
 
+const cameraTransitionTime = 2000;
 const oneVector = new THREE.Vector3(1, 1, 1);
 
 // locals
@@ -443,13 +444,15 @@ class PanelInstanceManager extends THREE.Object3D {
             // deselect old panel
             currentPanelInstance.setSelected(false);
 
+            // perform the transition animation in the story camera manager
+            // note that we have to do this before setting the new panel,
+            // so that the old camera start point can be snappshotted
+            const newPanelInstance = this.panelInstances[nextPanelIndex];
+            storyCameraManager.transitionLockCamera(newPanelInstance.zineRenderer.camera, cameraTransitionTime);
+
             // select new panel
             this.panelIndex = nextPanelIndex;
-            const newPanelInstance = this.panelInstances[this.panelIndex];
             newPanelInstance.setSelected(true);
-
-            // XXX perform the transition animation in the story camera manager
-            console.log('transition to panel', nextPanelIndex);
           }
         }
       });
@@ -462,6 +465,7 @@ class PanelInstanceManager extends THREE.Object3D {
   update({
     mousePosition,
   }) {
+    // update for entrance/exit transitions
     const _updatePanelInstances = () => {
       for (const panelInstance of this.panelInstances) {
         panelInstance.update();
@@ -469,6 +473,25 @@ class PanelInstanceManager extends THREE.Object3D {
     };
     _updatePanelInstances();
 
+    // update camera animation
+    const _updateCameraAnimation = () => {
+      if (this.cameraAnimation) {
+        const {start, end, startTime, endTime} = this.cameraAnimation;
+        
+        const now = performance.now();
+        const f = (now - startTime) / (endTime - startTime);
+
+        if (f < 1) {
+          const startPosition = start.position;
+          const endPosition = end.position;
+        } else {
+          
+        }
+      }
+    };
+    _updateCameraAnimation();
+
+    // update cursor
     const _updateStoryTargetMesh = () => {
       this.storyTargetMesh.visible = false;
       
