@@ -28,7 +28,7 @@ import {
   depthFloat32ArrayToOrthographicGeometry,
   getDepthFloat32ArrayWorldPosition,
 } from 'zine/zine-geometry-utils.js';
-import storyCameraManager from '../story-camera-manager.js';
+import zineCameraManager from './zine-camera-manager.js';
 import {
   playersManager,
 } from '../players-manager.js';
@@ -283,7 +283,7 @@ class PanelInstance extends THREE.Object3D {
       this.setPhysicsEnabled(selected);
 
       if (this.selected) {
-        storyCameraManager.setLockCamera(this.zineRenderer.camera);
+        zineCameraManager.setLockCamera(this.zineRenderer.camera);
       }
     }
   }
@@ -448,7 +448,7 @@ class PanelInstanceManager extends THREE.Object3D {
             // note that we have to do this before setting the new panel,
             // so that the old camera start point can be snappshotted
             const newPanelInstance = this.panelInstances[nextPanelIndex];
-            storyCameraManager.transitionLockCamera(newPanelInstance.zineRenderer.camera, cameraTransitionTime);
+            zineCameraManager.transitionLockCamera(newPanelInstance.zineRenderer.camera, cameraTransitionTime);
 
             // select new panel
             this.panelIndex = nextPanelIndex;
@@ -495,10 +495,10 @@ class PanelInstanceManager extends THREE.Object3D {
     const _updateStoryTargetMesh = () => {
       this.storyTargetMesh.visible = false;
       
-      if (storyCameraManager.cameraLocked) {
+      if (zineCameraManager.cameraLocked) {
         const x = (mousePosition.x + 1) / 2;
         const y = (mousePosition.y + 1) / 2;
-        const camera = storyCameraManager.lockCamera;
+        const camera = zineCameraManager.lockCamera;
 
         const selectedPanelInstance = this.panelInstances[this.panelIndex];
         const {
@@ -647,13 +647,13 @@ class ZineManager {
     instance.updateMatrixWorld();
 
     // update listeners
-    const {mousePosition} = storyCameraManager;
+    const {mousePosition} = zineCameraManager;
     world.appManager.addEventListener('frame', e => {
       panelInstanceManager.update({
         mousePosition,
       });
     });
-    storyCameraManager.addEventListener('mousemove', e => {
+    zineCameraManager.addEventListener('mousemove', e => {
       const {movementX, movementY} = e.data;
       const rate = 0.002;
       mousePosition.x += movementX * rate;

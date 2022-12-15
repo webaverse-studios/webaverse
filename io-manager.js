@@ -7,7 +7,7 @@ the functionality is implemented in other managers.
 import * as THREE from 'three';
 import metaversefile from 'metaversefile';
 import cameraManager from './camera-manager.js';
-import storyCameraManager from './story-camera-manager.js';
+import zineCameraManager from './zine-runtime/zine-camera-manager.js';
 import game from './game.js';
 import {world} from './world.js';
 import voiceInput from './voice-input/voice-input.js';
@@ -184,8 +184,8 @@ class IoManager extends EventTarget {
       this.keysDirection.set(0, 0, 0);
 
       const localPlayer = metaversefile.useLocalPlayer();
-      const transformCamera = storyCameraManager.cameraLocked ?
-        storyCameraManager.lockCamera
+      const transformCamera = zineCameraManager.cameraLocked ?
+        zineCameraManager.lockCamera
       :
         camera;
 
@@ -272,7 +272,7 @@ class IoManager extends EventTarget {
           localEuler.z = 0;
           const backQuaternion = localQuaternion2.setFromEuler(localEuler);
 
-          if (storyCameraManager.cameraLocked) {
+          if (zineCameraManager.cameraLocked) {
             // front
             const direction = localVector.copy(localPlayer.position)
             .sub(transformCamera.position);
@@ -544,7 +544,7 @@ class IoManager extends EventTarget {
         break;
       }
       case 85: { // U 
-        storyCameraManager.toggleCameraLock();
+        zineCameraManager.toggleCameraLock();
         break;
       } 
       case 74: { // J
@@ -673,7 +673,7 @@ class IoManager extends EventTarget {
 
   mousemove = e => {
     if (cameraManager.pointerLockElement) {
-      storyCameraManager.handleMouseMove(e) ||
+      zineCameraManager.handleMouseMove(e) ||
         cameraManager.handleMouseMove(e);
     } else {
       if (game.dragging) {

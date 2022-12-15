@@ -10,7 +10,7 @@ import {playersManager} from './players-manager.js';
 //
 
 const localVector = new THREE.Vector3();
-const localVector2 = new THREE.Vector3();
+// const localVector2 = new THREE.Vector3();
 
 // const maxResults = 16;
 

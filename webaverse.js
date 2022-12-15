@@ -13,7 +13,7 @@ import physxWorkerManager from './physx-worker-manager.js';
 import {world} from './world.js';
 // import * as blockchain from './blockchain.js';
 import cameraManager from './camera-manager.js';
-import storyCameraManager from './story-camera-manager.js';
+import zineCameraManager from './zine-runtime/zine-camera-manager.js';
 import game from './game.js';
 import hpManager from './hp-manager.js';
 import {playersManager} from './players-manager.js';
@@ -344,7 +344,7 @@ export default class Webaverse extends EventTarget {
           questManager.update(timestamp, timeDiffCapped);
           particleSystemManager.update(timestamp, timeDiffCapped);
 
-          storyCameraManager.updatePost(timestamp, timeDiffCapped) ||
+          zineCameraManager.updatePost(timestamp, timeDiffCapped) ||
             cameraManager.updatePost(timestamp, timeDiffCapped);
           ioManager.updatePost();
 

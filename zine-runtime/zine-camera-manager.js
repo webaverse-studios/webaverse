@@ -1,6 +1,8 @@
 import * as THREE from 'three';
-import {camera, rootScene} from './renderer.js';
-import easing from './easing.js';
+import easing from '../easing.js';
+import {
+  camera,
+} from '../renderer.js';
 
 //
 
@@ -59,9 +61,11 @@ function setAnimatedCamera(camera, srcCamera, srcCameraAnimation) {
 
 //
 
-class StoryCameraManager extends EventTarget {
-  constructor() {
+class ZineCameraManager extends EventTarget {
+  constructor(camera) {
     super();
+
+    this.camera = camera;
 
     this.cameraLocked = false;
     this.lockCamera = new THREE.PerspectiveCamera();
@@ -138,12 +142,12 @@ class StoryCameraManager extends EventTarget {
       // _shakeCamera();
 
       const _setLocked = () => {
-        if (!setAnimatedCamera(camera, this.lockCamera, this.lockCameraAnimation)) {
+        if (!setAnimatedCamera(this.camera, this.lockCamera, this.lockCameraAnimation)) {
           this.lockCameraAnimation = null;
         }
 
         const aspect = window.innerWidth / window.innerHeight;
-        setCameraToSquareFovAspect(this.lockCamera.fov, aspect, camera);
+        setCameraToSquareFovAspect(this.lockCamera.fov, aspect, this.camera);
 
         function radToDeg(rad) {
           return rad * 180 / Math.PI;
@@ -176,5 +180,5 @@ class StoryCameraManager extends EventTarget {
     }
   }
 };
-const storyCameraManager = new StoryCameraManager();
-export default storyCameraManager;
+const zineCameraManager = new ZineCameraManager(camera);
+export default zineCameraManager;

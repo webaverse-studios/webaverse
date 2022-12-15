@@ -27,7 +27,7 @@ import {avatarManager} from './avatar-manager.js';
 import npcManager from './npc-manager.js';
 import grabManager from './grab-manager.js';
 import {getVoucherFromUser} from './src/hooks/voucherHelpers'  
-import storyCameraManager from './story-camera-manager.js';
+import zineCameraManager from './zine-runtime/zine-camera-manager.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -473,24 +473,24 @@ class GameManager extends EventTarget {
   menuAim() {
     const localPlayer = playersManager.getLocalPlayer();
 
-    if (storyCameraManager.cameraLocked) {
+    if (zineCameraManager.cameraLocked) {
       // get the current mouse transform into an object
       const lastMouseEvent = raycastManager.getLastMouseEvent();
 
       // unproject points
-      const {mousePosition} = storyCameraManager;
+      const {mousePosition} = zineCameraManager;
       const unprojectedNearPoint = new THREE.Vector3(
         mousePosition.x,
         -mousePosition.y,
         -1
       )
-        .unproject(storyCameraManager.lockCamera);
+        .unproject(zineCameraManager.lockCamera);
       const unprojectedMidPoint = new THREE.Vector3(
         mousePosition.x,
         -mousePosition.y,
         0
       )
-        .unproject(storyCameraManager.lockCamera);
+        .unproject(zineCameraManager.lockCamera);
       
       const rayObject = new THREE.Object3D();
       rayObject.position.copy(unprojectedNearPoint);
@@ -499,7 +499,7 @@ class GameManager extends EventTarget {
           unprojectedNearPoint,
           unprojectedMidPoint,
           localVector.set(0, 1, 0)
-            .applyQuaternion(storyCameraManager.lockCamera.quaternion)
+            .applyQuaternion(zineCameraManager.lockCamera.quaternion)
         )
       );
       zTargeting.handleRayFocus(rayObject);
