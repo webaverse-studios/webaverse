@@ -250,7 +250,7 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
                                     numFrames={128}
                                     level={12}
                                     active={true}
-                                    type={"common"}
+                                    rarity={"common"}
                                 />
                             </li>
                             <li>
@@ -258,7 +258,7 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
                                     size={48}
                                     resolution={2048}
                                     numFrames={128}
-                                    type={"common"}
+                                    rarity={"common"}
                                 />
                             </li>
                             <li>
@@ -266,7 +266,7 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
                                     size={48}
                                     resolution={2048}
                                     numFrames={128}
-                                    type={"common"}
+                                    rarity={"common"}
                                 />
                             </li>
                         </ul>
@@ -279,7 +279,7 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
                                     numFrames={128}
                                     id="head"
                                     emptyIcon={"/assets/icons/slotHead.svg"}
-                                    type={"none"}
+                                    rarity={"none"}
                                 />
                             </li>
                             <li>
@@ -289,7 +289,7 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
                                     numFrames={128}
                                     id="body"
                                     emptyIcon={"/assets/icons/slotBody.svg"}
-                                    type={"none"}
+                                    rarity={"none"}
                                 />
                             </li>
                             <li>
@@ -299,7 +299,7 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
                                     numFrames={128}
                                     id="legs"
                                     emptyIcon={"/assets/icons/slotLegs.svg"}
-                                    type={"none"}
+                                    rarity={"none"}
                                 />
                             </li>
                             <li>
@@ -309,7 +309,7 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
                                     numFrames={128}
                                     id="leftHand"
                                     emptyIcon={"/assets/icons/slotLeftHand.svg"}
-                                    type={"none"}
+                                    rarity={"none"}
                                 />
                             </li>
                             <li>
@@ -319,7 +319,7 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
                                     numFrames={128}
                                     id="rightHand"
                                     emptyIcon={"/assets/icons/slotRightHand.svg"}
-                                    type={"none"}
+                                    rarity={"none"}
                                 />
                             </li>
                             <li>
@@ -329,7 +329,7 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
                                     numFrames={128}
                                     id="mount"
                                     emptyIcon={"/assets/icons/slotMount.svg"}
-                                    type={"none"}
+                                    rarity={"none"}
                                 />
                             </li>
                         </ul>
