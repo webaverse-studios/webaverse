@@ -151,7 +151,7 @@ class Conversation extends EventTarget {
         message,
       },
     }));
-    
+
     (async () => {
       await _playerSay(this.remotePlayer, text);
     })();
@@ -190,7 +190,7 @@ class Conversation extends EventTarget {
         emote,
         done,
       } = await aiScene.generateChatMessage(this.messages, this.remotePlayer.name);
-      
+
       if (!this.messages.some(m => m.text === comment && m.player === this.remotePlayer)) {
         this.addRemotePlayerMessage(comment, emote);
         done && this.finish();
@@ -209,7 +209,7 @@ class Conversation extends EventTarget {
         value: comment,
         done,
       } = await aiScene.generateChatMessage(this.messages, this.localPlayer.name);
-      
+
       if (!this.messages.some(m => m.text === comment && m.player === this.localPlayer)) {
         this.addLocalPlayerMessage(comment);
         done && this.finish();
@@ -221,13 +221,13 @@ class Conversation extends EventTarget {
 
   progressSelfOptions() {
     console.log('progress self options');
-    
+
     this.wrapProgress(async () => {
       const aiScene = metaversefile.useLoreAIScene();
       const {
         value: options,
         done,
-       } = await aiScene.generateDialogueOptions(this.messages, this.localPlayer.name);
+      } = await aiScene.generateDialogueOptions(this.messages, this.localPlayer.name);
 
       if (!done) {
         this.#setOptions(options);
@@ -253,7 +253,7 @@ class Conversation extends EventTarget {
     if (fuzzyEmotionName) {
       emoteManager.triggerEmote(fuzzyEmotionName, this.localPlayer);
     }
-    
+
     // clear options
     this.#setOptions(null);
     this.#setOption(option);
@@ -269,10 +269,10 @@ class Conversation extends EventTarget {
   progress() {
     if (!this.finished) {
       const lastMessage = this.#getMessageAgo(1);
-      
+
       const _handleLocalTurn = () => {
         // console.log('check last message 1', lastMessage, lastMessage?.type === 'chat', lastMessage?.player === this.localPlayer);
-        
+
         if (lastMessage?.type === 'chat' && lastMessage?.player === this.localPlayer) {
           // 50% chance of showing options
           if (Math.random() < 0.5) {
@@ -338,7 +338,7 @@ class Conversation extends EventTarget {
 
   #setOptions(options) {
     this.options = options;
-    
+
     this.dispatchEvent(new MessageEvent('options', {
       data: {
         options,
@@ -400,7 +400,7 @@ const fieldMusicNames = [
 
 let currentFieldMusic = null;
 let currentFieldMusicIndex = 0;
-export const handleStoryKeyControls = async (e) => {
+export const handleStoryKeyControls = async e => {
 
   switch (e.which) {
     case 48: { // 0
@@ -446,6 +446,58 @@ export const handleStoryKeyControls = async (e) => {
 
 };
 
+export const startConversation = app => {
+  if (!app)
+    return console.warn(
+      'could not find app for physics id', zTargeting.focusTargetReticle.physicsId,
+    );
+  const {appType} = app;
+
+  // cameraManager.setFocus(false);
+  // zTargeting.focusTargetReticle = null;
+  sounds.playSoundName('menuSelect');
+
+  cameraManager.setFocus(false);
+  cameraManager.setDynamicTarget();
+
+  (async () => {
+    const aiScene = metaversefile.useLoreAIScene();
+    if (appType === 'npc') {
+      const {name, description} = app.getLoreSpec();
+      const remotePlayer = npcManager.getNpcByApp(app);
+
+      if (remotePlayer) {
+        const {
+          value: comment,
+          done,
+        } = await aiScene.generateSelectCharacterComment(name, description);
+
+        _startConversation(comment, remotePlayer, done);
+      } else {
+        console.warn('no player associated with app', app);
+      }
+    } else {
+      const {name, description} = app;
+      const comment = await aiScene.generateSelectTargetComment(name, description);
+      const fakePlayer = {
+        avatar: {
+          modelBones: {
+            Head: app,
+          },
+        },
+      };
+      _startConversation(comment, fakePlayer, true);
+    }
+  })();
+}
+
+export const progressConversation = () => {
+  if (!currentConversation.progressing) {
+    currentConversation.progress();
+    sounds.playSoundName('menuNext');
+  }
+}
+
 const story = new EventTarget();
 
 let currentConversation = null;
@@ -486,55 +538,9 @@ story.listenHack = () => {
     if (cameraManager.pointerLockElement) {
       if (e.button === 0 && (cameraManager.focus && zTargeting.focusTargetReticle)) {
         const app = metaversefile.getAppByPhysicsId(zTargeting.focusTargetReticle.physicsId);
-        
-        if (app) {
-          const {appType} = app;
-
-          // cameraManager.setFocus(false);
-          // zTargeting.focusTargetReticle = null;
-          sounds.playSoundName('menuSelect');
-
-          cameraManager.setFocus(false);
-          cameraManager.setDynamicTarget();
-
-          (async () => {
-            const aiScene = metaversefile.useLoreAIScene();
-            if (appType === 'npc') {
-              const {name, description} = app.getLoreSpec();
-              const remotePlayer = npcManager.getNpcByApp(app);
-
-              if (remotePlayer) {
-                const {
-                  value: comment,
-                  done,
-                } = await aiScene.generateSelectCharacterComment(name, description);
-
-                _startConversation(comment, remotePlayer, done);
-              } else {
-                console.warn('no player associated with app', app);
-              }
-            } else {
-              const {name, description} = app;
-              const comment = await aiScene.generateSelectTargetComment(name, description);
-              const fakePlayer = {
-                avatar: {
-                  modelBones: {
-                    Head: app,
-                  },
-                },
-              };
-              _startConversation(comment, fakePlayer, true);
-            }
-          })();
-        } else {
-          console.warn('could not find app for physics id', zTargeting.focusTargetReticle.physicsId);
-        }
+        startConversation(app);
       } else if (e.button === 0 && currentConversation) {
-        if (!currentConversation.progressing) {
-          currentConversation.progress();
-
-          sounds.playSoundName('menuNext');
-        }
+        progressConversation();
       }
     }
   });
@@ -555,32 +561,32 @@ story.startCinematicIntro = () => {
   const localPlayer = playersManager.getLocalPlayer();
   const center = localPlayer.position.clone()
     .add(
-      new THREE.Vector3(0, range/4, 0)
-        .applyQuaternion(localPlayer.quaternion)
+      new THREE.Vector3(0, range / 4, 0)
+        .applyQuaternion(localPlayer.quaternion),
     );
   const centerToPlayerDirection = localPlayer.position.clone()
     .sub(center)
     .normalize();
-  
-  const startPosition = new THREE.Vector3((rng() < 0.5 ? 1 : -1) * range, range/2, -range)
+
+  const startPosition = new THREE.Vector3((rng() < 0.5 ? 1 : -1) * range, range / 2, -range)
     .applyQuaternion(localPlayer.quaternion)
     .add(r3(5, new THREE.Vector3()));
   const baseQuaternion = new THREE.Quaternion().setFromRotationMatrix(
     new THREE.Matrix4().lookAt(
       startPosition,
       center,
-      upVector
-    )
+      upVector,
+    ),
   );
   const startQuaternion = baseQuaternion.clone().multiply(
     new THREE.Quaternion().setFromEuler(
-      new THREE.Euler(-rp(Math.PI * 0.2), r(Math.PI * 0.2), r(Math.PI * 0.01), 'YXZ')
-    )
+      new THREE.Euler(-rp(Math.PI * 0.2), r(Math.PI * 0.2), r(Math.PI * 0.01), 'YXZ'),
+    ),
   );
   const endPosition = center.clone()
     .add(
       centerToPlayerDirection.clone()
-        .multiply(new THREE.Vector3(r(3), r(3), rp(3)))
+        .multiply(new THREE.Vector3(r(3), r(3), rp(3))),
     );
   const endEuler = new THREE.Euler().setFromQuaternion(baseQuaternion, 'YXZ');
   endEuler.x = 0;
@@ -588,8 +594,8 @@ story.startCinematicIntro = () => {
   const endQuaternion = new THREE.Quaternion().setFromEuler(endEuler)
     .multiply(
       new THREE.Quaternion().setFromEuler(
-        new THREE.Euler(-rp(Math.PI * 0.2), r(Math.PI * 0.2), 0, 'YXZ')
-      )
+        new THREE.Euler(-rp(Math.PI * 0.2), r(Math.PI * 0.2), 0, 'YXZ'),
+      ),
     );
 
   const sp2x = r(1);
@@ -599,7 +605,7 @@ story.startCinematicIntro = () => {
   const endPosition2 = startPosition2.clone()
     .add(
       new THREE.Vector3((sp2x < 0 ? 1 : -1) * (1 + rp(2)), 0, 0)
-        .applyQuaternion(localPlayer.quaternion)
+        .applyQuaternion(localPlayer.quaternion),
     );
   const endQuaternion2 = startQuaternion2.clone();
 

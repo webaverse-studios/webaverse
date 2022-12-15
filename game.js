@@ -37,10 +37,7 @@ const localVector5 = new THREE.Vector3();
 const localVector6 = new THREE.Vector3();
 const localVector7 = new THREE.Vector3();
 const localQuaternion = new THREE.Quaternion();
-const localQuaternion2 = new THREE.Quaternion();
-const localQuaternion3 = new THREE.Quaternion();
 const localEuler = new THREE.Euler();
-const localMatrix = new THREE.Matrix4();
 const localMatrix2 = new THREE.Matrix4();
 const localBox = new THREE.Box3();
 const localRay = new THREE.Ray();
@@ -89,7 +86,6 @@ class GameManager extends EventTarget {
     this.setFirstPersonAction(this.lastFirstPerson);
     this.bindPointerLock();
     this.registerHighlightMeshes();
-    this.init()
   }
 
   registerHighlightMeshes() {
@@ -114,15 +110,6 @@ class GameManager extends EventTarget {
   }
 
   init() {
-    // check if metaversefileApi.createApp exists
-    // if not, delay and try again
-    if (!metaversefileApi.createApp) {
-      setTimeout(() => {
-        this.init();
-      }, 1000);
-      return;
-    }
-
     this.grabUseMesh = metaversefileApi.createApp();
     (async () => {
       const {importModule} = metaversefileApi.useDefaultModules();
@@ -574,7 +561,7 @@ class GameManager extends EventTarget {
       }
     }
   }
-  
+
   menuVDown() {
     const localPlayer = playersManager.getLocalPlayer();
     if (grabManager.getGrabbedObject(0)) {
@@ -1135,7 +1122,7 @@ class GameManager extends EventTarget {
           const object = metaversefileApi.getAppByPhysicsId(physicsId);
           // console.log('got collision', physicsId, object);
           const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(physicsId);
-          if (object && !_isWear(object) && physicsObject) {
+          if (object && !_isWear(object) && physicsObject && !object.getComponent('invincible')) {
             this.grabUseMesh.position.setFromMatrixPosition(physicsObject.physicsMesh.matrixWorld);
             this.grabUseMesh.quaternion.copy(camera.quaternion);
             this.grabUseMesh.updateMatrixWorld();

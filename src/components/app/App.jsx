@@ -6,6 +6,7 @@ import game from '../../../game';
 import {parseQuery} from '../../../util.js'
 import universe from '../../../universe.js';
 import cameraManager from '../../../camera-manager';
+
 import {world} from '../../../world';
 
 import {Crosshair} from '../general/crosshair';
