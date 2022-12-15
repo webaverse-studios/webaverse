@@ -8,6 +8,59 @@ const cubicBezier = easing(0, 1, 0, 1);
 
 //
 
+function makeCameraAnimation(oldCamera, newCamera, timeMs) {
+  const _getCameraSpec = camera => ({
+    position: camera.position.clone(),
+    quaternion: camera.quaternion.clone(),
+    near: camera.near,
+    far: camera.far,
+    fov: camera.fov,
+    aspect: camera.aspect,
+  });
+  const startTime = performance.now();
+  const endTime = startTime + timeMs;
+  return {
+    start: _getCameraSpec(oldCamera),
+    end: _getCameraSpec(newCamera),
+    startTime,
+    endTime,
+  };
+}
+function lerpScalar(a, b, t) {
+  return a + (b - a) * t;
+}
+function setAnimatedCamera(camera, srcCamera, srcCameraAnimation) {
+  // console.log('set animated camera', !!camera, !!srcCamera, srcCameraAnimation);
+  if (srcCameraAnimation) {
+    const {start, end, startTime, endTime} = srcCameraAnimation;
+
+    const now = performance.now();
+    const f = (now - startTime) / (endTime - startTime);
+
+    if (f < 1) {
+      const t = cubicBezier(f);
+      // console.log('lerp', start.position.toArray(), end.position.toArray(), t);
+      camera.position.lerpVectors(start.position, end.position, t);
+      camera.quaternion.slerpQuaternions(start.quaternion, end.quaternion, t);
+      camera.near = lerpScalar(start.near, end.near, t);
+      camera.far = lerpScalar(start.far, end.far, t);
+      camera.fov = lerpScalar(start.fov, end.fov, t);
+      camera.aspect = lerpScalar(start.aspect, end.aspect, t);
+      camera.updateMatrixWorld();
+      camera.updateProjectionMatrix();
+      return true;
+    } else {
+      camera.copy(srcCamera);
+      return false;
+    }
+  } else {
+    camera.copy(srcCamera);
+    return false;
+  }
+}
+
+//
+
 class StoryCameraManager extends EventTarget {
   constructor() {
     super();
@@ -15,6 +68,7 @@ class StoryCameraManager extends EventTarget {
     this.cameraLocked = false;
     this.lockCamera = new THREE.PerspectiveCamera();
     this.oldCamera = new THREE.PerspectiveCamera();
+    this.lockCameraAnimation = null;
   }
 
   setLockCamera(camera) {
@@ -28,6 +82,11 @@ class StoryCameraManager extends EventTarget {
     } else {
       camera.copy(this.oldCamera);
     }
+  }
+  transitionLockCamera(newCamera, timeMs) {
+    const oldCamera = this.lockCamera;
+    this.lockCameraAnimation = makeCameraAnimation(oldCamera, newCamera, timeMs);
+    // console.log('lock camera animation', this.lockCameraAnimation);
   }
 
   handleMouseMove(e) {
@@ -79,7 +138,10 @@ class StoryCameraManager extends EventTarget {
       // _shakeCamera();
 
       const _setLocked = () => {
-        camera.copy(this.lockCamera);
+        if (!setAnimatedCamera(camera, this.lockCamera, this.lockCameraAnimation)) {
+          this.lockCameraAnimation = null;
+        }
+
         const aspect = window.innerWidth / window.innerHeight;
         setCameraToSquareFovAspect(this.lockCamera.fov, aspect, camera);
 
