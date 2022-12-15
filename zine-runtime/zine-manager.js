@@ -63,7 +63,7 @@ const localOrthographicCamera = new THREE.OrthographicCamera();
 
 // classes
 
-class PanelInstance extends THREE.Object3D {
+class PanelRuntimeInstance extends THREE.Object3D {
   constructor(panel, {
     physics,
   }) {
@@ -364,7 +364,7 @@ class PanelInstanceManager extends THREE.Object3D {
     const panels = this.storyboard.getPanels();
     for (let i = 0; i < panels.length; i++) {
       const panel = panels[i];
-      const panelInstance = new PanelInstance(panel, panelOpts);
+      const panelInstance = new PanelRuntimeInstance(panel, panelOpts);
       this.add(panelInstance);
       this.panelInstances.push(panelInstance);
     }
