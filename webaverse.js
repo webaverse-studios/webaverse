@@ -131,6 +131,8 @@ export default class Webaverse extends EventTarget {
         musicManager.waitForLoad(),
       ];
 
+      game.init();
+
       // update the loading progress
       _updateLoadProgress();
 
