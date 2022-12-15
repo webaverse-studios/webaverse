@@ -1,7 +1,8 @@
 import npcManager from './npc-manager';
 import {idleFn, followFn} from './npc-behavior';
+import metaversefile from 'metaversefile';
 
-const npcBehaviorMap = new WeakMap();
+const npcStateMap = new WeakMap();
 
 const behaviorFns = [
   idleFn,
@@ -20,8 +21,8 @@ class NpcAiManager {
 
     const removePlayer = player => {
       const app = npcManager.getAppByNpc(player);
-      if (npcBehaviorMap.has(app)) {
-        npcBehaviorMap.delete(app);
+      if (npcStateMap.has(app)) {
+        npcStateMap.delete(app);
       }
       const removeIndex = this.npcs.indexOf(player);
       this.npcs.splice(removeIndex, 1);
@@ -42,12 +43,18 @@ class NpcAiManager {
   update(timestamp, timeDiff) {
     for(const npc of this.npcs) {
       const app = npcManager.getAppByNpc(npc);
-      const currentState = npcBehaviorMap.get(app);
-      const nextState = app.getComponent('state');
-      if (currentState !== nextState) {
-        npcBehaviorMap.set(app, nextState);
-        npcManager.setBehaviorFn(app, behaviorFns[nextState]);
-        // console.log('changing state', currentState, '->', nextState);
+      const currentState = npcStateMap.get(app);
+      const currentBehavior = currentState && currentState.behavior;
+      const state = app.getComponent('state');
+      const {behavior} = state;
+      
+      if (currentBehavior !== behavior) {
+        console.log('state is', state)
+        const targetPlayer = npcManager.getNpcByAppInstanceId(state.target);
+        console.log('changed state to', behavior, 'state.target', state.target, 'targetPlayer', targetPlayer)
+        npc.target = targetPlayer;
+        npcStateMap.set(app, state);
+        npcManager.setBehaviorFn(app, behaviorFns[behavior]);
       }
     }
   }

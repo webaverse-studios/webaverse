@@ -28,6 +28,11 @@ const updateAvatarsFnMap = new WeakMap();
 const cancelFnsMap = new WeakMap();
 let targetSpec = null;
 
+const BehaviorType = {
+  IDLE: 0,
+  FOLLOW: 1,
+}
+
 class NpcManager extends EventTarget {
   constructor() {
     super();
@@ -44,6 +49,10 @@ class NpcManager extends EventTarget {
 
   getNpcByApp(app) {
     return this.npcs.find(npc => this.getAppByNpc(npc) === app);
+  }
+
+  getNpcByAppInstanceId(instanceId) {
+    return this.npcs.find(npc => this.getAppByNpc(npc).instanceId === instanceId);
   }
 
   getDetachedNpcByApp(app) {
@@ -318,7 +327,7 @@ class NpcManager extends EventTarget {
 
       this.setBehaviorFn(app, idleFn);
       if (!app.getComponent('state')) {
-        app.setComponent('state', 0);
+        app.setComponent('state', {behavior: BehaviorType.IDLE, target: null});
       }
 
       const updateAvatarFn = (timestamp, timeDiff) => {
@@ -380,12 +389,9 @@ class NpcManager extends EventTarget {
             };
             player.addAction(newSssAction);
           } else if (action === 'follow' || (object === 'none' && target === localPlayer.name)) { // follow player
-            targetSpec = {
-              type: 'follow',
-              object: localPlayer,
-            };
+            app.setComponent('state', {behavior: BehaviorType.FOLLOW, target: npcManager.getAppByNpc(localPlayer).instanceId});
           } else if (action === 'stop') { // stop
-            targetSpec = null;
+            app.setComponent('state', {behavior: BehaviorType.IDLE, target: null});
           } else if (action === 'moveto' || (object !== 'none' && target === 'none')) { // move to object
             console.log('move to object', object);
           } else if (action === 'moveto' || (object === 'none' && target !== 'none')) { // move to player
