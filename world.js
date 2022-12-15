@@ -36,8 +36,6 @@ export class World {
 
       const isInvincible = app.getComponent('invincible');
 
-      console.log('is invincible', isInvincible)
-
       // regular glb models default to invincible for now
       if (!isInvincible) {
         const hitTracker = hpManager.makeHitTracker();

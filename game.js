@@ -1103,7 +1103,7 @@ class GameManager extends EventTarget {
           const object = metaversefileApi.getAppByPhysicsId(physicsId);
           // console.log('got collision', physicsId, object);
           const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(physicsId);
-          if (object && !_isWear(object) && physicsObject) {
+          if (object && !_isWear(object) && physicsObject && !object.getComponent('invincible')) {
             this.grabUseMesh.position.setFromMatrixPosition(physicsObject.physicsMesh.matrixWorld);
             this.grabUseMesh.quaternion.copy(camera.quaternion);
             this.grabUseMesh.updateMatrixWorld();
