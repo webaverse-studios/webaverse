@@ -826,6 +826,7 @@ export class MobInstance {
       [MobStates.attack, ['attack']]
     ]);
     this.followTargetOutOfRange = false;
+    this.uTimeInt = 0;
     hitManager.addEventListener('hitattempt', (e) => this.hitAction(e.data));
   }
 
@@ -1117,8 +1118,10 @@ export class MobInstance {
     }
 
     // manage position
-    if(this.movement.length() > 0)
+    if(this.movement.length() > 0 || Math.floor(this.uTime) > this.uTimeInt){
+      this.uTimeInt = Math.floor(this.uTime);
       this.moveMobInternal(timeDiffS);
+    }
   }
 
   /*
@@ -1525,9 +1528,6 @@ instanceIndex = gl_DrawID * ${maxInstancesPerDrawCall} + gl_InstanceID;
   vec2 animationData = texture2D(animationsFrameInfo, fInfoUv).xy;
   float frameCount = animationData.x;
 
-  //float time1 = float(floor(uTime));
-  //float time2 = float(ceil(uTime));
-  //float timeRatio = (uTime - time1) / (time2 - time1);
   float time1 = float(floor(timeOffset));
   float time2 = float(ceil(timeOffset));
   float timeRatio = (timeOffset - time1) / (time2 - time1);
@@ -1535,10 +1535,8 @@ instanceIndex = gl_DrawID * ${maxInstancesPerDrawCall} + gl_InstanceID;
     timeRatio = 0.0f;
   }
 
-  //float frame1 = animationID * float(${maxAnimationFrameLength}) + mod( float(time1) + timeOffset * frameCount, frameCount );
-  //float frame2 = animationID * float(${maxAnimationFrameLength}) + mod( float(time2) + timeOffset * frameCount, frameCount );
-  float frame1 = animationID * float(${maxAnimationFrameLength}) + mod( float(time1), frameCount );
-  float frame2 = animationID * float(${maxAnimationFrameLength}) + mod( float(time2), frameCount );
+  float frame1 = animationID * float(${maxAnimationFrameLength}) + mod( time1, frameCount - 1.0 );
+  float frame2 = animationID * float(${maxAnimationFrameLength}) + mod( time2, frameCount - 1.0 );
   int boneTextureIndex1 = boneTextureIndex + int(frame1) * ${numGeometries} * ${maxBonesPerInstance};
   int boneTextureIndex2 = boneTextureIndex + int(frame2) * ${numGeometries} * ${maxBonesPerInstance};
   float boneIndexOffset1 = float(boneTextureIndex1) * 2.;
