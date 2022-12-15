@@ -122,15 +122,15 @@ class PanelInstance extends THREE.Object3D {
 
       const material2 = scenePhysicsMesh.material.clone();
       const scenePhysicsMesh2 = new THREE.Mesh(geometry2, material2);
-      scenePhysicsMesh.matrixWorld.decompose(
-        scenePhysicsMesh2.position,
-        scenePhysicsMesh2.quaternion,
-        scenePhysicsMesh2.scale
-      );
-      scenePhysicsMesh2.updateMatrixWorld();
+      // scenePhysicsMesh.position.copy(scenePhysicsMesh.position);
+      // scenePhysicsMesh.quaternion.copy(scenePhysicsMesh.quaternion);
+      // scenePhysicsMesh.scale.copy(scenePhysicsMesh.scale);
+      zineRenderer.transformScene.add(scenePhysicsMesh2);
+      this.scenePhysicsMesh = scenePhysicsMesh2;
 
-      const physicsId = this.physics.addGeometry(scenePhysicsMesh2);
-      physicsIds.push(physicsId);
+      const scenePhysicsObject = this.physics.addGeometry(scenePhysicsMesh2);
+      physicsIds.push(scenePhysicsObject);
+      this.scenePhysicsObject = scenePhysicsObject;
     }
 
     // floor physics
@@ -161,6 +161,7 @@ class PanelInstance extends THREE.Object3D {
       })();
       floorNetPhysicsMesh.position.set(-floorNetWorldSize/2, 0, -floorNetWorldSize/2);
       zineRenderer.transformScene.add(floorNetPhysicsMesh);
+      this.floorNetPhysicsMesh = floorNetPhysicsMesh;
 
       const numRows = width;
       const numColumns = height;
@@ -169,7 +170,7 @@ class PanelInstance extends THREE.Object3D {
         width,
         height
       );
-      const heightfieldPhysicsObject = this.physics.addHeightFieldGeometry(
+      const floorNetPhysicsObject = this.physics.addHeightFieldGeometry(
         floorNetPhysicsMesh,
         numRows,
         numColumns,
@@ -178,7 +179,8 @@ class PanelInstance extends THREE.Object3D {
         floorNetResolution,
         floorNetResolution
       );
-      physicsIds.push(heightfieldPhysicsObject);
+      physicsIds.push(floorNetPhysicsObject);
+      this.floorNetPhysicsObject = floorNetPhysicsObject;
     }
 
     // disable physics to start
@@ -309,11 +311,43 @@ class PanelInstanceManager extends THREE.Object3D {
       physics,
     };
 
+    // create panel instances
     const panels = this.storyboard.getPanels();
     for (let i = 0; i < panels.length; i++) {
       const panel = panels[i];
       const panelInstance = new PanelInstance(panel, panelOpts);
       panelInstance.visible = false;
+      this.add(panelInstance);
+      this.panelInstances.push(panelInstance);
+    }
+
+    // connect panels
+    console.log('connect panels', this.panelInstances.length)
+    for (let i = 0; i < this.panelInstances.length - 1; i++) {
+      // connect panels
+      const panelInstance = this.panelInstances[i];
+      const nextPanelInstance = this.panelInstances[i + 1];
+      console.log('call connect 1', panelInstance.zineRenderer, nextPanelInstance.zineRenderer);
+      panelInstance.zineRenderer.connect(nextPanelInstance.zineRenderer);
+      // update physics
+      // update scene mesh physics
+      nextPanelInstance.scenePhysicsMesh.matrixWorld.decompose(
+        nextPanelInstance.scenePhysicsObject.position,
+        nextPanelInstance.scenePhysicsObject.quaternion,
+        nextPanelInstance.scenePhysicsObject.scale
+      );
+      this.physics.setTransform(nextPanelInstance.scenePhysicsObject, false);
+      // update floor net physics
+      nextPanelInstance.floorNetPhysicsMesh.matrixWorld.decompose(
+        nextPanelInstance.floorNetPhysicsObject.position,
+        nextPanelInstance.floorNetPhysicsObject.quaternion,
+        nextPanelInstance.floorNetPhysicsObject.scale
+      );
+      this.physics.setTransform(nextPanelInstance.floorNetPhysicsObject, false);
+    }
+
+    // event listeners
+    for (const panelInstance of this.panelInstances) {
       panelInstance.addEventListener('transition', e => {
         // attempt to transition panels
         const {panelIndexDelta} = e;
@@ -322,15 +356,23 @@ class PanelInstanceManager extends THREE.Object3D {
           // XXX check that we are on the opposite side of the exit plane
           // this is to prevent glitching back and forth between panels
 
-          console.log('transition to panel', nextPanelIndex);
+          // deselect old panel
+          const oldPanelIndex = this.panelIndex;
+          const oldPanelInstance = this.panelInstances[oldPanelIndex];
+          oldPanelInstance.setSelected(false);
+
+          // select new panel
+          this.panelIndex = nextPanelIndex;
+          const newPanelInstance = this.panelInstances[nextPanelIndex];
+          newPanelInstance.setSelected(true);
 
           // XXX perform the transition animation in the story camera manager
-          this.panelIndex = nextPanelIndex;
+          console.log('transition to panel', nextPanelIndex);
         }
       });
-      this.add(panelInstance);
-      this.panelInstances.push(panelInstance);
     }
+
+    // select first panel
     const firstPanel = this.panelInstances[this.panelIndex];
     firstPanel.setSelected(true);
   }
