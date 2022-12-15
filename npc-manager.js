@@ -18,7 +18,6 @@ import metaversefile from './metaversefile-api.js';
 import {characterSelectManager} from './characterselect-manager.js';
 import emoteManager from './emotes/emote-manager.js';
 import {getFuzzyEmotionMapping} from './story.js';
-import {runSpeed, walkSpeed} from './constants.js';
 import {idleFn} from './npc-behavior.js';
 
 const localVector = new THREE.Vector3();
@@ -28,8 +27,6 @@ const updatePhysicsFnMap = new WeakMap();
 const updateAvatarsFnMap = new WeakMap();
 const cancelFnsMap = new WeakMap();
 let targetSpec = null;
-
-const cancelFns = [];
 
 class NpcManager extends EventTarget {
   constructor() {
@@ -203,12 +200,14 @@ class NpcManager extends EventTarget {
     json,
   }) {
     // cleanFns
-    cancelFns.push(() => {
-      npc.destroy();
-    });
+    npc.cancelFns = [
+      () => {
+        npc.destroy();
+      },
+    ];
     
     cancelFnsMap.set(app, () => {
-      for (const cancelFn of cancelFns) {
+      for (const cancelFn of npc.cancelFns) {
         cancelFn();
       }
     });
@@ -217,13 +216,13 @@ class NpcManager extends EventTarget {
     const detached = !!json.detached;
     if (!detached) {
       this.npcs.push(npc);
-      cancelFns.push(() => {
+      npc.cancelFns.push(() => {
         const removeIndex = this.npcs.indexOf(npc);
         this.npcs.splice(removeIndex, 1);
       });
     } else {
       this.detachedNpcs.push(npc);
-      cancelFns.push(() => {
+      npc.cancelFns.push(() => {
         const removeIndex = this.detachedNpcs.indexOf(npc);
         this.detachedNpcs.splice(removeIndex, 1);
       });
@@ -231,7 +230,7 @@ class NpcManager extends EventTarget {
 
     // npcApp map
     this.npcAppMap.set(npc, app);
-    cancelFns.push(() => {
+    npc.cancelFns.push(() => {
       this.npcAppMap.delete(npc);
     });
 
@@ -242,7 +241,7 @@ class NpcManager extends EventTarget {
         player,
       }
     }));
-    cancelFns.push(() => {
+    npc.cancelFns.push(() => {
       this.dispatchEvent(new MessageEvent('playerremove', {
         data: {
           player,
@@ -256,7 +255,7 @@ class NpcManager extends EventTarget {
       app.setPhysicsObject(player.characterPhysics.characterController);
     };
     player.addEventListener('avatarupdate', avatarupdate);
-    cancelFns.push(() => {
+    npc.cancelFns.push(() => {
       player.removeEventListener('avatarupdate', avatarupdate);
     });
 
@@ -290,7 +289,7 @@ class NpcManager extends EventTarget {
         });
       };
       app.addEventListener('hittrackeradded', hittrackeradd);
-      cancelFns.push(() => {
+      npc.cancelFns.push(() => {
         app.removeEventListener('hittrackeradded', hittrackeradd);
       });
 
@@ -310,7 +309,7 @@ class NpcManager extends EventTarget {
         }
       };
       app.addEventListener('activate', activate);
-      cancelFns.push(() => {
+      npc.cancelFns.push(() => {
         app.removeEventListener('activate', activate);
       });
 
@@ -323,7 +322,7 @@ class NpcManager extends EventTarget {
         player.updateAvatar(timestamp, timeDiff);
       };
       updateAvatarsFnMap.set(app, updateAvatarFn);
-      cancelFns.push(() => {
+      npc.cancelFns.push(() => {
         updateAvatarsFnMap.delete(app);
       });
     };
@@ -344,7 +343,7 @@ class NpcManager extends EventTarget {
         name: npcName,
         bio: npcBio,
       });
-      cancelFns.push(() => {
+      npc.cancelFns.push(() => {
         world.loreAIScene.removeCharacter(character);
       });
       character.addEventListener('say', e => {
@@ -446,8 +445,9 @@ class NpcManager extends EventTarget {
   }
 
   setBehaviorFn(app, behaviorFn) {
+    const npc = this.getNpcByApp(app);
     updatePhysicsFnMap.set(app, behaviorFn);
-    cancelFnsMap.set(app, () => updatePhysicsFnMap.delete(app))
+    npc.cancelFns.push(() => updatePhysicsFnMap.delete(app));
   }
 }
 const npcManager = new NpcManager();

@@ -12,24 +12,27 @@ class NpcAiManager {
   constructor() {
     this.npcs = [];
 
-    const updateNpcs = () => {
-      this.npcs = [].concat(
-        npcManager.npcs,
-        npcManager.detachedNpcs,
-      ).filter(player => player.getControlMode() !== 'controlled');
+    const addPlayer = player => {
+      if (player.getControlMode() !== 'controlled') {
+        this.npcs.push(player);
+      }
     };
 
-    const handlePlayerAdd = e => {
-      updateNpcs();
-    };
-
-    const handlePlayerRemove = e => {
-      const player = e.data.player;
+    const removePlayer = player => {
       const app = npcManager.getAppByNpc(player);
       if (npcBehaviorMap.has(app)) {
         npcBehaviorMap.delete(app);
       }
-      updateNpcs();
+      const removeIndex = this.npcs.indexOf(player);
+      this.npcs.splice(removeIndex, 1);
+    };
+
+    const handlePlayerAdd = e => {
+      addPlayer(e.data.player);
+    };
+
+    const handlePlayerRemove = e => {
+      removePlayer(e.data.player);
     };
 
     npcManager.addEventListener('playeradd', handlePlayerAdd);
