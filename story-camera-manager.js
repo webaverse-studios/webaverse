@@ -38,23 +38,6 @@ class StoryCameraManager extends EventTarget {
           movementY: e.movementY,
         },
       }));
-
-      // const {movementX, movementY} = e;
-
-      // camera.position.add(localVector.copy(this.getCameraOffset()).applyQuaternion(camera.quaternion));
-    
-      // camera.rotation.y -= movementX * Math.PI * 2 * 0.0005;
-      // camera.rotation.x -= movementY * Math.PI * 2 * 0.0005;
-      // camera.rotation.x = Math.min(Math.max(camera.rotation.x, -Math.PI * 0.35), Math.PI / 2);
-      // camera.quaternion.setFromEuler(camera.rotation);
-
-      // camera.position.sub(localVector.copy(this.getCameraOffset()).applyQuaternion(camera.quaternion));
-
-      // camera.updateMatrixWorld();
-
-      // if (!this.target) {
-      //   this.targetQuaternion.copy(camera.quaternion);
-      // }
       return true;
     } else {
       return false;
