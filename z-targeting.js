@@ -119,7 +119,6 @@ class QueryResults {
   snapshotRay(object) {
     const physicsScene = physicsManager.getScene();
     const results = physicsScene.raycast(object.position, object.quaternion);
-    console.log('TODO: snapshot results into reticle', results, object.position.toArray(), object.quaternion.toArray());
 
     if (results) {
       const {
@@ -156,27 +155,6 @@ class QueryResults {
     } else {
       this.results = [];
     }
-    // const distance = reticle.position.distanceTo(position);
-    // const type = (() => {
-    //   if (distance < 5) {
-    //     return 'friend';
-    //   } else if (distance < 10) {
-    //     return 'enemy';
-    //   } else {
-    //     return 'object';
-    //   }
-    // })();
-    // const zoom = 0;
-    // const reticle = {
-    //   position: reticle.position,
-    //   physicsId: reticle.objectId,
-    //   type,
-    //   zoom,
-    // };
-    // const reticles = [
-    //   reticle,
-    // ];
-    // this.results = reticles;
   }
 }
 
