@@ -11,7 +11,7 @@ import ioManager from './io-manager.js';
 import dioramaManager from './diorama/diorama-manager.js';
 import {world} from './world.js';
 import {buildMaterial, highlightMaterial, selectMaterial, hoverMaterial, hoverEquipmentMaterial} from './shaders.js';
-import {getRenderer, sceneLowPriority, camera} from './renderer.js';
+import {getRenderer, sceneLowPriority, camera, scene, rootScene} from './renderer.js';
 import {downloadFile, snapPosition, getDropUrl, handleDropJsonItem, makeId} from './util.js';
 import {maxGrabDistance, throwReleaseTime, throwAnimationDuration, walkSpeed, crouchSpeed, flySpeed} from './constants.js';
 import metaversefileApi from './metaversefile-api.js';
@@ -27,6 +27,7 @@ import {avatarManager} from './avatar-manager.js';
 import npcManager from './npc-manager.js';
 import grabManager from './grab-manager.js';
 import {getVoucherFromUser} from './src/hooks/voucherHelpers'  
+import storyCameraManager from './story-camera-manager.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -48,6 +49,15 @@ const hitRadius = 1;
 const hitHeight = 0.2;
 const hitHalfHeight = hitHeight * 0.5;
 const hitboxOffsetDistance = 0.3;
+
+const testMesh = new THREE.Mesh(
+  new THREE.BoxBufferGeometry(0.01, 0.01, 0.01),
+  new THREE.MeshPhongMaterial({
+    color: 0xff0000,
+  })
+);
+testMesh.frustumCulled = false;
+rootScene.add(testMesh);
 
 class GameManager extends EventTarget {
   menuOpen = 0;
@@ -471,32 +481,72 @@ class GameManager extends EventTarget {
 
   menuAim() {
     const localPlayer = playersManager.getLocalPlayer();
-    if (!localPlayer.hasAction('aim')) {
-      const wearApp = loadoutManager.getSelectedApp();
-      const wearAimApp = (() => {
-        if (wearApp) {
-          const aimComponent = wearApp.getComponent('aim');
-          if (aimComponent) {
-            return wearApp;
-          }
-        }
-        return null;
-      })();
-      const wearAimComponent = wearAimApp?.getComponent('aim');
 
-      const {instanceId} = wearAimApp ?? {};
-      const {appAnimation, characterAnimation, boneAttachment, position, quaternion, scale} = wearAimComponent ?? {};
-      const aimAction = {
-        type: 'aim',
-        instanceId,
-        appAnimation,
-        characterAnimation,
-        boneAttachment,
-        position,
-        quaternion,
-        scale,
-      };
-      localPlayer.addAction(aimAction);
+    if (storyCameraManager.cameraLocked) {
+      // this.menuMiddleToggle();
+      // get the current mouse transform into an object
+      const lastMouseEvent = raycastManager.getLastMouseEvent();
+      // console.log('TODO: set mouse event to rayObject', lastMouseEvent);
+
+      // XXX we can get this from the zine manager
+      const {mousePosition} = storyCameraManager;
+      // unproject point
+      const unprojectedNearPoint = new THREE.Vector3(
+        mousePosition.x,
+        -mousePosition.y,
+        -1
+      )
+        .unproject(storyCameraManager.lockCamera);
+      const unprojectedMidPoint = new THREE.Vector3(
+        mousePosition.x,
+        -mousePosition.y,
+        0
+      )
+        .unproject(storyCameraManager.lockCamera);
+      
+      // XXX debug mesh
+      testMesh.position.copy(unprojectedNearPoint);
+      testMesh.updateMatrixWorld();
+
+      const rayObject = new THREE.Object3D();
+      rayObject.position.copy(unprojectedNearPoint);
+      rayObject.quaternion.setFromRotationMatrix(
+        localMatrix.lookAt(
+          unprojectedNearPoint,
+          unprojectedMidPoint,
+          localVector.set(0, 1, 0)
+            .applyQuaternion(storyCameraManager.lockCamera.quaternion)
+        )
+      );
+      zTargeting.handleRayFocus(rayObject);
+    } else {
+      if (!localPlayer.hasAction('aim')) {
+        const wearApp = loadoutManager.getSelectedApp();
+        const wearAimApp = (() => {
+          if (wearApp) {
+            const aimComponent = wearApp.getComponent('aim');
+            if (aimComponent) {
+              return wearApp;
+            }
+          }
+          return null;
+        })();
+        const wearAimComponent = wearAimApp?.getComponent('aim');
+
+        const {instanceId} = wearAimApp ?? {};
+        const {appAnimation, characterAnimation, boneAttachment, position, quaternion, scale} = wearAimComponent ?? {};
+        const aimAction = {
+          type: 'aim',
+          instanceId,
+          appAnimation,
+          characterAnimation,
+          boneAttachment,
+          position,
+          quaternion,
+          scale,
+        };
+        localPlayer.addAction(aimAction);
+      }
     }
   }
 
