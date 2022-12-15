@@ -15,7 +15,7 @@ async function getSVG(iconName) {
 }
 
 export default function CustomButton(props) {
-  const {size, icon, className, onClick, theme, type, text, onMouseEnter} =
+  const {size, icon, className, onClick, theme, type, text, onMouseEnter, active} =
     props;
   const svgRef = useRef(null);
 
@@ -40,13 +40,14 @@ export default function CustomButton(props) {
           className,
           styles.iconButtonWrap,
           theme && theme === 'dark' ? styles.dark : styles.light,
+          active && styles.active
         )}
         style={{height: size}}
         onClick={onClick}
         onMouseEnter={onMouseEnter}
       >
         <svg
-          width="71"
+          width="71" 
           height="67"
           viewBox="0 0 71 67"
           className={styles.buttonBackground}
@@ -75,6 +76,7 @@ export default function CustomButton(props) {
           className,
           styles.iconButtonWrap,
           theme && theme === 'dark' ? styles.dark : styles.light,
+          active && styles.active
         )}
         style={{height: size}}
         onClick={onClick}

@@ -1,6 +1,7 @@
 export const baseUnit = 4;
 export const previewExt = 'jpg';
 export const maxGrabDistance = 1.5;
+export const heightfieldScale = 0.1;
 
 export const transparentPngUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
@@ -91,7 +92,7 @@ export const runSpeed = walkSpeed * 3;
 export const narutoRunSpeed = walkSpeed * 20;
 export const crouchSpeed = walkSpeed * 0.7;
 export const flySpeed = walkSpeed * 5;
-export const gliderSpeed = walkSpeed * 3;
+export const gliderSpeed = walkSpeed * 2;
 
 export const narutoRunTimeFactor = 2;
 
@@ -169,3 +170,9 @@ export const offscreenCanvasSize = 2048;
 export const realmSize = 256;
 
 export const IS_NARUTO_RUN_ENABLED = false;
+
+// note: For WASM API.
+export const GET = 0;
+export const GET_NORMALIZED = 1;
+export const GET_INVERSE = 2;
+//

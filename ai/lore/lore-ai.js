@@ -374,15 +374,7 @@ class LoreAI {
     const _apiTypeNeedsApiKey = apiType => apiType === 'OPENAI';
 
     const url = _getApiUrl(apiType);
-    if (_apiTypeNeedsApiKey(apiType)) {
-      this.setEndpoint(async query => {
-        const preauthenticatorModule = await import('../../preauthenticator');
-        const preauthenticator = preauthenticatorModule.default;
-        return await preauthenticator.callAuthenticatedApi(authenticatedApiName, url, query);
-      });
-    } else {
-      this.setEndpointUrl(url);
-    }
+    this.setEndpointUrl(url);
   };
 
   async generate(prompt, {
@@ -449,11 +441,24 @@ class LoreAI {
 
   async setEndpointUrl(url) {
     if (url) {
+      const settingsString = localStorage.getItem('AiSettings');
+      let settings;
+
+      try {
+        settings = JSON.parse(settingsString);
+      } catch (err) {
+        console.warn('could not parse AiSettings', err);
+      }
+
+      const apiKey = settings?.apiKey ?? '';
+
       const endpointFn = async query => {
+        // get openai api key from local storage
         const res = await fetch(url, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
           },
           body: JSON.stringify(query),
         });

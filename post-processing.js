@@ -173,7 +173,7 @@ const _isDecapitated = () => (
   (/^(?:camera|firstperson)$/.test(cameraManager.getMode()) && !cameraManager.target) ||
   !!getRenderer().xr.getSession()
 );
-webaverseRenderPass.onBeforeRender = (a, b, c) => {
+const decapitated = (a, b, c) => {
   // ensure lights attached
   // scene.add(world.lights);
   
@@ -190,6 +190,7 @@ webaverseRenderPass.onBeforeRender = (a, b, c) => {
     }
   }
 };
+webaverseRenderPass.onBeforeRenders.push(decapitated);
 webaverseRenderPass.onAfterRender = () => {
   // undecapitate
   const localPlayer = metaversefileApi.useLocalPlayer();

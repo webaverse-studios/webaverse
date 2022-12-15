@@ -79,6 +79,18 @@
     fill: #fdc503;
 }
 
+.iconButtonWrap.active .buttonBackgroundColor {
+    fill: #000000 !important;
+}
+
+.iconButtonWrap.active .innerBackgroundColor {
+    fill: #000000 !important;
+}
+
+.iconButtonWrap.active .icon * {
+    fill: #fdc503;
+}
+
 .buttonWrap {
     border: 2px solid #000000;
     background: #000000;

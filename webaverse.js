@@ -12,12 +12,13 @@ import game from './game.js';
 
 import * as THREE from 'three';
 import npcManager from './npc-manager.js';
+import npcAiManager from './npc-ai-manager.js';
 import Avatar from './avatars/avatars.js';
 import * as sounds from './sounds.js';
 import physx from './physx.js';
 import physicsManager from './physics-manager.js';
 import {world} from './world.js';
-// import * as blockchain from './blockchain.js';
+import storyCameraManager from './story-camera-manager.js';
 import hpManager from './hp-manager.js';
 import minimapManager from './minimap.js';
 import postProcessing from './post-processing.js';
@@ -131,6 +132,8 @@ export default class Webaverse extends EventTarget {
         musicManager.waitForLoad(),
       ];
 
+      game.init();
+
       // update the loading progress
       _updateLoadProgress();
 
@@ -160,7 +163,7 @@ export default class Webaverse extends EventTarget {
     })();
     this.contentLoaded = false;
     const self = this
-    // Todo: global variable for e2e automatic tests
+    /* // Todo: global variable for e2e automatic tests
     window.globalWebaverse = {
       metaversefileApi,
       playersManager,
@@ -172,11 +175,27 @@ export default class Webaverse extends EventTarget {
       webaverse: self,
       world,
       game,
-    };
+    }; */
   }
   
-  waitForLoad() {
-    return this.loadPromise;
+  async waitForLoad() {
+    if (!this.loadPromise) {
+      this.loadPromise = async () => {
+        await physx.waitForLoad();
+        await Promise.all([
+          Avatar.waitForLoad(),
+          physxWorkerManager.waitForLoad(),
+          sounds.waitForLoad(),
+          zTargeting.waitForLoad(),
+          particleSystemManager.waitForLoad(),
+          transformControls.waitForLoad(),
+          backgroundFx.waitForLoad(),
+          voices.waitForLoad(),
+          musicManager.waitForLoad(),
+        ]);
+      };
+    }
+    await this.loadPromise();
   }
 
   getRenderer() {
@@ -395,6 +414,7 @@ export default class Webaverse extends EventTarget {
           if (this.contentLoaded && physicsScene.getPhysicsEnabled()) {
             physicsScene.simulatePhysics(timeDiffCapped);
             physicsScene.getTriggerEvents();
+            npcAiManager.update(timestamp, timeDiffCapped);
             npcManager.updatePhysics(timestamp, timeDiffCapped);
           }
 
@@ -413,7 +433,8 @@ export default class Webaverse extends EventTarget {
           questManager.update(timestamp, timeDiffCapped);
           particleSystemManager.update(timestamp, timeDiffCapped);
 
-          cameraManager.updatePost(timestamp, timeDiffCapped);
+          storyCameraManager.updatePost(timestamp, timeDiffCapped) ||
+            cameraManager.updatePost(timestamp, timeDiffCapped);
           ioManager.updatePost();
 
           game.pushAppUpdates();
@@ -465,7 +486,7 @@ const _startHacks = webaverse => {
   const vpdAnimations = Avatar.getAnimations().filter(animation => animation.name.endsWith('.vpd'));
 
   // Press } to debug current state in console.
-  window.addEventListener('keydown', event => {
+  (typeof window !== 'undefined') && window.addEventListener('keydown', event => {
     if (event.key === '}') {
       console.log('>>>>> current state');
       console.log(universe.state);
@@ -641,7 +662,7 @@ const _startHacks = webaverse => {
   }; */
   webaverse.titleCardHack = false;
   // let haloMeshApp = null;
-  window.addEventListener('keydown', e => {
+  (typeof window !== 'undefined') && window.addEventListener('keydown', e => {
     if (e.which === 46) { // .
       emotionIndex = -1;
       _updateFacePose();

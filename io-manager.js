@@ -348,6 +348,7 @@ class IoManager extends EventTarget {
         this.lastKeysDownTime.keyD = now;
         this.lastKeysDownTime.keyA = 0;
         break;
+
       }
       case 70: { // F
         e.preventDefault();

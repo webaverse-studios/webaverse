@@ -109,7 +109,7 @@ const CharacterHup = function(props) {
 
   return (
     <div
-      className={classnames(styles['character-hup'])}
+      className={classnames(styles['character-hup'], localOpen ? styles.open : null)}
       style={{
         top: `${index * defaultHupSize}px`,
       }}
@@ -159,7 +159,6 @@ export default function CharacterHups({
       const newHups = hups.slice();
       newHups.splice(index, 1);
       oldHup.destroy();
-      setHups(newHups);
     }
     localPlayer.characterHups.addEventListener('hupadd', hupadd);
     localPlayer.characterHups.addEventListener('hupremove', hupremove);
