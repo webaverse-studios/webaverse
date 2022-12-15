@@ -167,3 +167,9 @@ export const minCanvasSize = 512;
 export const offscreenCanvasSize = 2048;
 
 export const IS_NARUTO_RUN_ENABLED = false;
+
+// note: For WASM API.
+export const GET = 0;
+export const GET_NORMALIZED = 1;
+export const GET_INVERSE = 2;
+//

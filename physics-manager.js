@@ -10,6 +10,7 @@ import {getNextPhysicsId, freePhysicsId, convertMeshToPhysicsMesh} from './util.
 import {CapsuleGeometry} from './geometries.js'
 import physxWorkerManager from './physx-worker-manager.js';
 import {BoxGeometry} from 'three';
+import {GET, GET_NORMALIZED, GET_INVERSE} from './constants.js'
 
 const localVector = new THREE.Vector3()
 
@@ -956,7 +957,7 @@ class PhysicsScene extends EventTarget {
     return triggerEvents;
   }
 
-  getActionInterpolant(character, actionName, type = 0) { // 0: get(), 1: getNormalized(), 2: getInverse()
+  getActionInterpolant(character, actionName, type = GET) { // note: type consts: GET, GET_NORMALIZED, GET_INVERSE.
     const interpolantValue = physx.physxWorker.getActionInterpolantAnimationAvatar(character.avatar.animationAvatarPtr, actionName, type);
     return interpolantValue;
   }
