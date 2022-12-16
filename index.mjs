@@ -5,6 +5,8 @@ import child_process from 'child_process';
 
 //
 
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
+
 const SERVER_NAME = 'local.webaverse.com';
 const DEVSERVER_PORT = 443;
 const MULTIPLAYER_PORT = 2222;
@@ -307,7 +309,7 @@ const _startPreviewer = async () => {
     _startCompiler(),
     _startMultiplayer(),
     // _startWiki(),
-    _startPreviewer(),
+    // _startPreviewer(),
   ]);
 
   console.log(`Welcome to the Webaverse!`);
