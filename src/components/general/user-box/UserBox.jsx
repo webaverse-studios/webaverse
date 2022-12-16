@@ -207,7 +207,7 @@ export const UserBox = ({className, setLoginFrom}) => {
               </div>
             </li>
             <li>
-              <div className={styles.loggedInText}>
+              <div className={styles.loggedInText} onClick={openInventory}>
                 <div className={styles.chainName}>Polygon</div>
                 <div className={styles.walletAddress}>{ensName || address}</div>
               </div>

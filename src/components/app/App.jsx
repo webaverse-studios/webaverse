@@ -78,10 +78,11 @@ export const App = () => {
     const [ editMode, setEditMode ] = useState(false);
     const [ claimableToken, setClaimableToken ] = useState([]);
     const [ mintedToken, setMintedToken ] = useState([]);
+    const [ resourceToken, setResourceToken ] = useState([]);
     const [ apps, setApps ] = useState(world.appManager.getApps().slice());
     const account = useContext(AccountContext);
     const chain = useContext(ChainContext);
-    const {getTokens} = useNFTContract(account.currentAddress);
+    const {getTokens, getOTtokens} = useNFTContract(account.currentAddress);
 
     const [domHover, setDomHover] = useState(null)
 
@@ -285,7 +286,7 @@ export const App = () => {
             getWalletItems();
         } else {
             setMintedToken([]);
-            console.log('could not query NFT collections')
+            // console.log('could not query NFT collections')
         }
     }, [account])
 
@@ -306,6 +307,16 @@ export const App = () => {
           }
         ))
         setMintedToken(nftData)
+
+        const OTTokens = await getOTtokens(); // will add more Resource
+        if(OTTokens.nftList.totalCount) {
+            setResourceToken([{
+                name: "OT",
+                start_url: "https://webaverse.github.io/ot-shard/shard.glb",
+                claimed: true,
+                value: OTTokens.nftList.totalCount
+            }])
+        }
       }
 
     //
@@ -347,6 +358,7 @@ export const App = () => {
         setClaimableToken,
         mintedToken,
         setMintedToken,
+        resourceToken,
         getWalletItems
     }
 
