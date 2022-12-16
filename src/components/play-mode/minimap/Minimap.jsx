@@ -96,7 +96,6 @@ export const Minimap = ({className}) => {
                     active={micEnabled && "active"}
                     onClick={handleMicBtnClick}
                     size={24}
-                    onClick={handleMicBtnClick}
                 />
                 <CustomButton
                     type="icon"
