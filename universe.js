@@ -29,6 +29,7 @@ class Universe extends EventTarget {
     this.currentWorld = null;
     this.sceneLoadedPromise = null;
 
+    this.multiplayerEnabled = false;
     this.multiplayerConnected = false;
     this.realms = null;
     this.actionsPrefix = 'actions.';
@@ -70,7 +71,8 @@ class Universe extends EventTarget {
 
       const promises = [];
       const {src, room} = worldSpec;
-      if (!room) {
+      this.multiplayerEnabled = room !== undefined;
+      if (!this.multiplayerEnabled) {
         await this.connectSinglePlayer();
 
         let match;
