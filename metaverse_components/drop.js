@@ -190,4 +190,14 @@ export default app => {
       app.updateMatrixWorld();
     });
   }
+
+  return {
+    remove() {
+      // metaversefile.clearFrame(frame);
+      /*
+        note: there's no need the content `metaversefile.clearFrame(frame);` ( And `frame` is undefined )
+        but have to keep this function to be used for `componentHandlers` to prevent inifite apps creation.
+      */
+    },
+  };
 };
