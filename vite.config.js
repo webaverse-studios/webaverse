@@ -18,7 +18,7 @@ export default defineConfig(({command, mode, ssrBuild}) => {
       },
     },
     worker:{
-      format: 'esm',
+      format: 'es',
     },
     /* optimizeDeps: {
       entries: [
