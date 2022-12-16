@@ -285,7 +285,7 @@ export const App = () => {
             getWalletItems();
         } else {
             setMintedToken([]);
-            console.log('could not query NFT collections')
+            // console.log('could not query NFT collections')
         }
     }, [account])
 
