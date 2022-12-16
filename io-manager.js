@@ -322,6 +322,10 @@ class IoManager extends EventTarget {
 
   setMovementEnabled(newMovementEnabled) {
     this.movementEnabled = newMovementEnabled;
+    if (!this.movementEnabled) {
+      const localPlayer = metaversefile.useLocalPlayer();
+      localPlayer.characterPhysics.applyWasd(zeroVector, 0);
+    }
   };
 
   resetKeys() {
