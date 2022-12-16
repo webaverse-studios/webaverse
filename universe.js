@@ -203,6 +203,7 @@ class Universe extends EventTarget {
 
   // Called by enterWorld() when a player enables multi-player.
   async connectMultiplayer(src, room, state = new Z.Doc()) {
+    console.log("Connect multiplayer");
     this.connectState(state);
 
     // Set up the network realms.
