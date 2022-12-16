@@ -45,7 +45,7 @@ const objects = {
     resources: [
         {
             name: "Silk",
-            start_url: "https://webaverse.github.io/silk/",
+            start_url: "https://webaverse.github.io/ot-shard/shard.glb",
             claimed: false,
             timerTimestamp: 1704454645000,
             value: 50,
@@ -225,7 +225,7 @@ const TokenList = ({
 };
 
 export const Inventory = () => {
-    const {state, setState, account, claimableToken, setClaimableToken, mintedToken, setMintedToken, getWalletItems} = useContext(AppContext);
+    const {state, setState, account, claimableToken, setClaimableToken, mintedToken, setMintedToken, resourceToken, getWalletItems} = useContext(AppContext);
     const [hoverObject, setHoverObject] = useState(null);
     const [selectObject, setSelectObject] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -364,7 +364,7 @@ export const Inventory = () => {
                             sections={[
                                 {
                                     name: "Resources",
-                                    tokens: objects.resources,
+                                    tokens: resourceToken,
                                 },
                             ]}
                             open={true}
@@ -382,7 +382,7 @@ export const Inventory = () => {
                             onDrop={onDrop}
                             mintClaim={mintClaim}
                             highlights={true}
-                            showTokenDropDown={showTokenDropDown}
+                            showTokenDropDown={false}
                         />
                         <TokenList
                             title="Backpack"

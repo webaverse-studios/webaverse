@@ -8,6 +8,8 @@ export const WEB3_EVENTS = {
   ACCOUNTS_CHANGE: 'accountsChanged',
 };
 
+export const OTCollectionAddress = "0x543D43F390b7d681513045e8a85707438c463d80";
+
 export const CONTRACTS = {
   testnetpolygon: {
     Webaverse: "0x367292a403115995d68a7d467FeBdF144910c06A",
