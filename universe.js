@@ -45,9 +45,7 @@ class Universe extends EventTarget {
   async enterWorld(worldSpec, locationSpec) {
     this.disconnectSingleplayer();
     this.disconnectMultiplayer();
-    /*
-    this.disconnectRoom();
-    */
+    // this.disconnectRoom();
     
     const localPlayer = metaversefile.useLocalPlayer();
     /* localPlayer.teleportTo(new THREE.Vector3(0, 1.5, 0), camera.quaternion, {
@@ -101,14 +99,12 @@ class Universe extends EventTarget {
           await this.connectMultiplayer(src, room);
         })();
         promises.push(p);
-      /*
-      } else {
-        const p = (async () => {
-          const roomUrl = this.getWorldsHost() + room;
-          await this.connectRoom(roomUrl);
-        })();
-        promises.push(p);
-      */
+      // } else {
+      //  const p = (async () => {
+      //    const roomUrl = this.getWorldsHost() + room;
+      //    await this.connectRoom(roomUrl);
+      //  })();
+      //  promises.push(p);
       }
       
       this.sceneLoadedPromise = Promise.all(promises)
