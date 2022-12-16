@@ -470,10 +470,23 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
         );
         bufferViewer.index += qsSize * Float32Array.BYTES_PER_ELEMENT;
 
+        const scalesSize = bufferViewer.dataView.getUint32(
+          bufferViewer.index,
+          true,
+        );
+        bufferViewer.index += Uint32Array.BYTES_PER_ELEMENT;
+        const scales = new Float32Array(
+          bufferViewer.dataView.buffer,
+          bufferViewer.dataView.byteOffset + bufferViewer.index,
+          scalesSize,
+        );
+        bufferViewer.index += scalesSize * Float32Array.BYTES_PER_ELEMENT;
+
         instances[i] = {
           instanceId,
           ps,
           qs,
+          scales
         };
       }
 
@@ -654,6 +667,18 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
         );
         bufferViewer.index += qsSize * Float32Array.BYTES_PER_ELEMENT;
 
+        const scalesSize = bufferViewer.dataView.getUint32(
+          bufferViewer.index,
+          true,
+        );
+        bufferViewer.index += Uint32Array.BYTES_PER_ELEMENT;
+        const scales = new Float32Array(
+          bufferViewer.dataView.buffer,
+          bufferViewer.dataView.byteOffset + bufferViewer.index,
+          scalesSize,
+        );
+        bufferViewer.index += scalesSize * Float32Array.BYTES_PER_ELEMENT;
+
         // materials
         const numMaterials = bufferViewer.dataView.getUint32(
           bufferViewer.index,
@@ -697,6 +722,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
           instanceId,
           ps,
           qs,
+          scales,
           materials,
           materialsWeights,
           grassProps,
