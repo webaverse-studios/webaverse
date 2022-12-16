@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, {useEffect, useState, useContext} from "react";
+import {Vector3} from 'three';
 import classnames from "classnames";
 
-import { defaultPlayerName } from "../../../../ai/lore/lore-model.js";
+import {defaultPlayerName} from "../../../../ai/lore/lore-model.js";
 import * as sounds from "../../../../sounds.js";
 
 import {
@@ -14,13 +15,19 @@ import {
     dex,
     lck,
     xp,
+    limit
 } from "../../../../player-stats.js";
 
-import { AppContext } from "../../app";
+import {AppContext} from "../../app";
 
 import styles from "./character.module.css";
 import CustomButton from "../custom-button/index.jsx";
-import { TokenBox } from "../token-box/TokenBox.jsx";
+import {TokenBox} from "../token-box/TokenBox.jsx";
+
+import {Emotions} from './Emotions';
+import {Poses} from './Poses';
+
+const localVector3 = new Vector3();
 
 const mainStatSpecs = [
     {
@@ -45,7 +52,7 @@ const mainStatSpecs = [
         imgSrc: "assets/icons/limit.svg",
         name: "Limit",
         className: "lm",
-        progress: 67,
+        progress: limit,
     },
 ];
 const statSpecs = [
@@ -81,7 +88,7 @@ const statSpecs = [
     },
 ];
 
-const Stat2 = ({ statSpec }) => {
+const Stat2 = ({statSpec}) => {
     return (
         <div className={classnames(styles.stat, styles[statSpec.className])}>
             <div className={styles.name}>
@@ -89,7 +96,7 @@ const Stat2 = ({ statSpec }) => {
                 <img className={styles.icon} src={statSpec.imgSrc} />
             </div>
             <div className={styles.progressBar}>
-                <div style={{ width: `${statSpec?.progress}%` }} />
+                <div style={{width: `${statSpec?.progress}%`}} />
             </div>
             <div className={styles.value}>
                 {statSpec?.progress}
@@ -99,7 +106,7 @@ const Stat2 = ({ statSpec }) => {
     );
 };
 
-const Stat = ({ statSpec }) => {
+const Stat = ({statSpec}) => {
     return (
         <div className={classnames(styles.stat, styles.columns)}>
             <div className={styles.name}>{statSpec.name}</div>
@@ -108,7 +115,7 @@ const Stat = ({ statSpec }) => {
     );
 };
 
-const AvatarPreviewBox = ({ dioramaCanvasRef, onClick }) => {
+const AvatarPreviewBox = ({dioramaCanvasRef, onClick}) => {
     const width = 160;
     const height = 330;
     return (
@@ -129,7 +136,7 @@ const AvatarPreviewBox = ({ dioramaCanvasRef, onClick }) => {
 
 //
 
-const AvatarEquipBox = ({ dioramaCanvasRef, onClick }) => {
+const AvatarEquipBox = ({dioramaCanvasRef, onClick}) => {
     const sideSize = 48;
     return (
         <div className={styles.avatarEquipBoxWrap}>
@@ -147,21 +154,20 @@ const AvatarEquipBox = ({ dioramaCanvasRef, onClick }) => {
     );
 };
 
-export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
-    const { state, setState } = useContext(AppContext);
+export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
+    const {state, setState} = useContext(AppContext);
     const [open, setOpen] = useState(false);
     const [characterSelectOpen, setCharacterSelectOpen] = useState(false);
 
     const sideSize = 400;
 
-    useEffect(() => {
+    useEffect(() => { 
         const canvas = dioramaCanvasRef.current;
 
         if (canvas && state.openedPanel === "CharacterPanel") {
             const playerDiorama = game.getPlayerDiorama();
-
+            playerDiorama.setCameraOffset(localVector3.set(0.3, -0.64, -1.9))
             playerDiorama.addCanvas(canvas);
-
             return () => {
                 playerDiorama.removeCanvas(canvas);
             };
@@ -187,6 +193,7 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
 
     function onCanvasClick() {
         const playerDiorama = game.getPlayerDiorama();
+        playerDiorama.setCameraOffset(localVector3.set(0.3, -0.64, -1.9))
         playerDiorama.toggleShader();
 
         const soundFiles = sounds.getSoundFiles();
@@ -195,6 +202,16 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
                 Math.floor(Math.random() * soundFiles.menuNext.length)
             ];
         sounds.playSound(audioSpec);
+    }
+
+    // Zoom in when editing emotions
+    function onEmotionsEdit(isEmotionEdit) {
+        const playerDiorama = game.getPlayerDiorama();
+        if (isEmotionEdit) {
+            playerDiorama.setCameraOffset(localVector3.set(0.3, 0, -0.7))
+        } else {
+            playerDiorama.setCameraOffset(localVector3.set(0.3, -0.64, -1.9))
+        }
     }
 
     function onCharacterSelectClick(e) {
@@ -220,6 +237,13 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
                 <div className={styles.characterTitleBox}>
                     Character Details
                 </div>
+                <Poses
+                    parentOpened={true}
+                />
+                <Emotions
+                    parentOpened={true}
+                    cameraOffset={onEmotionsEdit}
+                />
                 <div className={styles.avatarWrap}>
                     <div className={styles.avatarName}>
                         <img
@@ -250,7 +274,7 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
                                     numFrames={128}
                                     level={12}
                                     active={true}
-                                    type={"common"}
+                                    rarity={"common"}
                                 />
                             </li>
                             <li>
@@ -258,7 +282,7 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
                                     size={48}
                                     resolution={2048}
                                     numFrames={128}
-                                    type={"common"}
+                                    rarity={"common"}
                                 />
                             </li>
                             <li>
@@ -266,7 +290,7 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
                                     size={48}
                                     resolution={2048}
                                     numFrames={128}
-                                    type={"common"}
+                                    rarity={"common"}
                                 />
                             </li>
                         </ul>
@@ -279,7 +303,7 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
                                     numFrames={128}
                                     id="head"
                                     emptyIcon={"/assets/icons/slotHead.svg"}
-                                    type={"none"}
+                                    rarity={"none"}
                                 />
                             </li>
                             <li>
@@ -289,7 +313,7 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
                                     numFrames={128}
                                     id="body"
                                     emptyIcon={"/assets/icons/slotBody.svg"}
-                                    type={"none"}
+                                    rarity={"none"}
                                 />
                             </li>
                             <li>
@@ -299,7 +323,7 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
                                     numFrames={128}
                                     id="legs"
                                     emptyIcon={"/assets/icons/slotLegs.svg"}
-                                    type={"none"}
+                                    rarity={"none"}
                                 />
                             </li>
                             <li>
@@ -309,7 +333,7 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
                                     numFrames={128}
                                     id="leftHand"
                                     emptyIcon={"/assets/icons/slotLeftHand.svg"}
-                                    type={"none"}
+                                    rarity={"none"}
                                 />
                             </li>
                             <li>
@@ -319,7 +343,7 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
                                     numFrames={128}
                                     id="rightHand"
                                     emptyIcon={"/assets/icons/slotRightHand.svg"}
-                                    type={"none"}
+                                    rarity={"none"}
                                 />
                             </li>
                             <li>
@@ -329,7 +353,7 @@ export const Character = ({ game, /* wearActions, */ dioramaCanvasRef }) => {
                                     numFrames={128}
                                     id="mount"
                                     emptyIcon={"/assets/icons/slotMount.svg"}
-                                    type={"none"}
+                                    rarity={"none"}
                                 />
                             </li>
                         </ul>

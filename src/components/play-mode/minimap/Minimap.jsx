@@ -1,65 +1,109 @@
-import React, {useState, useRef, useEffect} from 'react';
-import minimapManager from '../../../../minimap.js';
+import React, {useState, useRef, useEffect, useContext} from "react";
+import minimapManager from "../../../../minimap.js";
 import voiceInput from '../../../../voice-input/voice-input';
-import classNames from 'classnames';
+import classNames from "classnames";
 
-import styles from './minimap.module.css';
+import styles from "./minimap.module.css";
 import CustomButton from "../../general/custom-button/index.jsx";
+import {AppContext} from "../../app/index.jsx";
 
 //
 
 let minimap = null;
 const canvasSize = 180 * window.devicePixelRatio;
-const minimapSize = 2048*3;
+const minimapSize = 2048 * 3;
 const minimapWorldSize = 400;
 const minimapMinZoom = 0.1;
 const minimapBaseSpeed = 30;
 
 export const Minimap = ({className}) => {
-
     const canvasRef = useRef();
-
-    const handleMicBtnClick = async () => {
-      if (!voiceInput.micEnabled()) {
-        await voiceInput.enableMic();
-      } else {
-        voiceInput.disableMic();
-      }
-    };
+    const {setState} = useContext(AppContext);
+    const [ micEnabled, setMicEnabled ] = useState(false);
+    const [ sttEnabled, setSttEnabled ] = useState(false);
 
     useEffect(() => {
         if (canvasRef.current) {
-          const canvas = canvasRef.current;
+            const canvas = canvasRef.current;
 
-          if (!minimap) {
-            minimap = minimapManager.createMiniMap(
-                minimapSize, minimapSize,
-                minimapWorldSize, minimapWorldSize,
-                minimapMinZoom,
-                minimapBaseSpeed
-            );
-          }
-          minimap.resetCanvases();
-          minimap.addCanvas(canvas);
+            if (!minimap) {
+                minimap = minimapManager.createMiniMap(
+                    minimapSize,
+                    minimapSize,
+                    minimapWorldSize,
+                    minimapWorldSize,
+                    minimapMinZoom,
+                    minimapBaseSpeed
+                );
+            }
+            minimap.resetCanvases();
+            minimap.addCanvas(canvas);
         }
-      }, [canvasRef.current]);
+    }, [canvasRef.current]);
+
+    const handleMicBtnClick = async () => {
+        setState({openedPanel: null});
+
+        if (!voiceInput.micEnabled()) {
+            await voiceInput.enableMic();
+        } else {
+            voiceInput.disableMic();
+        }
+    };
+
+    const stopPropagation = (event) => {
+
+        event.stopPropagation();
+
+    };
+
+    const handleSpeakBtnClick = async () => {
+        setState({openedPanel: null});
+
+        if (!voiceInput.speechEnabled()) {
+            await voiceInput.enableSpeech();
+        } else {
+            voiceInput.disableSpeech();
+        }
+    };
+
+    useEffect(() => {
+        function michange(event) {
+            setMicEnabled(event.data.enabled);
+        }
+
+        function speechchange(event) {
+            setSttEnabled(event.data.enabled);
+        }
+
+        voiceInput.addEventListener("micchange", michange);
+        voiceInput.addEventListener("speechchange", speechchange);
+
+        return () => {
+            voiceInput.removeEventListener("micchange", michange);
+            voiceInput.removeEventListener("speechchange", speechchange);
+        };
+    }, []);
 
     return (
-        <div className={ classNames(className, styles.locationMenu) } >
+        <div className={classNames(className, styles.locationMenu)} onClick={ stopPropagation }>
             <div className={styles.controls}>
                 <CustomButton
                     type="icon"
                     theme="dark"
                     icon="microphone"
                     className={styles.button}
-                    size={24}
+                    active={micEnabled && "active"}
                     onClick={handleMicBtnClick}
+                    size={24}
                 />
                 <CustomButton
                     type="icon"
                     theme="dark"
-                    icon="voice"
+                    icon="speechToText"
                     className={styles.button}
+                    active={sttEnabled && "active"}
+                    onClick={handleSpeakBtnClick}
                     size={24}
                 />
                 <CustomButton
@@ -78,7 +122,6 @@ export const Minimap = ({className}) => {
                     size={24}
                 />
             </div>
-            <div className={styles.mapBg} />
             <div className={styles.mapWrap}>
                 <canvas
                     width={canvasSize}
@@ -89,5 +132,4 @@ export const Minimap = ({className}) => {
             </div>
         </div>
     );
-
 };

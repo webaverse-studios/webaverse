@@ -1,5 +1,5 @@
 import pg from './pg-binding.js';
-import { makePromise } from './util.js';
+import {makePromise} from './util.js';
 
 //
 
@@ -941,24 +941,29 @@ const _handleMessage = async m => {
     );
   }
 };
-self.onmessage = (e) => {
-  const m = {
-    data: e.data,
-    port: self,
+if (typeof self !== 'undefined') {
+  self.onmessage = (e) => {
+    const m = {
+      data: e.data,
+      port: self,
+    };
+    if (loaded) {
+      _handleMessage(m);
+    } else {
+      // throw new Error('not loaded');
+      queue.push(m);
+    }
   };
-  if (loaded) {
-    _handleMessage(m);
-  } else {
-    queue.push(m);
-  }
-};
+}
 
-(async () => {
-  await pg.waitForLoad();
+if (typeof self !== 'undefined') {
+  (async () => {
+    await pg.waitForLoad();
 
-  loaded = true;
-  for (let i = 0; i < queue.length; i++) {
-    _handleMessage(queue[i]);
-  }
-  queue.length = 0;
-})();
+    loaded = true;
+    for (let i = 0; i < queue.length; i++) {
+      _handleMessage(queue[i]);
+    }
+    queue.length = 0;
+  })();
+}

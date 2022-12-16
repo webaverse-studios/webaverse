@@ -23,10 +23,11 @@ class VoiceInput extends EventTarget {
     localPlayer.setMicMediaStream(this.mediaStream);
 
     const wsrtc = universe.getConnection();
-    if (universe.multiplayerEnabled) {
-      universe.realms.enableMic()
-    } else if (wsrtc) {
+    if (wsrtc) {
       wsrtc.enableMic(this.mediaStream);
+    }
+    if (universe.multiplayerEnabled) {
+      universe.realms.enableMic();
     }
 
     this.dispatchEvent(new MessageEvent('micchange', {
@@ -133,14 +134,16 @@ class VoiceInput extends EventTarget {
   }
 
   disableSpeech() {
-    this.speechRecognition.stop();
-    this.speechRecognition = null;
+    if (this.speechEnabled()) {
+      this.speechRecognition.stop();
+      this.speechRecognition = null;
 
-    this.dispatchEvent(new MessageEvent('speechchange', {
-      data: {
-        enabled: false,
-      }
-    }));
+      this.dispatchEvent(new MessageEvent('speechchange', {
+        data: {
+          enabled: false,
+        }
+      }));
+    }
   }
 
   async toggleSpeech() {

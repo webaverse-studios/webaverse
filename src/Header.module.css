@@ -39,9 +39,9 @@
     color: white;
 }
 
-body {
+/* body {
   --header-height: 50px;
-}
+} */
 
 .header .tab {
   position: fixed;

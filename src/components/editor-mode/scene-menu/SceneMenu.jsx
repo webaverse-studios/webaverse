@@ -19,8 +19,6 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
     const {state, setState} = useContext(AppContext);
     const sceneNameInputRef = useRef(null);
     const [ rooms, setRooms ] = useState([]);
-    const [ micEnabled, setMicEnabled ] = useState(false);
-    const [ speechEnabled, setSpeechEnabled ] = useState(false);
     const [ sceneInputName, setSceneInputName ] = useState(selectedScene);
     const [ origSceneList, setOrigSceneList ] = useState([]);
     const [ scenesList, setScenesList ] = useState([]);
@@ -203,66 +201,6 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
         }
 
     };
-
-    const handleMicBtnClick = async () => {
-
-        setState({openedPanel: null});
-
-        if (! voiceInput.micEnabled()) {
-
-            await voiceInput.enableMic();
-
-        } else {
-
-            voiceInput.disableMic();
-
-        }
-
-    };
-
-    const handleSpeakBtnClick = async () => {
-
-        setState({openedPanel: null});
-
-        if (! voiceInput.speechEnabled()) {
-
-            await voiceInput.enableSpeech();
-
-        } else {
-
-            voiceInput.disableSpeech();
-
-        }
-
-    };
-
-    useEffect(() => {
-
-        refreshRooms();
-
-        function michange (event) {
-
-            setMicEnabled(event.data.enabled);
-
-        };
-
-        function speechchange (event) {
-
-            setSpeechEnabled(event.data.enabled);
-
-        };
-
-        voiceInput.addEventListener('micchange', michange);
-        voiceInput.addEventListener('speechchange', speechchange);
-
-        return () => {
-
-            voiceInput.removeEventListener('micchange', michange);
-            voiceInput.removeEventListener('speechchange', speechchange);
-
-        };
-
-    }, []);
 
     // remove everything before and including the last slash, remove the extension
     const sceneName = selectedScene.replace(/^.*[\\\/]/, '').replace(/\.[^/.]+$/, '');

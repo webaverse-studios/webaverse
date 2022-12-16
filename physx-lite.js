@@ -4,6 +4,7 @@ physx lite worker wasm integration.
 
 import Module from './public/bin/app-wasm-worker.js';
 import {Allocator, ScratchStack} from './geometry-util.js';
+import {heightfieldScale} from './constants.js';
 
 const physxLite = {};
 
@@ -113,6 +114,36 @@ physxLite.cookConvexGeometryPhysics = (mesh) => {
 
   return result;
 };
+physxLite.heightfieldScale = heightfieldScale;
+physxLite.cookHeightFieldGeometryPhysics = (numRows, numColumns, heights) => {
+  // numRows, numColumns are int16
+  // heights in an array of int16
+
+  const numVerts = numRows * numColumns;
+  for (let i = 0; i < numVerts; i++) {
+    scratchStack.i16[i] = heights[i];
+  }
+
+  const heightsOffset = numRows * numColumns;
+  const heightsOffsetBytes = heightsOffset * Int16Array.BYTES_PER_ELEMENT;
+
+  Module._cookHeightFieldGeometryPhysics(
+    numRows,
+    numColumns,
+    scratchStack.ptr,
+    scratchStack.u32.byteOffset + heightsOffsetBytes,
+    scratchStack.u32.byteOffset + heightsOffsetBytes + Uint32Array.BYTES_PER_ELEMENT,
+    scratchStack.u32.byteOffset + heightsOffsetBytes + Uint32Array.BYTES_PER_ELEMENT * 2
+  )
+
+  const outputU32Offset = heightsOffsetBytes / Uint32Array.BYTES_PER_ELEMENT;
+  const dataPtr = scratchStack.u32[outputU32Offset]
+  const dataLength = scratchStack.u32[outputU32Offset + 1]
+  const streamPtr = scratchStack.u32[outputU32Offset + 2]
+
+  const result = Module.HEAPU8.slice(dataPtr, dataPtr + dataLength);
+  return result
+}
 physxLite.meshoptSimplify = (mesh, targetRatio, targetError) => {
   /* EMSCRIPTEN_KEEPALIVE unsigned int *meshoptSimplify(
     const unsigned int* indices,

@@ -31,6 +31,7 @@ export const MegaChatBox = ({
     <div className={classnames(
       styles.megaChatBox,
       styles.outer,
+      message ? styles.open : null,
     )}>
       <div className={styles.inner}>
         <div className={styles.row}>
@@ -62,40 +63,39 @@ export const MegaChatBox = ({
           </div>
         )}
       </div>
-      {options && 
-        <div className={classnames(
-          styles.options,
-          styles.outer,
-          selectedOptionIndex !== -1 ? styles.selected : null,
-        )}>
-          <div className={styles.inner}>
-            {options ? options.map((option, i) => {
-              const hovered = i === hoverIndex;
-              const selected = i === selectedOptionIndex;
-              return (
-                <div
-                  className={classnames(
-                    styles.option,
-                    hovered ? styles.hovered : null,
-                    selected ? styles.selected : null,
-                  )}
-                  onClick={e => {
-                    onOptionSelect(option, i);
-                  }}
-                  onMouseEnter={e => {
-                    sounds.playSoundName('menuMove');
-                  }}
-                  key={i}
-                >
-                  <div className={styles.border}/>
-                  <div className={styles.value}>{option.message}</div>
-                  <img className={styles.arrow} src="./images/ui/left-red.svg" />
-                </div>
-              );
-            }) : null}
-          </div>
+      <div className={classnames(
+        styles.options,
+        styles.outer,
+        options ? styles.open : null,
+        selectedOptionIndex !== -1 ? styles.selected : null,
+      )}>
+        <div className={styles.inner}>
+          {options ? options.map((option, i) => {
+            const hovered = i === hoverIndex;
+            const selected = i === selectedOptionIndex;
+            return (
+              <div
+                className={classnames(
+                  styles.option,
+                  hovered ? styles.hovered : null,
+                  selected ? styles.selected : null,
+                )}
+                onClick={e => {
+                  onOptionSelect(option, i);
+                }}
+                onMouseEnter={e => {
+                  sounds.playSoundName('menuMove');
+                }}
+                key={i}
+              >
+                <div className={styles.border}/>
+                <div className={styles.value}>{option.message}</div>
+                <img className={styles.arrow} src="./images/ui/left-red.svg" />
+              </div>
+            );
+          }) : null}
         </div>
-      }
+      </div>
     </div>
   );
 };

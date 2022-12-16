@@ -2,6 +2,7 @@
 this file bootstraps the webaverse engine.
 it uses the help of various managers and stores, and executes the render loop.
 */
+import physxWorkerManager from './physx-worker-manager.js';
 
 import metaversefileApi from './metaversefile-api.js';
 import {playersManager} from './players-manager.js';
@@ -11,13 +12,13 @@ import game from './game.js';
 
 import * as THREE from 'three';
 import npcManager from './npc-manager.js';
+import npcAiManager from './npc-ai-manager.js';
 import Avatar from './avatars/avatars.js';
 import * as sounds from './sounds.js';
 import physx from './physx.js';
 import physicsManager from './physics-manager.js';
-import physxWorkerManager from './physx-worker-manager.js';
 import {world} from './world.js';
-// import * as blockchain from './blockchain.js';
+import storyCameraManager from './story-camera-manager.js';
 import hpManager from './hp-manager.js';
 import minimapManager from './minimap.js';
 import postProcessing from './post-processing.js';
@@ -51,6 +52,7 @@ import settingsManager from './settings-manager.js';
 import grabManager from './grab-manager.js';
 import backgroundFx from './background-fx/background-fx.js';
 import {partyManager} from './party-manager';
+import {LoadingManager} from './loading-manager';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -80,6 +82,8 @@ export default class Webaverse extends EventTarget {
   constructor() {
     super();
 
+    const loadingManager = new LoadingManager(this);
+
     const canvas = document.createElement('canvas');
     canvas.style.position = 'fixed';
     canvas.style.top = '0';
@@ -97,8 +101,26 @@ export default class Webaverse extends EventTarget {
     story.listenHack();
 
     this.loadPromise = (async () => {
+      let index = 0;
+      const totalWaitForLoadFunctions = 14;
+      let loadProgressPercentage = 0;
+
+      const _updateLoadProgress = () => {
+        loadProgressPercentage = Math.round((index++) / totalWaitForLoadFunctions * 100);
+
+        this.dispatchEvent(new MessageEvent('loadProgress', {
+          data: {
+            loadProgressPercentage,
+          },
+        }));
+        console.log('loadProgressPercentage', loadProgressPercentage);
+      }
+
+      // physx needs to be loaded first, before everything else, otherwise we have a race condition
       await physx.waitForLoad();      
-      await Promise.all([
+      _updateLoadProgress();
+
+      const waitForLoadFunctions = [
         Avatar.waitForLoad(),
         physxWorkerManager.waitForLoad(),
         sounds.waitForLoad(),
@@ -108,19 +130,40 @@ export default class Webaverse extends EventTarget {
         backgroundFx.waitForLoad(),
         voices.waitForLoad(),
         musicManager.waitForLoad(),
-      ]);
+      ];
+
+      game.init();
+
+      // update the loading progress
+      _updateLoadProgress();
+
+      // call the waitForLoad functions and update the loading progress
+      // we need to load them simultaneously
+      await Promise.all(waitForLoadFunctions.map(async (waitForLoadFunction, index) => {
+        await waitForLoadFunction;
+        _updateLoadProgress();
+      }));
 
       await npcManager.initDefaultPlayer();
+      _updateLoadProgress();
+
       loadoutManager.initDefault();
+      _updateLoadProgress();
+
       await universe.handleUrlUpdate();
+      _updateLoadProgress();
+
       partyManager.inviteDefaultPlayer();
 
+      _updateLoadProgress();
+
       await this.startLoop();
-      this.contentLoaded = true;
+
+      this.setContentLoaded();
     })();
     this.contentLoaded = false;
     const self = this
-    // Todo: global variable for e2e automatic tests
+    /* // Todo: global variable for e2e automatic tests
     window.globalWebaverse = {
       metaversefileApi,
       playersManager,
@@ -132,11 +175,27 @@ export default class Webaverse extends EventTarget {
       webaverse: self,
       world,
       game,
-    };
+    }; */
   }
   
-  waitForLoad() {
-    return this.loadPromise;
+  async waitForLoad() {
+    if (!this.loadPromise) {
+      this.loadPromise = async () => {
+        await physx.waitForLoad();
+        await Promise.all([
+          Avatar.waitForLoad(),
+          physxWorkerManager.waitForLoad(),
+          sounds.waitForLoad(),
+          zTargeting.waitForLoad(),
+          particleSystemManager.waitForLoad(),
+          transformControls.waitForLoad(),
+          backgroundFx.waitForLoad(),
+          voices.waitForLoad(),
+          musicManager.waitForLoad(),
+        ]);
+      };
+    }
+    await this.loadPromise();
   }
 
   getRenderer() {
@@ -161,6 +220,7 @@ export default class Webaverse extends EventTarget {
   
   setContentLoaded() {
     this.contentLoaded = true;
+    this.dispatchEvent(new MessageEvent('loaded'));
   }
 
   bindCanvas(c) {
@@ -354,6 +414,7 @@ export default class Webaverse extends EventTarget {
           if (this.contentLoaded && physicsScene.getPhysicsEnabled()) {
             physicsScene.simulatePhysics(timeDiffCapped);
             physicsScene.getTriggerEvents();
+            npcAiManager.update(timestamp, timeDiffCapped);
             npcManager.updatePhysics(timestamp, timeDiffCapped);
           }
 
@@ -372,7 +433,8 @@ export default class Webaverse extends EventTarget {
           questManager.update(timestamp, timeDiffCapped);
           particleSystemManager.update(timestamp, timeDiffCapped);
 
-          cameraManager.updatePost(timestamp, timeDiffCapped);
+          storyCameraManager.updatePost(timestamp, timeDiffCapped) ||
+            cameraManager.updatePost(timestamp, timeDiffCapped);
           ioManager.updatePost();
 
           game.pushAppUpdates();
@@ -424,7 +486,7 @@ const _startHacks = webaverse => {
   const vpdAnimations = Avatar.getAnimations().filter(animation => animation.name.endsWith('.vpd'));
 
   // Press } to debug current state in console.
-  window.addEventListener('keydown', event => {
+  (typeof window !== 'undefined') && window.addEventListener('keydown', event => {
     if (event.key === '}') {
       console.log('>>>>> current state');
       console.log(universe.state);
@@ -600,7 +662,7 @@ const _startHacks = webaverse => {
   }; */
   webaverse.titleCardHack = false;
   // let haloMeshApp = null;
-  window.addEventListener('keydown', e => {
+  (typeof window !== 'undefined') && window.addEventListener('keydown', e => {
     if (e.which === 46) { // .
       emotionIndex = -1;
       _updateFacePose();

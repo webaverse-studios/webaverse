@@ -21,7 +21,8 @@ const TransformAxisConstraints = {
   XYZ: new THREE.Vector3(1, 1, 1)
 };
 
-const loadPromise = (async () => {
+let loadPromise = null;
+const makeLoadPromise = async () => {
   await TransformGizmo.load();
 
   transformControls.transformGizmo = new TransformGizmo();
@@ -29,7 +30,7 @@ const loadPromise = (async () => {
   // transformControls.transformGizmo.visible = false;
   sceneLowPriority.add(transformControls.transformGizmo);
   transformControls.setTransformMode('translate');
-})();
+};
 
 // let binding = null;
 const transformControls = {
@@ -41,6 +42,9 @@ const transformControls = {
   startMatrix: new THREE.Matrix4(),
   startMouseMatrix: new THREE.Matrix4(),
   waitForLoad() {
+    if (!loadPromise) {
+      loadPromise = makeLoadPromise();
+    }
     return loadPromise;
   },
   setTransformMode(transformMode) {

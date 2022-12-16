@@ -745,8 +745,7 @@ const createPlayerDiorama = (opts = {}) => {
   let {
     objects = [],
     target = new THREE.Object3D(),
-    //cameraOffset = new THREE.Vector3(0.3, 0, -0.5),
-    cameraOffset = new THREE.Vector3(0.3, -0.64, -1.9),
+    cameraOffset = new THREE.Vector3(0.3, 0, -0.5),
     detached = false,
   } = opts;
 
