@@ -1392,12 +1392,13 @@ class LocalPlayer extends UninterpolatedPlayer {
         this.glider.rotation.x = 0;
         // note: Dynamically calc/set glider's rotation.z by hands positions.
         this.avatar.foundModelBones.Left_wrist.matrixWorld.decompose(localVector, localQuaternion, localVector4);
-        this.avatar.foundModelBones.Left_middleFinger1.matrixWorld.decompose(localVector3, localQuaternion, localVector4);
-        localVector.add(localVector3).multiplyScalar(0.5);
+        // this.avatar.foundModelBones.Left_middleFinger1.matrixWorld.decompose(localVector3, localQuaternion, localVector4);
+        // localVector.add(localVector3).multiplyScalar(0.5);
         this.avatar.foundModelBones.Right_wrist.matrixWorld.decompose(localVector2, localQuaternion, localVector4);
-        this.avatar.foundModelBones.Right_middleFinger1.matrixWorld.decompose(localVector3, localQuaternion, localVector4);
-        localVector2.add(localVector3).multiplyScalar(0.5);
+        // this.avatar.foundModelBones.Right_middleFinger1.matrixWorld.decompose(localVector3, localQuaternion, localVector4);
+        // localVector2.add(localVector3).multiplyScalar(0.5);
         localVector.add(localVector2).multiplyScalar(0.5);
+        localVector.y += 0.06; // note: because of some vrms such as meebit.vrm hasn't finger bones, so can't depend on finger's position, then have to hard-code this value to correct glider position.
         this.glider.position.copy(localVector);
         //
         localVector.set(0, 0, 0.032).applyEuler(this.glider.rotation);
