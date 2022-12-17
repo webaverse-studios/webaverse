@@ -34,7 +34,8 @@ class Universe extends EventTarget {
     this.multiplayerConnected = false;
     this.realms = null;
     this.actionsPrefix = 'actions.';
-    this.actionsCleanupFns = [];
+    this.appsPrefix = 'apps.';
+    this.playerCleanupFns = [];
   }
 
   getWorldsHost() {
@@ -216,7 +217,6 @@ class Universe extends EventTarget {
       const {playerId, player} = e.data;
       console.log('Player joined:', playerId);
 
-      const defaultPlayerSpec = await characterSelectManager.getDefaultSpecAsync();
       const defaultTransform = new Float32Array([0, 0, 0, 0, 0, 0, 1, 1, 1, 1]);
 
       const playersArray = this.state.getArray(playersMapName);
@@ -224,22 +224,11 @@ class Universe extends EventTarget {
       playersArray.doc.transact(() => {
         playerMap.set('playerId', playerId);
 
-        const appId = makeId(5);
-
         const appsArray = new Z.Array();
-        const avatarApp = {
-          instanceId: appId,
-          contentId: defaultPlayerSpec.avatarUrl,
-          transform: defaultTransform,
-          components: [],
-        };
-        appsArray.push([avatarApp]);
         playerMap.set(appsMapName, appsArray);
 
         const actionsArray = new Z.Array();
         playerMap.set(actionsMapName, actionsArray);
-
-        playerMap.set('avatar', appId);
 
         playersArray.push([playerMap]);
       });
@@ -293,6 +282,35 @@ class Universe extends EventTarget {
               }
             }
           });
+        } else if (key.startsWith(this.appsPrefix)) {
+          playersArray.doc.transact(() => {
+            const apps = playerMap.get(appsMapName);
+
+            if (val !== null) {
+              // Add app to state.
+              apps.push([{
+                components: [],
+                transform: defaultTransform.slice(),
+                ...val,
+                }]);
+            } else {
+              // Remove app from state.
+              const appKey = key.slice(this.appsPrefix.length);
+              let index = 0;
+              for (const app of apps) {
+                if (app.get('instanceId') === appKey) {
+                  apps.delete(index);
+                  break;
+                }
+                index += 1;
+              }
+            }
+          });
+        } else if (key === 'avatar') {
+          // Set new avatar instanceId.
+          playersArray.doc.transact(() => {
+            playerMap.set('avatar', val);
+          });
         } else if (key === 'voiceSpec') {
           playersArray.doc.transact(() => {
             playerMap.set('voiceSpec', val);
@@ -300,17 +318,38 @@ class Universe extends EventTarget {
         }
       });
 
-      // Handle already present remote players.
+      // Add this player to player map.
       const transform = player.getKeyValue('transform');
       if (transform) {
         playersArray.doc.transact(() => {
           playerMap.set('transform', transform);
+          playerMap.set('velocity', [0, 0, 0]);
         });
       }
       const voiceSpec = player.getKeyValue('voiceSpec');
       if (voiceSpec) {
         playersArray.doc.transact(() => {
           playerMap.set('voiceSpec', voiceSpec);
+        });
+      }
+      const avatar = player.getKeyValue('avatar');
+      if (avatar) {
+        const avatarApp = player.getKeyValue(this.appsPrefix + avatar);
+        if (avatarApp) {
+          // Add new avatar app.
+          playersArray.doc.transact(() => {
+            const apps = playerMap.get(appsMapName);
+            apps.push([{
+              instanceId: avatar,
+              contentId: avatarApp.contentId,
+              components: [],
+              transform: defaultTransform.slice(),
+            }]);
+          });
+        }
+        playersArray.doc.transact(() => {
+          // Set new avatar instanceId.
+          playerMap.set('avatar', avatar);
         });
       }
     });
@@ -340,26 +379,66 @@ class Universe extends EventTarget {
     });
 
     const onConnect = position => {
+      const localPlayer = playersManager.getLocalPlayer();
 
-      // Default player apps and actions can be included here.
+      // Player apps.
+      const onAppAdd = e => {
+        const app = e.data;
+        const components = app.components.reduce((acc, val) => {
+          acc[val.key] = val.value;
+          return acc;
+        }, {});
+        this.realms.localPlayer.setKeyValue(this.appsPrefix + app.instanceId, {
+          instanceId: app.instanceId,
+          ...components,
+        });
+      }
+      localPlayer.appManager.addEventListener('appadd', onAppAdd);
+      this.playerCleanupFns.push(() => {
+        localPlayer.appManager.removeEventListener('appadd', onAppAdd);
+      });
+      const onAppRemove = e => {
+        const app = e.data;
+        this.realms.localPlayer.setKeyValue(this.appsPrefix + app.instanceId, null);
+      }
+      localPlayer.appManager.addEventListener('appremove', onAppRemove);
+      this.playerCleanupFns.push(() => {
+        localPlayer.appManager.removeEventListener('appremove', onAppRemove);
+      });
+
+      // Player avatar.
+      const onAvatarChange = e => {
+        this.realms.localPlayer.setKeyValue('avatar', localPlayer.getAvatarInstanceId());
+      }
+      localPlayer.addEventListener('avatarchange', onAvatarChange);
+      this.playerCleanupFns.push(() => {
+        localPlayer.appManager.removeEventListener('avatarchange', onAvatarChange);
+      });
+      const onAvatarUpdate = e => {
+        // Nothing to do.
+      }
+      localPlayer.addEventListener('avatarupdate', onAvatarUpdate);
+      this.playerCleanupFns.push(() => {
+        localPlayer.appManager.removeEventListener('avatarupdate', onAvatarUpdate);
+      });
 
       // Player actions.
-      const localPlayer = playersManager.getLocalPlayer();
       const onActionAdd = e => {
         universe.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, e.action);
       };
       localPlayer.addEventListener('actionadd', onActionAdd);
-      this.actionsCleanupFns.push(() => {
+      this.playerCleanupFns.push(() => {
         localPlayer.removeEventListener('actionadd', onActionAdd);
       });
       const onActionRemove = e => {
         universe.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, null);
       };
       localPlayer.addEventListener('actionremove', onActionRemove);
-      this.actionsCleanupFns.push(() => {
+      this.playerCleanupFns.push(() => {
         localPlayer.removeEventListener('actionremove', onActionRemove);
       });
 
+      // Initialize player.
       this.realms.localPlayer.initializePlayer({
         position,
       }, {});
@@ -367,6 +446,19 @@ class Universe extends EventTarget {
       this.realms.localPlayer.setKeyValue('transform', transformAndTimestamp);
       this.realms.localPlayer.setKeyValue('voiceSpec', localPlayer.playerMap.get('voiceSpec'));
 
+      // Avatar model.
+      const apps = localPlayer.playerMap.get(appsMapName);
+      const appsArray = Array.from(apps);
+      const avatarInstanceId = localPlayer.getAvatarInstanceId();
+      const avatarApp = appsArray.find(app => app.get('instanceId') === avatarInstanceId);
+      const components = {
+        contentId: avatarApp.get('contentId'),
+        instanceId: avatarInstanceId,
+      };
+      this.realms.localPlayer.setKeyValue(this.appsPrefix + avatarInstanceId, components);
+      this.realms.localPlayer.setKeyValue('avatar', avatarInstanceId);
+
+      // Mic state.
       if (voiceInput.micEnabled()) {
         this.realms.enableMic();
       }
@@ -388,10 +480,10 @@ class Universe extends EventTarget {
 
     this.multiplayerConnected = false;
 
-    for (const cleanupFn of this.actionsCleanupFns) {
+    for (const cleanupFn of this.playerCleanupFns) {
       cleanupFn();
     }
-    this.actionsCleanupFns = [];
+    this.playerCleanupFns = [];
 
     if (this.realms) {
       this.realms.disconnect();
