@@ -76,7 +76,8 @@ class Universe extends EventTarget {
         let match;
         if (src === undefined) {
           const sceneNames = await sceneManager.getSceneNamesAsync();
-          const sceneUrl = sceneManager.getSceneUrl(sceneNames[0]);
+          // const sceneUrl = sceneManager.getSceneUrl(sceneNames[0]);
+          const sceneUrl = sceneManager.getSceneUrl('block.scn');
           worldSpec = {src: sceneUrl};
           promises.push(metaversefile.createAppAsync({
             start_url: sceneUrl,

@@ -10,7 +10,7 @@ export const scenesBaseUrl = isProd ?
   `https://webaverse.github.io/scenes/`
 :
   `/packages/scenes/`;
-export const defaultSceneName = 'homespace.scn';
+export const defaultSceneName = 'block.scn';
 
 // characters
 export const charactersBaseUrl = isProd ?
