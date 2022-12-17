@@ -294,12 +294,74 @@ class PanelRuntimeInstance extends THREE.Object3D {
       fn(physicsObject);
     }
   }
+  #getUnusedCandidateLocations() {
+    const {panel, zineRenderer} = this;
+    const layer1 = panel.getLayer(1);
+    const candidateLocations = layer1.getData('candidateLocations');
+    return candidateLocations.map(cl => {
+      localMatrix.compose(
+        localVector.fromArray(cl.position),
+        localQuaternion.fromArray(cl.quaternion),
+        oneVector,
+      ).premultiply(zineRenderer.transformScene.matrixWorld).decompose(
+        localVector,
+        localQuaternion,
+        localVector2
+      );
+      return {
+        position: localVector.toArray(),
+        quaternion: localQuaternion.toArray(),
+      };
+    });
+  }
+  setActorsEnabled(enabled = true) {
+    if (enabled) {
+      const layer0 = this.panel.getLayer(0);
+      const id = layer0.getData('id');
+      const localSeed = id + seed;
+
+      const candidateLocations = this.#getUnusedCandidateLocations();
+      if (!this.actors.item) {
+        this.actors.item = new PanelRuntimeItems({
+          candidateLocations,
+          n: 1,
+          seed: localSeed,
+        });
+        this.add(this.actors.item);
+      }
+      if (!this.actors.ore) {
+        this.actors.ore = new PanelRuntimeOres({
+          candidateLocations,
+          n: 1,
+          seed: localSeed,
+        });
+        this.add(this.actors.ore);
+      }
+      if (!this.actors.npc) {
+        this.actors.npc = new PanelRuntimeNpcs({
+          candidateLocations,
+          n: 1,
+          seed: localSeed,
+        });
+        this.add(this.actors.npc);
+      }
+      if (!this.actors.mob) {
+        this.actors.mob = new PanelRuntimeMobs({
+          candidateLocations,
+          n: 1,
+          seed: localSeed,
+        });
+        this.add(this.actors.mob);
+      }
+    }
+  }
   setSelected(selected = true) {
     if (selected !== this.selected) {
       this.selected = selected;
       this.visible = selected;
 
       this.setPhysicsEnabled(selected);
+      this.setActorsEnabled(selected)
 
       if (this.selected) {
         zineCameraManager.setLockCamera(this.zineRenderer.camera);
