@@ -63,6 +63,7 @@ import {makePromise} from '../util.js';
 
 const cameraTransitionTime = 3000;
 const oneVector = new THREE.Vector3(1, 1, 1);
+const seed = '';
 
 // locals
 
@@ -88,6 +89,12 @@ class PanelRuntimeInstance extends THREE.Object3D {
 
     this.loaded = false;
     this.selected = false;
+    this.actors = {
+      item: null,
+      ore: null,
+      npc: null,
+      mob: null,
+    };
 
     this.#init();
   }
