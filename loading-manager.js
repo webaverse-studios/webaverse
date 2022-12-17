@@ -67,7 +67,7 @@ export class LoadingManager {
         });
 
         webaverse.addEventListener('loaded', e => {
-            console.log('received loaded event', e)
+            // console.log('received loaded event', e)
             this.hide();
         });
     }

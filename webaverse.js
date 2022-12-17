@@ -113,7 +113,7 @@ export default class Webaverse extends EventTarget {
             loadProgressPercentage,
           },
         }));
-        console.log('loadProgressPercentage', loadProgressPercentage);
+        // console.log('loadProgressPercentage', loadProgressPercentage);
       }
 
       // physx needs to be loaded first, before everything else, otherwise we have a race condition
