@@ -1,83 +1,62 @@
 import EngineWorker from './engine-worker.js?worker';
 import {getRandomString} from '../util.js';
-// import {inappPreviewHost} from '../constants.js';
 
-class OffscreenEngineProxy {
+//
+
+const makeLocalWorker = () => {
+  const worker = new LocalEngineWorker();
+
+  const messageChannel = new MessageChannel();
+  const {port1, port2} = messageChannel;
+  worker.port1 = port1;
+  worker.port2 = port2;
+  const loadPromise = (async () => {
+    worker.postMessage({
+      method: 'initializeEngine',
+      port: port2,
+    }, [port2]);
+
+    let resolveFn;
+    const message = e => {
+      const {method} = e.data;
+      if (method === 'initialized') {
+        port1.removeEventListener('message', message);
+        resolveFn();
+      }
+    };
+    port1.start();
+    port1.addEventListener('message', message);
+    await new Promise((resolve, reject) =>{
+      resolveFn = resolve;
+    });
+  })();
+  worker.waitForLoad = () => loadPromise;
+  worker.destroy = () => {
+    port1.close();
+    worker.terminate();
+  };
+
+  return worker;
+};
+
+//
+
+class LocalEngineWorker {
   constructor() {
-    this.worker = null;
-    this.port = null;
-
-    this.loadPromise = null;
+    this.worker = new EngineWorker();
   }
-
-  async waitForLoad() {
-    if (!this.loadPromise) {
-      this.loadPromise = (async () => {
-        const worker = new EngineWorker();
-        this.worker = worker;
-        /* const iframe = document.createElement('iframe');
-        iframe.width = '0px';
-        iframe.height = '0px';
-        iframe.style.cssText = `\
-          border: 0;
-        `; */
-    
-        // this.live = true;
-    
-        const messageChannel = new MessageChannel();
-        const {port1, port2} = messageChannel;
-    
-        /* const iframeLoadPromise = new Promise((resolve, reject) => {
-          iframe.onload = () => {
-            resolve();
-            iframe.onload = null;
-            iframe.onerror = null;
-          };
-          iframe.onerror = reject;
-        }); */
-  
-        // iframe.allow = 'cross-origin-isolated';
-        // iframe.src = `${inappPreviewHost}/engine.html`;
-        // document.body.appendChild(iframe);
-  
-        // await iframeLoadPromise;
-  
-        worker.postMessage({
-          method: 'initializeEngine',
-          port: port2,
-        }, [port2]);
-
-        let resolveFn;
-        const message = e => {
-          const {method} = e.data;
-          if (method === 'initialized') {
-            port1.removeEventListener('message', message);
-            resolveFn();
-          }
-        };
-        port1.start();
-        port1.addEventListener('message', message);
-        await new Promise((resolve, reject) =>{
-          resolveFn = resolve;
-        });
-  
-        return port1;
-      })();
-    }
-    const port = await this.loadPromise;
-    this.port = port;
-    return port;
+  postMessage() {
+    return this.worker.postMessage.apply(this.worker, arguments);
   }
-
   async request(funcName, args = [], {
     signal = null,
   } = {}) {
-    await this.waitForLoad();
+    const {port1} = this;
 
     const id = getRandomString();
     const _postMessage = () => {
       try {
-        this.port.postMessage({
+        port1.postMessage({
           method: 'callHandler',
           funcName,
           id,
@@ -109,9 +88,9 @@ class OffscreenEngineProxy {
           _cleanup();
         }
       };
-      this.port.addEventListener('message', message);
+      port1.addEventListener('message', message);
       cleanups.push(() => {
-        this.port.removeEventListener('message', message);
+        port1.removeEventListener('message', message);
       });
 
       if (signal) {
@@ -128,20 +107,37 @@ class OffscreenEngineProxy {
     });
     return result;
   }
+}
+
+//
+
+class OffscreenEngineProxy {
+  constructor() {
+    this.worker = null;
+
+    this.loadPromise = null;
+  }
+
+  async waitForLoad() {
+    if (!this.loadPromise) {
+      this.loadPromise = (async () => {
+        const worker = makeLocalWorker();
+        // const worker = makeRemoteWorker();
+        this.worker = worker;
+        return worker.port1;
+      })();
+    }
+    return await this.loadPromise;
+  }
+
+  async request(funcName, args, opts) {
+    await this.waitForLoad();
+    return await this.worker.request(funcName, args, opts);
+  }
 
   destroy() {
-    // this.live = false;
-    
-    /* if (this.iframe) {
-      this.iframe.parentElement.removeChild(this.iframe);
-      this.iframe = null;
-    } */
-    if (this.port) {
-      this.port.close();
-      this.port = null;
-    }
     if (this.worker) {
-      this.worker.terminate();
+      this.worker.destroy();
       this.worker = null;
     }
   }
