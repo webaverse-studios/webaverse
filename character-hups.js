@@ -116,7 +116,7 @@ export class CharacterHups extends EventTarget {
       if (oldHup) {
         oldHup.mergeAction(action);
         oldHup.updateVoicer(action.message, action.emote);
-      } else if (Hup.isHupAction(action)) {
+      } else if (Hup.isHupAction(action) && character.avatar) {
         const newHup = new Hup(action.type, this);
         newHup.mergeAction(action);
         let pendingVoices = 0;
@@ -143,6 +143,10 @@ export class CharacterHups extends EventTarget {
           }));
         });
         this.hups.push(newHup);
+        if (character.isRemotePlayer) {
+          character.matrixWorld.makeRotationFromQuaternion(character.quaternion);
+          character.matrixWorld.setPosition(...character.position.toArray());
+        }
         this.dispatchEvent(new MessageEvent('hupadd', {
           data: {
             character,

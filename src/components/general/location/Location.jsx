@@ -65,6 +65,10 @@ export const Location = () => {
     event.stopPropagation();
   };
 
+  const handleMultiplayerBtnClick = async () => {
+    universe.toggleMultiplayer();
+  }
+
   const handleRoomCreateBtnClick = async () => {
     // const sceneName = selectedScene.trim();
     // const data = null; // Z.encodeStateAsUpdate( world.getState( true ) );
@@ -147,7 +151,7 @@ export const Location = () => {
             text="Create Room"
             size={12}
             className={styles.methodButton}
-            onClick={handleRoomCreateBtnClick}
+            onClick={handleMultiplayerBtnClick /* handleRoomCreateBtnClick */}
           />
         </div>
         {rooms.map((room, i) => (

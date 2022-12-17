@@ -485,7 +485,7 @@ const _startHacks = webaverse => {
   const localPlayer = playersManager.getLocalPlayer();
   const vpdAnimations = Avatar.getAnimations().filter(animation => animation.name.endsWith('.vpd'));
 
-  // press R to debug current state in console
+  // Press } to debug current state in console.
   (typeof window !== 'undefined') && window.addEventListener('keydown', event => {
     if (event.key === '}') {
       console.log('>>>>> current state');
@@ -494,8 +494,8 @@ const _startHacks = webaverse => {
       console.log(scene);
       console.log('>>>>> local player');
       console.log(localPlayer);
-      // console.log('>>>>> remotePlayers');
-      // console.log(playersManager.getRemotePlayers());
+      console.log('>>>>> remote players');
+      console.log(playersManager.getRemotePlayers());
     }
   });
 

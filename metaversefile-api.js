@@ -1123,6 +1123,13 @@ export default () => {
       return null;
     }
   },
+  getRemotePlayerByPlayerId(playerId) {
+    for (const pair of playersManager.getRemotePlayers()) {
+      if (pair[0] === playerId) {
+        return pair[1];
+      }
+    }
+  },
   getAppByInstanceId(instanceId) {
     // local
     const localPlayer = playersManager.getLocalPlayer();
