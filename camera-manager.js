@@ -1,11 +1,12 @@
 import * as THREE from 'three';
 import {canvas, getRenderer, camera} from './renderer.js';
 import physicsManager from './physics-manager.js';
-import {shakeAnimationSpeed, minFov, maxFov, midFov} from './constants.js';
+import {shakeAnimationSpeed, minFov, maxFov, midFov, MAX_CAMERA_OFFSET_TARGET} from './constants.js';
 import Simplex from './simplex-noise.js';
 import {playersManager} from './players-manager.js';
 import easing from './easing.js';
 import {isWorker} from './env.js';
+import {clamp} from 'three/src/math/MathUtils.js';
 
 const cubicBezier = easing(0, 1, 0, 1);
 const cubicBezier2 = easing(0.5, 0, 0.5, 1);
@@ -309,7 +310,7 @@ class CameraManager extends EventTarget {
 
   handleWheelEvent(e) {
     if (!this.target) {
-      cameraOffsetTargetZ = Math.min(cameraOffset.z - e.deltaY * 0.01, 0);
+      cameraOffsetTargetZ = clamp(cameraOffset.z - e.deltaY * 0.01, -MAX_CAMERA_OFFSET_TARGET, 0);
     }
   }
 
