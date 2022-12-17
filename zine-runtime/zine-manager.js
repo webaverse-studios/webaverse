@@ -42,6 +42,18 @@ import {
 import {
   EntranceExitMesh,
 } from './meshes/entrance-exit-mesh.js';
+import {
+  PanelRuntimeItems,
+} from './actors/zine-item-actors.js';
+import {
+  PanelRuntimeOres,
+} from './actors/zine-ore-actors.js';
+import {
+  PanelRuntimeNpcs,
+} from './actors/zine-npc-actors.js';
+import {
+  PanelRuntimeMobs,
+} from './actors/zine-mob-actors.js';
 
 import {heightfieldScale} from '../constants.js'
 import {world} from '../world.js';
