@@ -445,6 +445,11 @@ class PanelInstanceManager extends THREE.Object3D {
     const panels = this.storyboard.getPanels();
     for (let i = 0; i < panels.length; i++) {
       const panel = panels[i];
+      { // XXX hack: this should be set at generation time so it can serve as the panel seed
+        const id = 'panel_' + i;
+        const layer0 = panel.getLayer(0);
+        layer0.setData('id', id);
+      }
       const panelInstance = new PanelRuntimeInstance(panel, panelOpts);
       this.add(panelInstance);
       this.panelInstances.push(panelInstance);
