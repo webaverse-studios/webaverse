@@ -61,7 +61,7 @@ import {makePromise} from '../util.js';
 
 // constants
 
-const cameraTransitionTime = 2000;
+const cameraTransitionTime = 3000;
 const oneVector = new THREE.Vector3(1, 1, 1);
 
 // locals
