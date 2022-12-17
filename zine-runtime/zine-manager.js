@@ -664,6 +664,9 @@ class ZineManager {
       light.position.set(0, 1, 2);
       instance.add(light);
       light.updateMatrixWorld();
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 2);
+      instance.add(ambientLight);
     }
 
     // storyboard
