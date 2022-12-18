@@ -12,13 +12,13 @@ const isProduction = process.env.NODE_ENV === 'production';
 const vercelJson = JSON.parse(fs.readFileSync('./vercel.json', 'utf8'));
 
 const SERVER_NAME = 'local.webaverse.com';
-const MULTIPLAYER_NAME = 'local-multiplayer.webaverse.com';
+// const MULTIPLAYER_NAME = 'local-multiplayer.webaverse.com';
 const COMPILER_NAME = 'local-compiler.webaverse.com';
-const WIKI_NAME = 'local-previewer.webaverse.com';
-const PREVIEWER_NAME = 'local-previewer.webaverse.com';
+const RENDERER_NAME = 'local-renderer.webaverse.com';
 
 const port = parseInt(process.env.PORT, 10) || 443;
 const COMPILER_PORT = parseInt(process.env.COMPILER_PORT, 10) || 3333;
+const RENDERER_PORT = parseInt(process.env.RENDERER_PORT, 10) || 5555;
 
 //
 
@@ -111,6 +111,10 @@ const _proxyFile = (req, res, u) => {
 
     if (req.headers.host === COMPILER_NAME) {
       const u = `http://localhost:${COMPILER_PORT}${req.url}`;
+      _proxyUrl(req, res, u);
+    } else if (req.headers.host === RENDERER_NAME) {
+      const u = `http://localhost:${RENDERER_PORT}${req.url}`;
+      console.log('proxy to renderer', u);
       _proxyUrl(req, res, u);
     } else if (serveDirectories.some(d => req.url.startsWith(d))) {
       _proxyFile(req, res, req.url);
