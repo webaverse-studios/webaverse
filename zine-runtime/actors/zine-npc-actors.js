@@ -79,13 +79,13 @@ export class PanelRuntimeNpcs extends THREE.Object3D {
           position,
           quaternion,
         };
-        console.log('create npc app 1', {
-          position,
-          quaternion,
-          opts,
-        });
+        // console.log('create npc app 1', {
+        //   position,
+        //   quaternion,
+        //   opts,
+        // });
         const npcApp = await metaversefileApi.createAppAsync(opts);
-        console.log('create npc app 2', npcApp);
+        // console.log('create npc app 2', npcApp);
         this.add(npcApp);
       })();
     }
