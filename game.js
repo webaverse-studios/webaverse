@@ -13,7 +13,7 @@ import {world} from './world.js';
 import {buildMaterial, highlightMaterial, selectMaterial, hoverMaterial, hoverEquipmentMaterial} from './shaders.js';
 import {getRenderer, sceneLowPriority, camera} from './renderer.js';
 import {downloadFile, snapPosition, getDropUrl, handleDropJsonItem, makeId} from './util.js';
-import {maxGrabDistance, throwReleaseTime, throwAnimationDuration, walkSpeed, crouchSpeed, flySpeed, IS_NARUTO_RUN_ENABLED, gliderSpeed} from './constants.js';
+import {maxGrabDistance, throwReleaseTime, throwAnimationDuration, walkSpeed, crouchSpeed, flySpeed, IS_NARUTO_RUN_ENABLED, gliderSpeed, IS_FLYING_ENABLED} from './constants.js';
 import metaversefileApi from 'metaversefile';
 import loadoutManager from './loadout-manager.js';
 import * as sounds from './sounds.js';
@@ -640,12 +640,14 @@ class GameManager extends EventTarget {
   }
 
   toggleFly() {
-    const localPlayer = playersManager.getLocalPlayer();
-    if (localPlayer.actionsManager.isLongTrying('fly')) {
-      localPlayer.actionsManager.tryRemoveAction('fly', true);
-    } else {
-      const newFlyAction = {type: 'fly'};
-      localPlayer.actionsManager.tryAddAction(newFlyAction, true);
+    if(IS_FLYING_ENABLED) {
+      const localPlayer = playersManager.getLocalPlayer();
+      if (localPlayer.actionsManager.isLongTrying('fly')) {
+        localPlayer.actionsManager.tryRemoveAction('fly', true);
+      } else {
+        const newFlyAction = {type: 'fly'};
+        localPlayer.actionsManager.tryAddAction(newFlyAction, true);
+      }
     }
   }
 

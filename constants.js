@@ -167,7 +167,12 @@ export const characterSelectAvatarQuality = 4;
 export const minCanvasSize = 512;
 export const offscreenCanvasSize = 2048;
 
-export const IS_NARUTO_RUN_ENABLED = false;
+// dev mode
+const IS_DEV_MODE_ENABLED = true;
+
+export const IS_NARUTO_RUN_ENABLED = IS_DEV_MODE_ENABLED;
+export const IS_FLYING_ENABLED = IS_DEV_MODE_ENABLED;
+export const MAX_THIRD_PERSON_CAMERA_DISTANCE = IS_DEV_MODE_ENABLED ? Infinity : 20;
 
 // note: For WASM API.
 export const GET = 0;
