@@ -154,19 +154,27 @@ class AvatarIconer extends EventTarget {
         
         if (sourceCanvas) {
           for (const dstCanvas of this.canvases) {
+            if (sourceCanvas.width !== dstCanvas.width || sourceCanvas.height !== dstCanvas.height) {
+              throw new Error('invalid source canvas size');
+            }
+
             const {ctx} = dstCanvas;
             ctx.clearRect(0, 0, dstCanvas.width, dstCanvas.height);
-            ctx.drawImage(
-              sourceCanvas,
-              0,
-              0,
-              this.width,
-              this.height,
-              0,
-              0,
-              dstCanvas.width,
-              dstCanvas.height
-            );
+            if (sourceCanvas instanceof ImageData) {
+              ctx.putImageData(sourceCanvas, 0, 0);
+            } else {
+              ctx.drawImage(
+                sourceCanvas,
+                0,
+                0,
+                // this.width,
+                // this.height,
+                // 0,
+                // 0,
+                // dstCanvas.width,
+                // dstCanvas.height
+              );
+            }
           }
         }
       }
