@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {canvas, getRenderer, camera} from './renderer.js';
 import physicsManager from './physics-manager.js';
-import {shakeAnimationSpeed, minFov, maxFov, midFov, MAX_CAMERA_OFFSET_TARGET} from './constants.js';
+import {shakeAnimationSpeed, minFov, maxFov, midFov, MAX_THIRD_PERSON_CAMERA_DISTANCE} from './constants.js';
 import Simplex from './simplex-noise.js';
 import {playersManager} from './players-manager.js';
 import easing from './easing.js';
@@ -310,7 +310,7 @@ class CameraManager extends EventTarget {
 
   handleWheelEvent(e) {
     if (!this.target) {
-      cameraOffsetTargetZ = clamp(cameraOffset.z - e.deltaY * 0.01, -MAX_CAMERA_OFFSET_TARGET, 0);
+      cameraOffsetTargetZ = clamp(cameraOffset.z - e.deltaY * 0.01, -MAX_THIRD_PERSON_CAMERA_DISTANCE, 0);
     }
   }
 
