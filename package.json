@@ -64,7 +64,8 @@
     "wsrtc": "./packages/wsrtc",
     "xhr2": "^0.2.1",
     "zine": "./packages/zine",
-    "zjs": "./packages/zjs"
+    "zjs": "./packages/zjs",
+    "offscreen-engine": "./packages/offscreen-engine"
   },
   "devDependencies": {
     "@types/expect-puppeteer": "^5.0.1",
