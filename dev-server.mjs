@@ -114,7 +114,7 @@ const _proxyFile = (req, res, u) => {
       _proxyUrl(req, res, u);
     } else if (req.headers.host === RENDERER_NAME) {
       const u = `http://localhost:${RENDERER_PORT}${req.url}`;
-      console.log('proxy to renderer', u);
+      // console.log('proxy to renderer', u);
       _proxyUrl(req, res, u);
     } else if (serveDirectories.some(d => req.url.startsWith(d))) {
       _proxyFile(req, res, req.url);
