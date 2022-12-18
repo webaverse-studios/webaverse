@@ -13,7 +13,6 @@ export const compileScene = async imageArrayBuffer => {
   const result = await worker.request('compileScene', {
     imageArrayBuffer,
   });
-  console.log('got result', result);
   return result;
 };
 
