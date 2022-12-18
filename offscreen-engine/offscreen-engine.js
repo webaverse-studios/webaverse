@@ -60,10 +60,10 @@ class RemoteEngineWorker {
   async request(funcName, args = [], {
     signal = null,
   } = {}) {
-    console.log('remote engine request', {
-      funcName,
-      args,
-    });
+    // console.log('remote engine request', {
+    //   funcName,
+    //   args,
+    // });
 
     const u = new URL(`${rendererHost}/api`);
     const start_url = `${localhost}/engine.html`;
