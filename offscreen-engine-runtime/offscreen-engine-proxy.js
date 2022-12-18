@@ -17,10 +17,10 @@ export class OffscreenEngineProxy {
   async waitForLoad() {
     if (!this.loadPromise) {
       this.loadPromise = (async () => {
-        // const worker = makeLocalWorker();
+        const worker = makeLocalWorker();
         
-        const startUrl = new URL('/engine.html', location.href);
-        const worker = makeRemoteWorker(startUrl);
+        // const startUrl = new URL('/engine.html', location.href);
+        // const worker = makeRemoteWorker(startUrl);
 
         this.worker = worker;
         return worker.port1;
