@@ -1,6 +1,8 @@
 import * as b3 from './lib/behavior3js/index.js';
 import metaversefileApi from 'metaversefile';
 
+// note: doc/explain: https://github.com/upstreet-labs/app/pull/393#issue-1486522153 , https://github.com/upstreet-labs/app/pull/359#issuecomment-1338063650 .
+
 // note: tickResults will all reset to false after every tick, so don't need set `tickResults.xxx = false`.
 
 class Loading extends b3.Action {
@@ -165,6 +167,21 @@ class WaitOneTick extends b3.Action {
     }
   }
 }
+class WaitOneFrame extends b3.Action {
+  tick(tick) {
+    const frameCount = tick.blackboard.get('frameCount');
+    const thisFrameCount = tick.blackboard.get('frameCount', tick.tree.id, this.id);
+    if (!thisFrameCount) {
+      tick.blackboard.set('frameCount', frameCount, tick.tree.id, this.id);
+    }
+    if (frameCount > thisFrameCount) {
+      tick.blackboard.set('frameCount', undefined, tick.tree.id, this.id);
+      return b3.SUCCESS
+    } else {
+      return b3.RUNNING
+    }
+  }
+}
 class NarutoRun extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
@@ -241,11 +258,18 @@ class Glider extends b3.Action {
     const tickResults = tick.blackboard.get('tickResults');
     const tickTryStopActions = tick.blackboard.get('tickTryStopActions');
     if (tickTryStopActions.glider || localPlayer.characterPhysics.grounded) {
+      // tickResults.glider = true; // note: don't set `true` here to solve one frame empty tick issue when switch from low prio glider to high prio fallLoop, it's bad design, use ReTick instead.
       return b3.FAILURE;
     } else {
       tickResults.glider = true;
       return b3.RUNNING;
     }
+  }
+}
+class ReTick extends b3.Action {
+  tick(tick) {
+    tick.blackboard.set('needReTick', true);
+    return b3.FAILURE;
   }
 }
 
@@ -268,7 +292,7 @@ tree.root = new b3.MemSequence({title:'root',children: [
         ]}),
         new b3.MemSequence({title:'jump & doubleJump',children:[
           new StartJump({title:'StartJump'}),
-          new WaitOneTick({title:'WaitOneTick'}), // note: wait leave ground.
+          new WaitOneFrame({title:'WaitOneFrame'}), // note: wait leave ground.
           new Jump({title:'Jump'}),
           new DoubleJump({title:'DoubleJump'}),
         ]}),
@@ -284,7 +308,7 @@ tree.root = new b3.MemSequence({title:'root',children: [
               new Skydive({title:'Skydive'}),
             ]}),
           ]}),
-          new WaitOneTick({title:'WaitOneTick'}), // note: prevent remove glider immediately, because add/remove glider all triggered by space key.
+          new WaitOneFrame({title:'WaitOneFrame'}), // note: prevent remove glider immediately, because add/remove glider all triggered by space key.
           new Glider({title:'Glider'}),
         ]}),
         new b3.MemSequence({title:'crouch',children:[
@@ -292,6 +316,7 @@ tree.root = new b3.MemSequence({title:'root',children: [
           new Crouch({title:'Crouch'}),
         ]}),
         new NarutoRun({title:'NarutoRun'}),
+        new b3.Failor({title:'',child:new ReTick({title:''})}) // note: reTick to prevent one frame empty state when switch from low priority action to high priority action.
       ]}), // end: base
       new Land({title:'Land'}),
     ]}), // end: main
@@ -428,6 +453,7 @@ class ActionsManager {
     this.blackboard.set('tickTryActions', {});
     this.blackboard.set('longTryActions', {});
     this.blackboard.set('tickTryStopActions', {});
+    this.blackboard.set('frameCount', 0);
     this.blackboard.set('loaded', true);
   }
 
@@ -470,11 +496,12 @@ class ActionsManager {
     this.blackboard.set('now', timestamp);
     // preTickSettings(this.localPlayer, this.blackboard);
     tree.tick(this.localPlayer, this.blackboard);
-    if (this.blackboard.get('needReTick')) {
+    if (this.blackboard.get('needReTick')) { // note: only will do reTick once per update(), will not cause dead loop.
       this.blackboard.set('needReTick', false);
       tree.tick(this.localPlayer, this.blackboard); // note: will and needed to use the same `tickInfos` as first tree.tick(), because of called before `postTickSettings()`.
     }
     postTickSettings(this.localPlayer, this.blackboard);
+    this.blackboard.set('frameCount', this.blackboard.get('frameCount') + 1);
   }
 }
 
