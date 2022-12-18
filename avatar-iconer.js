@@ -1,5 +1,5 @@
 import {emotions} from './emotes/emotions';
-import offscreenEngineManager from './offscreen-engine/offscreen-engine-manager.js';
+import offscreenEngineManager from './offscreen-engine-runtime/offscreen-engine-manager.js';
 import {avatarManager} from './avatar-manager';
 import {playersManager} from './players-manager';
 

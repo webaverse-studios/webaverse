@@ -8,7 +8,7 @@ import Avatar from '../avatars/avatars.js';
 
 import {
   makeLocalWorker,
-} from './offscreen-engine.js';
+} from './local-engine-worker.js';
 import offscreenEngineApi from './offscreen-engine-api.js';
 
 console.log('offscreen engine api run...');

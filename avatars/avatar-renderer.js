@@ -8,7 +8,11 @@ import {WebaverseShaderMaterial} from '../materials.js';
 import {abortError} from '../lock-manager.js';
 import {minAvatarQuality, maxAvatarQuality} from '../constants.js';
 import settingsManager from '../settings-manager.js';
-import {createSpriteAvatarMesh, crunchAvatarModel, optimizeAvatarModel} from '../offscreen-engine/fns/avatar-renderer-fns.js';
+import {
+  createSpriteAvatarMesh,
+  crunchAvatarModel,
+  optimizeAvatarModel,
+} from '../offscreen-engine-runtime/fns/avatar-renderer-fns.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();

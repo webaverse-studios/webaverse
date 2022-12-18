@@ -1,4 +1,4 @@
-import offscreenEngineManager from './offscreen-engine/offscreen-engine-manager.js';
+import offscreenEngineManager from './offscreen-engine-runtime/offscreen-engine-manager.js';
 
 const useLandScreenshotter = (() => {
   return async (args) => {
