@@ -3,7 +3,7 @@ import {
 } from './local-engine-worker.js';
 import {
   makeRemoteWorker,
-} from '../offscreen-engine/remote-engine-worker.js';
+} from 'offscreen-engine/remote-engine-worker.js';
 
 //
 
