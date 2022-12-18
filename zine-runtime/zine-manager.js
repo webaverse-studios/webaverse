@@ -255,19 +255,8 @@ class PanelRuntimeInstance extends THREE.Object3D {
     const {panel} = this;
     const zineRenderer = new ZineRenderer({
       panel,
+      alignFloor: true,
     });
-
-    const floorInverseQuaternion = new THREE.Quaternion()
-      .fromArray(zineRenderer.metadata.floorPlaneLocation.quaternion)
-      .invert();
-
-    // console.log('floor inverse quaternion', floorInverseQuaternion.toArray());
-    zineRenderer.scene.quaternion.copy(floorInverseQuaternion);
-    zineRenderer.scene.updateMatrixWorld();
-    
-    zineRenderer.camera.quaternion.copy(floorInverseQuaternion);
-    zineRenderer.camera.updateMatrixWorld();
-
     return zineRenderer;
   }
   async waitForLoad() {
