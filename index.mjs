@@ -10,7 +10,7 @@ const DEVSERVER_PORT = 443;
 const MULTIPLAYER_PORT = 2222;
 const COMPILER_PORT = 3333;
 const WIKI_PORT = 4444;
-const PREVIEWER_PORT = 5555;
+const RENDERER_PORT = 5555;
 
 //
 
@@ -170,7 +170,7 @@ const _logProcess = childProcess => {
     } else if (key === 'w') {
       open(`https://local.webaverse.com:${WIKI_PORT}/`);
     } else if (key === 'p') {
-      open(`http://127.0.0.1:${PREVIEWER_PORT}/`);
+      open(`http://127.0.0.1:${RENDERER_PORT}/`);
     } else if (key === 't') {
       _startE2eTest()
     } else if (key === 'd') {
@@ -207,6 +207,7 @@ const _startDevServer = async () => {
       ...process.env,
       PORT: DEVSERVER_PORT,
       COMPILER_PORT,
+      RENDERER_PORT,
     },
     // uid: oldUid,
   });
@@ -279,24 +280,28 @@ const _startWiki = async () => {
 
   return wikiProcess;
 };
-const _startPreviewer = async () => {
-  const previewerPath = path.join(dirname, 'packages', 'previewer');
-  const previewerProcess = child_process.spawn(process.argv[0], ['server.js', 'https://local.webaverse.com/'], {
-    cwd: previewerPath,
+const _startRenderer = async () => {
+  const rendererPath = path.join(dirname, 'packages', 'previewer');
+  const rendererProcess = child_process.spawn(process.argv[0], ['server.js'], {
+    cwd: rendererPath,
     env: {
       ...process.env,
-      PORT: PREVIEWER_PORT,
+      PORT: RENDERER_PORT,
     },
     // uid: oldUid,
+    // stdio: 'pipe',
   });
-  previewerProcess.name = 'previewer';
-  previewerProcess.waitForExit = makeWaitForExit(previewerProcess);
+  rendererProcess.name = 'renderer';
+  rendererProcess.waitForExit = makeWaitForExit(rendererProcess);
+
+  rendererProcess.stdout.pipe(process.stdout);
+  rendererProcess.stderr.pipe(process.stderr);
   
-  _logProcess(previewerProcess);
+  _logProcess(rendererProcess);
 
-  await _waitForRegex(previewerProcess, /ready/i);
+  await _waitForRegex(rendererProcess, /ready/i);
 
-  return previewerProcess;
+  return rendererProcess;
 };
 
 //
@@ -305,15 +310,15 @@ const _startPreviewer = async () => {
   await Promise.all([
     _startDevServer(),
     _startCompiler(),
+    _startRenderer(),
     _startMultiplayer(),
     _startWiki(),
-    _startPreviewer(),
   ]);
 
   console.log(`Welcome to the Webaverse!`);
   console.log(`  > Local: https://${SERVER_NAME}:${DEVSERVER_PORT}/`);
   console.log('You have some options...');
-  console.log(`[A] App  [W] Wiki  [M] Multiplayer  [P] Previewer [T] Automated Tests  [D] Debug logging  [Q] Quit`);
+  console.log(`[A] App  [W] Wiki  [M] Multiplayer  [R] Renderer  [T] Automated Tests  [D] Debug logging  [Q] Quit`);
   
   /* const wsServer = (() => {
     if (isHttps) {
