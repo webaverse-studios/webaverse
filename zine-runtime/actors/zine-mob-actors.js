@@ -25,7 +25,7 @@ export class PanelRuntimeMobs extends THREE.Object3D {
     for (let i = 0; i < n; i++) {
       const candidateLocationIndex = Math.floor(rng() * candidateLocations.length);
       const candidateLocation = candidateLocations.splice(candidateLocationIndex, 1)[0];
-      console.log('mob location', candidateLocation);
+      // console.log('mob location', candidateLocation);
       const {
         position, // array[3]
         quaternion, // array[4]
