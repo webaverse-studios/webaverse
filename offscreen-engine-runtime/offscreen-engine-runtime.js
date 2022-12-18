@@ -6,7 +6,7 @@ import Avatar from '../avatars/avatars.js';
 import {
   makeLocalWorker,
 } from './local-engine-worker.js';
-import offscreenEngineApi from './offscreen-engine-api.js';
+import offscreenEngineApi from '../offscreen-engine/offscreen-engine-api.js';
 
 offscreenEngineApi(async (funcName, args, opts) => {
   const worker = makeLocalWorker();
