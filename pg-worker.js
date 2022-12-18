@@ -36,6 +36,7 @@ const _cloneChunkResult = chunkResult => {
     if (waterGeometry) {
       const size = waterGeometry.positions.length * waterGeometry.positions.constructor.BYTES_PER_ELEMENT +
         waterGeometry.normals.length * waterGeometry.normals.constructor.BYTES_PER_ELEMENT +
+        waterGeometry.flows.length * waterGeometry.flows.constructor.BYTES_PER_ELEMENT +
         waterGeometry.factors.length * waterGeometry.factors.constructor.BYTES_PER_ELEMENT +
         waterGeometry.liquids.length * waterGeometry.liquids.constructor.BYTES_PER_ELEMENT +
         waterGeometry.liquidsWeights.length * waterGeometry.liquidsWeights.constructor.BYTES_PER_ELEMENT +
@@ -279,6 +280,10 @@ const _cloneChunkResult = chunkResult => {
       normals.set(waterGeometry.normals);
       index += waterGeometry.normals.length * waterGeometry.normals.constructor.BYTES_PER_ELEMENT;
 
+      const flows = new waterGeometry.flows.constructor(arrayBuffer, index, waterGeometry.flows.length);
+      flows.set(waterGeometry.flows);
+      index += waterGeometry.flows.length * waterGeometry.flows.constructor.BYTES_PER_ELEMENT;
+
       const factors = new waterGeometry.factors.constructor(arrayBuffer, index, waterGeometry.factors.length);
       factors.set(waterGeometry.factors);
       index += waterGeometry.factors.length * waterGeometry.factors.constructor.BYTES_PER_ELEMENT;
@@ -310,6 +315,7 @@ const _cloneChunkResult = chunkResult => {
       return {
         positions,
         normals,
+        flows,
         factors,
         liquids,
         liquidsWeights,
