@@ -54,7 +54,11 @@ const _setHeaders = res => {
 //
 
 const _proxyUrl = (req, res, u) => {
-  const proxyReq = /^https:/.test(u) ? https.request(u) : http.request(u);
+  const {method} = req;
+  const opts = {
+    method,
+  };
+  const proxyReq = /^https:/.test(u) ? https.request(u, opts) : http.request(u, opts);
   for (const header in req.headers) {
     proxyReq.setHeader(header, req.headers[header]);
   }
@@ -70,7 +74,11 @@ const _proxyUrl = (req, res, u) => {
     res.statusCode = 500;
     res.end();
   });
-  proxyReq.end();
+  if (['POST', 'PUT', 'DELETE'].includes(method)) {
+    req.pipe(proxyReq);
+  } else {
+    proxyReq.end();
+  }
 };
 
 //
