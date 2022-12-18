@@ -154,9 +154,9 @@ class AvatarIconer extends EventTarget {
         
         if (sourceCanvas) {
           for (const dstCanvas of this.canvases) {
-            if (sourceCanvas.width !== dstCanvas.width || sourceCanvas.height !== dstCanvas.height) {
-              throw new Error('invalid source canvas size');
-            }
+            // if (sourceCanvas.width !== dstCanvas.width || sourceCanvas.height !== dstCanvas.height) {
+            //   throw new Error('invalid source canvas size');
+            // }
 
             const {ctx} = dstCanvas;
             ctx.clearRect(0, 0, dstCanvas.width, dstCanvas.height);
