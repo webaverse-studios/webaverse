@@ -399,12 +399,13 @@ class IoManager extends EventTarget {
       case 69: { // E
         const now = performance.now();
         const timeDiff = now - this.lastKeysDownTime.keyE;
-        if (timeDiff < doubleTapTime) {
+        const canRotate = grabManager.canRotate();
+        if (timeDiff < doubleTapTime && !canRotate) {
           game.menuMiddleToggle();
         } else {
           game.menuMiddleUp();
 
-          if (grabManager.canRotate()) {
+          if (canRotate) {
             grabManager.menuRotate(-1);
           } else {
             game.menuActivateDown();
