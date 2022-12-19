@@ -27,7 +27,11 @@ import {
   getDepthFloatsFromPointCloud,
   depthFloat32ArrayToOrthographicGeometry,
   getDepthFloat32ArrayWorldPosition,
+  getDoubleSidedGeometry,
 } from 'zine/zine-geometry-utils.js';
+import {
+  getFloorNetPhysicsMesh,
+} from 'zine/zine-mesh-utils.js';
 import zineCameraManager from './zine-camera-manager.js';
 import {
   playersManager,
@@ -73,50 +77,6 @@ const localQuaternion = new THREE.Quaternion();
 const localMatrix = new THREE.Matrix4();
 const localPlane = new THREE.Plane();
 const localOrthographicCamera = new THREE.OrthographicCamera();
-
-// helpers
-
-const getDoubleSidedGeometry = geometry => {
-  const geometry2 = geometry.clone();
-  // double-side the geometry
-  const indices = geometry2.index.array;
-  const newIndices = new indices.constructor(indices.length * 2);
-  newIndices.set(indices);
-  // the second set of indices is flipped
-  for (let i = 0; i < indices.length; i += 3) {
-    newIndices[indices.length + i + 0] = indices[i + 2];
-    newIndices[indices.length + i + 1] = indices[i + 1];
-    newIndices[indices.length + i + 2] = indices[i + 0];
-  }
-  geometry2.setIndex(new THREE.BufferAttribute(newIndices, 1));
-  return geometry2;
-};
-const getFloorNetPhysicsMesh = ({
-  floorNetDepths,
-  floorNetCamera,
-}) => {
-  const geometry = depthFloat32ArrayToOrthographicGeometry(
-    floorNetDepths,
-    floorNetPixelSize,
-    floorNetPixelSize,
-    floorNetCamera,
-  );
-  geometry.computeVertexNormals();
-
-  // shift geometry by half a floorNetWorldSize
-  geometry.translate(floorNetWorldSize/2, 0, floorNetWorldSize/2);
-  // ...but also shift the mesh to compensate
-  // this centering is required for the physics to work and render correctly
-  const material = new THREE.MeshPhongMaterial({
-    color: 0xFF0000,
-    side: THREE.BackSide,
-    transparent: true,
-    opacity: 0.5,
-  });
-  const mesh = new THREE.Mesh(geometry, material);
-  mesh.position.set(-floorNetWorldSize/2, 0, -floorNetWorldSize/2);
-  return mesh;
-};
 
 // classes
 
@@ -216,9 +176,16 @@ class PanelRuntimeInstance extends THREE.Object3D {
     {
       const [width, height] = floorResolution;
 
+      const floorNetPhysicsMaterial = new THREE.MeshPhongMaterial({
+        color: 0xFF0000,
+        side: THREE.BackSide,
+        transparent: true,
+        opacity: 0.5,
+      });
       const floorNetPhysicsMesh = getFloorNetPhysicsMesh({
         floorNetDepths,
         floorNetCamera,
+        material: floorNetPhysicsMaterial,
       });
       floorNetPhysicsMesh.name = 'floorNetPhysicsMesh';
       floorNetPhysicsMesh.visible = false;
