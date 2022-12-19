@@ -333,7 +333,6 @@ const _startPreviewer = async () => {
     };
     for (const object of objects) {
       let {start_url, type, content, position = [0, 0, 0], quaternion = [0, 0, 0, 1], scale = [1, 1, 1]} = object;
-
       const transform = Float32Array.from([...position, ...quaternion, ...scale]);
       const instanceId = makeId(5);
       if (!start_url && type && content) {
