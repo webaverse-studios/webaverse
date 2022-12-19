@@ -81,6 +81,8 @@ class StartJump extends b3.Action {
       (localPlayer.characterPhysics.grounded || localPlayer.hasAction('sit'))
     ) {
       tickResults.jump = true;
+      debugger
+      globalThis.isDebugger = true;
       // console.log('SUCCESS StartJump')
       return b3.SUCCESS;
     } else {
@@ -175,6 +177,7 @@ class WaitOneFrame extends b3.Action {
   tick(tick) {
     const frameCount = tick.blackboard.get('frameCount');
     const thisFrameCount = tick.blackboard.get('frameCount', tick.tree.id, this.id);
+    const tickResults = tick.blackboard.get('tickResults');
     if (!thisFrameCount) {
       tick.blackboard.set('frameCount', frameCount, tick.tree.id, this.id);
     }
@@ -183,6 +186,7 @@ class WaitOneFrame extends b3.Action {
       // console.log('SUCCESS WaitOneFrame')
       return b3.SUCCESS
     } else {
+      if (this.setTrueKey) tickResults[this.setTrueKey] = true;
       // console.log('RUNNING WaitOneFrame')
       return b3.RUNNING
     }
@@ -288,20 +292,20 @@ tree.root = new b3.MemSequence({title:'root',children: [
   new b3.Runnor({title:'loaded',child:
     new b3.Parallel({title:'main',children:[
       new b3.Priority({title:'base',children:[
-        // new b3.MemSequence({title:'sit',children:[
-        //   new StartSit(),
-        //   new b3.Priority({children:[
-        //     new HaltSit(),
-        //     new Sit(),
-        //   ]}),
-        // ]}),
-        // new b3.Sequence({title:'fly & narutoRun',children:[
+        new b3.MemSequence({title:'sit',children:[
+          new StartSit(),
+          new b3.Priority({children:[
+            new HaltSit(),
+            new Sit(),
+          ]}),
+        ]}),
+        new b3.Sequence({title:'fly & narutoRun',children:[
           new Fly({title:'Fly'}),
-        //   new b3.Succeedor({child: new NarutoRun({title:'NarutoRun'})}),
-        // ]}),
+          new b3.Succeedor({child: new NarutoRun({title:'NarutoRun'})}),
+        ]}),
         new b3.MemSequence({title:'jump & doubleJump',children:[
           new StartJump({title:'StartJump'}),
-          new WaitOneFrame({title:'WaitOneFrame'}), // note: wait leave ground.
+          new WaitOneFrame({title:'WaitOneFrame',setTrueKey:'jump'}), // note: wait leave ground.
           new Jump({title:'Jump'}),
           new DoubleJump({title:'DoubleJump'}),
         ]}),
@@ -317,7 +321,7 @@ tree.root = new b3.MemSequence({title:'root',children: [
               new Skydive({title:'Skydive'}),
             ]}),
           ]}),
-          new WaitOneFrame({title:'WaitOneFrame'}), // note: prevent remove glider immediately, because add/remove glider all triggered by space key.
+          new WaitOneFrame({title:'WaitOneFrame',setTrueKey:'glider'}), // note: prevent remove glider immediately, because add/remove glider all triggered by space key.
           new Glider({title:'Glider'}),
         ]}),
         new b3.MemSequence({title:'crouch',children:[
@@ -514,10 +518,12 @@ class ActionsManager {
   update(timestamp) {
     preFrameSettings(this.localPlayer, this.blackboard, timestamp);
     tree.tick(this.localPlayer, this.blackboard);
-    if (this.blackboard.get('needReTick')) { // note: only will do reTick once per update(), will not cause dead loop.
-      clearTickResults(this.localPlayer, this.blackboard);
-      tree.tick(this.localPlayer, this.blackboard);
-    }
+    if (globalThis.isDebugger) debugger
+    clearTickResults(this.localPlayer, this.blackboard);
+    tree.tick(this.localPlayer, this.blackboard); // note: reTick/doubleTick in order to switch from low prio action to high prio action immediately, prevent one frame empty state/action.
+    if (globalThis.isDebugger) debugger
+    // if (this.blackboard.get('needReTick')) { // note: only will do reTick once per update(), will not cause dead loop.
+    // } // todo: del needReTick
     postFrameSettings(this.localPlayer, this.blackboard);
     clearTickResults(this.localPlayer, this.blackboard);
   }
