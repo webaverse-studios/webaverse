@@ -216,6 +216,7 @@ class Grabmanager extends EventTarget {
   async toggleEditMode() {
     this.editMode = !this.editMode;
     this.setGridSnap(minGridSnap);
+    transformIndicators.targetApp = null;
     if (this.editMode) {
       if (!cameraManager.pointerLockElement) {
         await cameraManager.requestPointerLock();
