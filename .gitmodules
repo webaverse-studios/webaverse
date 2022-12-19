@@ -34,3 +34,6 @@
 [submodule "packages/offscreen-engine"]
 	path = packages/offscreen-engine
 	url = https://github.com/webaverse/offscreen-engine.git
+[submodule "packages/zine-aux"]
+	path = packages/zine-aux
+	url = https://github.com/webaverse/zine-aux
