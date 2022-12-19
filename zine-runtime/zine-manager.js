@@ -74,6 +74,50 @@ const localMatrix = new THREE.Matrix4();
 const localPlane = new THREE.Plane();
 const localOrthographicCamera = new THREE.OrthographicCamera();
 
+// helpers
+
+const getDoubleSidedGeometry = geometry => {
+  const geometry2 = geometry.clone();
+  // double-side the geometry
+  const indices = geometry2.index.array;
+  const newIndices = new indices.constructor(indices.length * 2);
+  newIndices.set(indices);
+  // the second set of indices is flipped
+  for (let i = 0; i < indices.length; i += 3) {
+    newIndices[indices.length + i + 0] = indices[i + 2];
+    newIndices[indices.length + i + 1] = indices[i + 1];
+    newIndices[indices.length + i + 2] = indices[i + 0];
+  }
+  geometry2.setIndex(new THREE.BufferAttribute(newIndices, 1));
+  return geometry2;
+};
+const getFloorNetPhysicsMesh = ({
+  floorNetDepths,
+  floorNetCamera,
+}) => {
+  const geometry = depthFloat32ArrayToOrthographicGeometry(
+    floorNetDepths,
+    floorNetPixelSize,
+    floorNetPixelSize,
+    floorNetCamera,
+  );
+  geometry.computeVertexNormals();
+
+  // shift geometry by half a floorNetWorldSize
+  geometry.translate(floorNetWorldSize/2, 0, floorNetWorldSize/2);
+  // ...but also shift the mesh to compensate
+  // this centering is required for the physics to work and render correctly
+  const material = new THREE.MeshPhongMaterial({
+    color: 0xFF0000,
+    side: THREE.BackSide,
+    transparent: true,
+    opacity: 0.5,
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(-floorNetWorldSize/2, 0, -floorNetWorldSize/2);
+  return mesh;
+};
+
 // classes
 
 class PanelRuntimeInstance extends THREE.Object3D {
@@ -152,21 +196,9 @@ class PanelRuntimeInstance extends THREE.Object3D {
 
     // object physics
     {
-      const geometry2 = scenePhysicsMesh.geometry.clone();
-      // double-side the geometry
-      const indices = geometry2.index.array;
-      const newIndices = new indices.constructor(indices.length * 2);
-      newIndices.set(indices);
-      // the second set of indices is flipped
-      for (let i = 0; i < indices.length; i += 3) {
-        newIndices[indices.length + i + 0] = indices[i + 2];
-        newIndices[indices.length + i + 1] = indices[i + 1];
-        newIndices[indices.length + i + 2] = indices[i + 0];
-      }
-      geometry2.setIndex(new THREE.BufferAttribute(newIndices, 1));
+      const geometry2 = getDoubleSidedGeometry(geometry);
 
-      const material2 = scenePhysicsMesh.material.clone();
-      const scenePhysicsMesh2 = new THREE.Mesh(geometry2, material2);
+      const scenePhysicsMesh2 = new THREE.Mesh(geometry2, scenePhysicsMesh.material);
       scenePhysicsMesh2.name = 'scenePhysicsMesh';
       // scenePhysicsMesh.position.copy(scenePhysicsMesh.position);
       // scenePhysicsMesh.quaternion.copy(scenePhysicsMesh.quaternion);
@@ -184,30 +216,11 @@ class PanelRuntimeInstance extends THREE.Object3D {
     {
       const [width, height] = floorResolution;
 
-      const floorNetPhysicsMesh = (() => {
-        const geometry = depthFloat32ArrayToOrthographicGeometry(
-          floorNetDepths,
-          floorNetPixelSize,
-          floorNetPixelSize,
-          floorNetCamera,
-        );
-        geometry.computeVertexNormals();
-
-        // shift geometry by half a floorNetWorldSize
-        geometry.translate(floorNetWorldSize/2, 0, floorNetWorldSize/2);
-        // ...but also shift the mesh to compensate
-        // this centering is required for the physics to work and render correctly
-        const material = new THREE.MeshPhongMaterial({
-          color: 0xFF0000,
-          side: THREE.BackSide,
-          transparent: true,
-          opacity: 0.5,
-        });
-        const mesh = new THREE.Mesh(geometry, material);
-        return mesh;
-      })();
+      const floorNetPhysicsMesh = getFloorNetPhysicsMesh({
+        floorNetDepths,
+        floorNetCamera,
+      });
       floorNetPhysicsMesh.name = 'floorNetPhysicsMesh';
-      floorNetPhysicsMesh.position.set(-floorNetWorldSize/2, 0, -floorNetWorldSize/2);
       floorNetPhysicsMesh.visible = false;
       zineRenderer.transformScene.add(floorNetPhysicsMesh);
       this.floorNetPhysicsMesh = floorNetPhysicsMesh;
