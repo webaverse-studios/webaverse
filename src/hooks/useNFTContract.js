@@ -64,13 +64,13 @@ export default function useNFTContract(currentAccount) {
       if (mintfee > 0) {
         // webaverse side chain mintfee != 0
         const FTapprovetx = await FTcontract.approve(
-          NFTcontractAddress,
+          WebaversecontractAddress,
           mintfee,
         ); // mintfee = 10 default
         const FTapproveres = await FTapprovetx.wait();
         if (FTapproveres.transactionHash) {
           try {
-            const minttx = await Webaversecontract.mint(
+            const minttx = await Webaversecontract.mintCreatorNFT(
               currentAccount,
               1,
               currentApp.contentId,
@@ -88,7 +88,7 @@ export default function useNFTContract(currentAccount) {
       } else {
         // mintfee = 0 for Polygon not webaverse sidechain
         try {
-          const minttx = await Webaversecontract.mint(
+          const minttx = await Webaversecontract.mintCreatorNFT(
             currentAccount,
             1,
             currentApp.contentId,
@@ -137,7 +137,7 @@ export default function useNFTContract(currentAccount) {
           ); // mintfee = 10 default
           const FTapproveres = await FTapprovetx.wait();
           if (FTapproveres.transactionHash) {
-                if(app.serverDrop === true) {
+            if(app.serverDrop === true) {
               try {
                 const claimtx = await webaverseContract.claimServerDropNFT(
                   currentAccount,
@@ -155,7 +155,7 @@ export default function useNFTContract(currentAccount) {
               }
             } else {
               try {
-                const minttx = await webaverseContract.claim_NFT(
+                const minttx = await webaverseContract.claimUserDropNFT(
                   currentAccount,
                   app.voucher
                 )
@@ -188,7 +188,7 @@ export default function useNFTContract(currentAccount) {
             }
           } else {
             try {
-              const minttx = await webaverseContract.claim_NFT(
+              const minttx = await webaverseContract.claimUserDropNFT(
                 currentAccount,
                 app.voucher
               );
@@ -222,7 +222,7 @@ export default function useNFTContract(currentAccount) {
 
         if (app.serverDrop === true) {
           try {
-            const minttx = await webaverseContract.claimServerDropFT(
+            const minttx = await webaverseContract.claimServerDropSilk(
               currentAccount,
               app.voucher,
             );
@@ -236,7 +236,7 @@ export default function useNFTContract(currentAccount) {
           }
         } else {
           try {
-            const minttx = await webaverseContract.claim_FT(
+            const minttx = await webaverseContract.claimUserDropSilk(
               currentAccount,
               app.voucher
             );
@@ -260,7 +260,7 @@ export default function useNFTContract(currentAccount) {
 
   async function totalSupply() {
     const contract = await getContract();
-    const totalSupply = await contract.totalSupply();
+    const totalSupply = await contract.currentTokenId();
     return BigNumber.from(totalSupply).toNumber();
   }
 

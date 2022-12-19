@@ -615,11 +615,6 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "signer",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
           "name": "to",
           "type": "address"
         },
