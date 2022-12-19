@@ -1826,7 +1826,9 @@ class Avatar {
       // console.log('-actions:', actionsStr)
 
       // console.log(physx.physxWorker.getActionInterpolantAnimationAvatar(this.animationAvatarPtr, 'land', 0))
-      console.log(physx.physxWorker.getActionInterpolantAnimationAvatar(this.animationAvatarPtr, 'readyGrab', 0))
+      // console.log(physx.physxWorker.getActionInterpolantAnimationAvatar(this.animationAvatarPtr, 'readyGrab', 0))
+
+      physx.physxWorker.getValuesAnimationAvatar(this.animationAvatarPtr)
 
       // if (actionsStr === 'movements,fallLoop') {
       // if (actionsStr === 'movements,fallLoop,fallLoopFromjump') {
