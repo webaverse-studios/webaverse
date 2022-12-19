@@ -138,11 +138,12 @@ class GameManager extends EventTarget {
   }
 
   startUse() {
+    const localPlayer = playersManager.getLocalPlayer();
     const wearApp = loadoutManager.getSelectedApp();
-    if (wearApp) {
+    const storyAction = localPlayer.getAction('story');
+    if (wearApp && !storyAction) {
       const useComponent = wearApp.getComponent('use');
       if (useComponent) {
-        const localPlayer = playersManager.getLocalPlayer();
         const useAction = localPlayer.getAction('use');
         if (!useAction) {
           const {instanceId} = wearApp;
