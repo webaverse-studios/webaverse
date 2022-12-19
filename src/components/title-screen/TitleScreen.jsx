@@ -206,10 +206,11 @@ const _startApp = (canvas, u) => {
     const scene = new THREE.Scene();
     scene.autoUpdate = false;
 
+    // path mesh
+    
+
+    // video mesh
     let video = null;
-    // let videoFrameReady = false;
-    // let videoCanvas = null;
-    // let videoContext = null;
     let videoTexture = null;
     let videoMesh = null;
     (async () => {
@@ -222,21 +223,17 @@ const _startApp = (canvas, u) => {
             const v = document.createElement('video');
             v.crossOrigin = 'Anonymous';
             v.src = u;
-            // v.oncanplay = e => {console.log('can play', e); };
             await new Promise((accept, reject) => {
                 v.oncanplaythrough = accept;
                 v.onerror = reject;
             });
-            // v.play();
             return v;
         };
         const [
             imageArrayBuffer,
             videoElement,
         ] = await Promise.all([
-            // _loadImageArrayBuffer(`https://local.webaverse.com/packages/zine/resources/images/Kalila_anime_cyberpunk_bright_empty_city_alley_upper_view_high__67930432-4de8-4b77-b7c4-7a5bb5a84c1c.png`),
             _loadImageArrayBuffer(u),
-            // _loadVideo('./packages/zine/resources/videos/upstreet.mp4'),
             _loadVideo(`${assetsBaseUrl}/videos/upstreet2.mp4`),
         ]);
         
@@ -270,21 +267,8 @@ const _startApp = (canvas, u) => {
             `;
             // document.body.appendChild(video);
 
-            // const _recurseVideoFrameReady = () => {
-            //   video.requestVideoFrameCallback(() => {
-            //     videoFrameReady = true;
-            //     _recurseVideoFrameReady();
-            //   });
-            // };
-            // _recurseVideoFrameReady();
-
             // full screen video mesh
             const geometry = new THREE.PlaneGeometry(2, 2, 1, 1);
-            
-            // videoCanvas = document.createElement('canvas');
-            // videoCanvas.width = 1980;
-            // videoCanvas.height = 1080;
-            // videoContext = videoCanvas.getContext('2d');
 
             videoTexture = new THREE.VideoTexture(video);
             const videoMaterial = new THREE.ShaderMaterial({
@@ -367,6 +351,7 @@ const _startApp = (canvas, u) => {
         }
     })();
 
+    // resize handler
     const _setSize = () => {
         renderer.setSize(globalThis.innerWidth, globalThis.innerHeight);
 
@@ -380,22 +365,11 @@ const _startApp = (canvas, u) => {
     };
     _setSize();
     renderer.setPixelRatio(window.devicePixelRatio);
-
     globalThis.addEventListener('resize', e => {
         _setSize();
     });
 
-    // const _getNextPlaybackRateSpec = (now = performance.now()) => {
-    //   const rate = Math.random() * 3;
-    //   const timestamp = now + Math.random() * 1000 + 500;
-    //   return {
-    //     rate,
-    //     timestamp,
-    //   };
-    // };
-    // let nextPlaybackRateSpec = _getNextPlaybackRateSpec();
-
-    let loadingTexture = false;
+    // frame loop
     const _frame = () => {
       requestAnimationFrame(_frame);
 
