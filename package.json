@@ -65,7 +65,8 @@
     "xhr2": "^0.2.1",
     "zine": "./packages/zine",
     "zjs": "./packages/zjs",
-    "offscreen-engine": "./packages/offscreen-engine"
+    "offscreen-engine": "./packages/offscreen-engine",
+    "zine-aux": "./packages/zine-aux"
   },
   "devDependencies": {
     "@types/expect-puppeteer": "^5.0.1",
