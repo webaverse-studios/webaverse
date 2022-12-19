@@ -191,28 +191,6 @@ class GameManager extends EventTarget {
     this.isMouseUp = true;
   };
 
-  grab(object) {
-    const localPlayer = playersManager.getLocalPlayer();
-    localPlayer.grab(object);
-
-    gameManager.gridSnap = 0;
-    gameManager.editMode = false;
-  };
-
-  getGrabAction(i) {
-    const targetHand = i === 0 ? 'left' : 'right';
-    const localPlayer = playersManager.getLocalPlayer();
-    const grabAction = localPlayer.findAction(action => action.type === 'grab' && action.hand === targetHand);
-    return grabAction;
-  };
-
-  getGrabbedObject(i) {
-    const grabAction = this.getGrabAction(i);
-    const grabbedObjectInstanceId = grabAction?.instanceId;
-    const result = grabbedObjectInstanceId ? metaversefileApi.getAppByInstanceId(grabbedObjectInstanceId) : null;
-    return result;
-  };
-
   unwearAppIfHasSitComponent(player) {
     const wearActions = player.getActionsByType('wear');
     for (const wearAction of wearActions) {
@@ -223,114 +201,6 @@ class GameManager extends EventTarget {
         app.unwear();
       }
     }
-  }
-
-  // returns whether we actually snapped
-  updateGrabbedObject(
-    o,
-    grabMatrix,
-    offsetMatrix,
-    {collisionEnabled, handSnapEnabled, physx, gridSnap},
-  ) {
-    grabMatrix.decompose(localVector, localQuaternion, localVector2);
-    offsetMatrix.decompose(localVector3, localQuaternion2, localVector4);
-    const offset = localVector3.length();
-    localMatrix
-      .multiplyMatrices(grabMatrix, offsetMatrix)
-      .decompose(localVector5, localQuaternion3, localVector6);
-
-    const _getPhysicalPosition = box => {
-      return localVector7.set(
-        (box.min.x + box.max.x) / 2,
-        box.min.y,
-        (box.min.z + box.max.z) / 2,
-      );
-    }
-
-    let physicalOffset = null;
-    const grabbedPhysicsObjects = o.getPhysicsObjects();
-
-    // Compute physical local bounding box and it's position offset from app.position.
-    // THREE.Box3.getCenter() has a console error, so I calculate manually.
-    if (grabbedPhysicsObjects) {
-      localBox.makeEmpty();
-      for (const physicsObject of grabbedPhysicsObjects) {
-        const geometry = physicsObject.physicsMesh.geometry;
-        geometry.computeBoundingBox();
-        localBox.union(geometry.boundingBox);
-      }
-      physicalOffset = _getPhysicalPosition(localBox);
-    }
-
-    const physicsScene = physicsManager.getScene();
-    const collision = collisionEnabled && physicsScene.raycast(localVector, localQuaternion);
-    localQuaternion2.setFromAxisAngle(localVector2.set(1, 0, 0), -Math.PI * 0.5);
-    const downCollision = collisionEnabled && physicsScene.raycast(localVector5, localQuaternion2);
-
-    if (collision) {
-      const {point} = collision;
-      localVector6.fromArray(point);
-    }
-
-    if (downCollision) {
-      const {point} = downCollision;
-      localVector4.fromArray(point);
-      if (ioManager.keys.shift) {
-        o.position.copy(localVector5.setY(localVector4.y));
-      } else {
-        // if collision point is closer to the player than the grab offset and collisionDown point
-        // is below collision point then place the object at collision point
-        if (
-          localVector.distanceTo(localVector6) < offset &&
-          localVector4.y < localVector6.y
-        )
-          localVector5.copy(localVector6);
-
-        // if grabbed object would go below another object then place object at downCollision point
-        if (localVector5.y < localVector4.y) localVector5.setY(localVector4.y);
-        o.position.copy(localVector5);
-      }
-    }
-
-    const collisionIsWithinOffset = localVector.distanceTo(localVector6) < offset;
-    const collisionIsAboveGround = localVector4.y < localVector6.y;
-
-    // Did the ray collide with any other object than the grabbed object? Need this check because on the first frame
-    // it collides with the grabbed object, although physical actors are being disabled. This caused teleport issue.
-    const collNonGrabbedObj = !!collision && !o.physicsObjects.some(obj => obj.physicsId === collision.objectId);
-
-    // if collision point is closer to the player than the grab offset and collisionDown point
-    // is below collision point then place the object at collision point
-    if (collNonGrabbedObj && !!downCollision && collisionIsWithinOffset && collisionIsAboveGround) {
-      localVector5.copy(localVector6).sub(physicalOffset);
-    }
-
-    const objectOverlapsVertically = localVector7.copy(localVector5).add(physicalOffset).y < localVector4.y;
-
-    // if grabbed object would overlap vertically then place object at downCollision point
-    if (!!downCollision && objectOverlapsVertically) {
-      localVector5.setY(localVector4.sub(physicalOffset).y);
-    }
-
-    o.position.copy(localVector5);
-
-    const handSnap =
-      !handSnapEnabled ||
-      offset >= maxGrabDistance ||
-      !!collision ||
-      !!downCollision;
-    if (handSnap) {
-      snapPosition(o, gridSnap);
-      o.quaternion.setFromEuler(o.savedRotation);
-    } else {
-      o.quaternion.copy(localQuaternion3);
-    }
-
-    o.updateMatrixWorld();
-
-    return {
-      handSnap,
-    };
   }
 
   getCurrentGrabAnimation() {
@@ -1153,32 +1023,6 @@ class GameManager extends EventTarget {
       ioManager.setMovementEnabled(!pickUpAction);
     }
     _handlePickUp();
-
-    const _updatePhysicsHighlight = () => {
-      this.highlightPhysicsMesh.visible = false;
-
-      if (this.highlightedPhysicsObject) {
-        const physicsId = this.highlightedPhysicsId;
-
-        this.highlightedPhysicsObject.updateMatrixWorld();
-
-        const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(physicsId);
-        if (physicsObject) {
-          const {physicsMesh} = physicsObject;
-          this.highlightPhysicsMesh.geometry = physicsMesh.geometry;
-          this.highlightPhysicsMesh.matrixWorld.copy(physicsMesh.matrixWorld)
-            .decompose(this.highlightPhysicsMesh.position, this.highlightPhysicsMesh.quaternion, this.highlightPhysicsMesh.scale);
-
-          this.highlightPhysicsMesh.material.uniforms.uTime.value = (now % 1500) / 1500;
-          this.highlightPhysicsMesh.material.uniforms.uTime.needsUpdate = true;
-          this.highlightPhysicsMesh.material.uniforms.uColor.value.setHex(buildMaterial.uniforms.uColor.value.getHex());
-          this.highlightPhysicsMesh.material.uniforms.uColor.needsUpdate = true;
-          this.highlightPhysicsMesh.visible = true;
-          this.highlightPhysicsMesh.updateMatrixWorld();
-        }
-      }
-    };
-    _updatePhysicsHighlight();
 
     const _updateMouseHighlight = () => {
       this.mouseHighlightPhysicsMesh.visible = false;
