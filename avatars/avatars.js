@@ -1823,9 +1823,10 @@ class Avatar {
       // const actionsStr = globalThis.localPlayer?.getActionsArray().map(n=>n.type).join(',')
       const actionsStr = globalThis.localPlayer?.getActionsArray().map(n=>n.type + (n.from ? 'From' + n.from : '')).join(',')
 
-      console.log('-actions:', actionsStr)
+      // console.log('-actions:', actionsStr)
 
       // console.log(physx.physxWorker.getActionInterpolantAnimationAvatar(this.animationAvatarPtr, 'land', 0))
+      console.log(physx.physxWorker.getActionInterpolantAnimationAvatar(this.animationAvatarPtr, 'readyGrab', 0))
 
       // if (actionsStr === 'movements,fallLoop') {
       // if (actionsStr === 'movements,fallLoop,fallLoopFromjump') {
