@@ -196,7 +196,7 @@ class PanelRuntimeInstance extends THREE.Object3D {
 
     // object physics
     {
-      const geometry2 = getDoubleSidedGeometry(geometry);
+      const geometry2 = getDoubleSidedGeometry(scenePhysicsMesh.geometry);
 
       const scenePhysicsMesh2 = new THREE.Mesh(geometry2, scenePhysicsMesh.material);
       scenePhysicsMesh2.name = 'scenePhysicsMesh';
