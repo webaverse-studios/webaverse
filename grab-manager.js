@@ -216,6 +216,7 @@ class Grabmanager extends EventTarget {
   async toggleEditMode() {
     this.editMode = !this.editMode;
     this.setGridSnap(minGridSnap);
+    transformIndicators.targetApp = null;
     if (this.editMode) {
       if (!cameraManager.pointerLockElement) {
         await cameraManager.requestPointerLock();
@@ -381,8 +382,11 @@ class Grabmanager extends EventTarget {
         const collision = physicsScene.raycast(position, quaternion);
         if (collision) {
           const physicsId = collision.objectId;
-          highlightedPhysicsObject = metaversefileApi.getAppByPhysicsId(physicsId);
-          highlightedPhysicsId = physicsId;
+          const app = metaversefileApi.getAppByPhysicsId(physicsId);
+          if(!app.getComponent('invincible')) {
+            highlightedPhysicsObject = app;
+            highlightedPhysicsId = physicsId;
+          }
         }
       }
     };
