@@ -28,6 +28,7 @@ import {
   depthFloat32ArrayToOrthographicGeometry,
   getDepthFloat32ArrayWorldPosition,
   getDoubleSidedGeometry,
+  getGeometryHeights,
 } from 'zine/zine-geometry-utils.js';
 import {
   getFloorNetPhysicsMesh,
@@ -197,7 +198,8 @@ class PanelRuntimeInstance extends THREE.Object3D {
       const heights = getGeometryHeights(
         floorNetPhysicsMesh.geometry,
         width,
-        height
+        height,
+        heightfieldScale
       );
       const floorNetPhysicsObject = this.physics.addHeightFieldGeometry(
         floorNetPhysicsMesh,
@@ -580,29 +582,6 @@ class PanelInstanceManager extends THREE.Object3D {
     _updateStoryTargetMesh();
   }
 }
-
-// utils
-    
-const getGeometryHeights = (geometry, width, height) => {
-  const heights = new Int16Array(geometry.attributes.position.array.length / 3);
-  let writeIndex = 0;
-  for (let dy = 0; dy < height; dy++) {
-    for (let dx = 0; dx < width; dx++) {
-      const ax = dx;
-      const ay = height - 1 - dy;
-      // XXX this is WRONG!
-      // we should index by ay * width + ax
-      // however, because of a bug which computes this wrong, we have to do it this way
-      const readIndex = ax * width + ay;
-
-      const y = geometry.attributes.position.array[readIndex * 3 + 1];
-      heights[writeIndex] = Math.round(y / heightfieldScale);
-
-      writeIndex++;
-    }
-  }
-  return heights;
-};
 
 // main class
 
