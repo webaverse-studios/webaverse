@@ -398,8 +398,8 @@ export default class Webaverse extends EventTarget {
     
     let lastTimestamp = performance.now();
     const animate = (timestamp, frame) => {
+      // console.log('---animate')
       performanceTracker.startFrame();
-
 
       window.domInfo.innerHTML = '';
 

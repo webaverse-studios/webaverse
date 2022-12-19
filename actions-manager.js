@@ -17,13 +17,13 @@ class Loading extends b3.Action {
 class FallLoop extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
-    const tickTryActions = tick.blackboard.get('tickTryActions');
+    const frameTryActions = tick.blackboard.get('frameTryActions');
     const localPlayer = tick.target;
     if (
       !localPlayer.characterPhysics.grounded &&
       (
         ((tick.blackboard.get('now') - localPlayer.characterPhysics.lastGroundedTime) > 200) ||
-        tickTryActions.fallLoop
+        frameTryActions.fallLoop
       )
     ) {
       tickResults.fallLoop = true;
@@ -36,9 +36,9 @@ class FallLoop extends b3.Action {
 class StartSkydive extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
-    const tickTryActions = tick.blackboard.get('tickTryActions');
+    const frameTryActions = tick.blackboard.get('frameTryActions');
     const localPlayer = tick.target;
-    if (!localPlayer.characterPhysics.grounded && tickTryActions.skydive) {
+    if (!localPlayer.characterPhysics.grounded && frameTryActions.skydive) {
       tickResults.skydive = true;
       return b3.SUCCESS;
     } else {
@@ -49,7 +49,7 @@ class StartSkydive extends b3.Action {
 class Skydive extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
-    const tickTryActions = tick.blackboard.get('tickTryActions');
+    const frameTryActions = tick.blackboard.get('frameTryActions');
     const localPlayer = tick.target;
     if (!localPlayer.characterPhysics.grounded) {
       tickResults.skydive = true;
@@ -74,13 +74,14 @@ class Fly extends b3.Action {
 class StartJump extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
-    const tickTryActions = tick.blackboard.get('tickTryActions');
+    const frameTryActions = tick.blackboard.get('frameTryActions');
     const localPlayer = tick.target;
     if (
-      tickTryActions.jump &&
+      frameTryActions.jump &&
       (localPlayer.characterPhysics.grounded || localPlayer.hasAction('sit'))
     ) {
       tickResults.jump = true;
+      // console.log('SUCCESS StartJump')
       return b3.SUCCESS;
     } else {
       return b3.FAILURE;
@@ -90,16 +91,19 @@ class StartJump extends b3.Action {
 class Jump extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
-    const tickTryActions = tick.blackboard.get('tickTryActions');
-    const tickTryStopActions = tick.blackboard.get('tickTryStopActions');
+    const frameTryActions = tick.blackboard.get('frameTryActions');
+    const frameTryStopActions = tick.blackboard.get('frameTryStopActions');
     const localPlayer = tick.target;
-    if (tickTryStopActions.jump || localPlayer.characterPhysics.grounded) {
+    if (frameTryStopActions.jump || localPlayer.characterPhysics.grounded) {
+      // console.log('FAILURE Jump')
       return b3.FAILURE;
-    } else if (tickTryActions.jump) { // note: for trigger doubleJump.
+    } else if (frameTryActions.jump) { // note: for trigger doubleJump.
       tickResults.jump = true; // note: doubleJump need jump in parallel.
+      // console.log('SUCCESS Jump')
       return b3.SUCCESS;
     } else {
       tickResults.jump = true;
+      // console.log('RUNNING Jump')
       return b3.RUNNING;
     }
   }
@@ -107,9 +111,9 @@ class Jump extends b3.Action {
 class DoubleJump extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
-    const tickTryStopActions = tick.blackboard.get('tickTryStopActions');
+    const frameTryStopActions = tick.blackboard.get('frameTryStopActions');
     const localPlayer = tick.target;
-    if (tickTryStopActions.doubleJump || localPlayer.characterPhysics.grounded) {
+    if (frameTryStopActions.doubleJump || localPlayer.characterPhysics.grounded) {
       return b3.FAILURE;
     } else {
       tickResults.jump = true; // note: doubleJump need jump in parallel.
@@ -134,8 +138,8 @@ class Land extends b3.Action {
 class StartCrouch extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
-    const tickTryActions = tick.blackboard.get('tickTryActions');
-    if (tickTryActions.crouch) {
+    const frameTryActions = tick.blackboard.get('frameTryActions');
+    if (frameTryActions.crouch) {
       tickResults.crouch = true;
       return b3.SUCCESS;
     } else {
@@ -146,8 +150,8 @@ class StartCrouch extends b3.Action {
 class Crouch extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
-    const tickTryStopActions = tick.blackboard.get('tickTryStopActions');
-    if (tickTryStopActions.crouch) {
+    const frameTryStopActions = tick.blackboard.get('frameTryStopActions');
+    if (frameTryStopActions.crouch) {
       return b3.FAILURE;
     } else {
       tickResults.crouch = true;
@@ -176,8 +180,10 @@ class WaitOneFrame extends b3.Action {
     }
     if (frameCount > thisFrameCount) {
       tick.blackboard.set('frameCount', undefined, tick.tree.id, this.id);
+      // console.log('SUCCESS WaitOneFrame')
       return b3.SUCCESS
     } else {
+      // console.log('RUNNING WaitOneFrame')
       return b3.RUNNING
     }
   }
@@ -188,6 +194,8 @@ class NarutoRun extends b3.Action {
     const longTryActions = tick.blackboard.get('longTryActions');
     if (longTryActions.narutoRun) {
       tickResults.narutoRun = true;
+      // if (globalThis.isDebugger) debugger
+      // console.log('SUCCESS NarutoRun')
       return b3.SUCCESS;
     } else {
       return b3.FAILURE;
@@ -197,8 +205,8 @@ class NarutoRun extends b3.Action {
 class StartSit extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
-    const tickTryActions = tick.blackboard.get('tickTryActions');
-    if (tickTryActions.sit) {
+    const frameTryActions = tick.blackboard.get('frameTryActions');
+    if (frameTryActions.sit) {
       tickResults.sit = true;
       return b3.SUCCESS;
     } else {
@@ -209,8 +217,8 @@ class StartSit extends b3.Action {
 class Sit extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
-    const tickTryStopActions = tick.blackboard.get('tickTryStopActions');
-    if (tickTryStopActions.sit) {
+    const frameTryStopActions = tick.blackboard.get('frameTryStopActions');
+    if (frameTryStopActions.sit) {
       return b3.FAILURE;
     } else {
       tickResults.sit = true;
@@ -220,10 +228,10 @@ class Sit extends b3.Action {
 }
 class HaltSit extends b3.Condition {
   tick(tick) {
-    const tickTryActions = tick.blackboard.get('tickTryActions');
+    const frameTryActions = tick.blackboard.get('frameTryActions');
     const localPlayer = tick.target;
-    if (tickTryActions.jump || tickTryActions.fly) {
-      tick.blackboard.set('needReTick', true);
+    if (frameTryActions.jump || frameTryActions.fly) {
+      tick.blackboard.set('needReTick', true); // todo: has class ReTick now, so don't need ?
       const wearActions = localPlayer.getActionsByType('wear');
       for (const wearAction of wearActions) {
         const instanceId = wearAction.instanceId;
@@ -242,9 +250,9 @@ class HaltSit extends b3.Condition {
 class StartGlider extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
-    const tickTryActions = tick.blackboard.get('tickTryActions');
+    const frameTryActions = tick.blackboard.get('frameTryActions');
     // const localPlayer = tick.target;
-    if (tickTryActions.glider) {
+    if (frameTryActions.glider) {
       tickResults.glider = true;
       return b3.SUCCESS;
     } else {
@@ -256,8 +264,8 @@ class Glider extends b3.Action {
   tick(tick) {
     const localPlayer = tick.target;
     const tickResults = tick.blackboard.get('tickResults');
-    const tickTryStopActions = tick.blackboard.get('tickTryStopActions');
-    if (tickTryStopActions.glider || localPlayer.characterPhysics.grounded) {
+    const frameTryStopActions = tick.blackboard.get('frameTryStopActions');
+    if (frameTryStopActions.glider || localPlayer.characterPhysics.grounded) {
       // tickResults.glider = true; // note: don't set `true` here to solve one frame empty tick issue when switch from low prio glider to high prio fallLoop, it's bad design, use ReTick instead.
       return b3.FAILURE;
     } else {
@@ -269,6 +277,7 @@ class Glider extends b3.Action {
 class ReTick extends b3.Action {
   tick(tick) {
     tick.blackboard.set('needReTick', true);
+    // console.log('ReTick')
     return b3.FAILURE;
   }
 }
@@ -279,17 +288,17 @@ tree.root = new b3.MemSequence({title:'root',children: [
   new b3.Runnor({title:'loaded',child:
     new b3.Parallel({title:'main',children:[
       new b3.Priority({title:'base',children:[
-        new b3.MemSequence({title:'sit',children:[
-          new StartSit(),
-          new b3.Priority({children:[
-            new HaltSit(),
-            new Sit(),
-          ]}),
-        ]}),
-        new b3.Sequence({title:'fly & narutoRun',children:[
+        // new b3.MemSequence({title:'sit',children:[
+        //   new StartSit(),
+        //   new b3.Priority({children:[
+        //     new HaltSit(),
+        //     new Sit(),
+        //   ]}),
+        // ]}),
+        // new b3.Sequence({title:'fly & narutoRun',children:[
           new Fly({title:'Fly'}),
-          new b3.Succeedor({child: new NarutoRun({title:'NarutoRun'})}),
-        ]}),
+        //   new b3.Succeedor({child: new NarutoRun({title:'NarutoRun'})}),
+        // ]}),
         new b3.MemSequence({title:'jump & doubleJump',children:[
           new StartJump({title:'StartJump'}),
           new WaitOneFrame({title:'WaitOneFrame'}), // note: wait leave ground.
@@ -315,31 +324,41 @@ tree.root = new b3.MemSequence({title:'root',children: [
           new StartCrouch({title:'StartCrouch'}),
           new Crouch({title:'Crouch'}),
         ]}),
+        new b3.Failor({title:'',child:new ReTick({title:''})}), // note: reTick to prevent one frame empty state when switch from low priority action to high priority action.
         new NarutoRun({title:'NarutoRun'}),
-        new b3.Failor({title:'',child:new ReTick({title:''})}) // note: reTick to prevent one frame empty state when switch from low priority action to high priority action.
+        // new b3.Failor({title:'',child:new ReTick({title:''})}), // note: reTick to prevent one frame empty state when switch from low priority action to high priority action.
       ]}), // end: base
       new Land({title:'Land'}),
     ]}), // end: main
   }), // end: loaded
 ]}); // end: root
 
-// const preTickSettings = (localPlayer, blackboard) => {
-// }
+const clearTickResults = (localPlayer, blackboard) => {
+  const tickResults = blackboard.get('tickResults');
+  for (const key in tickResults) {
+    tickResults[key] = false;
+  }
+}
 
-const postTickSettings = (localPlayer, blackboard) => {
-  const setActions = () => {
-    const tickResults = blackboard.get('tickResults');
-    const lastTickResults = blackboard.get('lastTickResults');
-    // const tickInfos = blackboard.get('tickInfos');
-    const tickTryActions = blackboard.get('tickTryActions');
-    const longTryActions = blackboard.get('longTryActions');
-  
-    if (tickResults.crouch && !lastTickResults.crouch) {
-      localPlayer.addAction(tickTryActions.crouch);
+const preFrameSettings = (localPlayer, blackboard, timestamp) => {
+  blackboard.set('now', timestamp);
+}
+
+const postFrameSettings = (localPlayer, blackboard) => {
+  const tickResults = blackboard.get('tickResults');
+  const lastFrameResults = blackboard.get('lastFrameResults');
+  const frameTryActions = blackboard.get('frameTryActions');
+  const longTryActions = blackboard.get('longTryActions');
+
+  // console.log('tickResults.jump', tickResults.jump)
+
+  const setActions = () => {  
+    if (tickResults.crouch && !lastFrameResults.crouch) {
+      localPlayer.addAction(frameTryActions.crouch);
     }
-    if (!tickResults.crouch && lastTickResults.crouch) localPlayer.removeAction('crouch');
+    if (!tickResults.crouch && lastFrameResults.crouch) localPlayer.removeAction('crouch');
   
-    if (tickResults.land && !lastTickResults.land) {
+    if (tickResults.land && !lastFrameResults.land) {
       const newLandAction = {
         type: 'land',
         time: blackboard.get('now'),
@@ -347,100 +366,101 @@ const postTickSettings = (localPlayer, blackboard) => {
       }
       localPlayer.addAction(newLandAction);
     }
-    if (!tickResults.land && lastTickResults.land) localPlayer.removeAction('land');
+    if (!tickResults.land && lastFrameResults.land) localPlayer.removeAction('land');
   
-    if (tickResults.narutoRun && !lastTickResults.narutoRun) localPlayer.addAction(longTryActions.narutoRun);
-    if (!tickResults.narutoRun && lastTickResults.narutoRun) localPlayer.removeAction('narutoRun');
-  
-    if (tickResults.fly && !lastTickResults.fly) localPlayer.addAction(longTryActions.fly);
-    if (!tickResults.fly && lastTickResults.fly) localPlayer.removeAction('fly');
-  
-    if (tickResults.jump && !lastTickResults.jump) {
-      localPlayer.addAction(tickTryActions.jump);
+    if (tickResults.narutoRun && !lastFrameResults.narutoRun) {
+      localPlayer.addAction(longTryActions.narutoRun);
+      // if (globalThis.isDebugger) debugger
     }
-    if (!tickResults.jump && lastTickResults.jump) {
+    if (!tickResults.narutoRun && lastFrameResults.narutoRun) {
+      localPlayer.removeAction('narutoRun');
+      // globalThis.isDebugger = true
+    }
+  
+    if (tickResults.fly && !lastFrameResults.fly) localPlayer.addAction(longTryActions.fly);
+    if (!tickResults.fly && lastFrameResults.fly) localPlayer.removeAction('fly');
+  
+    if (tickResults.jump && !lastFrameResults.jump) {
+      localPlayer.addAction(frameTryActions.jump);
+    }
+    if (!tickResults.jump && lastFrameResults.jump) {
       localPlayer.removeAction('jump');
     }
   
-    if (tickResults.doubleJump && !lastTickResults.doubleJump) {
+    if (tickResults.doubleJump && !lastFrameResults.doubleJump) {
       const newDoubleJumpAction = {
         type: 'doubleJump',
         startPositionY: localPlayer.characterPhysics.characterController.position.y,
       }
       localPlayer.addAction(newDoubleJumpAction);
     }
-    if (!tickResults.doubleJump && lastTickResults.doubleJump) {
+    if (!tickResults.doubleJump && lastFrameResults.doubleJump) {
       localPlayer.removeAction('doubleJump');
     }
   
-    if (tickResults.fallLoop && !lastTickResults.fallLoop) {
-      if (tickTryActions.fallLoop) {
-        localPlayer.addAction(tickTryActions.fallLoop)
+    if (tickResults.fallLoop && !lastFrameResults.fallLoop) {
+      if (frameTryActions.fallLoop) {
+        localPlayer.addAction(frameTryActions.fallLoop)
       } else {
         const newFallLoopAction = {type: 'fallLoop'};
         localPlayer.addAction(newFallLoopAction);
       }
     }
-    if (!tickResults.fallLoop && lastTickResults.fallLoop) localPlayer.removeAction('fallLoop');
+    if (!tickResults.fallLoop && lastFrameResults.fallLoop) localPlayer.removeAction('fallLoop');
   
-    if (tickResults.skydive && !lastTickResults.skydive) {
-      localPlayer.addAction(tickTryActions.skydive);
+    if (tickResults.skydive && !lastFrameResults.skydive) {
+      localPlayer.addAction(frameTryActions.skydive);
     }
-    if (!tickResults.skydive && lastTickResults.skydive) localPlayer.removeAction('skydive');
+    if (!tickResults.skydive && lastFrameResults.skydive) localPlayer.removeAction('skydive');
   
-    if (tickResults.fallLoopFromJump && !lastTickResults.fallLoopFromJump) {
-      localPlayer.addAction(tickTryActions.fallLoop);
+    if (tickResults.fallLoopFromJump && !lastFrameResults.fallLoopFromJump) {
+      localPlayer.addAction(frameTryActions.fallLoop);
     }
-    if (!tickResults.fallLoopFromJump && lastTickResults.fallLoopFromJump) {
+    if (!tickResults.fallLoopFromJump && lastFrameResults.fallLoopFromJump) {
       localPlayer.removeAction('fallLoop');
     }
   
-    if (tickResults.sit && !lastTickResults.sit) {
-      localPlayer.addAction(tickTryActions.sit);
+    if (tickResults.sit && !lastFrameResults.sit) {
+      localPlayer.addAction(frameTryActions.sit);
     }
-    if (!tickResults.sit && lastTickResults.sit) {
+    if (!tickResults.sit && lastFrameResults.sit) {
       localPlayer.removeAction('sit');
     }
   
-    if (tickResults.glider && !lastTickResults.glider) {
-      localPlayer.addAction(tickTryActions.glider);
+    if (tickResults.glider && !lastFrameResults.glider) {
+      localPlayer.addAction(frameTryActions.glider);
       localPlayer.glider.visible = true;
     }
-    if (!tickResults.glider && lastTickResults.glider) {
+    if (!tickResults.glider && lastFrameResults.glider) {
       localPlayer.removeAction('glider');
       localPlayer.glider.visible = false;
     }
   }
   setActions();
 
-  const setLastTickResults = () => {
+  const setLastFrameResults = () => {
     const tickResults = blackboard.get('tickResults');
-    const lastTickResults = blackboard.get('lastTickResults');
+    const lastFrameResults = blackboard.get('lastFrameResults');
     for (const key in tickResults) {
-      lastTickResults[key] = tickResults[key];
+      lastFrameResults[key] = tickResults[key];
     }
   }
-  setLastTickResults();
+  setLastFrameResults();
 
-  const resetTickInfos = () => {
-    // const tickInfos = blackboard.get('tickInfos');
-    // for (const key in tickInfos) {
-    //   tickInfos[key] = null;
-    // }
-    const tickTryActions = blackboard.get('tickTryActions');
-    for (const key in tickTryActions) {
-      tickTryActions[key] = null;
+  const resetFrameInfos = () => {
+    const frameTryActions = blackboard.get('frameTryActions');
+    for (const key in frameTryActions) {
+      frameTryActions[key] = null;
     }
-    const tickTryStopActions = blackboard.get('tickTryStopActions');
-    for (const key in tickTryStopActions) {
-      tickTryStopActions[key] = null;
-    }
-    const tickResults = blackboard.get('tickResults');
-    for (const key in tickResults) {
-      tickResults[key] = false;
+    const frameTryStopActions = blackboard.get('frameTryStopActions');
+    for (const key in frameTryStopActions) {
+      frameTryStopActions[key] = null;
     }
   }
-  resetTickInfos();
+  resetFrameInfos();
+
+  blackboard.set('needReTick', false);
+  blackboard.set('frameCount', blackboard.get('frameCount') + 1);
 }
 
 class ActionsManager {
@@ -448,11 +468,10 @@ class ActionsManager {
     this.localPlayer = localPlayer;
     this.blackboard = new b3.Blackboard();
     this.blackboard.set('tickResults', {});
-    this.blackboard.set('lastTickResults', {});
-    // this.blackboard.set('tickInfos', {});
-    this.blackboard.set('tickTryActions', {});
+    this.blackboard.set('lastFrameResults', {});
+    this.blackboard.set('frameTryActions', {});
     this.blackboard.set('longTryActions', {});
-    this.blackboard.set('tickTryStopActions', {});
+    this.blackboard.set('frameTryStopActions', {});
     this.blackboard.set('frameCount', 0);
     this.blackboard.set('loaded', true);
   }
@@ -469,11 +488,11 @@ class ActionsManager {
     if (isLong) {
       const longTryActions = this.blackboard.get('longTryActions');
       longTryActions[action.type] = action;
-      const tickTryActions = this.blackboard.get('tickTryActions');
-      tickTryActions[action.type] = action; // note: long try also trigger tick try.
+      const frameTryActions = this.blackboard.get('frameTryActions');
+      frameTryActions[action.type] = action; // note: long try also trigger frame try.
     } else {
-      const tickTryActions = this.blackboard.get('tickTryActions');
-      tickTryActions[action.type] = action;
+      const frameTryActions = this.blackboard.get('frameTryActions');
+      frameTryActions[action.type] = action;
     }
   }
 
@@ -482,8 +501,8 @@ class ActionsManager {
       const longTryActions = this.blackboard.get('longTryActions');
       longTryActions[actionType] = null;
     } else {
-      const tickTryStopActions = this.blackboard.get('tickTryStopActions');
-      tickTryStopActions[actionType] = true;
+      const frameTryStopActions = this.blackboard.get('frameTryStopActions');
+      frameTryStopActions[actionType] = true;
     }
   }
 
@@ -493,15 +512,14 @@ class ActionsManager {
   }
 
   update(timestamp) {
-    this.blackboard.set('now', timestamp);
-    // preTickSettings(this.localPlayer, this.blackboard);
+    preFrameSettings(this.localPlayer, this.blackboard, timestamp);
     tree.tick(this.localPlayer, this.blackboard);
     if (this.blackboard.get('needReTick')) { // note: only will do reTick once per update(), will not cause dead loop.
-      this.blackboard.set('needReTick', false);
-      tree.tick(this.localPlayer, this.blackboard); // note: will and needed to use the same `tickInfos` as first tree.tick(), because of called before `postTickSettings()`.
+      clearTickResults(this.localPlayer, this.blackboard);
+      tree.tick(this.localPlayer, this.blackboard);
     }
-    postTickSettings(this.localPlayer, this.blackboard);
-    this.blackboard.set('frameCount', this.blackboard.get('frameCount') + 1);
+    postFrameSettings(this.localPlayer, this.blackboard);
+    clearTickResults(this.localPlayer, this.blackboard);
   }
 }
 
