@@ -90,14 +90,14 @@
 }
 
 .userBoxWrap .chainName {
-  background-color: #C900C5;
+  background-color: #FFFFFF;
   border: 2px solid #000000;
   padding: 2px 6px;
   text-align: left;
   width: 80px;
   margin-left: 4px;
   margin-bottom: 2px;
-  color: #efefef;
+  color: #000000;
 }
 
 .userBoxWrap .walletAddress {
