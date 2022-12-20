@@ -515,9 +515,13 @@ story.handleWheel = e => {
 const _startConversation = (comment, remotePlayer, done) => {
   const localPlayer = playersManager.getLocalPlayer();
   currentConversation = new Conversation(localPlayer, remotePlayer);
+  const newStoryAction = {
+    type: 'story',
+  };
+  localPlayer.addAction(newStoryAction);
   currentConversation.addEventListener('close', () => {
     currentConversation = null;
-
+    localPlayer.removeAction('story');
     cameraManager.setDynamicTarget(null);
   }, {once: true});
   story.dispatchEvent(new MessageEvent('conversationstart', {
