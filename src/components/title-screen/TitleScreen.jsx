@@ -11,7 +11,7 @@ import {
 } from 'zine/zine-renderer.js';
 import {
     ZineCameraManager,
-} from '../../../zine-runtime/zine-camera-manager.js';
+} from '../../../zine-runtime/zine-camera.js';
 import {
     ZineStoryboard,
 } from 'zine/zine-format.js';
@@ -21,7 +21,9 @@ import {
 import {
     compileScene,
 } from '../../../zine-runtime/zine-remote-compiler.js';
-import {PathMesh} from 'zine-aux/meshes/path-mesh.js';
+import {
+    PathMesh,
+} from 'zine-aux/meshes/path-mesh.js';
 
 //
 
@@ -198,6 +200,24 @@ const imgUrls = imgNames.map(n => `${assetsBaseUrl}/images/${n}`);
 
 //
 
+const _loadImageArrayBuffer = async u => {
+    const res = await fetch(u);
+    const arrayBuffer = await res.arrayBuffer();
+    return arrayBuffer;
+};
+const _loadVideo = async u => {
+    const v = document.createElement('video');
+    v.crossOrigin = 'Anonymous';
+    v.src = u;
+    await new Promise((accept, reject) => {
+        v.oncanplaythrough = accept;
+        v.onerror = reject;
+    });
+    return v;
+};
+
+//
+
 const _startApp = (canvas, u) => {
     const renderer = new THREE.WebGLRenderer({
         canvas,
@@ -215,34 +235,9 @@ const _startApp = (canvas, u) => {
         normalizeView: false,
     });
 
-    // video mesh
-    let video = null;
-    let videoTexture = null;
-    let videoMesh = null;
     (async () => {
-        const _loadImageArrayBuffer = async u => {
-            const res = await fetch(u);
-            const arrayBuffer = await res.arrayBuffer();
-            return arrayBuffer;
-        };
-        const _loadVideo = async u => {
-            const v = document.createElement('video');
-            v.crossOrigin = 'Anonymous';
-            v.src = u;
-            await new Promise((accept, reject) => {
-                v.oncanplaythrough = accept;
-                v.onerror = reject;
-            });
-            return v;
-        };
-        const [
-            imageArrayBuffer,
-            videoElement,
-        ] = await Promise.all([
-            _loadImageArrayBuffer(u),
-            _loadVideo(`${assetsBaseUrl}/videos/upstreet2.mp4`),
-        ]);
-        
+        const imageArrayBuffer = await _loadImageArrayBuffer(u);
+
         const uint8Array = await compileScene(imageArrayBuffer);
 
         const zineStoryboard = new ZineStoryboard();
@@ -270,103 +265,106 @@ const _startApp = (canvas, u) => {
         // camera.copy(zineRenderer.camera);
         zineCameraManager.setLockCamera(zineRenderer.camera);
         zineCameraManager.toggleCameraLock();
+    })();
 
-        // video
-        {
-            video = videoElement;
-            video.muted = true;
-            video.play();
-            video.loop = true;
-            // video.playbackRate = 2;
-            video.style.cssText = `\
-                position: absolute;
-                top: 0;
-                left: 0;
-            `;
-            // document.body.appendChild(video);
+    // video mesh
+    let video = null;
+    let videoTexture = null;
+    let videoMesh = null;
+    (async () => {
+        video = await _loadVideo(`${assetsBaseUrl}/videos/upstreet2.mp4`);;
+        video.muted = true;
+        video.play();
+        video.loop = true;
+        // video.playbackRate = 2;
+        video.style.cssText = `\
+            position: absolute;
+            top: 0;
+            left: 0;
+        `;
+        // document.body.appendChild(video);
 
-            // full screen video mesh
-            const geometry = new THREE.PlaneGeometry(2, 2, 1, 1);
+        // full screen video mesh
+        const geometry = new THREE.PlaneGeometry(2, 2, 1, 1);
 
-            videoTexture = new THREE.VideoTexture(video);
-            const videoMaterial = new THREE.ShaderMaterial({
-                uniforms: {
-                    map: {
-                        value: videoTexture,
-                        needsUpdate: true,
-                    },
-                    screenResolution: {
-                        value: new THREE.Vector2(canvas.width, canvas.height),
-                        needsUpdate: true,
-                    },
-                    videoResolution: {
-                        value: new THREE.Vector2(1980, 1080),
-                        needsUpdate: true,
-                    },
-                    offset: {
-                        value: new THREE.Vector2(0, -0.3),
-                        needsUpdate: true,
-                    },
+        videoTexture = new THREE.VideoTexture(video);
+        const videoMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                map: {
+                    value: videoTexture,
+                    needsUpdate: true,
                 },
-                vertexShader: `\
-                    varying vec2 vUv;
+                screenResolution: {
+                    value: new THREE.Vector2(canvas.width, canvas.height),
+                    needsUpdate: true,
+                },
+                videoResolution: {
+                    value: new THREE.Vector2(1980, 1080),
+                    needsUpdate: true,
+                },
+                offset: {
+                    value: new THREE.Vector2(0, -0.3),
+                    needsUpdate: true,
+                },
+            },
+            vertexShader: `\
+                varying vec2 vUv;
 
-                    void main() {
-                        vUv = uv;
-                        gl_Position = vec4(position, 1.0);
+                void main() {
+                    vUv = uv;
+                    gl_Position = vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `\
+                uniform sampler2D map;
+                uniform vec2 screenResolution;
+                uniform vec2 videoResolution;
+                uniform vec2 offset;
+                varying vec2 vUv;
+
+                const vec3 baseColor = vec3(${
+                    new THREE.Color(0xd3d3d3).toArray().map(n => n.toFixed(8)).join(', ')
+                });
+                // const vec3 baseColor = vec3(0., 1., 0.);
+                /* const vec3 baseColor = vec3(${
+                    new THREE.Color(0x01b140).toArray().map(n => n.toFixed(8)).join(', ')
+                }); */
+
+                void main() {
+                    // adjust uv for the video aspect ratios of the screen and the video
+                    // to keep the video centered and unstretched regardless of the screen aspect ratio
+                    float screenAspectRatio = screenResolution.x / screenResolution.y;
+                    float videoAspectRatio = videoResolution.x / videoResolution.y;
+
+                    vec2 uv = vUv;
+                    uv = (uv - 0.5) * 2.0; // [-1, 1]
+                    uv.y /= screenAspectRatio;
+                    uv.y *= videoAspectRatio;
+                    uv += offset;
+                    uv = (uv + 1.0) / 2.0; // [0, 1]
+                    
+                    gl_FragColor = texture2D(map, uv);
+
+                    // float colorDistance = abs(gl_FragColor.r - baseColor.r) +
+                    //     abs(gl_FragColor.g - baseColor.g) +
+                    //     abs(gl_FragColor.b - baseColor.b);
+                    float colorDistance = distance(gl_FragColor.rgb, baseColor);
+                    if (colorDistance < 0.01) {
+                        discard;
+                    } else {
+                        gl_FragColor.a = min(max(colorDistance * 4., 0.0), 1.0);
                     }
-                `,
-                fragmentShader: `\
-                    uniform sampler2D map;
-                    uniform vec2 screenResolution;
-                    uniform vec2 videoResolution;
-                    uniform vec2 offset;
-                    varying vec2 vUv;
+                }
+            `,
+            side: THREE.DoubleSide,
+            transparent: true,
+            alphaToCoverage: true,
+            // alphaTest: 0.1,
+        });
 
-                    const vec3 baseColor = vec3(${
-                        new THREE.Color(0xd3d3d3).toArray().map(n => n.toFixed(8)).join(', ')
-                    });
-                    // const vec3 baseColor = vec3(0., 1., 0.);
-                    /* const vec3 baseColor = vec3(${
-                        new THREE.Color(0x01b140).toArray().map(n => n.toFixed(8)).join(', ')
-                    }); */
-
-                    void main() {
-                        // adjust uv for the video aspect ratios of the screen and the video
-                        // to keep the video centered and unstretched regardless of the screen aspect ratio
-                        float screenAspectRatio = screenResolution.x / screenResolution.y;
-                        float videoAspectRatio = videoResolution.x / videoResolution.y;
-
-                        vec2 uv = vUv;
-                        uv = (uv - 0.5) * 2.0; // [-1, 1]
-                        uv.y /= screenAspectRatio;
-                        uv.y *= videoAspectRatio;
-                        uv += offset;
-                        uv = (uv + 1.0) / 2.0; // [0, 1]
-                        
-                        gl_FragColor = texture2D(map, uv);
-
-                        // float colorDistance = abs(gl_FragColor.r - baseColor.r) +
-                        //     abs(gl_FragColor.g - baseColor.g) +
-                        //     abs(gl_FragColor.b - baseColor.b);
-                        float colorDistance = distance(gl_FragColor.rgb, baseColor);
-                        if (colorDistance < 0.01) {
-                            discard;
-                        } else {
-                            gl_FragColor.a = min(max(colorDistance * 4., 0.0), 1.0);
-                        }
-                    }
-                `,
-                side: THREE.DoubleSide,
-                transparent: true,
-                alphaToCoverage: true,
-                // alphaTest: 0.1,
-            });
-
-            videoMesh = new THREE.Mesh(geometry, videoMaterial);
-            videoMesh.frustumCulled = false;
-            scene.add(videoMesh);
-        }
+        videoMesh = new THREE.Mesh(geometry, videoMaterial);
+        videoMesh.frustumCulled = false;
+        scene.add(videoMesh);
     })();
 
     // resize handler
