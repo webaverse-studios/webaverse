@@ -404,7 +404,9 @@ const mirrors = [];
 const importFn = new Function('u', 'return import(u)');
 metaversefile.setApi({
   async import(s) {
-    if (/^[a-zA-Z0-9]+:/.test(s)) {
+    if (s.startsWith(compilerBaseUrl)) {
+      s = `${s.replace(/^([a-zA-Z0-9]+:\/)\//, '$1')}`;
+    } else if (/^[a-zA-Z0-9]+:/.test(s)) {
       s = `${compilerBaseUrl}${s.replace(/^([a-zA-Z0-9]+:\/)\//, '$1')}`;
     } else {
       s = new URL(s, compilerBaseUrl).href;
