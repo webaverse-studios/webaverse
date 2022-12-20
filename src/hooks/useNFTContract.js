@@ -60,30 +60,38 @@ export default function useNFTContract(currentAccount) {
 
       const Bigmintfee = await Webaversecontract.mintFee();
       const mintfee = BigNumber.from(Bigmintfee).toNumber();
+      const Bigsilkbalance = await FTcontract.balanceOf(currentAccount);
+      const silkbalance = BigNumber.from(Bigsilkbalance).toNumber();
 
       if (mintfee > 0) {
-        // webaverse side chain mintfee != 0
-        const FTapprovetx = await FTcontract.approve(
-          WebaversecontractAddress,
-          mintfee,
-        ); // mintfee = 10 default
-        const FTapproveres = await FTapprovetx.wait();
-        if (FTapproveres.transactionHash) {
-          try {
-            const minttx = await Webaversecontract.mintCreatorNFT(
-              currentAccount,
-              1,
-              currentApp.contentId,
-              '0x',
-            );
-            const res = await minttx.wait();
-            if (res.transactionHash) {
-              afterminting();
+        // check if silk token balance is enough to mint the NFT
+        if(silkbalance < mintfee) {
+          console.warn('your silk token balance is not enough to mint NFT');
+          setError('Mint Failed');
+        } else {
+          // webaverse side chain mintfee != 0
+          const FTapprovetx = await FTcontract.approve(
+            WebaversecontractAddress,
+            mintfee,
+          ); // mintfee = 10 default
+          const FTapproveres = await FTapprovetx.wait();
+          if (FTapproveres.transactionHash) {
+            try {
+              const minttx = await Webaversecontract.mintCreatorNFT(
+                currentAccount,
+                1,
+                currentApp.contentId,
+                '0x',
+              );
+              const res = await minttx.wait();
+              if (res.transactionHash) {
+                afterminting();
+              }
+            } catch (err) {
+              console.warn('minting to webaverse contract failed');
+              setError('Mint Failed');
             }
-          } catch (err) {
-            console.warn('minting to webaverse contract failed');
-            setError('Mint Failed');
-          }
+          }    
         }
       } else {
         // mintfee = 0 for Polygon not webaverse sidechain
@@ -129,7 +137,16 @@ export default function useNFTContract(currentAccount) {
 
         const bigMintFee = await webaverseContract.mintFee();
         const mintfee = BigNumber.from(bigMintFee).toNumber();
+        const Bigsilkbalance = await FTcontract.balanceOf(currentAccount);
+        const silkbalance = BigNumber.from(Bigsilkbalance).toNumber();
+
         if (mintfee > 0) {
+
+        // check if silk token balance is enough to mint the NFT
+        if(silkbalance < mintfee) {
+          console.warn('your silk token balance is not enough to mint NFT');
+          setError('Mint Failed');
+        } else {
           // webaverse side chain mintfee != 0
           const FTapprovetx = await FTcontract.approve(
             WebaversecontractAddress,
@@ -169,6 +186,7 @@ export default function useNFTContract(currentAccount) {
               }
             }
           }
+        }
         } else {
           if (app.serverDrop === true) {
             try {
