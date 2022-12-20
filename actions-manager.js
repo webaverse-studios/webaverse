@@ -49,7 +49,6 @@ class StartSkydive extends b3.Action {
 class Skydive extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
-    const frameTryActions = tick.blackboard.get('frameTryActions');
     const localPlayer = tick.target;
     if (!localPlayer.characterPhysics.grounded) {
       tickResults.skydive = true;
@@ -81,9 +80,6 @@ class StartJump extends b3.Action {
       (localPlayer.characterPhysics.grounded || localPlayer.hasAction('sit'))
     ) {
       tickResults.jump = true;
-      debugger
-      globalThis.isDebugger = true;
-      // console.log('SUCCESS StartJump')
       return b3.SUCCESS;
     } else {
       return b3.FAILURE;
@@ -97,15 +93,12 @@ class Jump extends b3.Action {
     const frameTryStopActions = tick.blackboard.get('frameTryStopActions');
     const localPlayer = tick.target;
     if (frameTryStopActions.jump || localPlayer.characterPhysics.grounded) {
-      // console.log('FAILURE Jump')
       return b3.FAILURE;
     } else if (frameTryActions.jump) { // note: for trigger doubleJump.
       tickResults.jump = true; // note: doubleJump need jump in parallel.
-      // console.log('SUCCESS Jump')
       return b3.SUCCESS;
     } else {
       tickResults.jump = true;
-      // console.log('RUNNING Jump')
       return b3.RUNNING;
     }
   }
@@ -183,11 +176,9 @@ class WaitOneFrame extends b3.Action {
     }
     if (frameCount > thisFrameCount) {
       tick.blackboard.set('frameCount', undefined, tick.tree.id, this.id);
-      // console.log('SUCCESS WaitOneFrame')
       return b3.SUCCESS
     } else {
       if (this.setTrueKey) tickResults[this.setTrueKey] = true;
-      // console.log('RUNNING WaitOneFrame')
       return b3.RUNNING
     }
   }
@@ -198,8 +189,6 @@ class NarutoRun extends b3.Action {
     const longTryActions = tick.blackboard.get('longTryActions');
     if (longTryActions.narutoRun) {
       tickResults.narutoRun = true;
-      // if (globalThis.isDebugger) debugger
-      // console.log('SUCCESS NarutoRun')
       return b3.SUCCESS;
     } else {
       return b3.FAILURE;
@@ -235,7 +224,6 @@ class HaltSit extends b3.Condition {
     const frameTryActions = tick.blackboard.get('frameTryActions');
     const localPlayer = tick.target;
     if (frameTryActions.jump || frameTryActions.fly) {
-      tick.blackboard.set('needReTick', true); // todo: has class ReTick now, so don't need ?
       const wearActions = localPlayer.getActionsByType('wear');
       for (const wearAction of wearActions) {
         const instanceId = wearAction.instanceId;
@@ -255,7 +243,6 @@ class StartGlider extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
     const frameTryActions = tick.blackboard.get('frameTryActions');
-    // const localPlayer = tick.target;
     if (frameTryActions.glider) {
       tickResults.glider = true;
       return b3.SUCCESS;
@@ -270,19 +257,12 @@ class Glider extends b3.Action {
     const tickResults = tick.blackboard.get('tickResults');
     const frameTryStopActions = tick.blackboard.get('frameTryStopActions');
     if (frameTryStopActions.glider || localPlayer.characterPhysics.grounded) {
-      // tickResults.glider = true; // note: don't set `true` here to solve one frame empty tick issue when switch from low prio glider to high prio fallLoop, it's bad design, use ReTick instead.
+      // tickResults.glider = true; // note: don't set `true` here to solve one frame empty tick issue when switch from low prio glider to high prio fallLoop, it's bad design, do reTick/doubleTick instead.
       return b3.FAILURE;
     } else {
       tickResults.glider = true;
       return b3.RUNNING;
     }
-  }
-}
-class ReTick extends b3.Action {
-  tick(tick) {
-    tick.blackboard.set('needReTick', true);
-    // console.log('ReTick')
-    return b3.FAILURE;
   }
 }
 
@@ -321,16 +301,14 @@ tree.root = new b3.MemSequence({title:'root',children: [
               new Skydive({title:'Skydive'}),
             ]}),
           ]}),
-          new WaitOneFrame({title:'WaitOneFrame',setTrueKey:'glider'}), // note: prevent remove glider immediately, because add/remove glider all triggered by space key.
+          new WaitOneFrame({title:'WaitOneFrame',setTrueKey:'glider'}), // note: WaitOneFrame to prevent remove glider immediately, because add/remove glider all triggered by space key.
           new Glider({title:'Glider'}),
         ]}),
         new b3.MemSequence({title:'crouch',children:[
           new StartCrouch({title:'StartCrouch'}),
           new Crouch({title:'Crouch'}),
         ]}),
-        new b3.Failor({title:'',child:new ReTick({title:''})}), // note: reTick to prevent one frame empty state when switch from low priority action to high priority action.
         new NarutoRun({title:'NarutoRun'}),
-        // new b3.Failor({title:'',child:new ReTick({title:''})}), // note: reTick to prevent one frame empty state when switch from low priority action to high priority action.
       ]}), // end: base
       new Land({title:'Land'}),
     ]}), // end: main
@@ -354,8 +332,6 @@ const postFrameSettings = (localPlayer, blackboard) => {
   const frameTryActions = blackboard.get('frameTryActions');
   const longTryActions = blackboard.get('longTryActions');
 
-  // console.log('tickResults.jump', tickResults.jump)
-
   const setActions = () => {  
     if (tickResults.crouch && !lastFrameResults.crouch) {
       localPlayer.addAction(frameTryActions.crouch);
@@ -374,11 +350,9 @@ const postFrameSettings = (localPlayer, blackboard) => {
   
     if (tickResults.narutoRun && !lastFrameResults.narutoRun) {
       localPlayer.addAction(longTryActions.narutoRun);
-      // if (globalThis.isDebugger) debugger
     }
     if (!tickResults.narutoRun && lastFrameResults.narutoRun) {
       localPlayer.removeAction('narutoRun');
-      // globalThis.isDebugger = true
     }
   
     if (tickResults.fly && !lastFrameResults.fly) localPlayer.addAction(longTryActions.fly);
@@ -463,7 +437,6 @@ const postFrameSettings = (localPlayer, blackboard) => {
   }
   resetFrameInfos();
 
-  blackboard.set('needReTick', false);
   blackboard.set('frameCount', blackboard.get('frameCount') + 1);
 }
 
@@ -518,12 +491,8 @@ class ActionsManager {
   update(timestamp) {
     preFrameSettings(this.localPlayer, this.blackboard, timestamp);
     tree.tick(this.localPlayer, this.blackboard);
-    if (globalThis.isDebugger) debugger
     clearTickResults(this.localPlayer, this.blackboard);
     tree.tick(this.localPlayer, this.blackboard); // note: reTick/doubleTick in order to switch from low prio action to high prio action immediately, prevent one frame empty state/action.
-    if (globalThis.isDebugger) debugger
-    // if (this.blackboard.get('needReTick')) { // note: only will do reTick once per update(), will not cause dead loop.
-    // } // todo: del needReTick
     postFrameSettings(this.localPlayer, this.blackboard);
     clearTickResults(this.localPlayer, this.blackboard);
   }

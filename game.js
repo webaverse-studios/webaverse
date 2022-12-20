@@ -893,7 +893,6 @@ class GameManager extends EventTarget {
   }
 
   setMovements() {
-    return;
     const localPlayer = playersManager.getLocalPlayer();
     if (ioManager.keys.up || ioManager.keys.down || ioManager.keys.left || ioManager.keys.right) {
       if (!localPlayer.hasAction('movements')) {
@@ -905,7 +904,6 @@ class GameManager extends EventTarget {
   }
 
   setSprint(bool) {
-    return;
     const localPlayer = playersManager.getLocalPlayer();
     if (bool) {
       if (!localPlayer.hasAction('sprint')) { // note: prevent holding shift switch browser page.
