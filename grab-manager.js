@@ -250,18 +250,21 @@ class Grabmanager extends EventTarget {
   hideUi() {
     this.dispatchEvent(new MessageEvent('hideui'));
   }
+
   drawPhone() {
     const localPlayer = playersManager.getLocalPlayer();
     if (!localPlayer.hasAction('readyGrab')) {
-      localPlayer.addAction({ // todo: handle in actions-manager.js
+      localPlayer.addAction({
         type: 'readyGrab'
       });
     }
   }
+
   undrawPhone() {
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.removeAction('readyGrab');
   }
+
   menuClick(e) {
     _click(e);
   }
@@ -280,7 +283,7 @@ class Grabmanager extends EventTarget {
     }
     this.dispatchEvent(
       new MessageEvent('setgridsnap', {
-        data: { gridSnap: this.gridSnap },
+        data: {gridSnap: this.gridSnap},
       })
     );
   }

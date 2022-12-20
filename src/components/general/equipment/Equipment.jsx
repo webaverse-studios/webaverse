@@ -39,19 +39,19 @@ const objects = {
     upstreet: [
         {
             name: 'Silsword',
-            start_url: 'https://127.0.0.1:8080/lib/webaverse_resource/silsword/',
+            start_url: 'https://webaverse.github.io/silsword/',
             description: 'A sword of great lore.',
             level: 6,
         },
         {
             name: 'Dragon',
-            start_url: 'https://127.0.0.1:8080/lib/webaverse_resource/dragon-mount/',
+            start_url: 'https://webaverse.github.io/dragon-mount/',
             description: 'A cute dragon. But something is wrong with it...',
             level: 5,
         },
         {
             name: 'Bow',
-            start_url: 'https://127.0.0.1:8080/lib/webaverse_resource/bow/',
+            start_url: 'https://webaverse.github.io/bow/',
             description: 'A nature-themed bow. It seems unbelievably magical for some reason.',
             level: 9,
         },

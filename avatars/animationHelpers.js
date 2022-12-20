@@ -114,7 +114,6 @@ async function loadAnimations() {
       animation.tracks.index[track.name] = track;
     }
   }
-  globalThis.animations = animations;
 
   /* const animationIndices = animationStepIndices.find(i => i.name === 'Fast Run.fbx');
           for (let i = 0; i < animationIndices.leftFootYDeltas.length; i++) {

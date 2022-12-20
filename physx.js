@@ -2548,7 +2548,7 @@ const physxWorker = (() => {
     const unuseAnimationIndex = scratchStack.f32[index++];
     const aimAnimationIndex = scratchStack.f32[index++];
     // ---
-    console.log('emoteFactor', emoteFactor)
+    // console.log('emoteFactor', emoteFactor)
   }
   w.createAnimationMixer = () => {
     const ptr = Module._createAnimationMixer(
