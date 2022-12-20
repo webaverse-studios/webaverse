@@ -18,6 +18,7 @@ import {
 import {
     compileScene,
 } from '../../../zine-runtime/zine-remote-compiler.js';
+import {PathMesh} from 'zine-aux/meshes/path-mesh.js';
 
 //
 
