@@ -65,6 +65,10 @@ export class ZineCameraManager extends EventTarget {
   constructor(camera, options = {}) {
     super();
 
+    if (options.normalizeView === undefined) {
+      options.normalizeView = true;
+    }
+
     this.camera = camera;
     this.options = options;
 
