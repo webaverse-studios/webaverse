@@ -33,7 +33,7 @@ import {
 import {
   getFloorNetPhysicsMesh,
 } from 'zine/zine-mesh-utils.js';
-import zineCameraManager from './zine-camera-manager.js';
+import zineCameraManagerGlobal from './zine-camera-manager.js';
 import {
   playersManager,
 } from '../players-manager.js';
@@ -83,12 +83,14 @@ const localOrthographicCamera = new THREE.OrthographicCamera();
 
 class PanelRuntimeInstance extends THREE.Object3D {
   constructor(panel, {
+    zineCameraManager,
     physics,
   }) {
     super();
 
     this.name = 'panelInstance';
 
+    this.zineCameraManager = zineCameraManager;
     this.panel = panel;
     this.physics = physics;
 
@@ -335,7 +337,7 @@ class PanelRuntimeInstance extends THREE.Object3D {
       this.setActorsEnabled(selected)
 
       if (this.selected) {
-        zineCameraManager.setLockCamera(this.zineRenderer.camera);
+        this.zineCameraManager.setLockCamera(this.zineRenderer.camera);
       }
     }
   }
@@ -385,6 +387,7 @@ class PanelRuntimeInstance extends THREE.Object3D {
 
 class PanelInstanceManager extends THREE.Object3D {
   constructor(storyboard, {
+    zineCameraManager,
     physics,
   }) {
     super();
@@ -392,6 +395,8 @@ class PanelInstanceManager extends THREE.Object3D {
     this.name = 'panelInstanceManager';
 
     this.storyboard = storyboard;
+    
+    this.zineCameraManager = zineCameraManager;
     this.physics = physics;
 
     this.panelIndex = 0;
@@ -407,8 +412,12 @@ class PanelInstanceManager extends THREE.Object3D {
     this.#init();
   }
   #init() {
-    const {physics} = this;
+    const {
+      zineCameraManager,
+      physics,
+    } = this;
     const panelOpts = {
+      zineCameraManager,
       physics,
     };
 
@@ -505,7 +514,7 @@ class PanelInstanceManager extends THREE.Object3D {
             // note that we have to do this before setting the new panel,
             // so that the old camera start point can be snappshotted
             const newPanelInstance = this.panelInstances[nextPanelIndex];
-            zineCameraManager.transitionLockCamera(newPanelInstance.zineRenderer.camera, cameraTransitionTime);
+            this.zineCameraManager.transitionLockCamera(newPanelInstance.zineRenderer.camera, cameraTransitionTime);
 
             // select new panel
             this.panelIndex = nextPanelIndex;
@@ -552,10 +561,10 @@ class PanelInstanceManager extends THREE.Object3D {
     const _updateStoryTargetMesh = () => {
       this.storyTargetMesh.visible = false;
       
-      if (zineCameraManager.cameraLocked) {
+      if (this.zineCameraManager.cameraLocked) {
         const x = (mousePosition.x + 1) / 2;
         const y = (mousePosition.y + 1) / 2;
-        const camera = zineCameraManager.lockCamera;
+        const camera = this.zineCameraManager.lockCamera;
 
         const selectedPanelInstance = this.panelInstances[this.panelIndex];
         const {
@@ -602,6 +611,7 @@ class ZineManager {
   async createStoryboardInstanceAsync({
     start_url,
     physics,
+    zineCameraManager = zineCameraManagerGlobal,
   }) {
     const instance = new THREE.Scene();
     instance.autoUpdate = false;
@@ -619,9 +629,10 @@ class ZineManager {
 
     // storyboard
     const storyboard = await this.#loadUrl(start_url);
-    
+
     // panel instance manager
     const panelInstanceManager = new PanelInstanceManager(storyboard, {
+      zineCameraManager,
       physics,
     });
     {

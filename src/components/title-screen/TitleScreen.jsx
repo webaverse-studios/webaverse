@@ -10,6 +10,9 @@ import {
     ZineRenderer,
 } from 'zine/zine-renderer.js';
 import {
+    ZineCameraManager,
+} from '../../../zine-runtime/zine-camera-manager.js';
+import {
     ZineStoryboard,
 } from 'zine/zine-format.js';
 // import {
@@ -207,8 +210,10 @@ const _startApp = (canvas, u) => {
     const scene = new THREE.Scene();
     scene.autoUpdate = false;
 
-    // path mesh
-    
+    // camera manager
+    const zineCameraManager = new ZineCameraManager(camera, {
+        normalizeView: false,
+    });
 
     // video mesh
     let video = null;
@@ -249,10 +254,22 @@ const _startApp = (canvas, u) => {
             alignFloor: true,
         });
 
+        // scene mesh
         scene.add(zineRenderer.scene);
         zineRenderer.scene.updateMatrixWorld();
 
-        camera.copy(zineRenderer.camera);
+        // path mesh
+        const splinePoints = zineRenderer.metadata.paths.map(p => new THREE.Vector3().fromArray(p.position));
+        const pathMesh = new PathMesh(splinePoints, {
+            animate: true,
+        });
+        scene.add(pathMesh);
+        pathMesh.updateMatrixWorld();
+
+        // apply camera
+        // camera.copy(zineRenderer.camera);
+        zineCameraManager.setLockCamera(zineRenderer.camera);
+        zineCameraManager.toggleCameraLock();
 
         // video
         {
@@ -370,11 +387,30 @@ const _startApp = (canvas, u) => {
         _setSize();
     });
 
+    // key handlers
+    globalThis.addEventListener('keydown', e => {
+        switch (e.key) {
+            case 'g': {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('trigger animation');
+                
+                break;
+            }
+        }
+    });
+
     // frame loop
+    let lastTimestamp = performance.now();
     const _frame = () => {
       requestAnimationFrame(_frame);
 
       if (!document.hidden) {
+        const timestamp = performance.now();
+        const timeDiff = timestamp - lastTimestamp;
+        zineCameraManager.updatePost(timestamp, timeDiff);
+
         renderer.render(scene, camera);
       }
     };
