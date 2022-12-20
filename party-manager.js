@@ -31,8 +31,9 @@ class PartyManager extends EventTarget {
   inviteDefaultPlayer() {
     const player = playersManager.getLocalPlayer();
     const app = npcManager.getAppByNpc(player);
-    world.appManager.importApp(app);
-    world.appManager.transplantApp(app, this.appManager);
+    // world.appManager.importApp(app);
+    // world.appManager.transplantApp(app, this.appManager);
+    this.appManager.importApp(app);
 
     this.invitePlayer(player);
     this.dispatchEvent(new Event("defaultplayerinvited"));
