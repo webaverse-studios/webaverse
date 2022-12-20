@@ -36,6 +36,7 @@ const _cloneChunkResult = chunkResult => {
     if (waterGeometry) {
       const size = waterGeometry.positions.length * waterGeometry.positions.constructor.BYTES_PER_ELEMENT +
         waterGeometry.normals.length * waterGeometry.normals.constructor.BYTES_PER_ELEMENT +
+        waterGeometry.flows.length * waterGeometry.flows.constructor.BYTES_PER_ELEMENT +
         waterGeometry.factors.length * waterGeometry.factors.constructor.BYTES_PER_ELEMENT +
         waterGeometry.liquids.length * waterGeometry.liquids.constructor.BYTES_PER_ELEMENT +
         waterGeometry.liquidsWeights.length * waterGeometry.liquidsWeights.constructor.BYTES_PER_ELEMENT +
@@ -63,10 +64,11 @@ const _cloneChunkResult = chunkResult => {
       let size = 0;
       for (let i = 0; i < instances.length; i++) {
         const instance = instances[i];
-        const {ps, qs, scales} = instance;
+        const {ps, qs, scales, colors} = instance;
         size += ps.length * ps.constructor.BYTES_PER_ELEMENT;
         size += qs.length * qs.constructor.BYTES_PER_ELEMENT;
         size += scales.length * scales.constructor.BYTES_PER_ELEMENT;
+        size += colors.length * colors.constructor.BYTES_PER_ELEMENT;
       }
       return size;
     } else {
@@ -95,10 +97,11 @@ const _cloneChunkResult = chunkResult => {
       let size = 0;
       for (let i = 0; i < instances.length; i++) {
         const instance = instances[i];
-        const {ps, qs, scales, materials, materialsWeights} = instance;
+        const {ps, qs, scales, colors, materials, materialsWeights} = instance;
         size += ps.length * ps.constructor.BYTES_PER_ELEMENT;
         size += qs.length * qs.constructor.BYTES_PER_ELEMENT;
         size += scales.length * scales.constructor.BYTES_PER_ELEMENT;
+        size += colors.length * colors.constructor.BYTES_PER_ELEMENT;
         size += materials.length * materials.constructor.BYTES_PER_ELEMENT;
         size += materialsWeights.length * materialsWeights.constructor.BYTES_PER_ELEMENT;
       }
@@ -114,10 +117,11 @@ const _cloneChunkResult = chunkResult => {
       let size = 0;
       for (let i = 0; i < instances.length; i++) {
         const instance = instances[i];
-        const {ps, qs, materials, scales, materialsWeights, grassProps} = instance;
+        const {ps, qs, materials, scales, colors, materialsWeights, grassProps} = instance;
         size += ps.length * ps.constructor.BYTES_PER_ELEMENT;
         size += qs.length * qs.constructor.BYTES_PER_ELEMENT;
         size += scales.length * scales.constructor.BYTES_PER_ELEMENT;
+        size += colors.length * colors.constructor.BYTES_PER_ELEMENT;
         size += materials.length * materials.constructor.BYTES_PER_ELEMENT;
         size += materialsWeights.length * materialsWeights.constructor.BYTES_PER_ELEMENT;
         size += grassProps.length * grassProps.constructor.BYTES_PER_ELEMENT;
@@ -276,6 +280,10 @@ const _cloneChunkResult = chunkResult => {
       normals.set(waterGeometry.normals);
       index += waterGeometry.normals.length * waterGeometry.normals.constructor.BYTES_PER_ELEMENT;
 
+      const flows = new waterGeometry.flows.constructor(arrayBuffer, index, waterGeometry.flows.length);
+      flows.set(waterGeometry.flows);
+      index += waterGeometry.flows.length * waterGeometry.flows.constructor.BYTES_PER_ELEMENT;
+
       const factors = new waterGeometry.factors.constructor(arrayBuffer, index, waterGeometry.factors.length);
       factors.set(waterGeometry.factors);
       index += waterGeometry.factors.length * waterGeometry.factors.constructor.BYTES_PER_ELEMENT;
@@ -307,6 +315,7 @@ const _cloneChunkResult = chunkResult => {
       return {
         positions,
         normals,
+        flows,
         factors,
         liquids,
         liquidsWeights,
@@ -357,7 +366,7 @@ const _cloneChunkResult = chunkResult => {
       const instances2 = Array(instances.length);
       for (let i = 0; i < instances.length; i++) {
         const instance = instances[i];
-        const {instanceId, ps, qs, scales} = instance;
+        const {instanceId, ps, qs, scales, colors} = instance;
 
         const ps2 = new ps.constructor(arrayBuffer, index, ps.length);
         ps2.set(ps);
@@ -371,11 +380,16 @@ const _cloneChunkResult = chunkResult => {
         scales2.set(scales);
         index += scales.length * scales.constructor.BYTES_PER_ELEMENT;
 
+        const colors2 = new colors.constructor(arrayBuffer, index, colors.length);
+        colors2.set(colors);
+        index += colors.length * colors.constructor.BYTES_PER_ELEMENT;
+
         instances2[i] = {
           instanceId,
           ps: ps2,
           qs: qs2,
           scales: scales2,
+          colors: colors2,
         };
       }
       return instances2;
@@ -409,7 +423,7 @@ const _cloneChunkResult = chunkResult => {
       const instances2 = Array(instances.length);
       for (let i = 0; i < instances.length; i++) {
         const instance = instances[i];
-        const {instanceId, ps, qs, scales, materials, materialsWeights} = instance;
+        const {instanceId, ps, qs, scales, colors, materials, materialsWeights} = instance;
 
         const ps2 = new ps.constructor(arrayBuffer, index, ps.length);
         ps2.set(ps);
@@ -422,6 +436,10 @@ const _cloneChunkResult = chunkResult => {
         const scales2 = new scales.constructor(arrayBuffer, index, scales.length);
         scales2.set(scales);
         index += scales.length * scales.constructor.BYTES_PER_ELEMENT;
+
+        const colors2 = new colors.constructor(arrayBuffer, index, colors.length);
+        colors2.set(colors);
+        index += colors.length * colors.constructor.BYTES_PER_ELEMENT;
 
         const materials2 = new materials.constructor(arrayBuffer, index, materials.length);
         materials2.set(materials);
@@ -436,6 +454,7 @@ const _cloneChunkResult = chunkResult => {
           ps: ps2,
           qs: qs2,
           scales: scales2,
+          colors: colors2,
           materials: materials2,
           materialsWeights: materialsWeights2
         };
@@ -452,7 +471,7 @@ const _cloneChunkResult = chunkResult => {
       const instances2 = Array(instances.length);
       for (let i = 0; i < instances.length; i++) {
         const instance = instances[i];
-        const {instanceId, ps, qs, scales, materials, materialsWeights, grassProps} = instance;
+        const {instanceId, ps, qs, scales, colors, materials, materialsWeights, grassProps} = instance;
 
         const ps2 = new ps.constructor(arrayBuffer, index, ps.length);
         ps2.set(ps);
@@ -465,6 +484,10 @@ const _cloneChunkResult = chunkResult => {
         const scales2 = new scales.constructor(arrayBuffer, index, scales.length);
         scales2.set(scales);
         index += scales.length * scales.constructor.BYTES_PER_ELEMENT;
+
+        const colors2 = new colors.constructor(arrayBuffer, index, colors.length);
+        colors2.set(colors);
+        index += colors.length * colors.constructor.BYTES_PER_ELEMENT;
 
         const materials2 = new materials.constructor(arrayBuffer, index, materials.length);
         materials2.set(materials);
@@ -483,6 +506,7 @@ const _cloneChunkResult = chunkResult => {
           ps: ps2,
           qs: qs2,
           scales: scales2,
+          colors: colors2,
           materials: materials2,
           materialsWeights: materialsWeights2,
           grassProps: grassProps2
