@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import React, {useState, useEffect, useRef, useContext, createContext, Fragment} from 'react';
 import classnames from 'classnames';
 
+import '../../../styles/globals.css';
 import styles from './TitleScreen.module.css';
 
 // let appStarted = false;
@@ -440,6 +441,27 @@ const Gallery = ({
 
 //
 
+const MainScreen = ({
+    appStarted,
+    canvasRef,
+}) => {
+    return (
+        <div className={classnames(
+            styles.mainScreen,
+            appStarted ? styles.enabled : null,
+        )}>
+            <canvas className={classnames(
+                styles.canvas,
+            )} ref={canvasRef} />
+            <footer className={styles.footer}>
+                <span className={styles.bold}>SEVERE WARNING:</span> This product is not intended for children under age sixty. <span className={styles.bold}>This is an AI generated product.</span> The ideas expressed are not proven to be safe. This product contains course language and due to its nature it should be viewed twice.<span className={styles.right}>Made by the Lisk.</span>
+            </footer>
+        </div>
+    );
+};
+
+//
+
 const GalleryImage = ({
     src,
     onClick,
@@ -457,6 +479,7 @@ export const TitleScreen = () => {
 
     const [appStarted, setAppStarted] = useState(false);
 
+    // forward the canvas ref to the main screen
     const canvasRef = useRef(null);
 
     //
@@ -465,10 +488,10 @@ export const TitleScreen = () => {
         <div
             className={styles.titleScreen}
         >
-            <canvas className={classnames(
-                appStarted ? styles.enabled : null,
-                styles.canvas,
-            )} ref={canvasRef} />
+            <MainScreen
+                appStarted={appStarted}
+                canvasRef={canvasRef}
+            />
             {appStarted ? null : <Gallery
                 onLoadImage={u => {
                     if (canvasRef.current && !appStarted) {
