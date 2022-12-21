@@ -316,7 +316,15 @@ export class ZineCameraManager extends EventTarget {
   updatePost(timestamp, timeDiff) {
     if (this.cameraLocked) {
       const _setLocked = () => {
-        if (!setAnimatedCamera(this.camera, this.lockCamera, this.lockCameraAnimation)) {
+        if (!setAnimatedCamera(
+          this.camera,
+          this.lockCamera,
+          !!this.options.followView,
+          this.cameraZ,
+          this.edgeDepths,
+          this.edgeMatrixWorld,
+          this.lockCameraAnimation
+        )) {
           this.lockCameraAnimation = null;
         }
 
