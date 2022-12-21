@@ -582,8 +582,10 @@ class IoManager extends EventTarget {
       const physicsScene = physicsManager.getScene();
       if (physicsScene.getPhysicsEnabled()) {
         const renderer = getRenderer();
+
         if (renderer && (e.target === renderer.domElement || e.target.id === 'app')) {
-          cameraManager.handleWheelEvent(e);
+          zineCameraManager.handleMouseWheel(e) ||
+            cameraManager.handleWheelEvent(e);
         }
       }
     }
