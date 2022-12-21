@@ -109,6 +109,81 @@ function setAnimatedCamera(
           localVector3.set(0, 1, 0)
         )
       );
+
+      // edgeDepth
+      // const farScale = 1000;
+      const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+      // XXX do not clip from the center, but the side
+      const leftEdgeDepth = edgeDepths.left.clone()
+        // .multiplyScalar(farScale)
+        .applyMatrix4(matrixWorld)
+        .sub(camera.position);
+      const rightEdgeDepth = edgeDepths.right.clone()
+        // .multiplyScalar(farScale)
+        .applyMatrix4(matrixWorld)
+        .sub(camera.position);
+      const topEdgeDepth = edgeDepths.top.clone()
+        // .multiplyScalar(farScale)
+        .applyMatrix4(matrixWorld)
+        .sub(camera.position);
+      const bottomEdgeDepth = edgeDepths.bottom.clone()
+        // .multiplyScalar(farScale)
+        .applyMatrix4(matrixWorld)
+        .sub(camera.position);
+      const leftFovDiff = getSignedAngle(
+        forward.x, -forward.z,
+        leftEdgeDepth.x, -leftEdgeDepth.z
+      );
+      const rightFovDiff = getSignedAngle(
+        forward.x, -forward.z,
+        rightEdgeDepth.x, -rightEdgeDepth.z
+      );
+      const topFovDiff = getSignedAngle(
+        -forward.y, -forward.z,
+        -topEdgeDepth.y, -topEdgeDepth.z
+      );
+      const bottomFovDiff = getSignedAngle(
+        -forward.y, -forward.z,
+        -bottomEdgeDepth.y, -bottomEdgeDepth.z
+      );
+
+      // // XXX debugging
+      // cubeMesh.position.copy(edgeDepths.bottom)
+      //   .applyMatrix4(matrixWorld);
+      // cubeMesh.updateMatrixWorld();
+
+      localEuler.setFromQuaternion(camera.quaternion, 'YXZ');
+      // const fovRadians = camera.fov * Math.PI / 180;
+      if (leftFovDiff < 0 && leftFovDiff >= -Math.PI / 2) {
+        localEuler.y += leftFovDiff;
+      } else if (rightFovDiff > 0 && rightFovDiff <= Math.PI / 2) {
+        localEuler.y += rightFovDiff;
+      }
+      if (topFovDiff < 0 && topFovDiff >= -Math.PI / 2) {
+        localEuler.x += topFovDiff;
+      } else if (bottomFovDiff > 0 && bottomFovDiff <= Math.PI / 2) {
+        localEuler.x += bottomFovDiff;
+      }
+      camera.quaternion.setFromEuler(localEuler);
+      // if (localEuler.y ) {
+      //   localEuler.y = -fovRadians / 2 - leftFovDiff;
+      // }
+      globalThis.depths = {
+        top: edgeDepths.top,
+        bottom: edgeDepths.bottom,
+        left: edgeDepths.left,
+        right: edgeDepths.right,
+        cameraPosition: camera.position.clone(),
+        forward: forward.clone(),
+        topFovDiff,
+        bottomFovDiff,
+        leftFovDiff,
+        rightFovDiff,
+        leftEdgeDepth,
+        rightEdgeDepth,
+        topEdgeDepth,
+        bottomEdgeDepth,
+      };
     }
   };
 
@@ -126,15 +201,20 @@ function setAnimatedCamera(
       camera.far = lerpScalar(start.far, end.far, t);
       camera.fov = lerpScalar(start.fov, end.fov, t);
       camera.aspect = lerpScalar(start.aspect, end.aspect, t);
+      _adjust();
       camera.updateMatrixWorld();
       camera.updateProjectionMatrix();
       return true;
     } else {
       camera.copy(srcCamera);
+      _adjust();
+      camera.updateMatrixWorld();
       return false;
     }
   } else {
     camera.copy(srcCamera);
+    _adjust();
+    camera.updateMatrixWorld();
     return false;
   }
 }
@@ -160,7 +240,17 @@ export class ZineCameraManager extends EventTarget {
     this.oldCamera = new THREE.PerspectiveCamera();
     this.lockCameraAnimation = null;
 
+    this.edgeDepths = {
+      top: new THREE.Vector3(),
+      bottom: new THREE.Vector3(),
+      left: new THREE.Vector3(),
+      right: new THREE.Vector3(),
+    };
+    this.edgeMatrixWorld = new THREE.Matrix4();
+
     this.mousePosition = new THREE.Vector2();
+
+    this.cameraZ = 0;
   }
 
   setLockCamera(camera) {
@@ -179,6 +269,21 @@ export class ZineCameraManager extends EventTarget {
     const oldCamera = this.lockCamera;
     this.lockCameraAnimation = makeCameraAnimation(oldCamera, newCamera, timeMs);
     // console.log('lock camera animation', this.lockCameraAnimation);
+  }
+
+  setEdgeDepths(edgeDepths, matrixWorld, scaleArray) {
+    // console.log('edge depths 1', this, edgeDepths, scaleArray);
+    this.edgeDepths.top.fromArray(edgeDepths.top)
+      // .multiply(localVector.fromArray(scaleArray));
+    this.edgeDepths.bottom.fromArray(edgeDepths.bottom)
+      // .multiply(localVector.fromArray(scaleArray));
+    this.edgeDepths.left.fromArray(edgeDepths.left)
+      // .multiply(localVector.fromArray(scaleArray));
+    this.edgeDepths.right.fromArray(edgeDepths.right)
+      // .multiply(localVector.fromArray(scaleArray));
+    console.log('set edge depths', edgeDepths, matrixWorld.toArray());
+    // debugger;
+    this.edgeMatrixWorld.copy(matrixWorld);
   }
 
   handleMouseMove(e) {
