@@ -348,6 +348,8 @@ export default class Webaverse extends EventTarget {
             cameraManager.updatePost(timestamp, timeDiffCapped);
           ioManager.updatePost();
 
+          zTargeting.update(timestamp, timeDiff);
+
           game.pushAppUpdates();
           game.pushPlayerUpdates();
 

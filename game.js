@@ -1170,8 +1170,6 @@ class GameManager extends EventTarget {
     };
     _updateGrab();
 
-    zTargeting.update(timestamp, timeDiff);
-
     const _handlePickUp = () => {
       const pickUpAction = localPlayer.getAction('pickUp');
       if (pickUpAction) {
