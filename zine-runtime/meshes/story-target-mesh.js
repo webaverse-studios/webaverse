@@ -121,14 +121,17 @@ export class StoryTargetMesh extends THREE.Mesh {
         uniform float uPress;
         attribute float y;
         attribute vec3 direction;
+        attribute float monocolor;
         varying float vY;
         varying vec2 vUv;
         varying vec3 vDirection;
+        varying float vMonocolor;
 
         void main() {
           vUv = uv;
           vY = y;
           vDirection = direction; // XXX offset by direction and time
+          vMonocolor = monocolor;
           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }
       `,
@@ -136,11 +139,13 @@ export class StoryTargetMesh extends THREE.Mesh {
         varying vec2 vUv;
         varying float vY;
         varying vec3 vDirection;
+        varying float vMonocolor;
 
         void main() {
           vec3 c = vec3(0.1, 0.1, 0.1);
           gl_FragColor = vec4(c, 1.);
           gl_FragColor.rgb += vY * 0.15;
+          gl_FragColor.rgb += vMonocolor;
           // gl_FragColor.rg += vUv * 0.2;
         }
       `,
