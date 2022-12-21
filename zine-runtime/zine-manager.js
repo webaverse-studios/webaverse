@@ -74,9 +74,11 @@ const seed = '';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
+const localVector2D = new THREE.Vector2();
 const localQuaternion = new THREE.Quaternion();
 const localMatrix = new THREE.Matrix4();
 const localPlane = new THREE.Plane();
+const localRaycaster = new THREE.Raycaster();
 const localOrthographicCamera = new THREE.OrthographicCamera();
 
 // classes
@@ -542,6 +544,8 @@ class PanelInstanceManager extends THREE.Object3D {
   update({
     mousePosition,
   }) {
+    const {physics} = this;
+
     // update for entrance/exit transitions
     const _updatePanelInstances = () => {
       for (const panelInstance of this.panelInstances) {
@@ -550,53 +554,34 @@ class PanelInstanceManager extends THREE.Object3D {
     };
     _updatePanelInstances();
 
-    // update camera animation
-    const _updateCameraAnimation = () => {
-      if (this.cameraAnimation) {
-        const {start, end, startTime, endTime} = this.cameraAnimation;
-        
-        const now = performance.now();
-        const f = (now - startTime) / (endTime - startTime);
-
-        if (f < 1) {
-          const startPosition = start.position;
-          const endPosition = end.position;
-        } else {
-          
-        }
-      }
-    };
-    _updateCameraAnimation();
-
     // update cursor
     const _updateStoryTargetMesh = () => {
       this.storyTargetMesh.visible = false;
       
       if (this.zineCameraManager.cameraLocked) {
-        const x = (mousePosition.x + 1) / 2;
-        const y = (mousePosition.y + 1) / 2;
-        const camera = this.zineCameraManager.lockCamera;
-
-        const selectedPanelInstance = this.panelInstances[this.panelIndex];
-        const {
-          depthFloat32Array,
-          scale,
-        } = selectedPanelInstance.precomputedCache;
+        localVector2D.copy(mousePosition);
+        localVector2D.y = -localVector2D.y;
         
-        getDepthFloat32ArrayWorldPosition(
-          depthFloat32Array,
-          x,
-          y,
-          panelSize,
-          panelSize,
-          camera,
-          scale,
-          this.storyTargetMesh.position
-        );
-
+        // raycast
+        {
+          localRaycaster.setFromCamera(localVector2D, camera);
+          const result = physics.raycast(
+            localRaycaster.ray.origin,
+            localQuaternion.setFromRotationMatrix(
+              localMatrix.lookAt(
+                localVector.set(0, 0, 0),
+                localRaycaster.ray.direction,
+                localVector2.set(0, 1, 0)
+              )
+            )
+          );
+          if (result) {
+            // console.log('got result', result);
+            this.storyTargetMesh.position.fromArray(result.point);
+          }
+          this.storyTargetMesh.visible = !!result;
+        }
         this.storyTargetMesh.updateMatrixWorld();
-
-        this.storyTargetMesh.visible = true;
       }
     };
     _updateStoryTargetMesh();
