@@ -233,6 +233,7 @@ const _startApp = (canvas, u) => {
     // camera manager
     const zineCameraManager = new ZineCameraManager(camera, {
         normalizeView: false,
+        followView: false,
     });
 
     (async () => {
