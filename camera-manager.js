@@ -144,12 +144,13 @@ function initOffsetRayParams(arrayIndex,originPoint) {
   rayDirectionArray[arrayIndex].copy(rayQuaternion);
 } */
 
+//
+
 class CameraManager extends EventTarget {
   constructor() {
     super();
 
     this.pointerLockElement = null;
-    // this.pointerLockEpoch = 0;
     this.shakes = [];
     this.focus = false;
     this.lastFocusChangeTime = 0; // XXX this needs to be removed
@@ -199,7 +200,6 @@ class CameraManager extends EventTarget {
   }
 
   async requestPointerLock() {
-    // const localPointerLockEpoch = ++this.pointerLockEpoch;
     for (const options of [
       {
         unadjustedMovement: true,
@@ -215,9 +215,7 @@ class CameraManager extends EventTarget {
             }
 
             const _pointerlockchange = e => {
-              // if (localPointerLockEpoch === this.pointerLockEpoch) {
-                accept();
-              // }
+              accept();
               _cleanup();
             };
             document.addEventListener('pointerlockchange', _pointerlockchange);
