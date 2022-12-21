@@ -293,6 +293,11 @@
           "internalType": "address",
           "name": "treasuryAddress_",
           "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "signerAddress_",
+          "type": "address"
         }
       ],
       "name": "initialize",
@@ -409,6 +414,33 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "signerAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "signerAddress_",
+          "type": "address"
+        }
+      ],
+      "name": "setSignerAddress",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -431,7 +463,7 @@
           "type": "bytes"
         }
       ],
-      "name": "mint",
+      "name": "mintCreatorNFT",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -481,7 +513,7 @@
           "type": "tuple"
         }
       ],
-      "name": "claim_NFT",
+      "name": "claimUserDropNFT",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -531,7 +563,7 @@
           "type": "tuple"
         }
       ],
-      "name": "claim_FT",
+      "name": "claimUserDropSilk",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -636,7 +668,7 @@
           "type": "tuple"
         }
       ],
-      "name": "claimServerDropFT",
+      "name": "claimServerDropSilk",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
