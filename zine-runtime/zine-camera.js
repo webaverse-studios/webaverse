@@ -1,12 +1,39 @@
 import * as THREE from 'three';
 import easing from '../easing.js';
+import {
+  playersManager,
+} from '../players-manager.js';
 // import {
-//   camera,
+//   scene,
 // } from '../renderer.js';
 
 //
 
+const localVector = new THREE.Vector3();
+const localVector2 = new THREE.Vector3();
+const localVector3 = new THREE.Vector3();
+const localEuler = new THREE.Euler();
+const localMatrix = new THREE.Matrix4();
+const localPlane = new THREE.Plane();
+
+//
+
 const cubicBezier = easing(0, 1, 0, 1);
+
+//
+
+// const cubeMesh = new THREE.Mesh(
+//   new THREE.BoxBufferGeometry(0.2, 0.2, 0.2),
+//   new THREE.MeshBasicMaterial({
+//     color: 0x0000FF,
+//     // wireframe: true,
+//     depthTest: false,
+//     depthWrite: true,
+//   })
+// );
+// cubeMesh.frustumCulled = false;
+// scene.add(cubeMesh);
+// globalThis.cubeMesh = cubeMesh;
 
 //
 
@@ -31,7 +58,60 @@ function makeCameraAnimation(oldCamera, newCamera, timeMs) {
 function lerpScalar(a, b, t) {
   return a + (b - a) * t;
 }
-function setAnimatedCamera(camera, srcCamera, srcCameraAnimation) {
+function getRotationFromUp(x, y) {
+  let angle = Math.atan2(y, x) - Math.PI / 2;
+  while (angle < -Math.PI) {
+    angle += Math.PI * 2;
+  }
+  while (angle > Math.PI) {
+    angle -= Math.PI * 2;
+  }
+  return angle;
+}
+function getSignedAngle(x1, y1, x2, y2) {
+  const angle1 = getRotationFromUp(x1, y1);
+  const angle2 = getRotationFromUp(x2, y2)
+  return angle2 - angle1;
+}
+function setAnimatedCamera(
+  camera,
+  srcCamera,
+  followView,
+  cameraZ,
+  edgeDepths,
+  matrixWorld,
+  srcCameraAnimation
+) {
+  const _adjust = () => {
+    const localPlayer = playersManager.getLocalPlayer();
+    // compute the camera offset
+    localPlane.setFromNormalAndCoplanarPoint(
+      localVector.set(0, 0, -1).applyQuaternion(camera.quaternion),
+      camera.position
+    );
+    // if the player is in front of the camera
+    let cameraOffset;
+    if (localPlane.distanceToPoint(localPlayer.position) > 0) {
+      const f = Math.min(Math.max(cameraZ / 5, 0), 1);
+      cameraOffset = localVector.copy(localPlayer.position)
+        .sub(camera.position)
+        .multiplyScalar(f);
+    } else {
+      cameraOffset = localVector.set(0, 0, 0);
+    }
+
+    camera.position.add(cameraOffset);
+    if (followView && cameraZ > 0) {
+      camera.quaternion.setFromRotationMatrix(
+        localMatrix.lookAt(
+          localVector2.set(0, 0, 0),
+          cameraOffset,
+          localVector3.set(0, 1, 0)
+        )
+      );
+    }
+  };
+
   if (srcCameraAnimation) {
     const {start, end, startTime, endTime} = srcCameraAnimation;
 
@@ -67,6 +147,9 @@ export class ZineCameraManager extends EventTarget {
 
     if (options.normalizeView === undefined) {
       options.normalizeView = true;
+    }
+    if (options.followView === undefined) {
+      options.followView = true;
     }
 
     this.camera = camera;
