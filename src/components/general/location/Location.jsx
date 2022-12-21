@@ -31,6 +31,7 @@ export const Location = () => {
   useEffect(() => {
     (async () => {
         const sceneNames = await sceneManager.getSceneNamesAsync();
+        origSceneList.length = 0;
         sceneNames.forEach(name => {
           const sceneUrl= sceneManager.getSceneUrl(name)
           origSceneList.push(sceneUrl);
