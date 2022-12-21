@@ -111,9 +111,12 @@ class PanelRuntimeInstance extends THREE.Object3D {
     const layer0 = panel.getLayer(0);
     const layer1 = panel.getLayer(1);
     const cameraJson = layer1.getData('cameraJson');
+    const scaleArray = layer1.getData('scale');
     const floorResolution = layer1.getData('floorResolution');
     const floorNetDepths = layer1.getData('floorNetDepths');
     const floorNetCameraJson = layer1.getData('floorNetCameraJson');
+    // const edgeDepths = layer1.getData('edgeDepths');
+    // console.log('read edge depths', edgeDepths);
 
     // zine renderer
     const zineRenderer = this.#createRenderer();
@@ -228,7 +231,6 @@ class PanelRuntimeInstance extends THREE.Object3D {
       panelSize,
       panelSize
     );
-    const scaleArray = layer1.getData('scale');
     const scale = new THREE.Vector3().fromArray(scaleArray);
     this.precomputedCache = {
       depthFloat32Array,
