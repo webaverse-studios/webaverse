@@ -156,7 +156,6 @@ class CameraManager extends EventTarget {
     this.fovFactor = 0;
     this.lastNonzeroDirectionVector = new THREE.Vector3(0, 0, -1);
 
-    this.targetType = 'dynamic';
     this.target = null;
     this.target2 = null;
     this.lastTarget = null;
@@ -337,7 +336,6 @@ class CameraManager extends EventTarget {
   }
 
   setDynamicTarget(target = null, target2 = null) {
-    this.targetType = 'dynamic';
     this.target = target;
     this.target2 = target2;
 
@@ -416,10 +414,8 @@ class CameraManager extends EventTarget {
     }
   }
 
-  setStaticTarget(target = null, target2 = null) {
-    this.targetType = 'static';
+  setStaticTarget(target = null) {
     this.target = target;
-    this.target2 = target2;
 
     // console.log('set static target', this.target, this.target2, new Error().stack);
 
