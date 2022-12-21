@@ -340,6 +340,15 @@ class PanelRuntimeInstance extends THREE.Object3D {
 
       if (this.selected) {
         this.zineCameraManager.setLockCamera(this.zineRenderer.camera);
+
+        const {panel} = this;
+        const layer1 = panel.getLayer(1);
+        const scale = layer1.getData('scale');
+        this.zineCameraManager.setEdgeDepths(
+          this.zineRenderer.metadata.edgeDepths,
+          this.zineRenderer.transformScene.matrixWorld,
+          scale
+        );
       }
     }
   }
