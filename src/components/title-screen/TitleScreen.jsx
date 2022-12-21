@@ -454,7 +454,7 @@ const MainScreen = ({
                 styles.canvas,
             )} ref={canvasRef} />
             <footer className={styles.footer}>
-                <span className={styles.bold}>SEVERE WARNING:</span> This product is not intended for children under age sixty. <span className={styles.bold}>This is an AI generated product.</span> The ideas expressed are not proven to be safe. This product contains course language and due to its nature it should be viewed twice.<span className={styles.right}>Made by the Lisk.</span>
+                <span className={styles.bold}>SEVERE WARNING:</span> This product is not intended for children under age sixty. <span className={styles.bold}>This is an AI generated product.</span> The ideas expressed are not proven to be safe. This product contains course language and due to its nature it should be viewed twice. Made by the Lisk.
             </footer>
         </div>
     );
