@@ -296,7 +296,7 @@ class PanelRuntimeInstance extends THREE.Object3D {
       const localSeed = id + seed;
 
       const candidateLocations = this.#getUnusedCandidateLocations();
-      if (!this.actors.item) {
+      if (!this.actors.item && candidateLocations.length > 0) {
         this.actors.item = new PanelRuntimeItems({
           candidateLocations,
           n: 1,
@@ -304,7 +304,7 @@ class PanelRuntimeInstance extends THREE.Object3D {
         });
         this.add(this.actors.item);
       }
-      if (!this.actors.ore) {
+      if (!this.actors.ore && candidateLocations.length > 0) {
         this.actors.ore = new PanelRuntimeOres({
           candidateLocations,
           n: 1,
@@ -312,7 +312,7 @@ class PanelRuntimeInstance extends THREE.Object3D {
         });
         this.add(this.actors.ore);
       }
-      if (!this.actors.npc) {
+      if (!this.actors.npc && candidateLocations.length > 0) {
         this.actors.npc = new PanelRuntimeNpcs({
           candidateLocations,
           n: 1,
@@ -320,7 +320,7 @@ class PanelRuntimeInstance extends THREE.Object3D {
         });
         this.add(this.actors.npc);
       }
-      if (!this.actors.mob) {
+      if (!this.actors.mob && candidateLocations.length > 0) {
         this.actors.mob = new PanelRuntimeMobs({
           candidateLocations,
           n: 1,
