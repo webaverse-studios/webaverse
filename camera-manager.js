@@ -153,7 +153,6 @@ class CameraManager extends EventTarget {
     this.pointerLockElement = null;
     this.shakes = [];
     this.focus = false;
-    this.lastFocusChangeTime = 0; // XXX this needs to be removed
     this.fovFactor = 0;
     this.lastNonzeroDirectionVector = new THREE.Vector3(0, 0, -1);
 
@@ -328,7 +327,6 @@ class CameraManager extends EventTarget {
   setFocus(focus) {
     if (focus !== this.focus) {
       this.focus = focus;
-      // this.lastFocusChangeTime = performance.now();
 
       this.dispatchEvent(new MessageEvent('focuschange', {
         data: {
