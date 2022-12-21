@@ -344,53 +344,80 @@ class CameraManager extends EventTarget {
     if (this.target) {
       const _setCameraToDynamicTarget = () => {
         this.target.matrixWorld.decompose(localVector, localQuaternion, localVector2);
-        
+        const position1 = localVector;
+        const quaternion1 = localQuaternion;
+        const scale1 = localVector2;
+
         if (this.target2) {
           this.target2.matrixWorld.decompose(localVector3, localQuaternion2, localVector4);
+          const position2 = localVector3;
+          const quaternion2 = localQuaternion2;
+          const scale2 = localVector4;
 
-          const faceDirection = localVector5.set(0, 0, 1).applyQuaternion(localQuaternion);
+          const faceDirection1 = localVector5.set(0, 0, 1).applyQuaternion(quaternion1);
           const lookQuaternion = localQuaternion3.setFromRotationMatrix(
             localMatrix.lookAt(
-              localVector,
-              localVector3,
+              position1,
+              position2,
               upVector,
             )
           );
           const lookDirection = localVector6.set(0, 0, -1).applyQuaternion(lookQuaternion);
 
-          const sideOfY = getSideOfY(faceDirection, lookDirection);
-          const face = faceDirection.dot(lookDirection) >= 0 ? 1 : -1;
+          const sideOfY = getSideOfY(faceDirection1, lookDirection);
+          const face = faceDirection1.dot(lookDirection) >= 0 ? 1 : -1;
 
-          const dollyPosition = localVector7.copy(localVector)
-            .add(localVector3)
-            .multiplyScalar(0.5);
+          // the dolly is between the points, but offset to the side of y
+          const dollyPosition = localVector7.copy(position1)
+            .add(position2)
+            .multiplyScalar(0.5)
+            .add(
+              localVector8.set(sideOfY * -0.3, 0, 0)
+                .applyQuaternion(lookQuaternion)
+            );
 
-          dollyPosition.add(
-            localVector8.set(sideOfY * -0.3, 0, 0).applyQuaternion(lookQuaternion)
-          );
-
-          const lookToDollyVector = localVector9.copy(dollyPosition).sub(localVector).normalize();
-
-          this.targetPosition.copy(localVector)
-            .add(lookToDollyVector);
+          // set the target position to 1m in the direction of the dolly
+          const lookToDollyDirection = localVector9.copy(dollyPosition).sub(position1).normalize();
+          this.targetPosition.copy(position1)
+            .add(lookToDollyDirection);
+          // look from the dolly to the target
           this.targetQuaternion.setFromRotationMatrix(
             localMatrix.lookAt(
-              lookToDollyVector,
+              lookToDollyDirection,
               zeroVector,
               upVector
             )
           );
 
-          if (face < 0) {
-            this.targetPosition.add(localVector10.set(0, 0, -0.8).applyQuaternion(this.targetQuaternion));
-            this.targetQuaternion.multiply(localQuaternion4.setFromAxisAngle(upVector, Math.PI));
-            this.targetPosition.add(localVector10.set(0, 0, 0.8).applyQuaternion(this.targetQuaternion));
-          } else if (!this.lastTarget) {
-            this.targetPosition.add(localVector10.set(0, 0, -cameraOffsetDefault).applyQuaternion(this.targetQuaternion));
-            this.targetQuaternion.multiply(localQuaternion4.setFromAxisAngle(upVector, sideOfY * -Math.PI * 0.87));
-            this.targetPosition.add(localVector10.set(0, 0, cameraOffsetDefault).applyQuaternion(this.targetQuaternion));
+          if (face < 0) { // if looking from the front
+            // look at the character's face
+            this.targetPosition.add(
+              localVector10.set(0, 0, -0.8)
+                .applyQuaternion(this.targetQuaternion)
+            );
+            this.targetQuaternion.multiply(
+              localQuaternion4.setFromAxisAngle(upVector, Math.PI)
+            );
+            this.targetPosition.add(
+              localVector10.set(0, 0, 0.8)
+                .applyQuaternion(this.targetQuaternion)
+            );
+          } else if (!this.lastTarget) { // if there was no previous target
+            // look from the back
+            this.targetPosition.add(
+              localVector10.set(0, 0, -cameraOffsetDefault)
+                .applyQuaternion(this.targetQuaternion)
+            );
+            this.targetQuaternion.multiply(
+              localQuaternion4.setFromAxisAngle(upVector, sideOfY * -Math.PI * 0.87)
+            );
+            this.targetPosition.add(
+              localVector10.set(0, 0, cameraOffsetDefault)
+                .applyQuaternion(this.targetQuaternion)
+            );
           }
         } else {
+          debugger; // never used; we always trigger two targets
           this.targetPosition.copy(localVector)
             .add(localVector2.set(0, 0, 1).applyQuaternion(localQuaternion));
           this.targetQuaternion.copy(localQuaternion);
@@ -421,8 +448,6 @@ class CameraManager extends EventTarget {
 
     if (this.target) {
       const _setCameraToStaticTarget = () => {
-        // this.target.matrixWorld.decompose(localVector, localQuaternion, localVector2);
-
         cameraOffsetTargetZ = -1;
         cameraOffset.z = cameraOffsetTargetZ;
 
@@ -430,8 +455,6 @@ class CameraManager extends EventTarget {
         const targetPosition = localVector.copy(localPlayer.position)
           .add(localVector2.set(0, 0, -cameraOffsetTargetZ).applyQuaternion(localPlayer.quaternion));
         const targetQuaternion = localPlayer.quaternion;
-        // camera.position.lerp(targetPosition, 0.2);
-        // camera.quaternion.slerp(targetQuaternion, 0.2);
 
         this.sourcePosition.copy(camera.position);
         this.sourceQuaternion.copy(camera.quaternion);
@@ -442,9 +465,6 @@ class CameraManager extends EventTarget {
         const timestamp = performance.now();
         this.lerpStartTime = timestamp;
         this.lastTimestamp = timestamp;
-
-        // cameraOffsetZ = -cameraOffsetDefault;
-        // cameraOffset.z = -cameraOffsetDefault;
       };
       _setCameraToStaticTarget();
     } else {
