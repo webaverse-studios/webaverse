@@ -77,7 +77,6 @@ export const CharacterSelect = () => {
     const [ lastTargetCharacter, setLastTargetCharacter ] = useState(null);
     const [ abortFn, setAbortFn ] = useState(null);
     const [ arrowPosition, setArrowPosition ] = useState(null);
-    const [ npcPlayer, setNpcPlayer ] = useState(null);
     const [ npcLoader, setNpcLoader ] = useState(() => new CachedLoader({
         loadFn: async (url, targetCharacter, {signal = null} = {}) => {
             let live = true;
@@ -92,6 +91,7 @@ export const CharacterSelect = () => {
                 content: detachedCharacter,
                 components: {
                     quality: characterSelectAvatarQuality,
+                    norenderer: true,
                 },
             });
             return npcManager.getDetachedNpcByApp(app);
@@ -206,7 +206,6 @@ export const CharacterSelect = () => {
                 live = false;
 
                 setText('');
-                setNpcPlayer(null);
             });
             
             const loadNpcPromise = (async () => {
@@ -257,12 +256,6 @@ export const CharacterSelect = () => {
                     setText('');
                 }
             })();
-
-            loadNpcPromise.then(npcPlayer => {
-                if (live) {
-                    setNpcPlayer(npcPlayer);
-                }
-            });
 
             const localAbortFn = () => {
                 abortController.abort();

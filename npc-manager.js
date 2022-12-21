@@ -116,6 +116,7 @@ class NpcManager extends EventTarget {
         .add(localVector2.set(0, 1, 0));
       const quaternion = app.quaternion;
       const scale = app.scale;
+      const norenderer = app.getComponent('norenderer');
       const components = [{
         key: 'quality',
         value: app.getComponent('quality'),
@@ -129,6 +130,7 @@ class NpcManager extends EventTarget {
         quaternion,
         scale,
         detached,
+        norenderer,
         components,
       });
 
@@ -183,6 +185,7 @@ class NpcManager extends EventTarget {
     quaternion,
     scale,
     detached,
+    norenderer,
     components,
   }) {
     const player = new LocalPlayer({
@@ -208,10 +211,12 @@ class NpcManager extends EventTarget {
       player.updateMatrixWorld();
     }
 
-    await player.loadAvatar(avatarUrl, {
-      components,
-    });
-    player.updateAvatar(0, 0);
+    if (!norenderer) {
+      await player.loadAvatar(avatarUrl, {
+        components,
+      });
+      player.updateAvatar(0, 0);
+    }
 
     return player;
   }
