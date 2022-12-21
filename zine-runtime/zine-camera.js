@@ -300,8 +300,10 @@ export class ZineCameraManager extends EventTarget {
     }
   }
 
-  handleWheelEvent(e) {
+  handleMouseWheel(e) {
     if (this.cameraLocked) {
+      this.cameraZ -= e.deltaY * 0.01;
+      this.cameraZ = Math.min(Math.max(this.cameraZ, 0), 5);
       // if (!this.target) {
       //   cameraOffsetTargetZ = Math.min(cameraOffset.z - e.deltaY * 0.01, 0);
       // }
