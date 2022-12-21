@@ -64,7 +64,19 @@ a {
 }
 @font-face {
   font-family: 'SF Movie Poster';
-  src:  url('/fonts/SF Movie Poster.ttf');
+  src:  url('/fonts/SF Movie Poster.woff');
+}
+@font-face {
+  font-family: 'SF Movie Poster Condensed';
+  src:  url('/fonts/SF Movie Poster Condensed.woff');
+}
+@font-face {
+  font-family: 'SF Movie Poster Bold';
+  src:  url('/fonts/SF Movie Poster Bold.woff');
+}
+@font-face {
+  font-family: 'SF Movie Poster Condensed Bold';
+  src:  url('/fonts/SF Movie Poster Condensed Bold.woff');
 }
 
 /* cards */
