@@ -83,29 +83,51 @@ function setAnimatedCamera(
   srcCameraAnimation
 ) {
   const _adjust = () => {
+    // clip camera to near edge
+    {
+      // compute the edge near z
+      const edgeNearZ = Math.min(
+        edgeDepths.top.max.z,
+        edgeDepths.bottom.max.z,
+        edgeDepths.right.max.z,
+        edgeDepths.left.max.z,
+      );
+      // apply near offset
+      if (followView && cameraZ > 0) {
+        camera.position.add(
+          localVector.set(0, 0, edgeNearZ)
+            .applyQuaternion(camera.quaternion)
+        );
+      }
+    }
+    
+    // apply camera wheel offset
     const localPlayer = playersManager.getLocalPlayer();
-    // compute the camera offset
-    localPlane.setFromNormalAndCoplanarPoint(
-      localVector.set(0, 0, -1).applyQuaternion(camera.quaternion),
-      camera.position
-    );
-    // if the player is in front of the camera
-    let cameraOffset;
-    if (localPlane.distanceToPoint(localPlayer.position) > 0) {
-      const f = Math.min(Math.max(cameraZ / 5, 0), 1);
-      cameraOffset = localVector.copy(localPlayer.position)
-        .sub(camera.position)
-        .multiplyScalar(f);
-    } else {
-      cameraOffset = localVector.set(0, 0, 0);
+    {
+      localPlane.setFromNormalAndCoplanarPoint(
+        localVector.set(0, 0, -1).applyQuaternion(camera.quaternion),
+        camera.position
+      );
+      let cameraOffset;
+      if (localPlane.distanceToPoint(localPlayer.position) > 0) { // if the player is in front of the camera
+        const f = Math.min(Math.max(cameraZ / 5, 0), 1);
+        cameraOffset = localVector.copy(localPlayer.position)
+          .sub(camera.position)
+          .multiplyScalar(f);
+      } else { // else if the player is behind the camera
+        cameraOffset = localVector.set(0, 0, 0);
+      }
+      camera.position.add(cameraOffset);
     }
 
-    camera.position.add(cameraOffset);
+    // follow view
     if (followView && cameraZ > 0) {
       camera.quaternion.setFromRotationMatrix(
         localMatrix.lookAt(
-          localVector2.set(0, 0, 0),
-          cameraOffset,
+          // localVector2.set(0, 0, 0),
+          // cameraOffset,
+          camera.position,
+          localPlayer.position,
           localVector3.set(0, 1, 0)
         )
       );
@@ -114,19 +136,19 @@ function setAnimatedCamera(
       // const farScale = 1000;
       const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
       // XXX do not clip from the center, but the side
-      const leftEdgeDepth = edgeDepths.left.clone()
+      const leftEdgeDepth = edgeDepths.left.min.clone()
         // .multiplyScalar(farScale)
         .applyMatrix4(matrixWorld)
         .sub(camera.position);
-      const rightEdgeDepth = edgeDepths.right.clone()
+      const rightEdgeDepth = edgeDepths.right.min.clone()
         // .multiplyScalar(farScale)
         .applyMatrix4(matrixWorld)
         .sub(camera.position);
-      const topEdgeDepth = edgeDepths.top.clone()
+      const topEdgeDepth = edgeDepths.top.min.clone()
         // .multiplyScalar(farScale)
         .applyMatrix4(matrixWorld)
         .sub(camera.position);
-      const bottomEdgeDepth = edgeDepths.bottom.clone()
+      const bottomEdgeDepth = edgeDepths.bottom.min.clone()
         // .multiplyScalar(farScale)
         .applyMatrix4(matrixWorld)
         .sub(camera.position);
@@ -165,25 +187,23 @@ function setAnimatedCamera(
         localEuler.x += bottomFovDiff;
       }
       camera.quaternion.setFromEuler(localEuler);
-      // if (localEuler.y ) {
-      //   localEuler.y = -fovRadians / 2 - leftFovDiff;
-      // }
-      globalThis.depths = {
-        top: edgeDepths.top,
-        bottom: edgeDepths.bottom,
-        left: edgeDepths.left,
-        right: edgeDepths.right,
-        cameraPosition: camera.position.clone(),
-        forward: forward.clone(),
-        topFovDiff,
-        bottomFovDiff,
-        leftFovDiff,
-        rightFovDiff,
-        leftEdgeDepth,
-        rightEdgeDepth,
-        topEdgeDepth,
-        bottomEdgeDepth,
-      };
+
+      // globalThis.depths = {
+      //   top: edgeDepths.top,
+      //   bottom: edgeDepths.bottom,
+      //   left: edgeDepths.left,
+      //   right: edgeDepths.right,
+      //   cameraPosition: camera.position.clone(),
+      //   forward: forward.clone(),
+      //   topFovDiff,
+      //   bottomFovDiff,
+      //   leftFovDiff,
+      //   rightFovDiff,
+      //   leftEdgeDepth,
+      //   rightEdgeDepth,
+      //   topEdgeDepth,
+      //   bottomEdgeDepth,
+      // };
     }
   };
 
@@ -240,11 +260,17 @@ export class ZineCameraManager extends EventTarget {
     this.oldCamera = new THREE.PerspectiveCamera();
     this.lockCameraAnimation = null;
 
+    const _makeMinMax = () => {
+      return {
+        min: new THREE.Vector3(),
+        max: new THREE.Vector3(),
+      };
+    };
     this.edgeDepths = {
-      top: new THREE.Vector3(),
-      bottom: new THREE.Vector3(),
-      left: new THREE.Vector3(),
-      right: new THREE.Vector3(),
+      top: _makeMinMax(),
+      bottom: _makeMinMax(),
+      left: _makeMinMax(),
+      right: _makeMinMax(),
     };
     this.edgeMatrixWorld = new THREE.Matrix4();
 
@@ -273,15 +299,15 @@ export class ZineCameraManager extends EventTarget {
 
   setEdgeDepths(edgeDepths, matrixWorld, scaleArray) {
     // console.log('edge depths 1', this, edgeDepths, scaleArray);
-    this.edgeDepths.top.fromArray(edgeDepths.top)
-      // .multiply(localVector.fromArray(scaleArray));
-    this.edgeDepths.bottom.fromArray(edgeDepths.bottom)
-      // .multiply(localVector.fromArray(scaleArray));
-    this.edgeDepths.left.fromArray(edgeDepths.left)
-      // .multiply(localVector.fromArray(scaleArray));
-    this.edgeDepths.right.fromArray(edgeDepths.right)
-      // .multiply(localVector.fromArray(scaleArray));
-    console.log('set edge depths', edgeDepths, matrixWorld.toArray());
+    this.edgeDepths.top.min.fromArray(edgeDepths.top.min);
+    this.edgeDepths.top.max.fromArray(edgeDepths.top.max);
+
+    this.edgeDepths.bottom.min.fromArray(edgeDepths.bottom.min);
+    this.edgeDepths.bottom.max.fromArray(edgeDepths.bottom.max);
+    
+    this.edgeDepths.left.min.fromArray(edgeDepths.left.min);
+    this.edgeDepths.right.max.fromArray(edgeDepths.right.max);
+    // console.log('set edge depths', edgeDepths, matrixWorld.toArray());
     // debugger;
     this.edgeMatrixWorld.copy(matrixWorld);
   }
