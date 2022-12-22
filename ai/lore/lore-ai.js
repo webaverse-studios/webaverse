@@ -35,7 +35,7 @@ import {
 } from './lore-model.js'
 import {
   OPENAI_API_KEY,
-} from '../../auth.js';
+} from '../../constants/auth.js';
 
 const numGenerateTries = 2;
 const temperature = 1;
