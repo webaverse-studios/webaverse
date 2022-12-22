@@ -15,6 +15,7 @@ import physxWorkerManager from './physx-worker-manager.js';
 import {playersManager} from './players-manager.js';
 import {parseQuery} from './util.js';
 import {world} from './world.js';
+import {defaultSceneName} from './endpoints.js';
 import {sceneManager} from './scene-manager.js';
 
 class Universe extends EventTarget {
@@ -58,9 +59,9 @@ class Universe extends EventTarget {
         
         let match;
         if (src === undefined) {
-          const sceneNames = await sceneManager.getSceneNamesAsync();
+          // const sceneNames = await sceneManager.getSceneNamesAsync();
           promises.push(metaversefile.createAppAsync({
-            start_url: sceneManager.getSceneUrl(sceneNames[0]),
+            start_url: sceneManager.getSceneUrl(defaultSceneName),
           }));
         } else if (src === '') {
           // nothing
