@@ -430,7 +430,7 @@ class IoManager extends EventTarget {
         if (cameraManager.pointerLockElement) {
           if (grabManager.canRotate()) {
             grabManager.menuRotate(1);
-          } else {
+          } else if (!e.ctrlKey) {
             game.dropSelectedApp();
           }
         }
@@ -576,6 +576,8 @@ class IoManager extends EventTarget {
           game.setMouseHoverObject(null);
           game.setMouseSelectedObject(null);
           world.removeObject(object.instanceId);
+        } else if (!e.ctrlKey) {
+          game.deleteSelectedApp();
         }
         break;
       }

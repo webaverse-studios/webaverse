@@ -14,29 +14,6 @@ import grabManager from '../../../../grab-manager.js';
 export const Hotbar = ({className}) => {
     const {setState, editMode} = useContext(AppContext);
 
-    useEffect(() => {
-            const keydown = e => {
-                if (game.inputFocused()) return true;
-                if (!e.ctrlKey) {
-                    switch (e.which) {
-                        case 82: { // R
-                            game.dropSelectedApp();
-                            return false;
-                        }
-                        case 46: { // delete
-                            game.deleteSelectedApp();
-                            return false;
-                        }
-                    }
-                }
-            };
-            registerIoEventHandler('keydown', keydown);
-
-            return () => {
-                unregisterIoEventHandler('keydown', keydown);
-            };
-    }, []);
-
     const onDragOver = index => e => {
         e.preventDefault();
     };
