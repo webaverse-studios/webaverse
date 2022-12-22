@@ -195,7 +195,7 @@ class ZTargeting extends THREE.Object3D {
       reticles = [];
     }
     if (this.focusTargetReticle) {
-      const timeDiff = timestamp - cameraManager.lerpStartTime;
+      const timeDiff = timestamp - (cameraManager.cameraTarget ? cameraManager.cameraTarget.lerpStartTime : 0);
       const focusTime = 250;
 
       const f = timeDiff / focusTime;
@@ -274,7 +274,7 @@ class ZTargeting extends THREE.Object3D {
   handleUp() {
     if (cameraManager.focus) {
       cameraManager.setFocus(false);
-      cameraManager.setStaticTarget();
+      cameraManager.setCameraToNullTarget();
 
       if (this.focusTargetReticle) {
         sounds.playSoundName('zTargetCancel');
