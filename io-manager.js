@@ -453,15 +453,10 @@ class IoManager extends EventTarget {
         game.menuSwitchCharacter();
         break;
       }
-      /* case 78: { // N
-        const zineApp = world.appManager.apps.find(app => !!app.zineInstance);
-        if (zineApp) {
-          zineApp.zineInstance.link();
-        } else {
-          console.warn('no zine app found');
-        }
+      case 78: { // N
+        // XXX make this run the intro OOT style cutscene / dialogue / zone card
         break;
-      } */
+      }
       case 86: { // V
         e.preventDefault();
         e.stopPropagation();
