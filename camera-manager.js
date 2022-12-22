@@ -625,9 +625,6 @@ class CameraManager extends EventTarget {
       this.setCameraToNullTarget();
     }
   }
-  // setCameraToCenterTarget() {
-  //   // XXX
-  // }
   setCameraToNullTarget() {
     const cameraTarget = new CameraTargetNull({
       transformFn: (targetPosition, targetQuaternion) => {
