@@ -356,7 +356,7 @@ export class ZineCameraManager extends EventTarget {
 
         if (this.options.normalizeView) {
           const aspect = window.innerWidth / window.innerHeight;
-          setCameraToSquareFovAspect(this.lockCamera.fov, aspect, this.camera);
+          setCameraToContainer(aspect, this.camera);
         }
 
         function radToDeg(rad) {
@@ -365,20 +365,19 @@ export class ZineCameraManager extends EventTarget {
         function degToRad(deg) {
           return deg * Math.PI / 180;
         }
-        // given an ideal square fov (in degrees) and new aspect ratio,
-        // set the camera to be contained within the the original square fov
-        // calculate a new fov and aspect ratio that will fit the original square fov
-        // this requires zooming in and clipping
-        // camera is a THREE.PerspectiveCamera
-        function setCameraToSquareFovAspect(squareFov, aspect, camera) {
-          // first, calculate the new min fov of vertical/horizontal
-          const fovH = radToDeg(2 * Math.atan(Math.tan(degToRad(squareFov) / 2) * aspect));
-          const fovV = radToDeg(2 * Math.atan(Math.tan(degToRad(squareFov) / 2) / aspect));
-          const newFov = Math.min(fovH, fovV);
-          const newAspect = Math.max(fovH, fovV) / Math.min(fovH, fovV);
-
-          camera.fov = newFov;
-          camera.aspect = newAspect;
+        // given the aspect ratio, set the camera to be contains
+        function setCameraToContainer(aspect, camera) {
+          // first, decide whether we are clipping horizontally or vertically
+          if (aspect > 1) { // horizontal
+            // set the fov to be the vertical fov
+            camera.fov = radToDeg(Math.atan(Math.tan(degToRad(camera.fov) / 2) / aspect) * 2);
+          } else { // vertical
+            // set the fov to be the horizontal fov
+            camera.fov = radToDeg(Math.atan(Math.tan(degToRad(camera.fov) / 2) * aspect) * 2);
+          }
+          // fix the aspect ratio
+          camera.aspect = aspect;
+          // update the camera projection matrix
           camera.updateProjectionMatrix();
         }
       };
