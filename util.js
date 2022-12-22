@@ -698,6 +698,8 @@ export function fitCameraToBoundingBox(camera, box, fitOffset = 1) {
     .normalize()
     .multiplyScalar(distance);
 
+  camera.near = Math.min(0.1, maxSize / 20.0);
+  camera.updateProjectionMatrix();
   camera.position.copy(center).add(direction);
   camera.quaternion.setFromRotationMatrix(
     localMatrix.lookAt(camera.position, center, camera.up)
