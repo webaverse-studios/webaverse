@@ -36,6 +36,7 @@ const localVector4 = new THREE.Vector3();
 const localVector5 = new THREE.Vector3();
 const localVector6 = new THREE.Vector3();
 const localVector7 = new THREE.Vector3();
+const localVector2D = new THREE.Vector2();
 const localQuaternion = new THREE.Quaternion();
 const localQuaternion2 = new THREE.Quaternion();
 const localQuaternion3 = new THREE.Quaternion();
@@ -44,6 +45,10 @@ const localMatrix = new THREE.Matrix4();
 const localMatrix2 = new THREE.Matrix4();
 const localBox = new THREE.Box3();
 const localRay = new THREE.Ray();
+const localRaycaster = new THREE.Raycaster();
+
+const zeroVector = new THREE.Vector3(0, 0, 0);
+const upVector = new THREE.Vector3(0, 1, 0);
 
 const hitRadius = 1;
 const hitHeight = 0.2;
@@ -474,32 +479,20 @@ class GameManager extends EventTarget {
     const localPlayer = playersManager.getLocalPlayer();
 
     if (zineCameraManager.cameraLocked) {
-      // get the current mouse transform into an object
-      const lastMouseEvent = raycastManager.getLastMouseEvent();
-
-      // unproject points
+      // compute the ray
       const {mousePosition} = zineCameraManager;
-      const unprojectedNearPoint = new THREE.Vector3(
-        mousePosition.x,
-        -mousePosition.y,
-        -1
-      )
-        .unproject(zineCameraManager.lockCamera);
-      const unprojectedMidPoint = new THREE.Vector3(
-        mousePosition.x,
-        -mousePosition.y,
-        0
-      )
-        .unproject(zineCameraManager.lockCamera);
-      
+      localVector2D.copy(mousePosition);
+      localVector2D.y = -localVector2D.y;
+      localRaycaster.setFromCamera(localVector2D, camera);
+
+      // raycast to select
       const rayObject = new THREE.Object3D();
-      rayObject.position.copy(unprojectedNearPoint);
+      rayObject.position.copy(localRaycaster.ray.origin);
       rayObject.quaternion.setFromRotationMatrix(
         localMatrix.lookAt(
-          unprojectedNearPoint,
-          unprojectedMidPoint,
-          localVector.set(0, 1, 0)
-            .applyQuaternion(zineCameraManager.lockCamera.quaternion)
+          zeroVector,
+          localRaycaster.ray.direction,
+          upVector
         )
       );
       zTargeting.handleRayFocus(rayObject);
