@@ -229,7 +229,6 @@ class CameraTarget extends EventTarget {
     }
   }
   handleMouseMove(e) {
-    console.log('handle move internal');
     _applyMouseMove(this.targetPosition, this.targetQuaternion, cameraOffset, e);
   }
 }
