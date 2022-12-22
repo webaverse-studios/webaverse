@@ -133,7 +133,12 @@ class Conversation extends EventTarget {
       await _playerSay(this.localPlayer, text);
     })();
 
-    cameraManager.setDynamicTarget(this.localPlayer.avatar.modelBones.Head, this.remotePlayer?.avatar.modelBones.Head);
+    const first = this.messages.length === 1;
+    cameraManager.setDynamicTarget(
+      this.localPlayer.avatar.modelBones.Head,
+      this.remotePlayer?.avatar.modelBones.Head,
+      first,
+    );
   }
 
   addRemotePlayerMessage(text, emote, type = 'chat') {
@@ -156,7 +161,12 @@ class Conversation extends EventTarget {
       await _playerSay(this.remotePlayer, text);
     })();
 
-    cameraManager.setDynamicTarget(this.remotePlayer.avatar.modelBones.Head, this.localPlayer.avatar.modelBones.Head);
+    const first = this.messages.length === 1;
+    cameraManager.setDynamicTarget(
+      this.remotePlayer.avatar.modelBones.Head,
+      this.localPlayer.avatar.modelBones.Head,
+      first,
+    );
 
     const fuzzyEmotionName = getFuzzyEmotionMapping(emote);
     if (fuzzyEmotionName) {
@@ -466,7 +476,7 @@ const _startConversation = (comment, remotePlayer, done) => {
   currentConversation.addEventListener('close', () => {
     currentConversation = null;
 
-    cameraManager.setDynamicTarget(null);
+    cameraManager.setDynamicTarget();
   }, {once: true});
   story.dispatchEvent(new MessageEvent('conversationstart', {
     data: {
