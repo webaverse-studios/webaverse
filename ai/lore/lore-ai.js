@@ -33,6 +33,9 @@ import {
   makeCharacterIntroStop,
   parseCharacterIntroResponse,
 } from './lore-model.js'
+import {
+  OPENAI_API_KEY,
+} from '../../constants/auth-constants.js';
 
 const numGenerateTries = 2;
 const temperature = 1;
@@ -441,7 +444,10 @@ class LoreAI {
 
   async setEndpointUrl(url) {
     if (url) {
-      const settingsString = localStorage.getItem('AiSettings');
+      // const settingsString = localStorage.getItem('AiSettings');
+      const settingsString = JSON.stringify({
+        apiKey: OPENAI_API_KEY,
+      });
       let settings;
 
       try {
