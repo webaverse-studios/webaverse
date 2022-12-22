@@ -420,6 +420,79 @@ class CameraTargetNull extends CameraTarget {
 
 //
 
+class CameraTargetCinematic extends CameraTarget {
+  constructor({
+    cinematicScript,
+    clearFn,
+  }) {
+    super();
+
+    this.cinematicScript = cinematicScript;
+    this.clearFn = clearFn;
+
+    this.cinematicScriptStartTime = performance.now();
+  }
+  update(timestamp/*, timeDiff */) {
+    const timeDiff = timestamp - this.cinematicScriptStartTime;
+    // find the line in the script that we are currently on
+    let currentDuration = 0;
+    const currentLineIndex = (() => {
+      let i;
+      for (i = 0; i < this.cinematicScript.length; i++) {
+        const currentLine = this.cinematicScript[i];
+
+        if (currentDuration + currentLine.duration > timeDiff) {
+          break;
+        } else {
+          currentDuration += currentLine.duration;
+        }
+      }
+      return i < this.cinematicScript.length ? i : -1;
+    })();
+
+    if (currentLineIndex !== -1) {
+      // calculate how far into the line we are, in 0..1
+      const currentLine = this.cinematicScript[currentLineIndex];
+      const {type} = currentLine;
+      switch (type) {
+        case 'set': {
+          camera.position.copy(currentLine.position);
+          camera.quaternion.copy(currentLine.quaternion);
+          camera.updateMatrixWorld();
+          break;
+        }
+        case 'move': {
+          let factor = Math.min(Math.max((timeDiff - currentDuration) / currentLine.duration, 0), 1);
+          if (factor < 1) {
+            factor = cubicBezier2(factor);
+            const previousLine = this.cinematicScript[currentLineIndex - 1];
+            
+            camera.position.copy(previousLine.position).lerp(currentLine.position, factor);
+            camera.quaternion.copy(previousLine.quaternion).slerp(currentLine.quaternion, factor);
+            camera.updateMatrixWorld();
+
+            // console.log('previous line', previousLine, camera.position.toArray().join(','), camera.quaternion.toArray().join(','), factor);
+            /* if (isNaN(camera.position.x)) {
+              debugger;
+            } */
+          } else {
+            this.clearFn();
+          }
+          break;
+        }
+        default: {
+          throw new Error('unknown cinematic script line type: ' + type);
+        }
+      }
+    } else {
+      // console.log('no line', timeDiff, this.cinematicScript.slice());
+      this.clearFn();
+    }
+  }
+}
+
+//
+
 class CameraManager extends EventTarget {
   constructor() {
     super();
@@ -429,9 +502,6 @@ class CameraManager extends EventTarget {
     this.focus = false;
     this.fovFactor = 0;
     this.lastNonzeroDirectionVector = new THREE.Vector3(0, 0, -1);
-
-    this.cinematicScript = null;
-    this.cinematicScriptStartTime = -1;
 
     this.cameraTarget = null;
 
@@ -523,7 +593,7 @@ class CameraManager extends EventTarget {
   }
 
   getMode() {
-    if (this.cameraTarget || this.cinematicScript || zineCameraManager.cameraLocked) {
+    if (this.cameraTarget || zineCameraManager.cameraLocked) {
       return 'isometric';
     } else {
       return cameraOffset.z > -0.5 ? 'firstperson' : 'isometric';
@@ -631,7 +701,7 @@ class CameraManager extends EventTarget {
         this.#getFreeCameraTarget(targetPosition, targetQuaternion);
       },
       clearFn: () => {
-        this.clearTarget();
+        this.clearTarget(); // done with smoothing
       },
     });
     this.setTarget(cameraTarget);
@@ -641,8 +711,13 @@ class CameraManager extends EventTarget {
   }
 
   startCinematicScript(cinematicScript) {
-    this.cinematicScript = cinematicScript;
-    this.cinematicScriptStartTime = performance.now();
+    const cameraTarget = new CameraTargetCinematic({
+      cinematicScript,
+      clearFn: () => {
+        this.setDynamicTarget(); // smooth camera back
+      },
+    });
+    this.setTarget(cameraTarget);
   }
 
   #getFreeCameraTarget(targetPosition, targetQuaternion) {
@@ -761,62 +836,6 @@ class CameraManager extends EventTarget {
       }
       _lerpCameraOffset();
       this.cameraTarget.update(timestamp, timeDiff);
-    } else if (this.cinematicScript) {
-      const timeDiff = timestamp - this.cinematicScriptStartTime;
-      // find the line in the script that we are currently on
-      let currentDuration = 0;
-      const currentLineIndex = (() => {
-        let i;
-        for (i = 0; i < this.cinematicScript.length; i++) {
-          const currentLine = this.cinematicScript[i];
-
-          if (currentDuration + currentLine.duration > timeDiff) {
-            break;
-          } else {
-            currentDuration += currentLine.duration;
-          }
-        }
-        return i < this.cinematicScript.length ? i : -1;
-      })();
-
-      if (currentLineIndex !== -1) {
-        // calculate how far into the line we are, in 0..1
-        const currentLine = this.cinematicScript[currentLineIndex];
-        const {type} = currentLine;
-        switch (type) {
-          case 'set': {
-            camera.position.copy(currentLine.position);
-            camera.quaternion.copy(currentLine.quaternion);
-            camera.updateMatrixWorld();
-            break;
-          }
-          case 'move': {
-            let factor = Math.min(Math.max((timeDiff - currentDuration) / currentLine.duration, 0), 1);
-            if (factor < 1) {
-              factor = cubicBezier2(factor);
-              const previousLine = this.cinematicScript[currentLineIndex - 1];
-              
-              camera.position.copy(previousLine.position).lerp(currentLine.position, factor);
-              camera.quaternion.copy(previousLine.quaternion).slerp(currentLine.quaternion, factor);
-              camera.updateMatrixWorld();
-
-              // console.log('previous line', previousLine, camera.position.toArray().join(','), camera.quaternion.toArray().join(','), factor);
-              /* if (isNaN(camera.position.x)) {
-                debugger;
-              } */
-            } else {
-              this.cinematicScript = null;
-            }
-            break;
-          }
-          default: {
-            throw new Error('unknown cinematic script line type: ' + type);
-          }
-        }
-      } else {
-        // console.log('no line', timeDiff, this.cinematicScript.slice());
-        this.cinematicScript = null;
-      }
     } else {
       _bumpCamera();
       _lerpCameraOffset();
