@@ -373,7 +373,6 @@ export const App = () => {
         >
         <DomRenderer />
         <canvas className={ classnames(styles.canvas, domHover ? styles.domHover : null) } ref={ canvasRef } />
-        <DragAndDrop />
         <IoHandler />
         <WorldObjectsList
             setSelectedApp={ setSelectedApp }

@@ -133,6 +133,7 @@ const DragAndDrop = () => {
     }
     window.addEventListener('dragover', dragover);
     const drop = async e => {
+      e.preventDefault();
       const items = Array.from(e.dataTransfer.items);
       await Promise.all(items.map(async item => {
         const drop = _isJsonItem(item);
@@ -232,8 +233,8 @@ const DragAndDrop = () => {
       await mintNFT(app, () => {
         setMintComplete(true);
         setPendingTx(false);
-        setCurrentApp(null);
         getWalletItems();
+        setCurrentApp(null);
       });
     }
     setCurrentApp(null);
