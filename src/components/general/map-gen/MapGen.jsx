@@ -8,7 +8,6 @@ import {getRenderer, rootScene, scene, sceneLowPriority} from '../../../../rende
 import game from '../../../../game.js';
 import {world} from '../../../../world.js';
 import cameraManager from '../../../../camera-manager.js';
-import story from '../../../../story.js';
 import {snapshotMapChunk} from '../../../../scene-cruncher.js';
 import {Text} from 'troika-three-text';
 import {buildMaterial} from '../../../../shaders.js';
@@ -600,13 +599,6 @@ export const MapGen = () => {
 
             return false;
 
-          }
-
-          case 219: { // [
-
-            story.startCinematicIntro();
-
-            return false;
           }
 
         }
