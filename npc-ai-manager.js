@@ -46,14 +46,18 @@ class NpcAiManager {
       const currentState = npcStateMap.get(app);
       const currentBehavior = currentState && currentState.behavior;
       const state = app.getComponent('state');
-      const {behavior} = state;
       
-      if (currentBehavior !== behavior) {
-        const targetPlayer = npcManager.getNpcByAppInstanceId(state.target);
-        console.log('changed state to', behavior, 'state.target', state.target, 'targetPlayer', targetPlayer)
-        npc.target = targetPlayer;
-        npcStateMap.set(app, state);
-        npcManager.setBehaviorFn(app, behaviorFns[behavior]);
+      if(state && state.behavior){
+
+        const {behavior} = state;
+        
+        if (currentBehavior !== behavior) {
+          const targetPlayer = npcManager.getNpcByAppInstanceId(state.target);
+          console.log('changed state to', behavior, 'state.target', state.target, 'targetPlayer', targetPlayer)
+          npc.target = targetPlayer;
+          npcStateMap.set(app, state);
+          npcManager.setBehaviorFn(app, behaviorFns[behavior]);
+        }
       }
     }
   }
