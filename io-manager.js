@@ -454,7 +454,7 @@ class IoManager extends EventTarget {
         break;
       }
       case 78: { // N
-        // XXX make this run the intro OOT style cutscene / dialogue / zone card
+        game.menuZoneIntro();
         break;
       }
       case 86: { // V
