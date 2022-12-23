@@ -238,14 +238,6 @@ class IoManager extends EventTarget {
         _updateVertical(this.keysDirection);
       } else {
         const _applyCameraRelativeKeys = () => {
-          // // if we are on the forward side of the camera
-          // localPlane.setFromNormalAndCoplanarPoint(
-          //   localVector.set(0, 0, -1)
-          //     .applyQuaternion(transformCamera.quaternion),
-          //   transformCamera.position
-          // );
-          // const d = localPlane.distanceToPoint(localPlayer.position);
-          
           // get distance to the camera frustum planes
           const transformCameraFrustum = localFrustum.setFromProjectionMatrix(
             transformCamera.projectionMatrix
