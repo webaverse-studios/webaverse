@@ -3,18 +3,22 @@ import easing from '../easing.js';
 import {
   playersManager,
 } from '../players-manager.js';
-// import {
-//   scene,
-// } from '../renderer.js';
+import {
+  scene,
+  // rootScene,
+} from '../renderer.js';
 
 //
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
 const localVector3 = new THREE.Vector3();
+const localVector4 = new THREE.Vector3();
+const localQuaternion = new THREE.Quaternion();
 const localEuler = new THREE.Euler();
 const localMatrix = new THREE.Matrix4();
 const localPlane = new THREE.Plane();
+const localRay = new THREE.Ray();
 
 //
 
