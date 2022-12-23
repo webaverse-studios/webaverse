@@ -128,6 +128,7 @@ class PanelRuntimeInstance extends THREE.Object3D {
     const zineRenderer = this.#createRenderer();
     const {
       sceneMesh,
+      capSceneMesh,
       scenePhysicsMesh,
       floorNetMesh,
     } = zineRenderer;
@@ -147,9 +148,14 @@ class PanelRuntimeInstance extends THREE.Object3D {
     const camera = setPerspectiveCameraFromJson(localCamera, cameraJson);
     const floorNetCamera = setOrthographicCameraFromJson(localOrthographicCamera, floorNetCameraJson);
 
-    // scene meshes
+    // attach scene
     {
       this.add(zineRenderer.scene);
+    }
+
+    // cap scene mesh
+    {
+      capSceneMesh.visible = true;
     }
 
     // extra meshes
