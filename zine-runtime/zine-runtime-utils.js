@@ -3,7 +3,7 @@ import {
   entranceExitWidth,
   entranceExitHeight,
   entranceExitDepth,
-} from './zine-runtime-constants.js';
+} from 'zine/zine-constants.js';
 
 //
 
