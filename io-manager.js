@@ -255,16 +255,17 @@ class IoManager extends EventTarget {
             }
           }
           // console.log('closest distance', closestDistance);
-          const d = closestDistance;
-          const smoothDistance = 3;
+          // const d = closestDistance;
+          // const smoothDistance = 3;
 
           // back
-          localEuler.setFromQuaternion(transformCamera.quaternion, 'YXZ');
-          localEuler.x = 0;
-          localEuler.z = 0;
-          const backQuaternion = localQuaternion2.setFromEuler(localEuler);
+          // localEuler.setFromQuaternion(transformCamera.quaternion, 'YXZ');
+          // localEuler.x = 0;
+          // localEuler.z = 0;
+          // const backQuaternion = localQuaternion2.setFromEuler(localEuler);
+          const backQuaternion = transformCamera.quaternion;
 
-          if (zineCameraManager.cameraLocked) {
+          if (zineCameraManager.cameraLocked && zineCameraManager.cameraZ > 0) {
             // front
             const direction = localVector.copy(localPlayer.position)
             .sub(transformCamera.position);
@@ -275,9 +276,9 @@ class IoManager extends EventTarget {
             );
 
             // smoothed
-            const f = Math.min(Math.max(d, 0), smoothDistance) / smoothDistance;
-            const smoothedQuaternion = localQuaternion3.copy(backQuaternion).slerp(frontQuaternion, f);
-            this.keysDirection.applyQuaternion(smoothedQuaternion);
+            // const f = Math.min(Math.max(d, 0), smoothDistance) / smoothDistance;
+            // const smoothedQuaternion = localQuaternion3.copy(backQuaternion).slerp(frontQuaternion, f);
+            this.keysDirection.applyQuaternion(frontQuaternion);
           } else {
             this.keysDirection.applyQuaternion(backQuaternion);
           }
