@@ -78,8 +78,13 @@ const localVector2D = new THREE.Vector2();
 const localQuaternion = new THREE.Quaternion();
 const localMatrix = new THREE.Matrix4();
 const localPlane = new THREE.Plane();
+const localFrustum = new THREE.Frustum();
 const localRaycaster = new THREE.Raycaster();
+const localCamera = new THREE.PerspectiveCamera();
 const localOrthographicCamera = new THREE.OrthographicCamera();
+
+const planeGeometryNormalizeQuaternion = new THREE.Quaternion()
+  .setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI/2);
 
 // classes
 
@@ -117,8 +122,7 @@ class PanelRuntimeInstance extends THREE.Object3D {
     const floorResolution = layer1.getData('floorResolution');
     const floorNetDepths = layer1.getData('floorNetDepths');
     const floorNetCameraJson = layer1.getData('floorNetCameraJson');
-    // const edgeDepths = layer1.getData('edgeDepths');
-    // console.log('read edge depths', edgeDepths);
+    const edgeDepths = layer1.getData('edgeDepths');
 
     // zine renderer
     const zineRenderer = this.#createRenderer();
@@ -140,6 +144,7 @@ class PanelRuntimeInstance extends THREE.Object3D {
     this.zineRenderer = zineRenderer;
 
     // camera
+    const camera = setPerspectiveCameraFromJson(localCamera, cameraJson);
     const floorNetCamera = setOrthographicCameraFromJson(localOrthographicCamera, floorNetCameraJson);
 
     // scene meshes
@@ -219,6 +224,178 @@ class PanelRuntimeInstance extends THREE.Object3D {
       );
       physicsIds.push(floorNetPhysicsObject);
       this.floorNetPhysicsObject = floorNetPhysicsObject;
+    }
+
+    // wall physics
+    // walls are the back, left, and right edges of the scene
+    {
+      // const [width, height] = floorResolution;
+
+      // const floorNetPhysicsMaterial = new THREE.MeshPhongMaterial({
+      //   color: 0xFF0000,
+      //   side: THREE.BackSide,
+      //   transparent: true,
+      //   opacity: 0.5,
+      // });
+      // const floorNetPhysicsMesh = getFloorNetPhysicsMesh({
+      //   floorNetDepths,
+      //   floorNetCamera,
+      //   material: floorNetPhysicsMaterial,
+      // });
+      // floorNetPhysicsMesh.name = 'floorNetPhysicsMesh';
+      // floorNetPhysicsMesh.visible = false;
+      // zineRenderer.transformScene.add(floorNetPhysicsMesh);
+      // this.floorNetPhysicsMesh = floorNetPhysicsMesh;
+
+      // const numRows = width;
+      // const numColumns = height;
+      // const heights = getGeometryHeights(
+      //   floorNetPhysicsMesh.geometry,
+      //   width,
+      //   height,
+      //   heightfieldScale
+      // );
+
+      const cameraDirection = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+      console.log('camera direction', cameraDirection.toArray());
+
+      // setFromProjectionMatrix( m ) {
+
+      //   const planes = this.planes;
+      //   const me = m.elements;
+      //   const me0 = me[ 0 ], me1 = me[ 1 ], me2 = me[ 2 ], me3 = me[ 3 ];
+      //   const me4 = me[ 4 ], me5 = me[ 5 ], me6 = me[ 6 ], me7 = me[ 7 ];
+      //   const me8 = me[ 8 ], me9 = me[ 9 ], me10 = me[ 10 ], me11 = me[ 11 ];
+      //   const me12 = me[ 12 ], me13 = me[ 13 ], me14 = me[ 14 ], me15 = me[ 15 ];
+    
+      //   planes[ 0 ].setComponents( me3 - me0, me7 - me4, me11 - me8, me15 - me12 ).normalize();
+      //   planes[ 1 ].setComponents( me3 + me0, me7 + me4, me11 + me8, me15 + me12 ).normalize();
+      //   planes[ 2 ].setComponents( me3 + me1, me7 + me5, me11 + me9, me15 + me13 ).normalize();
+      //   planes[ 3 ].setComponents( me3 - me1, me7 - me5, me11 - me9, me15 - me13 ).normalize();
+      //   planes[ 4 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize();
+      //   planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 ).normalize();
+    
+      //   return this;
+    
+      // }
+      // the planes order above is:
+      // planes[0] = left
+      // planes[1] = right
+      // planes[2] = top
+      // planes[3] = bottom
+      // planes[4] = near
+      // planes[5] = far
+
+
+      this.wallPhysicsObjects = [];
+
+      // near wall
+      {
+        let minMaxPoint = new THREE.Vector3(Infinity, Infinity, Infinity);
+        if (edgeDepths.top.min[2] < minMaxPoint.z) {
+          minMaxPoint.fromArray(edgeDepths.top.max);
+        }
+        if (edgeDepths.bottom.min[2] < minMaxPoint.z) {
+          minMaxPoint.fromArray(edgeDepths.bottom.max);
+        }
+        if (edgeDepths.left.min[2] < minMaxPoint.z) {
+          minMaxPoint.fromArray(edgeDepths.left.max);
+        }
+        if (edgeDepths.right.min[2] < minMaxPoint.z) {
+          minMaxPoint.fromArray(edgeDepths.right.max);
+        }
+
+        let minMaxPoint2 = new THREE.Vector3(-Infinity, -Infinity, -Infinity);
+        if (edgeDepths.top.max[2] > minMaxPoint2.z) {
+          minMaxPoint2.fromArray(edgeDepths.top.max);
+        }
+        if (edgeDepths.bottom.max[2] > minMaxPoint2.z) {
+          minMaxPoint2.fromArray(edgeDepths.bottom.max);
+        }
+        if (edgeDepths.left.max[2] > minMaxPoint2.z) {
+          minMaxPoint2.fromArray(edgeDepths.left.max);
+        }
+        if (edgeDepths.right.max[2] > minMaxPoint2.z) {
+          minMaxPoint2.fromArray(edgeDepths.right.max);
+        }
+
+        const minMaxPoint3 = minMaxPoint.clone().lerp(minMaxPoint2, 0.5);
+        minMaxPoint3.applyMatrix4(zineRenderer.transformScene.matrixWorld);
+
+        const planeQuaternion = camera.quaternion.clone()
+          .multiply(planeGeometryNormalizeQuaternion);
+        const dynamic = false;
+        const planePhysicsObject = this.physics.addPlaneGeometry(
+          minMaxPoint3,
+          planeQuaternion,
+          dynamic
+        );
+        physicsIds.push(planePhysicsObject);
+        this.wallPhysicsObjects.push(planePhysicsObject);
+      }
+      // left + right walls
+      {
+        localFrustum.setFromProjectionMatrix(
+          camera.projectionMatrix
+        );
+        for (const plane of localFrustum.planes) {
+          plane.applyMatrix4(zineRenderer.transformScene.matrixWorld);
+        }
+        
+        // plane order:
+        // planes[0] = right
+        // planes[1] = left
+        // planes[2] = bottom
+        // planes[3] = top
+        // planes[4] = far
+        // planes[5] = near
+        
+        {
+          const leftPlane = localFrustum.planes[1];
+          const leftPlanePosition = new THREE.Vector3()
+            .fromArray(leftPlane.normal.toArray())
+            .multiplyScalar(leftPlane.constant);
+          const leftPlaneQuaternion = new THREE.Quaternion().setFromRotationMatrix(
+            new THREE.Matrix4().lookAt(
+              new THREE.Vector3(0, 0, 0),
+              leftPlane.normal,
+              new THREE.Vector3(0, 1, 0)
+            )
+          ).multiply(planeGeometryNormalizeQuaternion);
+          const dynamic = false;
+          const leftPlanePhysicsObject = this.physics.addPlaneGeometry(
+            leftPlanePosition,
+            leftPlaneQuaternion,
+            dynamic
+          );
+          physicsIds.push(leftPlanePhysicsObject);
+          this.wallPhysicsObjects.push(leftPlanePhysicsObject);
+        }
+        {
+          const rightPlane = localFrustum.planes[0];
+          // console.log('right plane normal', localFrustum.planes.map(p => {
+          //   return p.normal.toArray();
+          // }));
+          const rightPlanePosition = new THREE.Vector3()
+            .fromArray(rightPlane.normal.toArray())
+            .multiplyScalar(rightPlane.constant);
+          const rightPlaneQuaternion = new THREE.Quaternion().setFromRotationMatrix(
+            new THREE.Matrix4().lookAt(
+              new THREE.Vector3(0, 0, 0),
+              rightPlane.normal,
+              new THREE.Vector3(0, 1, 0)
+            )
+          ).multiply(planeGeometryNormalizeQuaternion);
+          const dynamic = false;
+          const rightPlanePhysicsObject = this.physics.addPlaneGeometry(
+            rightPlanePosition,
+            rightPlaneQuaternion,
+            dynamic
+          );
+          physicsIds.push(rightPlanePhysicsObject);
+          this.wallPhysicsObjects.push(rightPlanePhysicsObject);
+        }
+      }
     }
 
     // hide to start
