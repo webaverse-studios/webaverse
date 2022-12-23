@@ -84,6 +84,25 @@ const validate = async (req, res, configs) => {
 };
 
 /**
+ * Check if the request is a preflight request and sets the appropriate CORS headers.
+ *
+ * @param req The http request object
+ * @param res The http response object
+ * @returns {boolean} True if the request was a preflight request, false otherwise
+ */
+const preflight = (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS,POST');
+
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return true;
+    }
+    return false;
+};
+
+/**
  * Implementation of the serverless proxy.
  *
  * @param req The http request object
@@ -91,6 +110,10 @@ const validate = async (req, res, configs) => {
  * @returns {Promise<void>}
  */
 const handler = async (req, res) => {
+    if (preflight(req, res)) {
+        return;
+    }
+
     // Configure OpenAI API
     const openAiApiKey = process.env.OPENAI_KEY;
     const openAiUrl = process.env.OPENAI_URL || 'https://api.openai.com/v1/engines/text-davinci-002/completions';
