@@ -310,9 +310,11 @@ export class ZineCameraManager extends EventTarget {
     this.edgeDepths.bottom.max.fromArray(edgeDepths.bottom.max);
     
     this.edgeDepths.left.min.fromArray(edgeDepths.left.min);
+    this.edgeDepths.left.max.fromArray(edgeDepths.left.max);
+
+    this.edgeDepths.right.min.fromArray(edgeDepths.right.min);
     this.edgeDepths.right.max.fromArray(edgeDepths.right.max);
-    // console.log('set edge depths', edgeDepths, matrixWorld.toArray());
-    // debugger;
+
     this.edgeMatrixWorld.copy(matrixWorld);
   }
 
