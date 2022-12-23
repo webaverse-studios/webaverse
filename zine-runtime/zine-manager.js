@@ -659,34 +659,6 @@ class ZineManager {
     }
     instance.add(panelInstanceManager);
 
-    /* // methods
-    instance.link = () => {
-      // XXX this needs to happen automatically during panel instance manager initiailization
-      console.log('linking needs to happen in the panel instance manager');
-      debugger;
-
-      const panel1 = storyboard.getPanel(1);
-      const zineRenderer2 = this.createRenderer(panel1);
-      // console.log('link instance', zineRenderer, zineRenderer2);
-      
-      zineRenderer.connect(zineRenderer2);
-      
-      // scene mesh
-      {
-        instance.add(zineRenderer2.scene);
-      }
-
-      // extra meshes
-      {
-        const entranceExitMesh2 = new EntranceExitMesh({
-          entranceExitLocations,
-        });
-        zineRenderer2.transformScene.add(entranceExitMesh2);
-      }
-
-      instance.updateMatrixWorld();
-    }; */
-
     // update matrix world
     instance.updateMatrixWorld();
 
