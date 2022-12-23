@@ -298,11 +298,9 @@ export class ZineCameraManager extends EventTarget {
   transitionLockCamera(newCamera, timeMs) {
     const oldCamera = this.lockCamera;
     this.lockCameraAnimation = makeCameraAnimation(oldCamera, newCamera, timeMs);
-    // console.log('lock camera animation', this.lockCameraAnimation);
   }
 
-  setEdgeDepths(edgeDepths, matrixWorld, scaleArray) {
-    // console.log('edge depths 1', this, edgeDepths, scaleArray);
+  setEdgeDepths(edgeDepths, matrixWorld) {
     this.edgeDepths.top.min.fromArray(edgeDepths.top.min);
     this.edgeDepths.top.max.fromArray(edgeDepths.top.max);
 
