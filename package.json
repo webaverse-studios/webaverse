@@ -19,6 +19,7 @@
   ],
   "scripts": {
     "install-libs": "bash scripts/npm-preinstall.sh",
+    "install-prod": "npm i --omit=dev && cd api && npm i --omit=dev",
     "start": "npm run prod",
     "dev": "bash scripts/start-dev.sh",
     "stop": "sudo killall node",
