@@ -249,7 +249,7 @@ export const UserBox = ({className, setLoginFrom}) => {
             onClick={metaMaskLogin}
             onMouseEnter={_triggerClickSound}
           />
-          <CustomButton
+          {/* <CustomButton
             theme="light"
             icon="discord"
             text="Discord"
@@ -258,7 +258,7 @@ export const UserBox = ({className, setLoginFrom}) => {
             className={styles.methodButton}
             // onClick={metaMaskLogin}
             onMouseEnter={_triggerClickSound}
-          />
+          /> */}
           <CustomButton
             theme="light"
             icon="close"
