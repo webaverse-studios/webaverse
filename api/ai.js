@@ -61,8 +61,22 @@ const rateLimitRequest = async req => {
  */
 const validate = async (req, res) => {
     if (!openAiApiKey) {
-        res.status(500).json('Misconfigured');
+        res.status(500).json({error: 'Misconfigured'});
         return false;
+    }
+
+    if (req.method !== 'POST') {
+        res.status(400).json({error: 'Invalid request method'});
+        return false;
+    }
+
+    try {
+        if (!req.body){
+            // Check if the body is valid JSON, Vercel will parse it when accessing the Node.js ".body" helper.
+            // The if is redundant, we just need to access req.body to trigger the parsing.
+        }
+    } catch (error) {
+        return res.status(400).json({error: 'Invalid request Body'});
     }
 
     try {
@@ -107,7 +121,7 @@ const handler = async (req, res) => {
         const data = await apiResponse.json();
         res.status(200).json(data);
     } catch (error) {
-        res.status(500).json(error.message);
+        res.status(500).json({error: error.message});
     }
 };
 
