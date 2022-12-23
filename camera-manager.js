@@ -189,22 +189,9 @@ class CameraTarget extends EventTarget {
     const {position, quaternion} = camera;
 
     const lerpTime = 2000;
-    // const lastTimeFactor = Math.min(Math.max(cubicBezier((this.lastTimestamp - this.lerpStartTime) / lerpTime), 0), 1);
     const currentTimeFactor = Math.min(Math.max(cubicBezier((timestamp - this.lerpStartTime) / lerpTime), 0), 1);
-    // if (lastTimeFactor !== currentTimeFactor) {
-      position.lerpVectors(this.sourcePosition, this.targetPosition, currentTimeFactor);
-      quaternion.slerpQuaternions(this.sourceQuaternion, this.targetQuaternion, currentTimeFactor);
-      /* {
-        const lastLerp = localVector.copy(this.sourcePosition).lerp(this.targetPosition, lastTimeFactor);
-        const currentLerp = localVector2.copy(this.sourcePosition).lerp(this.targetPosition, currentTimeFactor);
-        position.add(currentLerp).sub(lastLerp);
-      }
-      {
-        const lastLerp = localQuaternion.copy(this.sourceQuaternion).slerp(this.targetQuaternion, lastTimeFactor);
-        const currentLerp = localQuaternion2.copy(this.sourceQuaternion).slerp(this.targetQuaternion, currentTimeFactor);
-        quaternion.premultiply(lastLerp.invert()).premultiply(currentLerp);
-      } */
-    // }
+    position.lerpVectors(this.sourcePosition, this.targetPosition, currentTimeFactor);
+    quaternion.slerpQuaternions(this.sourceQuaternion, this.targetQuaternion, currentTimeFactor);
 
     this.lastTimestamp = timestamp;
 
