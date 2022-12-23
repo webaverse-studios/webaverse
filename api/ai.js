@@ -90,7 +90,7 @@ const handler = async (req, res) => {
 
     const {headers, body} = req;
     try {
-        const response = await fetch(openAiUrl, {
+        const apiResponse = await fetch(openAiUrl, {
             method: 'POST',
             headers: {
                 Accept: headers?.Accept || 'application/json',
@@ -99,11 +99,12 @@ const handler = async (req, res) => {
             body: JSON.stringify(body),
         });
 
-        if (!response.ok) {
-            res.status(response.status).json(response.statusText);
+        if (!apiResponse.ok) {
+            res.status(apiResponse.status).json(apiResponse.statusText);
+            return;
         }
-        const data = await response.json();
 
+        const data = await apiResponse.json();
         res.status(200).json(data);
     } catch (error) {
         res.status(500).json(error.message);
