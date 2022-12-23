@@ -24,7 +24,7 @@ const localRay = new THREE.Ray();
 
 const cubicBezier = easing(0, 1, 0, 1);
 
-//
+/* // XXX debugging
 
 const _makeCubeMesh = ({
   color = 0x00FF00,
@@ -81,7 +81,7 @@ const planeMesh = new THREE.Mesh(
 );
 planeMesh.frustumCulled = false;
 scene.add(planeMesh);
-globalThis.planeMesh = planeMesh;
+globalThis.planeMesh = planeMesh; */
 
 //
 
@@ -174,10 +174,10 @@ function setAnimatedCamera(
       const localVector2 = new THREE.Vector3();
       const localVector3 = new THREE.Vector3();
       const localVector4 = new THREE.Vector3();
-      const localVector5 = new THREE.Vector3();
       const localQuaternion = new THREE.Quaternion();
       const localMatrix = new THREE.Matrix4();
 
+      // look at the player
       camera.quaternion.setFromRotationMatrix(
         localMatrix.lookAt(
           camera.position,
@@ -187,7 +187,21 @@ function setAnimatedCamera(
       );
       camera.updateMatrixWorld();
 
-      // clip planes
+      // clip camera position
+      const _pushByCameraPositionDistance = d => {
+        const delta = normal.clone().multiplyScalar(-d);
+        camera.position.add(delta);
+      };
+      const _clipCameraPosition = () => {
+        const d = pushPlane.distanceToPoint(camera.position);
+        if (d < 0) {
+          _pushByCameraPositionDistance(d);
+          camera.updateMatrixWorld();
+        }
+      };
+      // _clipCameraPosition();
+
+      // clip frustum planes using corner points
       const _clipPlane = (direction, up, worldMinPoint) => {
         // edge point
         localMatrix.makeTranslation(worldMinPoint.x, worldMinPoint.y, worldMinPoint.z)
@@ -209,22 +223,16 @@ function setAnimatedCamera(
         const pushPlane = localPlane.setFromNormalAndCoplanarPoint(normal, edgeDepth);
 
         // XXX debug meshes
-        // cubeMesh.position.copy(edgeDepth);
-        // cubeMesh.updateMatrixWorld();
-        planeMesh.position.copy(edgeDepth);
-        planeMesh.quaternion.setFromRotationMatrix(
-          localMatrix.lookAt(
-            new THREE.Vector3(0, 0, 0),
-            normal,
-            localVector4.copy(up).applyQuaternion(srcCamera.quaternion)
-          )
-        );
-        planeMesh.updateMatrixWorld();
+        // planeMesh.position.copy(edgeDepth);
+        // planeMesh.quaternion.setFromRotationMatrix(
+        //   localMatrix.lookAt(
+        //     new THREE.Vector3(0, 0, 0),
+        //     normal,
+        //     localVector4.copy(up).applyQuaternion(srcCamera.quaternion)
+        //   )
+        // );
+        // planeMesh.updateMatrixWorld();
 
-        const _pushByCameraPositionDistance = d => {
-          const delta = normal.clone().multiplyScalar(-d);
-          camera.position.add(delta);
-        };
         const _pushByCameraCornerClipPoint = (clipPoint, clipPointNdc) => {
           const correctionPoint = localPlane.projectPoint(
             clipPoint,
@@ -241,9 +249,12 @@ function setAnimatedCamera(
           // const correctionPoint = localRay.intersectPlane(pushPlane, localVector4);
 
           if (correctionPoint) {
-            cubeMesh3.position.copy(correctionPoint);
-            cubeMesh3.quaternion.copy(camera.quaternion);
-            cubeMesh3.updateMatrixWorld();
+            // cubeMesh3.position.copy(correctionPoint);
+            // cubeMesh3.quaternion.copy(camera.quaternion);
+            // cubeMesh3.updateMatrixWorld();
+
+
+
 
             // shift the camera by the correction point
             // const delta = localVector5.copy(correctionPoint)
@@ -282,17 +293,6 @@ function setAnimatedCamera(
             camera.quaternion.premultiply(correctionQuaternion);
           }
         };
-
-        // clip camera position
-        // {
-        //   const d = pushPlane.distanceToPoint(camera.position);
-        //   if (d < 0) {
-        //     _pushByCameraPositionDistance(d);
-        //     camera.updateMatrixWorld();
-        //   }
-        // }
-
-        // clip corner points
         {
           const clipArmLength = 10;
 
@@ -314,9 +314,9 @@ function setAnimatedCamera(
             return p.clone().unproject(camera);
           });
 
-          cubeMesh.position.copy(new THREE.Vector3(direction.x, direction.y, 1).sub(axis).unproject(camera));
-          cubeMesh.quaternion.copy(camera.quaternion);
-          cubeMesh.updateMatrixWorld();
+          // cubeMesh.position.copy(new THREE.Vector3(direction.x, direction.y, 1).sub(axis).unproject(camera));
+          // cubeMesh.quaternion.copy(camera.quaternion);
+          // cubeMesh.updateMatrixWorld();
 
           for (let i = 0; i < cameraCornerPoints.length; i++) {
             const cameraCornerPoint = cameraCornerPoints[i];
@@ -330,82 +330,19 @@ function setAnimatedCamera(
             // get the clip point and correction point
             const clipPoint = cameraCornerPoints[clipIndex];
             const clipPointNdc = cameraCornerPointNdcs[clipIndex];
-            // _pushByCameraCornerClipPoint(clipPoint, clipPointNdc);
+            _pushByCameraCornerClipPoint(clipPoint, clipPointNdc);
             camera.updateMatrixWorld();
 
-            cubeMesh2.position.copy(new THREE.Vector3(direction.x, direction.y, 0).sub(axis).unproject(camera));
-            cubeMesh2.quaternion.copy(camera.quaternion);
-            cubeMesh2.updateMatrixWorld();
+            // cubeMesh2.position.copy(new THREE.Vector3(direction.x, direction.y, 0).sub(axis).unproject(camera));
+            // cubeMesh2.quaternion.copy(camera.quaternion);
+            // cubeMesh2.updateMatrixWorld();
           }
         }
       };
       // _clipPlane(new THREE.Vector3(-1, 0, 0), new THREE.Vector3(0, 1, 0), edgeDepths.left.min);
       // _clipPlane(new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, -1, 0), edgeDepths.right.min);
-      _clipPlane(new THREE.Vector3(0, 1, 0), new THREE.Vector3(1, 0, 0), edgeDepths.top.min);
+      // _clipPlane(new THREE.Vector3(0, 1, 0), new THREE.Vector3(1, 0, 0), edgeDepths.top.min);
       // _clipPlane(new THREE.Vector3(0, -1, 0), new THREE.Vector3(-1, 0, 0), edgeDepths.bottom.min);
-
-      globalThis.edgeDepths2 = edgeDepths;
-      // globalThis.depths = {
-      //   top: edgeDepths.top,
-      //   bottom: edgeDepths.bottom,
-      //   left: edgeDepths.left,
-      //   right: edgeDepths.right,
-      //   tops: edgeDepths.tops,
-      //   bottoms: edgeDepths.bottoms,
-      //   lefts: edgeDepths.lefts,
-      //   rights: edgeDepths.rights,
-      // };
-
-      // edgeDepth
-      // const farScale = 1000;
-      // const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
-      // XXX do not clip from the center, but the side
-      // const leftEdgeDepth = edgeDepths.left.min.clone()
-      //   // .multiplyScalar(farScale)
-      //   .applyMatrix4(matrixWorld)
-      //   .sub(camera.position);
-      // const rightEdgeDepth = edgeDepths.right.min.clone()
-      //   // .multiplyScalar(farScale)
-      //   .applyMatrix4(matrixWorld)
-      //   .sub(camera.position);
-      // const topEdgeDepth = edgeDepths.top.min.clone()
-      //   // .multiplyScalar(farScale)
-      //   .applyMatrix4(matrixWorld)
-      //   .sub(camera.position);
-      // const bottomEdgeDepth = edgeDepths.bottom.min.clone()
-      //   // .multiplyScalar(farScale)
-      //   .applyMatrix4(matrixWorld)
-      //   .sub(camera.position);
-      // const leftFovDiff = getSignedAngle(
-      //   forward.x, -forward.z,
-      //   leftEdgeDepth.x, -leftEdgeDepth.z
-      // );
-      // const rightFovDiff = getSignedAngle(
-      //   forward.x, -forward.z,
-      //   rightEdgeDepth.x, -rightEdgeDepth.z
-      // );
-      // const topFovDiff = getSignedAngle(
-      //   -forward.y, -forward.z,
-      //   -topEdgeDepth.y, -topEdgeDepth.z
-      // );
-      // const bottomFovDiff = getSignedAngle(
-      //   -forward.y, -forward.z,
-      //   -bottomEdgeDepth.y, -bottomEdgeDepth.z
-      // );
-
-      // localEuler.setFromQuaternion(camera.quaternion, 'YXZ');
-      // // const fovRadians = camera.fov * Math.PI / 180;
-      // if (leftFovDiff < 0 && leftFovDiff >= -Math.PI / 2) {
-      //   localEuler.y += leftFovDiff;
-      // } else if (rightFovDiff > 0 && rightFovDiff <= Math.PI / 2) {
-      //   localEuler.y += rightFovDiff;
-      // }
-      // if (topFovDiff < 0 && topFovDiff >= -Math.PI / 2) {
-      //   localEuler.x += topFovDiff;
-      // } else if (bottomFovDiff > 0 && bottomFovDiff <= Math.PI / 2) {
-      //   localEuler.x += bottomFovDiff;
-      // }
-      // camera.quaternion.setFromEuler(localEuler);
     }
   };
 
