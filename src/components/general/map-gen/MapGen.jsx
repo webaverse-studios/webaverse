@@ -985,6 +985,7 @@ export const MapGen = () => {
   useEffect(() => {
     (async () => {
       if (state.openedPanel === 'MapGenPanel' && !loaded) {
+        console.log("opens");
         setLoaded(true);
 
         // lights
@@ -1011,9 +1012,11 @@ export const MapGen = () => {
         mapScene.add(selectedPhysicsMesh);
         setSelectedPhysicsMesh(selectedPhysicsMesh);
 
+        // THIS SEEMS TO BE LEGACY CODE. PURPOSE UNCLEAR
         // apps
-        await Promise.all([
+        /*await Promise.all([
           (async () => {
+            
             // street base
             const streetBaseApp = await metaversefile.createAppAsync({
               start_url: '../street-base/',
@@ -1039,7 +1042,7 @@ export const MapGen = () => {
             mapScene.add(terrainApp);
             setTerrainApp(terrainApp);
           })(),
-        ]);
+        ]);*/
       }
     })();
   }, [state.openedPanel, loaded]);
