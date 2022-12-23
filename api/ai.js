@@ -19,7 +19,7 @@ const openAiUrl = process.env.OPENAI_URL || 'https://api.openai.com/v1/engines/t
 // Redis DB for rate limiting data
 const rateLimitDb = new Redis({
     url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
 });
 
 // IP address rate limiter
@@ -40,16 +40,16 @@ const globalRateLimit = new Ratelimit({
  * @returns {Promise<void>}
  * @throws {Error} If any of the rate limits were exceeded
  */
-const rateLimitRequest = async (req) => {
+const rateLimitRequest = async req => {
     const {headers} = req;
     const ip = headers['x-real-ip'];
-    const {success} = await ipRateLimit.limit(ip);
-    if (!success) {
-        throw new Error(`Rate limit exceeded for IP address ${ip}`);
+    const {success: ipSuccess} = await ipRateLimit.limit(ip);
+    if (!ipSuccess) {
+        throw new Error('Rate limit exceeded');
     }
-    const {globalSuccess} = await globalRateLimit.limit(globalRateLimitIdentifier);
+    const {success: globalSuccess} = await globalRateLimit.limit(globalRateLimitIdentifier);
     if (!globalSuccess) {
-        throw new Error(`Global rate limit exceeded`);
+        throw new Error('Global rate limit exceeded');
     }
 };
 
