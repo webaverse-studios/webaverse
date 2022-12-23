@@ -7,6 +7,7 @@ import {AppContext} from '../../app';
 import universe from '../../../../universe';
 import {makeId} from '../../../../util.js';
 import classnames from 'classnames';
+import cameraManager from '../../../../camera-manager';
 
 
 // const sceneNames = await sceneManager.getSceneNamesAsync();
@@ -119,7 +120,7 @@ export const Location = () => {
 
   return (
     <div className={styles.locationWrap} onClick={stopPropagation}>
-      <div className={styles.scenesList}>
+      <div className={styles.scenesList} onMouseEnter={() => {cameraManager.canZoom = false;}} onMouseLeave={() => {cameraManager.canZoom = true;}}>
         {scenesList.map((sceneName, i) => {
           const scnName = sceneName
             .replace('.scn', '')
@@ -128,6 +129,7 @@ export const Location = () => {
             <div
               className={styles.scene}
               onMouseDown={e => {
+                cameraManager.canZoom = true;
                 handleSceneSelect(e, sceneName);
               }}
               key={i}

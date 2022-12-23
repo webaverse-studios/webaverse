@@ -169,6 +169,7 @@ class CameraManager extends EventTarget {
     this.pointerLockElement = null;
     // this.pointerLockEpoch = 0;
     this.shakes = [];
+    this.canZoom = true;
     this.focus = false;
     this.lastFocusChangeTime = 0; // XXX this needs to be removed
     this.fovFactor = 0;
@@ -309,7 +310,7 @@ class CameraManager extends EventTarget {
   }
 
   handleWheelEvent(e) {
-    if (!this.target) {
+    if (!this.target && this.canZoom) {
       cameraOffsetTargetZ = clamp(cameraOffset.z - e.deltaY * 0.01, -MAX_THIRD_PERSON_CAMERA_DISTANCE, 0);
     }
   }
