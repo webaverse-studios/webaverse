@@ -384,7 +384,7 @@ export const App = () => {
                 <Header setSelectedApp={ setSelectedApp } selectedApp={ selectedApp } />
                 <Crosshair />
                 {state.openedPanel !== 'CharacterSelect' &&
-                    <PlayMode />
+                    <PlayMode setShowUI={setShowUI}/>
                 }
                 <EditorMode
                     selectedScene={ selectedScene }
