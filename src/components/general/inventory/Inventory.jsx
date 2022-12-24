@@ -130,7 +130,7 @@ const Token = ({
                 timerTimestamp={object.voucher ? object.voucher.expiry : false}
             />
             <div className={styles.tokenDropdown}>
-                {showTokenDropDown && showTokenDropDown === object && (
+                { !object.isSpawn && showTokenDropDown && showTokenDropDown === object && (
                     <>
                         <CustomButton
                             theme="dark"
@@ -225,7 +225,7 @@ const TokenList = ({
 };
 
 export const Inventory = () => {
-    const {state, setState, account, claimableToken, setClaimableToken, mintedToken, setMintedToken, resourceToken, getWalletItems} = useContext(AppContext);
+    const {state, setState, account, claimableToken, setClaimableToken, mintedToken, setMintedToken, spawnItem, resourceToken, getWalletItems} = useContext(AppContext);
     const [hoverObject, setHoverObject] = useState(null);
     const [selectObject, setSelectObject] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -395,6 +395,10 @@ export const Inventory = () => {
                                     name: "From Upstreet",
                                     tokens: mintedToken,
                                 },
+                                {
+                                    name: "Spawn",
+                                    tokens: spawnItem,
+                                }
                             ]}
                             open={true}
                             hoverObject={hoverObject}
