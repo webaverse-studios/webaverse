@@ -1043,8 +1043,6 @@ class ZineManager {
           }
         };
         _compile();
-        // globalThis.compile = _compile;
-        // globalThis.instance1 = panelInstanceManager.panelInstances[1];
       };
       const cleanup = () => {
         panelInstanceManager.removeEventListener('load', onload);
