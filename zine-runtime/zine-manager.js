@@ -767,7 +767,6 @@ class PanelInstanceManager extends THREE.Object3D {
     })();
 
     // connect panels
-    // console.log('connect panels', this.panelInstances.length)
     for (let i = 0; i < this.panelInstances.length - 1; i++) {
       // connect panels
       const panelInstance = this.panelInstances[i];
@@ -805,21 +804,74 @@ class PanelInstanceManager extends THREE.Object3D {
 
           const currentPanelInstance = this.panelInstances[this.panelIndex];
           const {entranceExitLocations} = currentPanelInstance.zineRenderer.metadata;
-          const entranceLocation = entranceExitLocations[entranceExitIndex];
+          const exitLocation = entranceExitLocations[entranceExitIndex];
           
+          // compute exitWorldLocation
           localMatrix.compose(
-            localVector.fromArray(entranceLocation.position),
-            localQuaternion.fromArray(entranceLocation.quaternion),
+            localVector.fromArray(exitLocation.position),
+            localQuaternion.fromArray(exitLocation.quaternion),
             oneVector
-          ).premultiply(currentPanelInstance.zineRenderer.transformScene.matrixWorld).decompose(
+          )
+          .premultiply(
+            currentPanelInstance.zineRenderer.transformScene.matrixWorld
+          )
+          .decompose(
             localVector,
             localQuaternion,
             localVector2
           );
+          const exitWorldLocation = {
+            position: localVector.toArray(),
+            quaternion: localQuaternion.toArray(),
+          };
+
+          // compute entranceLocalLocation
+          const nextPanelInstance = this.panelInstances[nextPanelIndex];
+          const nextEntranceIndex = nextPanelIndex > this.panelIndex ? 0 : 1;
+          const {
+            entranceExitLocations: nextEntranceExitLocations,
+          } = nextPanelInstance.zineRenderer.metadata;
+          const nextEntranceLocation = nextEntranceExitLocations[nextEntranceIndex];
+          const {panel} = nextPanelInstance;
+          const layer1 = panel.getLayer(1);
+          const positionArray = layer1.getData('position');
+          const quaternionArray = layer1.getData('quaternion');
+          const scaleArray = layer1.getData('scale');
+          // const nextFloorPlaneLocation = layer1.getData('floorPlaneLocation');
+          // const nextFloorPlanePosition = new THREE.Vector3().fromArray(nextFloorPlaneLocation.position);
+          // const nextFloorPlaneQuaternion = new THREE.Quaternion().fromArray(nextFloorPlaneLocation.quaternion)
+          
+          const position = new THREE.Vector3().fromArray(positionArray);
+          const quaternion = new THREE.Quaternion().fromArray(quaternionArray);
+          const scale = new THREE.Vector3().fromArray(scaleArray);
+          const mainMatrixWorld = new THREE.Matrix4()
+            .compose(
+              position,
+              quaternion,
+              scale
+            );
+          
+          new THREE.Matrix4()
+            .compose(
+              localVector.fromArray(nextEntranceLocation.position),
+              localQuaternion.fromArray(nextEntranceLocation.quaternion),
+              oneVector
+            )
+            .premultiply(mainMatrixWorld)
+            .decompose(
+              localVector,
+              localQuaternion,
+              localVector2
+            );
+          const entranceLocalLocation = {
+            position: localVector.toArray(),
+            quaternion: localQuaternion.toArray(),
+          };
+
           localPlane.setFromNormalAndCoplanarPoint(
             localVector2.set(0, 0, -1)
-              .applyQuaternion(localQuaternion),
-            localVector
+              .applyQuaternion(localQuaternion.fromArray(exitWorldLocation.quaternion)),
+            localVector.fromArray(exitWorldLocation.position)
           );
 
           const localPlayer = playersManager.getLocalPlayer();
@@ -828,18 +880,52 @@ class PanelInstanceManager extends THREE.Object3D {
 
           // if we are on the opposite side of the entrance plane
           if (signedDistance < 0) {
-            // deselect old panel
-            currentPanelInstance.setSelected(false);
+            // align new panel under avatar
+            {
+              const localPlayer = playersManager.getLocalPlayer();
+              const playerHeight = localPlayer.avatar.height;
+              const playerFloorPosition = localPlayer.position.clone();
+              playerFloorPosition.y -= playerHeight;
 
-            // perform the transition animation in the story camera manager
-            // note that we have to do this before setting the new panel,
-            // so that the old camera start point can be snappshotted
-            const newPanelInstance = this.panelInstances[nextPanelIndex];
-            this.zineCameraManager.transitionLockCamera(newPanelInstance.zineRenderer.camera, cameraTransitionTime);
+              // compute height
+              const result = physics.raycast(
+                localPlayer.position,
+                downQuaternion,
+              );
+              let heightOffset = 0;
+              if (result) {
+                heightOffset = result.distance - playerHeight;
+              }
+              playerFloorPosition.y -= heightOffset;
 
-            // select new panel
-            this.panelIndex = nextPanelIndex;
-            newPanelInstance.setSelected(true);
+              // offset backward along the exit plane
+              const entranceFrontOffset = 0.001;
+              playerFloorPosition.add(
+                localVector.set(0, 0, -entranceFrontOffset)
+                  .applyQuaternion(localQuaternion.fromArray(exitWorldLocation.quaternion))
+              );
+
+              // align
+              nextPanelInstance.alignEntranceToFloor(
+                playerFloorPosition,
+                exitWorldLocation,
+                entranceLocalLocation
+              );
+            }
+            /*if (window.lol) */ {
+              // deselect old panel
+              currentPanelInstance.setSelected(false);
+
+              // perform the transition animation in the story camera manager
+              // note that we have to do this before setting the new panel,
+              // so that the old camera start point can be snappshotted
+              this.zineCameraManager.transitionLockCamera(nextPanelInstance.zineRenderer.camera, cameraTransitionTime);
+
+              // select new panel
+              console.log('select next panel', this.panelIndex, nextPanelIndex);
+              this.panelIndex = nextPanelIndex;
+              nextPanelInstance.setSelected(true);
+            }
           }
         }
       });
