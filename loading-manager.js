@@ -12,6 +12,56 @@ export class LoadingManager {
         this.loadingScreen.style.zIndex = 1000;
         document.body.appendChild(this.loadingScreen);
 
+        const backgroundImage = document.createElement('img');
+        backgroundImage.src = 'images/loadingplaceholder.jpg';
+        backgroundImage.style.position = 'absolute';
+        backgroundImage.style.top = 0;
+        backgroundImage.style.left = 0;
+        backgroundImage.style.width = '100%';
+        backgroundImage.style.height = '100%';
+        backgroundImage.style.filter = 'blur(10px)';
+        // darken the background image
+        backgroundImage.style.opacity = 0.75;
+        backgroundImage.style.objectFit = 'cover';
+        backgroundImage.style.zIndex = -1;
+        this.loadingScreen.appendChild(backgroundImage);
+
+        // detect if the user is on mobile
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+        // detect if the user is using chromium, chrome or a compatible browser
+        const isChromium = window.chrome;
+
+        // detect if Firefox
+        const isFirefox = typeof InstallTrigger !== 'undefined';
+
+        if(isMobile || !isChromium) {
+            // display a div that tells the user to use a compatible browser on a desktop computer
+            // make sure the div uses relative units
+            const incompatibleBrowser = document.createElement('div');
+            incompatibleBrowser.style.position = 'absolute';
+            incompatibleBrowser.style.top = '50%';
+            incompatibleBrowser.style.left = '50%';
+            incompatibleBrowser.style.width = '100%';
+            incompatibleBrowser.style.textAlign = 'center';
+            incompatibleBrowser.style.color = 'rgba(255, 255, 255, 1.0)';
+            incompatibleBrowser.style.transform = 'translate(-50%, -50%)';
+            incompatibleBrowser.style.fontSize = '2vw';
+            incompatibleBrowser.style.fontFamily = 'Arial';
+            incompatibleBrowser.style.fontWeight = 'bold';
+            incompatibleBrowser.style.zIndex = 1001;
+            if(isMobile){
+                incompatibleBrowser.innerHTML = 'This experience is currently only available on Desktop. Mobile is coming soon!';
+            } else if (isFirefox) {
+                incompatibleBrowser.innerHTML = 'This experience is not available in Firefox. Sorry!';
+            } else {
+                incompatibleBrowser.innerHTML = 'This experience is not available in your browser. Please use Chrome, Edge, Chromium, Brave or Opera.';
+            }
+            this.loadingScreen.appendChild(incompatibleBrowser);
+            return;
+        }
+
+
         this.loadingBar = document.createElement('div');
         this.loadingBar.style.backgroundImage = 'url(images/ui/loadingbarprogress.svg)';
         this.loadingBar.style.backgroundPosition = 'center';
@@ -38,20 +88,6 @@ export class LoadingManager {
         border.style.transform = 'translate(-50%, 0%)';
         this.loadingScreen.appendChild(border);
 
-        const backgroundImage = document.createElement('img');
-        backgroundImage.src = 'images/loadingplaceholder.jpg';
-        backgroundImage.style.position = 'absolute';
-        backgroundImage.style.top = 0;
-        backgroundImage.style.left = 0;
-        backgroundImage.style.width = '100%';
-        backgroundImage.style.height = '100%';
-        backgroundImage.style.filter = 'blur(10px)';
-        // darken the background image
-        backgroundImage.style.opacity = 0.75;
-        backgroundImage.style.objectFit = 'cover';
-        backgroundImage.style.zIndex = -1;
-
-        this.loadingScreen.appendChild(backgroundImage);
         const keyboardImage = document.createElement('div');
         keyboardImage.style.position = 'absolute';
         keyboardImage.style.top = 'calc(50% + 20px)';
