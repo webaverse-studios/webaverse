@@ -5,37 +5,41 @@ import fetch from 'node-fetch';
 import {Ratelimit} from '@upstash/ratelimit';
 import {Redis} from '@upstash/redis';
 
+// Configure rate limiting
+const ipRateLimitWindowInSecs = process.env.IP_RATE_LIMIT_WINDOW_IN_SECS || 600; // 10 minutes by default
+const globalRateLimitWindowInSecs = process.env.GLOBAL_RATE_LIMIT_WINDOW_IN_SECS || 60; // 1 minute by default
+const ipRateLimitMaxRequests = process.env.IP_RATE_LIMIT_MAX_REQUESTS || 5; // 5 requests per 10 minutes per IP address by default
+const globalRateLimitMaxRequests = process.env.GLOBAL_RATE_LIMIT_MAX_REQUESTS || 10; // 10 requests per 1 minute by default
+const globalRateLimitIdentifier = process.env.GLOBAL_RATE_LIMIT_IDENTIFIER || 'global'; // Global rate limit identifier
+
+// Redis DB for rate limiting data
+const rateLimitDb = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
+
+// IP address rate limiter
+const ipRateLimit = new Ratelimit({
+    redis: rateLimitDb,
+    limiter: Ratelimit.fixedWindow(ipRateLimitMaxRequests, `${ipRateLimitWindowInSecs} s`),
+});
+
+// Global rate limiter
+const globalRateLimit = new Ratelimit({
+    redis: rateLimitDb,
+    limiter: Ratelimit.slidingWindow(globalRateLimitMaxRequests, `${globalRateLimitWindowInSecs} s`),
+});
+
+// Configure OpenAI API
+const openAiApiKey = process.env.OPENAI_KEY;
+const openAiUrl = process.env.OPENAI_URL || 'https://api.openai.com/v1/engines/text-davinci-002/completions';
+
 /**
  * Rate limit requests by IP address and globally
  * @param req The http request object
  * @returns {Promise<boolean>} True if the request was rate limited, false otherwise
  */
 const rateLimitRequest = async (req, res) => {
-    // Configure rate limiting
-    const ipRateLimitWindowInSecs = process.env.IP_RATE_LIMIT_WINDOW_IN_SECS || 600; // 10 minutes by default
-    const globalRateLimitWindowInSecs = process.env.GLOBAL_RATE_LIMIT_WINDOW_IN_SECS || 60; // 1 minute by default
-    const ipRateLimitMaxRequests = process.env.IP_RATE_LIMIT_MAX_REQUESTS || 5; // 5 requests per 10 minutes per IP address by default
-    const globalRateLimitMaxRequests = process.env.GLOBAL_RATE_LIMIT_MAX_REQUESTS || 10; // 10 requests per 1 minute by default
-    const globalRateLimitIdentifier = process.env.GLOBAL_RATE_LIMIT_IDENTIFIER || 'global'; // Global rate limit identifier
-
-    // Redis DB for rate limiting data
-    const rateLimitDb = new Redis({
-        url: process.env.UPSTASH_REDIS_REST_URL,
-        token: process.env.UPSTASH_REDIS_REST_TOKEN,
-    });
-
-    // IP address rate limiter
-    const ipRateLimit = new Ratelimit({
-        redis: rateLimitDb,
-        limiter: Ratelimit.fixedWindow(ipRateLimitMaxRequests, `${ipRateLimitWindowInSecs} s`),
-    });
-
-    // Global rate limiter
-    const globalRateLimit = new Ratelimit({
-        redis: rateLimitDb,
-        limiter: Ratelimit.slidingWindow(globalRateLimitMaxRequests, `${globalRateLimitWindowInSecs} s`),
-    });
-
     const {headers} = req;
     const ip = headers['x-real-ip'];
     const {success: ipSuccess} = await ipRateLimit.limit(ip);
@@ -58,8 +62,8 @@ const rateLimitRequest = async (req, res) => {
  * @param res The http response object
  * @returns {Promise<boolean>} True if the request is valid, false otherwise
  */
-const validate = async (req, res, configs) => {
-    if (!configs.openAiApiKey) {
+const validate = async (req, res) => {
+    if (!openAiApiKey) {
         res.status(500).json({error: 'Misconfigured'});
         return false;
     }
@@ -114,11 +118,7 @@ const handler = async (req, res) => {
         return;
     }
 
-    // Configure OpenAI API
-    const openAiApiKey = process.env.OPENAI_KEY;
-    const openAiUrl = process.env.OPENAI_URL || 'https://api.openai.com/v1/engines/text-davinci-002/completions';
-
-    const valid  = await validate(req, res, {openAiApiKey, openAiUrl});
+    const valid  = await validate(req, res);
     if (!valid) {
         return;
     }
