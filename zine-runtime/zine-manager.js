@@ -641,6 +641,27 @@ class PanelRuntimeInstance extends THREE.Object3D {
       }
     }
   }
+  alignEntranceToFloor(floorPosition, exitWorldLocation, entranceLocalLocation) {
+    // transform the zine renderer
+    this.zineRenderer.alignEntranceToFloorPosition(floorPosition, exitWorldLocation, entranceLocalLocation);
+
+    // call update() on all physics objects
+    // XXX aligning is only supported for disabled actors!
+    // XXX because we need to add + remove them to set their transform
+    // XXX this can be fixed by tracking physics id lookups independently of scene children in the C++ code
+    for (let i = 0; i < this.physicsIds.length; i++) {
+      const physicsObject = this.physicsIds[i];
+      this.physics.enableActor(physicsObject);
+    }
+    for (let i = 0; i < this.physicsIds.length; i++) {
+      const physicsObject = this.physicsIds[i];
+      physicsObject.update();
+    }
+    for (let i = 0; i < this.physicsIds.length; i++) {
+      const physicsObject = this.physicsIds[i];
+      this.physics.disableActor(physicsObject);
+    }
+  }
   update() {
     if (this.selected) {
       const {zineRenderer} = this;
