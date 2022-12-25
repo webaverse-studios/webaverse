@@ -10,6 +10,7 @@ class DropManager extends EventTarget {
     super();
 
     this.claims = [];
+    this.spawns = [];
   }
 
   async createDropApp({
@@ -79,6 +80,31 @@ class DropManager extends EventTarget {
       data: {
         claims: this.claims,
         addedClaim: claim
+      },
+    }));
+  }
+
+  addSpawnToBackpack({name, contentId, uuid }) {
+    // console.log("spawn pick up", app)
+    const spawn = {
+      name,
+      start_url: contentId, 
+      uuid
+    };
+    this.spawns.push(spawn);
+    this.dispatchEvent(new MessageEvent('spawnschange', {
+      data: {
+        spawns: this.spawns
+      },
+    }));
+  }
+
+  removeSpawnFromBackpack({uuid}) {
+    const newSpawns = this.spawns.filter((each) => each.uuid !== uuid)
+    this.spawns = newSpawns;
+    this.dispatchEvent(new MessageEvent('spawnschange', {
+      data: {
+        spawns: newSpawns
       },
     }));
   }
