@@ -16,7 +16,8 @@ const minimapWorldSize = 400;
 const minimapMinZoom = 0.1;
 const minimapBaseSpeed = 30;
 
-export const Minimap = ({className}) => {
+export const Minimap = ({setShowUI, className}) => {
+    const ref = useRef();
     const canvasRef = useRef();
     const {setState} = useContext(AppContext);
     const [ micEnabled, setMicEnabled ] = useState(false);
@@ -67,6 +68,10 @@ export const Minimap = ({className}) => {
         }
     };
 
+    const handleHideBtnClick = async () => {
+      setShowUI(false);
+    }
+
     useEffect(() => {
         function michange(event) {
             setMicEnabled(event.data.enabled);
@@ -86,7 +91,7 @@ export const Minimap = ({className}) => {
     }, []);
 
     return (
-        <div className={classNames(className, styles.locationMenu)} onClick={ stopPropagation }>
+        <div className={classNames(className, styles.locationMenu)} ref={ref} onClick={ stopPropagation }>
             <div className={styles.controls}>
                 <CustomButton
                     type="icon"
@@ -119,6 +124,7 @@ export const Minimap = ({className}) => {
                     theme="dark"
                     icon="hide"
                     className={styles.button}
+                    onClick={handleHideBtnClick}
                     size={24}
                 />
             </div>
