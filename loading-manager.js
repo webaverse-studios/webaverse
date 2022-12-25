@@ -1,6 +1,5 @@
 export class LoadingManager {
     constructor(webaverse) {
-
         this.loadingScreen = document.createElement('div');
         this.loadingScreen.style.position = 'fixed';
         this.loadingScreen.style.top = 0;
@@ -14,60 +13,70 @@ export class LoadingManager {
         document.body.appendChild(this.loadingScreen);
 
         this.loadingBar = document.createElement('div');
+        this.loadingBar.style.backgroundImage = 'url(images/ui/loadingbarprogress.svg)';
+        this.loadingBar.style.backgroundPosition = 'center';
+        this.loadingBar.style.backgroundSize = 'contain';
         this.loadingBar.style.position = 'absolute';
-        this.loadingBar.style.top = '50%';
+        this.loadingBar.style.bottom = '151px';
         this.loadingBar.style.left = '50%';
         this.loadingBar.style.width = '0%';
         this.loadingBar.style.height = '5px';
-        this.loadingBar.style.background = 'rgba(255, 255, 255, 1.0)';
-        this.loadingBar.style.transform = 'translate(-50%, -50%)';
+        this.loadingBar.style.transform = 'translate(-50%, 0%)';
+        this.loadingBar.style.zIndex = 1001;
         this.loadingScreen.appendChild(this.loadingBar);
 
         const border = document.createElement('div');
+        border.style.backgroundImage = 'url(images/ui/loadingbar.svg)';
+        border.style.backgroundPosition = 'center';
+        border.style.backgroundSize = 'contain';
+        border.style.backgroundRepeat = 'no-repeat';
         border.style.position = 'absolute';
-        border.style.top = '50%';
+        border.style.bottom = '100px';
         border.style.left = '50%';
-        border.style.width = '50%';
-        border.style.height = '5px';
-        border.style.background = 'rgba(255, 255, 255, 0.5)';
-        border.style.transform = 'translate(-50%, -50%)';
+        border.style.width = '800px';
+        border.style.height = '92px';
+        border.style.transform = 'translate(-50%, 0%)';
         this.loadingScreen.appendChild(border);
 
-        const loadingText = document.createElement('div');
-        loadingText.style.position = 'absolute';
-        loadingText.style.top = 'calc(50% - 20px)';
-        loadingText.style.left = '50%';
-        loadingText.style.width = '100%';
-        loadingText.style.textAlign = 'center';
-        loadingText.style.color = 'rgba(255, 255, 255, 1.0)';
-        loadingText.style.transform = 'translate(-50%, -50%)';
-        loadingText.innerHTML = 'LOADING...';
-        loadingText.style.fontSize = '20px';
-        this.loadingScreen.appendChild(loadingText);
-
         const backgroundImage = document.createElement('img');
-        backgroundImage.src = 'images/world.jpg';
+        backgroundImage.src = 'images/loadingplaceholder.jpg';
         backgroundImage.style.position = 'absolute';
         backgroundImage.style.top = 0;
         backgroundImage.style.left = 0;
         backgroundImage.style.width = '100%';
         backgroundImage.style.height = '100%';
         backgroundImage.style.filter = 'blur(10px)';
+        // darken the background image
+        backgroundImage.style.opacity = 0.75;
         backgroundImage.style.objectFit = 'cover';
-
         backgroundImage.style.zIndex = -1;
 
         this.loadingScreen.appendChild(backgroundImage);
+        const keyboardImage = document.createElement('div');
+        keyboardImage.style.position = 'absolute';
+        keyboardImage.style.top = 'calc(50% + 20px)';
+        keyboardImage.style.left = '50%';
+        keyboardImage.style.width = '100%';
+        keyboardImage.style.textAlign = 'center';
+        keyboardImage.style.color = 'rgba(255, 255, 255, 1.0)';
+        keyboardImage.style.transform = 'translate(-50%, -50%)';
+        keyboardImage.style.backgroundImage = 'url(images/inputlayout.png)';
+        keyboardImage.style.backgroundPosition = 'center';
+        keyboardImage.style.backgroundSize = 'contain';
+        keyboardImage.style.width = '60vw';
+        keyboardImage.style.height = '26vw';
+        keyboardImage.style.zIndex = 1;
+
+        this.loadingScreen.appendChild(keyboardImage);
 
         this.webavere = webaverse;
     
         webaverse.addEventListener('loadProgress', e => {
             const progress = e.data.loadProgressPercentage;
-            this.loadingBar.style.width = `${progress/2}%`;
+            this.loadingBar.style.width = `${progress/100*800-10}px`;
         });
 
         webaverse.addEventListener('loaded', e => {
-            // console.log('received loaded event', e)
             this.hide();
         });
     }
