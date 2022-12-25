@@ -69,6 +69,7 @@ import {makePromise} from '../util.js';
 
 const cameraTransitionTime = 3000;
 const oneVector = new THREE.Vector3(1, 1, 1);
+const downQuaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
 const seed = '';
 
 // locals
@@ -83,6 +84,9 @@ const localFrustum = new THREE.Frustum();
 const localRaycaster = new THREE.Raycaster();
 const localCamera = new THREE.PerspectiveCamera();
 const localOrthographicCamera = new THREE.OrthographicCamera();
+
+const zeroVector = new THREE.Vector3(0, 0, 0);
+const upVector = new THREE.Vector3(0, 1, 0);
 
 const planeGeometryNormalizeQuaternion = new THREE.Quaternion()
   .setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI/2);
