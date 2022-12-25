@@ -17,7 +17,7 @@ export class LoadingManager {
         this.loadingBar.style.backgroundPosition = 'center';
         this.loadingBar.style.backgroundSize = 'contain';
         this.loadingBar.style.position = 'absolute';
-        this.loadingBar.style.bottom = 'calc(152px)';
+        this.loadingBar.style.bottom = '151px';
         this.loadingBar.style.left = '50%';
         this.loadingBar.style.width = '0%';
         this.loadingBar.style.height = '5px';
@@ -33,19 +33,21 @@ export class LoadingManager {
         border.style.position = 'absolute';
         border.style.bottom = '100px';
         border.style.left = '50%';
-        border.style.width = '80vw';
+        border.style.width = '800px';
         border.style.height = '92px';
         border.style.transform = 'translate(-50%, 0%)';
         this.loadingScreen.appendChild(border);
 
         const backgroundImage = document.createElement('img');
-        backgroundImage.src = 'images/world.jpg';
+        backgroundImage.src = 'images/loadingplaceholder.jpg';
         backgroundImage.style.position = 'absolute';
         backgroundImage.style.top = 0;
         backgroundImage.style.left = 0;
         backgroundImage.style.width = '100%';
         backgroundImage.style.height = '100%';
         backgroundImage.style.filter = 'blur(10px)';
+        // darken the background image
+        backgroundImage.style.opacity = 0.75;
         backgroundImage.style.objectFit = 'cover';
         backgroundImage.style.zIndex = -1;
 
@@ -71,7 +73,7 @@ export class LoadingManager {
     
         webaverse.addEventListener('loadProgress', e => {
             const progress = e.data.loadProgressPercentage;
-            this.loadingBar.style.width = `calc(${progress*(.8)}vw - 10px)`;
+            this.loadingBar.style.width = `${progress/100*800-10}px`;
         });
 
         webaverse.addEventListener('loaded', e => {
