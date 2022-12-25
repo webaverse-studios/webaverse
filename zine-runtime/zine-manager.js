@@ -91,6 +91,27 @@ const upVector = new THREE.Vector3(0, 1, 0);
 const planeGeometryNormalizeQuaternion = new THREE.Quaternion()
   .setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI/2);
 
+// helpers
+
+const forwardizeQuaternion = (() => {
+  const localVector = new THREE.Vector3();
+  const localMatrix = new THREE.Matrix4();
+  
+  return quaternion => {
+    const forwardDirection = localVector.set(0, 0, -1)
+      .applyQuaternion(quaternion);
+    forwardDirection.y = 0;
+    forwardDirection.normalize();
+    return quaternion.setFromRotationMatrix(
+      localMatrix.lookAt(
+        zeroVector,
+        forwardDirection,
+        upVector,
+      )
+    );
+  };
+})();
+
 // classes
 
 class PanelRuntimeInstance extends THREE.Object3D {
