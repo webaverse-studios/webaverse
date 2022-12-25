@@ -1014,7 +1014,7 @@ export const MapGen = () => {
 
         // THIS SEEMS TO BE LEGACY CODE. PURPOSE UNCLEAR
         // apps
-        /*await Promise.all([
+        /* await Promise.all([
           (async () => {
             
             // street base
@@ -1042,7 +1042,7 @@ export const MapGen = () => {
             mapScene.add(terrainApp);
             setTerrainApp(terrainApp);
           })(),
-        ]);*/
+        ]); */
       }
     })();
   }, [state.openedPanel, loaded]);

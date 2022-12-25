@@ -84,7 +84,7 @@ class DropManager extends EventTarget {
     }));
   }
 
-  addSpawnToBackpack({name, contentId, uuid }) {
+  addSpawnToBackpack({name, contentId, uuid}) {
     // console.log("spawn pick up", app)
     const spawn = {
       name,
