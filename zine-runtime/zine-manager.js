@@ -232,25 +232,30 @@ class PanelRuntimeInstance extends THREE.Object3D {
     const physicsIds = [];
     this.physicsIds = physicsIds;
 
-    // object physics
+    // scene physics
     {
       const geometry2 = getDoubleSidedGeometry(scenePhysicsMesh.geometry);
 
       const scenePhysicsMesh2 = new THREE.Mesh(geometry2, scenePhysicsMesh.material);
       scenePhysicsMesh2.name = 'scenePhysicsMesh';
-      // scenePhysicsMesh.position.copy(scenePhysicsMesh.position);
-      // scenePhysicsMesh.quaternion.copy(scenePhysicsMesh.quaternion);
-      // scenePhysicsMesh.scale.copy(scenePhysicsMesh.scale);
       scenePhysicsMesh2.visible = false;
       zineRenderer.transformScene.add(scenePhysicsMesh2);
       this.scenePhysicsMesh = scenePhysicsMesh2;
 
       const scenePhysicsObject = this.physics.addGeometry(scenePhysicsMesh2);
+      scenePhysicsObject.update = () => {
+        scenePhysicsMesh2.matrixWorld.decompose(
+          scenePhysicsObject.position,
+          scenePhysicsObject.quaternion,
+          scenePhysicsObject.scale
+        );
+        this.physics.setTransform(scenePhysicsObject, false);
+      };
       physicsIds.push(scenePhysicsObject);
       this.scenePhysicsObject = scenePhysicsObject;
     }
 
-    // floor physics
+    // floor net physics
     {
       const [width, height] = floorResolution;
 
@@ -287,71 +292,28 @@ class PanelRuntimeInstance extends THREE.Object3D {
         floorNetResolution,
         floorNetResolution
       );
+      floorNetPhysicsObject.update = () => {
+        floorNetPhysicsMesh.matrixWorld.decompose(
+          floorNetPhysicsObject.position,
+          floorNetPhysicsObject.quaternion,
+          floorNetPhysicsObject.scale
+        );
+        this.physics.setTransform(floorNetPhysicsObject, false);
+      };
       physicsIds.push(floorNetPhysicsObject);
       this.floorNetPhysicsObject = floorNetPhysicsObject;
     }
 
     // wall physics
     // walls are the back, left, and right edges of the scene
+    // frustum planes order:
+    // planes[0] = right
+    // planes[1] = left
+    // planes[2] = bottom
+    // planes[3] = top
+    // planes[4] = far
+    // planes[5] = near
     {
-      // const [width, height] = floorResolution;
-
-      // const floorNetPhysicsMaterial = new THREE.MeshPhongMaterial({
-      //   color: 0xFF0000,
-      //   side: THREE.BackSide,
-      //   transparent: true,
-      //   opacity: 0.5,
-      // });
-      // const floorNetPhysicsMesh = getFloorNetPhysicsMesh({
-      //   floorNetDepths,
-      //   floorNetCamera,
-      //   material: floorNetPhysicsMaterial,
-      // });
-      // floorNetPhysicsMesh.name = 'floorNetPhysicsMesh';
-      // floorNetPhysicsMesh.visible = false;
-      // zineRenderer.transformScene.add(floorNetPhysicsMesh);
-      // this.floorNetPhysicsMesh = floorNetPhysicsMesh;
-
-      // const numRows = width;
-      // const numColumns = height;
-      // const heights = getGeometryHeights(
-      //   floorNetPhysicsMesh.geometry,
-      //   width,
-      //   height,
-      //   heightfieldScale
-      // );
-
-      const cameraDirection = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
-      console.log('camera direction', cameraDirection.toArray());
-
-      // setFromProjectionMatrix( m ) {
-
-      //   const planes = this.planes;
-      //   const me = m.elements;
-      //   const me0 = me[ 0 ], me1 = me[ 1 ], me2 = me[ 2 ], me3 = me[ 3 ];
-      //   const me4 = me[ 4 ], me5 = me[ 5 ], me6 = me[ 6 ], me7 = me[ 7 ];
-      //   const me8 = me[ 8 ], me9 = me[ 9 ], me10 = me[ 10 ], me11 = me[ 11 ];
-      //   const me12 = me[ 12 ], me13 = me[ 13 ], me14 = me[ 14 ], me15 = me[ 15 ];
-    
-      //   planes[ 0 ].setComponents( me3 - me0, me7 - me4, me11 - me8, me15 - me12 ).normalize();
-      //   planes[ 1 ].setComponents( me3 + me0, me7 + me4, me11 + me8, me15 + me12 ).normalize();
-      //   planes[ 2 ].setComponents( me3 + me1, me7 + me5, me11 + me9, me15 + me13 ).normalize();
-      //   planes[ 3 ].setComponents( me3 - me1, me7 - me5, me11 - me9, me15 - me13 ).normalize();
-      //   planes[ 4 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize();
-      //   planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 ).normalize();
-    
-      //   return this;
-    
-      // }
-      // the planes order above is:
-      // planes[0] = left
-      // planes[1] = right
-      // planes[2] = top
-      // planes[3] = bottom
-      // planes[4] = near
-      // planes[5] = far
-
-
       this.wallPhysicsObjects = [];
 
       // near wall
@@ -384,82 +346,165 @@ class PanelRuntimeInstance extends THREE.Object3D {
           minMaxPoint2.fromArray(edgeDepths.right.max);
         }
 
-        const minMaxPoint3 = minMaxPoint.clone().lerp(minMaxPoint2, 0.5);
-        minMaxPoint3.applyMatrix4(zineRenderer.transformScene.matrixWorld);
+        const _getTransform = () => {
+          const position = minMaxPoint.clone()
+           .lerp(minMaxPoint2, 0.5);
+          const quaternion = camera.quaternion.clone();
+          const scale = new THREE.Vector3(1, 1, 1);
+          new THREE.Matrix4().compose(
+            position,
+            quaternion,
+            scale,
+          )
+          // .premultiply(zineRenderer.transformScene.matrixWorld)
+          .premultiply(this.zineRenderer.camera.matrixWorld)
+          .decompose(
+            position,
+            quaternion,
+            scale,
+          );
 
-        const planeQuaternion = camera.quaternion.clone()
-          .multiply(planeGeometryNormalizeQuaternion);
+          // rotate the wall to be perpendicular to the floor, to prevent jump climbing exploits
+          forwardizeQuaternion(quaternion);
+          quaternion.multiply(planeGeometryNormalizeQuaternion);
+          return {
+            position,
+            quaternion,
+          };
+        };
+        const {
+          position: centerPoint,
+          quaternion: planeQuaternion,
+        } = _getTransform();
+
         const dynamic = false;
         const planePhysicsObject = this.physics.addPlaneGeometry(
-          minMaxPoint3,
+          centerPoint,
           planeQuaternion,
           dynamic
         );
+        planePhysicsObject.update = () => {
+          const {
+            position: centerPoint,
+            quaternion: planeQuaternion,
+          } = _getTransform();
+          planePhysicsObject.position.copy(centerPoint);
+          planePhysicsObject.quaternion.copy(planeQuaternion);
+
+          planeMesh1.position.copy(planePhysicsObject.position);
+          planeMesh1.quaternion.copy(planePhysicsObject.quaternion);
+          planeMesh1.updateMatrixWorld();
+
+          this.physics.setTransform(planePhysicsObject, false);
+        };
         physicsIds.push(planePhysicsObject);
         this.wallPhysicsObjects.push(planePhysicsObject);
       }
-      // left + right walls
+      // left, right walls
       {
-        localFrustum.setFromProjectionMatrix(
-          camera.projectionMatrix
-        );
-        for (const plane of localFrustum.planes) {
-          plane.applyMatrix4(zineRenderer.transformScene.matrixWorld);
-        }
-        
-        // plane order:
-        // planes[0] = right
-        // planes[1] = left
-        // planes[2] = bottom
-        // planes[3] = top
-        // planes[4] = far
-        // planes[5] = near
-        
-        {
-          const leftPlane = localFrustum.planes[1];
-          const leftPlanePosition = new THREE.Vector3()
-            .fromArray(leftPlane.normal.toArray())
-            .multiplyScalar(leftPlane.constant);
-          const leftPlaneQuaternion = new THREE.Quaternion().setFromRotationMatrix(
+        const _getPlaneTransforms = () => {
+          localFrustum.setFromProjectionMatrix(
+            camera.projectionMatrix
+          );
+          return localFrustum.planes.map(plane => {
+            const position = new THREE.Vector3()
+              .fromArray(plane.normal.toArray())
+              .multiplyScalar(plane.constant);
+            const quaternion = new THREE.Quaternion().setFromRotationMatrix(
+              new THREE.Matrix4().lookAt(
+                new THREE.Vector3(0, 0, 0),
+                plane.normal,
+                new THREE.Vector3(0, 1, 0)
+              )
+            );
+            const scale = new THREE.Vector3(1, 1, 1);
+            new THREE.Matrix4().compose(
+              position,
+              quaternion,
+              scale,
+            )
+            .premultiply(this.zineRenderer.camera.matrixWorld)
+            .decompose(
+              position,
+              quaternion,
+              scale,
+            );
+            forwardizeQuaternion(quaternion);
+            quaternion.multiply(planeGeometryNormalizeQuaternion);
+            return {
+              position,
+              quaternion,
+            };
+          });
+        };
+        const _getPlaneTransform = i => {
+          localFrustum.setFromProjectionMatrix(
+            camera.projectionMatrix
+          );
+          const plane = localFrustum.planes[i];
+          const position = new THREE.Vector3()
+            .fromArray(plane.normal.toArray())
+            .multiplyScalar(plane.constant);
+          const quaternion = new THREE.Quaternion().setFromRotationMatrix(
             new THREE.Matrix4().lookAt(
               new THREE.Vector3(0, 0, 0),
-              leftPlane.normal,
+              plane.normal,
               new THREE.Vector3(0, 1, 0)
             )
-          ).multiply(planeGeometryNormalizeQuaternion);
+          );
+          const scale = new THREE.Vector3(1, 1, 1);
+          new THREE.Matrix4().compose(
+            position,
+            quaternion,
+            scale,
+          )
+          .premultiply(this.zineRenderer.camera.matrixWorld)
+          .decompose(
+            position,
+            quaternion,
+            scale,
+          );
+          forwardizeQuaternion(quaternion);
+          quaternion.multiply(planeGeometryNormalizeQuaternion);
+          return {
+            position,
+            quaternion,
+          };
+        };
+        const planeTransforms = _getPlaneTransforms();
+        [
+          0, // right
+          1, // left
+          // 5, // near
+        ].forEach(i => {
+          const {
+            position: wallPlanePosition,
+            quaternion: wallPlaneQuaternion,
+          } = planeTransforms[i];
           const dynamic = false;
-          const leftPlanePhysicsObject = this.physics.addPlaneGeometry(
-            leftPlanePosition,
-            leftPlaneQuaternion,
+          const wallPlanePhysicsObject = this.physics.addPlaneGeometry(
+            wallPlanePosition,
+            wallPlaneQuaternion,
             dynamic
           );
-          physicsIds.push(leftPlanePhysicsObject);
-          this.wallPhysicsObjects.push(leftPlanePhysicsObject);
-        }
-        {
-          const rightPlane = localFrustum.planes[0];
-          // console.log('right plane normal', localFrustum.planes.map(p => {
-          //   return p.normal.toArray();
-          // }));
-          const rightPlanePosition = new THREE.Vector3()
-            .fromArray(rightPlane.normal.toArray())
-            .multiplyScalar(rightPlane.constant);
-          const rightPlaneQuaternion = new THREE.Quaternion().setFromRotationMatrix(
-            new THREE.Matrix4().lookAt(
-              new THREE.Vector3(0, 0, 0),
-              rightPlane.normal,
-              new THREE.Vector3(0, 1, 0)
-            )
-          ).multiply(planeGeometryNormalizeQuaternion);
-          const dynamic = false;
-          const rightPlanePhysicsObject = this.physics.addPlaneGeometry(
-            rightPlanePosition,
-            rightPlaneQuaternion,
-            dynamic
-          );
-          physicsIds.push(rightPlanePhysicsObject);
-          this.wallPhysicsObjects.push(rightPlanePhysicsObject);
-        }
+          wallPlanePhysicsObject.update = () => {
+            const {
+              position: wallPlanePosition,
+              quaternion: wallPlaneQuaternion,
+            } = _getPlaneTransform(i);
+            wallPlanePhysicsObject.position.copy(wallPlanePosition);
+            wallPlanePhysicsObject.quaternion.copy(wallPlaneQuaternion);
+
+            const planeMesh = i === 0 ? planeMesh2 : planeMesh3;
+            planeMesh.position.copy(wallPlanePhysicsObject.position);
+            planeMesh.quaternion.copy(wallPlanePhysicsObject.quaternion);
+            planeMesh.updateMatrixWorld();
+
+            this.physics.setTransform(wallPlanePhysicsObject, false);
+          };
+          physicsIds.push(wallPlanePhysicsObject);
+          this.wallPhysicsObjects.push(wallPlanePhysicsObject);
+        });
       }
     }
 
