@@ -1,6 +1,5 @@
 export class LoadingManager {
     constructor(webaverse) {
-
         this.loadingScreen = document.createElement('div');
         this.loadingScreen.style.position = 'fixed';
         this.loadingScreen.style.top = 0;
@@ -14,26 +13,21 @@ export class LoadingManager {
         document.body.appendChild(this.loadingScreen);
 
         this.loadingBar = document.createElement('div');
-        // set the background to images/ui/loadingbar.svg
         this.loadingBar.style.backgroundImage = 'url(images/ui/loadingbarprogress.svg)';
-        // make sure the svg is centered and full width
         this.loadingBar.style.backgroundPosition = 'center';
         this.loadingBar.style.backgroundSize = 'contain';
-
         this.loadingBar.style.position = 'absolute';
         this.loadingBar.style.bottom = 'calc(152px)';
         this.loadingBar.style.left = '50%';
         this.loadingBar.style.width = '0%';
         this.loadingBar.style.height = '5px';
         this.loadingBar.style.transform = 'translate(-50%, 0%)';
-        // set z-index on top of everything
         this.loadingBar.style.zIndex = 1001;
         this.loadingScreen.appendChild(this.loadingBar);
 
         const border = document.createElement('div');
         border.style.backgroundImage = 'url(images/ui/loadingbar.svg)';
         border.style.backgroundPosition = 'center';
-        // force the svg to fit inside the div
         border.style.backgroundSize = 'contain';
         border.style.backgroundRepeat = 'no-repeat';
         border.style.position = 'absolute';
@@ -53,14 +47,9 @@ export class LoadingManager {
         backgroundImage.style.height = '100%';
         backgroundImage.style.filter = 'blur(10px)';
         backgroundImage.style.objectFit = 'cover';
-
         backgroundImage.style.zIndex = -1;
 
         this.loadingScreen.appendChild(backgroundImage);
-
-        // add a div with images/inputlayout.jpg' as a background
-        // center on screen
-
         const keyboardImage = document.createElement('div');
         keyboardImage.style.position = 'absolute';
         keyboardImage.style.top = 'calc(50% + 20px)';
@@ -74,9 +63,6 @@ export class LoadingManager {
         keyboardImage.style.backgroundSize = 'contain';
         keyboardImage.style.width = '60vw';
         keyboardImage.style.height = '26vw';
-        
-        //2.59
-
         keyboardImage.style.zIndex = 1;
 
         this.loadingScreen.appendChild(keyboardImage);
@@ -89,7 +75,6 @@ export class LoadingManager {
         });
 
         webaverse.addEventListener('loaded', e => {
-            // console.log('received loaded event', e)
             this.hide();
         });
     }
