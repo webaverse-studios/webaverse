@@ -14,36 +14,35 @@ export class LoadingManager {
         document.body.appendChild(this.loadingScreen);
 
         this.loadingBar = document.createElement('div');
+        // set the background to images/ui/loadingbar.svg
+        this.loadingBar.style.backgroundImage = 'url(images/ui/loadingbarprogress.svg)';
+        // make sure the svg is centered and full width
+        this.loadingBar.style.backgroundPosition = 'center';
+        this.loadingBar.style.backgroundSize = 'contain';
+
         this.loadingBar.style.position = 'absolute';
-        this.loadingBar.style.top = '50%';
+        this.loadingBar.style.bottom = 'calc(152px)';
         this.loadingBar.style.left = '50%';
         this.loadingBar.style.width = '0%';
         this.loadingBar.style.height = '5px';
-        this.loadingBar.style.background = 'rgba(255, 255, 255, 1.0)';
-        this.loadingBar.style.transform = 'translate(-50%, -50%)';
+        this.loadingBar.style.transform = 'translate(-50%, 0%)';
+        // set z-index on top of everything
+        this.loadingBar.style.zIndex = 1001;
         this.loadingScreen.appendChild(this.loadingBar);
 
         const border = document.createElement('div');
+        border.style.backgroundImage = 'url(images/ui/loadingbar.svg)';
+        border.style.backgroundPosition = 'center';
+        // force the svg to fit inside the div
+        border.style.backgroundSize = 'contain';
+        border.style.backgroundRepeat = 'no-repeat';
         border.style.position = 'absolute';
-        border.style.top = '50%';
+        border.style.bottom = '100px';
         border.style.left = '50%';
-        border.style.width = '50%';
-        border.style.height = '5px';
-        border.style.background = 'rgba(255, 255, 255, 0.5)';
-        border.style.transform = 'translate(-50%, -50%)';
+        border.style.width = '80vw';
+        border.style.height = '92px';
+        border.style.transform = 'translate(-50%, 0%)';
         this.loadingScreen.appendChild(border);
-
-        const loadingText = document.createElement('div');
-        loadingText.style.position = 'absolute';
-        loadingText.style.top = 'calc(50% - 20px)';
-        loadingText.style.left = '50%';
-        loadingText.style.width = '100%';
-        loadingText.style.textAlign = 'center';
-        loadingText.style.color = 'rgba(255, 255, 255, 1.0)';
-        loadingText.style.transform = 'translate(-50%, -50%)';
-        loadingText.innerHTML = 'LOADING...';
-        loadingText.style.fontSize = '20px';
-        this.loadingScreen.appendChild(loadingText);
 
         const backgroundImage = document.createElement('img');
         backgroundImage.src = 'images/world.jpg';
@@ -59,11 +58,34 @@ export class LoadingManager {
 
         this.loadingScreen.appendChild(backgroundImage);
 
+        // add a div with images/inputlayout.jpg' as a background
+        // center on screen
+
+        const keyboardImage = document.createElement('div');
+        keyboardImage.style.position = 'absolute';
+        keyboardImage.style.top = 'calc(50% + 20px)';
+        keyboardImage.style.left = '50%';
+        keyboardImage.style.width = '100%';
+        keyboardImage.style.textAlign = 'center';
+        keyboardImage.style.color = 'rgba(255, 255, 255, 1.0)';
+        keyboardImage.style.transform = 'translate(-50%, -50%)';
+        keyboardImage.style.backgroundImage = 'url(images/inputlayout.png)';
+        keyboardImage.style.backgroundPosition = 'center';
+        keyboardImage.style.backgroundSize = 'contain';
+        keyboardImage.style.width = '60vw';
+        keyboardImage.style.height = '26vw';
+        
+        //2.59
+
+        keyboardImage.style.zIndex = 1;
+
+        this.loadingScreen.appendChild(keyboardImage);
+
         this.webavere = webaverse;
     
         webaverse.addEventListener('loadProgress', e => {
             const progress = e.data.loadProgressPercentage;
-            this.loadingBar.style.width = `${progress/2}%`;
+            this.loadingBar.style.width = `calc(${progress*(.8)}vw - 10px)`;
         });
 
         webaverse.addEventListener('loaded', e => {
