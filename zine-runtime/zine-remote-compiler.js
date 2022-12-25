@@ -4,12 +4,13 @@ import {
 
 //
 
-const remoteUrl = `https://local.webaverse.com:9999/engine`;
+// generative world engine remote url
+const gweRemoteUrl = `https://local.webaverse.com:9999/engine`;
 
 //
 
 export const compileScene = async imageArrayBuffer => {
-  const worker = makeRemoteWorker(remoteUrl);
+  const worker = makeRemoteWorker(gweRemoteUrl);
   const result = await worker.request('compileScene', {
     imageArrayBuffer,
   });
