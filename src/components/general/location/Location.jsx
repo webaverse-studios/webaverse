@@ -34,9 +34,11 @@ export const Location = () => {
         const sceneNames = await sceneManager.getSceneNamesAsync();
         sceneNames.forEach(name => {
           const sceneUrl= sceneManager.getSceneUrl(name)
-          origSceneList.push(sceneUrl);
+          if(!origSceneList.includes(sceneUrl)){
+            origSceneList.push(sceneUrl);
+          }
         });
-        setScenesList(origSceneList)
+        setScenesList(origSceneList);
     })();
   }, []);
 
