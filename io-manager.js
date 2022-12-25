@@ -19,6 +19,7 @@ import raycastManager from './raycast-manager.js';
 import grabManager from './grab-manager.js';
 
 const localVector = new THREE.Vector3();
+const localVector2 = new THREE.Vector3();
 const localEuler = new THREE.Euler();
 const localMatrix2 = new THREE.Matrix4();
 const localMatrix3 = new THREE.Matrix4();
@@ -254,32 +255,33 @@ class IoManager extends EventTarget {
               closestDistance = distance;
             }
           }
-          // console.log('closest distance', closestDistance);
-          // const d = closestDistance;
-          // const smoothDistance = 3;
 
-          // back
-          // localEuler.setFromQuaternion(transformCamera.quaternion, 'YXZ');
-          // localEuler.x = 0;
-          // localEuler.z = 0;
-          // const backQuaternion = localQuaternion2.setFromEuler(localEuler);
-          const backQuaternion = transformCamera.quaternion;
-
-          if (zineCameraManager.cameraLocked && zineCameraManager.cameraZ > 0) {
+          if (zineCameraManager.cameraLocked) {
             // front
-            const direction = localVector.copy(localPlayer.position)
-            .sub(transformCamera.position);
+            const direction = localVector2.copy(localPlayer.position)
+              .sub(transformCamera.position);
             direction.y = 0;
+            if (direction.x === 0 && direction.z === 0) {
+              direction.z = -1;
+            }
             direction.normalize();
             const frontQuaternion = localQuaternion.setFromRotationMatrix(
               localMatrix.lookAt(zeroVector, direction, upVector)
             );
 
-            // smoothed
-            // const f = Math.min(Math.max(d, 0), smoothDistance) / smoothDistance;
-            // const smoothedQuaternion = localQuaternion3.copy(backQuaternion).slerp(frontQuaternion, f);
             this.keysDirection.applyQuaternion(frontQuaternion);
           } else {
+            const transformCameraForwardDirection = localVector.set(0, 0, -1)
+              .applyQuaternion(transformCamera.quaternion);
+            transformCameraForwardDirection.y = 0;
+            if (transformCameraForwardDirection.x === 0 && transformCameraForwardDirection.z === 0) {
+              transformCameraForwardDirection.z = -1;
+            }
+            transformCameraForwardDirection.normalize();
+            const backQuaternion = localQuaternion2.setFromRotationMatrix(
+              localMatrix.lookAt(zeroVector, transformCameraForwardDirection, upVector)
+            );
+
             this.keysDirection.applyQuaternion(backQuaternion);
           }
         };
