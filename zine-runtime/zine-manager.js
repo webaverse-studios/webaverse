@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import {
   camera,
   getRenderer,
+  scene,
 } from '../renderer.js';
 import {
   ZineStoryboard,
