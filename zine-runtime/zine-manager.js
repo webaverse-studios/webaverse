@@ -24,6 +24,7 @@ import {
   setOrthographicCameraFromJson,
 } from 'zine/zine-camera-utils.js';
 import {
+  reconstructPointCloudFromDepthField,
   setCameraViewPositionFromOrthographicViewZ,
   getDepthFloatsFromPointCloud,
   depthFloat32ArrayToOrthographicGeometry,
@@ -176,12 +177,19 @@ class PanelRuntimeInstance extends THREE.Object3D {
     const {panel} = this;
     const layer0 = panel.getLayer(0);
     const layer1 = panel.getLayer(1);
+    const resolution = layer1.getData('resolution');
+    const depthField = layer1.getData('depthField');
     const cameraJson = layer1.getData('cameraJson');
     const scaleArray = layer1.getData('scale');
     const floorResolution = layer1.getData('floorResolution');
     const floorNetDepths = layer1.getData('floorNetDepths');
     const floorNetCameraJson = layer1.getData('floorNetCameraJson');
     const edgeDepths = layer1.getData('edgeDepths');
+
+    const [
+      width,
+      height,
+    ] = resolution;
 
     // zine renderer
     const zineRenderer = this.#createRenderer();
@@ -257,7 +265,10 @@ class PanelRuntimeInstance extends THREE.Object3D {
 
     // floor net physics
     {
-      const [width, height] = floorResolution;
+      const [
+        floorWidth,
+        floorHeight,
+      ] = floorResolution;
 
       const floorNetPhysicsMaterial = new THREE.MeshPhongMaterial({
         color: 0xFF0000,
@@ -275,12 +286,12 @@ class PanelRuntimeInstance extends THREE.Object3D {
       zineRenderer.transformScene.add(floorNetPhysicsMesh);
       this.floorNetPhysicsMesh = floorNetPhysicsMesh;
 
-      const numRows = width;
-      const numColumns = height;
+      const numRows = floorWidth;
+      const numColumns = floorHeight;
       const heights = getGeometryHeights(
         floorNetPhysicsMesh.geometry,
-        width,
-        height,
+        floorWidth,
+        floorHeight,
         heightfieldScale
       );
       const floorNetPhysicsObject = this.physics.addHeightFieldGeometry(
@@ -514,7 +525,13 @@ class PanelRuntimeInstance extends THREE.Object3D {
     this.setPhysicsEnabled(false);
 
     // precompute cache
-    const pointCloudArrayBuffer = layer1.getData('pointCloud');
+    const pointCloudFloat32Array = reconstructPointCloudFromDepthField(
+      depthField,
+      width,
+      height,
+      camera.fov,
+    );
+    const pointCloudArrayBuffer = pointCloudFloat32Array.buffer;
     const depthFloat32Array = getDepthFloatsFromPointCloud(
       pointCloudArrayBuffer,
       panelSize,
@@ -995,7 +1012,7 @@ class ZineManager {
     // const uint8Array = new Uint8Array(arrayBuffer, zineMagicBytesUint8Array.byteLength);
     const uint8Array = new Uint8Array(arrayBuffer, 4);
     const zineStoryboard = new ZineStoryboard();
-    zineStoryboard.load(uint8Array);
+    await zineStoryboard.loadAsync(uint8Array);
     return zineStoryboard;
   }
   async createStoryboardInstanceAsync({
