@@ -9,7 +9,7 @@ import {
   zineMagicBytes,
 } from 'zine/zine-format.js';
 
-const cleanName = name => path.basename(name).replace(/\..*$/, '');
+const cleanName = name => path.basename(name).replace(/\.[^\.]+$/, '');
 
 (async () => {
   const fileNames = process.argv.slice(2);
