@@ -93,7 +93,7 @@ const uploadCreateApp = async (item, {
 };
 
 const DragAndDrop = () => {
-  const {state, setState, account} = useContext(AppContext)
+  const {state, setState, account, getWalletItems} = useContext(AppContext)
   const [queue, setQueue] = useState([]);
   const [currentApp, setCurrentApp] = useState(null);
   const {mintNFT, minting, error, setError, WebaversecontractAddress} = useNFTContract(account.currentAddress);
@@ -133,6 +133,7 @@ const DragAndDrop = () => {
     }
     window.addEventListener('dragover', dragover);
     const drop = async e => {
+      e.preventDefault();
       const items = Array.from(e.dataTransfer.items);
       await Promise.all(items.map(async item => {
         const drop = _isJsonItem(item);
@@ -231,7 +232,9 @@ const DragAndDrop = () => {
       const app = currentApp;
       await mintNFT(app, () => {
         setMintComplete(true);
-        setPendingTx(false)
+        setPendingTx(false);
+        getWalletItems();
+        setCurrentApp(null);
       });
     }
     setCurrentApp(null);

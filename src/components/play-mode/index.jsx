@@ -10,13 +10,13 @@ import styles from './play-mode.module.css';
 
 //
 
-export const PlayMode = () => {
+export const PlayMode = ({setShowUI}) => {
 
     //
 
     return (
         <div className={ styles.playMode }>
-            <Minimap />
+            <Minimap setShowUI={setShowUI} />
             <Hotbar />
             <Infobox />
             <Chat />

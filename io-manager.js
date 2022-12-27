@@ -399,12 +399,13 @@ class IoManager extends EventTarget {
       case 69: { // E
         const now = performance.now();
         const timeDiff = now - this.lastKeysDownTime.keyE;
-        if (timeDiff < doubleTapTime) {
+        const canRotate = grabManager.canRotate();
+        if (timeDiff < doubleTapTime && !canRotate) {
           game.menuMiddleToggle();
         } else {
           game.menuMiddleUp();
 
-          if (grabManager.canRotate()) {
+          if (canRotate) {
             grabManager.menuRotate(-1);
           } else {
             game.menuActivateDown();
@@ -429,7 +430,7 @@ class IoManager extends EventTarget {
         if (cameraManager.pointerLockElement) {
           if (grabManager.canRotate()) {
             grabManager.menuRotate(1);
-          } else {
+          } else if (!e.ctrlKey) {
             game.dropSelectedApp();
           }
         }
@@ -575,6 +576,8 @@ class IoManager extends EventTarget {
           game.setMouseHoverObject(null);
           game.setMouseSelectedObject(null);
           world.removeObject(object.instanceId);
+        } else if (!e.ctrlKey) {
+          game.deleteSelectedApp();
         }
         break;
       }

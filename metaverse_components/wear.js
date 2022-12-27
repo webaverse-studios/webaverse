@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import metaversefile from 'metaversefile';
 import Avatar from '../avatars/avatars.js';
 import physicsManager from '../physics-manager.js';
+import dropManager from '../drop-manager.js';
+
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -38,6 +40,8 @@ export default (app, component) => {
       initialScale.copy(app.scale);
       // console.log('wear activate', app, wearSpec, e);
       if (wearSpec) {
+        dropManager.addSpawnToBackpack(app);
+
         // const {app, wearSpec} = e.data;
         // console.log('got wear spec', [wearSpec.skinnedMesh, app.glb]);
         
@@ -185,6 +189,8 @@ export default (app, component) => {
   });
 
   const _unwear = () => {
+    
+    dropManager.removeSpawnFromBackpack(app);
     if (wearSpec) {
       const physicsObjects = app.getPhysicsObjects();
       const physicsScene = physicsManager.getScene();

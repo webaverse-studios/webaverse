@@ -149,7 +149,9 @@ export class AvatarCharacterSfx {
 
     // step
     const _handleStep = () => {
-      if (idleWalkFactor > 0.5 && !this.character.avatar.jumpState && !this.character.avatar.fallLoopState && !this.character.avatar.flyState && !this.character.hasAction('glider') && !this.character.hasAction('swim')) {
+      // if (idleWalkFactor > 0.5 && !this.character.avatar.jumpState && !this.character.avatar.fallLoopState && !this.character.avatar.flyState && !this.character.hasAction('glider') && !this.character.hasAction('swim')) {
+      // note: need check action directly instead of check xxxState, because xxxState maybe one frame delayed then cause wrongly play step sound.
+      if (idleWalkFactor > 0.5 && !this.character.hasAction('jump') && !this.character.hasAction('fallLoop') && !this.character.hasAction('fly') && !this.character.hasAction('glider') && !this.character.hasAction('swim')) {
         const isRunning = walkRunFactor > 0.5;
         const isCrouching = crouchFactor > 0.5;
         const isNarutoRun = this.character.avatar.narutoRunState;

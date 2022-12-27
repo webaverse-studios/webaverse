@@ -1239,6 +1239,7 @@ export const align = (v, N) => {
 export const align4 = v => align(v, 4);
 
 export const getClosestPowerOf2 = size => Math.ceil(Math.log2(size));
+export const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
 
 export const getBoundingSize = boundingType => {
   switch (boundingType) {
