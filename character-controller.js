@@ -158,14 +158,15 @@ class Character extends THREE.Object3D {
     this.voiceEndpoint = null;
   }
 
-  setSpawnPoint(position, quaternion) {
+  /* setSpawnPoint(position, quaternion) {
     this.position.copy(position);
     this.quaternion.copy(quaternion);
 
+    console.log('set spawn point with character controller', this.characterPhysics.characterController);
     if (this.characterPhysics.characterController) {
       this.characterPhysics.setPosition(position);
     }
-  }
+  } */
 
   // serializers
   getPosition() {
