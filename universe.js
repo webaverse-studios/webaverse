@@ -17,6 +17,7 @@ import {parseQuery} from './util.js';
 import {world} from './world.js';
 import {defaultSceneName} from './endpoints.js';
 import {sceneManager} from './scene-manager.js';
+import spawnManager from './spawn-manager.js';
 
 class Universe extends EventTarget {
   constructor() {
@@ -96,6 +97,8 @@ class Universe extends EventTarget {
     localPlayer.updatePhysics(0, 0);
 
     this.currentWorld = worldSpec;
+
+    await spawnManager.spawn();
 
     this.dispatchEvent(new MessageEvent('worldload'));
   }
