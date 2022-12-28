@@ -764,6 +764,23 @@ class PanelInstanceManager extends THREE.Object3D {
     );
     spawnManager.setSpawnPoint(position, quaternion);
   }
+  #pushRaycast() {
+    const wallPhysicsObjects = [];
+    for (let i = 0; i < this.panelInstances.length; i++) {
+      const panelInstance = this.panelInstances[i];
+      for (let j = 0; j < panelInstance.wallPhysicsObjects.length; j++) {
+        const wallPhysicsObject = panelInstance.wallPhysicsObjects[j];
+        this.physics.disableGeometryQueries(wallPhysicsObject);
+        wallPhysicsObjects.push(wallPhysicsObject);
+      }
+    }
+    return () => {
+      for (let i = 0; i < wallPhysicsObjects.length; i++) {
+        const wallPhysicsObject = wallPhysicsObjects[i];
+        this.physics.enableGeometryQueries(wallPhysicsObject);
+      }
+    }
+  }
   update({
     mousePosition,
   }) {
@@ -788,16 +805,22 @@ class PanelInstanceManager extends THREE.Object3D {
         // raycast
         {
           localRaycaster.setFromCamera(localVector2D, camera);
-          const result = physics.raycast(
-            localRaycaster.ray.origin,
-            localQuaternion.setFromRotationMatrix(
-              localMatrix.lookAt(
-                localVector.set(0, 0, 0),
-                localRaycaster.ray.direction,
-                localVector2.set(0, 1, 0)
+
+          let result;
+          {
+            const popRaycast = this.#pushRaycast(); // disable walls
+            result = physics.raycast(
+              localRaycaster.ray.origin,
+              localQuaternion.setFromRotationMatrix(
+                localMatrix.lookAt(
+                  localVector.set(0, 0, 0),
+                  localRaycaster.ray.direction,
+                  localVector2.set(0, 1, 0)
+                )
               )
-            )
-          );
+            );
+            popRaycast();
+          }
           if (result) {
             this.storyTargetMesh.position.fromArray(result.point);
           }
