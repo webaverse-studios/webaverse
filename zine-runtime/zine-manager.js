@@ -126,27 +126,6 @@ const planeMesh3 = _makePlaneMesh({
 globalThis.planeMesh3 = planeMesh3;
 scene.add(planeMesh3);
 
-// helpers
-
-const forwardizeQuaternion = (() => {
-  const localVector = new THREE.Vector3();
-  const localMatrix = new THREE.Matrix4();
-  
-  return quaternion => {
-    const forwardDirection = localVector.set(0, 0, -1)
-      .applyQuaternion(quaternion);
-    forwardDirection.y = 0;
-    forwardDirection.normalize();
-    return quaternion.setFromRotationMatrix(
-      localMatrix.lookAt(
-        zeroVector,
-        forwardDirection,
-        upVector,
-      )
-    );
-  };
-})();
-
 // classes
 
 class PanelRuntimeInstance extends THREE.Object3D {
@@ -199,6 +178,7 @@ class PanelRuntimeInstance extends THREE.Object3D {
       capSceneMesh,
       scenePhysicsMesh,
       floorNetMesh,
+      wallPlaneMeshes,
     } = zineRenderer;
     const {
       entranceExitLocations,
@@ -314,81 +294,38 @@ class PanelRuntimeInstance extends THREE.Object3D {
       };
       physicsIds.push(floorNetPhysicsObject);
       this.floorNetPhysicsObject = floorNetPhysicsObject;
+      console.log('zine create floor net physics object', floorNetPhysicsObject);
     }
 
-    // wall physics
-    // walls are the back, left, and right edges of the scene
-    // frustum planes order:
+    // wall plane meshes
     // planes[0] = right
     // planes[1] = left
     // planes[2] = bottom
     // planes[3] = top
     // planes[4] = far
     // planes[5] = near
+    this.wallPhysicsObjects = [];
     {
-      this.wallPhysicsObjects = [];
-
-      // near wall
-      {
-        let minMaxPoint = new THREE.Vector3(Infinity, Infinity, Infinity);
-        if (edgeDepths.top.min[2] < minMaxPoint.z) {
-          minMaxPoint.fromArray(edgeDepths.top.max);
-        }
-        if (edgeDepths.bottom.min[2] < minMaxPoint.z) {
-          minMaxPoint.fromArray(edgeDepths.bottom.max);
-        }
-        if (edgeDepths.left.min[2] < minMaxPoint.z) {
-          minMaxPoint.fromArray(edgeDepths.left.max);
-        }
-        if (edgeDepths.right.min[2] < minMaxPoint.z) {
-          minMaxPoint.fromArray(edgeDepths.right.max);
-        }
-
-        let minMaxPoint2 = new THREE.Vector3(-Infinity, -Infinity, -Infinity);
-        if (edgeDepths.top.max[2] > minMaxPoint2.z) {
-          minMaxPoint2.fromArray(edgeDepths.top.max);
-        }
-        if (edgeDepths.bottom.max[2] > minMaxPoint2.z) {
-          minMaxPoint2.fromArray(edgeDepths.bottom.max);
-        }
-        if (edgeDepths.left.max[2] > minMaxPoint2.z) {
-          minMaxPoint2.fromArray(edgeDepths.left.max);
-        }
-        if (edgeDepths.right.max[2] > minMaxPoint2.z) {
-          minMaxPoint2.fromArray(edgeDepths.right.max);
-        }
+      for (let i = 0; i < wallPlaneMeshes.length; i++) {
+        const wallPlaneMesh = wallPlaneMeshes[i];
+        wallPlaneMesh.visible = true;
 
         const _getTransform = () => {
-          const position = minMaxPoint.clone()
-           .lerp(minMaxPoint2, 0.5);
-          const quaternion = camera.quaternion.clone();
-          const scale = new THREE.Vector3(1, 1, 1);
-          new THREE.Matrix4().compose(
-            position,
-            quaternion,
-            scale,
-          )
-          // .premultiply(zineRenderer.transformScene.matrixWorld)
-          .premultiply(this.zineRenderer.camera.matrixWorld)
-          .decompose(
-            position,
-            quaternion,
-            scale,
-          );
-
-          // rotate the wall to be perpendicular to the floor, to prevent jump climbing exploits
-          forwardizeQuaternion(quaternion);
-          quaternion.multiply(planeGeometryNormalizeQuaternion);
+          const position = new THREE.Vector3();
+          const quaternion = new THREE.Quaternion();
+          const scale = new THREE.Vector3();
+          wallPlaneMesh.matrixWorld.decompose(position, quaternion, scale);
           return {
             position,
             quaternion,
+            // scale,
           };
         };
+
         const {
           position: centerPoint,
           quaternion: planeQuaternion,
         } = _getTransform();
-
         const dynamic = false;
         const planePhysicsObject = this.physics.addPlaneGeometry(
           centerPoint,
@@ -403,120 +340,10 @@ class PanelRuntimeInstance extends THREE.Object3D {
           planePhysicsObject.position.copy(centerPoint);
           planePhysicsObject.quaternion.copy(planeQuaternion);
 
-          planeMesh1.position.copy(planePhysicsObject.position);
-          planeMesh1.quaternion.copy(planePhysicsObject.quaternion);
-          planeMesh1.updateMatrixWorld();
-
           this.physics.setTransform(planePhysicsObject, false);
         };
         physicsIds.push(planePhysicsObject);
         this.wallPhysicsObjects.push(planePhysicsObject);
-      }
-      // left, right walls
-      {
-        const _getPlaneTransforms = () => {
-          localFrustum.setFromProjectionMatrix(
-            camera.projectionMatrix
-          );
-          return localFrustum.planes.map(plane => {
-            const position = new THREE.Vector3()
-              .fromArray(plane.normal.toArray())
-              .multiplyScalar(plane.constant);
-            const quaternion = new THREE.Quaternion().setFromRotationMatrix(
-              new THREE.Matrix4().lookAt(
-                new THREE.Vector3(0, 0, 0),
-                plane.normal,
-                new THREE.Vector3(0, 1, 0)
-              )
-            );
-            const scale = new THREE.Vector3(1, 1, 1);
-            new THREE.Matrix4().compose(
-              position,
-              quaternion,
-              scale,
-            )
-            .premultiply(this.zineRenderer.camera.matrixWorld)
-            .decompose(
-              position,
-              quaternion,
-              scale,
-            );
-            forwardizeQuaternion(quaternion);
-            quaternion.multiply(planeGeometryNormalizeQuaternion);
-            return {
-              position,
-              quaternion,
-            };
-          });
-        };
-        const _getPlaneTransform = i => {
-          localFrustum.setFromProjectionMatrix(
-            camera.projectionMatrix
-          );
-          const plane = localFrustum.planes[i];
-          const position = new THREE.Vector3()
-            .fromArray(plane.normal.toArray())
-            .multiplyScalar(plane.constant);
-          const quaternion = new THREE.Quaternion().setFromRotationMatrix(
-            new THREE.Matrix4().lookAt(
-              new THREE.Vector3(0, 0, 0),
-              plane.normal,
-              new THREE.Vector3(0, 1, 0)
-            )
-          );
-          const scale = new THREE.Vector3(1, 1, 1);
-          new THREE.Matrix4().compose(
-            position,
-            quaternion,
-            scale,
-          )
-          .premultiply(this.zineRenderer.camera.matrixWorld)
-          .decompose(
-            position,
-            quaternion,
-            scale,
-          );
-          forwardizeQuaternion(quaternion);
-          quaternion.multiply(planeGeometryNormalizeQuaternion);
-          return {
-            position,
-            quaternion,
-          };
-        };
-        const planeTransforms = _getPlaneTransforms();
-        [
-          0, // right
-          1, // left
-          // 5, // near
-        ].forEach(i => {
-          const {
-            position: wallPlanePosition,
-            quaternion: wallPlaneQuaternion,
-          } = planeTransforms[i];
-          const dynamic = false;
-          const wallPlanePhysicsObject = this.physics.addPlaneGeometry(
-            wallPlanePosition,
-            wallPlaneQuaternion,
-            dynamic
-          );
-          wallPlanePhysicsObject.update = () => {
-            const {
-              position: wallPlanePosition,
-              quaternion: wallPlaneQuaternion,
-            } = _getPlaneTransform(i);
-            wallPlanePhysicsObject.position.copy(wallPlanePosition);
-            wallPlanePhysicsObject.quaternion.copy(wallPlaneQuaternion);
-
-            const planeMesh = i === 0 ? planeMesh2 : planeMesh3;
-            planeMesh.position.copy(wallPlanePhysicsObject.position);
-            planeMesh.quaternion.copy(wallPlanePhysicsObject.quaternion);
-            planeMesh.updateMatrixWorld();
-
-            this.physics.setTransform(wallPlanePhysicsObject, false);
-          };
-          physicsIds.push(wallPlanePhysicsObject);
-          this.wallPhysicsObjects.push(wallPlanePhysicsObject);
-        });
       }
     }
 
