@@ -5,6 +5,7 @@ import {
   getRenderer,
   scene,
 } from '../renderer.js';
+import spawnManager from '../spawn-manager.js';
 import {
   ZineStoryboard,
   zineMagicBytes,
@@ -939,7 +940,6 @@ class PanelInstanceManager extends THREE.Object3D {
               this.zineCameraManager.transitionLockCamera(nextPanelInstance.zineRenderer.camera, cameraTransitionTime);
 
               // select new panel
-              console.log('select next panel', this.panelIndex, nextPanelIndex);
               this.panelIndex = nextPanelIndex;
               nextPanelInstance.setSelected(true);
             }
@@ -948,9 +948,34 @@ class PanelInstanceManager extends THREE.Object3D {
       });
     }
 
-    // select first panel
+    // set spawn point
     const firstPanel = this.panelInstances[this.panelIndex];
     firstPanel.setSelected(true);
+  }
+  async spawn() {
+    const firstPanel = this.panelInstances[this.panelIndex];
+    const {cameraEntranceLocation} = firstPanel.zineRenderer.metadata;
+    // if (!cameraEntranceLocation) {
+    //   console.warn('no camera entrance location', firstPanel);
+    //   debugger;
+    // }
+    const position = new THREE.Vector3()
+      .fromArray(cameraEntranceLocation.position);
+    const quaternion = new THREE.Quaternion()
+      .fromArray(cameraEntranceLocation.quaternion);
+    const scale = oneVector.clone();
+    new THREE.Matrix4().compose(
+      position,
+      quaternion,
+      scale
+    )
+    .premultiply(firstPanel.zineRenderer.transformScene.matrixWorld)
+    .decompose(
+      position,
+      quaternion,
+      scale
+    );
+    spawnManager.setSpawnPoint(position, quaternion);
   }
   update({
     mousePosition,
@@ -987,7 +1012,6 @@ class PanelInstanceManager extends THREE.Object3D {
             )
           );
           if (result) {
-            // console.log('got result', result);
             this.storyTargetMesh.position.fromArray(result.point);
           }
           this.storyTargetMesh.visible = !!result;
@@ -1067,6 +1091,10 @@ class ZineManager {
       panelInstanceManager.addEventListener('load', onload);
     }
     instance.add(panelInstanceManager);
+
+    instance.spawn = async () => {
+      await panelInstanceManager.spawn();
+    };
 
     // update matrix world
     instance.updateMatrixWorld();
