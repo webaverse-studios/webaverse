@@ -29,6 +29,7 @@ import npcManager from './npc-manager.js';
 import grabManager from './grab-manager.js';
 import {getVoucherFromUser} from './src/hooks/voucherHelpers'  
 import zineCameraManager from './zine-runtime/zine-camera-manager.js';
+import universe from './universe.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -115,7 +116,15 @@ class GameManager extends EventTarget {
     sceneLowPriority.add(this.mouseDomEquipmentHoverPhysicsMesh);
   }
 
-  init() {
+  async load() {
+    await npcManager.initDefaultPlayer();
+    loadoutManager.initDefault();
+    await universe.handleUrlUpdate();
+    partyManager.inviteDefaultPlayer();
+
+    this.#localInit();
+  }
+  #localInit() {
     this.grabUseMesh = metaversefileApi.createApp();
     (async () => {
       const {importModule} = metaversefileApi.useDefaultModules();
