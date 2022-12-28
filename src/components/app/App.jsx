@@ -77,6 +77,7 @@ export const App = () => {
     const [ selectedRoom, setSelectedRoom ] = useState(_getCurrentRoom());
     const [ editMode, setEditMode ] = useState(false);
     const [ claimableToken, setClaimableToken ] = useState([]);
+    const [ spawnItem, setSpawnItem ] = useState([]);
     const [ mintedToken, setMintedToken ] = useState([]);
     const [ resourceToken, setResourceToken ] = useState([]);
     const [ apps, setApps ] = useState(world.appManager.getApps().slice());
@@ -254,7 +255,7 @@ export const App = () => {
     useEffect(_loadUrlState, []);
 
     useEffect(() => {
-        const claimschange = async (e) => {
+        const claimsChange = async (e) => {
             const {claims, addedClaim} = e.data;
             const claimableItem = claims.map(({name, start_url, type, voucher, serverDrop, level}) => ({
                 name,
@@ -275,9 +276,33 @@ export const App = () => {
 
             setClaimableToken(claimableItem);
         };
-        dropManager.addEventListener('claimschange', claimschange);
+        const spawnsChange = async (e) => {
+            const {spawns} = e.data;
+            const spawnItem = spawns.map(({name, start_url}) => ({
+                name,
+                start_url: start_url.split("index.js")[0],
+                description: "This is the Spawn Drop",
+                params: [
+                    {
+                        label: 'Token type',
+                        value: 'Seasonal Spawn Drop (Not Token)',
+                    },
+                ],
+                isSpawn: true,
+                claimed: true
+                // type,
+                // voucher,
+                // serverDrop,
+                // level
+            }))
+
+            setSpawnItem(spawnItem);
+        };
+        dropManager.addEventListener('claimschange', claimsChange);
+        dropManager.addEventListener('spawnschange', spawnsChange);
         return () => {
-            dropManager.removeEventListener('claimschange', claimschange);
+            dropManager.removeEventListener('claimschange', claimsChange);
+            dropManager.removeEventListener('spawnschange', spawnsChange);
         };
     }, []);
 
@@ -356,6 +381,8 @@ export const App = () => {
         chain,
         claimableToken,
         setClaimableToken,
+        spawnItem,
+        setSpawnItem,
         mintedToken,
         setMintedToken,
         resourceToken,
@@ -373,7 +400,6 @@ export const App = () => {
         >
         <DomRenderer />
         <canvas className={ classnames(styles.canvas, domHover ? styles.domHover : null) } ref={ canvasRef } />
-        <DragAndDrop />
         <IoHandler />
         <WorldObjectsList
             setSelectedApp={ setSelectedApp }
@@ -385,7 +411,7 @@ export const App = () => {
                 <Header setSelectedApp={ setSelectedApp } selectedApp={ selectedApp } />
                 <Crosshair />
                 {state.openedPanel !== 'CharacterSelect' &&
-                    <PlayMode />
+                    <PlayMode setShowUI={setShowUI}/>
                 }
                 <EditorMode
                     selectedScene={ selectedScene }

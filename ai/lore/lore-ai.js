@@ -40,7 +40,7 @@ const frequency_penalty = 0.2;
 const presence_penalty = 0.2;
 const top_p = 1;
 
-const ApiTypes = ['NONE', 'AI21', 'GOOSEAI', 'OPENAI'];
+const ApiTypes = ['UPSTREET', 'AI21', 'GOOSEAI', 'OPENAI', 'NONE'];
 const DefaultSettings = {
   apiType: ApiTypes[0],
   apiKey: '',
@@ -365,6 +365,7 @@ class LoreAI {
     const _getApiUrl = apiType => {
       switch (apiType) {
         case 'NONE': return null;
+        case 'UPSTREET': return `https://upstreet.webaverse.com/api/ai`;
         case 'AI21': return `https://ai.webaverse.com/ai21/v1/engines/j1-large/completions`;
         case 'GOOSEAI': return `https://ai.webaverse.com/gooseai/v1/engines/gpt-neo-20b/completions`;
         case 'OPENAI': return `https://api.openai.com/v1/engines/text-davinci-002/completions`;

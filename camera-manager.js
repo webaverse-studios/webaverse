@@ -1,11 +1,12 @@
 import * as THREE from 'three';
 import {canvas, getRenderer, camera} from './renderer.js';
 import physicsManager from './physics-manager.js';
-import {shakeAnimationSpeed, minFov, maxFov, midFov} from './constants.js';
+import {shakeAnimationSpeed, minFov, maxFov, midFov, MAX_THIRD_PERSON_CAMERA_DISTANCE} from './constants.js';
 import Simplex from './simplex-noise.js';
 import {playersManager} from './players-manager.js';
 import easing from './easing.js';
 import {isWorker} from './env.js';
+import {clamp} from 'three/src/math/MathUtils.js';
 
 const cubicBezier = easing(0, 1, 0, 1);
 const cubicBezier2 = easing(0.5, 0, 0.5, 1);
@@ -168,6 +169,7 @@ class CameraManager extends EventTarget {
     this.pointerLockElement = null;
     // this.pointerLockEpoch = 0;
     this.shakes = [];
+    this.canZoom = true;
     this.focus = false;
     this.lastFocusChangeTime = 0; // XXX this needs to be removed
     this.fovFactor = 0;
@@ -308,8 +310,8 @@ class CameraManager extends EventTarget {
   }
 
   handleWheelEvent(e) {
-    if (!this.target) {
-      cameraOffsetTargetZ = Math.min(cameraOffset.z - e.deltaY * 0.01, 0);
+    if (!this.target && this.canZoom) {
+      cameraOffsetTargetZ = clamp(cameraOffset.z - e.deltaY * 0.01, -MAX_THIRD_PERSON_CAMERA_DISTANCE, 0);
     }
   }
 

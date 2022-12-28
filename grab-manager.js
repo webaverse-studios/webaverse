@@ -158,6 +158,7 @@ const _click = (e) => {
     localPlayer.ungrab();
 
     transformIndicators.targetApp = null;
+    grabManager.undrawPhone();
     grabManager.hideUi();
     grabManager.setGridSnap(minGridSnap);
   } else {
@@ -216,6 +217,7 @@ class Grabmanager extends EventTarget {
   async toggleEditMode() {
     this.editMode = !this.editMode;
     this.setGridSnap(minGridSnap);
+    transformIndicators.targetApp = null;
     if (this.editMode) {
       if (!cameraManager.pointerLockElement) {
         await cameraManager.requestPointerLock();
@@ -228,8 +230,10 @@ class Grabmanager extends EventTarget {
         localPlayer.ungrab();
       }
       this.showUi();
+      this.drawPhone();
     } else {
       this.hideUi();
+      this.undrawPhone();
     }
   }
 
@@ -245,6 +249,20 @@ class Grabmanager extends EventTarget {
 
   hideUi() {
     this.dispatchEvent(new MessageEvent('hideui'));
+  }
+
+  drawPhone() {
+    const localPlayer = playersManager.getLocalPlayer();
+    if (!localPlayer.hasAction('readyGrab')) {
+      localPlayer.addAction({
+        type: 'readyGrab'
+      });
+    }
+  }
+
+  undrawPhone() {
+    const localPlayer = playersManager.getLocalPlayer();
+    localPlayer.removeAction('readyGrab');
   }
 
   menuClick(e) {
@@ -265,7 +283,7 @@ class Grabmanager extends EventTarget {
     }
     this.dispatchEvent(
       new MessageEvent('setgridsnap', {
-        data: { gridSnap: this.gridSnap },
+        data: {gridSnap: this.gridSnap},
       })
     );
   }
@@ -381,8 +399,11 @@ class Grabmanager extends EventTarget {
         const collision = physicsScene.raycast(position, quaternion);
         if (collision) {
           const physicsId = collision.objectId;
-          highlightedPhysicsObject = metaversefileApi.getAppByPhysicsId(physicsId);
-          highlightedPhysicsId = physicsId;
+          const app = metaversefileApi.getAppByPhysicsId(physicsId);
+          if(!app.getComponent('invincible')) {
+            highlightedPhysicsObject = app;
+            highlightedPhysicsId = physicsId;
+          }
         }
       }
     };
@@ -420,6 +441,13 @@ class Grabmanager extends EventTarget {
       }
     };
     _updatePhysicsHighlight();
+
+    const _handleCellphoneUndraw = () => {
+      if(localPlayer.avatar?.cellphoneUndrawTime >= 1000) {
+        localPlayer.removeAction('readyGrab');
+      }
+    };
+    _handleCellphoneUndraw();
   }
 }
 

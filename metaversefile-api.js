@@ -403,7 +403,7 @@ const mirrors = [];
 metaversefile.setApi({
   async import(s) {
     if (/^[a-zA-Z0-9]+:/.test(s)) {
-      s = `${compilerBaseUrl}${s.replace(/^([a-zA-Z0-9]+:\/)\//, '$1')}`;
+      s = `${compilerBaseUrl}${s.replace(compilerBaseUrl, '').replace(/^([a-zA-Z0-9]+:\/)\//, '$1')}`;
     } else {
       s = new URL(s, compilerBaseUrl).href;
     }
@@ -1376,12 +1376,19 @@ export default () => {
   useDebug() {
     return debug;
   },
+  useCompilerBaseUrl() {
+    return compilerBaseUrl
+  },
   async addModule(app, m) {
     // wait to make sure module initialization happens in a clean tick loop,
     // even when adding a module from inside of another module's initialization
     await Promise.resolve();
-
-    app.name = m.name ?? (m.contentId ? m.contentId.match(/([^\/\.]*)$/)[1] : '');
+    
+    try {
+      app.name = m.name ?? (m.contentId ? m.contentId.match(/([^\/\.]*)$/)[1] : '');
+    } catch (error) {
+      console.error(error)
+    }
     app.description = m.description ?? '';
     app.appType = m.type ?? '';
     app.contentId = m.contentId ?? '';
