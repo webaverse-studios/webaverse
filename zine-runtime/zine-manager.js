@@ -82,49 +82,9 @@ const localVector2D = new THREE.Vector2();
 const localQuaternion = new THREE.Quaternion();
 const localMatrix = new THREE.Matrix4();
 const localPlane = new THREE.Plane();
-const localFrustum = new THREE.Frustum();
 const localRaycaster = new THREE.Raycaster();
 const localCamera = new THREE.PerspectiveCamera();
 const localOrthographicCamera = new THREE.OrthographicCamera();
-
-const zeroVector = new THREE.Vector3(0, 0, 0);
-const upVector = new THREE.Vector3(0, 1, 0);
-
-const planeGeometryNormalizeQuaternion = new THREE.Quaternion()
-  .setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI/2);
-
-// XXX debugging
-
-const _makePlaneMesh = ({
-  color,
-}) => {
-  const geometry = new THREE.PlaneGeometry(10, 10)
-    .rotateY(Math.PI / 2) // because physx has planes normals in +x direction
-    // .rotateY(Math.PI); // face forward
-  const material = new THREE.MeshPhongMaterial({
-    color,
-    // side: THREE.DoubleSide,
-    // transparent: true,
-  });
-  const mesh = new THREE.Mesh(geometry, material);
-  mesh.frustumCulled = false;
-  return mesh;
-};
-const planeMesh1 = _makePlaneMesh({
-  color: 0xFF0000,
-});
-globalThis.planeMesh1 = planeMesh1;
-scene.add(planeMesh1);
-const planeMesh2 = _makePlaneMesh({
-  color: 0x00FF00,
-});
-globalThis.planeMesh2 = planeMesh2;
-scene.add(planeMesh2);
-const planeMesh3 = _makePlaneMesh({
-  color: 0x0000FF,
-});
-globalThis.planeMesh3 = planeMesh3;
-scene.add(planeMesh3);
 
 // classes
 
