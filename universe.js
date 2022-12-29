@@ -377,11 +377,11 @@ class Universe extends EventTarget {
 
     // Handle scene updates from network realms.
     const onWorldAppEntityAdd = e => {
-      const { arrayId, entityId } = e.data;
+      const {arrayId, entityId} = e.data;
       const instanceId = entityId;
       if (arrayId === "worldApps" && !world.appManager.hasTrackedApp(instanceId)) {
         const virtualWorld = this.realms.getVirtualWorld();
-        const { contentId, transform, components } = virtualWorld.worldApps.getVirtualMap(instanceId).toObject();
+        const {contentId, transform, components} = virtualWorld.worldApps.getVirtualMap(instanceId).toObject();
         const appsArray = state.getArray(appsMapName);
         appsArray.doc.transact(() => {
           const appMap = new Z.Map();
@@ -514,10 +514,12 @@ class Universe extends EventTarget {
       // Load the scene if not already loaded in the multiplayer realms.
       // TODO: Won't need to load the scene once multiplayer "rooms" are used.
       if (virtualWorld.worldApps.getSize() === 0) {
+        // First player loads scene from file.
         await metaversefile.createAppAsync({
           start_url: src,
         });
       }
+      // Second and subsequent players load scene from network realms.
 
       console.log('Multiplayer connected');
       this.multiplayerConnected = true;
@@ -528,15 +530,12 @@ class Universe extends EventTarget {
     });
 
     // Wait for world apps to be loaded so that avatar doesn't fall.
-    await new Promise(async resolve => {
-      const TEST_INTERVAL = 100;
-      const MAX_TIMEOUT = 20000;
-      const startTime = Date.now();
-      while (world.appManager.pendingAddPromises.size > 0 && (Date.now() - startTime) < MAX_TIMEOUT) {
-        await new Promise(resolve => setTimeout(resolve, TEST_INTERVAL));
-      }
-      resolve();
-    });
+    const TEST_INTERVAL = 100;
+    const MAX_TIMEOUT = 20000;
+    const startTime = Date.now();
+    while (world.appManager.pendingAddPromises.size > 0 && (Date.now() - startTime) < MAX_TIMEOUT) {
+      await new Promise(resolve => setTimeout(resolve, TEST_INTERVAL));
+    }
   }
 
   // Called by enterWorld() to ensure we aren't connected to multi-player.
