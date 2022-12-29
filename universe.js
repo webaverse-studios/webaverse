@@ -376,28 +376,29 @@ class Universe extends EventTarget {
     });
 
     // Handle scene updates from network realms.
-    const virtualWorld = this.realms.getVirtualWorld();
-    const onNeedledEntityAdd = e => {
-      const {entityId, needledEntity} = e.data;
-      const {instanceId, contentId, transform, components} = needledEntity.toObject();
-      if (!world.appManager.hasTrackedApp(instanceId)) {
+    const onWorldAppEntityAdd = e => {
+      const { arrayId, entityId } = e.data;
+      const instanceId = entityId;
+      if (arrayId === "worldApps" && !world.appManager.hasTrackedApp(instanceId)) {
+        const virtualWorld = this.realms.getVirtualWorld();
+        const { contentId, transform, components } = virtualWorld.worldApps.getVirtualMap(instanceId).toObject();
         const appsArray = state.getArray(appsMapName);
         appsArray.doc.transact(() => {
           const appMap = new Z.Map();
           appMap.set('instanceId', instanceId);
           appMap.set('contentId', contentId);
-          appMap.set('transform', transform);
+          appMap.set('transform', new Float32Array(transform));
           appMap.set('components', components);
           appsArray.push([appMap]);
         });
       }
     };
-    virtualWorld.worldApps.addEventListener('needledentityadd', onNeedledEntityAdd);
-    const onNeedledEntityRemove = e => {
+    this.realms.addEventListener('entityadd', onWorldAppEntityAdd);
+    const onWorldAppEntityRemove = e => {
       // TODO
-      console.warn('onNeedledEntityRemove() not implemented');
+      console.warn('onWorldAppEntityRemove() not implemented');
     };
-    virtualWorld.worldApps.addEventListener('needledentityremove', onNeedledEntityRemove);
+    this.realms.addEventListener('entityremove', onWorldAppEntityRemove);
 
 
     const onConnect = async position => {
