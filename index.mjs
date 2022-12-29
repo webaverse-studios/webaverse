@@ -263,7 +263,7 @@ const _startMultiplayer = async () => {
 };
 const _startWiki = async () => {
   const wikiPath = path.join(dirname, 'packages', 'wiki');
-  const wikiProcess = child_process.spawn(process.argv[0], ['./server.js'], {
+  const wikiProcess = child_process.spawn(process.argv[0], ['server.js'], {
     cwd: wikiPath,
     env: {
       ...process.env,
