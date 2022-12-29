@@ -124,9 +124,9 @@ class Universe extends EventTarget {
     this.dispatchEvent(new MessageEvent('worldload'));
   }
 
-  async reload() {
-    await this.enterWorld(this.currentWorld);
-  }
+  // async reload() {
+  //   await this.enterWorld(this.currentWorld);
+  // }
 
   async pushUrl(u) {
     history.pushState({}, '', u);
@@ -199,19 +199,18 @@ class Universe extends EventTarget {
 
   // Called by enterWorld() to ensure we aren't connected as single player.
   disconnectSingleplayer() {
-    // Nothing to do at present.
+    // Nothing to do.
   }
 
   // Called by enterWorld() when a player enables multi-player.
   async connectMultiplayer(src, room, state = new Z.Doc()) {
-    console.log("Connect multiplayer");
-    this.connectState(state);
-
-    // Use default scene if none specified.
-    if (src === undefined) {
-      const sceneNames = await sceneManager.getSceneNamesAsync();
-      src = sceneManager.getSceneUrl(sceneNames[0]);
+    console.log('Connect multiplayer');
+    if (src === undefined || room === undefined) {
+      console.error('Multiplayer src and room must be defined.')
+      return;
     }
+
+    this.connectState(state);
 
     // Set up the network realms.
     const localPlayer = playersManager.getLocalPlayer();
@@ -403,9 +402,9 @@ class Universe extends EventTarget {
 
     const onConnect = async position => {
       const localPlayer = playersManager.getLocalPlayer();
+      const virtualWorld = this.realms.getVirtualWorld();
 
       // World app changes.
-      const virtualWorld = this.realms.getVirtualWorld();
       const onTrackedAppAdd = async e => {
         // An app has been added to the world.
         const {trackedApp} = e.data;
@@ -511,15 +510,15 @@ class Universe extends EventTarget {
         this.realms.enableMic();
       }
 
-      // Load the scene if not already loaded in the multiplayer realms.
-      // TODO: Won't need to load the scene once multiplayer "rooms" are used.
+      // Load the scene.
+      // First player loads scene from src.
+      // Second and subsequent players load scene from network realms.
+      // TODO: Won't need to load the scene once the multiplayer-do state is used.
       if (virtualWorld.worldApps.getSize() === 0) {
-        // First player loads scene from file.
         await metaversefile.createAppAsync({
           start_url: src,
         });
       }
-      // Second and subsequent players load scene from network realms.
 
       console.log('Multiplayer connected');
       this.multiplayerConnected = true;
