@@ -48,7 +48,7 @@ class SpawnManager {
     const diff = localVector.subVectors(this.#spawnPosition, localPlayer.position);
     for (const player of partyMembers) {
       const playerPosition = localVector2.addVectors(diff, player.position);
-      player.setSpawnPoint(playerPosition, quaternion);
+      player.setSpawnPoint(playerPosition, this.#spawnQuaternion);
     }
   }
 }
