@@ -9,13 +9,12 @@ import WSRTC from 'wsrtc/wsrtc.js';
 import * as Z from 'zjs';
 
 import {actionsMapName, appsMapName, partyMapName, initialPosY, playersMapName, realmSize} from './constants.js';
-import {characterSelectManager} from './characterselect-manager.js';
 import {loadOverworld} from './overworld.js';
 import {partyManager} from './party-manager.js';
 import physicsManager from './physics-manager.js';
 import physxWorkerManager from './physx-worker-manager.js';
 import {playersManager} from './players-manager.js';
-import {makeId, parseQuery} from './util.js';
+import {parseQuery} from './util.js';
 import voiceInput from './voice-input/voice-input.js';
 import {world} from './world.js';
 import {sceneManager} from './scene-manager.js';
@@ -375,6 +374,7 @@ class Universe extends EventTarget {
     });
 
     // Handle scene updates from network realms.
+    // In particular, 'entityadd' events for world apps are received by player 2+ when they join a room.
     const onWorldAppEntityAdd = e => {
       const {arrayId, entityId} = e.data;
       const instanceId = entityId;
@@ -404,9 +404,11 @@ class Universe extends EventTarget {
       const localPlayer = playersManager.getLocalPlayer();
       const virtualWorld = this.realms.getVirtualWorld();
 
-      // World app changes.
+      // World app initialization.
+      // 'trackedappadd' events occur when player 1 loads the scene upon entering multiplayer. These apps are added to the
+      // realms for other players to obtain when they join via realms 'entityadd' events.
+      // TODO: Won't need this once the multiplayer-do state is used instead of current Z state.
       const onTrackedAppAdd = async e => {
-        // An app has been added to the world.
         const {trackedApp} = e.data;
         const {instanceId, contentId, transform, components} = trackedApp.toJSON();
         const position = [...transform].slice(0, 3);
@@ -417,18 +419,18 @@ class Universe extends EventTarget {
       this.playerCleanupFns.push(() => {
         world.appManager.removeEventListener('trackedappadd', onTrackedAppAdd);
       });
+      /*
       const onTrackedAppRemove = async e => {
-        // An app has been removed from the world.
-        const {instanceId, app} = e.data;
-        // TODO
         console.warn('onTrackedAppRemove() not implemented');
       };
       world.appManager.addEventListener('trackedappremove', onTrackedAppRemove);
       this.playerCleanupFns.push(() => {
         world.appManager.removeEventListener('trackedappremove', onTrackedAppRemove);
       });
+      */
 
       // Player app changes.
+      // TODO: Use realms.localPlayer.playerApps collection instead of key values.
       const onAppAdd = e => {
         const app = e.data;
         const components = app.components.reduce((acc, val) => {
@@ -470,15 +472,16 @@ class Universe extends EventTarget {
       });
 
       // Player action changes.
+      // TODO: Use realms.localPlayer.playerActions collection instead of key values.
       const onActionAdd = e => {
-        universe.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, e.action);
+        this.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, e.action);
       };
       localPlayer.addEventListener('actionadd', onActionAdd);
       this.playerCleanupFns.push(() => {
         localPlayer.removeEventListener('actionadd', onActionAdd);
       });
       const onActionRemove = e => {
-        universe.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, null);
+        this.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, null);
       };
       localPlayer.addEventListener('actionremove', onActionRemove);
       this.playerCleanupFns.push(() => {
@@ -513,7 +516,7 @@ class Universe extends EventTarget {
       // Load the scene.
       // First player loads scene from src.
       // Second and subsequent players load scene from network realms.
-      // TODO: Won't need to load the scene once the multiplayer-do state is used.
+      // TODO: Won't need to load the scene once the multiplayer-do state is used instead of the current Z state.
       if (virtualWorld.worldApps.getSize() === 0) {
         await metaversefile.createAppAsync({
           start_url: src,
@@ -524,9 +527,11 @@ class Universe extends EventTarget {
       this.multiplayerConnected = true;
     };
 
+    // Initiate network realms connection.
     await this.realms.updatePosition(localPlayer.position.toArray(), realmSize, {
       onConnect,
     });
+
 
     // Wait for world apps to be loaded so that avatar doesn't fall.
     const TEST_INTERVAL = 100;
