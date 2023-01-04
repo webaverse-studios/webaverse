@@ -19,6 +19,7 @@ import voiceInput from './voice-input/voice-input.js';
 import {world} from './world.js';
 import {sceneManager} from './scene-manager.js';
 import physx from './physx.js';
+import {defaultSceneName} from './endpoints.js';
 
 class Universe extends EventTarget {
   constructor() {
@@ -74,12 +75,8 @@ class Universe extends EventTarget {
 
         let match;
         if (src === undefined) {
-          const sceneNames = await sceneManager.getSceneNamesAsync();
-          // const sceneUrl = sceneManager.getSceneUrl(sceneNames[0]);
-          const sceneUrl = sceneManager.getSceneUrl('block.scn');
-          worldSpec = {src: sceneUrl};
           promises.push(metaversefile.createAppAsync({
-            start_url: sceneUrl,
+            start_url: sceneManager.getSceneUrl(defaultSceneName),
           }));
         } else if (src === '') {
           // nothing
