@@ -5,7 +5,7 @@ import {
 //
 
 // generative world engine remote url
-const gweRemoteUrl = `https://local.webaverse.com:9999/engine`;
+const gweRemoteUrl = `https://local.webaverse.com:9999/engine.html`;
 
 //
 
