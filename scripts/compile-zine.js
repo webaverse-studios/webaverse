@@ -19,14 +19,19 @@ const cleanName = name => path.basename(name).replace(/\.[^\.]+$/, '');
     console.log(`Compiling ${fileName} [${index + 1}/${fileNames.length}]...`);
     const buffer = await fs.promises.readFile(fileName);
     const imageArrayBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
-    const result = await compileScene(imageArrayBuffer);
-    console.log(`${fileName}: ${result.byteLength} ok`);
-    const outputFileName = cleanName(fileName) + '.zine';
-    await fs.promises.writeFile(outputFileName, [
-      zineMagicBytes,
-      result,
-    ]);
-    return outputFileName;
+    try {
+      const result = await compileScene(imageArrayBuffer);
+      console.log(`${fileName}: ${result.byteLength} ok`);
+      const outputFileName = cleanName(fileName) + '.zine';
+      await fs.promises.writeFile(outputFileName, [
+        zineMagicBytes,
+        result,
+      ]);
+      return outputFileName;
+    } catch(err) {
+      console.warn('failed to compile', fileName, err);
+      throw err;
+    }
   }
 
   const parallelism = 4;
@@ -65,9 +70,9 @@ const cleanName = name => path.basename(name).replace(/\.[^\.]+$/, '');
   const queue = new Queue();
   const promises = fileNames.map((fileName, index) => queue.processFile(fileName, index));
   const outputFileNames = await Promise.all(promises);
-  console.warn('Writing zine files index to zines.json...')
-  await fs.promises.writeFile(
-    'zines.json',
-    JSON.stringify(outputFileNames, null, 2)
-  );
+  // console.warn('Writing zine files index to zines.json...')
+  // await fs.promises.writeFile(
+  //   'zines.json',
+  //   JSON.stringify(outputFileNames, null, 2)
+  // );
 })();
