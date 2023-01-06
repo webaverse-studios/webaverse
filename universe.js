@@ -18,6 +18,7 @@ import {world} from './world.js';
 import {defaultSceneName} from './endpoints.js';
 import {sceneManager} from './scene-manager.js';
 import spawnManager from './spawn-manager.js';
+import {rootScene} from './renderer.js';
 
 class Universe extends EventTarget {
   constructor() {
@@ -59,22 +60,30 @@ class Universe extends EventTarget {
         this.connectState(state);
         
         let match;
-        if (src === undefined) {
+        if (src === undefined) { // default load
           // const sceneNames = await sceneManager.getSceneNamesAsync();
-          promises.push(metaversefile.createAppAsync({
-            start_url: sceneManager.getSceneUrl(defaultSceneName),
-          }));
-        } else if (src === '') {
+          const p = (async () => {
+            const app = await metaversefile.createAppAsync({
+              start_url: sceneManager.getSceneUrl(defaultSceneName),
+            });
+            return app;
+          })();
+          promises.push(p);
+        } else if (src === '') { // blank load
           // nothing
-        } else if (match = src.match(/^weba:\/\/(-?[0-9\.]+),(-?[0-9\.]+)(?:\/|$)/i)) {
+        } else if (match = src.match(/^weba:\/\/(-?[0-9\.]+),(-?[0-9\.]+)(?:\/|$)/i)) { // world load
           const [, x, y] = match;
           const [x1, y1] = [parseFloat(x), parseFloat(y)];
           const p = loadOverworld(x1, y1);
           promises.push(p);
-        } else {
-          const p = metaversefile.createAppAsync({
-            start_url: src,
-          });
+        } else { // src load
+          const p = (async () => {
+            const app = await metaversefile.createAppAsync({
+              start_url: src,
+            });
+            rootScene.add(app);
+            return app;
+          })();
           promises.push(p);
         }
       } else {
