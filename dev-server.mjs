@@ -58,12 +58,39 @@ const _setHeaders = res => {
 
 //
 
-// const serveDirectories = [
-//   '/packages/scenes/',
-//   '/packages/characters/',
-//   // '/packages/wsrtc/',
-// ];
-/* const _proxyFile = (req, res, u) => {
+const _proxyUrl = (req, res, u) => {
+  const {method} = req;
+  const opts = {
+    method,
+  };
+  const proxyReq = /^https:/.test(u) ? https.request(u, opts) : http.request(u, opts);
+  for (const header in req.headers) {
+    proxyReq.setHeader(header, req.headers[header]);
+  }
+  proxyReq.on('response', proxyRes => {
+    for (const header in proxyRes.headers) {
+      res.setHeader(header, proxyRes.headers[header]);
+    }
+    res.statusCode = proxyRes.statusCode;
+    proxyRes.pipe(res);
+  });
+  proxyReq.on('error', err => {
+    console.error(err);
+    res.statusCode = 500;
+    res.end();
+  });
+  if (['POST', 'PUT', 'DELETE'].includes(method)) {
+    req.pipe(proxyReq);
+  } else {
+    proxyReq.end();
+  }
+};
+const serveDirectories = [
+  '/packages/scenes/',
+  '/packages/characters/',
+  // '/packages/wsrtc/',
+];
+const _proxyFile = (req, res, u) => {
   u = path.join(dirname, u);
   // console.log('proxy file', u);
   const rs = fs.createReadStream(u);
@@ -73,7 +100,7 @@ const _setHeaders = res => {
     res.end(err.stack);
   });
   rs.pipe(res);
-}; */
+};
 const _proxyTmp = (req, res) => {
   const o = url.parse(req.url);
   const p = path.join(tmpDir, o.path.replace(/^\/tmp\//, ''));
@@ -114,21 +141,17 @@ const _proxyTmp = (req, res) => {
 
     _setHeaders(res);
 
-    // req.headers.host = '127.0.0.1';
-    // delete req.headers.host;
-
-    if (req.url.startsWith('/tmp/')) {
+    if (req.headers.host === COMPILER_NAME) {
+      const u = `http://127.0.0.1:${COMPILER_PORT}${req.url}`;
+      _proxyUrl(req, res, u);
+    } else if (req.headers.host === RENDERER_NAME) {
+      const u = `http://127.0.0.1:${RENDERER_PORT}${req.url}`;
+      // console.log('proxy to renderer', u);
+      _proxyUrl(req, res, u);
+    } else if (req.url.startsWith('/tmp/')) {
       _proxyTmp(req, res);
-    // if (req.headers.host === COMPILER_NAME) {
-    //   const u = `http://127.0.0.1:${COMPILER_PORT}${req.url}`;
-    //   _proxyUrl(req, res, u);
-    // } else if (req.headers.host === RENDERER_NAME) {
-    //   const u = `http://127.0.0.1:${RENDERER_PORT}${req.url}`;
-    //   // console.log('proxy to renderer', u);
-    //   _proxyUrl(req, res, u);
-    // } else if (serveDirectories.some(d => req.url.startsWith(d))) {
-    //   _proxyFile(req, res, req.url);
-    
+    } else if (serveDirectories.some(d => req.url.startsWith(d))) {
+      _proxyFile(req, res, req.url);
     } else {
       next();
     }
