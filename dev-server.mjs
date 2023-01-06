@@ -40,7 +40,7 @@ const certs = {
   key: _tryReadFile('./certs/privkey.pem') || _tryReadFile('./certs-local/privkey.pem'),
   cert: _tryReadFile('./certs/fullchain.pem') || _tryReadFile('./certs-local/fullchain.pem'),
 };
-const tmpDir = `/tmp/webaverse-dev-server/`;
+const tmpDir = `/tmp/webaverse-dev-server`;
 fs.mkdirSync(tmpDir, {
   recursive: true,
 });
