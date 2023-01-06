@@ -68,6 +68,7 @@ import {compilerBaseUrl} from './endpoints.js';
 import {getDefaultCanvas} from './offscreen-engine-runtime/fns/avatar-iconer-fn.js';
 import {isWorker} from './env.js';
 import './metaversefile-binding.js';
+import spawnManager from './spawn-manager.js';
 
 // const localVector2D = new THREE.Vector2();
 
@@ -1379,6 +1380,9 @@ export default () => {
   },
   useZine() {
     return zineManager;
+  },
+  useSpawnManager() {
+    return spawnManager;
   },
   useDebug() {
     return debug;
