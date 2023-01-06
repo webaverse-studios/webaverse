@@ -2,6 +2,7 @@ import path from 'path';
 import http from 'http';
 import https from 'https';
 import fs from 'fs';
+import url from 'url';
 
 import express from 'express';
 import * as vite from 'vite';
@@ -39,6 +40,10 @@ const certs = {
   key: _tryReadFile('./certs/privkey.pem') || _tryReadFile('./certs-local/privkey.pem'),
   cert: _tryReadFile('./certs/fullchain.pem') || _tryReadFile('./certs-local/fullchain.pem'),
 };
+const tmpDir = `/tmp/webaverse-dev-server/`;
+fs.mkdirSync(tmpDir, {
+  recursive: true,
+});
 
 //
 
@@ -53,42 +58,12 @@ const _setHeaders = res => {
 
 //
 
-const _proxyUrl = (req, res, u) => {
-  const {method} = req;
-  const opts = {
-    method,
-  };
-  const proxyReq = /^https:/.test(u) ? https.request(u, opts) : http.request(u, opts);
-  for (const header in req.headers) {
-    proxyReq.setHeader(header, req.headers[header]);
-  }
-  proxyReq.on('response', proxyRes => {
-    for (const header in proxyRes.headers) {
-      res.setHeader(header, proxyRes.headers[header]);
-    }
-    res.statusCode = proxyRes.statusCode;
-    proxyRes.pipe(res);
-  });
-  proxyReq.on('error', err => {
-    console.error(err);
-    res.statusCode = 500;
-    res.end();
-  });
-  if (['POST', 'PUT', 'DELETE'].includes(method)) {
-    req.pipe(proxyReq);
-  } else {
-    proxyReq.end();
-  }
-};
-
-//
-
-const serveDirectories = [
-  '/packages/scenes/',
-  '/packages/characters/',
-  // '/packages/wsrtc/',
-];
-const _proxyFile = (req, res, u) => {
+// const serveDirectories = [
+//   '/packages/scenes/',
+//   '/packages/characters/',
+//   // '/packages/wsrtc/',
+// ];
+/* const _proxyFile = (req, res, u) => {
   u = path.join(dirname, u);
   // console.log('proxy file', u);
   const rs = fs.createReadStream(u);
@@ -98,6 +73,36 @@ const _proxyFile = (req, res, u) => {
     res.end(err.stack);
   });
   rs.pipe(res);
+}; */
+const _proxyTmp = (req, res) => {
+  const o = url.parse(req.url);
+  const p = path.join(tmpDir, o.path.replace(/^\/tmp\//, ''));
+
+  // console.log('got tmp request', req.method, req.url, p);
+
+  if (req.method === 'GET') {
+    const rs = fs.createReadStream(p);
+    rs.on('error', err => {
+      console.warn(err);
+      res.statusCode = 500;
+      res.end(err.stack);
+    });
+    rs.pipe(res);
+  } else if (['PUT', 'POST'].includes(req.method)) {
+    const ws = fs.createWriteStream(p);
+    ws.on('error', err => {
+      console.warn(err);
+      res.statusCode = 500;
+      res.end(err.stack);
+    });
+    ws.on('finish', () => {
+      res.end();
+    });
+    req.pipe(ws);
+  } else {
+    res.statusCode = 400;
+    res.end('not implemented');
+  }
 };
 
 // main
@@ -109,15 +114,21 @@ const _proxyFile = (req, res, u) => {
 
     _setHeaders(res);
 
-    if (req.headers.host === COMPILER_NAME) {
-      const u = `http://127.0.0.1:${COMPILER_PORT}${req.url}`;
-      _proxyUrl(req, res, u);
-    } else if (req.headers.host === RENDERER_NAME) {
-      const u = `http://127.0.0.1:${RENDERER_PORT}${req.url}`;
-      // console.log('proxy to renderer', u);
-      _proxyUrl(req, res, u);
-    } else if (serveDirectories.some(d => req.url.startsWith(d))) {
-      _proxyFile(req, res, req.url);
+    // req.headers.host = '127.0.0.1';
+    // delete req.headers.host;
+
+    if (req.url.startsWith('/tmp/')) {
+      _proxyTmp(req, res);
+    // if (req.headers.host === COMPILER_NAME) {
+    //   const u = `http://127.0.0.1:${COMPILER_PORT}${req.url}`;
+    //   _proxyUrl(req, res, u);
+    // } else if (req.headers.host === RENDERER_NAME) {
+    //   const u = `http://127.0.0.1:${RENDERER_PORT}${req.url}`;
+    //   // console.log('proxy to renderer', u);
+    //   _proxyUrl(req, res, u);
+    // } else if (serveDirectories.some(d => req.url.startsWith(d))) {
+    //   _proxyFile(req, res, req.url);
+    
     } else {
       next();
     }
