@@ -855,6 +855,7 @@ class ZineManager {
     zineCameraManager = zineCameraManagerGlobal,
   }) {
     const instance = new THREE.Scene();
+    instance.name = 'storyboardInstance';
     instance.autoUpdate = false;
 
     // lights
