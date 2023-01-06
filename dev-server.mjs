@@ -126,6 +126,8 @@ const _proxyTmp = (req, res) => {
       res.end();
     });
     req.pipe(ws);
+  } else if (req.method === 'OPTIONS') {
+    res.end();
   } else {
     res.statusCode = 400;
     res.end('not implemented');
