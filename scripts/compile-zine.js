@@ -7,7 +7,11 @@ import {
 } from '../zine-runtime/zine-remote-compiler.js';
 import {
   zineMagicBytes,
-} from 'zine/zine-format.js';
+} from 'zine/zine-constants.js';
+// vqa client
+// import {
+//   VQAClient,
+// } from '../src/clients/vqa-client.js';
 
 const cleanName = name => path.basename(name).replace(/\.[^\.]+$/, '');
 
@@ -19,8 +23,15 @@ const cleanName = name => path.basename(name).replace(/\.[^\.]+$/, '');
     console.log(`Compiling ${fileName} [${index + 1}/${fileNames.length}]...`);
     const buffer = await fs.promises.readFile(fileName);
     const imageArrayBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+    
+    // const vqaClient = new VQAClient();
+    // const prompt = await vqaClient.getImageCaption(file);
+    
     try {
-      const result = await compileScene(imageArrayBuffer);
+      const result = await compileScene({
+        imageArrayBuffer,
+        // prompt,
+      });
       console.log(`${fileName}: ${result.byteLength} ok`);
       const outputFileName = cleanName(fileName) + '.zine';
       await fs.promises.writeFile(outputFileName, [

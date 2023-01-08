@@ -9,10 +9,14 @@ const gweRemoteUrl = `https://local.webaverse.com:9999/engine.html`;
 
 //
 
-export const compileScene = async imageArrayBuffer => {
+export const compileScene = async ({
+  imageArrayBuffer,
+  // prompt,
+}) => {
   const worker = makeRemoteWorker(gweRemoteUrl);
   const result = await worker.request('compileScene', {
     imageArrayBuffer,
+    // prompt,
   });
   return result;
 };
