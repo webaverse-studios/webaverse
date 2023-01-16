@@ -1,6 +1,6 @@
-var recBuffers = [],
-    outputSampleRate = 16000,
-    inSampleRate;
+var recBuffers = [];
+    var outputSampleRate = 16000;
+    var inSampleRate;
 
 this.onmessage = function(e){
   switch(e.data.command){
@@ -29,10 +29,10 @@ function record(inputBuffer){
     }
     while(recBuffers.length * outputSampleRate / inSampleRate > outputBufferLength) {
 	var result = new Int16Array(outputBufferLength);
-	var bin = 0,
-	num = 0,
-	indexIn = 0,
-	indexOut = 0;
+	var bin = 0;
+	var num = 0;
+	var indexIn = 0;
+	var indexOut = 0;
 	while(indexIn < outputBufferLength) {
 	    bin = 0;
 	    num = 0;

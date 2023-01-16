@@ -31,7 +31,7 @@ function Utf8Decode(strUtf) {
     var strUni = strUtf.replace(
         /[\u00e0-\u00ef][\u0080-\u00bf][\u0080-\u00bf]/g,  // 3-byte chars
         function(c) {  // (note parentheses for precedence)
-            var cc = ((c.charCodeAt(0)&0x0f)<<12) | ((c.charCodeAt(1)&0x3f)<<6) | ( c.charCodeAt(2)&0x3f);
+            var cc = ((c.charCodeAt(0)&0x0f)<<12) | ((c.charCodeAt(1)&0x3f)<<6) | (c.charCodeAt(2)&0x3f);
             return String.fromCharCode(cc); }
     );
     strUni = strUni.replace(
@@ -48,8 +48,8 @@ function startup(onMessage) {
         var pocketsphinxJS = (event.data && 'pocketsphinx.js' in event.data) ? event.data['pocketsphinx.js'] : 'pocketsphinx.js';
         var pocketsphinxWASM = (event.data && 'pocketsphinx.wasm' in event.data) ? event.data['pocketsphinx.wasm'] : '/webapp/js/pocketsphinx.wasm';
         // Case of compilation to WebAssembly, this is an absolute path
-        Module['locateFile'] = function() {return pocketsphinxWASM;}
-        Module['onRuntimeInitialized'] = function() {
+        Module.locateFile = function() {return pocketsphinxWASM;}
+        Module.onRuntimeInitialized = function() {
             self.onmessage = onMessage;
             self.postMessage({});
         };
@@ -134,10 +134,10 @@ class Resampler extends EventTarget {
 			}
 			while (outputBufferLength < recBuffers.length * outputSampleRate / inSampleRate) {
 				var result = new Int16Array(outputBufferLength);
-				var bin = 0,
-				num = 0,
-				indexIn = 0,
-				indexOut = 0;
+				var bin = 0;
+				var num = 0;
+				var indexIn = 0;
+				var indexOut = 0;
 				while (indexIn < outputBufferLength) {
 					bin = 0;
 					num = 0;
@@ -163,6 +163,7 @@ class Resampler extends EventTarget {
 			}
 		};
 	}
+
 	send(data) {
 		this.handle(data);
 	}
@@ -217,21 +218,21 @@ function load(data, clbId) {
 function lazyLoad(data, clbId) {
     var files = [];
     var folders = [];
-    data['folders'].forEach(function(folder) {folders.push([folder[0], folder[1]]);});
-    data['files'].forEach(function(file) {files.push([file[0], file[1], file[2]]);});
+    data.folders.forEach(function(folder) {folders.push([folder[0], folder[1]]);});
+    data.files.forEach(function(file) {files.push([file[0], file[1], file[2]]);});
     var preloadFiles = function() {
 	folders.forEach(function(folder) {
-	    Module['FS_createPath'](folder[0], folder[1], true, true);
+	    Module.FS_createPath(folder[0], folder[1], true, true);
 	});
 	files.forEach(function(file) {
-	    Module['FS_createLazyFile'](file[0], file[1], file[2], true, true);
+	    Module.FS_createLazyFile(file[0], file[1], file[2], true, true);
 	});
     };
-    if (Module['calledRun']) {
+    if (Module.calledRun) {
 	preloadFiles();
     } else {
-	if (!Module['preRun']) Module['preRun'] = [];
-	Module["preRun"].push(preloadFiles); // FS is not initialized yet, wait for it
+	if (!Module.preRun) Module.preRun = [];
+	Module.preRun.push(preloadFiles); // FS is not initialized yet, wait for it
     }
     post({status: "done", command: "lazyLoad", id: clbId});
 }

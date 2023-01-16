@@ -1,11 +1,11 @@
-import React, { useState, useRef, useEffect, useContext } from "react";
+import React, {useState, useRef, useEffect, useContext} from "react";
 import minimapManager from "../../../../minimap.js";
 import voiceInput from '../../../../voice-input/voice-input';
 import classNames from "classnames";
 
 import styles from "./minimap.module.css";
 import CustomButton from "../../general/custom-button/index.jsx";
-import { AppContext } from "../../app/index.jsx";
+import {AppContext} from "../../app/index.jsx";
 
 //
 
@@ -16,7 +16,7 @@ const minimapWorldSize = 400;
 const minimapMinZoom = 0.1;
 const minimapBaseSpeed = 30;
 
-export const Minimap = ({ className }) => {
+export const Minimap = ({className}) => {
     const canvasRef = useRef();
     const {setState} = useContext(AppContext);
     const [ micEnabled, setMicEnabled ] = useState(false);
@@ -42,7 +42,7 @@ export const Minimap = ({ className }) => {
     }, [canvasRef.current]);
 
     const handleMicBtnClick = async () => {
-        setState({ openedPanel: null });
+        setState({openedPanel: null});
 
         if (!voiceInput.micEnabled()) {
             await voiceInput.enableMic();
@@ -58,7 +58,7 @@ export const Minimap = ({ className }) => {
     };
 
     const handleSpeakBtnClick = async () => {
-        setState({ openedPanel: null });
+        setState({openedPanel: null});
 
         if (!voiceInput.speechEnabled()) {
             await voiceInput.enableSpeech();

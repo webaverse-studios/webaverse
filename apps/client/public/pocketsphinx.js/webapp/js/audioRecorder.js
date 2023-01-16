@@ -30,7 +30,7 @@
 	};
 	this.start = function(data) {
 	    this.consumers.forEach(function(consumer, y, z) {
-                consumer.postMessage({ command: 'start', data: data });
+                consumer.postMessage({command: 'start', data: data});
 		recording = true;
 		return true;
 	    });
@@ -40,11 +40,11 @@
 	this.stop = function() {
 	    if (recording) {
 		this.consumers.forEach(function(consumer, y, z) {
-                    consumer.postMessage({ command: 'stop' });
+                    consumer.postMessage({command: 'stop'});
 		});
 		recording = false;
 	    }
-	    worker.postMessage({ command: 'clear' });
+	    worker.postMessage({command: 'clear'});
 	};
 	this.cancel = function() {
 	    this.stop();
@@ -54,7 +54,7 @@
 	    if (e.data.error && (e.data.error == "silent")) errorCallback("silent");
 	    if ((e.data.command == 'newBuffer') && recording) {
 		myClosure.consumers.forEach(function(consumer, y, z) {
-                    consumer.postMessage({ command: 'process', data: e.data.data });
+                    consumer.postMessage({command: 'process', data: e.data.data});
 		});
 	    }
 	};

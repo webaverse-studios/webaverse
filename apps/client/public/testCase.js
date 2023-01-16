@@ -8,7 +8,7 @@ export default () => {
       var evt = new CustomEvent("cEvent", {detail: "Any Object Here"});
       window.dispatchEvent(evt);
     }, 40 * 1000)
-    //Dispatch an event
+    // Dispatch an event
     
     return app;
   };

@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useContext} from "react";
-import { Vector3 } from 'three';
+import {Vector3} from 'three';
 import classnames from "classnames";
 
 import {defaultPlayerName} from "../../../../ai/lore/lore-model.js";
