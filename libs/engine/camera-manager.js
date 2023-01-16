@@ -184,6 +184,7 @@ class CameraTarget extends EventTarget {
     this.lerpStartTime = 0;
     this.lastTimestamp = 0;
   }
+
   update(timestamp, timeDiff) {
     const {position, quaternion} = camera;
 
@@ -196,6 +197,7 @@ class CameraTarget extends EventTarget {
 
     return currentTimeFactor >= 1;
   }
+
   updateFov(timestamp, timeDiff) {
     const focusTime = Math.min((timestamp - this.lerpStartTime) / maxFocusTime, 1);
     let newFov;
@@ -214,6 +216,7 @@ class CameraTarget extends EventTarget {
       camera.updateProjectionMatrix();
     }
   }
+
   handleMouseMove(e) {
     _applyMouseMove(this.targetPosition, this.targetQuaternion, cameraOffset, e);
   }
@@ -392,12 +395,14 @@ class CameraTargetNull extends CameraTarget {
     this.lerpStartTime = timestamp;
     this.lastTimestamp = timestamp;
   }
+
   update(timestamp, timeDiff) {
     this.transformFn(this.targetPosition, this.targetQuaternion);
 
     const done = super.update(timestamp, timeDiff);
     done && this.clearFn();
   }
+
   handleMouseMove(e) {
     _applyMouseMove(camera.position, camera.quaternion, cameraOffset, e);
   }
@@ -417,6 +422,7 @@ class CameraTargetCinematic extends CameraTarget {
 
     this.cinematicScriptStartTime = performance.now();
   }
+
   update(timestamp/*, timeDiff */) {
     const timeDiff = timestamp - this.cinematicScriptStartTime;
     // find the line in the script that we are currently on
@@ -660,6 +666,7 @@ class CameraManager extends EventTarget {
     //   });
     // }
   }
+
   setDynamicTarget(
     target = null,
     target2 = null,
@@ -672,6 +679,7 @@ class CameraManager extends EventTarget {
       this.setCameraToNullTarget();
     }
   }
+
   setStaticTarget(target = null) {
     if (target) {
       const cameraTarget = new CameraTargetStatic(target);
@@ -680,6 +688,7 @@ class CameraManager extends EventTarget {
       this.setCameraToNullTarget();
     }
   }
+
   setCameraToNullTarget() {
     const cameraTarget = new CameraTargetNull({
       transformFn: (targetPosition, targetQuaternion) => {
@@ -691,6 +700,7 @@ class CameraManager extends EventTarget {
     });
     this.setTarget(cameraTarget);
   }
+
   clearTarget() {
     this.setTarget(null);
   }

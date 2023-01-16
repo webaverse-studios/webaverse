@@ -40,7 +40,7 @@ const Simplex = (function() {
 
   function SimplexNoise(randomOrSeed) {
     var random;
-    if (typeof randomOrSeed == 'function') {
+    if (typeof randomOrSeed === 'function') {
       random = randomOrSeed;
     }
     else if (randomOrSeed) {
@@ -485,6 +485,7 @@ class MultiSimplex {
     }
     this.simplexes = simplexes;
   }
+
   noise2D(x, z) {
     let result = 0;
     for (let i = 0; i < this.simplexes.length; i++) {

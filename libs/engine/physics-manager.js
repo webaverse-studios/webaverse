@@ -397,6 +397,7 @@ class PhysicsScene extends EventTarget {
     const buffer = physx.physxWorker.cookHeightfieldGeometryPhysics(numRows, numColumns, heights);
     return buffer;
   }
+
   async cookHeightfieldGeometryAsync(numRows, numColumns, heights, {
     signal = null,
   } = {}) {
@@ -404,6 +405,7 @@ class PhysicsScene extends EventTarget {
     signal && signal.throwIfAborted();
     return buffer;
   }
+
   addCookedHeightfieldGeometry(
     buffer,
     heightScale,

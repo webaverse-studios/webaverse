@@ -251,34 +251,18 @@ class IoManager extends EventTarget {
             }
           }
 
-          if (zineCameraManager.cameraLocked) {
-            // front
-            const direction = localVector2.copy(localPlayer.position)
-              .sub(camera.position);
-            direction.y = 0;
-            if (direction.x === 0 && direction.z === 0) {
-              direction.z = -1;
-            }
-            direction.normalize();
-            const frontQuaternion = localQuaternion.setFromRotationMatrix(
-              localMatrix.lookAt(zeroVector, direction, upVector)
-            );
-
-            this.keysDirection.applyQuaternion(frontQuaternion);
-          } else {
-            const transformCameraForwardDirection = localVector.set(0, 0, -1)
-              .applyQuaternion(camera.quaternion);
-            transformCameraForwardDirection.y = 0;
-            if (transformCameraForwardDirection.x === 0 && transformCameraForwardDirection.z === 0) {
-              transformCameraForwardDirection.z = -1;
-            }
-            transformCameraForwardDirection.normalize();
-            const backQuaternion = localQuaternion2.setFromRotationMatrix(
-              localMatrix.lookAt(zeroVector, transformCameraForwardDirection, upVector)
-            );
-
-            this.keysDirection.applyQuaternion(backQuaternion);
+          const transformCameraForwardDirection = localVector.set(0, 0, -1)
+            .applyQuaternion(camera.quaternion);
+          transformCameraForwardDirection.y = 0;
+          if (transformCameraForwardDirection.x === 0 && transformCameraForwardDirection.z === 0) {
+            transformCameraForwardDirection.z = -1;
           }
+          transformCameraForwardDirection.normalize();
+          const backQuaternion = localQuaternion2.setFromRotationMatrix(
+            localMatrix.lookAt(zeroVector, transformCameraForwardDirection, upVector)
+          );
+
+          this.keysDirection.applyQuaternion(backQuaternion);
         };
         _applyCameraRelativeKeys();
 

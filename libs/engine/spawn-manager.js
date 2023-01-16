@@ -17,6 +17,7 @@ class SpawnManager {
     this.#spawnPosition.copy(position);
     this.#spawnQuaternion.copy(quaternion);
   }
+
   async spawn() {
     const localPlayer = playersManager.getLocalPlayer();
     // if the avatar was not set, we'll need to set the spawn again when it is

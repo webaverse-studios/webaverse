@@ -3,7 +3,8 @@
   "version": "0.6.0",
   "license": "MIT",
   "scripts": {
-    "build:all": "nx run-many --target=build"
+    "build": "nx run-many --target=build",
+    "lint": "nx run-many --target=lint"
   },
   "private": true,
   "dependencies": {

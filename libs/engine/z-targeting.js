@@ -116,6 +116,7 @@ class QueryResults {
     reticles = reticleSpecs.map(reticleSpec => reticleSpec.reticle);
     this.results = reticles;
   }
+
   snapshotRay(object) {
     const physicsScene = physicsManager.getScene();
     const results = physicsScene.raycast(object.position, object.quaternion);
@@ -226,10 +227,12 @@ class ZTargeting extends THREE.Object3D {
     this.queryResults.snapshotSweep(object);
     this.#updateFocusTargetReticle();
   }
+
   #snapshotSelectRay(object) {
     this.queryResults.snapshotRay(object);
     this.#updateFocusTargetReticle();
   }
+
   #updateFocusTargetReticle() {
     if (this.queryResults.results.length > 0) {
       this.focusTargetReticle = this.queryResults.results[0];
@@ -237,6 +240,7 @@ class ZTargeting extends THREE.Object3D {
       this.focusTargetReticle = null;
     }
   }
+
   #focusSelectedApp() {
     cameraManager.setFocus(true);
     const remoteApp = this.focusTargetReticle ?
@@ -246,6 +250,7 @@ class ZTargeting extends THREE.Object3D {
     const localPlayer = playersManager.getLocalPlayer();
     cameraManager.setStaticTarget(localPlayer.avatar.modelBones.Head, remoteApp);
   }
+
   #playSelectSound() {
     if (this.focusTargetReticle) {
       sounds.playSoundName(this.focusTargetReticle.type === 'enemy' ? 'zTargetEnemy' : 'zTargetObject');
@@ -271,6 +276,7 @@ class ZTargeting extends THREE.Object3D {
       this.#playSelectSound();
     }
   }
+
   handleUp() {
     if (cameraManager.focus) {
       cameraManager.setFocus(false);

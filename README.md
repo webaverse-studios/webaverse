@@ -149,4 +149,4 @@ Please search Github issues before reporting a new issue or starting a new featu
 
 Please make sure your PRs change as little existing code as is necessary to prevent upstream merge conflicts. When posting a pull request, please document what the PR does and how it can be reviewed and QA'd. PRs will be reviewed and accepted if they conform to our linting and code conventions, don't cause any bugs and don't decrease performance of the app.
 
-<img align="middle" style='margin: 1em' src="/docs/town.jpeg" width=100% />
+<img align="middle" style='margin: 1em' src="lib/docs/town.jpeg" width=100% />

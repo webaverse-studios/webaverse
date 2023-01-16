@@ -123,6 +123,7 @@ class GameManager extends EventTarget {
 
     this.#localInit();
   }
+
   #localInit() {
     this.grabUseMesh = metaversefileApi.createApp();
     (async () => {

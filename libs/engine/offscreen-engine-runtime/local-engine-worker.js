@@ -46,9 +46,11 @@ class LocalEngineWorker {
   constructor() {
     this.worker = new EngineWorker();
   }
+
   postMessage() {
     return this.worker.postMessage.apply(this.worker, arguments);
   }
+
   async request(funcName, args = [], {
     signal = null,
   } = {}) {
