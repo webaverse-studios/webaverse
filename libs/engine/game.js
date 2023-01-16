@@ -22,7 +22,6 @@ import {playersManager} from './players-manager.js';
 import {partyManager} from './party-manager.js';
 import physicsManager from './physics-manager.js';
 import raycastManager from './raycast-manager.js';
-import zTargeting from './z-targeting.js';
 import Avatar from './avatars/avatars.js';
 import {avatarManager} from './avatar-manager.js';
 import npcManager from './npc-manager.js';
@@ -525,20 +524,8 @@ class GameManager extends EventTarget {
     }
   }
 
-  menuMiddleDown() {
-    zTargeting.handleDown();
-  }
-
   menuMiddle() {
     // nothing
-  }
-
-  menuMiddleUp() {
-    zTargeting.handleUp();
-  }
-
-  menuMiddleToggle() {
-    zTargeting.toggle();
   }
 
   menuDragdownRight(e) {
@@ -1616,8 +1603,6 @@ class GameManager extends EventTarget {
             .unproject(camera);
           localPlayer.headTargetInverted = false;
           localPlayer.headTargetEnabled = true;
-        } else if (zTargeting?.focusTargetReticle?.position) {
-          localPlayer.setTarget(zTargeting.focusTargetReticle.position);
         } else {
           localPlayer.setTarget(null);
         }

@@ -39,7 +39,6 @@ import loaders from './loaders.js';
 import writers from './writers.js';
 import * as voices from './voices.js';
 import * as procgen from './procgen/procgen.js';
-import performanceTracker from './performance-tracker.js';
 import renderSettingsManager from './rendersettings-manager.js';
 import questManager from './quest-manager.js';
 import {murmurhash3} from './procgen/murmurhash3.js';
@@ -87,14 +86,6 @@ class App extends THREE.Object3D {
     this.hitTracker = null;
     this.hasSubApps = false;
     this.lastMatrix = new THREE.Matrix4();
-
-    const startframe = () => {
-      performanceTracker.decorateApp(this);
-    };
-    performanceTracker.addEventListener('startframe', startframe);
-    this.addEventListener('destroy', () => {
-      performanceTracker.removeEventListener('startframe', startframe);
-    });
   }
 
   getComponent(key) {
@@ -579,9 +570,7 @@ metaversefile.setApi({
     if (app) {
       const frame = e => {
         if (!app.paused) {
-          performanceTracker.startCpuObject(app.modulesHash, app.name);
           fn(e.data);
-          performanceTracker.endCpuObject();
         }
       };
       world.appManager.addEventListener('frame', frame);

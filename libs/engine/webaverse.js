@@ -16,7 +16,6 @@ import cameraManager from './camera-manager.js';
 import game from './game.js';
 import hpManager from './hp-manager.js';
 import {playersManager} from './players-manager.js';
-import minimapManager from './minimap.js';
 import postProcessing from './post-processing.js';
 import particleSystemManager from './particle-system.js';
 import loadoutManager from './loadout-manager.js';
@@ -35,12 +34,10 @@ import {
 import transformControls from './transform-controls.js';
 import dioramaManager from './diorama/diorama-manager.js';
 import * as voices from './voices.js';
-import performanceTracker from './performance-tracker.js';
 import renderSettingsManager from './rendersettings-manager.js';
 import metaversefileApi from './metaversefile-api.js';
 import musicManager from './music-manager.js';
 import story from './story.js';
-import zTargeting from './z-targeting.js';
 import raycastManager from './raycast-manager.js';
 import universe from './universe.js';
 import npcManager from './npc-manager.js';
@@ -104,7 +101,6 @@ export default class Webaverse extends EventTarget {
           Avatar.waitForLoad(),
           physxWorkerManager.waitForLoad(),
           sounds.waitForLoad(),
-          zTargeting.waitForLoad(),
           particleSystemManager.waitForLoad(),
           transformControls.waitForLoad(),
           backgroundFx.waitForLoad(),
@@ -309,14 +305,11 @@ export default class Webaverse extends EventTarget {
     
     let lastTimestamp = performance.now();
     const animate = (timestamp, frame) => {
-      performanceTracker.startFrame();
-
       const _frame = () => {
         timestamp = timestamp ?? performance.now();
         const timeDiff = timestamp - lastTimestamp;
         const timeDiffCapped = Math.min(Math.max(timeDiff, 0), 100);
 
-        performanceTracker.setGpuPrefix('pre');
         const _pre = () => {
           ioManager.update(timeDiffCapped);
           // this.injectRigInput();
@@ -346,8 +339,6 @@ export default class Webaverse extends EventTarget {
           cameraManager.updatePost(timestamp, timeDiffCapped);
           ioManager.updatePost();
 
-          zTargeting.update(timestamp, timeDiff);
-
           game.pushAppUpdates();
           game.pushPlayerUpdates();
 
@@ -363,11 +354,7 @@ export default class Webaverse extends EventTarget {
         _pre();
 
         // render scenes
-        performanceTracker.setGpuPrefix('diorama');
         dioramaManager.update(timestamp, timeDiffCapped);
-        performanceTracker.setGpuPrefix('minimap');
-        minimapManager.update(timestamp, timeDiffCapped);
-        performanceTracker.setGpuPrefix('loadout');
         loadoutManager.update(timestamp, timeDiffCapped);
 
         {
@@ -375,7 +362,6 @@ export default class Webaverse extends EventTarget {
             postProcessing,
           });
 
-          performanceTracker.setGpuPrefix('');
           this.render(timestamp, timeDiffCapped);
 
           popRenderSettings();
@@ -383,7 +369,6 @@ export default class Webaverse extends EventTarget {
       };
       _frame();
 
-      performanceTracker.endFrame();
     }
     renderer.setAnimationLoop(animate);
 

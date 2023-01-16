@@ -12,13 +12,11 @@ import {
 } from './renderer.js';
 import * as sounds from './sounds.js';
 import musicManager from './music-manager.js';
-import zTargeting from './z-targeting.js';
 import cameraManager from './camera-manager.js';
 import npcManager from './npc-manager.js';
 import {chatManager} from './chat-manager.js';
 import {mod} from './util.js';
 import {playersManager} from './players-manager.js';
-import {alea} from './procgen/procgen.js';
 import renderSettingsManager from './rendersettings-manager.js';
 
 import emoteManager from './emotes/emote-manager.js';
@@ -494,52 +492,7 @@ story.startLocalPlayerComment = comment => {
 story.listenHack = () => {
   (typeof window !== 'undefined') && window.document.addEventListener('click', async e => {
     if (cameraManager.pointerLockElement) {
-      if (e.button === 0 && (cameraManager.focus && zTargeting.focusTargetReticle)) {
-        const app = metaversefile.getAppByPhysicsId(zTargeting.focusTargetReticle.physicsId);
-        
-        if (app) {
-          const {appType} = app;
-
-          // cameraManager.setFocus(false);
-          // zTargeting.focusTargetReticle = null;
-          sounds.playSoundName('menuSelect');
-
-          cameraManager.setFocus(false);
-          cameraManager.setDynamicTarget();
-
-          (async () => {
-            const aiScene = metaversefile.useLoreAIScene();
-            if (appType === 'npc') {
-              const {name, description} = app.getLoreSpec();
-              const remotePlayer = npcManager.getNpcByApp(app);
-
-              if (remotePlayer) {
-                const {
-                  value: comment,
-                  done,
-                } = await aiScene.generateSelectCharacterComment(name, description);
-
-                _startConversation(comment, remotePlayer, done);
-              } else {
-                console.warn('no player associated with app', app);
-              }
-            } else {
-              const {name, description} = app;
-              const comment = await aiScene.generateSelectTargetComment(name, description);
-              const fakePlayer = {
-                avatar: {
-                  modelBones: {
-                    Head: app,
-                  },
-                },
-              };
-              _startConversation(comment, fakePlayer, true);
-            }
-          })();
-        } else {
-          console.warn('could not find app for physics id', zTargeting.focusTargetReticle.physicsId);
-        }
-      } else if (e.button === 0 && currentConversation) {
+      if (e.button === 0 && currentConversation) {
         if (!currentConversation.progressing) {
           currentConversation.progress();
 
