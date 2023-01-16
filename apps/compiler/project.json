@@ -5,6 +5,7 @@
   "projectType": "application",
   "targets": {
     "build": {
+      "exclude": ["./public"],
       "executor": "@nrwl/next:build",
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",

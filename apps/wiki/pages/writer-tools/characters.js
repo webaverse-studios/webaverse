@@ -737,3 +737,5 @@ ${formatedTrivia}
         </div>
     );
 };
+
+export default Character;
