@@ -1,5 +1,5 @@
 {
-  "name": "compiler",
+  "name": "@webaverse-studios/compiler",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/compiler",
   "projectType": "application",

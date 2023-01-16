@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/nx/schemas/workspace-schema.json",
+  "version": 2,
+  "projects": {
+    "@webaverse-studios/client": "apps/client",
+    "@webaverse-studios/compiler": "apps/compiler",
+    "@webaverse-studios/wiki": "apps/wiki",
+    "engine": "libs/engine",
+    "metaversefile": "libs/metaversefile",
+    "multiplayer": "libs/multiplayer",
+    "offscreen-engine": "libs/offscreen-engine",
+    "scenes": "libs/scenes",
+    "test": "apps/test",
+    "test-e2e": "libs/test-e2e",
+    "webaverse-previewer": "libs/previewer",
+    "wsrtc": "libs/wsrtc",
+    "zjs": "libs/zjs"
+  }
+}

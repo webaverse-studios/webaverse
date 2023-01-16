@@ -2,12 +2,12 @@
 import React, {useState, useEffect, useRef, useContext, createContext, Fragment} from 'react';
 import classnames from 'classnames';
 
-import game from '../../../game';
-import {parseQuery} from '../../../util.js'
-import Webaverse from '../../../webaverse.js';
-import universe from '../../../universe.js';
-import cameraManager from '../../../camera-manager';
-import {world} from '../../../world';
+import {game} from '@webaverse-studios/engine/game.js';
+import {parseQuery} from '@webaverse-studios/engine/util.js'
+import Webaverse from '@webaverse-studios/engine/webaverse.js';
+import universe from '@webaverse-studios/engine/universe.js';
+import cameraManager from '@webaverse-studios/engine/camera-manager';
+import {world} from '@webaverse-studios/engine/world';
 
 import {Crosshair} from '../general/crosshair';
 import {WorldObjectsList} from '../general/world-objects-list';
@@ -26,22 +26,19 @@ import Header from '../../Header.jsx';
 import QuickMenu from '../../QuickMenu.jsx';
 import {DomRenderer} from '../../DomRenderer.jsx';
 import {BuildVersion} from '../general/build-version/BuildVersion.jsx';
-import {handleStoryKeyControls} from '../../../story';
-import {scenesBaseUrl, defaultSceneName} from '../../../endpoints.js';
+import {handleStoryKeyControls} from '@webaverse-studios/engine/story';
+import {scenesBaseUrl, defaultSceneName} from '@webaverse-studios/engine/endpoints.js';
 
 import styles from './App.module.css';
 import '../../../styles/globals.css';
-import raycastManager from '../../../raycast-manager';
-import npcManager from '../../../npc-manager';
-import grabManager from '../../../grab-manager';
+import raycastManager from '@webaverse-studios/engine/raycast-manager';
+import grabManager from '@webaverse-studios/engine/grab-manager';
 
 import {AccountContext} from '../../hooks/web3AccountProvider';
 import {ChainContext} from '../../hooks/chainProvider';
-import loadoutManager from '../../../loadout-manager';
-import {partyManager} from '../../../party-manager';
 import Modals from '../modals';
-import dropManager from '../../../drop-manager';
-import useNFTContract from '../../../src/hooks/useNFTContract';
+import dropManager from '@webaverse-studios/engine/drop-manager';
+import useNFTContract from '../../hooks/useNFTContract';
 //
 
 const _startApp = async (weba, canvas) => {
