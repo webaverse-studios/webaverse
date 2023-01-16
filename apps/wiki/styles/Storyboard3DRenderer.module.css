@@ -1,0 +1,59 @@
+.storyboard3DRenderer {
+  
+}
+
+/* */
+
+.storyboard3DRenderer .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.storyboard3DRenderer .header .button {
+  display: inline-block;
+  font-size: 30px;
+  padding: 10px;
+  border: 3px solid currentColor;
+  cursor: pointer;
+}
+.storyboard3DRenderer .header .button:hover {
+  color: #FFF;
+  background-color: #000;
+  border-color: #000;
+}
+
+.storyboard3DRenderer canvas {
+  width: 768px;
+  height: 768px;
+}
+
+/* */
+
+.storyboard3DRenderer .header input[type="text"] {
+  min-width: 500px;
+  padding: 10px;
+  font-size: 24px;
+}
+
+/* */
+
+.storyboard3DRenderer .layers {
+  display: flex;
+}
+.storyboard3DRenderer .layers .layer {
+  width: 150px;
+  height: 150px;
+  margin-right: 5px;
+  padding: 5px;
+  background-color: #CCC;
+  font-size: 12px;
+  cursor: pointer;
+}
+.storyboard3DRenderer .layers .layer:hover,
+.storyboard3DRenderer .layers .layer.selected
+{
+  background-color: #AAA;
+}
+.storyboard3DRenderer .layers .layer.selected {
+  cursor: default;
+}

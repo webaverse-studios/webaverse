@@ -1,0 +1,16 @@
+.storyboardRenderer {
+  width: 1024px;
+  height: 1024px;
+}
+.storyboardRenderer .panelPlaceholder {
+  display: flex;
+  width: inherit;
+  height: inherit;
+  /* padding: 50px; */
+  /* repeat */
+  background-repeat: repeat;
+  /* center */
+  background-size: 16px;
+  background-position: center;
+  flex-direction: column;
+}

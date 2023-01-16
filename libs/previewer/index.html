@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+
+<head>
+<title>Previewer - Webaverse</title>
+</head>
+
+<body>
+  <form id=form1>
+    <input type="text" value="/avatars/ann.vrm" placeholder="https://" id="u1" />
+    <input type="text" value="image/png+icon" placeholder="image/png+icon" id="mimeType1" />
+    <input type="submit">
+  </form>
+  <form id=form2>
+    <input type="text" value="https://webaverse.github.io/homespace-island/" placeholder="https://" id="u2" />
+    <input type="text" value="image/png+profile" placeholder="image/png+profile" id="mimeType2" />
+    <input type="text" value='{"width":768,"height":768}' placeholder="" id="args2" />
+    <input type="submit">
+  </form>
+  <form id=form3>
+    <input type="text" value="https://webaverse.github.io/homespace-island/" placeholder="https://" id="u3" />
+    <input type="text" value="image/png+birdseye" placeholder="image/png+birdseye" id="mimeType3" />
+    <input type="text" value='{"width":1024,"height":1024}' placeholder="" id="args3" />
+    <input type="submit">
+  </form>
+  <form id=form4>
+    <input type="text" value="https://webaverse.github.io/homespace-island/" placeholder="https://" id="u4" />
+    <input type="text" value="image/png+360-video" placeholder="image/png+360-video" id="mimeType4" />
+    <input type="text" value='{"width":256,"height":256}' placeholder="" id="args4" />
+    <input type="submit">
+  </form>
+  <script type="module">
+// form 1
+const form1 = document.getElementById('form1');
+const u1 = document.getElementById('u1');
+const mimeType1 = document.getElementById('mimeType1');
+form1.addEventListener('submit', e => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  if (u1.value && mimeType1.value) {
+    window.location.href = `/?u=${encodeURI(u1.value)}&mimeType=${encodeURIComponent(mimeType1.value)}`;
+  } else {
+    console.warn('missing inputs');
+  }
+});
+
+// form 2
+const form2 = document.getElementById('form2');
+const u2 = document.getElementById('u2');
+const mimeType2 = document.getElementById('mimeType2');
+const args2 = document.getElementById('args2');
+form2.addEventListener('submit', e => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  if (u2.value && mimeType2.value) {
+    window.location.href = `/?u=${encodeURI(u2.value)}&mimeType=${encodeURIComponent(mimeType2.value)}${args2.value ? `&args=${encodeURIComponent(args2.value)}` : ''}`;
+  } else {
+    console.warn('missing inputs');
+  }
+});
+
+// form 3
+const form3 = document.getElementById('form3');
+const u3 = document.getElementById('u3');
+const mimeType3 = document.getElementById('mimeType3');
+const args3 = document.getElementById('args3');
+form3.addEventListener('submit', e => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  if (u3.value && mimeType3.value) {
+    window.location.href = `/?u=${encodeURI(u3.value)}&mimeType=${encodeURIComponent(mimeType3.value)}${args3.value ? `&args=${encodeURIComponent(args3.value)}` : ''}`;
+  } else {
+    console.warn('missing inputs');
+  }
+});
+
+
+// form 4
+const form4 = document.getElementById('form4');
+const u4 = document.getElementById('u4');
+const mimeType4 = document.getElementById('mimeType4');
+const args4 = document.getElementById('args4');
+form4.addEventListener('submit', e => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  if (u4.value && mimeType4.value) {
+    window.location.href = `/?u=${encodeURI(u4.value)}&mimeType=${encodeURIComponent(mimeType4.value)}${args4.value ? `&args=${encodeURIComponent(args4.value)}` : ''}`;
+  } else {
+    console.warn('missing inputs');
+  }
+});
+  </script>
+</body>
+
+</html>

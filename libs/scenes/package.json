@@ -1,0 +1,19 @@
+{
+  "name": "scenes",
+  "version": "0.6.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webaverse/scenes.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/webaverse/scenes/issues"
+  },
+  "homepage": "https://github.com/webaverse/scenes#readme"
+}

@@ -1,0 +1,70 @@
+.rightSection {
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #091319;
+    padding: 10px 16px;
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+.rightSection * {
+    font-size: 12px !important;
+    line-height: 16px !important;
+}
+.rightSection p {
+    margin: 0 !important;
+    padding: 0;
+}
+.rightSection::after {
+    content: " ";
+    display: block;
+    clear: both;
+}
+.rightSection .label {
+    width: 34%;
+    float: left;
+    color: #687674;
+    text-transform: capitalize;
+}
+.rightSection .value {
+    float: left;
+    width: 66%;
+    box-sizing: border-box;
+    padding-right: 8px;
+}
+.rightSection .locationMap {
+    position: relative;
+    width: 128px;
+    height: 115px;
+    margin-top: 8px;
+    margin-bottom: 4px;
+}
+.rightSection .mapWrap {
+    width: 160px;
+    height: 140px;
+    overflow: hidden;
+    position: relative;
+    -webkit-mask-image: url("/assets/map-background.svg");
+    mask-image: url("/assets/map-background.svg");
+    -webkit-mask-size: 80%;
+    mask-size: 80%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+}
+.rightSection .mapBg {
+    width: 138px;
+    height: 119px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    background-image: url("/assets/map-background.svg");
+    background-position: center;
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+.rightSection .map {
+    margin-left: -54px;
+    margin-top: -50px;
+    width: 240px;
+    height: 240px;
+}

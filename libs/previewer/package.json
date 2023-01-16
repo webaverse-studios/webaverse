@@ -1,0 +1,18 @@
+{
+  "name": "webaverse-previewer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "NODE_ENV=development $(which node) server.js",
+    "prod": "NODE_ENV=production $(which node) server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "puppeteer": "^19.0.0",
+    "https-proxy-agent": "^5.0.0"
+  }
+}

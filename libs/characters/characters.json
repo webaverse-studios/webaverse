@@ -1,0 +1,14 @@
+{
+  "packs": [
+    {
+      "name": "upstreet",
+      "characters": [
+        "scillia.npc",
+        "drake.npc",
+        "hyacinth.npc",
+        "juniper.npc",
+        "anemone.npc"
+      ]
+    }
+  ]
+}

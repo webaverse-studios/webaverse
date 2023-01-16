@@ -1,0 +1,38 @@
+.mapSidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 400px;
+  background-color: #000;
+  z-index: 1;
+  transition: 0.3s transform cubic-bezier(0, 1, 0, 1);
+}
+.mapSidebar:not(.open) {
+  transform: translateX(100%);
+}
+
+/* */
+@keyframes rot {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+}
+.placeholder img {
+  width: 100px;
+  height: 100px;
+}
+/* rotate the image */
+.placeholder img {
+  animation: rot 1s linear infinite;
+}

@@ -1,0 +1,44 @@
+{
+  "objects": [
+    {
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "start_url": "https://webaverse.github.io/cloud-skydome/"
+    },
+    {
+      "type": "application/rendersettings",
+      "content": {
+        "fog": {
+          "fogType": "exp",
+          "args": [
+            [
+              0,
+              0,
+              0
+            ],
+            0
+          ]
+        }
+      }
+    },
+    {
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "start_url": "https://webaverse.github.io/dynamic-water/"
+    },
+    {
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "start_url": "https://tcm390.github.io/beach/"
+    }
+  ]
+}

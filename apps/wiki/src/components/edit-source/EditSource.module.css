@@ -1,0 +1,14 @@
+.sourceWrap {}
+.sourceWrap .textarea {
+    width: 100%;
+    height: 300px;
+    background: #FFFFFF;
+    color: black;
+    outline: none;
+    margin-top: 16px;
+    resize: vertical;
+    min-height: 300px;
+}
+.sourceWrap > p {
+    margin-bottom: 0 !important;
+}

@@ -1,0 +1,55 @@
+{
+  "objects": [
+    {
+      "type": "application/spawnpoint",
+      "content": {
+        "position": [0, 380, 210],
+        "quaternion": [0, 0, 0, 1]
+      }
+    },
+    {
+      "position": [
+        0,
+        0,
+        110
+      ],
+      "start_url": "https://webaverse.github.io/floor/"
+    },
+    {
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "start_url": "https://webaverse.github.io/skybox/"
+    },
+    {
+      "type": "application/light",
+      "content": {
+        "lightType": "ambient",
+        "args": [[255, 255, 255], 1]
+      }
+    },
+    {
+      "type": "application/light",
+      "content": {
+        "lightType": "directional",
+        "args": [[255, 255, 255], 3],
+        "position": [1, 2, 3]
+      }
+    },
+    {
+      "start_url": "https://aerydna.github.io/webaverse/spawner/",
+      "components": [
+        {
+          "key": "appUrls",
+          "value": [
+            "https://webaverse.github.io/silkworm-bloater/",
+            "https://webaverse.github.io/silkworm-slasher/",
+            "https://webaverse.github.io/silkworm-runner/"
+          ]
+        }
+      ]
+    }
+  ]
+}

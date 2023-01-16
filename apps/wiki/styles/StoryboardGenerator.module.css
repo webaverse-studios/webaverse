@@ -1,0 +1,22 @@
+.storyboardGenerator {
+  width: inherit;
+  height: inherit;
+}
+.storyboardGenerator .input {
+  min-width: 800px;
+  margin-right: 30px;
+  padding: 10px;
+  font-size: 24px;
+}
+.storyboardGenerator .button {
+  display: inline-block;
+  font-size: 30px;
+  padding: 10px;
+  border: 3px solid currentColor;
+  cursor: pointer;
+}
+.storyboardGenerator .button:hover {
+  color: #FFF;
+  background-color: #000;
+  border-color: #000;
+}

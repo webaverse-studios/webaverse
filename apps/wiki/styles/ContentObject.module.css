@@ -1,0 +1,193 @@
+.character {
+  width: 100vw;
+  max-width: 960px;
+  margin: 0 auto;
+  position: relative;
+  padding: 100px 0 80px 0;
+  font-size: 14px;
+}
+.character * {
+  position: relative;
+}
+.character .logo {
+  height: 60px;
+  position: absolute;
+  left: 40px;
+  top: 22px;
+}
+.character .contentWrap {
+  background-color: #112029;
+  width: 100%;
+  padding: 28px 40px;
+  box-sizing: border-box;
+}
+.character .contentWrap .name {
+  font-size: 24px;
+  border-bottom: 2px solid #152934;
+  padding-bottom: 14px;
+  margin-bottom: 24px;
+}
+
+.character .contentWrap .name span {
+  color: #687674;
+  text-transform: capitalize;
+  margin-bottom: 4px;
+  font-size: 14px;
+  display: block;
+}
+
+.character .contentWrap .name::after {
+  content: ' ';
+  display: block;
+  clear: both;
+}
+.character .contentWrap .name .sourceActions {
+  float: right;
+  color: #FFFFFF;
+  font-size: 12px;
+  margin-top: 8px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.character .contentWrap .name .sourceActions .icon {
+  height: 18px;
+  margin-right: 8px;
+  vertical-align: sub;
+}
+.character .contentWrap .name .sourceActions .iconBack {
+  height: 10px;
+  margin-right: 8px;
+}
+.character .contentWrap .name .sourceActions > div:hover {
+  opacity: 0.7;
+}
+.character .contentWrap .name .sourceActions .button {
+  border: 2px solid #000000;
+  color: #000000;
+  background-color: #eaf4ef;
+  margin-left: 16px;
+  padding: 4px 24px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: "TTSC-Bold";
+}
+.character .contentWrap .name .sourceActions .button:hover {
+  background-color: #fdbf00;
+  border: 2px solid #000000;
+  color: #FFFFFF;
+}
+
+.character .contentWrap .name .sourceActions > div {
+  float: left;
+  vertical-align: middle;
+  line-height: 26px;
+}
+.character .contentWrap h2 {
+  color: #88989e;
+  text-transform: uppercase;
+  font-weight: 300;
+  font-size: 16px;
+  border-bottom: 2px solid #152934;
+  padding-bottom: 14px;
+  margin-bottom: 8px;
+  position: relative;
+  margin-top: 24px;
+}
+.character .contentWrap p {
+  font-size: 14px;
+  font-weight: 300;
+  margin: 0 0 0 0;
+  padding: 0;
+  line-height: 20px;
+  color: #dadada;
+}
+.character .contentWrap .leftContent {
+  width: -webkit-calc(100% - 300px);
+  width: -moz-calc(100% - 300px);
+  width: calc(100% - 300px);
+}
+
+.character .contentWrap .rightContent {
+  width: 280px;
+  float: right;
+  box-sizing: border-box;
+  padding-left: 24px;
+}
+.character .contentWrap .rightContent .title {
+  text-align: center;
+  font-weight: 300;
+  font-size: 18px;
+  margin: 0 0 2px 0;
+}
+.character .contentWrap .rightContent .subtitle {
+  text-align: center;
+  color: #88989e;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 300;
+  margin: 0 0 2px 0;
+}
+.character .contentWrap .rightContent .previewImageWrap {
+  width: 100%;
+  position: relative;
+  margin-bottom: 8px;
+}
+.character .contentWrap .rightContent .previewImageWrap .frame {
+  width: 100%;
+}
+.character .contentWrap .rightContent .previewImageWrap .mask {
+  width: 96%;
+  height: 96%;
+  overflow: hidden;
+  -webkit-mask-image: url("/assets/image-frame.svg");
+  mask-image: url("/assets/image-frame.svg");
+  -webkit-mask-size: 100%;
+  mask-size: 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translateX(-50%) translateY(-50%);
+  -webkit-transform: translateX(-50%) translateY(-50%);
+  transform: translateX(-50%) translateY(-50%);
+  position: absolute;
+  z-index: 10;
+}
+.character .contentWrap .rightContent .mask .image {
+  width: 100%;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translateX(-50%) translateY(-50%);
+  -webkit-transform: translateX(-50%) translateY(-50%);
+  transform: translateX(-50%) translateY(-50%);
+  position: absolute;
+}
+.character .contentWrap::after {
+  content: ' ';
+  display: block;
+  clear: both;
+}
+.character .bio {
+  white-space: pre-wrap;
+}
+.character .markdown img {
+  display: block;
+}
+.character pre {
+  white-space: pre-wrap;
+}
+.character a {
+  color: #FBD301;
+  font-weight: 600;
+  cursor: pointer;
+}
+.character a:hover {
+  color: #CE9B0E;
+}
+.character a:active {
+  color: #CE9B0E;
+}
+
+.hide {
+  display: none !important;
+}

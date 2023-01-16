@@ -1,0 +1,3 @@
+[submodule "packages/three"]
+	path = packages/three
+	url = https://github.com/webaverse/three.git

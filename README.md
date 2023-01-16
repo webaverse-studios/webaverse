@@ -1,8 +1,8 @@
 <img src="docs/banner.jpeg" width=100% />
 
 <p align="center">
-    <a href="https://github.com/webaverse/app/graphs/contributors" alt="Contributors">
-        <img src="https://img.shields.io/github/contributors/webaverse/app" /></a>
+    <a href="https://github.com/webaverse-studios/webaverse/graphs/contributors" alt="Contributors">
+        <img src="https://img.shields.io/github/contributors/webaverse-studios/webaverse" /></a>
     <a href="https://discord.gg/webaverse">
         <img src="https://img.shields.io/discord/906925486049992755.svg?logo=discord"
             alt="chat on Discord"></a>
@@ -62,7 +62,7 @@ User documentation is <a href="https://webaverse.notion.site/User-Docs-3a36b223e
 You need to install with the `--recurse-submodules` flag or installation will not work. Copy the code below to clone the repository if you aren't sure.
 
 ```sh
-git clone --recurse-submodules https://github.com/webaverse/app.git
+git clone --recurse-submodules https://github.com/webaverse-studios/webaverse.git
 cd app/ # Go into the repository
 git pull --recurse-submodules # Pull recursively
 npm install # Install dependencies

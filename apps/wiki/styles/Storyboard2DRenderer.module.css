@@ -1,0 +1,31 @@
+.storyboard2DRenderer {
+  
+}
+
+/* */
+
+.storyboard2DRenderer .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.storyboard2DRenderer .header .button {
+  display: inline-block;
+  font-size: 30px;
+  padding: 10px;
+  border: 3px solid currentColor;
+  cursor: pointer;
+}
+.storyboard2DRenderer .header .button:hover {
+  color: #FFF;
+  background-color: #000;
+  border-color: #000;
+}
+
+/* */
+
+.storyboard2DRenderer .header input[type="text"] {
+  min-width: 500px;
+  padding: 10px;
+  font-size: 24px;
+}

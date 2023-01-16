@@ -1,0 +1,41 @@
+{
+  "name": "@webaverse-studios/compiler",
+  "version": "0.0.32",
+  "description": "",
+  "main": "next dev",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webaverse/metaversefile.git"
+  },
+  "author": "Avaer Kazmer <a@modules.io>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/webaverse/metaversefile/issues"
+  },
+  "homepage": "https://github.com/webaverse/metaversefile#readme",
+  "dependencies": {
+    "@babel/core": "^7.15.0",
+    "@babel/preset-react": "^7.14.5",
+    "data-urls": "^3.0.1",
+    "esbuild": "^0.15.10",
+    "etag": "^1.8.1",
+    "mime-types": "^2.1.32",
+    "next": "12.3.1",
+    "node-fetch": "^3.2.10",
+    "pako": "^2.0.4",
+    "postcss": "^8.4.17",
+    "postcss-modules": "^5.0.0",
+    "unix-path": "^0.2.0"
+  },
+  "devDependencies": {
+    "eslint": "8.25.0",
+    "eslint-config-next": "12.3.1"
+  }
+}

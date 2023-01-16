@@ -1,0 +1,60 @@
+.galleryWrap {
+    display: block;
+    margin: 0;
+    padding: 0;
+    margin-bottom: 8px;
+}
+.galleryWrap .galleryItem {
+    display: block;
+    margin: 0;
+    padding: 0;
+    float: left;
+    width: 33.33%;
+    box-sizing: border-box;
+    padding: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.galleryWrap .imageWrap {
+    width: 100%;
+    border: 2px solid #FFFFFF;
+    position: relative;
+    float: left;
+    cursor: pointer;
+}
+
+.galleryWrap .galleryItem:hover p {
+    color: #FBD301;
+}
+
+.galleryWrap .imageWrap:before {
+    content: "";
+    display: block;
+    padding-top: 100%;
+    float: left;
+}
+.galleryWrap .galleryItem::after {
+    content: " ";
+    display: block;
+    visibility: hidden;
+    clear: both;
+}
+
+.galleryWrap .galleryItem p {
+    color: #dadada;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    clear: both;
+    margin: 0;
+    padding: 6px 12px 4px 0;
+}
+
+.galleryWrap::after {
+    content: " ";
+    display: block;
+    visibility: hidden;
+    clear: both;
+}
+
