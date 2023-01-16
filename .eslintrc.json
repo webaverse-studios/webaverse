@@ -1,7 +1,6 @@
 {
     "root": true,
     "extends": ["semistandard", "eslint:recommended", "plugin:react/recommended", "prettier"],
-    "plugins": ["@nrwl/nx"],
     "parserOptions": {
       "ecmaVersion": "latest",
       "sourceType": "module"
