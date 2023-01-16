@@ -1,4 +1,4 @@
-<img src="docs/banner.jpeg" width=100% />
+<img src="libs/docs/banner.jpeg" width=100% />
 
 <p align="center">
     <a href="https://github.com/webaverse-studios/webaverse/graphs/contributors" alt="Contributors">
@@ -30,17 +30,17 @@ Everything you need to get started with building in the Webaverse is contained i
 - 🖥️ Completely self-hostable
 
 <p align="center">
-<img src="docs/combat.gif" width=30% padding="0" margin="0" align="center" />
-<img src="docs/asteroids.gif" width=30% align="center" />
-<img src="docs/rug_radio.gif" width=30% align="center" />
+<img src="libs/docs/combat.gif" width=30% padding="0" margin="0" align="center" />
+<img src="libs/docs/asteroids.gif" width=30% align="center" />
+<img src="libs/docs/rug_radio.gif" width=30% align="center" />
 </p>
 <p align="center">
-<img src="docs/rotation.gif" width=91% align="center" />
+<img src="libs/docs/rotation.gif" width=91% align="center" />
 </p>
 <p align="center">
-<img src="docs/Uncanny_alley.gif" width=30% align="center" />
-<img src="docs/monster_truck.gif" width=30% align="center" />
-<img src="docs/plane.gif" width=30% align="center" />
+<img src="libs/docs/Uncanny_alley.gif" width=30% align="center" />
+<img src="libs/docs/monster_truck.gif" width=30% align="center" />
+<img src="libs/docs/plane.gif" width=30% align="center" />
 </p>
 
 <h1 align="center">Documentation</h1>
