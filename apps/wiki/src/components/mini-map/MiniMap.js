@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, {useState, useEffect, useContext} from "react";
 import classnames from "classnames";
 import styles from "./MiniMap.module.css";
 
-export const MiniMap = (coordinates) => {
+export const MiniMap = coordinates => {
     return (
         <div className={styles.rightSection}>
             <div className={styles.label}>Location</div>

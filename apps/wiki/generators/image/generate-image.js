@@ -1,5 +1,3 @@
-import {stableDiffusionUrl} from '../../constants/endpoints.js';
-
 export const generateImage = ({
   modelName,
   prefix,
@@ -9,15 +7,15 @@ export const generateImage = ({
 } = {}) => {
   
   
-  //const s = `${prefix} ${description}`;
-  //const u = `${stableDiffusionUrl}/image?s=${encodeURIComponent(s)}&model=${modelName}`;
+  // const s = `${prefix} ${description}`;
+  // const u = `${stableDiffusionUrl}/image?s=${encodeURIComponent(s)}&model=${modelName}`;
   // console.log('generate image url 1', {u});
   // const res = await fetch(u);
   // console.log('generate image url 2', {u, status: res.status});
 
   const response = await fetch("https://stable-diffusion.webaverse.com/run/txt2img", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
           data: [
             description,
@@ -76,6 +74,6 @@ export const generateImage = ({
       throw new Error(`generated empty image`);
     }
   } else {
-    throw new Error(`invalid status: ${res.status}`);
+    throw new Error(`invalid status`);
   }
 };

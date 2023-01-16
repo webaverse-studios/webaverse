@@ -1,14 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
-import { IconCollection } from "./IconCollection";
+import React, {useEffect, useRef, useState} from "react";
+import {IconCollection} from "./IconCollection";
 import styles from "./CustomButton.module.css";
 import classnames from "classnames";
 import CustomIcon from "../custom-icons";
 
 async function getSVG(iconName) {
-    const icon = IconCollection.find((item) => item.name === iconName);
+    const icon = IconCollection.find(item => item.name === iconName);
     return await fetch(icon.file)
-        .then((res) => res.text())
-        .then((res) => {
+        .then(res => res.text())
+        .then(res => {
             const parser = new DOMParser();
             const svgDom = parser.parseFromString(res, "image/svg+xml");
             return svgDom.firstElementChild;
@@ -16,16 +16,16 @@ async function getSVG(iconName) {
 }
 
 export default function CustomButton(props) {
-    const { size, icon, className, onClick, theme, type, text, onMouseEnter } = props;
+    const {size, icon, className, onClick, theme, type, text, onMouseEnter} = props;
     if (type && type === "login") {
         return (
             <div
                 className={classnames(
                     className,
                     styles.iconButtonWrap,
-                    theme && theme === "dark" ? styles.dark : styles.light
+                    theme && theme === "dark" ? styles.dark : styles.light,
                 )}
-                style={{ height: size }}
+                style={{height: size}}
                 onClick={onClick}
                 onMouseEnter={onMouseEnter}
             >
@@ -58,9 +58,9 @@ export default function CustomButton(props) {
                 className={classnames(
                     className,
                     styles.iconButtonWrap,
-                    theme && theme === "dark" ? styles.dark : styles.light
+                    theme && theme === "dark" ? styles.dark : styles.light,
                 )}
-                style={{ height: size }}
+                style={{height: size}}
                 onClick={onClick}
                 onMouseEnter={onMouseEnter}
             >
@@ -94,14 +94,14 @@ export default function CustomButton(props) {
                 className={classnames(
                     className,
                     styles.buttonWrap,
-                    theme && theme === "dark" ? styles.dark : styles.light
+                    theme && theme === "dark" ? styles.dark : styles.light,
                 )}
                 onClick={onClick}
                 onMouseEnter={onMouseEnter}
             >
                 <div
                     className={styles.innerWrap}
-                    style={{ fontSize: size }}
+                    style={{fontSize: size}}
                 >
                     {icon && (
                         <CustomIcon icon={icon} size={size} className={styles.buttonIconWrap} />

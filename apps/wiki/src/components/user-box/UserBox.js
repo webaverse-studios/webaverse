@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, {useState, useEffect, useContext} from "react";
 import classnames from "classnames";
 import styles from "./UserBox.module.css";
 import CustomButton from "../custom-button";
 import Link from "next/link";
 
-export const UserBox = ({ className }) => {
+export const UserBox = ({className}) => {
     const loggedIn = false;
     const [ open , setOpen] = useState(false);
     return (
@@ -92,7 +92,7 @@ export const UserBox = ({ className }) => {
             <div
                 className={classnames(
                     styles.userLoginMethodsModal,
-                    open ? styles.opened : null
+                    open ? styles.opened : null,
                 )}
             >
                 <div className={styles.title}>

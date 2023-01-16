@@ -79,21 +79,21 @@ export const getImagesJSON = async (md, type) => {
     let galleryArray = [];
 
     const matc2 = md.match(/^([\s\S]*?)(\|[\s\S]*?)?$/);
-    //console.log(matc2)
+    // console.log(matc2)
     md = md.replace(/\!\[([^\]]*?)\]\(([^\)]*?)\)/g, (all, title, url) => {
         const match = title.match(/^([\s\S]*?)(\|[\s\S]*?)?$/);
         if (match) {
             title = match[1].trim();
-            //console.log(match)
+            // console.log(match)
             url = match[2] ? match[2].trim() : title;
             url = url.replaceAll("|","").trim();
             if (url) {
                 galleryArray.push({
-                    //image: `![${title}](/api/images/${type}s/${encodeURIComponent(
+                    // image: `![${title}](/api/images/${type}s/${encodeURIComponent(
                      //   url
-                    //)}.png)`,
+                    // )}.png)`,
                     title: title,
-                    prompt: url ? url : title,
+                    prompt: url || title,
                     token: "",
                     format: "png",
                     url: "",
@@ -151,11 +151,11 @@ export const formatParsedDataToJSON = async (rawJSON, type) => {
             url = url.replaceAll("|","").trim();
 
             JSON.Image = {
-                //image: `![${title}](/api/images/${type}s/${encodeURIComponent(
+                // image: `![${title}](/api/images/${type}s/${encodeURIComponent(
                  //   url
-                //)}.png)`,
+                // )}.png)`,
                 title: title,
-                prompt: url ? url : title,
+                prompt: url || title,
                 token: "",
                 format: "png",
                 url: "",

@@ -27,7 +27,7 @@ const ContentObjectRaw = ({
 ContentObjectRaw.getInitialProps = async ctx => {
   const {req} = ctx;
   const match = req.url.match(/^\/([^\/]*)\/([^\/]*)/);
-  let type = match ? match[1].replace(/s$/, '') : '';
+  const type = match ? match[1].replace(/s$/, '') : '';
   let name = match ? match[2] : '';
   name = decodeURIComponent(name);
   name = cleanName(name);

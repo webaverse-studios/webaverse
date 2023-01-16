@@ -115,13 +115,14 @@ export class ParcelsMesh extends THREE.InstancedMesh {
           gl_FragColor = vec4(vColor, 0.2 * opacity);
         }
       `,
-      transparent: true
+      transparent: true,
     });
     super(parcelGeometry, parcelMaterial, maxCount);
 
     this.minMax = new Float32Array(4);
     this.result = null;
   }
+
   setResult(result) {
     this.result = result;
   
@@ -140,16 +141,17 @@ export class ParcelsMesh extends THREE.InstancedMesh {
         localVector.set(
           min[0] * chunkSize,
           0,
-          min[1] * chunkSize
+          min[1] * chunkSize,
         ),
         zeroQuaternion,
-        localVector2.setScalar(size - spacing)
+        localVector2.setScalar(size - spacing),
       );
       this.setMatrixAt(i, localMatrix);
     }
     this.instanceMatrix.needsUpdate = true;
     this.count = leafNodes.length;
   }
+
   updateHover(position) {
     let hoverIndex = -1;
     if (this.result) {
@@ -206,29 +208,35 @@ export class ParcelsMesh extends THREE.InstancedMesh {
       active: this.material.uniforms.uDown.value > 0,
     }
   }
+
   updateActive(down) {
     this.material.uniforms.uDown.value = down ? 1 : 0;
     this.material.uniforms.uDown.needsUpdate = true;
   }
+
   getActive() {
     return this.material.uniforms.uDown.value > 0;
   }
+
   clearHover() {
     this.material.uniforms.highlightMin.value.setScalar(0);
     this.material.uniforms.highlightMin.needsUpdate = true;
     this.material.uniforms.highlightMax.value.setScalar(0);
     this.material.uniforms.highlightMax.needsUpdate = true;
   }
+
   clearSelected() {
     this.material.uniforms.selectMin.value.setScalar(0);
     this.material.uniforms.selectMin.needsUpdate = true;
     this.material.uniforms.selectMax.value.setScalar(0);
     this.material.uniforms.selectMax.needsUpdate = true;
   }
+
   hoverEqualsSelect() {
     return this.material.uniforms.highlightMin.value.equals(this.material.uniforms.selectMin.value) &&
       this.material.uniforms.highlightMax.value.equals(this.material.uniforms.selectMax.value);
   }
+
   updateSelected() {
     // copy from highlight state
     if (this.material.uniforms.hoverIndex.value !== -1) {
@@ -249,6 +257,7 @@ export class ParcelsMesh extends THREE.InstancedMesh {
       this.material.uniforms.selectMax.value.y,
     ];
   }
+
   setOpacity(opacity) {
     this.material.uniforms.opacity.value = opacity;
     this.material.uniforms.opacity.needsUpdate = true;

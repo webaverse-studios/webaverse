@@ -314,7 +314,7 @@ export const CharacterSelect = () => {
                 if (result) {
                     const {preloadedOnSelectMessage} = result;
 
-                    npcPlayer && npcPlayer.voicer.stop();
+                    // npcPlayer && npcPlayer.voicer.stop();
                     const localPlayer = metaversefile.useLocalPlayer();
                     localPlayer.voicer.stop();
                     await chatManager.waitForVoiceTurn(() => {

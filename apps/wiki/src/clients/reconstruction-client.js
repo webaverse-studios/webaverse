@@ -77,7 +77,7 @@ export function pointCloudArrayBufferToPositionAttributeArray(arrayBuffer, width
 export function pointCloudArrayBufferToGeometry(arrayBuffer, width, height) {
   const widthSegments = width - 1;
   const heightSegments = height - 1;
-  let geometry = new THREE.PlaneGeometry(1, 1, widthSegments, heightSegments);
+  const geometry = new THREE.PlaneGeometry(1, 1, widthSegments, heightSegments);
   pointCloudArrayBufferToPositionAttributeArray(arrayBuffer, width, height, geometry.attributes.position.array);
   return geometry;
 }
@@ -88,7 +88,7 @@ export const reinterpretFloatImageData = imageData => {
   const result = new Float32Array(
     imageData.data.buffer,
     imageData.data.byteOffset,
-    imageData.data.byteLength / Float32Array.BYTES_PER_ELEMENT
+    imageData.data.byteLength / Float32Array.BYTES_PER_ELEMENT,
   );
   const {width, height} = imageData;
   // flip Y
@@ -192,10 +192,10 @@ export function depthFloat32ArrayToOrthographicGeometry(
 //
 
 function viewZToOrthographicDepth(viewZ, near, far) {
-  return ( viewZ + near ) / ( near - far );
+  return (viewZ + near) / (near - far);
 }
 function orthographicDepthToViewZ(orthoZ, near, far) {
-  return orthoZ * ( near - far ) - near;
+  return orthoZ * (near - far) - near;
 }
 export const setCameraViewPositionFromViewZ = (x, y, viewZ, camera, target) => {
   const {near, far, projectionMatrix, projectionMatrixInverse} = camera;
@@ -207,7 +207,7 @@ export const setCameraViewPositionFromViewZ = (x, y, viewZ, camera, target) => {
     (x - 0.5) * 2,
     (y - 0.5) * 2,
     (depth - 0.5) * 2,
-    1
+    1,
   );
   clipPosition.multiplyScalar(clipW);
   const viewPosition = clipPosition.applyMatrix4(projectionMatrixInverse);
@@ -236,7 +236,7 @@ export const setCameraViewPositionFromOrthographicViewZ = (x, y, viewZ, camera, 
   const ndcPoint = new THREE.Vector3(
     (x - 0.5) * 2,
     (y - 0.5) * 2,
-    (depth - 0.5) * 2
+    (depth - 0.5) * 2,
   );
   // if (isNaN(ndcPoint.x)) {
   //   console.warn('ndcPoint.x is nan', ndcPoint.toArray());
@@ -273,7 +273,7 @@ export const reprojectCameraFov = (() => {
       (x - 0.5) * 2,
       (y - 0.5) * 2,
       (depth - 0.5) * 2,
-      1
+      1,
     );
     clipPosition.multiplyScalar(clipW);
 

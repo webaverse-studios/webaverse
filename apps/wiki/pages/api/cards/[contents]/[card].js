@@ -1,8 +1,8 @@
 import stream from "stream";
-import { Ctx } from "../../../../clients/context.js";
-import { getDatasetSpecs } from "../../../../datasets/dataset-specs.js";
-import { cleanName } from "../../../../utils.js";
-import { generateCard } from "../../../../media/cards/card-generator.js";
+import {Ctx} from "../../../../clients/context.js";
+import {getDatasetSpecs} from "../../../../datasets/dataset-specs.js";
+import {cleanName} from "../../../../utils.js";
+import {generateCard} from "../../../../media/cards/card-generator.js";
 
 //
 
@@ -11,9 +11,9 @@ const globalImagePrompt = `trending on ArtStation`;
 //
 
 const CardImage = async (req, res) => {
-    const props = await CardImage.getInitialProps({ req });
+    const props = await CardImage.getInitialProps({req});
     if (props) {
-        const { imgUrl } = props;
+        const {imgUrl} = props;
         const proxyRes = await fetch(imgUrl);
         // proxy the status and headers
         res.status(proxyRes.status);
@@ -28,8 +28,8 @@ const CardImage = async (req, res) => {
     }
 };
 
-CardImage.getInitialProps = async (ctx) => {
-    const { req } = ctx;
+CardImage.getInitialProps = async ctx => {
+    const {req} = ctx;
     // Clean url from passed values after ?
     const reqUrlClean = req.url.replace(/\?.*$/, "");
     const match = reqUrlClean.match(/^\/api\/cards\/([^\/]*)\/([^\/]*)\.png$/);
@@ -39,10 +39,10 @@ CardImage.getInitialProps = async (ctx) => {
         datasetSpec,
         description,
         imageName,
-        imageTitle
+        imageTitle,
     ) => {
         const c = new Ctx();
-        const { imagePrompt } = datasetSpec;
+        const {imagePrompt} = datasetSpec;
 
         const generateCharacterImage = generateCard({
             modelName: null,
@@ -50,7 +50,7 @@ CardImage.getInitialProps = async (ctx) => {
             suffix: `${imagePrompt}, ${globalImagePrompt}`,
             // seed: [512, 512, 64, 128, 1, 256],
         });
-        let file = await generateCharacterImage(description); // XXX make this based on the type
+        const file = await generateCharacterImage(description); // XXX make this based on the type
 
         file.name = imageName;
         const hash = await c.storageClient.uploadFile(file);
@@ -73,7 +73,7 @@ CardImage.getInitialProps = async (ctx) => {
     description = cleanName(description);
 
     const datasetSpecs = await getDatasetSpecs();
-    const datasetSpec = datasetSpecs.find((spec) => spec.type === singleType);
+    const datasetSpec = datasetSpecs.find(spec => spec.type === singleType);
 
     if (datasetSpec) {
         const imageTitle = `images/${type}/${description}`;
@@ -82,7 +82,7 @@ CardImage.getInitialProps = async (ctx) => {
             datasetSpec,
             description,
             imageName,
-            imageTitle
+            imageTitle,
         );
     } else {
         return null;

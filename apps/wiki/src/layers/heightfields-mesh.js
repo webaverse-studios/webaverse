@@ -48,7 +48,7 @@ const _getChunkHeightfieldAsync = async (x, z, lod, {
     numVegetationInstances,
     numGrassInstances,
     numPoiInstances,
-    options
+    options,
   );
   return chunkResult;
 };
@@ -126,7 +126,7 @@ export class HeightfieldsMesh extends THREE.InstancedMesh {
     super(
       chunksInstancedGeometry,
       chunksMaterial,
-      maxChunks
+      maxChunks,
     );
 
     this.instance = instance;
@@ -135,6 +135,7 @@ export class HeightfieldsMesh extends THREE.InstancedMesh {
     // document.body.appendChild(canvas); // XXX debugging
     this.updateCancelFn = null;
   }
+
   addChunk({
     chunk,
     freeListEntry,
@@ -169,10 +170,10 @@ export class HeightfieldsMesh extends THREE.InstancedMesh {
               localVector.set(
                 min.x * chunkSize,
                 0,
-                min.y * chunkSize
+                min.y * chunkSize,
               ),
               zeroQuaternion,
-              localVector2.setScalar(scaleInt * chunkSize - spacing)
+              localVector2.setScalar(scaleInt * chunkSize - spacing),
             );
             this.setMatrixAt(freeListEntry, localMatrix);
             this.instanceMatrix.needsUpdate = true;
@@ -220,6 +221,7 @@ export class HeightfieldsMesh extends THREE.InstancedMesh {
       }
     })();
   }
+
   removeChunk(freeListEntry) {
     // console.log('remove chunk', chunk.min.toArray().join(','), freeListEntry);
     
@@ -227,7 +229,7 @@ export class HeightfieldsMesh extends THREE.InstancedMesh {
     localMatrix.makeScale(
       0,
       0,
-      0
+      0,
     );
     this.setMatrixAt(freeListEntry, localMatrix);
     this.instanceMatrix.needsUpdate = true;
@@ -240,10 +242,12 @@ export class HeightfieldsMesh extends THREE.InstancedMesh {
     ctx.clearRect(dx * chunkSize, dy * chunkSize, chunkSize, chunkSize);
     this.material.uniforms.uTex.value.needsUpdate = true; */
   }
+
   setOpacity(opacity) {
     this.material.uniforms.opacity.value = opacity;
     this.material.uniforms.opacity.needsUpdate = true;
   }
+
   destroy() {
     // this.canvas?.parentNode?.removeChild(this.canvas);
   }

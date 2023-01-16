@@ -12,13 +12,13 @@ const openai = new OpenAIApi(configuration);
 
 //
 
-const createImageBlob = async (prompt) => {
+const createImageBlob = async prompt => {
   const response = await openai.createImage({
     prompt,
     n: 1,
     size: "1024x1024",
   });
-  let image_url = response.data.data[0].url;
+  const image_url = response.data.data[0].url;
 
   // const u2 = new URL('/api/proxy', location.href);
   // u2.searchParams.set('url', image_url);
@@ -43,7 +43,7 @@ const makeEditImgFormData = (blob, maskBlob, prompt) => {
   });
   return fd;
 };
-const editImgFormDataBlob = async (fd) => {
+const editImgFormDataBlob = async fd => {
   const response = await fetch(`https://api.openai.com/v1/images/edits`, {
     method: 'POST',
     headers: {
@@ -52,7 +52,7 @@ const editImgFormDataBlob = async (fd) => {
     body: fd,
   });
   const responseData = await response.json();
-  let image_url = responseData.data[0].url;
+  const image_url = responseData.data[0].url;
 
   // const u2 = new URL('/api/proxy', location.href);
   // u2.searchParams.set('url', image_url);
@@ -77,7 +77,7 @@ const editRequestBlob = async req => {
   });
   if (response.ok) {
     const responseData = await response.json();
-    let image_url = responseData.data[0].url;
+    const image_url = responseData.data[0].url;
 
     // const u2 = new URL('/api/proxy', location.href);
     // u2.searchParams.set('url', image_url);
@@ -97,11 +97,13 @@ export class ImageAiClient {
   constructor() {
     // nothing
   }
+
   async createImage(prompt, opts) {
     const resultBlob = await this.createImageBlob(prompt, opts);
     const img = await blob2img(resultBlob);
     return img;
   }
+
   async createImageBlob(prompt, {
     n = 1,
     size = '1024x1024',
@@ -118,6 +120,7 @@ export class ImageAiClient {
     const resultBlob = await res.blob();
     return resultBlob;
   }
+
   async editImgBlob(blob, maskBlob, prompt, {
     n = 1,
   } = {}) {
@@ -134,6 +137,7 @@ export class ImageAiClient {
     const resultBlob = await res.blob();
     return resultBlob;
   }
+
   async editImg(blob, maskBlob, prompt, opts) {
     const resultBlob = await this.editImgBlob(blob, maskBlob, prompt, opts);
     const img = await blob2img(resultBlob);
@@ -144,6 +148,7 @@ export class ImageAiServer {
   constructor() {
     // nothing
   }
+
   async handleRequest(req, res) {
     try {
       const match = req.url.match(/^\/api\/ai\/image-ai\/([^\/\?]+)/);

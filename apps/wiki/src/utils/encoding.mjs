@@ -71,7 +71,7 @@ const encodableConstructors = [
 ];
 const _isAddendumEncodable = o =>
   encodableConstructors.includes(
-    o?.constructor
+    o?.constructor,
   );
 const nullUint8Array = textEncoder.encode('null');
 function zbencode(o) {
@@ -211,7 +211,7 @@ function zbdecode(uint8Array) {
     const addendum = TypedArrayCons(
       uint8Array.buffer,
       uint8Array.byteOffset + index,
-      addendumByteLength
+      addendumByteLength,
     );
     index += addendumByteLength;
     index = align4(index);

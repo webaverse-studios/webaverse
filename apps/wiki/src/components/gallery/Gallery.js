@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, {useState, useEffect, useContext} from "react";
 import classnames from "classnames";
 import styles from "./Gallery.module.css";
-import { ImageLoader } from "../image-loader/ImageLoader";
+import {ImageLoader} from "../image-loader/ImageLoader";
 
-export const Gallery = ({ gallery, className }) => {
+export const Gallery = ({gallery, className}) => {
     
     const [ reroll, setReroll ] = useState(true);
 

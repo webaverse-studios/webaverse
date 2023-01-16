@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, {useState, useEffect, useContext, useRef} from "react";
 import classnames from "classnames";
 import styles from "./ImageLoader.module.css";
 
-export const ImageLoader = ({ url, className, rerollable }) => {
+export const ImageLoader = ({url, className, rerollable}) => {
     const [loading, setLoading] = useState(true);
     const [loadingProgress, setLoadingProgress] = useState("0%");
     const [imageUrl, setImageUrl] = useState("");
@@ -10,7 +10,7 @@ export const ImageLoader = ({ url, className, rerollable }) => {
     const [triggerLoader, setTriggerLoader] = useState(true);
     const [timestamp, setTimestamp] = useState("");
 
-    const imgLoad = (loadUrl) => {
+    const imgLoad = loadUrl => {
         return new Promise(function (resolve, reject) {
             var request = new XMLHttpRequest();
             // console.log(loadUrl)
@@ -18,7 +18,7 @@ export const ImageLoader = ({ url, className, rerollable }) => {
             request.responseType = "blob";
             request.onprogress = function (pr) {
                 setLoadingProgress(
-                    `${Math.round((pr.loaded * 100) / pr.total)}%`
+                    `${Math.round((pr.loaded * 100) / pr.total)}%`,
                 );
             };
             request.onload = function () {
@@ -69,7 +69,7 @@ export const ImageLoader = ({ url, className, rerollable }) => {
                 },
                 function (Error) {
                     console.log(Error);
-                }
+                },
             );
         }
     }, [url, triggerLoader]);

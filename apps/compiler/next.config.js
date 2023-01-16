@@ -20,6 +20,10 @@ const securityHeaders = [
 ];
 
 const nextConfig = {
+  eslint: {
+    dirs: ['pages', 'types', 'plugins'],
+    ignoreDuringBuilds: true,
+  },
   reactStrictMode: true,
   swcMinify: true,
   trailingSlash: true,

@@ -1,12 +1,12 @@
 // import stream from "stream";
 import uuidByString from "uuid-by-string";
-import { Ctx } from "../../../../../clients/context.js";
-import { cleanName } from "../../../../../utils.js";
+import {Ctx} from "../../../../../clients/context.js";
+import {cleanName} from "../../../../../utils.js";
 
 export default async function handler(req, res) { 
-    const { contents, name } = req.query;
-    let type = contents ? contents.replace(/s$/, "") : "";
-    let setName = name ? name : "";
+    const {contents, name} = req.query;
+    const type = contents ? contents.replace(/s$/, "") : "";
+    let setName = name || "";
     
     setName = cleanName(setName);
 
@@ -18,7 +18,7 @@ export default async function handler(req, res) {
         await c.databaseClient.setByName(
             "Content",
             title,
-            req.body
+            req.body,
         );
         res.send(200);
     } else {

@@ -12,5 +12,5 @@ export {
     NFTABI, 
     FTABI, 
     WebaverseABI,
-    VoucherABI
+    VoucherABI,
 }

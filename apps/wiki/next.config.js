@@ -27,6 +27,10 @@ const securityHeaders = [
 ];
 
 const nextConfig = {
+  eslint: {
+    dirs: ['pages', 'utils', 'src'],
+    ignoreDuringBuilds: true,
+  },
   reactStrictMode: true,
   swcMinify: true,
   async headers() {

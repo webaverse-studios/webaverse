@@ -181,13 +181,13 @@ export const MapCanvas = ({
     const playerPosition = localVector.set(
       camera.position.x,
       0,
-      camera.position.z
+      camera.position.z,
     );
     instance.setCamera(
       playerPosition,
       playerPosition,
       camera.quaternion,
-      camera.projectionMatrix
+      camera.projectionMatrix,
     );
 
     lodTracker.update(playerPosition);
@@ -270,7 +270,7 @@ export const MapCanvas = ({
           targetMesh.visible = false;
         }
       };
-      targetMesh.updateActive = (newActive) => {
+      targetMesh.updateActive = newActive => {
         active = newActive;
         _updateScale();
         targetMesh.updateMatrixWorld();
@@ -315,7 +315,7 @@ export const MapCanvas = ({
         top / fov,
         bottom / fov,
         near,
-        far
+        far,
       );
       camera.position.set(0, 128, 0);
       camera.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
@@ -431,12 +431,12 @@ export const MapCanvas = ({
       const startPosition = localVector.set(
         (-startX / w) * 2 + 1,
         (startY / h) * 2 - 1,
-        0
+        0,
         ).unproject(camera);
       const endPosition = localVector2.set(
         (-clientX / w) * 2 + 1,
         (clientY / h) * 2 - 1,
-        0
+        0,
         ).unproject(camera);
         
       camera.position.copy(dragState.cameraStartPositon)
@@ -549,24 +549,24 @@ export const MapCanvas = ({
     localMatrix.compose(
       camera.position,
       camera.quaternion,
-      localVector2.setScalar(oldScale)
+      localVector2.setScalar(oldScale),
     )
       .premultiply(
         localMatrix2.makeTranslation(
           -localRaycaster.ray.origin.x,
           0,
-          -localRaycaster.ray.origin.z
-        )
+          -localRaycaster.ray.origin.z,
+        ),
       )
       .premultiply(
-        localMatrix2.makeScale(scaleFactor, scaleFactor, scaleFactor)
+        localMatrix2.makeScale(scaleFactor, scaleFactor, scaleFactor),
       )
       .premultiply(
         localMatrix2.makeTranslation(
           localRaycaster.ray.origin.x,
           0,
-          localRaycaster.ray.origin.z
-        )
+          localRaycaster.ray.origin.z,
+        ),
       )
       .decompose(camera.position, localQuaternion, localVector2);
     camera.scale.set(newScale, newScale, 1);

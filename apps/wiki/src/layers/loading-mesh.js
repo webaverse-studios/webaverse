@@ -13,11 +13,13 @@ import * as THREE from 'three';
 //
 
 export class LoadingMesh extends THREE.InstancedMesh {
-  constructor({
+  constructor(
+    // {
     // instance,
     // gpuTaskManager,
     // renderer,
-  }) {
+    // }
+  ) {
     const size = 128;
     const maxCount = 512;
 
@@ -112,14 +114,17 @@ export class LoadingMesh extends THREE.InstancedMesh {
     });
     this.add(this.iconMesh); */
   }
+
   setOpacity(opacity) {
     this.material.uniforms.opacity.value = opacity;
     this.material.uniforms.opacity.needsUpdate = true;
   }
+
   update() {
     this.material.uniforms.uTime.value = performance.now() / 1000;
     this.material.uniforms.uTime.needsUpdate = true;
   }
+
   async waitForLoad() {
     // const iconPackage = await IconPackage.loadUrls(hudUrls);
     // this.iconMesh.setPackage(iconPackage);

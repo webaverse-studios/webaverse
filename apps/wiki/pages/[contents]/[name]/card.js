@@ -9,13 +9,13 @@ import {cleanName} from '../../../utils.js';
 // import {generateItem} from '../../datasets/dataset-generator.js';
 import {parseDatasetItems} from '../../../datasets/dataset-parser.js';
 import {getDatasetSpecs} from '../../../datasets/dataset-specs.js';
-import { useEffect, useRef } from 'react';
+import {useEffect, useRef} from 'react';
 
 
 async function getSVG() {
     return await fetch(`https://local.webaverse.com:4444/cards/wiki_card_template_1.svg`)
-        .then((res) => res.text())
-        .then((res) => {
+        .then(res => res.text())
+        .then(res => {
             const parser = new DOMParser();
             const svgDom = parser.parseFromString(res, "image/svg+xml");
             return svgDom.firstElementChild;
@@ -31,7 +31,7 @@ const ContentObjectJson = ({
     const svgRef = useRef(null);
 
     useEffect(() => {
-        getSVG().then((res) => {
+        getSVG().then(res => {
             svgRef.current.innerHTML = "";
             if (res) {
                 res.classList.add("icon");
@@ -44,20 +44,20 @@ const ContentObjectJson = ({
         <div ref={svgRef} style={{maxWidth: "300px", margin: "24px auto"}}></div>
     );
 
-  if (!error) {
-    return (
-      <div className={styles.character}>
-        <pre>{JSON.stringify(json, null, 2)}</pre>
-      </div>
-    );
-  } else {
-    return <div>{error}</div>
-  }
+  // if (!error) {
+  //   return (
+  //     <div className={styles.character}>
+  //       <pre>{JSON.stringify(json, null, 2)}</pre>
+  //     </div>
+  //   );
+  // } else {
+  //   return <div>{error}</div>
+  // }
 };
 ContentObjectJson.getInitialProps = async ctx => {
   const {req} = ctx;
   const match = req.url.match(/^\/([^\/]*)\/([^\/]*)/);
-  let type = match ? match[1].replace(/s$/, '') : '';
+  const type = match ? match[1].replace(/s$/, '') : '';
   let name = match ? match[2] : '';
   name = decodeURIComponent(name);
   name = cleanName(name);

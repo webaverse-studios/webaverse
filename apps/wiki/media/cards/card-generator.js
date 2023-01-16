@@ -1,8 +1,8 @@
-import { stableDiffusionUrl } from "../../constants/endpoints-constants.js";
-import { parse } from "node-html-parser";
+import {stableDiffusionUrl} from "../../constants/endpoints-constants.js";
+import {parse} from "node-html-parser";
 
 export const generateCard =
-    ({ modelName, suffix, seed }) =>
+    ({modelName, suffix, seed}) =>
     async (description) => {
         if (!seed) {
             const s = `${description}, ${suffix}`;
@@ -10,7 +10,7 @@ export const generateCard =
                 modelName ? `&model=${modelName}` : ""
             }`;
             
-            //const file = await fetch(
+            // const file = await fetch(
             //    `https://local.webaverse.com:4444/cards/wiki_card_template_1.svg`
            // );
 

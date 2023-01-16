@@ -25,19 +25,19 @@ export default {
           const _mapUrl = () => {
             if (/^https?:\/\//.test(start_url)) {
               const o = url.parse(start_url, true);
-              let s = url.format(o);
+              const s = url.format(o);
               return s;
             } else if (/^https?:\/\//.test(id)) {
               const o = url.parse(id, true);
               o.pathname = path.join(path.dirname(o.pathname), start_url);
-              let s = url.format(o);
+              const s = url.format(o);
               return s;
             } else if (/^\//.test(id)) {
               id = createRelativeFromAbsolutePath(id);
               
               const o = url.parse(id, true);
               o.pathname = path.join(path.dirname(o.pathname), start_url);
-              let s = url.format(o);
+              const s = url.format(o);
               return s;
             } else {
               throw new Error('.metaversefile scheme unknown');
@@ -76,5 +76,5 @@ export default {
     } else {
       throw new Error('.metaversefile could not be loaded');
     }
-  }
+  },
 };

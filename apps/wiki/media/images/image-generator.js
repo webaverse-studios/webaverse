@@ -25,7 +25,7 @@ export const generateImage = ({
     // const res = await fetch(u);
     const response = await fetch("https://stable-diffusion.webaverse.com/run/txt2img", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
           data: [
             description,
@@ -75,7 +75,7 @@ export const generateImage = ({
 
       const file = await fetch(`https://stable-diffusion.webaverse.com/file=${response.name}`);
 
-      //console.log("IMAAAAAAAAAAGE", file)
+      // console.log("IMAAAAAAAAAAGE", file)
     // console.log('generate image url 2', {u, status: res.status});
     if (file.ok) {
       

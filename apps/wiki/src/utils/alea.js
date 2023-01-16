@@ -95,7 +95,8 @@ function aleaPRNG() {
             s0 = s1;
             s1 = s2;
 
-            return s2 = t - (c = t | 0);
+            const out = s2 = t - (c = t | 0);
+            return out;
         };
 
         /* public: return a 53-bit fraction in the range [0, 1] */

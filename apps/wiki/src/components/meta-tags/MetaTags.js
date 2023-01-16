@@ -1,8 +1,8 @@
 import Head from "next/head";
 import React from "react";
 
-export const MetaTags = (props) => {
-    const { title, description, image, url } = props;
+export const MetaTags = props => {
+    const {title, description, image, url} = props;
     return (
         <Head>
             <title>{title}</title>

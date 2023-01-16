@@ -68,6 +68,7 @@ export class StorageClient {
 
     this.client = new S3Client(s3ClientConfig);
   }
+
   async uploadFile(file) {
     const {name} = file;
 
@@ -83,7 +84,7 @@ export class StorageClient {
        Body: ab,
    }); */
     const contentType = mime.lookup(name);
-    //console.log("Bucket Name", bucketName)
+    // console.log("Bucket Name", bucketName)
     const command = new PutObjectCommand({
       Bucket: bucketName,
       Key: `${hash}/${name}`,
@@ -99,6 +100,7 @@ export class StorageClient {
 
     return hash;
   }
+
   async uploadFiles(files) {
     const hashes = await Promise.all(files.map(async file => {
       const hash = await _getFileHash(file);
@@ -135,6 +137,7 @@ export class StorageClient {
 
     return metaHash;
   }
+
   /* async downloadFile(hash) {
     // XXX
   } */

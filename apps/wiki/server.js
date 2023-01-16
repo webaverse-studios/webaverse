@@ -3,7 +3,7 @@
 // const next = require("next");
 // const fs = require("fs");
 import {createServer} from 'https';
-import {parse} from 'url';
+import {URL} from 'url';
 import next from 'next';
 import fs from 'fs';
 
@@ -24,7 +24,7 @@ const httpsOptions = {
 app.prepare()
   .then(() => {
     createServer(httpsOptions, (req, res) => {
-      const parsedUrl = parse(req.url, true);
+      const parsedUrl = new URL(req.url, true);
       handle(req, res, parsedUrl);
     }).listen(port, SERVER_ADDR, (err) => {
       if (err) throw err;

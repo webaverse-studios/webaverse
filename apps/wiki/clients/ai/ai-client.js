@@ -31,7 +31,7 @@ export function makeGenerateFn() {
       return "returning from error";
     }
   }
-  async function openaiRequest(prompt, stop/*, needsRepetition*/) {
+  async function openaiRequest(prompt, stop/*, needsRepetition */) {
     return await query({
       // model: 'text-davinci-002',
       model,
@@ -46,8 +46,8 @@ export function makeGenerateFn() {
     });
   }
   
-  return async (prompt, stop/*, needsRepetition = true*/) => {
-    return await openaiRequest(prompt, stop/*, needsRepetition*/);
+  return async (prompt, stop/*, needsRepetition = true */) => {
+    return await openaiRequest(prompt, stop/*, needsRepetition */);
   };
 }
 

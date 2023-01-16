@@ -1,5 +1,5 @@
 // import stream from 'stream';
-import url from 'url';
+import {URL} from 'url';
 // import {Readable} from 'node:stream';
 const fetch = require("node-fetch");
 
@@ -9,7 +9,7 @@ const proxy = async (req, res) => {
   res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
 
-  const o = url.parse(req.url, true);
+  const o = new URL(req.url, true);
   const {url: u} = o.query;
   if (u) {
     console.log('fetch u', {u});

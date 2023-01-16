@@ -1,8 +1,8 @@
 import stream from "stream";
-import { Ctx } from "../../../../clients/context.js";
-import { getDatasetSpecs } from "../../../../datasets/dataset-specs.js";
-import { cleanName } from "../../../../utils.js";
-import { generateImage } from "../../../../media/images/image-generator.js";
+import {Ctx} from "../../../../clients/context.js";
+import {getDatasetSpecs} from "../../../../datasets/dataset-specs.js";
+import {cleanName} from "../../../../utils.js";
+import {generateImage} from "../../../../media/images/image-generator.js";
 
 //
 
@@ -11,9 +11,9 @@ const globalImagePrompt = `trending on ArtStation`;
 //
 
 const CharacterImage = async (req, res) => {
-    const props = await CharacterImage.getInitialProps({ req });
+    const props = await CharacterImage.getInitialProps({req});
     if (props) {
-        const { imgUrl } = props;
+        const {imgUrl} = props;
 
         const proxyRes = await fetch(imgUrl);
         // proxy the status and headers
@@ -29,8 +29,8 @@ const CharacterImage = async (req, res) => {
     }
 };
 
-CharacterImage.getInitialProps = async (ctx) => {
-    const { req } = ctx;
+CharacterImage.getInitialProps = async ctx => {
+    const {req} = ctx;
 
     // Check if ?reroll=true is passed in the query
     const isReRoll = req.query?.reroll;
@@ -47,10 +47,10 @@ CharacterImage.getInitialProps = async (ctx) => {
         datasetSpec,
         description,
         imageName,
-        imageTitle
+        imageTitle,
     ) => {
         const c = new Ctx();
-        const { imagePrompt } = datasetSpec;
+        const {imagePrompt} = datasetSpec;
 
         const generateCharacterImage = generateImage({
             modelName: null,
@@ -58,7 +58,7 @@ CharacterImage.getInitialProps = async (ctx) => {
             suffix: `${imagePrompt}, ${globalImagePrompt}`,
             // seed: [512, 512, 64, 128, 1, 256],
         });
-        let imgArrayBuffer = await generateCharacterImage(description); // XXX make this based on the type
+        const imgArrayBuffer = await generateCharacterImage(description); // XXX make this based on the type
 
         const file = new Blob([imgArrayBuffer], {
             type: "image/png",
@@ -88,7 +88,7 @@ CharacterImage.getInitialProps = async (ctx) => {
 
         const datasetSpecs = await getDatasetSpecs();
         const datasetSpec = datasetSpecs.find(
-            (spec) => spec.type === singleType
+            spec => spec.type === singleType,
         );
         if (datasetSpec) {
             const imageTitle = `images/${type}/${description}`;
@@ -97,7 +97,7 @@ CharacterImage.getInitialProps = async (ctx) => {
             const c = new Ctx();
             const imageQuery = await c.databaseClient.getByName(
                 "IpfsData",
-                imageTitle
+                imageTitle,
             );
 
             console.log(imageQuery);
@@ -108,10 +108,10 @@ CharacterImage.getInitialProps = async (ctx) => {
                         datasetSpec,
                         description,
                         imageName,
-                        imageTitle
+                        imageTitle,
                     );
                 } else {
-                    const { content: ipfsHash } = imageQuery;
+                    const {content: ipfsHash} = imageQuery;
                     const imgUrl = c.storageClient.getUrl(ipfsHash, imageName);
                     return {
                         imgUrl,
@@ -122,7 +122,7 @@ CharacterImage.getInitialProps = async (ctx) => {
                     datasetSpec,
                     description,
                     imageName,
-                    imageTitle
+                    imageTitle,
                 );
             }
         } else {

@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 
 import {FTABI, NFTABI, WebaverseABI} from '../../../src/abis/contract.jsx';
-import { ethers } from 'ethers'
+import {ethers} from 'ethers'
 
 const NFTcontractAddress = '0x3D081BF4b7eAe74e25fF1a2461f92aBc3Ea15441';
 
-const getMetaverseData = async (tokenId) => {
+const getMetaverseData = async tokenId => {
     const defaultProvider = new ethers.providers.StaticJsonRpcProvider('https://polygon-rpc.com/')
     const NFTcontract = new ethers.Contract(NFTcontractAddress, NFTABI, defaultProvider);
 
@@ -14,12 +14,12 @@ const getMetaverseData = async (tokenId) => {
     if (_isServerSigned) {
         const content_url = await NFTcontract.getTokenContentURL(tokenId)
 
-        let metaverse_url = content_url.split("index.js")[0] + '.metaversefile';
+        const metaverse_url = content_url.split("index.js")[0] + '.metaversefile';
 
         try {
 
-            let res = await fetch(metaverse_url);
-            let data = await res.json();
+            const res = await fetch(metaverse_url);
+            const data = await res.json();
             return data
 
         } catch(err) {
@@ -40,16 +40,16 @@ const MetadataObject = async (req, res) => {
     console.log("clean url", reqUrlClean)
     const match = reqUrlClean.match(/^\/api\/metadata\/([^\/]*)/);
 
-    let id = match ? match[1] : "";
+    const id = match ? match[1] : "";
 
-    let metadata =    
+    const metadata =    
     {
         name: "",
         description: "",
         image: "",
         animation_url: "",
         attributes: [
-        ]
+        ],
     };
         
     const metaversefile_data = await getMetaverseData(id)

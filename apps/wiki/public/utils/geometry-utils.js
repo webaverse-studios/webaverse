@@ -75,6 +75,7 @@ export class FreeListArray {
     this.entries = new Int32Array(maxSlotEntries);
     this.allocatedEntries = 0;
   }
+
   alloc() {
     if (this.allocatedEntries < maxSlotEntries) {
       if (this.startIndex === this.endIndex) {
@@ -89,6 +90,7 @@ export class FreeListArray {
       throw new Error('out of slots to allocate');
     }
   }
+
   free(index) {
     this.entries[this.endIndex] = index;
     this.endIndex = (this.endIndex + 1) % maxSlotEntries;
@@ -104,6 +106,7 @@ export class FreeList {
     this.slots = new Map(); // Map<slotSize, FreeListArray>
     this.slotSizes = new Map(); // Map<index, slotSize>
   }
+
   allocIndex(slotSize) {
     const allocSize = 1 << slotSize;
     let newFreeStart = this.freeStart + allocSize;
@@ -116,6 +119,7 @@ export class FreeList {
       throw new Error('out of memory to allocate to slot');
     }
   }
+
   alloc(size) {
     const slotSize = getClosestPowerOf2(size);
     let freeListArray = this.slots.get(slotSize);
@@ -127,6 +131,7 @@ export class FreeList {
     this.slotSizes.set(index, slotSize);
     return index;
   }
+
   free(index) {
     const slotSize = this.slotSizes.get(index);
     if (slotSize !== undefined) {

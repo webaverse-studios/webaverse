@@ -20,7 +20,7 @@ export default {
     let src;
     if (/https?:/i.test(id)) {
       const o = url.parse(id, true);
-      o.query['noimport'] = 1 + '';
+      o.query.noimport = 1 + '';
       id = url.format(o);
 
       const res = await fetch(id);
@@ -32,7 +32,7 @@ export default {
     } else if (/^data:/.test(id)) {
       const o = dataUrls(id);
       if (o) {
-        const {/*mimeType, */body} = o;
+        const {/* mimeType, */body} = o;
         src = textDecoder.decode(body);
       } else {
         throw new Error('invalid data url');

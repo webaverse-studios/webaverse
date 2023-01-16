@@ -2,7 +2,7 @@ import uuidByString from "uuid-by-string";
 import Head from "next/head";
 
 import styles from "../../styles/ContentObject.module.css";
-import { Ctx, saveContent } from "../../clients/context.js";
+import {Ctx, saveContent} from "../../clients/context.js";
 import {
     cleanName,
     formatImages,
@@ -10,19 +10,19 @@ import {
     getGalleryArray,
     getSections,
 } from "../../utils.js";
-import { generateItem } from "../../datasets/dataset-generator.js";
-import { formatItemText } from "../../datasets/dataset-parser.js";
-import { getDatasetSpecs } from "../../datasets/dataset-specs.js";
-import React, { useState } from "react";
-import { UserBox } from "../../src/components/user-box/UserBox";
-import { EditSource } from "../../src/components/edit-source";
+import {generateItem} from "../../datasets/dataset-generator.js";
+import {formatItemText} from "../../datasets/dataset-parser.js";
+import {getDatasetSpecs} from "../../datasets/dataset-specs.js";
+import React, {useState} from "react";
+import {UserBox} from "../../src/components/user-box/UserBox";
+import {EditSource} from "../../src/components/edit-source";
 import {
     LeftSection,
     RightSection,
 } from "../../src/components/content-sections";
-import { MiniMap } from "../../src/components/mini-map/MiniMap";
-import { ImageLoader } from "../../src/components/image-loader/ImageLoader";
-import { MetaTags } from "../../src/components/meta-tags/MetaTags";
+import {MiniMap} from "../../src/components/mini-map/MiniMap";
+import {ImageLoader} from "../../src/components/image-loader/ImageLoader";
+import {MetaTags} from "../../src/components/meta-tags/MetaTags";
 
 //
 
@@ -41,15 +41,15 @@ const hideSections = ["Name", "Class", "Image"];
 //
 
 async function testImage(prompt) {
-    let data = {
+    const data = {
         "data": [
-            prompt
-        ] 
+            prompt,
+        ], 
       }
-      let sdEndpoint = "https://stable-diffusion.webaverse.com/run/txt2img";
+      const sdEndpoint = "https://stable-diffusion.webaverse.com/run/txt2img";
       const response = await fetch("https://stable-diffusion.webaverse.com/run/txt2img", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
           data: [
             "hello world",
@@ -87,14 +87,14 @@ async function testImage(prompt) {
             true,
             false,
             false,
-          ]
+          ],
         })})
       .then(r => r.json())
       .then(
         r => {
-          let data = r.data;
+          const data = r.data;
           return r.data[0][0];
-        }
+        },
       );
 
       const file = await fetch(`https://stable-diffusion.webaverse.com/file=${response.name}`)
@@ -102,7 +102,7 @@ async function testImage(prompt) {
 
 }
 
-const ContentObject = ({ type, title, content }) => {
+const ContentObject = ({type, title, content}) => {
     const [itemName, setItemName] = useState("");
     const [itemClass, setItemClass] = useState("");
     const [featuredImage, setFeaturedImage] = useState("");
@@ -118,8 +118,8 @@ const ContentObject = ({ type, title, content }) => {
     }, []);
     React.useEffect(() => {
         if (content) {
-            formatImages(content, type).then((fiContent) => {
-                formatUrls(fiContent).then((fuContent) => {
+            formatImages(content, type).then(fiContent => {
+                formatUrls(fiContent).then(fuContent => {
                     setFormatedContent(fuContent);
                 });
             });
@@ -128,16 +128,16 @@ const ContentObject = ({ type, title, content }) => {
 
     React.useEffect(() => {
         if (formatedContent) {
-            getSections(formatedContent).then((res) => {
+            getSections(formatedContent).then(res => {
                 setSections(res);
                 setItemName(
-                    res.filter((item) => item.title === "Name")[0]?.content
+                    res.filter(item => item.title === "Name")[0]?.content,
                 );
                 setItemClass(
-                    res.filter((item) => item.title === "Class")[0]?.content
+                    res.filter(item => item.title === "Class")[0]?.content,
                 );
             });
-            getGalleryArray(formatedContent).then((res) => {
+            getGalleryArray(formatedContent).then(res => {
                 if (res) {
                     setGallery(res);
                 }
@@ -147,7 +147,7 @@ const ContentObject = ({ type, title, content }) => {
 
     React.useEffect(() => {
         const imageContent = sections.filter(
-            (item) => item.title === "Image"
+            item => item.title === "Image",
         )[0]?.content;
         if (imageContent) {
             const match = imageContent.match(/(?<=\().+?(?=\))/g);
@@ -158,7 +158,7 @@ const ContentObject = ({ type, title, content }) => {
             }
         } else {
             if (gallery) {
-                let randIndex = Math.floor(Math.random() * gallery.length);
+                const randIndex = Math.floor(Math.random() * gallery.length);
                 setFeaturedImage(gallery[randIndex]?.url);
             }
         }
@@ -172,7 +172,7 @@ const ContentObject = ({ type, title, content }) => {
         setEditSource(false);
     };
 
-    const editSection = async (content) => {
+    const editSection = async content => {
         saveContent();
     };
 
@@ -262,10 +262,10 @@ const ContentObject = ({ type, title, content }) => {
                                     sections.map((section, i) => {
                                         if (
                                             !rightColumn.includes(
-                                                section.title
+                                                section.title,
                                             ) &&
                                             !hideSections.includes(
-                                                section.title
+                                                section.title,
                                             )
                                         ) {
                                             return (
@@ -291,10 +291,10 @@ const ContentObject = ({ type, title, content }) => {
     );
 };
 
-ContentObject.getInitialProps = async (ctx) => {
-    const { req } = ctx;
+ContentObject.getInitialProps = async ctx => {
+    const {req} = ctx;
     const match = req.url.match(/^\/([^\/]*)\/([^\/]*)/);
-    let type = match ? match[1].replace(/s$/, "") : "";
+    const type = match ? match[1].replace(/s$/, "") : "";
     let name = match ? match[2] : "";
     name = decodeURIComponent(name);
     name = cleanName(name);
@@ -304,7 +304,7 @@ ContentObject.getInitialProps = async (ctx) => {
     const id = uuidByString(title);
     const query = await c.databaseClient.getByName("Content", title);
     if (query) {
-        const { content } = query;
+        const {content} = query;
         return {
             type,
             id,
@@ -317,7 +317,7 @@ ContentObject.getInitialProps = async (ctx) => {
             getDatasetSpecs(),
             generateItem(type, name),
         ]);
-        const datasetSpec = datasetSpecs.find((ds) => ds.type === type);
+        const datasetSpec = datasetSpecs.find(ds => ds.type === type);
         // console.log('got datset spec', {datasetSpec});
         const itemText = formatItemText(generatedItem, datasetSpec);
 

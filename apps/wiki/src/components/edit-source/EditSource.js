@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, {useState, useEffect, useContext} from "react";
 import classnames from "classnames";
 import styles from "./EditSource.module.css";
 
-export const EditSource = (content) => {
-    //console.log("Content: ",content);
+export const EditSource = content => {
+    // console.log("Content: ",content);
     return (
         <div className={styles.sourceWrap}>
             <p>

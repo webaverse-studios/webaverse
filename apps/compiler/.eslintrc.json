@@ -1,3 +1,4 @@
 {
+  "ignorePatterns": ["!**/*", "public/*", "public/**/*", "*pg.js", "**/*pg.worker.js", "**/*pg.module.js"],
   "extends": "next/core-web-vitals"
 }

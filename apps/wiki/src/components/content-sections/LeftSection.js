@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, {useState, useEffect, useContext} from "react";
 import classnames from "classnames";
 import Markdown from "marked-react";
 import styles from "./Sections.module.css";
-import { Gallery } from "../gallery";
+import {Gallery} from "../gallery";
 
-export const LeftSection = (props) => {
-    const { title, content, index, editSection, gallery } = props;
+export const LeftSection = props => {
+    const {title, content, index, editSection, gallery} = props;
     const [editSource, setEditSource] = useState(false);
     const [iniContent, setIniContent] = useState(content);
     const [editedContent, setEditedContent] = useState(content);
     const [showEdit, setShowEdit] = useState(true);
-    const handleContentChange = (e) => {
+    const handleContentChange = e => {
         setEditedContent(e.target.value);
     };
     const saveSectionContent = () => {
@@ -66,7 +66,7 @@ export const LeftSection = (props) => {
                             {showEdit ? (
                                 <textarea
                                     className={styles.sectionTextarea}
-                                    onChange={(e) => handleContentChange(e)}
+                                    onChange={e => handleContentChange(e)}
                                     value={editedContent}
                                 />
                             ) : (

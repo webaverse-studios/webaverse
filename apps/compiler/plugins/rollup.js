@@ -1,6 +1,5 @@
 import path from 'path';
-import url from 'url';
-import fs from 'fs';
+import {URL} from 'url';
 import mimeTypes from 'mime-types';
 import {createHash} from 'crypto';
 import postcss from 'postcss';
@@ -85,7 +84,7 @@ const loaders = {
 const dataUrlRegex = /^data:([^;,]+)(?:;(charset=utf-8|base64))?,([\s\S]*?)\.data$/;
 const dataUrlRegexNoSuffix = /^data:([^;,]+)(?:;(charset=utf-8|base64))?,([\s\S]*?)$/;
 const _getType = id => {
-  const o = url.parse(id, true);
+  const o = new URL(id, true);
   // console.log('get type', o, o.href.match(dataUrlRegex));
   let match;
   if (o.href && (match = o.href.match(dataUrlRegexNoSuffix))) {
@@ -138,14 +137,14 @@ const _resolveLoaderId = loaderId => {
    * as windows is converting constantly all forward slashes into
    * backward slash
    */
-  //console.log(loaderId);
+  // console.log(loaderId);
   // const cwd = getCwd();
   if(process.platform === 'win32'){
-    //if(loaderId.startsWith(cwd) || loaderId.replaceAll('/','\\').startsWith(cwd)){
+    // if(loaderId.startsWith(cwd) || loaderId.replaceAll('/','\\').startsWith(cwd)){
     //  loaderId = loaderId.slice(cwd.length);
-    //}else if(loaderId.startsWith('http') || loaderId.startsWith('https')){
+    // }else if(loaderId.startsWith('http') || loaderId.startsWith('https')){
     //  loaderId = loaderId.replaceAll('\\','/');
-    //}
+    // }
     loaderId = loaderId.replaceAll('\\','/');
 
     // if(loaderId.startsWith('http') || loaderId.startsWith('https')){
@@ -213,7 +212,7 @@ const buildCssModulesJs = async (css, cssFullPath, options = {}) => {
     localsConvention = 'camelCaseOnly',
     inject = true,
     generateScopedName,
-    cssModulesOption = {}
+    cssModulesOption = {},
   } = options;
 
   // const css = await readFile(cssFullPath);
@@ -224,14 +223,14 @@ const buildCssModulesJs = async (css, cssFullPath, options = {}) => {
       localsConvention,
       generateScopedName,
       getJSON(cssSourceFile, json) {
-        cssModulesJSON = { ...json };
+        cssModulesJSON = {...json};
         return cssModulesJSON;
       },
-      ...cssModulesOption
-    })
+      ...cssModulesOption,
+    }),
   ]).process(css, {
     from: cssFullPath,
-    map: false
+    map: false,
   });
 
   const classNames = JSON.stringify(cssModulesJSON);
@@ -258,7 +257,7 @@ const buildCssModulesJs = async (css, cssFullPath, options = {}) => {
     injectedCode = inject(result.css, digest);
   }
 
-  let jsContent = `
+  const jsContent = `
 const digest = '${digest}';
 const css = \`${result.css}\`;
 ${injectedCode}
@@ -328,7 +327,7 @@ export default function metaversefilePlugin() {
       if (/^ipfs:\/\//.test(source)) {
         source = source.replace(/^ipfs:\/\/(?:ipfs\/)?/, 'https://cloudflare-ipfs.com/ipfs/');
         
-        const o = url.parse(source, true);
+        const o = new URL(source, true);
         if (!o.query.type) {
           const res = await fetch(source, {
             method: 'HEAD',
@@ -380,7 +379,7 @@ export default function metaversefilePlugin() {
       if (source) {
         return source;
       } else {
-        throw new Error(`could not resolve "${id}"`);
+        throw new Error(`could not resolve`);
       }
     },
     async load(id) {

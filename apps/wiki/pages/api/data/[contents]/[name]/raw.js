@@ -1,6 +1,6 @@
 // import stream from "stream";
-import { Ctx } from "../../../../../clients/context.js";
-import { cleanName } from "../../../../../utils.js";
+import {Ctx} from "../../../../../clients/context.js";
+import {cleanName} from "../../../../../utils.js";
 
 export default async function handler(req, res) {
   // const match = req.url.match(/^\/api\/data\/([^\/]*)\/([^\/]*)/);
@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   // let name = match ? match[2] : '';
 
   // A safer way to get the URL params
-  let type = req.query?.contents ? req.query?.contents.replace(/s$/, '') : '';
+  const type = req.query?.contents ? req.query?.contents.replace(/s$/, '') : '';
   let name = req.query?.name ? req.query?.name : '';
 
   name = decodeURIComponent(name);
@@ -27,4 +27,3 @@ export default async function handler(req, res) {
   }
 
 }
-

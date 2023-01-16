@@ -27,15 +27,19 @@ export class HudMesh extends THREE.Object3D {
     });
     this.add(this.iconMesh);
   }
+
   addChunk(chunk, chunkResult) {
     this.iconMesh.addChunk(chunk, chunkResult);
   }
+
   removeChunk(chunk) {
     this.iconMesh.removeChunk(chunk);
   }
+
   update() {
     this.iconMesh.update();
   }
+
   async waitForLoad() {
     const iconPackage = await IconPackage.loadUrls(hudUrls);
     this.iconMesh.setPackage(iconPackage);

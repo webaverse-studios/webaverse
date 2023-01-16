@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 import fetch from "node-fetch";
-dotenv.config();
 import fs from "fs";
 import {
   generateLocation,
@@ -57,6 +56,7 @@ import {
   makeQuestPrompt,
   makeQuestStop,
 } from "./lore-model.js";
+dotenv.config();
 
 const args = process.argv;
 // if the first arg contains 'sk-' then it's the openai key
@@ -266,11 +266,11 @@ const run = async () => {
 
   // ********** OBJECT COMMENT **********
   async function generateObjectCommentTest() {
-    const { name, description } = testData.objects[0];
-    const prompt = makeCommentPrompt({ name, description, type: "Object" });
+    const {name, description} = testData.objects[0];
+    const prompt = makeCommentPrompt({name, description, type: "Object"});
 
     const output = await generateObjectComment(
-      { name, description },
+      {name, description},
       makeGenerateFn()
     );
 
@@ -292,11 +292,11 @@ const run = async () => {
 
   // ********** NPC COMMENT **********
   async function generateNPCCommentTest() {
-    const { name, description } = testData.npcs[0];
-    const prompt = makeCommentPrompt({ name, description, type: "Character" });
+    const {name, description} = testData.npcs[0];
+    const prompt = makeCommentPrompt({name, description, type: "Character"});
 
     const output = await generateNPCComment(
-      { name, description },
+      {name, description},
       makeGenerateFn()
     );
 
@@ -318,11 +318,11 @@ const run = async () => {
 
   // ********** Mob COMMENT **********
   async function generateMobCommentTest() {
-    const { name, description } = testData.mobs[0];
-    const prompt = makeCommentPrompt({ name, description, type: "Character" });
+    const {name, description} = testData.mobs[0];
+    const prompt = makeCommentPrompt({name, description, type: "Character"});
 
     const output = await generateMobComment(
-      { name, description },
+      {name, description},
       makeGenerateFn()
     );
 
@@ -345,7 +345,7 @@ const run = async () => {
   // ********** LOCATION COMMENT **********
   async function generateLocationCommentTest() {
     const input = testData.locations[0];
-    const prompt = makeCommentPrompt({ ...input, type: "location" });
+    const prompt = makeCommentPrompt({...input, type: "location"});
 
     const output = await generateLocationComment(input, makeGenerateFn());
 
@@ -399,13 +399,13 @@ const run = async () => {
       type: "object",
     };
     const prompt = makeExpositionPrompt(input);
-    const { name, description, comment } = await generateExposition(
+    const {name, description, comment} = await generateExposition(
       input,
       makeGenerateFn()
     );
 
     writeData(
-      { name },
+      {name},
       prompt,
       description + (comment ? "\nQuote: " + comment : ""),
       "exposition_object",
@@ -421,13 +421,13 @@ const run = async () => {
     };
     const prompt = makeExpositionPrompt(input);
 
-    let { name, description, comment } = await generateExposition(
+    let {name, description, comment} = await generateExposition(
       input,
       makeGenerateFn()
     );
 
     writeData(
-      { name },
+      {name},
       prompt,
       description + (comment ? "\nQuote: " + comment : ""),
       "exposition_character",
@@ -441,13 +441,13 @@ const run = async () => {
       type: "location",
     };
     const prompt = makeExpositionPrompt(input);
-    let { name, description, comment } = await generateExposition(
+    let {name, description, comment} = await generateExposition(
       input,
       makeGenerateFn()
     );
 
     writeData(
-      { name },
+      {name},
       prompt,
       description + (comment ? "\nQuote: " + comment : ""),
       "exposition_location",
@@ -468,7 +468,7 @@ const run = async () => {
 
   async function generateLocationTest() {
     const prompt = makeLocationPrompt();
-    const { name, description, comment } = await generateLocation(
+    const {name, description, comment} = await generateLocation(
       makeGenerateFn()
     );
     const formattedOutput = `Location: "${name}" ${description}\nQuote: "${comment}"`;
@@ -488,7 +488,7 @@ const run = async () => {
 
   async function generateCharacterTest() {
     const prompt = makeCharacterPrompt();
-    const { name, description, comment } = await generateCharacter(
+    const {name, description, comment} = await generateCharacter(
       makeGenerateFn()
     );
     const formattedOutput = `Character: "${name}" ${description}\nQuote: "${comment}"`;
@@ -508,7 +508,7 @@ const run = async () => {
 
   async function generateObjectTest() {
     const prompt = makeObjectPrompt();
-    const { name, description, comment } = await generateObject(
+    const {name, description, comment} = await generateObject(
       makeGenerateFn()
     );
     const formattedOutput = `Object: "${name}" ${description}\nQuote: "${comment}"`;
@@ -530,10 +530,10 @@ const run = async () => {
   // ********** CHARACTER SELECTION INTRO **********
 
   async function generateCharacterIntroTest() {
-    const { name, description } = testData.party[0];
-    const prompt = makeCharacterIntroPrompt({ name, description });
-    const { message, onselect } = await generateCharacterIntro(
-      { name, description },
+    const {name, description} = testData.party[0];
+    const prompt = makeCharacterIntroPrompt({name, description});
+    const {message, onselect} = await generateCharacterIntro(
+      {name, description},
       makeGenerateFn()
     );
 
@@ -542,7 +542,7 @@ const run = async () => {
     console.log(output);
 
     writeData(
-      { name, description },
+      {name, description},
       prompt,
       output,
       "character_intro_prompt",
@@ -560,10 +560,10 @@ const run = async () => {
   // ********** CHARACTER BATTLE INTRO **********
 
   async function generateBattleIntroductionTest() {
-    const { name, description } = testData.party[0];
-    const prompt = makeBattleIntroductionPrompt({ name });
-    const { value } = await generateBattleIntroduction(
-      { name, description },
+    const {name, description} = testData.party[0];
+    const prompt = makeBattleIntroductionPrompt({name});
+    const {value} = await generateBattleIntroduction(
+      {name, description},
       makeGenerateFn()
     );
 
@@ -572,7 +572,7 @@ const run = async () => {
     console.log("output: ", output);
 
     writeData(
-      { name, description },
+      {name, description},
       prompt,
       output,
       "battle_introduction",
@@ -759,7 +759,7 @@ const run = async () => {
 
   // ********** QUEST **********
   async function generateQuestTest() {
-    const input = { location: testData.locations[0] };
+    const input = {location: testData.locations[0]};
     const prompt = makeQuestPrompt(input);
     const output = await generateQuest(input, makeGenerateFn());
 
@@ -785,7 +785,7 @@ const run = async () => {
     const prompt = makeChatPrompt(input);
     // iterate over testData.party.length
     for (let i = 0; i < testData.party.length; i++) {
-      input = { messages: testData.messages, nextCharacter: testData.party[i] };
+      input = {messages: testData.messages, nextCharacter: testData.party[i]};
       const _res = await generateChatMessage(input, makeGenerateFn());
       const value = _res?.value;
       const emote = _res?.emote;
@@ -800,7 +800,7 @@ const run = async () => {
     console.log(JSON.stringify(outputs));
 
     writeData(
-      { messages: testData.messages, nextCharacter: testData.party[0] },
+      {messages: testData.messages, nextCharacter: testData.party[0]},
       prompt,
       outputs.join("\n"),
       "chat_message",
@@ -827,7 +827,7 @@ const run = async () => {
     console.log(output);
 
     writeData(
-      { messages: testData.messages, nextCharacter: testData.party[0] },
+      {messages: testData.messages, nextCharacter: testData.party[0]},
       prompt,
       output,
       "dialogue_options",
