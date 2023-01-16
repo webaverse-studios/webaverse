@@ -62,8 +62,8 @@ User documentation is <a href="https://webaverse.notion.site/User-Docs-3a36b223e
 You need to install with the `--recurse-submodules` flag or installation will not work. Copy the code below to clone the repository if you aren't sure.
 
 ```sh
-git clone --recurse-submodules https://github.com/webaverse-studios/webaverse.git
-cd app/ # Go into the repository
+git clone https://github.com/webaverse-studios/webaverse.git
+cd webaverse/ # Go into the repository
 git pull --recurse-submodules # Pull recursively
 npm install # Install dependencies
 ```
