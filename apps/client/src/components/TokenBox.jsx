@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import classnames from "classnames";
 import styles from "./TokenBox.module.css";
-import {Spritesheet} from "../spritesheet";
+import {Spritesheet} from "./Spritesheet";
 
 export const TokenBox = (props) => {
     const {

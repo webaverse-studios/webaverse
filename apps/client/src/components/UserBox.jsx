@@ -1,6 +1,6 @@
 import React, {Fragment, useState, useEffect, useContext} from "react";
 import classnames from "classnames";
-import {AppContext} from "@webaverse-studios/engine/App";
+import {AppContext} from "./App";
 import styles from "./UserBox.module.css";
 import * as sounds from "@webaverse-studios/engine/sounds.js";
 import CustomButton from "./CustomButton";

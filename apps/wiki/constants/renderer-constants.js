@@ -1,1 +1,0 @@
-export const maxAnisotropy = 16;

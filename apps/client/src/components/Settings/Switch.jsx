@@ -1,7 +1,7 @@
 
 import React from 'react';
 import classNames from 'classnames';
-import CustomButton from '../../CustomButton';
+import CustomButton from '../CustomButton';
 
 import styles from './Switch.module.css';
 

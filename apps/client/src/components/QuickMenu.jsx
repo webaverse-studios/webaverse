@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import React, {useEffect, useRef, useState} from 'react';
 import classnames from 'classnames';
-import {registerIoEventHandler, unregisterIoEventHandler} from './components/general/io-handler/IoHandler';
+import {registerIoEventHandler, unregisterIoEventHandler} from './IoHandler';
 import {LightArrow} from './LightArrow';
 
 import styles from './QuickMenu.module.css';

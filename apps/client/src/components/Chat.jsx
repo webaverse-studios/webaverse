@@ -5,7 +5,7 @@ import {checkText} from 'smile2emoji';
 
 import game from '@webaverse-studios/engine/game';
 import {chatManager} from '@webaverse-studios/engine/chat-manager.js';
-import {registerIoEventHandler, unregisterIoEventHandler} from '../../general/io-handler';
+import {registerIoEventHandler, unregisterIoEventHandler} from './IoHandler';
 import voiceInput from '@webaverse-studios/engine/voice-input/voice-input.js';
 import {AppContext} from './App';
 

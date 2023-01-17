@@ -1,7 +1,7 @@
 
 import React, {useEffect, useState} from 'react';
 import classNames from 'classnames';
-import {Slider} from './slider';
+import {Slider} from './Slider';
 import * as voices from '@webaverse-studios/engine/voices';
 import overrides from '@webaverse-studios/engine/overrides';
 

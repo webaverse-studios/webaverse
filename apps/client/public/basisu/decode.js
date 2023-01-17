@@ -1,4 +1,4 @@
-import loaders from '../loaders.js.js';
+import loaders from '../loaders.js';
 
 export async function loadKtx2TextureBlob(blob) {
   const imageUrl = window.URL.createObjectURL(blob);

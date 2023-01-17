@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 import game from '@webaverse-studios/engine/game.js';
 import settingsManager from '@webaverse-studios/engine/settings-manager.js';
-import {Switch} from './switch';
+import {Switch} from './Switch';
 
 import styles from './Settings.module.css';
 

@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useRef, useContext} from 'react';
 import styles from './GrabKeyIndicators.module.css';
-import {AppContext} from './components/app';
+import {AppContext} from './App';
 import {KeyIndicator} from './KeyIndicator';
 import grabManager from '@webaverse-studios/engine/grab-manager';
 

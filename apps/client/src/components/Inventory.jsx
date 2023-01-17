@@ -2,11 +2,11 @@ import dropManager from "@webaverse-studios/engine/drop-manager";
 import game from "@webaverse-studios/engine/game.js";
 import {createLandIcon} from "@webaverse-studios/engine/land-iconer.js";
 import * as sounds from "@webaverse-studios/engine/sounds.js";
-import useNFTContract from "@webaverse-studios/engine/src/hooks/useNFTContract";
+import useNFTContract from "../hooks/useNFTContract";
 import classnames from "classnames";
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {AppContext} from "../../app";
-import CustomButton from "../custom-button";
+import {AppContext} from "./App";
+import CustomButton from "./CustomButton";
 import styles from "./Inventory.module.css";
 import {TokenBox} from "./TokenBox";
 

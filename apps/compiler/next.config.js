@@ -19,6 +19,8 @@ const securityHeaders = [
   },
 ];
 
+const dirToIgnore = /public/;
+
 const nextConfig = {
   eslint: {
     dirs: ['pages', 'types', 'plugins'],

@@ -90,8 +90,7 @@
     "start-server-and-test": "^1.14.0",
     "supertest": "^6.2.4",
     "trace-unhandled": "2.0.1",
-    "uuid": "^9.0.0",
-    "wiki": "./packages/wiki"
+    "uuid": "^9.0.0"
   },
   "preset": "jest-puppeteer"
 }

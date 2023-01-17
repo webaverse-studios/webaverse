@@ -3,7 +3,7 @@ physx wasm integration.
 */
 
 import * as THREE from 'three';
-import Module from './public/bin/geometry.js.js.js';
+import Module from './public/bin/geometry.js';
 import {Allocator, ScratchStack} from './geometry-util.js';
 import {heightfieldScale} from './constants.js';
 

@@ -2,7 +2,7 @@
 import React, {useState, useEffect, useRef, useContext, createContext, Fragment} from 'react';
 import classnames from 'classnames';
 
-import {game} from '@webaverse-studios/engine/game.js';
+import game from '@webaverse-studios/engine/game.js';
 import {parseQuery} from '@webaverse-studios/engine/util.js'
 import Webaverse from '@webaverse-studios/engine/webaverse.js';
 import universe from '@webaverse-studios/engine/universe.js';

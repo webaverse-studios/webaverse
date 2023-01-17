@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import * as sounds from '@webaverse-studios/engine/sounds.js';
 import storyManager from '@webaverse-studios/engine/story.js';
-import {registerIoEventHandler, unregisterIoEventHandler} from './components/general/io-handler';
-import {MegaChatBox} from './components/mega-chat-box';
+import {registerIoEventHandler, unregisterIoEventHandler} from './IoHandler';
+import {MegaChatBox} from './MegaChatBox';
 
 import styles from './StoryTime.module.css';
 

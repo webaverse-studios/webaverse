@@ -1,7 +1,7 @@
 
 import classNames from 'classnames';
 import React from 'react';
-import CustomButton from '../../custom-button';
+import CustomButton from '../CustomButton';
 
 import styles from './Slider.module.css';
 

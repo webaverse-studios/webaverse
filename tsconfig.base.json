@@ -18,7 +18,6 @@
       "@webaverse-studios/client": ["apps/client"],
       "@webaverse-studios/compiler": ["apps/compiler"],
       "@webaverse-studios/engine": ["libs/engine/index.js"],
-      "@webaverse-studios/wiki": ["apps/wiki"],
       "metaversefile": ["libs/metaversefile"],
       "multiplayer": ["libs/multiplayer"],
       "offscreen-engine": ["libs/offscreen-engine"],

@@ -1,7 +1,7 @@
 import React, {useState, useContext, useEffect} from 'react';
 import classnames from 'classnames';
-import {registerIoEventHandler, unregisterIoEventHandler} from '../../general/io-handler';
-import {AppContext} from './app';
+import {registerIoEventHandler, unregisterIoEventHandler} from './IoHandler';
+import {AppContext} from './App';
 
 import {ImageAiPanel} from './AIPanels/image-ai-panel.jsx';
 import {AudioAiPanel} from './AIPanels/audio-ai-panel.jsx';

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 import {App} from './components/App';
-import {ErrorPage} from './components/general/ErrorPage';
+import {ErrorPage} from './components/ErrorPage';
 import {ChainProvider} from './hooks/chainProvider';
 import {AccountProvider} from './hooks/web3AccountProvider';
 

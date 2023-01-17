@@ -1,5 +1,4 @@
 import {MathUtils} from 'three';
-import {VRMCurveMapper} from '@pixiv/three-vrm';
 import loaders from '../loaders.js';
 import {zbdecode} from 'zjs/encoding.mjs';
 import physx from '../physx.js';
@@ -12,10 +11,10 @@ import {
 import {
   angleDifference,
 } from '../util.js';
+import {VRMCurveMapper} from './VRMCurveMapper';
 
 let animations;
 let animationStepIndices;
-// let animationsBaseModel;
 
 const UseAnimationIndexes = {};
 

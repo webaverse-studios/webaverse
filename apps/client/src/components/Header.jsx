@@ -7,13 +7,13 @@ import metaversefile from '@webaverse-studios/engine/metaversefile-api.js'
 import ioManager from '@webaverse-studios/engine/io-manager.js'
 
 import {Character} from './Character';
-import {registerIoEventHandler, unregisterIoEventHandler} from './components/IoHandler';
+import {registerIoEventHandler, unregisterIoEventHandler} from './IoHandler';
 import {AppContext} from './App';
 import {StoryTime} from './StoryTime';
 
 import styles from './Header.module.css';
 import {UserBox} from './UserBox';
-import {Inventory} from './Inventory/index.jsx';
+import {Inventory} from './Inventory';
 
 //
 

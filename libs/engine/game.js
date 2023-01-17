@@ -26,7 +26,7 @@ import Avatar from './avatars/avatars.js';
 import {avatarManager} from './avatar-manager.js';
 import npcManager from './npc-manager.js';
 import grabManager from './grab-manager.js';
-import {getVoucherFromUser} from './src/hooks/voucherHelpers'  
+import {getVoucherFromUser} from './voucherHelpers'  
 import universe from './universe.js';
 
 const localVector = new THREE.Vector3();

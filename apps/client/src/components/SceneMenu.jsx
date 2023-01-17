@@ -9,7 +9,7 @@ import {AppContext} from './App';
 import {scenesBaseUrl} from '@webaverse-studios/engine/endpoints';
 import {makeId} from '@webaverse-studios/engine/util.js';
 
-import styles from './scene-menu.module.css';
+import styles from './SceneMenu.module.css';
 
 //
 

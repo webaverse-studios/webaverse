@@ -2,8 +2,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
-// import WebaWallet from '../../wallet';
-import {Button} from './button';
+import {Button} from './Button';
 
 import styles from './Settings.module.css';
 

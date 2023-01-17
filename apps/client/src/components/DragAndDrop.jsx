@@ -4,15 +4,15 @@ import classnames from 'classnames';
 import style from './DragAndDrop.module.css';
 import {world} from '@webaverse-studios/engine/world.js';
 import {getRandomString, handleUpload} from '@webaverse-studios/engine/util.js';
-import {registerIoEventHandler, unregisterIoEventHandler} from './components/general/io-handler/IoHandler.jsx';
+import {registerIoEventHandler, unregisterIoEventHandler} from './IoHandler.jsx';
 import {ObjectPreview} from './ObjectPreview.jsx';
 import game from '@webaverse-studios/engine/game.js';
 import {getRenderer} from '@webaverse-studios/engine/renderer.js';
 import cameraManager from '@webaverse-studios/engine/camera-manager.js';
 import metaversefile from 'metaversefile';
-import {AppContext} from './components/app';
-import CustomButton from './components/CustomButton';
-import useNFTContract from './hooks/useNFTContract';
+import {AppContext} from './App';
+import CustomButton from './CustomButton';
+import useNFTContract from '../hooks/useNFTContract';
 import {
   GenericLoadingMessage,
   registerLoad,

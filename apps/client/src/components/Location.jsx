@@ -2,7 +2,7 @@ import React, {useState, useContext, useEffect} from 'react';
 import styles from './Location.module.css';
 import {sceneManager} from '@webaverse-studios/engine/scene-manager'
 import {scenesBaseUrl} from '@webaverse-studios/engine/endpoints';
-import CustomButton from '@webaverse-studios/engine/Custom-Button';
+import CustomButton from './CustomButton';
 import {AppContext} from './App';
 import universe from '@webaverse-studios/engine/universe';
 import classnames from 'classnames';

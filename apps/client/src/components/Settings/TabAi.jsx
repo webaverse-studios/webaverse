@@ -2,7 +2,7 @@
 import React, {useEffect, useState} from 'react';
 import classNames from 'classnames';
 
-import {Switch} from './switch';
+import {Switch} from './Switch';
 import loreAI from '@webaverse-studios/engine/ai/lore/lore-ai';
 import debug from '@webaverse-studios/engine/debug';
 

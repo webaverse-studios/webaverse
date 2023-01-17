@@ -5,7 +5,7 @@ import {camera} from '@webaverse-studios/engine/renderer.js';
 import cameraManager from '@webaverse-studios/engine/camera-manager.js';
 import {playersManager} from '@webaverse-studios/engine/players-manager.js';
 
-import domRenderEngine, {DomRenderEngine} from '@webaverse-studios/engine/DomRenderer.jsx';
+import domRenderEngine, {DomRenderEngine} from '@webaverse-studios/engine/dom-renderer.jsx';
 
 const transtionTime = 1000;
 const scaleEpsilon = 0.01;
