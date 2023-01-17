@@ -6,12 +6,12 @@ import {LightArrow} from './LightArrow';
 
 import styles from './QuickMenu.module.css';
 
-import emoteManager, {emotes} from '../emotes/emote-manager.js';
+import emoteManager, {emotes} from '@webaverse-studios/engine/emotes/emote-manager.js';
 
-import game from '../game.js';
-import cameraManager from '../camera-manager.js';
-import * as sounds from '../sounds.js';
-import {mod, loadImage, imageToCanvas} from '../util.js';
+import game from '@webaverse-studios/engine/game.js';
+import cameraManager from '@webaverse-studios/engine/camera-manager.js';
+import * as sounds from '@webaverse-studios/engine/sounds.js';
+import {mod, loadImage, imageToCanvas} from '@webaverse-studios/engine/util.js';
 
 const modPi2 = angle => mod(angle, Math.PI*2);
 

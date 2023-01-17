@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import React, {useState, useEffect, useRef} from 'react';
 import classnames from 'classnames';
-import dioramaManager from '../diorama/diorama-manager.js';
-import {world} from '../world.js';
+import dioramaManager from '@webaverse-studios/engine/diorama/diorama-manager.js';
+import {world} from '@webaverse-studios/engine/world.js';
 import styles from './MegaHup.module.css';
 
 const MegaHup = function({

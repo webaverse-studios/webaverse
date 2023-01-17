@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import classnames from 'classnames';
-import {chatTextSpeed} from '../constants.js';
+import {chatTextSpeed} from '@webaverse-studios/engine/constants.js';
 
 export const RpgText = ({
   className,

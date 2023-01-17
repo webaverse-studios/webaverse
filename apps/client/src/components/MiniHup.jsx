@@ -1,8 +1,8 @@
 import React, {useEffect, useRef} from 'react';
-import game from '../game.js';
+import game from '@webaverse-studios/engine/game.js';
 import styles from './MiniHup.module.css';
 import {RpgText} from './RpgText.jsx';
-import {chatTextSpeed} from '../constants.js';
+import {chatTextSpeed} from '@webaverse-studios/engine/constants.js';
 
 const defaultHupSize = 150;
 const pixelRatio = window.devicePixelRatio;

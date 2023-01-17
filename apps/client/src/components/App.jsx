@@ -9,38 +9,35 @@ import universe from '@webaverse-studios/engine/universe.js';
 import cameraManager from '@webaverse-studios/engine/camera-manager';
 import {world} from '@webaverse-studios/engine/world';
 
-import {Crosshair} from '../general/crosshair';
-import {IoHandler, registerIoEventHandler, unregisterIoEventHandler} from '../general/io-handler';
-import {LoadingBox} from '../../LoadingBox.jsx';
-import {FocusBar} from '../../FocusBar.jsx';
-import {DragAndDrop} from '../../DragAndDrop.jsx';
-import {EditorMode} from '../editor-mode';
-import {GrabKeyIndicators} from '../../GrabKeyIndicators.jsx'
-import Header from '../../Header.jsx';
-import QuickMenu from '../../QuickMenu.jsx';
-import {DomRenderer} from '../../DomRenderer.jsx';
+import {Crosshair} from './Crosshair';
+import {IoHandler, registerIoEventHandler, unregisterIoEventHandler} from './IoHandler';
+import {LoadingBox} from './LoadingBox.jsx';
+import {FocusBar} from './FocusBar.jsx';
+import {DragAndDrop} from './DragAndDrop.jsx';
+import {GrabKeyIndicators} from './GrabKeyIndicators.jsx'
+import Header from './Header.jsx';
+import QuickMenu from './QuickMenu.jsx';
+import {DomRenderer} from './DomRenderer.jsx';
 import {handleStoryKeyControls} from '@webaverse-studios/engine/story';
 import {scenesBaseUrl, defaultSceneName} from '@webaverse-studios/engine/endpoints.js';
 
 import styles from './App.module.css';
-import '../../../styles/globals.css';
+import '../../styles/globals.css';
 import raycastManager from '@webaverse-studios/engine/raycast-manager';
 import grabManager from '@webaverse-studios/engine/grab-manager';
 
-import {AccountContext} from '../../hooks/web3AccountProvider';
-import {ChainContext} from '../../hooks/chainProvider';
-import Modals from '../modals';
+import {AccountContext} from '../hooks/web3AccountProvider';
+import {ChainContext} from '../hooks/chainProvider';
+import Modals from './Modals';
 import dropManager from '@webaverse-studios/engine/drop-manager';
-import useNFTContract from '../../hooks/useNFTContract';
+import useNFTContract from '../hooks/useNFTContract';
 
-import {Hotbar} from './play-mode/hotbar';
-import {Infobox} from './play-mode/infobox';
-import {Chat} from './chat';
+import {Hotbar} from './Hotbar';
+import {Infobox} from './Infobox';
+import {Chat} from './Chat';
 
-import {AiMenu} from './ai-menu';
-import {SceneMenu} from './scene-menu';
-import {Inspector} from './inspector';
-import {AppContext} from '../app';
+import {AiMenu} from './AiMenu';
+import {SceneMenu} from './SceneMenu';
 //
 
 const _startApp = async (weba, canvas) => {
@@ -94,7 +91,6 @@ const useWebaverseApp = (() => {
 let appStarted = false;
 
 export const App = () => {
-    const multiplayerConnected = !! selectedRoom;
     const [ state, setState ] = useState({openedPanel: null, openedModal: null});
     const [ showUI, setShowUI ] = useState('normal');
 
@@ -103,6 +99,7 @@ export const App = () => {
     const [ selectedApp, setSelectedApp ] = useState(null);
     const [ selectedScene, setSelectedScene ] = useState(_getCurrentSceneSrc());
     const [ selectedRoom, setSelectedRoom ] = useState(_getCurrentRoom());
+    const multiplayerConnected = !! selectedRoom;
     const [ editMode, setEditMode ] = useState(false);
     const [ claimableToken, setClaimableToken ] = useState([]);
     const [ mintedToken, setMintedToken ] = useState([]);

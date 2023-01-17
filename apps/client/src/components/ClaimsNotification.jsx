@@ -1,10 +1,10 @@
 import React, {useState, useEffect, useContext} from 'react';
 import classnames from 'classnames';
-import {AppContext} from './components/app';
+import {AppContext} from './App';
 
 import styles from './ClaimsNotification.module.css';
 
-import dropManager from '../drop-manager.js';
+import dropManager from '@webaverse-studios/engine/DropManager.js';
 
 const ClaimsNotification = () => {
   const {state, setState} = useContext(AppContext);

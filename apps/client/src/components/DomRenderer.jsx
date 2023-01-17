@@ -1,14 +1,12 @@
 import * as THREE from 'three';
 import React, {useState, useEffect, useRef} from 'react';
-import gameManager from '../game.js';
-import {camera} from '../renderer.js';
-import cameraManager from '../camera-manager.js';
-import {playersManager} from '../players-manager.js';
+import gameManager from '@webaverse-studios/engine/game.js';
+import {camera} from '@webaverse-studios/engine/renderer.js';
+import cameraManager from '@webaverse-studios/engine/camera-manager.js';
+import {playersManager} from '@webaverse-studios/engine/players-manager.js';
 
-import domRenderEngine, {DomRenderEngine} from '../dom-renderer.jsx';
+import domRenderEngine, {DomRenderEngine} from '@webaverse-studios/engine/DomRenderer.jsx';
 
-const floatFactor = 0.05;
-const floatTime = 3000;
 const transtionTime = 1000;
 const scaleEpsilon = 0.01;
 

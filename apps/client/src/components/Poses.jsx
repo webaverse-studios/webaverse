@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import {setFacePoseValue} from './Emotions';
 import styles from './Poses.module.css';
 
-import emoteManager, {emotes} from '../../../../emotes/emote-manager.js';
+import emoteManager, {emotes} from '@webaverse-studios/engine/emotes/emote-manager.js';
 
 //
 

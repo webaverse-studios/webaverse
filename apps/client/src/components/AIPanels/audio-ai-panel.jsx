@@ -3,7 +3,7 @@ import classnames from 'classnames';
 
 import styles from './audio-ai-panel.module.css';
 
-import audioAI from '../../../../../ai/audio/audio-ai';
+import audioAI from '@webaverse-studios/engine/ai/audio/audio-ai';
 
 const defaultPrompt = `insects chirp in a windy field`;
 

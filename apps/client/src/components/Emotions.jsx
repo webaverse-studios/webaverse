@@ -2,9 +2,9 @@
 import React, {useEffect, useState, useRef} from 'react';
 import classnames from 'classnames';
 
-import metaversefile from '../../../../metaversefile-api.js';
-import {avatarManager} from '../../../../avatar-manager.js';
-import {emotions} from '../../../../emotes/emotions.js';
+import metaversefile from '@webaverse-studios/engine/metaversefile-api.js';
+import {avatarManager} from '@webaverse-studios/engine/avatar-manager.js';
+import {emotions} from '@webaverse-studios/engine/emotes/emotions.js';
 
 import styles from './Emotions.module.css';
 

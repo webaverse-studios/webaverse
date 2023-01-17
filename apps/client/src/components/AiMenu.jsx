@@ -1,20 +1,18 @@
 import React, {useState, useContext, useEffect} from 'react';
 import classnames from 'classnames';
 import {registerIoEventHandler, unregisterIoEventHandler} from '../../general/io-handler';
-import {AppContext} from '../app';
+import {AppContext} from './app';
 
-import {ImageAiPanel} from './panels/image-ai-panel.jsx';
-import {AudioAiPanel} from './panels/audio-ai-panel.jsx';
-import {ModelAiPanel} from './panels/model-ai-panel.jsx';
-import {CameraAiPanel} from './panels/camera-ai-panel.jsx';
-import {LoreAiPanel} from './panels/lore-ai-panel.jsx';
-import {CodeAiPanel} from './panels/code-ai-panel.jsx';
+import {ImageAiPanel} from './AIPanels/image-ai-panel.jsx';
+import {AudioAiPanel} from './AIPanels/audio-ai-panel.jsx';
+import {ModelAiPanel} from './AIPanels/model-ai-panel.jsx';
+import {CodeAiPanel} from './AIPanels/code-ai-panel.jsx';
 
 import styles from './AiMenu.module.css';
 
-import * as sounds from '../../../../sounds';
-import game from '../../../../game';
-import cameraManager from '../../../../camera-manager';
+import * as sounds from '@webaverse-studios/engine/sounds';
+import game from '@webaverse-studios/engine/game';
+import cameraManager from '@webaverse-studios/engine/camera-manager';
 
 //
 
@@ -33,16 +31,6 @@ const panels = [
         name: 'model',
         iconUrl: `/images/ui/sword.svg`,
         component: ModelAiPanel,
-    },
-    {
-        name: 'camera',
-        iconUrl: `/images/ui/camera.svg`,
-        component: CameraAiPanel,
-    },
-    {
-        name: 'lore',
-        iconUrl: `/images/ui/brain.svg`,
-        component: LoreAiPanel,
     },
     {
         name: 'code',

@@ -1,14 +1,14 @@
 import React, {useState, useEffect, useRef, useContext} from 'react';
 import classnames from 'classnames';
-import {AppContext} from '../../app';
+import {AppContext} from '../app';
 import metaversefile from 'metaversefile';
 
 import {registerIoEventHandler, unregisterIoEventHandler} from '../../../general/io-handler';
 
 import styles from './code-ai-panel.module.css';
 
-import {generateStream} from '../../../../../ai/code/code-ai';
-// import game from '../../../../../game';
+import {generateStream} from '@webaverse-studios/engine/ai/code/code-ai';
+// import game from '@webaverse-studios/engine/game';
 
 export function CodeAiPanel() {
     const {state, setState} = useContext(AppContext);

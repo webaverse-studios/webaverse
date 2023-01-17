@@ -1,23 +1,19 @@
 import React, {useEffect, useRef, useContext, useState} from 'react';
 
 import CharacterHups from './CharacterHups.jsx';
-import game from '../game.js'
-// import * as hacks from '../hacks.js'
-import cameraManager from '../camera-manager.js'
-import metaversefile from '../metaversefile-api.js'
-import ioManager from '../io-manager.js'
+import game from '@webaverse-studios/engine/game.js'
+import cameraManager from '@webaverse-studios/engine/camera-manager.js'
+import metaversefile from '@webaverse-studios/engine/metaversefile-api.js'
+import ioManager from '@webaverse-studios/engine/io-manager.js'
 
-import {Character} from './components/general/character';
-import {CharacterSelect} from './components/general/character-select';
-// import { Tokens } from './tabs/tokens';
-import {registerIoEventHandler, unregisterIoEventHandler} from './components/general/io-handler';
-import {AppContext} from './components/app';
+import {Character} from './Character';
+import {registerIoEventHandler, unregisterIoEventHandler} from './components/IoHandler';
+import {AppContext} from './App';
 import {StoryTime} from './StoryTime';
 
 import styles from './Header.module.css';
-import {UserBox} from './components/general/user-box';
-import {Inventory} from './components/general/inventory/index.jsx';
-import {AvatarBox} from './components/avatar-box/AvatarBox.jsx';
+import {UserBox} from './UserBox';
+import {Inventory} from './Inventory/index.jsx';
 
 //
 
@@ -264,7 +260,6 @@ export default function Header() {
             />
             <StoryTime />
             {/* <div className={styles.inner}> */}
-                <AvatarBox />
                 <UserBox
                     // address={address}
                     // setAddress={setAddress}
@@ -277,9 +272,6 @@ export default function Header() {
                         dioramaCanvasRef={dioramaCanvasRef}
                         game={game}
                     />
-                    {state.openedPanel === 'CharacterSelect' && (
-                        <CharacterSelect />
-                    )}
                     {(state.openedPanel === 'CharacterPanel' || state.openedPanel === 'Inventory') &&
                         <Inventory />
                     }

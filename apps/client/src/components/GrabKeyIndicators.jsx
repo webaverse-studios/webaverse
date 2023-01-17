@@ -2,7 +2,7 @@ import React, {useEffect, useState, useRef, useContext} from 'react';
 import styles from './GrabKeyIndicators.module.css';
 import {AppContext} from './components/app';
 import {KeyIndicator} from './KeyIndicator';
-import grabManager from '../grab-manager';
+import grabManager from '@webaverse-studios/engine/grab-manager';
 
 export const GrabKeyIndicators = () => {
   const {editMode} = useContext(AppContext);

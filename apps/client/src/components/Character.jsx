@@ -2,118 +2,18 @@ import React, {useEffect, useState, useContext} from "react";
 import {Vector3} from 'three';
 import classnames from "classnames";
 
-import {defaultPlayerName} from "../../../../ai/lore/lore-model.js";
-import * as sounds from "../../../../sounds.js";
+import {defaultPlayerName} from "@webaverse-studios/engine/ai/lore/lore-model.js";
+import * as sounds from "@webaverse-studios/engine/sounds.js";
 
-import {
-    hp,
-    mp,
-    atk,
-    def,
-    vit,
-    spr,
-    dex,
-    lck,
-    xp,
-    limit
-} from "../../../../player-stats.js";
-
-import {AppContext} from "../../app";
+import {AppContext} from "./App";
 
 import styles from "./Character.module.css";
-import CustomButton from "../custom-button/index.jsx";
-import {TokenBox} from "../token-box/TokenBox.jsx";
+import {TokenBox} from "./TokenBox.jsx";
 
 import {Emotions} from './Emotions';
 import {Poses} from './Poses';
 
 const localVector3 = new Vector3();
-
-const mainStatSpecs = [
-    {
-        imgSrc: "assets/icons/health.svg",
-        name: "Health",
-        className: "hp",
-        progress: hp,
-    },
-    {
-        imgSrc: "assets/icons/mana.svg",
-        name: "Mana",
-        className: "mp",
-        progress: mp,
-    },
-    {
-        imgSrc: "assets/icons/exp.svg",
-        name: "Exp.",
-        className: "xp",
-        progress: xp,
-    },
-    {
-        imgSrc: "assets/icons/limit.svg",
-        name: "Limit",
-        className: "lm",
-        progress: limit,
-    },
-];
-const statSpecs = [
-    {
-        imgSrc: "images/stats/noun-skill-sword-swing-2360242.svg",
-        name: "Attack",
-        value: atk,
-    },
-    {
-        imgSrc: "images/stats/noun-abnormal-burned-2359995.svg",
-        name: "Defence",
-        value: def,
-    },
-    {
-        imgSrc: "images/stats/noun-skill-dna-2360269.svg",
-        name: "Vitality",
-        value: vit,
-    },
-    {
-        imgSrc: "images/stats/noun-skill-magic-chain-lightning-2360268.svg",
-        name: "Sprint",
-        value: spr,
-    },
-    {
-        imgSrc: "images/stats/noun-skill-speed-down-2360205.svg",
-        name: "Dexterity",
-        value: dex,
-    },
-    {
-        imgSrc: "images/stats/noun-effect-circle-strike-2360022.svg",
-        name: "Luck",
-        value: lck,
-    },
-];
-
-const Stat2 = ({statSpec}) => {
-    return (
-        <div className={classnames(styles.stat, styles[statSpec.className])}>
-            <div className={styles.name}>
-                {statSpec?.name}
-                <img className={styles.icon} src={statSpec.imgSrc} />
-            </div>
-            <div className={styles.progressBar}>
-                <div style={{width: `${statSpec?.progress}%`}} />
-            </div>
-            <div className={styles.value}>
-                {statSpec?.progress}
-                {statSpec.className === "lm" && "%"}
-            </div>
-        </div>
-    );
-};
-
-const Stat = ({statSpec}) => {
-    return (
-        <div className={classnames(styles.stat, styles.columns)}>
-            <div className={styles.name}>{statSpec.name}</div>
-            <div className={styles.value}>{statSpec.value}</div>
-        </div>
-    );
-};
 
 const AvatarPreviewBox = ({dioramaCanvasRef, onClick}) => {
     const width = 160;
@@ -134,32 +34,9 @@ const AvatarPreviewBox = ({dioramaCanvasRef, onClick}) => {
     );
 };
 
-//
-
-const AvatarEquipBox = ({dioramaCanvasRef, onClick}) => {
-    const sideSize = 48;
-    return (
-        <div className={styles.avatarEquipBoxWrap}>
-            <div className={styles.bg} />
-            <div className={styles.mask}>
-                <canvas
-                    className={styles.item}
-                    ref={dioramaCanvasRef}
-                    width={sideSize}
-                    height={sideSize}
-                    onClick={onClick}
-                />
-            </div>
-        </div>
-    );
-};
-
 export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
     const {state, setState} = useContext(AppContext);
     const [open, setOpen] = useState(false);
-    const [characterSelectOpen, setCharacterSelectOpen] = useState(false);
-
-    const sideSize = 400;
 
     useEffect(() => { 
         const canvas = dioramaCanvasRef.current;
@@ -176,10 +53,8 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
 
     useEffect(() => {
         const lastOpen = open;
-        const lastCharacterSelectOpen = characterSelectOpen;
 
         const newOpen = state.openedPanel === "CharacterPanel";
-        const newCharacterSelectOpen = state.openedPanel === "CharacterSelect";
 
         if (!lastOpen && newOpen) {
             sounds.playSoundName("menuOpen");
@@ -188,7 +63,6 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
         }
 
         setOpen(newOpen);
-        setCharacterSelectOpen(newCharacterSelectOpen);
     }, [state.openedPanel]);
 
     function onCanvasClick() {
@@ -214,14 +88,6 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
         }
     }
 
-    function onCharacterSelectClick(e) {
-        setState({
-            openedPanel:
-                state.openedPanel === "CharacterSelect"
-                    ? null
-                    : "CharacterSelect",
-        });
-    }
     function onDrop(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -359,33 +225,6 @@ export const Character = ({game, /* wearActions, */ dioramaCanvasRef}) => {
                         </ul>
                     </div>
                 </div>
-
-                <div className={styles.infoWrap}>
-                    <div className={styles.row}>
-                        {mainStatSpecs.map((statSpec, i) => {
-                            return <Stat2 statSpec={statSpec} key={i} />;
-                        })}
-                    </div>
-                    <div className={styles.row}>
-                        {statSpecs.map((statSpec, i) => {
-                            return <Stat statSpec={statSpec} key={i} />;
-                        })}
-                    </div>
-                    <div className={styles.row}>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Quisque lacinia rutrum scelerisque. Vivamus sem ipsum,
-                        pellentesque nec augue sed, molestie dapibus libero.
-                    </div>
-                </div>
-            </div>
-            <div className={styles.actionsWrap}>
-                <CustomButton
-                    theme="light"
-                    text="Change Avatar"
-                    size={14}
-                    className={styles.button}
-                    onClick={onCharacterSelectClick}
-                />
             </div>
         </div>
     ) : null;

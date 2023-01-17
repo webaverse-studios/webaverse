@@ -1,10 +1,10 @@
 import React, {useState, useEffect, useRef} from 'react';
 import classnames from 'classnames';
-import dioramaManager from '../diorama/diorama-manager.js';
+import dioramaManager from '@webaverse-studios/engine/diorama/diorama-manager.js';
 import {RpgText} from './RpgText.jsx';
 import styles from './CharacterHups.module.css';
-import {chatTextSpeed} from '../constants.js';
-import {playersManager} from '../players-manager.js';
+import {chatTextSpeed} from '@webaverse-studios/engine/constants.js';
+import {playersManager} from '@webaverse-studios/engine/players-manager.js';
 
 const defaultHupSize = 256;
 const pixelRatio = window.devicePixelRatio;

@@ -1,11 +1,11 @@
 import React, {useState, useRef} from 'react';
 import classnames from 'classnames';
-import imageAI from '../../../../../ai/image/image-ai';
-import materialColors from '../../../../../material-colors';
-import {canvasHasContent} from '../../../../../util';
+import imageAI from '@webaverse-studios/engine/ai/image/image-ai';
+import materialColors from '@webaverse-studios/engine/material-colors.json';
+import {canvasHasContent} from '@webaverse-studios/engine/util';
 import styles from './image-ai-panel.module.css';
 
-import * as sounds from '../../../../../sounds';
+import * as sounds from '@webaverse-studios/engine/sounds';
 
 //
 
