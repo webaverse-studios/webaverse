@@ -102,7 +102,7 @@ const _proxyFile = (req, res, u) => {
   rs.pipe(res);
 };
 const _proxyTmp = (req, res) => {
-  const o = url.parse(req.url);
+  const o = new URL(req.url);
   const p = path.join(tmpDir, o.path.replace(/^\/tmp\//, ''));
 
   // console.log('got tmp request', req.method, req.url, p);

@@ -166,7 +166,7 @@ const bindServer = (server, {initialRoomState = null, initialRoomNames = []} = [
     noServer: true,
   });
   wss.on('connection', (ws, req) => {
-    const o = url.parse(req.url, true);
+    const o = new URL(req.url, true);
     const match = o.pathname.match(/^\/worlds\/([a-z0-9\-_]+)$/i);
     const roomId = match && match[1];
     const {playerId} = o.query;
@@ -226,7 +226,7 @@ const bindServer = (server, {initialRoomState = null, initialRoomNames = []} = [
     if (req.method === 'HEAD' || req.method === 'OPTIONS') {
       res.end();
     } else {
-      const o = url.parse(req.url, true);
+      const o = new URL(req.url, true);
       // console.log('server request', o);
       const match = o.pathname.match(/^\/worlds\/([\s\S]*)?$/);
       if (match) {

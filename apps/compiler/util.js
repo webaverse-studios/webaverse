@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-import url from 'url';
+import {URL, format} from 'url';
 import fetch from 'node-fetch';
 
 export function jsonParse(s) {
@@ -43,13 +43,12 @@ export const readFile = async id => {
 };
 
 export const fetchFileFromId = async (id, importer, encoding = null) => {
-  id = id
   //  .replace(/^\/@proxy\//, '')
   //  .replace(/^(https?:\/(?!\/))/, '$1/');
   if (/^https?:\/\//.test(id)) {
-    const u = url.parse(id, true);
+    const u = new URL(id, true);
     u.query.noimport = 1 + '';
-    id = url.format(u);
+    id = format(u);
     const res = await fetch(id)
     if (encoding === 'utf8') {
       const s = await res.text();
@@ -80,6 +79,7 @@ export const fetchFileFromId = async (id, importer, encoding = null) => {
 };
 
 export const fillTemplate = function(templateString, templateVars) {
+  // eslint-disable-next-line no-new-func
   return new Function("return `"+templateString +"`;").call(templateVars);
 };
 

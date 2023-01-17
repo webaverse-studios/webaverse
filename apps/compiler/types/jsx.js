@@ -8,7 +8,7 @@ import {parseIdHash, getCwd} from '../util.js';
 
 const textDecoder = new TextDecoder();
 
-export default {
+const jsx = {
   /* async resolveId(source, importer) {
     if (/^\.\//.test(source) && /^data:/.test(importer)) {
       return path.join(cwd, source);
@@ -19,7 +19,7 @@ export default {
   async load(id) {
     let src;
     if (/https?:/i.test(id)) {
-      const o = url.parse(id, true);
+      const o = new URL(id, true);
       o.query.noimport = 1 + '';
       id = url.format(o);
 
@@ -72,3 +72,5 @@ export const components = ${JSON.stringify(components)};
     };
   },
 };
+
+export default jsx;

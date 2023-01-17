@@ -184,7 +184,6 @@ export const decodeTypedMessage = (uint8Array, uint8ArrayByteLength, parts) => {
       }
       default: {
         throw new Error('cannot parse message part with type ' + type);
-        break;
       }
     }
   }

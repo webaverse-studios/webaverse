@@ -78,7 +78,7 @@ class WSRTC extends EventTarget {
       const _handleStateUpdateMessage = (e, dataView) => {
         const byteLength = dataView.getUint32(Uint32Array.BYTES_PER_ELEMENT, true);
         const data = new Uint8Array(dataView.buffer, dataView.byteOffset + 2 * Uint32Array.BYTES_PER_ELEMENT, byteLength);
-        Z.applyUpdate(this.crdtState, data);
+        // Z.applyUpdate(this.crdtState, data);
       };
       
       const _handleAudioMessage = (e, dataView) => {

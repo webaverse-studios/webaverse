@@ -97,7 +97,7 @@ const _startPostbackServer = () => (async () => {
           const id = searchParams.get('id');
           // console.log('postback', {url: req.url, headers: req.headers, id});
           
-          const o = url.parse(req.url, true);
+          const o = new URL(req.url, true);
           if (o.pathname === '/args') {
             // console.log('postback handle args');
             let arg = args.get(id);
@@ -293,7 +293,7 @@ if (compilerUrl && start_url) {
     // console.log('got headers', req.method, req.url, req.headers);
     // console.log('render server got', req.url);
 
-    const o = url.parse(req.url, true);
+    const o = new URL(req.url, true);
     if (o.pathname === '/') {
       res.setHeader('Content-Type', 'text/html');
       const rs = fs.createReadStream(dirname + '/index.html');

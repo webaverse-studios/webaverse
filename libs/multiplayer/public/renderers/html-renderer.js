@@ -80,35 +80,6 @@ export class RemotePlayerCursorHtmlRenderer {
   }
 }
 
-export class WorldItemHtmlRenderer {
-  constructor(realms) {
-
-    const div = document.createElement('div');
-    div.id = 'world-items';
-    document.body.appendChild(div);
-
-    virtualWorld.addEventListener('needledentityadd', entityadd);
-
-    const entityremove = e => {
-      const {val} = e.data;
-      // const [x, y, z] = val;
-      console.log('removed', val);
-    };
-    virtualWorld.addEventListener('needledentityremove', entityremove);
-
-    this.cleanupFn = () => {
-      document.body.removeChild(div);
-
-      virtualWorld.removeEventListener('needledentityadd', entityadd);
-      virtualWorld.removeEventListener('needledentityremove', entityremove);
-    };
-  }
-
-  destroy() {
-    this.cleanupFn();
-  }
-}
-
 //
 
 export class AppsHtmlRenderer {

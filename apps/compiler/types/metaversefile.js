@@ -1,5 +1,5 @@
 import path from 'path';
-import url from 'url';
+import {format, URL} from 'url';
 import {fetchFileFromId, createRelativeFromAbsolutePath} from '../util.js';
 
 const _jsonParse2 = s => {
@@ -11,7 +11,7 @@ const _jsonParse2 = s => {
   }
 };
 
-export default {
+const metaversefile = {
   async resolveId(id, importer) {
     const s = await fetchFileFromId(id, importer, 'utf8');
 
@@ -24,20 +24,20 @@ export default {
         if (start_url) {
           const _mapUrl = () => {
             if (/^https?:\/\//.test(start_url)) {
-              const o = url.parse(start_url, true);
-              const s = url.format(o);
+              const o = new URL(start_url, true);
+              const s = format(o);
               return s;
             } else if (/^https?:\/\//.test(id)) {
-              const o = url.parse(id, true);
+              const o = new URL(id, true);
               o.pathname = path.join(path.dirname(o.pathname), start_url);
-              const s = url.format(o);
+              const s = format(o);
               return s;
             } else if (/^\//.test(id)) {
               id = createRelativeFromAbsolutePath(id);
               
-              const o = url.parse(id, true);
+              const o = new URL(id, true);
               o.pathname = path.join(path.dirname(o.pathname), start_url);
-              const s = url.format(o);
+              const s = format(o);
               return s;
             } else {
               throw new Error('.metaversefile scheme unknown');
@@ -68,7 +68,7 @@ export default {
             return u;
           }
         } else {
-          throw new Error('.metaversefile has no "start_url": string', {j, id, s});
+          throw new Error('.metaversefile has no "start_url": string', {id, s});
         }
       } else {
         throw new Error('.metaversefile could not be parsed: ' + error.stack);
@@ -78,3 +78,5 @@ export default {
     }
   },
 };
+
+export default metaversefile;

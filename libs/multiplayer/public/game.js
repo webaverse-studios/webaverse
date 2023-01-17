@@ -515,6 +515,8 @@ export const startGame = async ({
     const imageNode = new Image();
     imageNode.src = '/public/images/audio.svg';
     imageNode.classList.add('audio-icon');
+    let roster = document.querySelector("#roster");
+
     const _addPlayer = player => {
       // ui
       const p = document.createElement("p");
