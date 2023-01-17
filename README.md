@@ -1,7 +1,7 @@
 <img src="libs/docs/banner.jpeg" width=100% />
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-44-orange.svg?style=flat-square)](#contributors-)
-
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 <p align="center">
     <a href="https://github.com/webaverse-studios/webaverse/graphs/contributors" alt="Contributors">
         <img src="https://img.shields.io/github/contributors/webaverse-studios/webaverse" /></a>
