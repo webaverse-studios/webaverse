@@ -1,6 +1,6 @@
 <img src="libs/docs/banner.jpeg" width=100% />
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-38-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-40-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <p align="center">
@@ -201,6 +201,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/blockchainFull2022"><img src="https://avatars.githubusercontent.com/u/117472008?v=4?s=100" width="100px;" alt="potoelite"/><br /><sub><b>potoelite</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=blockchainFull2022" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://twitter.com/NotFuji_"><img src="https://avatars.githubusercontent.com/u/38316883?v=4?s=100" width="100px;" alt="NotFuji"/><br /><sub><b>NotFuji</b></sub></a><br /><a href="#design-NotFuji" title="Design">🎨</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/zenkale"><img src="https://avatars.githubusercontent.com/u/111510128?v=4?s=100" width="100px;" alt="zenkale"/><br /><sub><b>zenkale</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=zenkale" title="Tests">⚠️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/semilistnik"><img src="https://avatars.githubusercontent.com/u/6167566?v=4?s=100" width="100px;" alt="Dmytro Fomenko"/><br /><sub><b>Dmytro Fomenko</b></sub></a><br /><a href="#design-semilistnik" title="Design">🎨</a></td>
     </tr>
   </tbody>
 </table>
