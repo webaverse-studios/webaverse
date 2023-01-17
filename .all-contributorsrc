@@ -397,6 +397,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "kishdr",
+      "name": "kishdr",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17167456?v=4",
+      "profile": "https://github.com/kishdr",
+      "contributions": [
+        "design"
+      ]
     }
   ],
   "contributorsPerLine": 7,
