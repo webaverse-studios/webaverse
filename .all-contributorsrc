@@ -14,6 +14,15 @@
       "contributions": [
         "infra"
       ]
+    },
+    {
+      "login": "avaer",
+      "name": "Avaer Kazmer",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6926057?v=4",
+      "profile": "https://webaverse.com/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
