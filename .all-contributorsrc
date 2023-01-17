@@ -298,6 +298,105 @@
         "ideas",
         "content"
       ]
+    },
+    {
+      "login": "aerydna",
+      "name": "Andrea Ruzzenenti",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7593650?v=4",
+      "profile": "https://github.com/aerydna",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "soulofmischief",
+      "name": "soulofmischief",
+      "avatar_url": "https://avatars.githubusercontent.com/u/30357883?v=4",
+      "profile": "https://github.com/soulofmischief",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "belopot",
+      "name": "belopot",
+      "avatar_url": "https://avatars.githubusercontent.com/u/46432435?v=4",
+      "profile": "https://github.com/belopot",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "ctrlaltdavid",
+      "name": "David Rowe",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7455448?v=4",
+      "profile": "http://ctrlaltstudio.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "blockchainFull2022",
+      "name": "potoelite",
+      "avatar_url": "https://avatars.githubusercontent.com/u/117472008?v=4",
+      "profile": "https://github.com/blockchainFull2022",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "NotFuji",
+      "name": "NotFuji",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38316883?v=4",
+      "profile": "https://twitter.com/NotFuji_",
+      "contributions": [
+        "design"
+      ]
+    },
+    {
+      "login": "zenkale",
+      "name": "zenkale",
+      "avatar_url": "https://avatars.githubusercontent.com/u/111510128?v=4",
+      "profile": "https://github.com/zenkale",
+      "contributions": [
+        "test"
+      ]
+    },
+    {
+      "login": "semilistnik",
+      "name": "Dmytro Fomenko",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6167566?v=4",
+      "profile": "https://github.com/semilistnik",
+      "contributions": [
+        "design"
+      ]
+    },
+    {
+      "login": "kiibarina",
+      "name": "kiibarina",
+      "avatar_url": "https://avatars.githubusercontent.com/u/108288701?v=4",
+      "profile": "https://github.com/kiibarina",
+      "contributions": [
+        "design"
+      ]
+    },
+    {
+      "login": "JFKraasch",
+      "name": "Jonas Kraasch",
+      "avatar_url": "https://avatars.githubusercontent.com/u/76698239?v=4",
+      "profile": "https://github.com/JFKraasch",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "listofbanned",
+      "name": "Jimmy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/50330310?v=4",
+      "profile": "https://github.com/listofbanned",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
