@@ -251,6 +251,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "patriboz",
+      "name": "Patrick Bozic",
+      "avatar_url": "https://avatars.githubusercontent.com/u/49231818?v=4",
+      "profile": "https://github.com/patriboz",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
