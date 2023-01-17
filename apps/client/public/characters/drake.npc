@@ -1,7 +1,7 @@
 {
   "name": "Drake",
   "previewUrl": "./images/characters/upstreet/small/drake.png",
-  "avatarUrl": "./avatars/Drake_hacker_v8_Guilty.vrm",
+  "avatarUrl": "/avatars/Drake_hacker_v8_Guilty.vrm",
   "voice": "Shining Armor",
   "voicePack": "Andrew voice pack",
   "class": "Neural Hacker",

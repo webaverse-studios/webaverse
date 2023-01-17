@@ -1,7 +1,7 @@
 {
   "name": "Anemone",
   "previewUrl": "./images/characters/upstreet/small/anemone.png",
-  "avatarUrl": "./avatars/ann.vrm",
+  "avatarUrl": "/avatars/ann.vrm",
   "voice": "Trixie",
   "voicePack": "ShiShi voice pack",
   "class": "Lisk Witch",

@@ -3,14 +3,14 @@ import {isProd} from './env.js';
 export const compilerBaseUrl = isProd ?
   `https://compiler.webaverse.com/`
 :
-  `https://local-compiler.webaverse.com/`;
+  `http://localhost:3000/`;
 
 // scenes
 export const scenesBaseUrl = `/scenes/`;
 export const defaultSceneName = 'block.scn';
 
 // characters
-export const charactersBaseUrl = `/characters/`;
+export const charactersBaseUrl = `http://localhost:4200/characters/`;
 export const defaultCharacterName = 'scillia.npc';
 
 // voice packs

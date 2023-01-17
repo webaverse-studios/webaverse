@@ -9,7 +9,7 @@
     "multiplayer": "apps/multiplayer",
     "offscreen-engine": "libs/offscreen-engine",
     "test-e2e": "libs/test-e2e",
-    "webaverse-previewer": "libs/previewer",
+    "webaverse-previewer": "apps/previewer",
     "wsrtc": "libs/wsrtc",
     "zjs": "libs/zjs"
   }

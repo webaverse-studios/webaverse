@@ -1,7 +1,7 @@
 {
   "name": "Juniper",
   "previewUrl": "./images/characters/upstreet/small/juniper.png",
-  "avatarUrl": "./avatars/jun_engineer_v1_vian.vrm",
+  "avatarUrl": "/avatars/jun_engineer_v1_vian.vrm",
   "voice": "Cadance",
   "voicePack": "Tiffany voice pack",
   "class": "Academy Engineer",

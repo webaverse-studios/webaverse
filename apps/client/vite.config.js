@@ -19,7 +19,7 @@ export default defineConfig({
       "wsrtc": resolve(__dirname, './../../libs/wsrtc'),
       "offscreen-canvas": resolve(__dirname, './../../libs/offscreen-canvas'),
       "zjs": resolve(__dirname, './../../libs/zjs'),
-      "previewer": resolve(__dirname, './../../libs/previewer'),
+      "previewer": resolve(__dirname, './../../apps/previewer'),
       "multiplayer": resolve(__dirname, './../../apps/multiplayer'),
     },
   },

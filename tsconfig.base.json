@@ -21,7 +21,7 @@
       "metaversefile": ["libs/metaversefile"],
       "multiplayer": ["apps/multiplayer"],
       "offscreen-engine": ["libs/offscreen-engine"],
-      "webaverse-previewer": ["libs/previewer"],
+      "webaverse-previewer": ["apps/previewer"],
       "wsrtc": ["libs/wsrtc"],
       "zjs": ["libs/zjs"]
     }

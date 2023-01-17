@@ -1,7 +1,7 @@
 {
   "name": "previewer",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/previewer/src",
+  "sourceRoot": "apps/previewer/src",
   "projectType": "library",
   "targets": {},
   "tags": []

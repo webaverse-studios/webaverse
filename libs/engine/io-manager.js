@@ -516,10 +516,6 @@ class IoManager extends EventTarget {
         }
         break;
       }
-      case 85: { // U 
-        zineCameraManager.toggleCameraLock();
-        break;
-      } 
       case 74: { // J
         game.inventoryHack = !game.inventoryHack;
         break;
@@ -553,7 +549,6 @@ class IoManager extends EventTarget {
         const renderer = getRenderer();
 
         if (renderer && (e.target === renderer.domElement || e.target.id === 'app')) {
-          zineCameraManager.handleMouseWheel(e) ||
             cameraManager.handleWheelEvent(e);
         }
       }
@@ -648,7 +643,6 @@ class IoManager extends EventTarget {
 
   mousemove = e => {
     if (cameraManager.pointerLockElement) {
-      zineCameraManager.handleMouseMove(e) ||
         cameraManager.handleMouseMove(e);
     } else {
       if (game.dragging) {

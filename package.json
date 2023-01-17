@@ -3,10 +3,10 @@
   "version": "0.6.0",
   "license": "MIT",
   "scripts": {
-    "build": "nx run-many --target=build",
-    "dev": "nx run-many --target=dev",
-    "test": "nx run-many --target=test",
-    "lint": "nx run-many --target=lint"
+    "build": "nx run-many --target=build --parallel 4",
+    "dev": "nx run-many --target=dev --parallel 4",
+    "test": "nx run-many --target=test --parallel 4",
+    "lint": "nx run-many --target=lint --parallel 4"
   },
   "private": true,
   "dependencies": {
