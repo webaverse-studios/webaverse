@@ -134,6 +134,15 @@
       "contributions": [
         "design"
       ]
+    },
+    {
+      "login": "torchesburn",
+      "name": "torchesburn",
+      "avatar_url": "https://avatars.githubusercontent.com/u/51108458?v=4",
+      "profile": "https://github.com/torchesburn",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
