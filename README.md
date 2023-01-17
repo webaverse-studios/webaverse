@@ -1,6 +1,6 @@
 <img src="libs/docs/banner.jpeg" width=100% />
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-30-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-31-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <p align="center">
@@ -187,6 +187,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/GaladWarder"><img src="https://avatars.githubusercontent.com/u/29031531?v=4?s=100" width="100px;" alt="Grant Roberts"/><br /><sub><b>Grant Roberts</b></sub></a><br /><a href="#design-GaladWarder" title="Design">🎨</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/alextitonis"><img src="https://avatars.githubusercontent.com/u/45359358?v=4?s=100" width="100px;" alt="alextitonis"/><br /><sub><b>alextitonis</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=alextitonis" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ahadshams"><img src="https://avatars.githubusercontent.com/u/44798013?v=4?s=100" width="100px;" alt="ahadshams"/><br /><sub><b>ahadshams</b></sub></a><br /><a href="#business-ahadshams" title="Business development">💼</a></td>
     </tr>
   </tbody>
 </table>
