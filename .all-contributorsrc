@@ -23,6 +23,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "gonnavis",
+      "name": "Vis",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10785634?v=4",
+      "profile": "http://gonnavis.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
