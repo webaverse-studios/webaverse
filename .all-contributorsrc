@@ -354,12 +354,21 @@
       ]
     },
     {
-    "login": "zenkale",
+      "login": "zenkale",
       "name": "zenkale",
       "avatar_url": "https://avatars.githubusercontent.com/u/111510128?v=4",
       "profile": "https://github.com/zenkale",
       "contributions": [
         "test"
+      ]
+    },
+    {
+      "login": "semilistnik",
+      "name": "Dmytro Fomenko",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6167566?v=4",
+      "profile": "https://github.com/semilistnik",
+      "contributions": [
+        "design"
       ]
     }
   ],
