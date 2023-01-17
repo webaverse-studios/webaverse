@@ -6,17 +6,11 @@ export const compilerBaseUrl = isProd ?
   `https://local-compiler.webaverse.com/`;
 
 // scenes
-export const scenesBaseUrl = isProd ?
-  `https://webaverse.github.io/scenes/`
-:
-  `/packages/scenes/`;
+export const scenesBaseUrl = `/scenes/`;
 export const defaultSceneName = 'block.scn';
 
 // characters
-export const charactersBaseUrl = isProd ?
-  `https://webaverse.github.io/characters/`
-:
-  `/packages/characters/`;
+export const charactersBaseUrl = `/characters/`;
 export const defaultCharacterName = 'scillia.npc';
 
 // voice packs

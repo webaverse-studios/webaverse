@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "build": "nx run-many --target=build",
+    "dev": "nx run-many --target=dev",
     "test": "nx run-many --target=test",
     "lint": "nx run-many --target=lint"
   },
@@ -12,6 +13,7 @@
     "@aws-sdk/client-s3": "^3.180.0",
     "@babel/core": "^7.15.0",
     "@babel/preset-react": "^7.14.5",
+    "@cloudflare/kv-asset-handler": "^0.2.0",
     "@pixiv/three-vrm": "webaverse-studios/three-vrm#main",
     "@shaderfrog/glsl-parser": "^0.1.23",
     "@vitejs/plugin-react": "^3.0.0",

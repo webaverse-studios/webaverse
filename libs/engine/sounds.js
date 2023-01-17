@@ -1,6 +1,6 @@
 import audioManager from './audio-manager.js';
 import {loadAudioBuffer} from './util.js';
-import soundFileSpecs from './public/sounds/sound-files.json';
+import soundFileSpecs from './sound-files.json';
 
 const _getSoundFiles = regex => soundFileSpecs.filter(f => regex.test(f.name));
 const soundFiles = {

@@ -327,7 +327,7 @@ const baseMaterial = new THREE.MeshBasicMaterial({
   fog: false,
   lights: false,
 });
-baseMaterial.freeze();
+// baseMaterial.freeze();
 const triplanarVertexShader = `\
   precision highp float;
   precision highp int;

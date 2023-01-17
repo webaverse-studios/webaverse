@@ -20,7 +20,7 @@ export default defineConfig({
       "offscreen-canvas": resolve(__dirname, './../../libs/offscreen-canvas'),
       "zjs": resolve(__dirname, './../../libs/zjs'),
       "previewer": resolve(__dirname, './../../libs/previewer'),
-      "multiplayer": resolve(__dirname, './../../libs/multiplayer'),
+      "multiplayer": resolve(__dirname, './../../apps/multiplayer'),
     },
   },
   // setup relative aliases from @webaverse-studios/engine to ../../libs/engine

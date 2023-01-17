@@ -474,7 +474,7 @@ class LoreAI {
       this.setEndpoint(endpointFn);
     } else {
       this.setEndpoint(null);
-      throw new Error('url is required');
+      console.warn('url is required');
     }
   }
 

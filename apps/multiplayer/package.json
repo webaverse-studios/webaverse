@@ -1,0 +1,20 @@
+{
+  "name": "@webaverse-studios/multiplayer",
+  "version": "0.6.0",
+  "description": "",
+  "main": "index.mjs",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webaverse-studios/webaverse.git"
+  },
+  "author": "Webaverse",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/webaverse-studios/webaverse/issues"
+  },
+  "homepage": "https://github.com/webaverse-studios/webaverse",
+  "scripts": {
+    "dev": "wrangler dev -l --port 2222"
+  }
+}

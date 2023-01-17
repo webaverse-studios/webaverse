@@ -92,7 +92,7 @@ const uploadCreateApp = async (item, {
 };
 
 const DragAndDrop = () => {
-  const {state, setState, account} = useContext(AppContext)
+  const {setState, account} = useContext(AppContext)
   const [queue, setQueue] = useState([]);
   const [currentApp, setCurrentApp] = useState(null);
   const {mintNFT, minting, error, setError, WebaversecontractAddress} = useNFTContract(account.currentAddress);

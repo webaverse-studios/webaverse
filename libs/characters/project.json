@@ -1,8 +1,0 @@
-{
-  "name": "@webaverse-studios/characters",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/characters/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": []
-}

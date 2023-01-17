@@ -10,7 +10,7 @@ import puppeteer from 'puppeteer';
 
 const SERVER_ADDR = '0.0.0.0';
 const SERVER_NAME = 'local-renderer.webaverse.com';
-const PORT = parseInt(process.env.PORT, 10) ?? 5555;
+const PORT = parseInt(process.env.PORT ?? 5555, 10) ?? 5555;
 const CB_PORT = PORT + 1;
 
 //

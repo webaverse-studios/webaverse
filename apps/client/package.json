@@ -19,8 +19,8 @@
   ],
   "scripts": {
     "install-libs": "bash scripts/npm-preinstall.sh",
-    "start": "npm run prod",
-    "dev": "bash scripts/start-dev.sh",
+    "start": "vite",
+    "dev": "vite dev",
     "stop": "sudo killall node",
     "prod": "bash scripts/start-prod.sh",
     "build": "vite build",

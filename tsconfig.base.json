@@ -19,7 +19,7 @@
       "@webaverse-studios/compiler": ["apps/compiler"],
       "@webaverse-studios/engine": ["libs/engine/index.js"],
       "metaversefile": ["libs/metaversefile"],
-      "multiplayer": ["libs/multiplayer"],
+      "multiplayer": ["apps/multiplayer"],
       "offscreen-engine": ["libs/offscreen-engine"],
       "webaverse-previewer": ["libs/previewer"],
       "wsrtc": ["libs/wsrtc"],

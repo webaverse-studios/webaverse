@@ -22,7 +22,7 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
     const [ origSceneList, setOrigSceneList ] = useState([]);
     const [ scenesList, setScenesList ] = useState([]);
 
-    const sceneRoot = '/packages/scenes/';
+    const sceneRoot = '/scenes/';
 
     //
 
