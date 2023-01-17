@@ -260,6 +260,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "GaladWarder",
+      "name": "Grant Roberts",
+      "avatar_url": "https://avatars.githubusercontent.com/u/29031531?v=4",
+      "profile": "https://github.com/GaladWarder",
+      "contributions": [
+        "design"
+      ]
     }
   ],
   "contributorsPerLine": 7,
