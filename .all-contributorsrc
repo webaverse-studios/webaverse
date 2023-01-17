@@ -143,6 +143,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "AGoblinKing",
+      "name": "a Goblin King",
+      "avatar_url": "https://avatars.githubusercontent.com/u/462380?v=4",
+      "profile": "http://a.goblin.life",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
