@@ -343,6 +343,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "NotFuji",
+      "name": "NotFuji",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38316883?v=4",
+      "profile": "https://twitter.com/NotFuji_",
+      "contributions": [
+        "design"
+      ]
     }
   ],
   "contributorsPerLine": 7,
