@@ -1,4 +1,6 @@
 {
+  
+  // ignore .next and all subdirectories
   "ignorePatterns": [".next", ".next/*", "!**/*", "public/*", "public/**/*", "*pg.js", "**/*pg.worker.js", "**/*pg.module.js"],
   "extends": "next/core-web-vitals"
 }

@@ -14,8 +14,8 @@
     "type": "git",
     "url": "git+https://github.com/webaverse/metaversefile.git"
   },
-  "author": "Avaer Kazmer <a@modules.io>",
-  "license": "ISC",
+  "author": "Webaverse",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/webaverse/metaversefile/issues"
   },

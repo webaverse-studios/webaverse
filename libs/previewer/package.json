@@ -8,8 +8,8 @@
     "dev": "NODE_ENV=development $(which node) server.js",
     "prod": "NODE_ENV=production $(which node) server.js"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Webaverse",
+  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
     "puppeteer": "^19.0.0",

@@ -10,14 +10,6 @@
       "options": {
         "lintFilePatterns": ["libs/multiplayer/**/*.js"]
       }
-    },
-    "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-      "options": {
-        "jestConfig": "libs/multiplayer/jest.config.js",
-        "passWithNoTests": true
-      }
     }
   },
   "tags": []
