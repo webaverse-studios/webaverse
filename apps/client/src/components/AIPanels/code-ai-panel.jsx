@@ -108,7 +108,7 @@ export function CodeAiPanel() {
     //
 
     useEffect(() => {
-        const handleKeyUp = (event) => {
+        const handleKeyUp = event => {
             if (
                 event.which === 13 && // enter
                 window.document.activeElement !== outputTextarea.current &&

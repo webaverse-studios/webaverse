@@ -28,7 +28,7 @@ const _throttleFn = (fn, ms) => {
     }
   };
 };
-const _updateCoord = _throttleFn((coord) => {
+const _updateCoord = _throttleFn(coord => {
   const u = new URL(window.location.href);
   u.searchParams.set('coord', JSON.stringify(coord));
   history.replaceState({}, '', u);
@@ -42,7 +42,7 @@ export const startGame = async ({
   // locals
   const playerId = makeId();
   let localPlayerCanvas = null;
-  let remotePlayerCanvases = new Map();
+  const remotePlayerCanvases = new Map();
   
   // realms
   const realms = new NetworkRealms('scene', playerId);
@@ -177,7 +177,7 @@ export const startGame = async ({
     x: 0,
     y: 0,
   };
-  let lastMouseState = {
+  const lastMouseState = {
     buttons: 0,
     x: 0,
     y: 0,
@@ -392,7 +392,7 @@ export const startGame = async ({
         const newAppMap = realms.localPlayer.playerApps.addEntityAt(
           collidedVirtualMap.entityMap.arrayIndexId,
           collidedAppJson,
-          targetRealm
+          targetRealm,
         );
 
         // add new action
@@ -404,7 +404,7 @@ export const startGame = async ({
         const newActionMap = realms.localPlayer.playerActions.addEntity(action, targetRealm);
 
         // remove from the old location (world)
-        //collidedVirtualMap.remove();
+        // collidedVirtualMap.remove();
         virtualWorld.worldApps.removeEntityAt(collidedVirtualMap.entityMap.arrayIndexId);
 
         // livehand
@@ -470,14 +470,14 @@ export const startGame = async ({
             const newPlayerAppMap = virtualWorld.worldApps.addEntityAt(
               firstApp.entityMap.arrayIndexId,
               firstAppJson,
-              targetRealm
+              targetRealm,
             );
             // const newPlayerApp = virtualWorld.worldApps.getVirtualMap(newPlayerAppMap.arrayIndexId);
             // newPlayerApp.headTracker.setHeadRealm(targetRealm);
 
             // remove from the old location (player)
-            //firstApp.remove();
-            //firstAction.remove();
+            // firstApp.remove();
+            // firstAction.remove();
             realms.localPlayer.playerApps.removeEntityAt(appId);
             realms.localPlayer.playerActions.removeEntityAt(firstAction.arrayIndexId);
 
@@ -517,7 +517,7 @@ export const startGame = async ({
     imageNode.classList.add('audio-icon');
     const _addPlayer = player => {
       // ui
-      let p = document.createElement("p");
+      const p = document.createElement("p");
       p.classList.add('player');
       
       p.appendChild(imageNode.cloneNode());
@@ -536,7 +536,7 @@ export const startGame = async ({
     };
     const _removePlayer = playerId => {
       for (let i = 0; i < roster.children.length; i++) {
-        let p = roster.children[i];
+        const p = roster.children[i];
         if (p.playerId === playerId) {
           roster.removeChild(p);
           break;
@@ -570,7 +570,7 @@ export const startGame = async ({
     // audio
     const _enableAudioOutput = playerId => {
       for (let i = 0; i < roster.children.length; i++) {
-        let p = roster.children[i];
+        const p = roster.children[i];
         const textNode = p.children[1];
         if (textNode.playerId === playerId) {
           // console.log('swap on');
@@ -581,7 +581,7 @@ export const startGame = async ({
     };
     const _disableAudioOutput = playerId => {
       for (let i = 0; i < roster.children.length; i++) {
-        let p = roster.children[i];
+        const p = roster.children[i];
         const textNode = p.children[1];
         if (textNode.playerId === playerId) {
           // console.log('swap off');
@@ -617,7 +617,7 @@ export const startGame = async ({
 
   const _startFrameLoop = () => {
     let connected = false;
-    const onConnect = (position) => {
+    const onConnect = position => {
       console.log('on connect');
       if (!position) {
         debugger;
@@ -630,7 +630,7 @@ export const startGame = async ({
         {
           start_url: 'rock',
           position: new Float32Array(3),
-        }
+        },
       ];
       const appIds = Array(appVals.length);
       for (let i = 0; i < appIds.length; i++) {
@@ -686,7 +686,7 @@ export const startGame = async ({
           realms.localPlayer.setKeyValue('cursorPosition', [
             lastMouseState.x,
             lastMouseState.y,
-            0
+            0,
           ]);
           
           lastMouseState.x = mouseState.x;

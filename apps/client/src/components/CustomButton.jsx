@@ -40,7 +40,7 @@ export default function CustomButton(props) {
           className,
           styles.iconButtonWrap,
           theme && theme === 'dark' ? styles.dark : styles.light,
-          active && styles.active
+          active && styles.active,
         )}
         style={{height: size}}
         onClick={onClick}
@@ -76,7 +76,7 @@ export default function CustomButton(props) {
           className,
           styles.iconButtonWrap,
           theme && theme === 'dark' ? styles.dark : styles.light,
-          active && styles.active
+          active && styles.active,
         )}
         style={{height: size}}
         onClick={onClick}

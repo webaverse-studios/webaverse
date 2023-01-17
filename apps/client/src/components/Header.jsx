@@ -36,7 +36,7 @@ export default function Header() {
 
     //
 
-    const stopPropagation = (event) => {
+    const stopPropagation = event => {
 
         event.stopPropagation();
 
@@ -122,7 +122,7 @@ export default function Header() {
 
     useEffect(() => {
 
-        const handleNonInputKey = (event) => {
+        const handleNonInputKey = event => {
 
             switch (event.which) {
 
@@ -144,7 +144,7 @@ export default function Header() {
 
         };
 
-        const handleAnytimeKey = (event) => {
+        const handleAnytimeKey = event => {
 
             switch (event.which) {
 
@@ -170,7 +170,7 @@ export default function Header() {
 
         };
 
-        const keydown = (event) => {
+        const keydown = event => {
 
             let handled = false;
             const inputFocused = document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.nodeName);

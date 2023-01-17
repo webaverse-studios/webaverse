@@ -23,13 +23,13 @@ function ChatInput () {
 
     //
 
-    const stopPropagation = (event) => {
+    const stopPropagation = event => {
 
         event.stopPropagation();
 
     };
 
-    const handleMessageChange = (event) => {
+    const handleMessageChange = event => {
 
         setValue(event.target.value);
 
@@ -39,7 +39,7 @@ function ChatInput () {
 
     useEffect(() => {
 
-        const handleActiveKey = (event) => {
+        const handleActiveKey = event => {
 
             if (game.inputFocused() && document.activeElement !== inputRef.current) {
                 
@@ -91,7 +91,7 @@ function ChatInput () {
 
         };
 
-        const handleAnytimeKey = (event) => {
+        const handleAnytimeKey = event => {
 
             switch (event.which) {
 
@@ -118,7 +118,7 @@ function ChatInput () {
 
         };
 
-        const handleKeyUp = (event) => {
+        const handleKeyUp = event => {
 
             let handled = handleActiveKey(event);
 

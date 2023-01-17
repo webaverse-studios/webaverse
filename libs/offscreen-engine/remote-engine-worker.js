@@ -17,9 +17,11 @@ class RemoteEngineWorker {
   constructor(startUrl) {
     this.startUrl = startUrl;
   }
+
   async waitForLoad() {
     // nothing
   }
+
   async request(funcName, args = [], {
     signal = null,
   } = {}) {
@@ -59,6 +61,7 @@ class RemoteEngineWorker {
       throw new Error('failed to fetch: ' + res.status);
     }
   }
+
   destroy() {
     // nothing
   }

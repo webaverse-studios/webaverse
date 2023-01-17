@@ -18,7 +18,7 @@ const DefaultSettings = {
     run:                'shift+w',
     narutoRun:          'shift+w+w',
     chat:               'enter',
-    inventory:          'i'
+    inventory:          'i',
 };
 
 export const TabControls = ({active}) => {
@@ -52,7 +52,7 @@ export const TabControls = ({active}) => {
             narutoRun,
             action,
             chat,
-            inventory
+            inventory,
         };
 
         localStorage.setItem('ControlsSettings', JSON.stringify(settings));

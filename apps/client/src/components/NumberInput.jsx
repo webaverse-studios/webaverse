@@ -27,7 +27,7 @@ export const NumberInput = ({title = '', initalValue = 0, zeroValue = true, maxP
 
     //
 
-    const prettifyNumber = (value) => {
+    const prettifyNumber = value => {
 
         return + parseFloat(parseFloat(value ?? 0).toFixed(maxPrecision));
 
@@ -47,7 +47,7 @@ export const NumberInput = ({title = '', initalValue = 0, zeroValue = true, maxP
 
     };
 
-    const handleInputKeyUp = (event) => {
+    const handleInputKeyUp = event => {
 
         if (event.key === 'ArrowUp') {
 
@@ -77,14 +77,14 @@ export const NumberInput = ({title = '', initalValue = 0, zeroValue = true, maxP
 
     };
 
-    const handleInputOnChange = (event) => {
+    const handleInputOnChange = event => {
 
         const newValue = event.target.value;
         setValue(newValue);
 
     };
 
-    const handleInputBlur = (event) => {
+    const handleInputBlur = event => {
 
         apply(event.target.value, true);
 

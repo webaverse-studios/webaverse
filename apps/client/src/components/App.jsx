@@ -167,7 +167,7 @@ export const App = () => {
 
     useEffect(() => {
 
-        const handleStoryKeyUp = (event) => {
+        const handleStoryKeyUp = event => {
 
             if (game.inputFocused()) return;
             handleStoryKeyControls(event);
@@ -192,7 +192,7 @@ export const App = () => {
 
         }
 
-        const handleKeyDown = (event) => {
+        const handleKeyDown = event => {
 
             if (event.ctrlKey && event.code === 'KeyH') {
 
@@ -288,7 +288,7 @@ export const App = () => {
     useEffect(_loadUrlState, []);
 
     useEffect(() => {
-        const claimschange = async (e) => {
+        const claimschange = async e => {
             const {claims, addedClaim} = e.data;
             const claimableItem = claims.map(({name, start_url, type, voucher, serverDrop, level}) => ({
                 name,
@@ -304,7 +304,7 @@ export const App = () => {
                 voucher,
                 serverDrop,
                 claimed: false,
-                level
+                level,
             }))
 
             setClaimableToken(claimableItem);
@@ -337,7 +337,7 @@ export const App = () => {
               claimed: true,
               rarity: "common",
               type: "major",
-              level: 15
+              level: 15,
           }
         ))
         setMintedToken(nftData)
@@ -346,7 +346,7 @@ export const App = () => {
     //
     
     useEffect(() => {
-        const setEditModeState = async (e) => {
+        const setEditModeState = async e => {
             const {editMode} = e.target;
             setEditMode(editMode);
         };
@@ -383,7 +383,7 @@ export const App = () => {
         setClaimableToken,
         mintedToken,
         setMintedToken,
-        getWalletItems
+        getWalletItems,
     }
 
     return (

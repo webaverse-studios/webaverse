@@ -104,11 +104,11 @@ const DomRendererChild = ({
           const cameraCSSMatrix = getCameraCSSMatrix(
             localMatrix.copy(camera.matrixWorldInverse)
               .premultiply(
-                localMatrix2.makeTranslation(0, 0, fov)
+                localMatrix2.makeTranslation(0, 0, fov),
               )
               .multiply(
-                floatNodeMatrixWorld
-              )
+                floatNodeMatrixWorld,
+              ),
           );
           iframeContainer2.style.transform = cameraCSSMatrix;
         };
@@ -191,8 +191,8 @@ const DomRendererChild = ({
               localMatrix.compose(
                 localVector.set(0, 0, 0),
                 localQuaternion.set(0, 0, 0, 1),
-                localVector2.setScalar(scaleFactor)
-              )
+                localVector2.setScalar(scaleFactor),
+              ),
             ),
           pointerEvents: 'auto',
         }}

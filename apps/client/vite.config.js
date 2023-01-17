@@ -10,7 +10,7 @@ export default defineConfig({
   },
 
   plugins: [
-    react()
+    react(),
   ],
   resolve:{
     alias:{

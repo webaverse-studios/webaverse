@@ -217,14 +217,14 @@ export default function QuickMenu() {
             ctx.globalAlpha = 0.3;
             ctx.translate(
               pixelSize/2 + Math.cos(midAngle)*radiusCenterSoft,
-              pixelSize/2 + Math.sin(midAngle)*radiusCenterSoft
+              pixelSize/2 + Math.sin(midAngle)*radiusCenterSoft,
             );
             ctx.rotate(midAngle + Math.PI);
             ctx.translate(-chevronSize/2, -chevronSize/2);
             ctx.drawImage(
               chevronImage,
               0,
-              0
+              0,
             );
             ctx.restore();
           }
@@ -233,7 +233,7 @@ export default function QuickMenu() {
           ctx.drawImage(
             emoteIconImages[i],
             pixelSize/2 + Math.cos(midAngle)*radiusCenter - iconSize/2,
-            pixelSize/2 + Math.sin(midAngle)*radiusCenter - iconSize/2 - pixelSize/30
+            pixelSize/2 + Math.sin(midAngle)*radiusCenter - iconSize/2 - pixelSize/30,
           );
 
           // hard label
@@ -242,7 +242,7 @@ export default function QuickMenu() {
           ctx.fillText(
             emotes[i].name,
             pixelSize/2 + Math.cos(midAngle)*radiusCenter,
-            pixelSize/2 + Math.sin(midAngle)*radiusCenter + pixelSize/20
+            pixelSize/2 + Math.sin(midAngle)*radiusCenter + pixelSize/20,
           );
         }
       }

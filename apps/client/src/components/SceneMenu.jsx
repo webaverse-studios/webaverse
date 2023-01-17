@@ -32,7 +32,7 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
             const scenes = await sceneManager.getSceneNamesAsync();
             if (!live) return;
             const origScenes = [];
-            scenes.forEach((name) => {
+            scenes.forEach(name => {
                 origScenes.push(`${scenesBaseUrl}${name}`);
             });
             setOrigSceneList(origScenes);
@@ -63,13 +63,13 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
 
     //
 
-    const stopPropagation = (event) => {
+    const stopPropagation = event => {
 
         event.stopPropagation();
 
     };
 
-    const handleSceneMenuOpen = (value) => {
+    const handleSceneMenuOpen = value => {
 
         value = (typeof value === 'boolean' ? value : (state.openedPanel === 'SceneMenuPanel'));
         setState({openedPanel: value ? null : 'SceneMenuPanel'});
@@ -87,7 +87,7 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
 
     };
 
-    const handleRoomMenuOpen = (value) => {
+    const handleRoomMenuOpen = value => {
 
         value = (typeof value === 'boolean' ? value : (state.openedPanel === 'RoomMenuPanel'));
 
@@ -126,7 +126,7 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
         }
       };
 
-    const handleRoomSelect = (room) => {
+    const handleRoomSelect = room => {
 
         setState({openedPanel: null});
 
@@ -164,15 +164,15 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
 
     };
 
-    const handleSceneInputKeyDown = (event) => {
+    const handleSceneInputKeyDown = event => {
 
-        const newList = (event.target.value ? origSceneList.filter((sceneName) => (sceneName.indexOf(event.target.value) !== -1)) : origSceneList);
+        const newList = (event.target.value ? origSceneList.filter(sceneName => (sceneName.indexOf(event.target.value) !== -1)) : origSceneList);
         setScenesList(newList);
         setSceneInputName(event.target.value);
 
     };
 
-    const handleSceneMenuKeyUp = (event) => {
+    const handleSceneMenuKeyUp = event => {
 
         switch (event.which) {
 
@@ -221,7 +221,7 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
                     <div className={ styles.rooms }>
                     {
                         scenesList.map((sceneName, i) => (
-                            <div className={ styles.room } onMouseDown={ (e) => { handleSceneSelect(e, sceneName) } } key={ i } >
+                            <div className={ styles.room } onMouseDown={ e => { handleSceneSelect(e, sceneName) } } key={ i } >
                                 <img className={ styles.image } src="images/world.jpg" />
                                 <div className={ styles.name } >{ sceneName }</div>
                             </div>
@@ -239,7 +239,7 @@ export const SceneMenu = ({className, multiplayerConnected, selectedScene, setSe
                         </div>
                         {
                             rooms.map((room, i) => (
-                                <div className={ styles.room } onClick={ (e) => { handleRoomSelect(room) } } key={ i } >
+                                <div className={ styles.room } onClick={ e => { handleRoomSelect(room) } } key={ i } >
                                     <img className={ styles.image } src="images/world.jpg" />
                                     <div className={ styles.name } >{ room.name }</div>
                                     <div className={ styles.delete } >

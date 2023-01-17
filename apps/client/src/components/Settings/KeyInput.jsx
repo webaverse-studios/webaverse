@@ -40,14 +40,14 @@ export const KeyInput = ({value, setValue, className}) => {
 
     };
 
-    const handleKeyDown = (event) => {
+    const handleKeyDown = event => {
 
         keysList.set(event.key, true);
         updateValue();
 
     };
 
-    const handleKeyUp = (event) => {
+    const handleKeyUp = event => {
 
         keysList.delete(event.key);
 
@@ -62,7 +62,7 @@ export const KeyInput = ({value, setValue, className}) => {
 
     };
 
-    const handleClick = (event) => {
+    const handleClick = event => {
 
         event.stopPropagation();
         setActive(true);

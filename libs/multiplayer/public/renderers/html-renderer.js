@@ -74,6 +74,7 @@ export class RemotePlayerCursorHtmlRenderer {
       virtualPlayer.removeEventListener('update', update);
     };
   }
+
   destroy() {
     this.cleanupFn();
   }
@@ -102,6 +103,7 @@ export class WorldItemHtmlRenderer {
       virtualWorld.removeEventListener('needledentityremove', entityremove);
     };
   }
+
   destroy() {
     this.cleanupFn();
   }
@@ -134,7 +136,7 @@ export class AppsHtmlRenderer {
           //   throw new Error('only local player is supported');
           // }
 
-          let playerAppIndex = playerAppIndexes.get(wearPlayerId) ?? 0;
+          const playerAppIndex = playerAppIndexes.get(wearPlayerId) ?? 0;
           playerAppIndexes.set(wearPlayerId, playerAppIndex + 1);
 
           const playerEl = document.getElementById(`player-${wearPlayerId}`);
@@ -196,7 +198,7 @@ export class AppsHtmlRenderer {
       const playerActionIdsMap = new Map();
       const allPlayerActions = Array.from(playerActions.values()).concat(
         Array.from(remotePlayerActions.values())
-          .flatMap(set => Array.from(set))
+          .flatMap(set => Array.from(set)),
       );
       /* const allPlayerActions = realms.localPlayer.playerActions.getValues()
         .concat(
@@ -391,6 +393,7 @@ export class GamePlayerCanvas {
       virtualPlayer.removeEventListener('update', update);
     };
   }
+
   move() {
     const oldPosition = this.virtualPlayer.getKeyValue('position');
     const oldDirection = this.virtualPlayer.getKeyValue('direction');
@@ -443,6 +446,7 @@ export class GamePlayerCanvas {
     };
     _updateDirection();
   }
+
   draw() {
     if (GamePlayerCanvas.#spriteImg) {
       const direction = this.virtualPlayer.getKeyValue('direction');
@@ -472,6 +476,7 @@ export class GamePlayerCanvas {
       }
     }
   }
+
   static #spriteImg = null;
   static async waitForLoad() {
     this.#spriteImg = await new Promise((accept, reject) => {
@@ -640,6 +645,7 @@ export class GameRealmsCanvases {
       }
     }
   }
+
   update() {
     for (const div of this.element.childNodes) {
       div.update();

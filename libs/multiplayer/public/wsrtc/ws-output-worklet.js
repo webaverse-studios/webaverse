@@ -18,6 +18,7 @@ class WsOutputWorklet extends AudioWorkletProcessor {
       }
     };
   }
+
   process(inputs, outputs, parameters) {
     const output = outputs[0];
     /* for (const frames of output) {

@@ -29,7 +29,7 @@ const userTokenObjects = []; // Array(2);
 for (let i = 0; i < userTokenObjects.length; i++) {
     userTokenObjects[i] = {
         name: '',
-        start_url: ''
+        start_url: '',
     };
 }
 const objects = {
@@ -62,7 +62,7 @@ const landTokenObjects = [
         lods: 1,
         clipRange: [
             [-32, 0, -32],
-            [32, 128, 32]
+            [32, 128, 32],
         ],
     },
 ];
@@ -275,7 +275,7 @@ const EquipmentItems = ({
                                 onDoubleClick={onDoubleClick(object)}
                                 key={i}
                                 // ref={refsMap.get(object)}
-                            />
+                            />,
                         )}
                     </ul>
                 </div>
@@ -298,7 +298,7 @@ export const Equipment = () => {
                 {
                     width,
                     signal,
-                }
+                },
             );
             return imageBitmap;
         },

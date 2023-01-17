@@ -12,6 +12,8 @@
     },
     "globals": { "webkitSpeechRecognition": false },
     "ignorePatterns": [
+      ".next",
+      "*.wasm.js",
       "packages/*",
       "node_modules/*",
       "dist/*",

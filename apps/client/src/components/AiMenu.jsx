@@ -47,7 +47,7 @@ export function AiMenu () {
 
     //
 
-    const stopPropagation = (event) => {
+    const stopPropagation = event => {
         event.stopPropagation();
     };
 
@@ -55,7 +55,7 @@ export function AiMenu () {
 
     // key bindings
     useEffect(() => {
-        const handleKeyUp = (event) => {
+        const handleKeyUp = event => {
             if (game.inputFocused()) {
                 return true;
             } else {

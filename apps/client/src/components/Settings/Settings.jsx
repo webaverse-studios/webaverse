@@ -19,7 +19,7 @@ export const Settings = () => {
 
     //
 
-    const stopPropagation = (event) => {
+    const stopPropagation = event => {
 
         event.stopPropagation();
 
@@ -31,7 +31,7 @@ export const Settings = () => {
 
     };
 
-    const handleTabClick = (event) => {
+    const handleTabClick = event => {
         const tabName = event.currentTarget.getAttribute('data-tab-name');
         setActiveTab(tabName);
     };

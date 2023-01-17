@@ -37,6 +37,7 @@
     "jest.config.ts",
     "src/**/*.spec.ts",
     "src/**/*.test.ts",
-    "public/**/*"
+    "public/**/*",
+    ".next"    
   ]
 }

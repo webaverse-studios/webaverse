@@ -54,6 +54,7 @@ class FakeAudioData {
       },
     };
   }
+
   set(data) {
     this.data = data;
   }
@@ -63,6 +64,7 @@ class FakeIteratorResult {
     this.value = value;
     this.done = false;
   }
+
   setDone(done) {
     this.done = done;
   }
@@ -96,6 +98,7 @@ export class WsMediaStreamAudioReader {
       mediaStream.removeEventListener('close', close);
     };
   }
+
   read() {
     if (this.buffers.length > 0) {
       const b = this.buffers.shift();
@@ -121,10 +124,12 @@ export class WsMediaStreamAudioReader {
       return p;
     }
   }
+
   cancel() {
     this.pushAudioData(null);
     this.cleanup();
   }
+
   pushAudioData(b) {
     if (this.cbs.length > 0) {
       this.cbs.shift()(b);
@@ -149,9 +154,11 @@ export class WsAudioEncoder {
     this.worker.onerror = error;
     this.worker.postMessage('encode');
   }
+
   encode(audioData) {
     this.worker.postMessage(audioData.data, [audioData.data.buffer]);
   }
+
   close() {
     this.worker.terminate();
   }
@@ -170,9 +177,11 @@ export class WsAudioDecoder {
     this.worker.onerror = error;
     this.worker.postMessage('decode');
   }
+
   decode(data) {
     this.worker.postMessage(data, [data.buffer]);
   }
+
   close() {
     this.worker.terminate();
   }

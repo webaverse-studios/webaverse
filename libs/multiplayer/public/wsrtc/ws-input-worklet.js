@@ -7,6 +7,7 @@ class WsInputWorklet extends AudioWorkletProcessor {
     this.buffer = new Float32Array(bufferSize);
     this.bufferIndex = 0;
   }
+
   process(inputs, outputs, parameters) {
     const channels = inputs[0];
     const firstChannel = channels[0];

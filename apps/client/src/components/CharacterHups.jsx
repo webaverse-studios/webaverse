@@ -143,7 +143,7 @@ const CharacterHup = function(props) {
 export default function CharacterHups({
   localPlayer,
   npcs,
-  remotePlayers
+  remotePlayers,
 }) {
   const [hups, setHups] = useState([]);
 
@@ -173,12 +173,12 @@ export default function CharacterHups({
       remotePlayer.characterHups.addEventListener('hupremove', hupremove);
     }
 
-    const handleCharacterAdd = (e) => {
+    const handleCharacterAdd = e => {
       e.data.player.characterHups.addEventListener('hupadd', hupadd);
       e.data.player.characterHups.addEventListener('hupremove', hupremove);
     }
 
-    const handleCharacterRemove = (e) => {
+    const handleCharacterRemove = e => {
       e.data.player.characterHups.removeEventListener('hupadd', hupadd);
       e.data.player.characterHups.removeEventListener('hupremove', hupremove);
     }

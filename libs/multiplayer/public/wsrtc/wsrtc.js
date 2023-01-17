@@ -1,8 +1,8 @@
 import {channelCount, sampleRate, bitrate, MESSAGE} from './ws-constants.js';
 import {WsEncodedAudioChunk, WsMediaStreamAudioReader, WsAudioEncoder, WsAudioDecoder} from './ws-codec.js';
 import {ensureAudioContext, getAudioContext} from './ws-audio-context.js';
-import {encodeMessage, encodeAudioMessage, encodePoseMessage, encodeTypedMessage, decodeTypedMessage, getEncodedAudioChunkBuffer, getAudioDataBuffer/*, loadState*/} from './ws-util.js';
-import { zbdecode } from '../encoding.mjs';
+import {encodeMessage, encodeAudioMessage, encodePoseMessage, encodeTypedMessage, decodeTypedMessage, getEncodedAudioChunkBuffer, getAudioDataBuffer/*, loadState */} from './ws-util.js';
+import {zbdecode} from '../encoding.mjs';
 // import * as Z from 'zjs';
 
 function formatWorldUrl(u, localPlayer) {
@@ -98,9 +98,9 @@ class WSRTC extends EventTarget {
             new MessageEvent('audio', {
               data: {
                 playerId,
-                data: encodedAudioChunk
+                data: encodedAudioChunk,
               },
-            })
+            }),
           );
 
         };
@@ -160,16 +160,19 @@ class WSRTC extends EventTarget {
       // console.log('close');
     });
   }
+
   sendMessage(parts) {
     if (this.ws.readyState === WebSocket.OPEN) {
       const encodedMessage = encodeMessage(parts);
       this.ws.send(encodedMessage);
     }
   }
+
   sendAudioMessage(method, id, type, timestamp, data) { // for performance
     const encodedMessage = encodeAudioMessage(method, id, type, timestamp, data);
     this.ws.send(encodedMessage);
   }
+
   close() {
     if (this.state === 'open') {
       this.ws.close();
@@ -177,6 +180,7 @@ class WSRTC extends EventTarget {
       throw new Error('connection not open');
     }
   }
+
   async enableMic(mediaStream) {
     if (this.mediaStream) {
       throw new Error('mic already enabled');
@@ -218,6 +222,7 @@ class WSRTC extends EventTarget {
     }
     readAndEncode();
   }
+
   disableMic() {
     if (this.mediaStream) {
       WSRTC.destroyUserMedia(this.mediaStream);
@@ -236,9 +241,11 @@ class WSRTC extends EventTarget {
   static waitForReady() {
     return ensureAudioContext();
   }
+
   static getAudioContext() {
     return getAudioContext();
   }
+
   static getUserMedia() {
     return navigator.mediaDevices.getUserMedia({
       audio: {
@@ -247,6 +254,7 @@ class WSRTC extends EventTarget {
       },
     });
   }
+
   static destroyUserMedia(mediaStream) {
     for (const track of mediaStream.getTracks()) {
       track.stop();

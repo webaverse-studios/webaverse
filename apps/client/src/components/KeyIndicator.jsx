@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./KeyIndicator.module.css";
 
-export const KeyIndicator = (props) => {
+export const KeyIndicator = props => {
     return (
         <div className={styles.container}>
             <div className={styles.bg}>

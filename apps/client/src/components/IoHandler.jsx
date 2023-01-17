@@ -39,9 +39,9 @@ function IoHandler () {
 
     useEffect(() => {
 
-        const cleanups = types.map((type) => {
+        const cleanups = types.map(type => {
 
-            const fn = (event) => {
+            const fn = event => {
 
                 let broke = false;
 
@@ -129,5 +129,5 @@ function IoHandler () {
 export {
     IoHandler,
     registerIoEventHandler,
-    unregisterIoEventHandler
+    unregisterIoEventHandler,
 };

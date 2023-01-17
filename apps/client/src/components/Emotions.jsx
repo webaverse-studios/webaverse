@@ -32,7 +32,7 @@ export const setFacePoseValue = (emotion, value) => {
 
 export const Emotions = ({
     parentOpened,
-    cameraOffset
+    cameraOffset,
 }) => {
     const [ emotionsOpen, setEmotionsOpen ] = useState(false);
     const emotionStates = emotions.map(emotion => {

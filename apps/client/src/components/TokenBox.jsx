@@ -3,7 +3,7 @@ import classnames from "classnames";
 import styles from "./TokenBox.module.css";
 import {Spritesheet} from "./Spritesheet";
 
-export const TokenBox = (props) => {
+export const TokenBox = props => {
     const {
         size,
         resolution,
@@ -30,10 +30,10 @@ export const TokenBox = (props) => {
                 var now = new Date().getTime();
                 var distance = countDownDate - now;
                 var hours = Math.floor(
-                    (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+                    (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
                 );
                 var minutes = Math.floor(
-                    (distance % (1000 * 60 * 60)) / (1000 * 60)
+                    (distance % (1000 * 60 * 60)) / (1000 * 60),
                 );
                 var seconds = Math.floor((distance % (1000 * 60)) / 1000);
                 if (hours < 1) {
@@ -100,7 +100,7 @@ export const TokenBox = (props) => {
                 <div
                     className={classnames(
                         styles.level,
-                        rarity && styles[rarity]
+                        rarity && styles[rarity],
                     )}
                     style={{opacity: timerTimestamp ? 0.6 : 1}}
                 >

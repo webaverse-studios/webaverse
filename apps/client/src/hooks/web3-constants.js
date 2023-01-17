@@ -28,8 +28,8 @@ export const CONTRACTS = {
   polygon: {
     Webaverse: "0xbD82801A0417166979E6c0eDCbA0c2F9b255E770",
     FT: "0x3d57335Ae4C04ac3b596842D793a2D152D008203",
-    NFT: "0x3D081BF4b7eAe74e25fF1a2461f92aBc3Ea15441"
-  }
+    NFT: "0x3D081BF4b7eAe74e25fF1a2461f92aBc3Ea15441",
+  },
 };
 
 export const CHAIN_TYPE = {

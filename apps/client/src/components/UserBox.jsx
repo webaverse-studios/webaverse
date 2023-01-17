@@ -231,7 +231,7 @@ export const UserBox = ({setLoginFrom}) => {
       {state.openedPanel === "LoginPanel" &&
         <div
           className={classnames(
-            styles.userLoginMethodsModal
+            styles.userLoginMethodsModal,
           )}
         >
           <div className={styles.title}>

@@ -46,7 +46,7 @@ const ObjectPreview = ({
           fitCameraToBoundingBox(
             camera,
             localBox.setFromObject(object),
-            1.2
+            1.2,
           );
           camera.updateMatrixWorld();
         

@@ -25,7 +25,7 @@ export const Tokens = ({userOpen, loginFrom, hacks, address}) => {
 
                 if (loginFrom === 'metamask') {
 
-                    const res = await fetch(`https://api.opensea.io/api/v1/assets?owner=${address}&limit=${50}`, {headers: {'X-API-KEY': '6a7ceb45f3c44c84be65779ad2907046',}});
+                    const res = await fetch(`https://api.opensea.io/api/v1/assets?owner=${address}&limit=${50}`, {headers: {'X-API-KEY': '6a7ceb45f3c44c84be65779ad2907046'}});
                     const j = await res.json();
                     const {assets} = j;
                     setNfts(assets);

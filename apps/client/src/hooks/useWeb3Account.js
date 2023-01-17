@@ -85,9 +85,9 @@ export default function useWeb3Account(currentChain = DEFAULT_CHAIN) {
     }
   };
 
-  const getAccountDetails = async (address) => {
+  const getAccountDetails = async address => {
     const provider = ethers.getDefaultProvider('mainnet', {
-      alchemy: ALCHEMY_KEY
+      alchemy: ALCHEMY_KEY,
     });
     const check = ethers.utils.getAddress(address);
 

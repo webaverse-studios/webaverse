@@ -19,12 +19,12 @@ const DefaultSettings = {
         enabled:        'ON',
         depthOfField:   'ON',
         hdr:            'ON',
-        bloom:          'ON'
+        bloom:          'ON',
     },
     character: {
         details:        'HIGH',
-        hairPhysics:    'ON'
-    }
+        hairPhysics:    'ON',
+    },
 };
 
 export const TabGraphics = ({active}) => {
@@ -57,12 +57,12 @@ export const TabGraphics = ({active}) => {
                 enabled:        postprocessing,
                 depthOfField:   depthOfField,
                 hdr:            hdr,
-                bloom:          bloom
+                bloom:          bloom,
             },
             character: {
                 details:        characterDetails,
-                hairPhysics:    hairPhysics
-            }
+                hairPhysics:    hairPhysics,
+            },
         };
 
         settingsManager.saveSettings(settings);
@@ -90,7 +90,7 @@ export const TabGraphics = ({active}) => {
 
         // set avatar style
 
-        let avatarStyle = settingsManager.convertCharacterQualityToValue(characterDetails);
+        const avatarStyle = settingsManager.convertCharacterQualityToValue(characterDetails);
 
         function setAvatarQuality () {
 

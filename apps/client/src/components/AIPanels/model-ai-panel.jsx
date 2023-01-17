@@ -115,7 +115,7 @@ export function ModelAiPanel() {
                             preset={preset}
                             setSelectedPreset={_setPreset}
                             key={i}
-                        />
+                        />,
                     )}
                 </div>
                 <canvas width={size} height={size} className={styles.canvas} ref={canvasRef} />
