@@ -98,6 +98,15 @@
       "contributions": [
         "design"
       ]
+    },
+    {
+      "login": "abeersaqib",
+      "name": "Muhammad Abeer",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5277220?v=4",
+      "profile": "https://github.com/abeersaqib",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
