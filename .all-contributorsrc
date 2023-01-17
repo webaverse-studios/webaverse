@@ -379,6 +379,15 @@
       "contributions": [
         "design"
       ]
+    },
+    {
+      "login": "JFKraasch",
+      "name": "Jonas Kraasch",
+      "avatar_url": "https://avatars.githubusercontent.com/u/76698239?v=4",
+      "profile": "https://github.com/JFKraasch",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
