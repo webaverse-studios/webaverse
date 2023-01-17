@@ -1,6 +1,6 @@
 <img src="libs/docs/banner.jpeg" width=100% />
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-43-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-44-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <p align="center">
@@ -207,6 +207,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/listofbanned"><img src="https://avatars.githubusercontent.com/u/50330310?v=4?s=100" width="100px;" alt="Jimmy"/><br /><sub><b>Jimmy</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=listofbanned" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/kishdr"><img src="https://avatars.githubusercontent.com/u/17167456?v=4?s=100" width="100px;" alt="kishdr"/><br /><sub><b>kishdr</b></sub></a><br /><a href="#design-kishdr" title="Design">🎨</a></td>
     </tr>
   </tbody>
 </table>
