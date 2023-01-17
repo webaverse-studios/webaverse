@@ -1,6 +1,6 @@
 <img src="libs/docs/banner.jpeg" width=100% />
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-21-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-22-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <p align="center">
@@ -174,6 +174,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/0reo"><img src="https://avatars.githubusercontent.com/u/7738818?v=4?s=100" width="100px;" alt="Adam Clarke"/><br /><sub><b>Adam Clarke</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=0reo" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Arthur-Acha"><img src="https://avatars.githubusercontent.com/u/96268540?v=4?s=100" width="100px;" alt="2AM"/><br /><sub><b>2AM</b></sub></a><br /><a href="#audio-Arthur-Acha" title="Audio">🔊</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://cybermancers.ca"><img src="https://avatars.githubusercontent.com/u/889851?v=4?s=100" width="100px;" alt="Matthew Willox"/><br /><sub><b>Matthew Willox</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=mwmwmw" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/memelotsqui"><img src="https://avatars.githubusercontent.com/u/1117257?v=4?s=100" width="100px;" alt="memelotsqui"/><br /><sub><b>memelotsqui</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=memelotsqui" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
