@@ -170,6 +170,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "0reo",
+      "name": "Adam Clarke",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7738818?v=4",
+      "profile": "https://github.com/0reo",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
