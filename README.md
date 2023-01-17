@@ -1,6 +1,6 @@
 <img src="libs/docs/banner.jpeg" width=100% />
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-34-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-35-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <p align="center">
@@ -194,6 +194,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://emotionull.art/"><img src="https://avatars.githubusercontent.com/u/91581825?v=4?s=100" width="100px;" alt="Emotionull"/><br /><sub><b>Emotionull</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=helloama" title="Documentation">📖</a> <a href="#ideas-helloama" title="Ideas, Planning, & Feedback">🤔</a> <a href="#content-helloama" title="Content">🖋</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/aerydna"><img src="https://avatars.githubusercontent.com/u/7593650?v=4?s=100" width="100px;" alt="Andrea Ruzzenenti"/><br /><sub><b>Andrea Ruzzenenti</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=aerydna" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/soulofmischief"><img src="https://avatars.githubusercontent.com/u/30357883?v=4?s=100" width="100px;" alt="soulofmischief"/><br /><sub><b>soulofmischief</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=soulofmischief" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/belopot"><img src="https://avatars.githubusercontent.com/u/46432435?v=4?s=100" width="100px;" alt="belopot"/><br /><sub><b>belopot</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=belopot" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
