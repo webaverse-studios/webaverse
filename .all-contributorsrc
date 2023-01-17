@@ -388,6 +388,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "listofbanned",
+      "name": "Jimmy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/50330310?v=4",
+      "profile": "https://github.com/listofbanned",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
