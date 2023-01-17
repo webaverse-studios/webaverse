@@ -81,7 +81,6 @@ npm run dev
 
 Once the server has started up, you can press the "A" key to visit `https://local.webaverse.com`.
 
-
 ## Installation and Running on Windows
 
 #### WSL
@@ -89,6 +88,7 @@ Once the server has started up, you can press the "A" key to visit `https://loca
 You need to use Windows Subsystem for Linux to install and run Webaverse. [This video](https://www.youtube.com/watch?v=5RTSlby-l9w) shows you how you can set up WSL and Ubuntu.
 
 Requirements:
+
 - WSL2. If you have WSL1 installed you need to upgrade to WSL2.
 - Ubuntu 20+. Install Ubuntu 20+.
 
@@ -101,9 +101,11 @@ At a WSL command prompt, use `nvm` to install Node 18+.
 #### Dependencies
 
 Run the following command at the WSL command prompt to install dependencies:
+
 ```sh
 npm run install-libs
 ```
+
 <details>
 <summary>The following libraries get installed with this command (you can also install manually):</summary>
 
@@ -123,6 +125,7 @@ npm run install-libs
 #### Port Mapping
 
 To route all of the needed ports for 127.0.0.1 -> WSL to work locally, run the following command in a Powershell window:
+
 ```
 powershell.exe .\scripts\wsl-port-forwarding.ps1
 ```
@@ -151,44 +154,46 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://webaverse.com/"><img src="https://avatars.githubusercontent.com/u/6926057?v=4?s=100" width="100px;" alt="Avaer Kazmer"/><br /><sub><b>Avaer Kazmer</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=avaer" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://xrdevlog.com/"><img src="https://avatars.githubusercontent.com/u/32600939?v=4?s=100" width="100px;" alt="jin"/><br /><sub><b>jin</b></sub></a><br /><a href="#content-madjin" title="Content">🖋</a> <a href="https://github.com/webaverse-studios/webaverse/commits?author=madjin" title="Code">💻</a> <a href="https://github.com/webaverse-studios/webaverse/commits?author=madjin" title="Documentation">📖</a> <a href="#ideas-madjin" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ahadshams"><img src="https://avatars.githubusercontent.com/u/44798013?v=4?s=100" width="100px;" alt="ahadshams"/><br /><sub><b>ahadshams</b></sub></a><br /><a href="#business-ahadshams" title="Business development">💼</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://thenexus.city"><img src="https://avatars.githubusercontent.com/u/18633264?v=4?s=100" width="100px;" alt="M̵̞̗̝̼̅̏̎͝Ȯ̴̝̻̊̃̋̀Õ̷̼͋N̸̩̿͜ ̶̜̠̹̼̩͒"/><br /><sub><b>M̵̞̗̝̼̅̏̎͝Ȯ̴̝̻̊̃̋̀Õ̷̼͋N̸̩̿͜ ̶̜̠̹̼̩͒</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=lalalune" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://gonnavis.com"><img src="https://avatars.githubusercontent.com/u/10785634?v=4?s=100" width="100px;" alt="Vis"/><br /><sub><b>Vis</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=gonnavis" title="Code">💻</a></td>
-            <td align="center" valign="top" width="14.28%"><a href="https://github.com/GuiltyRegicide"><img src="https://avatars.githubusercontent.com/u/58578426?v=4?s=100" width="100px;" alt="GuiltyRegicide"/><br /><sub><b>GuiltyRegicide</b></sub></a><br /><a href="#design-GuiltyRegicide" title="Design">🎨</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/abeersaqib"><img src="https://avatars.githubusercontent.com/u/5277220?v=4?s=100" width="100px;" alt="Muhammad Abeer"/><br /><sub><b>Muhammad Abeer</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=abeersaqib" title="Code">💻</a></td>
-            <td align="center" valign="top" width="14.28%"><a href="https://github.com/Loryhoof"><img src="https://avatars.githubusercontent.com/u/29487929?v=4?s=100" width="100px;" alt="Loryhoof"/><br /><sub><b>Loryhoof</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=Loryhoof" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/GuiltyRegicide"><img src="https://avatars.githubusercontent.com/u/58578426?v=4?s=100" width="100px;" alt="GuiltyRegicide"/><br /><sub><b>GuiltyRegicide</b></sub></a><br /><a href="#design-GuiltyRegicide" title="Design">🎨</a></td>
+      </tr>
+      <tr> 
+        <td align="center" valign="top" width="14.28%"><a href="https://github.com/Loryhoof"><img src="https://avatars.githubusercontent.com/u/29487929?v=4?s=100" width="100px;" alt="Loryhoof"/><br /><sub><b>Loryhoof</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=Loryhoof" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/plankatron"><img src="https://avatars.githubusercontent.com/u/5592454?v=4?s=100" width="100px;" alt="plankatron"/><br /><sub><b>plankatron</b></sub></a><br /><a href="#design-plankatron" title="Design">🎨</a></td>
-            <td align="center" valign="top" width="14.28%"><a href="http://www.sjain.dev"><img src="https://avatars.githubusercontent.com/u/8850830?v=4?s=100" width="100px;" alt="Shubham Jain"/><br /><sub><b>Shubham Jain</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=shu8" title="Code">💻</a></td>
+            <td align="center" valign="top" width="14.28%"><a href="https://github.com/mavisakalyan"><img src="https://avatars.githubusercontent.com/u/55106546?v=4?s=100" width="100px;" alt="ꈤꍟꎭꍟꌗꀤꌗ"/><br /><sub><b>ꈤꍟꎭꍟꌗꀤꌗ</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=mavisakalyan" title="Code">💻</a></td>
+                  <td align="center" valign="top" width="14.28%"><a href="https://github.com/alextitonis"><img src="https://avatars.githubusercontent.com/u/45359358?v=4?s=100" width="100px;" alt="alextitonis"/><br /><sub><b>alextitonis</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=alextitonis" title="Code">💻</a></td>
+          <td align="center" valign="top" width="14.28%"><a href="https://github.com/torchesburn"><img src="https://avatars.githubusercontent.com/u/51108458?v=4?s=100" width="100px;" alt="torchesburn"/><br /><sub><b>torchesburn</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=torchesburn" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/jakezira"><img src="https://avatars.githubusercontent.com/u/14852075?v=4?s=100" width="100px;" alt="Jack Z."/><br /><sub><b>Jack Z.</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=jakezira" title="Code">💻</a></td>
     </tr>
     <tr>
          <td align="center" valign="top" width="14.28%"><a href="https://github.com/empec-webastudios"><img src="https://avatars.githubusercontent.com/u/113935397?v=4?s=100" width="100px;" alt="empec-webastudios"/><br /><sub><b>empec-webastudios</b></sub></a><br /><a href="#infra-empec-webastudios" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+               <td align="center" valign="top" width="14.28%"><a href="https://github.com/alisaad673"><img src="https://avatars.githubusercontent.com/u/35926530?v=4?s=100" width="100px;" alt="Ali Saad"/><br /><sub><b>Ali Saad</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=alisaad673" title="Code">💻</a></td>
           <td align="center" valign="top" width="14.28%"><a href="https://github.com/tcm390"><img src="https://avatars.githubusercontent.com/u/60634884?v=4?s=100" width="100px;" alt="tcm390"/><br /><sub><b>tcm390</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=tcm390" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://demo.iconix.io"><img src="https://avatars.githubusercontent.com/u/1478866?v=4?s=100" width="100px;" alt="TheoTheDev"/><br /><sub><b>TheoTheDev</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=TheoTheDev" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/arya-prod"><img src="https://avatars.githubusercontent.com/u/64514807?v=4?s=100" width="100px;" alt="arya"/><br /><sub><b>arya</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=arya-prod" title="Code">💻</a></td>
                   <td align="center" valign="top" width="14.28%"><a href="https://github.com/codingbycl"><img src="https://avatars.githubusercontent.com/u/29695350?v=4?s=100" width="100px;" alt="codingbycl"/><br /><sub><b>codingbycl</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=codingbycl" title="Code">💻</a></td>
+                        <td align="center" valign="top" width="14.28%"><a href="https://github.com/patriboz"><img src="https://avatars.githubusercontent.com/u/49231818?v=4?s=100" width="100px;" alt="Patrick Bozic"/><br /><sub><b>Patrick Bozic</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=patriboz" title="Code">💻</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/torchesburn"><img src="https://avatars.githubusercontent.com/u/51108458?v=4?s=100" width="100px;" alt="torchesburn"/><br /><sub><b>torchesburn</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=torchesburn" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://a.goblin.life"><img src="https://avatars.githubusercontent.com/u/462380?v=4?s=100" width="100px;" alt="a Goblin King"/><br /><sub><b>a Goblin King</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=AGoblinKing" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/jakezira"><img src="https://avatars.githubusercontent.com/u/14852075?v=4?s=100" width="100px;" alt="Jack Z."/><br /><sub><b>Jack Z.</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=jakezira" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/alisaad673"><img src="https://avatars.githubusercontent.com/u/35926530?v=4?s=100" width="100px;" alt="Ali Saad"/><br /><sub><b>Ali Saad</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=alisaad673" title="Code">💻</a></td>
+          <td align="center" valign="top" width="14.28%"><a href="https://github.com/memelotsqui"><img src="https://avatars.githubusercontent.com/u/1117257?v=4?s=100" width="100px;" alt="memelotsqui"/><br /><sub><b>memelotsqui</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=memelotsqui" title="Code">💻</a></td>
+          <td align="center" valign="top" width="14.28%"><a href="http://demo.iconix.io"><img src="https://avatars.githubusercontent.com/u/1478866?v=4?s=100" width="100px;" alt="TheoTheDev"/><br /><sub><b>TheoTheDev</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=TheoTheDev" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/0reo"><img src="https://avatars.githubusercontent.com/u/7738818?v=4?s=100" width="100px;" alt="Adam Clarke"/><br /><sub><b>Adam Clarke</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=0reo" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Arthur-Acha"><img src="https://avatars.githubusercontent.com/u/96268540?v=4?s=100" width="100px;" alt="2AM"/><br /><sub><b>2AM</b></sub></a><br /><a href="#audio-Arthur-Acha" title="Audio">🔊</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://cybermancers.ca"><img src="https://avatars.githubusercontent.com/u/889851?v=4?s=100" width="100px;" alt="Matthew Willox"/><br /><sub><b>Matthew Willox</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=mwmwmw" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://emotionull.art/"><img src="https://avatars.githubusercontent.com/u/91581825?v=4?s=100" width="100px;" alt="Emotionull"/><br /><sub><b>Emotionull</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=helloama" title="Documentation">📖</a> <a href="#ideas-helloama" title="Ideas, Planning, & Feedback">🤔</a> <a href="#content-helloama" title="Content">🖋</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/memelotsqui"><img src="https://avatars.githubusercontent.com/u/1117257?v=4?s=100" width="100px;" alt="memelotsqui"/><br /><sub><b>memelotsqui</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=memelotsqui" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ChristopherTrimboli"><img src="https://avatars.githubusercontent.com/u/27584221?v=4?s=100" width="100px;" alt="cjft"/><br /><sub><b>cjft</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=ChristopherTrimboli" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ultrabot2022"><img src="https://avatars.githubusercontent.com/u/80860637?v=4?s=100" width="100px;" alt="UltraBot"/><br /><sub><b>UltraBot</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=ultrabot2022" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/intelliverse777"><img src="https://avatars.githubusercontent.com/u/103969701?v=4?s=100" width="100px;" alt="intelliverse777"/><br /><sub><b>intelliverse777</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=intelliverse777" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/rondoor124"><img src="https://avatars.githubusercontent.com/u/92342281?v=4?s=100" width="100px;" alt="Ron"/><br /><sub><b>Ron</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=rondoor124" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/mavisakalyan"><img src="https://avatars.githubusercontent.com/u/55106546?v=4?s=100" width="100px;" alt="ꈤꍟꎭꍟꌗꀤꌗ"/><br /><sub><b>ꈤꍟꎭꍟꌗꀤꌗ</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=mavisakalyan" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/patriboz"><img src="https://avatars.githubusercontent.com/u/49231818?v=4?s=100" width="100px;" alt="Patrick Bozic"/><br /><sub><b>Patrick Bozic</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=patriboz" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/GaladWarder"><img src="https://avatars.githubusercontent.com/u/29031531?v=4?s=100" width="100px;" alt="Grant Roberts"/><br /><sub><b>Grant Roberts</b></sub></a><br /><a href="#design-GaladWarder" title="Design">🎨</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/abeersaqib"><img src="https://avatars.githubusercontent.com/u/5277220?v=4?s=100" width="100px;" alt="Muhammad Abeer"/><br /><sub><b>Muhammad Abeer</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=abeersaqib" title="Code">💻</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/GaladWarder"><img src="https://avatars.githubusercontent.com/u/29031531?v=4?s=100" width="100px;" alt="Grant Roberts"/><br /><sub><b>Grant Roberts</b></sub></a><br /><a href="#design-GaladWarder" title="Design">🎨</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/alextitonis"><img src="https://avatars.githubusercontent.com/u/45359358?v=4?s=100" width="100px;" alt="alextitonis"/><br /><sub><b>alextitonis</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=alextitonis" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ahadshams"><img src="https://avatars.githubusercontent.com/u/44798013?v=4?s=100" width="100px;" alt="ahadshams"/><br /><sub><b>ahadshams</b></sub></a><br /><a href="#business-ahadshams" title="Business development">💼</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://emotionull.art/"><img src="https://avatars.githubusercontent.com/u/91581825?v=4?s=100" width="100px;" alt="Emotionull"/><br /><sub><b>Emotionull</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=helloama" title="Documentation">📖</a> <a href="#ideas-helloama" title="Ideas, Planning, & Feedback">🤔</a> <a href="#content-helloama" title="Content">🖋</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://www.sjain.dev"><img src="https://avatars.githubusercontent.com/u/8850830?v=4?s=100" width="100px;" alt="Shubham Jain"/><br /><sub><b>Shubham Jain</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=shu8" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://a.goblin.life"><img src="https://avatars.githubusercontent.com/u/462380?v=4?s=100" width="100px;" alt="a Goblin King"/><br /><sub><b>a Goblin King</b></sub></a><br /><a href="https://github.com/webaverse-studios/webaverse/commits?author=AGoblinKing" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
