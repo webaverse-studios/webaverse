@@ -125,6 +125,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "plankatron",
+      "name": "plankatron",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5592454?v=4",
+      "profile": "https://github.com/plankatron",
+      "contributions": [
+        "design"
+      ]
     }
   ],
   "contributorsPerLine": 7,
