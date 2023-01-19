@@ -2,7 +2,7 @@
 physx lite worker wasm integration.
 */
 
-import Module from './public/bin/app-wasm-worker.js';
+import Module from './bin/app-wasm-worker.js';
 import {Allocator, ScratchStack} from './geometry-util.js';
 import {heightfieldScale} from './constants.js';
 
@@ -18,6 +18,7 @@ physxLite.waitForLoad = () => {
       Module._initialize();
 
       const scratchStackSize = 1024 * 1024;
+      console.log('Module', Module)
       scratchStack = new ScratchStack(Module, scratchStackSize);
       // physxLite.base = physxLite.makePhysicsBase();
 

@@ -5,6 +5,7 @@
   "author": "Webaverse",
   "license": "MIT",
   "scripts": {
-    "build": "bash src/compile.sh"
+    "build": "bash ./compile.sh",
+    "move-build": "cp -r ./bin/* ../client/public/bin"
   }
 }

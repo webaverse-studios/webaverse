@@ -3,7 +3,7 @@ physx wasm integration.
 */
 
 import * as THREE from 'three';
-import Module from './public/bin/geometry.js';
+import Module from './bin/geometry.js';
 import {Allocator, ScratchStack} from './geometry-util.js';
 import {heightfieldScale} from './constants.js';
 
@@ -32,6 +32,7 @@ physx.waitForLoad =  () => {
       Module._initialize();
 
       const scratchStackSize = 8 * 1024 * 1024;
+      console.log('Module', Module)
       scratchStack = new ScratchStack(Module, scratchStackSize);
 
       physx.loaded = true;
@@ -2470,6 +2471,85 @@ const physxWorker = (() => {
       type,
     )
     return interpolantValue;
+  }
+  w.getValuesAnimationAvatar = (animationAvatarPtr) => { // test
+    Module._getValuesAnimationAvatar(animationAvatarPtr, scratchStack.ptr);
+    let index = 0;
+    const activateTime = scratchStack.f32[index++];
+    const landTime = scratchStack.f32[index++];
+    const fallLoopFactor = scratchStack.f32[index++];
+    const fallLoopTime = scratchStack.f32[index++];
+    const skydiveTime = scratchStack.f32[index++];
+    const gliderTime = scratchStack.f32[index++];
+    const flyTime = scratchStack.f32[index++];
+    const doubleJumpTime = scratchStack.f32[index++];
+    const jumpTime = scratchStack.f32[index++];
+    const narutoRunTime = scratchStack.f32[index++];
+    const danceFactor = scratchStack.f32[index++];
+    const emoteFactor = scratchStack.f32[index++];
+    const lastEmoteTime = scratchStack.f32[index++];
+    const idleWalkFactor = scratchStack.f32[index++];
+    const useTime = scratchStack.f32[index++];
+    const useAnimationEnvelopeLength = scratchStack.f32[index++];
+    const hurtTime = scratchStack.f32[index++];
+    const readyGrabTime = scratchStack.f32[index++];
+    const unuseTime = scratchStack.f32[index++];
+    const aimTime = scratchStack.f32[index++];
+    const aimMaxTime = scratchStack.f32[index++];
+    const walkRunFactor = scratchStack.f32[index++];
+    const crouchFactor = scratchStack.f32[index++];
+    const pickUpTime = scratchStack.f32[index++];
+    const forwardFactor = scratchStack.f32[index++];
+    const backwardFactor = scratchStack.f32[index++];
+    const leftFactor = scratchStack.f32[index++];
+    const rightFactor = scratchStack.f32[index++];
+    const mirrorLeftFactorReverse = scratchStack.f32[index++];
+    const mirrorLeftFactor = scratchStack.f32[index++];
+    const mirrorRightFactorReverse = scratchStack.f32[index++];
+    const mirrorRightFactor = scratchStack.f32[index++];
+    const landTimeS = scratchStack.f32[index++];
+    const timeSinceLastMoveS = scratchStack.f32[index++];
+    const swimTime = scratchStack.f32[index++];
+    const movementsTime = scratchStack.f32[index++];
+    const sprintFactor = scratchStack.f32[index++];
+    const movementsTransitionFactor = scratchStack.f32[index++];
+    const jumpState = scratchStack.f32[index++];
+    const doubleJumpState = scratchStack.f32[index++];
+    const landState = scratchStack.f32[index++];
+    const flyState = scratchStack.f32[index++];
+    const crouchState = scratchStack.f32[index++];
+    const narutoRunState = scratchStack.f32[index++];
+    const sitState = scratchStack.f32[index++];
+    const holdState = scratchStack.f32[index++];
+    const pickUpState = scratchStack.f32[index++];
+    const swimState = scratchStack.f32[index++];
+    const activateState = scratchStack.f32[index++];
+    const useState = scratchStack.f32[index++];
+    const aimState = scratchStack.f32[index++];
+    const fallLoopState = scratchStack.f32[index++];
+    const skydiveState = scratchStack.f32[index++];
+    const gliderState = scratchStack.f32[index++];
+    const danceState = scratchStack.f32[index++];
+    const emoteState = scratchStack.f32[index++];
+    const hurtState = scratchStack.f32[index++];
+    const readyGrabState = scratchStack.f32[index++];
+    const rightHandState = scratchStack.f32[index++];
+    const leftHandState = scratchStack.f32[index++];
+    const sprintState = scratchStack.f32[index++];
+    const movementsState = scratchStack.f32[index++];
+    const landWithMoving = scratchStack.f32[index++];
+    const fallLoopFromJump = scratchStack.f32[index++];
+    const activateAnimationIndex = scratchStack.f32[index++];
+    const sitAnimationIndex = scratchStack.f32[index++];
+    const danceAnimationIndex = scratchStack.f32[index++];
+    const emoteAnimationIndex = scratchStack.f32[index++];
+    const useAnimationIndex = scratchStack.f32[index++];
+    const useAnimationComboIndex = scratchStack.f32[index++];
+    const hurtAnimationIndex = scratchStack.f32[index++];
+    const unuseAnimationIndex = scratchStack.f32[index++];
+    const aimAnimationIndex = scratchStack.f32[index++];
+    // ---
+    // console.log('emoteFactor', emoteFactor)
   }
   w.createAnimationMixer = () => {
     const ptr = Module._createAnimationMixer(

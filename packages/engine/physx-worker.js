@@ -39,7 +39,7 @@ const _handleMethod = ({
       };
     }
     case 'cookHeightfieldGeometry': {
-      const {numRows, numColumns, heights} = args;
+      const {numRows, positions, indices, numColumns, heights} = args;
       const geometry = new THREE.BufferGeometry();
       geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
       geometry.setIndex(new THREE.BufferAttribute(indices, 1));
