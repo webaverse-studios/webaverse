@@ -58,7 +58,7 @@
     "smile2emoji": "^1.1.6",
     "stats.js": "^0.17.0",
     "stream": "^0.0.2",
-    "three": "webaverse-studios/three#r143",
+    "three": "webaverse/three#r143",
     "troika-three-text": "^0.43.1-alpha.0",
     "tslib": "^2.3.0",
     "typescript": "^4.9.4",
