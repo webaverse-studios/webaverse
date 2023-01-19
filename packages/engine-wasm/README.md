@@ -6,7 +6,7 @@ It is compiled with EMSDK.
 
 ## Setup Requirements
 
-### Get [Webaverse PhysX Build](https://github.com/webaverse/app-wasm) (APP-WASM)
+### Get [Webaverse PhysX Build](https://github.com/webaverse/engine-wasm) (ENGINE-WASM)
 - Fork and clone it to your prefered directory.
 
 
@@ -18,17 +18,17 @@ It is compiled with EMSDK.
 
 ## Compilation
 
-- Within **app-wasm/src** point to the **emsdk** directory using this command:
+- Within **engine-wasm/src** point to the **emsdk** directory using this command:
 `source /home/user/emsdk/emsdk_env.sh` change it to your own path.
 
-- Now inside **app-wasm** run this to compile:
+- Now inside **engine-wasm** run this to compile:
 `./compile.sh`
 
-- Congrats! If it compiled without errors the finished build should be in `app-wasm/bin`
+- Congrats! If it compiled without errors the finished build should be in `engine-wasm/bin`
 
 ## Use it in Webaverse
 
-- Copy the `geometry.js` and `geometry.wasm` files from `app-wasm/bin`
+- Copy the `geometry.js` and `geometry.wasm` files from `engine-wasm/bin`
 - Paste them into `app/public/bin` in the Webaverse app
 - Done! Now reload the Webaverse app and try out your own PhysX configuration!
 
