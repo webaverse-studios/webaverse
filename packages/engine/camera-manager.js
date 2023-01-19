@@ -503,8 +503,7 @@ class CameraManager extends EventTarget {
     if (!isWorker) {
       document.addEventListener('pointerlockchange', e => {
         let pointerLockElement = document.pointerLockElement;
-        const renderer = getRenderer();
-        if (pointerLockElement !== null && pointerLockElement !== renderer.domElement) {
+        if (pointerLockElement !== null) {
           pointerLockElement = null;
         }
 
@@ -532,8 +531,6 @@ class CameraManager extends EventTarget {
     ]) {
       try {
         await new Promise((accept, reject) => {
-          const renderer = getRenderer();
-          if (document.pointerLockElement !== renderer.domElement) {
             if (document.activeElement) {
               document.activeElement.blur();
             }
@@ -565,11 +562,6 @@ class CameraManager extends EventTarget {
               document.removeEventListener('pointerlockchange', _pointerlockchange);
               document.removeEventListener('pointerlockerror', _pointerlockerror);
             };
-            renderer.domElement.requestPointerLock(options)
-              .catch(_pointerlockerror);
-          } else {
-            accept();
-          }
         });
         break;
       } catch (err) {

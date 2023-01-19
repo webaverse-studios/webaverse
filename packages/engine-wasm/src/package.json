@@ -1,0 +1,19 @@
+{
+  "name": "vxl",
+  "version": "0.0.61",
+  "description": "Native voxel library",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/modulesio/vxl.git"
+  },
+  "author": "Avaer Kazmer <a@modules.io>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/modulesio/vxl/issues"
+  },
+  "homepage": "https://github.com/modulesio/vxl#readme"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "engine-wasm",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/engine-wasm/src",
+  "projectType": "library",
+  "targets": {},
+  "tags": []
+}
