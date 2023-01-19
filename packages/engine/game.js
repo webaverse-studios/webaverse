@@ -117,8 +117,6 @@ class GameManager extends EventTarget {
     await npcManager.initDefaultPlayer();
     loadoutManager.initDefault();
     await universe.handleUrlUpdate();
-    console.log('inviting default player')
-    partyManager.inviteDefaultPlayer();
     console.log('initing')
     this.#localInit();
   }
