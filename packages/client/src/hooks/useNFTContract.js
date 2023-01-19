@@ -2,7 +2,7 @@ import {useEffect, useState, useContext} from 'react';
 import {ethers, BigNumber} from 'ethers';
 
 import {
-  CONTRACTS, OTCollectionAddress
+  CONTRACTS, OTCollectionAddress,
 } from './web3-constants.js';
 import {FTABI, NFTABI, WebaverseABI} from '../abis/Contract.jsx';
 import {ChainContext} from './chainProvider.jsx';
@@ -319,7 +319,7 @@ export default function useNFTContract(currentAccount) {
     const OTtoken = await fetch(`https://serverless-backend-blue.vercel.app/api/getOpenSeaNFTCollection?walletAddress=${walletAddress}&collectionAddress=${OTCollectionAddress}&network=${network}`,
     {
             method: 'get',
-            redirect: 'follow'
+            redirect: 'follow',
     }).then(response => response.json())
     return OTtoken;
   }
@@ -338,6 +338,6 @@ export default function useNFTContract(currentAccount) {
     error,
     setError,
     WebaversecontractAddress,
-    getOTtokens
+    getOTtokens,
   };
 }

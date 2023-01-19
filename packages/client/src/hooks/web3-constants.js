@@ -31,7 +31,7 @@ export const CONTRACTS = {
     Webaverse: "0x59447075653354D7d064a1788E331473c18daC12",
     FT: "0x216C491a619722Ed0b70B8689712f7D4421Daca3",
     NFT: "0x93F7e79C737dcdEd153389AC28d12B0f3d9d04bF",
-  }
+  },
 };
 
 export const CHAIN_TYPE = {

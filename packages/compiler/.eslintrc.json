@@ -1,6 +1,20 @@
 {
-  
-  // ignore .next and all subdirectories
-  "ignorePatterns": [".next", ".next/*", "!**/*", "public/*", "public/**/*", "*pg.js", "**/*pg.worker.js", "**/*pg.module.js"],
-  "extends": "next/core-web-vitals"
+  "extends": ["../../.eslintrc.json"],
+  "ignorePatterns": ["!**/*", ".next", "*.d.ts", "public/**/*", "node_modules/**/*", "node_modules"],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "rules": {
+        "node/no-deprecated-api": "off"
+      }
+    },
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {}
+    },
+    {
+      "files": ["*.js", "*.jsx"],
+      "rules": {}
+    }
+  ]
 }

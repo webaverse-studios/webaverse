@@ -3,14 +3,6 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/offscreen-engine/src",
   "projectType": "library",
-  "targets": {
-    "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["packages/offscreen-engine/**/*.js"]
-      }
-    }
-  },
+  "targets": {},
   "tags": []
 }

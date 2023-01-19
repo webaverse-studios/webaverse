@@ -392,7 +392,7 @@ export const Inventory = () => {
                                 {
                                     name: "Spawn",
                                     tokens: spawnItem,
-                                }
+                                },
                             ]}
                             open={true}
                             hoverObject={hoverObject}

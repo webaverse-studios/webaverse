@@ -1,6 +1,4 @@
 {
-  "rules": {
-    "no-debugger": "off",
-    "promise/param-names":  "off"
-  }
+  "extends": ["../../.eslintrc.json"],
+  "ignorePatterns": ["public/**/*", "node_modules/**/*", "node_modules"]
 }

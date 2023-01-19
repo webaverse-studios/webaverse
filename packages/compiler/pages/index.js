@@ -1,5 +1,4 @@
-// import Head from 'next/head'
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 /*
 http://localhost:3000/https://webaverse.github.io/procgen-assets/avatars/male-procgen.vrm
