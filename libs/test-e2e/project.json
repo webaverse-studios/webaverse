@@ -1,8 +1,0 @@
-{
-  "name": "test-e2e",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/test-e2e/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": []
-}

@@ -1,0 +1,56 @@
+{
+  "name": "@webaverse-studios/compiler",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/compiler",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "exclude": ["./public"],
+      "executor": "@nrwl/next:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "root": "packages/compiler",
+        "outputPath": "dist/packages/compiler"
+      },
+      "configurations": {
+        "development": {
+          "outputPath": "packages/compiler"
+        },
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/next:server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "compiler:build",
+        "dev": true
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "compiler:build:development",
+          "dev": true
+        },
+        "production": {
+          "buildTarget": "compiler:build:production",
+          "dev": false
+        }
+      }
+    },
+    "export": {
+      "executor": "@nrwl/next:export",
+      "options": {
+        "buildTarget": "compiler:build:production"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/compiler/**/*.{ts,tsx,js,jsx}"]
+      }
+    }
+  },
+  "tags": []
+}

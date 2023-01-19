@@ -15,15 +15,15 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@webaverse-studios/client": ["apps/client"],
-      "@webaverse-studios/compiler": ["apps/compiler"],
-      "@webaverse-studios/engine": ["libs/engine/index.js"],
-      "metaversefile": ["libs/metaversefile"],
-      "multiplayer": ["apps/multiplayer"],
-      "offscreen-engine": ["libs/offscreen-engine"],
-      "webaverse-previewer": ["apps/previewer"],
-      "wsrtc": ["libs/wsrtc"],
-      "zjs": ["libs/zjs"]
+      "@webaverse-studios/client": ["packages/client"],
+      "@webaverse-studios/compiler": ["packages/compiler"],
+      "@webaverse-studios/engine": ["packages/engine/index.js"],
+      "metaversefile": ["packages/metaversefile"],
+      "multiplayer": ["packages/multiplayer"],
+      "offscreen-engine": ["packages/offscreen-engine"],
+      "webaverse-previewer": ["packages/previewer"],
+      "wsrtc": ["packages/wsrtc"],
+      "zjs": ["packages/zjs"]
     }
   },
   "exclude": ["node_modules", "tmp"]

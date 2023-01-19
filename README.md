@@ -1,4 +1,4 @@
-<img src="libs/docs/banner.jpeg" width=100% />
+<img src="packages/docs/banner.jpeg" width=100% />
 <p align="center">
     <a href="https://github.com/webaverse-studios/webaverse/graphs/contributors" alt="Contributors">
         <img src="https://img.shields.io/github/contributors/webaverse-studios/webaverse" /></a>
@@ -29,17 +29,17 @@ Everything you need to get started with building in the Webaverse is contained i
 - 🖥️ Completely self-hostable
 
 <p align="center">
-<img src="libs/docs/combat.gif" width=30% padding="0" margin="0" align="center" />
-<img src="libs/docs/asteroids.gif" width=30% align="center" />
-<img src="libs/docs/rug_radio.gif" width=30% align="center" />
+<img src="packages/docs/combat.gif" width=30% padding="0" margin="0" align="center" />
+<img src="packages/docs/asteroids.gif" width=30% align="center" />
+<img src="packages/docs/rug_radio.gif" width=30% align="center" />
 </p>
 <p align="center">
-<img src="libs/docs/rotation.gif" width=91% align="center" />
+<img src="packages/docs/rotation.gif" width=91% align="center" />
 </p>
 <p align="center">
-<img src="libs/docs/Uncanny_alley.gif" width=30% align="center" />
-<img src="libs/docs/monster_truck.gif" width=30% align="center" />
-<img src="libs/docs/plane.gif" width=30% align="center" />
+<img src="packages/docs/Uncanny_alley.gif" width=30% align="center" />
+<img src="packages/docs/monster_truck.gif" width=30% align="center" />
+<img src="packages/docs/plane.gif" width=30% align="center" />
 </p>
 
 <h1 align="center">Documentation</h1>
@@ -225,4 +225,4 @@ Please search Github issues before reporting a new issue or starting a new featu
 
 Please make sure your PRs change as little existing code as is necessary to prevent upstream merge conflicts. When posting a pull request, please document what the PR does and how it can be reviewed and QA'd. PRs will be reviewed and accepted if they conform to our linting and code conventions, don't cause any bugs and don't decrease performance of the app.
 
-<img align="middle" style='margin: 1em' src="libs/docs/town.jpeg" width=100% />
+<img align="middle" style='margin: 1em' src="packages/docs/town.jpeg" width=100% />

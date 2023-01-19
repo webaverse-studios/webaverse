@@ -1,8 +1,0 @@
-{
-  "name": "engine",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/engine/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": []
-}

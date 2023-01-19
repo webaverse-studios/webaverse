@@ -2,15 +2,15 @@
   "$schema": "./node_modules/nx/schemas/workspace-schema.json",
   "version": 2,
   "projects": {
-    "@webaverse-studios/client": "apps/client",
-    "@webaverse-studios/compiler": "apps/compiler",
-    "engine": "libs/engine",
-    "metaversefile": "libs/metaversefile",
-    "multiplayer": "apps/multiplayer",
-    "offscreen-engine": "libs/offscreen-engine",
-    "test-e2e": "libs/test-e2e",
-    "webaverse-previewer": "apps/previewer",
-    "wsrtc": "libs/wsrtc",
-    "zjs": "libs/zjs"
+    "@webaverse-studios/client": "packages/client",
+    "@webaverse-studios/compiler": "packages/compiler",
+    "engine": "packages/engine",
+    "metaversefile": "packages/metaversefile",
+    "multiplayer": "packages/multiplayer",
+    "offscreen-engine": "packages/offscreen-engine",
+    "test-e2e": "packages/test-e2e",
+    "webaverse-previewer": "packages/previewer",
+    "wsrtc": "packages/wsrtc",
+    "zjs": "packages/zjs"
   }
 }
