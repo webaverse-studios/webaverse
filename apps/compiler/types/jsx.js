@@ -19,7 +19,7 @@ const jsx = {
   async load(id) {
     let src;
     if (/https?:/i.test(id)) {
-      const o = new URL(id, true);
+      const o = url.parse(id, true);
       o.query.noimport = 1 + '';
       id = url.format(o);
 

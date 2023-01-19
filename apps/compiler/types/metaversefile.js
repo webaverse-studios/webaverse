@@ -1,3 +1,4 @@
+import { url } from 'inspector';
 import path from 'path';
 import {format, URL} from 'url';
 import {fetchFileFromId, createRelativeFromAbsolutePath} from '../util.js';
@@ -24,18 +25,18 @@ const metaversefile = {
         if (start_url) {
           const _mapUrl = () => {
             if (/^https?:\/\//.test(start_url)) {
-              const o = new URL(start_url, true);
+              const o = url.parse(start_url, true);
               const s = format(o);
               return s;
             } else if (/^https?:\/\//.test(id)) {
-              const o = new URL(id, true);
+              const o = url.parse(id, true);
               o.pathname = path.join(path.dirname(o.pathname), start_url);
               const s = format(o);
               return s;
             } else if (/^\//.test(id)) {
               id = createRelativeFromAbsolutePath(id);
               
-              const o = new URL(id, true);
+              const o = url.parse(id, true);
               o.pathname = path.join(path.dirname(o.pathname), start_url);
               const s = format(o);
               return s;

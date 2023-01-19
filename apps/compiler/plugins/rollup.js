@@ -1,5 +1,5 @@
 import path from 'path';
-import {URL} from 'url';
+import url, {URL} from 'url';
 import mimeTypes from 'mime-types';
 import {createHash} from 'crypto';
 import postcss from 'postcss';
@@ -84,7 +84,7 @@ const loaders = {
 const dataUrlRegex = /^data:([^;,]+)(?:;(charset=utf-8|base64))?,([\s\S]*?)\.data$/;
 const dataUrlRegexNoSuffix = /^data:([^;,]+)(?:;(charset=utf-8|base64))?,([\s\S]*?)$/;
 const _getType = id => {
-  const o = new URL(id, true);
+  const o = url.parse(id, true);
   // console.log('get type', o, o.href.match(dataUrlRegex));
   let match;
   if (o.href && (match = o.href.match(dataUrlRegexNoSuffix))) {
@@ -327,7 +327,7 @@ export default function metaversefilePlugin() {
       if (/^ipfs:\/\//.test(source)) {
         source = source.replace(/^ipfs:\/\/(?:ipfs\/)?/, 'https://cloudflare-ipfs.com/ipfs/');
         
-        const o = new URL(source, true);
+        const o = new url.parse(source, true);
         if (!o.query.type) {
           const res = await fetch(source, {
             method: 'HEAD',

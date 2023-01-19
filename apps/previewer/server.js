@@ -1,5 +1,4 @@
 import http from 'http';
-// import https from 'https';
 import path from 'path';
 import fs from 'fs';
 import url from 'url';
@@ -27,7 +26,7 @@ function makeid(length) {
   var result           = '';
   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   var charactersLength = characters.length;
-  for ( var i = 0; i < length; i++ ) {
+  for (var i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
  }
  return result;
@@ -91,13 +90,13 @@ const _startPostbackServer = () => (async () => {
           res.end();
         } else {
           // console.log('postback server got', req.url);
-          const u = new URL(req.url, `${req.protocol}://${req.headers.host}`);
+          const u = url.parse(req.url, `${req.protocol}://${req.headers.host}`);
           const proxyStatusCode = req.headers['x-proxy-status-code'] || 200;
           const {searchParams} = u;
           const id = searchParams.get('id');
           // console.log('postback', {url: req.url, headers: req.headers, id});
           
-          const o = new URL(req.url, true);
+          const o = url.parse(req.url, true);
           if (o.pathname === '/args') {
             // console.log('postback handle args');
             let arg = args.get(id);
@@ -293,14 +292,14 @@ if (compilerUrl && start_url) {
     // console.log('got headers', req.method, req.url, req.headers);
     // console.log('render server got', req.url);
 
-    const o = new URL(req.url, true);
+    const o = url.parse(req.url, true);
     if (o.pathname === '/') {
       res.setHeader('Content-Type', 'text/html');
       const rs = fs.createReadStream(dirname + '/index.html');
       rs.pipe(res);
     } else if (o.pathname === '/api') {
       // parse the URL and query string, making sure the protocol is correct
-      const url = new URL(req.url, `${req.protocol}://${req.headers.host}`);
+      const url = url.parse(req.url, `${req.protocol}://${req.headers.host}`);
       const {searchParams} = url;
       const start_url = searchParams.get('start_url');
       // const mimeType = searchParams.get('mimeType');
