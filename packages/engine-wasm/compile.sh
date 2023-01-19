@@ -377,10 +377,10 @@ emcc -s NO_EXIT_RUNTIME=1 -s TOTAL_MEMORY=52428800 -D__linux__ -s ALLOW_MEMORY_G
   *.o \
   -DNDEBUG -DPX_SIMD_DISABLED -DPX_EMSCRIPTEN=1 -DPX_COOKING \
   -I. \
-  -o bin/app-wasm-worker.js
-sed -Ei 's/app-wasm-worker.wasm/bin\/app-wasm-worker.wasm/g' bin/app-wasm-worker.js
-sed -Ei 's/scriptDirectory\+path/"\/"+path/g' bin/app-wasm-worker.js
-echo 'let accept, reject;const p = new Promise((a, r) => {  accept = a;  reject = r;});Module.postRun = () => {  accept();};Module.waitForLoad = () => p;run();export default Module;' >> bin/app-wasm-worker.js
+  -o bin/engine-wasm-worker.js
+sed -Ei 's/engine-wasm-worker.wasm/bin\/engine-wasm-worker.wasm/g' bin/engine-wasm-worker.js
+sed -Ei 's/scriptDirectory\+path/"\/"+path/g' bin/engine-wasm-worker.js
+echo 'let accept, reject;const p = new Promise((a, r) => {  accept = a;  reject = r;});Module.postRun = () => {  accept();};Module.waitForLoad = () => p;run();export default Module;' >> bin/engine-wasm-worker.js
 echo 'done building worker'
 
 # Prevent compile window auto close after error, to see the error details. https://askubuntu.com/a/20353/1012283

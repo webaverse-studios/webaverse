@@ -2,7 +2,7 @@
 physx lite worker wasm integration.
 */
 
-import Module from './bin/app-wasm-worker.js';
+import Module from './bin/engine-wasm-worker.js';
 import {Allocator, ScratchStack} from './geometry-util.js';
 import {heightfieldScale} from './constants.js';
 
