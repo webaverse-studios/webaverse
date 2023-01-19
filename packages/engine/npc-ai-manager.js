@@ -1,5 +1,5 @@
 import npcManager from './npc-manager';
-import {idleFn, followFn} from '../../npc-behavior';
+import {idleFn, followFn} from './npc-behavior';
 import metaversefile from 'metaversefile';
 
 const npcStateMap = new WeakMap();
