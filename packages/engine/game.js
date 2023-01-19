@@ -117,8 +117,7 @@ class GameManager extends EventTarget {
     await npcManager.initDefaultPlayer();
     loadoutManager.initDefault();
     await universe.handleUrlUpdate();
-    partyManager.inviteDefaultPlayer();
-
+    console.log('initing')
     this.#localInit();
   }
 
@@ -798,8 +797,8 @@ class GameManager extends EventTarget {
       speed = crouchSpeed;
     } else if (gameManager.isFlying()) {
       speed = flySpeed;
-    } else if (gameManager.isGlidering()) {
-      speed = gliderSpeed;
+    // } else if (gameManager.isGlidering()) {
+    //   speed = gliderSpeed;
     } else {
       speed = walkSpeed;
     }
@@ -973,41 +972,6 @@ class GameManager extends EventTarget {
       }
     };
     _updateRealms();
-
-    const _updateGrab = () => {
-      const renderer = getRenderer();
-      const _isWear = o => localPlayer.findAction(action => action.type === 'wear' && action.instanceId === o.instanceId);
-
-      // XXX commented to prevent synchronous loading for this.grabUseMesh 
-      this.grabUseMesh.visible = false;
-      if (!grabManager.editMode) {
-        const avatarHeight = localPlayer.avatar ? localPlayer.avatar.height : 0;
-        localVector.copy(localPlayer.position)
-          .add(localVector2.set(0, avatarHeight * (1 - localPlayer.getCrouchFactor()) * 0.5, -0.3).applyQuaternion(localPlayer.quaternion));
-
-        const radius = 1;
-        const halfHeight = 0.1;
-        const physicsScene = physicsManager.getScene();
-        const collision = physicsScene.getCollisionObject(radius, halfHeight, localVector, localPlayer.quaternion);
-        if (collision) {
-          const physicsId = collision.objectId;
-          const object = metaversefileApi.getAppByPhysicsId(physicsId);
-          // console.log('got collision', physicsId, object);
-          const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(physicsId);
-          if (object && !_isWear(object) && physicsObject && !object.getComponent('invincible')) {
-            this.grabUseMesh.position.setFromMatrixPosition(physicsObject.physicsMesh.matrixWorld);
-            this.grabUseMesh.quaternion.copy(camera.quaternion);
-            this.grabUseMesh.updateMatrixWorld();
-            this.grabUseMesh.targetApp = object;
-            this.grabUseMesh.targetPhysicsId = physicsId;
-            this.grabUseMesh.setComponent('value', physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'activate', 1));
-
-            this.grabUseMesh.visible = true;
-          }
-        }
-      }
-    };
-    _updateGrab();
 
     const _handlePickUp = () => {
       const pickUpAction = localPlayer.getAction('pickUp');

@@ -18,7 +18,6 @@ import * as sounds from './sounds.js';
 import physx from './physx.js';
 import physicsManager from './physics-manager.js';
 import {world} from './world.js';
-import storyCameraManager from './story-camera-manager.js';
 import hpManager from './hp-manager.js';
 import postProcessing from './post-processing.js';
 import particleSystemManager from './particle-system.js';
@@ -79,6 +78,8 @@ export default class Webaverse extends EventTarget {
   constructor() {
     super();
 
+    console.log('constructing webaverse')
+
     this.loadingManager = new LoadingManager(this);
 
     const canvas = document.createElement('canvas');
@@ -113,9 +114,12 @@ export default class Webaverse extends EventTarget {
         // console.log('loadProgressPercentage', loadProgressPercentage);
       }
 
+      console.log('physx loading...')
       // physx needs to be loaded first, before everything else, otherwise we have a race condition
       await physx.waitForLoad();      
       _updateLoadProgress();
+
+      console.log('metaversefileApi loading...')
 
       const waitForLoadFunctions = [
         Avatar.waitForLoad(),
@@ -128,7 +132,9 @@ export default class Webaverse extends EventTarget {
         musicManager.waitForLoad(),
       ];
 
-      game.init();
+      console.log('game init...')
+
+      game.load();
 
       // update the loading progress
       _updateLoadProgress();
@@ -425,8 +431,7 @@ export default class Webaverse extends EventTarget {
           questManager.update(timestamp, timeDiffCapped);
           particleSystemManager.update(timestamp, timeDiffCapped);
 
-          storyCameraManager.updatePost(timestamp, timeDiffCapped) ||
-            cameraManager.updatePost(timestamp, timeDiffCapped);
+          cameraManager.updatePost(timestamp, timeDiffCapped);
           ioManager.updatePost();
 
           game.pushAppUpdates();

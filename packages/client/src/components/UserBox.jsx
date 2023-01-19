@@ -7,6 +7,7 @@ import CustomButton from "./CustomButton";
 import cameraManager from "@webaverse-studios/engine/camera-manager.js";
 
 export const UserBox = ({setLoginFrom}) => {
+  console.log('AppContext', AppContext)
   const {state, setState, account, chain} = useContext(AppContext);
   const [address, setAddress] = useState("");
   const [ensName, setEnsName] = useState("");

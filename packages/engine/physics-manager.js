@@ -138,9 +138,7 @@ class PhysicsScene extends EventTarget {
       quaternion,
       localVector.set(1, 1, 1)
     )
-    const geometry = new THREE.PlaneGeometry(1, 1)
-      .rotateY(-Math.PI / 2); // because physx plane normal is in the +x direction
-    const physicsMesh = new THREE.Mesh(geometry, redMaterial)
+    const physicsMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), redMaterial)
     physicsMesh.visible = false
     physicsObject.add(physicsMesh)
     physicsObject.updateMatrixWorld()

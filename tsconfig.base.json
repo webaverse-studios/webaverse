@@ -15,6 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@@webaverse-studios/webaverse/engine-wasm": [
+        "packages/engine-wasm/src/index.ts"
+      ],
       "@webaverse-studios/client": ["packages/client"],
       "@webaverse-studios/compiler": ["packages/compiler"],
       "@webaverse-studios/engine": ["packages/engine/index.js"],

@@ -8,7 +8,7 @@ export class Allocator {
 
   alloc(constructor, size) {
     if (size > 0) {
-      const offset = this.moduleInstance._malloc(
+      const offset = this.moduleInstance._doMalloc(
         size * constructor.BYTES_PER_ELEMENT
       )
       const b = new constructor(
@@ -36,7 +36,8 @@ export class Allocator {
 
 export class ScratchStack {
   constructor(moduleInstance, size) {
-    this.ptr = moduleInstance._malloc(size)
+    console.log('moduleInstance', moduleInstance)
+    this.ptr = moduleInstance._doMalloc(size)
 
     this.u8 = new Uint8Array(
       moduleInstance.HEAP8.buffer,

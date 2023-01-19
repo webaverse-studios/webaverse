@@ -13,12 +13,13 @@
   <div id="iframe-container"></div>
 
   <div id="root"></div>
+  import('/src/main-split.jsx');
   <script type="module">
+      import('/src/webaverse.jsx');
     if (import.meta.env.VITE_SPLIT_UI !== 'true') {
       console.log("Initializing Webaverse Engine in SINGLE process mode");
       import('/src/main.jsx');
     } else {
-      import('/src/main-split.jsx');
       console.log("Initializing Webaverse Engine in SPLIT process mode");
 
       const tld = import.meta.env.VITE_SPLIT_UI_DOMAIN_TLD || '.online';

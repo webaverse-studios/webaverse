@@ -3,7 +3,7 @@ physx wasm integration.
 */
 
 import * as THREE from 'three';
-import Module from './public/bin/geometry.js';
+import Module from './bin/geometry.js';
 import {Allocator, ScratchStack} from './geometry-util.js';
 import {heightfieldScale} from './constants.js';
 
@@ -32,6 +32,7 @@ physx.waitForLoad =  () => {
       Module._initialize();
 
       const scratchStackSize = 8 * 1024 * 1024;
+      console.log('Module', Module)
       scratchStack = new ScratchStack(Module, scratchStackSize);
 
       physx.loaded = true;

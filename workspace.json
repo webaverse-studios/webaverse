@@ -5,6 +5,7 @@
     "@webaverse-studios/client": "packages/client",
     "@webaverse-studios/compiler": "packages/compiler",
     "engine": "packages/engine",
+    "engine-wasm": "packages/engine-wasm",
     "metaversefile": "packages/metaversefile",
     "multiplayer": "packages/multiplayer",
     "offscreen-engine": "packages/offscreen-engine",
