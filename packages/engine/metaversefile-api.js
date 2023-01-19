@@ -393,7 +393,7 @@ let recursion = 0;
 let wasDecapitated = false;
 const mirrors = [];
 // eslint-disable-next-line no-new-func
-const importFn = new Function('u', 'return import(u)');
+const importFn = new Function('u', 'console.log(u); return import(u)');
 metaversefile.setApi({
   async import(s) {
     let oldS = s;
@@ -409,7 +409,10 @@ metaversefile.setApi({
 
     try {
       // const m = await import(s);
+      console.log('s', s);
+      
       const m = await importFn(s);
+      console.log('m', m)
       return m;
     } catch(err) {
       // console.warn('error loading', JSON.stringify(s), err.stack);
