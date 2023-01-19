@@ -2,15 +2,15 @@
 
 import path from 'path';
 import fs from 'fs';
-import http from 'http';
-import https from 'https';
 import etag from 'etag';
 import {getCwd} from '../../util.js'
 import compile from '../../scripts/compile.js'
 
 const _proxy = (req, res, u) => new Promise((resolve, reject) => {
-  // console.log('redirect asset 1', {u});
+  console.log('redirect asset 1', {u});
 
+  res.setHeader('Access-Control-Allow-Methods', '*');
+  res.setHeader('Access-Control-Allow-Headers', '*');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cross-Origin-Opener-Policy', 'unsafe-none');
   res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
@@ -20,7 +20,7 @@ const _proxy = (req, res, u) => new Promise((resolve, reject) => {
     const cwd = getCwd();
     u = path.join(cwd, u);
     
-    // console.log('fetch file locally', {cwd, u});
+    console.log('fetch file locally', {cwd, u});
 
     const rs = fs.createReadStream(u);
     rs.pipe(res);
@@ -34,6 +34,7 @@ const _proxy = (req, res, u) => new Promise((resolve, reject) => {
 });
 
 export default async function handler(req, res) {
+  console.log('got request', req.url);
   /* if (/\.glb/.test(req.url)) {
     console.log('\n\n\n\ncompile', req.headers, req.url, '\n\n\n\n');
   } */
@@ -47,7 +48,7 @@ export default async function handler(req, res) {
     const dest = req.headers['sec-fetch-dest'];
     // const accept = req.headers['accept'];
     if (/* /^image\//.test(accept) || */['empty', 'image'].includes(dest) || dest.includes('github.io')) {
-      // console.log('\n\n\n\ncompile', req.headers, req.url, '\n\n\n\n');
+      console.log('\n\n\n\ncompile', req.headers, req.url, '\n\n\n\n');
       await _proxy(req, res, u);
     } else {
       let resultUint8Array, err;
@@ -63,9 +64,16 @@ export default async function handler(req, res) {
         // check if-none-match (multiple)
         if (req.headers['if-none-match'] && req.headers['if-none-match'].split(',').includes(et)) {
           res.statusCode = 304;
+          console.log('304', u);
           res.end();
         } else {
+          console.log('200', u);
           res.setHeader('Content-Type', 'application/javascript');
+
+
+          res.setHeader('Access-Control-Allow-Methods', '*');
+          res.setHeader('Access-Control-Allow-Headers', '*');
+
           // res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
           res.setHeader('Cache-Control', 'no-cache');
           res.setHeader('Access-Control-Allow-Origin', '*');

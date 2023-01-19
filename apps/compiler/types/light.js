@@ -9,6 +9,7 @@ const templateString = fs.readFileSync(path.resolve('.', 'public', 'type_templat
 export default {
   async load(id) {
     id = createRelativeFromAbsolutePath(id);
+    console.log('got id', id)
 
     const {
       contentId,

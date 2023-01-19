@@ -46,7 +46,7 @@ export const fetchFileFromId = async (id, importer, encoding = null) => {
   //  .replace(/^\/@proxy\//, '')
   //  .replace(/^(https?:\/(?!\/))/, '$1/');
   if (/^https?:\/\//.test(id)) {
-    const u = new URL(id, true);
+    const u = url.parse(id, true);
     u.query.noimport = 1 + '';
     id = format(u);
     const res = await fetch(id)

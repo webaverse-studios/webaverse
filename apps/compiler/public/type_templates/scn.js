@@ -89,6 +89,7 @@ export default e => {
   
   let live = true;
   e.waitUntil((async () => {
+    console.log('loading scn', srcUrl);
     const res = await fetch(srcUrl);
     const j = await res.json();
     const {objects} = j;
@@ -116,7 +117,9 @@ export default e => {
           scale = new THREE.Vector3().fromArray(scale);
           
           const baseUrl = import.meta.url;
+          console.log('baseUrl', baseUrl);
           const url = getObjectUrl(object, baseUrl);
+          console.log('url', url)
           await loadApp(url, position, quaternion, scale, components);
         }
       }));
