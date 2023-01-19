@@ -6,7 +6,10 @@ export const compilerBaseUrl = isProd ?
   `https://local-compiler.webaverse.com/`;
 
 // scenes
-export const scenesBaseUrl = `/scenes/`;
+export const scenesBaseUrl = isProd ?
+  `https://webaverse.github.io/scenes/`
+:
+  `/scenes/`;
 export const defaultSceneName = 'block.scn';
 
 // characters

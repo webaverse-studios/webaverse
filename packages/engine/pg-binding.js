@@ -358,6 +358,19 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
       );
       bufferViewer.index += Float32Array.BYTES_PER_ELEMENT * numNormals * 3;
 
+      // flows
+      const numFlows = bufferViewer.dataView.getUint32(
+        bufferViewer.index,
+        true,
+      );
+      bufferViewer.index += Uint32Array.BYTES_PER_ELEMENT;
+      const flows = new Float32Array(
+        arrayBuffer,
+        bufferAddress + bufferViewer.index,
+        numFlows * 3,
+      );
+      bufferViewer.index += Float32Array.BYTES_PER_ELEMENT * numFlows * 3;
+
       // factors
       const numFactors = bufferViewer.dataView.getUint32(
         bufferViewer.index,
@@ -416,6 +429,7 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
         bufferAddress,
         positions,
         normals,
+        flows,
         factors,
         liquids,
         liquidsWeights,
@@ -470,10 +484,37 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
         );
         bufferViewer.index += qsSize * Float32Array.BYTES_PER_ELEMENT;
 
+        const scalesSize = bufferViewer.dataView.getUint32(
+          bufferViewer.index,
+          true,
+        );
+        bufferViewer.index += Uint32Array.BYTES_PER_ELEMENT;
+        const scales = new Float32Array(
+          bufferViewer.dataView.buffer,
+          bufferViewer.dataView.byteOffset + bufferViewer.index,
+          scalesSize,
+        );
+        bufferViewer.index += scalesSize * Float32Array.BYTES_PER_ELEMENT;
+
+        const colorsSize = bufferViewer.dataView.getUint32(
+          bufferViewer.index,
+          true,
+        );
+        bufferViewer.index += Uint32Array.BYTES_PER_ELEMENT;
+        const colors = new Float32Array(
+          bufferViewer.dataView.buffer,
+          bufferViewer.dataView.byteOffset + bufferViewer.index,
+          colorsSize,
+        );
+        bufferViewer.index += colorsSize * Float32Array.BYTES_PER_ELEMENT;
+
+
         instances[i] = {
           instanceId,
           ps,
           qs,
+          scales,
+          colors
         };
       }
 
@@ -654,6 +695,30 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
         );
         bufferViewer.index += qsSize * Float32Array.BYTES_PER_ELEMENT;
 
+        const scalesSize = bufferViewer.dataView.getUint32(
+          bufferViewer.index,
+          true,
+        );
+        bufferViewer.index += Uint32Array.BYTES_PER_ELEMENT;
+        const scales = new Float32Array(
+          bufferViewer.dataView.buffer,
+          bufferViewer.dataView.byteOffset + bufferViewer.index,
+          scalesSize,
+        );
+        bufferViewer.index += scalesSize * Float32Array.BYTES_PER_ELEMENT;
+
+        const colorsSize = bufferViewer.dataView.getUint32(
+          bufferViewer.index,
+          true,
+        );
+        bufferViewer.index += Uint32Array.BYTES_PER_ELEMENT;
+        const colors = new Float32Array(
+          bufferViewer.dataView.buffer,
+          bufferViewer.dataView.byteOffset + bufferViewer.index,
+          colorsSize,
+        );
+        bufferViewer.index += colorsSize * Float32Array.BYTES_PER_ELEMENT;
+
         // materials
         const numMaterials = bufferViewer.dataView.getUint32(
           bufferViewer.index,
@@ -697,6 +762,8 @@ const _parseChunkResult = (arrayBuffer, bufferAddress) => {
           instanceId,
           ps,
           qs,
+          scales,
+          colors,
           materials,
           materialsWeights,
           grassProps,

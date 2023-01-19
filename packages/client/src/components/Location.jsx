@@ -1,11 +1,13 @@
-import React, {useState, useContext, useEffect} from 'react';
-import styles from './Location.module.css';
-import {sceneManager} from '@webaverse-studios/engine/scene-manager'
-import {scenesBaseUrl} from '@webaverse-studios/engine/endpoints';
-import CustomButton from './CustomButton';
-import {AppContext} from './App';
+import cameraManager from '@webaverse-studios/engine/camera-manager';
+import {defaultSceneName, scenesBaseUrl} from '@webaverse-studios/engine/endpoints';
+import {sceneManager} from '@webaverse-studios/engine/scene-manager';
 import universe from '@webaverse-studios/engine/universe';
+import {makeId, parseQuery} from '@webaverse-studios/engine/util.js';
 import classnames from 'classnames';
+import React, {useContext, useEffect, useState} from 'react';
+import {AppContext} from './App';
+import CustomButton from './CustomButton';
+import styles from './Location.module.css';
 
 const origSceneList = [];
 
@@ -22,9 +24,11 @@ export const Location = () => {
         origSceneList.length = 0;
         sceneNames.forEach(name => {
           const sceneUrl= sceneManager.getSceneUrl(name)
-          origSceneList.push(sceneUrl);
+          if(!origSceneList.includes(sceneUrl)){
+            origSceneList.push(sceneUrl);
+          }
         });
-        setScenesList(origSceneList)
+        setScenesList(origSceneList);
     })();
   }, []);
 
@@ -53,6 +57,17 @@ export const Location = () => {
   const stopPropagation = event => {
     event.stopPropagation();
   };
+
+  const handleMultiplayerBtnClick = async () => {
+    let {src} = parseQuery(window.location.search);
+    if (src === undefined) {
+      src = scenesBaseUrl + defaultSceneName;
+    }
+
+    const sceneName = src.trim();
+    const roomName = makeId(5);
+    universe.enterMultiplayer(`/?src=${encodeURIComponent(sceneName)}&room=${roomName}`);
+  }
 
   const handleRoomCreateBtnClick = async () => {
     // const sceneName = selectedScene.trim();
@@ -108,7 +123,7 @@ export const Location = () => {
 
   return (
     <div className={styles.locationWrap} onClick={stopPropagation}>
-      <div className={styles.scenesList}>
+      <div className={styles.scenesList} onMouseEnter={() => {cameraManager.canZoom = false;}} onMouseLeave={() => {cameraManager.canZoom = true;}}>
         {scenesList.map((sceneName, i) => {
           const scnName = sceneName
             .replace('.scn', '')
@@ -117,6 +132,7 @@ export const Location = () => {
             <div
               className={styles.scene}
               onMouseDown={e => {
+                cameraManager.canZoom = true;
                 handleSceneSelect(e, sceneName);
               }}
               key={i}
@@ -136,7 +152,7 @@ export const Location = () => {
             text="Create Room"
             size={12}
             className={styles.methodButton}
-            onClick={handleRoomCreateBtnClick}
+            onClick={handleMultiplayerBtnClick /* handleRoomCreateBtnClick */}
           />
         </div>
         {rooms.map((room, i) => (

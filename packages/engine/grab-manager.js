@@ -31,6 +31,8 @@ const maxGridSnap = 32;
 const minGridSnap = 0
 let highlightedPhysicsObject = null;
 let highlightedPhysicsId = 0;
+let transformIndicators = null;
+
 
 const getPhysicalPosition = box => {
   return localVector7.set(
@@ -68,6 +70,7 @@ const _updateGrabbedObject = (
       geometry.computeBoundingBox();
       localBox.union(geometry.boundingBox);
     }
+    transformIndicators.bb = localBox;
     physicalOffset = getPhysicalPosition(localBox);
   }
 
@@ -153,6 +156,9 @@ const _click = (e) => {
   if (grabManager.getGrabbedObject(0)) {
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.ungrab();
+
+    transformIndicators.targetApp = null;
+    grabManager.undrawPhone();
     grabManager.hideUi();
     grabManager.setGridSnap(minGridSnap);
   } else {
@@ -162,16 +168,30 @@ const _click = (e) => {
   }
 };
 
+const _createTransformIndicators = () => {
+  transformIndicators = metaversefileApi.createApp();
+  (async () => {
+    const {importModule} = metaversefileApi.useDefaultModules();
+    const m = await importModule('transformIndicators');
+    await transformIndicators.addModule(m);
+  })();
+  transformIndicators.targetApp = null;
+  sceneLowPriority.add(transformIndicators);
+}
+
 class Grabmanager extends EventTarget {
   constructor() {
     super();
     this.gridSnap = minGridSnap;
     this.editMode = false;
+    Promise.resolve()
+      .then(_createTransformIndicators);
   }
 
   grab(object) {
     const localPlayer = playersManager.getLocalPlayer();
     localPlayer.grab(object);
+    transformIndicators.targetApp = object;
     this.gridSnap = minGridSnap;
     this.editMode = false;
   }
@@ -197,6 +217,7 @@ class Grabmanager extends EventTarget {
   async toggleEditMode() {
     this.editMode = !this.editMode;
     this.setGridSnap(minGridSnap);
+    transformIndicators.targetApp = null;
     if (this.editMode) {
       if (!cameraManager.pointerLockElement) {
         await cameraManager.requestPointerLock();
@@ -209,8 +230,10 @@ class Grabmanager extends EventTarget {
         localPlayer.ungrab();
       }
       this.showUi();
+      this.drawPhone();
     } else {
       this.hideUi();
+      this.undrawPhone();
     }
   }
 
@@ -226,6 +249,20 @@ class Grabmanager extends EventTarget {
 
   hideUi() {
     this.dispatchEvent(new MessageEvent('hideui'));
+  }
+
+  drawPhone() {
+    const localPlayer = playersManager.getLocalPlayer();
+    if (!localPlayer.hasAction('readyGrab')) {
+      localPlayer.addAction({
+        type: 'readyGrab'
+      });
+    }
+  }
+
+  undrawPhone() {
+    const localPlayer = playersManager.getLocalPlayer();
+    localPlayer.removeAction('readyGrab');
   }
 
   menuClick(e) {
@@ -244,6 +281,11 @@ class Grabmanager extends EventTarget {
     } else {
       this.setGridSnap(minGridSnap);
     }
+    this.dispatchEvent(
+      new MessageEvent('setgridsnap', {
+        data: {gridSnap: this.gridSnap},
+      })
+    );
   }
 
   setGridSnap(gridSnap) {
@@ -357,8 +399,11 @@ class Grabmanager extends EventTarget {
         const collision = physicsScene.raycast(position, quaternion);
         if (collision) {
           const physicsId = collision.objectId;
-          highlightedPhysicsObject = metaversefileApi.getAppByPhysicsId(physicsId);
-          highlightedPhysicsId = physicsId;
+          const app = metaversefileApi.getAppByPhysicsId(physicsId);
+          if(!app.getComponent('invincible')) {
+            highlightedPhysicsObject = app;
+            highlightedPhysicsId = physicsId;
+          }
         }
       }
     };
@@ -396,6 +441,13 @@ class Grabmanager extends EventTarget {
       }
     };
     _updatePhysicsHighlight();
+
+    const _handleCellphoneUndraw = () => {
+      if(localPlayer.avatar?.cellphoneUndrawTime >= 1000) {
+        localPlayer.removeAction('readyGrab');
+      }
+    };
+    _handleCellphoneUndraw();
   }
 }
 

@@ -154,7 +154,7 @@ class Conversation extends EventTarget {
         message,
       },
     }));
-    
+
     (async () => {
       await _playerSay(this.remotePlayer, text);
     })();
@@ -198,7 +198,7 @@ class Conversation extends EventTarget {
         emote,
         done,
       } = await aiScene.generateChatMessage(this.messages, this.remotePlayer.name);
-      
+
       if (!this.messages.some(m => m.text === comment && m.player === this.remotePlayer)) {
         this.addRemotePlayerMessage(comment, emote);
         done && this.finish();
@@ -217,7 +217,7 @@ class Conversation extends EventTarget {
         value: comment,
         done,
       } = await aiScene.generateChatMessage(this.messages, this.localPlayer.name);
-      
+
       if (!this.messages.some(m => m.text === comment && m.player === this.localPlayer)) {
         this.addLocalPlayerMessage(comment);
         done && this.finish();
@@ -229,13 +229,13 @@ class Conversation extends EventTarget {
 
   progressSelfOptions() {
     console.log('progress self options');
-    
+
     this.wrapProgress(async () => {
       const aiScene = metaversefile.useLoreAIScene();
       const {
         value: options,
         done,
-       } = await aiScene.generateDialogueOptions(this.messages, this.localPlayer.name);
+      } = await aiScene.generateDialogueOptions(this.messages, this.localPlayer.name);
 
       if (!done) {
         this.#setOptions(options);
@@ -261,7 +261,7 @@ class Conversation extends EventTarget {
     if (fuzzyEmotionName) {
       emoteManager.triggerEmote(fuzzyEmotionName, this.localPlayer);
     }
-    
+
     // clear options
     this.#setOptions(null);
     this.#setOption(option);
@@ -277,10 +277,10 @@ class Conversation extends EventTarget {
   progress() {
     if (!this.finished) {
       const lastMessage = this.#getMessageAgo(1);
-      
+
       const _handleLocalTurn = () => {
         // console.log('check last message 1', lastMessage, lastMessage?.type === 'chat', lastMessage?.player === this.localPlayer);
-        
+
         if (lastMessage?.type === 'chat' && lastMessage?.player === this.localPlayer) {
           // 50% chance of showing options
           if (Math.random() < 0.5) {
@@ -346,7 +346,7 @@ class Conversation extends EventTarget {
 
   #setOptions(options) {
     this.options = options;
-    
+
     this.dispatchEvent(new MessageEvent('options', {
       data: {
         options,
@@ -408,7 +408,7 @@ const fieldMusicNames = [
 
 let currentFieldMusic = null;
 let currentFieldMusicIndex = 0;
-export const handleStoryKeyControls = async (e) => {
+export const handleStoryKeyControls = async e => {
 
   switch (e.which) {
     case 48: { // 0
@@ -454,6 +454,58 @@ export const handleStoryKeyControls = async (e) => {
 
 };
 
+export const startConversation = app => {
+  if (!app)
+    return console.warn(
+      'could not find app for physics id',
+    );
+  const {appType} = app;
+
+  // cameraManager.setFocus(false);
+  // zTargeting.focusTargetReticle = null;
+  sounds.playSoundName('menuSelect');
+
+  cameraManager.setFocus(false);
+  cameraManager.setDynamicTarget();
+
+  (async () => {
+    const aiScene = metaversefile.useLoreAIScene();
+    if (appType === 'npc') {
+      const {name, description} = app.getLoreSpec();
+      const remotePlayer = npcManager.getNpcByApp(app);
+
+      if (remotePlayer) {
+        const {
+          value: comment,
+          done,
+        } = await aiScene.generateSelectCharacterComment(name, description);
+
+        _startConversation(comment, remotePlayer, done);
+      } else {
+        console.warn('no player associated with app', app);
+      }
+    } else {
+      const {name, description} = app;
+      const comment = await aiScene.generateSelectTargetComment(name, description);
+      const fakePlayer = {
+        avatar: {
+          modelBones: {
+            Head: app,
+          },
+        },
+      };
+      _startConversation(comment, fakePlayer, true);
+    }
+  })();
+}
+
+export const progressConversation = () => {
+  if (!currentConversation.progressing) {
+    currentConversation.progress();
+    sounds.playSoundName('menuNext');
+  }
+}
+
 const story = new EventTarget();
 
 let currentConversation = null;
@@ -471,10 +523,14 @@ story.handleWheel = e => {
 const _startConversation = (comment, remotePlayer, done) => {
   const localPlayer = playersManager.getLocalPlayer();
   currentConversation = new Conversation(localPlayer, remotePlayer);
+  const newStoryAction = {
+    type: 'story',
+  };
+  localPlayer.addAction(newStoryAction);
   currentConversation.addEventListener('close', () => {
     currentConversation = null;
-
-    cameraManager.setDynamicTarget();
+    localPlayer.removeAction('story');
+    cameraManager.setDynamicTarget(null);
   }, {once: true});
   story.dispatchEvent(new MessageEvent('conversationstart', {
     data: {
@@ -494,9 +550,7 @@ story.listenHack = () => {
     if (cameraManager.pointerLockElement) {
       if (e.button === 0 && currentConversation) {
         if (!currentConversation.progressing) {
-          currentConversation.progress();
-
-          sounds.playSoundName('menuNext');
+          progressConversation();
         }
       }
     }

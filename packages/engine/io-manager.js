@@ -48,7 +48,6 @@ class IoManager extends EventTarget {
   currentWeaponGrabs = [false, false];
   lastWeaponGrabs = [false, false];
   currentWalked = false;
-  lastCtrlKey = false;
   lastMouseButtons = 0;
   movementEnabled = true;
 
@@ -397,6 +396,7 @@ class IoManager extends EventTarget {
         this.lastKeysDownTime.keyD = now;
         this.lastKeysDownTime.keyA = 0;
         break;
+
       }
       case 70: { // F
         e.preventDefault();
@@ -420,15 +420,12 @@ class IoManager extends EventTarget {
           ioManager.keys.backward = true;
         } else {
           ioManager.keys.ctrl = true;
+          game.toggleCrouch();
         }
         break;
       }
       case 71: { // G
         game.menuSwitchCharacter();
-        break;
-      }
-      case 78: { // N
-        game.menuZoneIntro();
         break;
       }
       case 86: { // V
@@ -446,12 +443,13 @@ class IoManager extends EventTarget {
       case 69: { // E
         const now = performance.now();
         const timeDiff = now - this.lastKeysDownTime.keyE;
-        if (timeDiff < doubleTapTime) {
+        const canRotate = grabManager.canRotate();
+        if (timeDiff < doubleTapTime && !canRotate) {
           game.menuMiddleToggle();
         } else {
           game.menuMiddleUp();
 
-          if (grabManager.canRotate()) {
+          if (canRotate) {
             grabManager.menuRotate(-1);
           } else {
             game.menuActivateDown();
@@ -476,7 +474,7 @@ class IoManager extends EventTarget {
         if (cameraManager.pointerLockElement) {
           if (grabManager.canRotate()) {
             grabManager.menuRotate(1);
-          } else {
+          } else if (!e.ctrlKey) {
             game.dropSelectedApp();
           }
         }
@@ -489,13 +487,7 @@ class IoManager extends EventTarget {
       }
       case 32: { // space
         ioManager.keys.space = true;
-        // if (controlsManager.isPossessed()) {
-        if (!game.isJumping()) {
-          game.jump('jump');
-        } else if (!game.isDoubleJumping()) {
-          game.doubleJump();
-        }
-        // }
+        game.jump();
         break;
       }
       case 81: { // Q
@@ -545,12 +537,14 @@ class IoManager extends EventTarget {
       // nothing
     } else {
       const physicsScene = physicsManager.getScene();
-      if (physicsScene.getPhysicsEnabled()) {
-        const renderer = getRenderer();
+      // if (physicsScene.getPhysicsEnabled()) {
+      //   const renderer = getRenderer();
 
-        if (renderer && (e.target === renderer.domElement || e.target.id === 'app')) {
-            cameraManager.handleWheelEvent(e);
-        }
+      //   if (renderer && (e.target === renderer.domElement || e.target.id === 'app')) {
+      //       cameraManager.handleWheelEvent(e);
+      //   }
+      if (physicsScene.getPhysicsEnabled() && getRenderer()) {
+        cameraManager.handleWheelEvent(e);
       }
     }
   }
@@ -632,6 +626,8 @@ class IoManager extends EventTarget {
           game.setMouseHoverObject(null);
           game.setMouseSelectedObject(null);
           world.removeObject(object.instanceId);
+        } else if (!e.ctrlKey) {
+          game.deleteSelectedApp();
         }
         break;
       }
@@ -697,7 +693,7 @@ class IoManager extends EventTarget {
       if (!cameraManager.pointerLockElement) {
         cameraManager.requestPointerLock();
       }
-      game.menuMiddleDown();
+      // game.menuMiddleDown();
     }
     this.lastMouseButtons = e.buttons;
     raycastManager.setLastMouseEvent(e);

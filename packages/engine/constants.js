@@ -1,6 +1,7 @@
 export const baseUnit = 4;
 export const previewExt = 'jpg';
 export const maxGrabDistance = 1.5;
+export const heightfieldScale = 0.1;
 
 export const transparentPngUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
@@ -76,6 +77,7 @@ export const runSpeed = walkSpeed * 3;
 export const narutoRunSpeed = walkSpeed * 20;
 export const crouchSpeed = walkSpeed * 0.7;
 export const flySpeed = walkSpeed * 5;
+export const gliderSpeed = walkSpeed * 2;
 
 export const narutoRunTimeFactor = 2;
 
@@ -104,9 +106,11 @@ export const aimTransitionMaxTime = 150;
 export const jumpHeight = 3;
 export const flatGroundJumpAirTime = 666;
 
+export const startSkydiveTimeS = 2;
+
 export const avatarInterpolationFrameRate = 60;
 export const avatarInterpolationTimeDelay = 1000/(avatarInterpolationFrameRate * 0.5);
-export const avatarInterpolationNumFrames = 4;
+export const avatarInterpolationNumFrames = 15; // For chrome "Network throttling: Slow 3G", old value `4` is too less to hit snapshots cache. `10` can hit most. `15` can hit almot all and safe for worse real network connections.
 
 export const eatFrameIndices = [500, 800, 1100];
 export const drinkFrameIndices = [400, 700, 1000];
@@ -148,7 +152,14 @@ export const characterSelectAvatarQuality = 4;
 export const minCanvasSize = 512;
 export const offscreenCanvasSize = 2048;
 
-export const heightfieldScale = 0.1; // must fit heightfield in int16
+export const realmSize = 256;
+
+// dev mode
+const IS_DEV_MODE_ENABLED = false;
+
+export const IS_NARUTO_RUN_ENABLED = IS_DEV_MODE_ENABLED;
+export const IS_FLYING_ENABLED = IS_DEV_MODE_ENABLED;
+export const MAX_THIRD_PERSON_CAMERA_DISTANCE = IS_DEV_MODE_ENABLED ? Infinity : 20;
 
 // note: For WASM API.
 export const GET = 0;

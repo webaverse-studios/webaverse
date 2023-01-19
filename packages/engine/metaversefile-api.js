@@ -396,16 +396,13 @@ const mirrors = [];
 const importFn = new Function('u', 'console.log(u); return import(u)');
 metaversefile.setApi({
   async import(s) {
-    let oldS = s;
-    if (s.startsWith(compilerBaseUrl)) {
-      s = `${s.replace(/^([a-zA-Z0-9]+:\/)\//, '$1')}`;
-    } else if (/^[a-zA-Z0-9]+:/.test(s)) {
-      s = `${compilerBaseUrl}/${s}`;
+    if (/^[a-zA-Z0-9]+:/.test(s)) {
+      s = `${compilerBaseUrl}${s.replace(compilerBaseUrl, '').replace(/^([a-zA-Z0-9]+:\/)\//, '$1')}`;
     } else {
       s = new URL(s, compilerBaseUrl).href;
     }
 
-    console.log('metaversefile import', {s, oldS});
+    console.log('metaversefile import', {s});
 
     try {
       // const m = await import(s);
@@ -1128,6 +1125,13 @@ export default () => {
       return null;
     }
   },
+  getRemotePlayerByPlayerId(playerId) {
+    for (const pair of playersManager.getRemotePlayers()) {
+      if (pair[0] === playerId) {
+        return pair[1];
+      }
+    }
+  },
   getAppByInstanceId(instanceId) {
     // local
     const localPlayer = playersManager.getLocalPlayer();
@@ -1377,12 +1381,19 @@ export default () => {
   useDebug() {
     return debug;
   },
+  useCompilerBaseUrl() {
+    return compilerBaseUrl
+  },
   async addModule(app, m) {
     // wait to make sure module initialization happens in a clean tick loop,
     // even when adding a module from inside of another module's initialization
     await Promise.resolve();
-
-    app.name = m.name ?? (m.contentId ? m.contentId.match(/([^\/\.]*)$/)[1] : '');
+    
+    try {
+      app.name = m.name ?? (m.contentId ? m.contentId.match(/([^\/\.]*)$/)[1] : '');
+    } catch (error) {
+      console.error(error)
+    }
     app.description = m.description ?? '';
     app.appType = m.type ?? '';
     app.contentId = m.contentId ?? '';

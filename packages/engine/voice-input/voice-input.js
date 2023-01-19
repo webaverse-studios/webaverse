@@ -26,6 +26,9 @@ class VoiceInput extends EventTarget {
     if (wsrtc) {
       wsrtc.enableMic(this.mediaStream);
     }
+    if (universe.multiplayerEnabled) {
+      universe.realms.enableMic();
+    }
 
     this.dispatchEvent(new MessageEvent('micchange', {
       data: {
@@ -37,7 +40,9 @@ class VoiceInput extends EventTarget {
   disableMic() {
     /* if (this.micEnabled()) */ {
       const wsrtc = universe.getConnection();
-      if (wsrtc) {
+      if (universe.multiplayerEnabled) {
+        universe.realms.disableMic();
+      } else if (wsrtc) {
         wsrtc.disableMic();
       } else {
         WSRTC.destroyUserMedia(this.mediaStream);
