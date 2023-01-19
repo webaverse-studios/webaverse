@@ -12,7 +12,7 @@ import {WebaverseScene} from './webaverse-scene.js';
 // XXX enable this when the code is stable; then, we will have many more places to add missing matrix updates
 // THREE.Object3D.DefaultMatrixAutoUpdate = false;
 
-let canvas = null; let context = null; let renderer = null; let composer = null;
+let offscreenCanvas = null; let canvas = null; let context = null; let renderer = null; let composer = null;
 
 let waitPromise = makePromise();
 const waitForLoad = () => waitPromise;
@@ -20,14 +20,19 @@ const waitForLoad = () => waitPromise;
 function bindCanvas(c) {
   // initialize renderer
   canvas = c;
-  context = canvas && canvas.getContext('webgl2', {
-    antialias: true,
-    alpha: true,
-    xrCompatible: true,
-  });
+  // context = canvas && canvas.getContext('webgl2', {
+  //   antialias: true,
+  //   alpha: true,
+  //   xrCompatible: true,
+  // });
+
+  // get canvas context as a bitmap renderer
+  context = canvas && canvas.getContext('bitmaprenderer');
+
+  offscreenCanvas = new OffscreenCanvas(1024, 1024);
+
   renderer = new THREE.WebGLRenderer({
-    canvas,
-    context,
+    canvas: offscreenCanvas,
     antialias: true,
     alpha: true,
     rendererExtensionFragDepth: true,
@@ -71,7 +76,6 @@ function getRenderer() {
   return renderer;
 }
 function getContainerElement() {
-  const canvas = renderer.domElement;
   const container = canvas.parentNode;
   return container;
 }
@@ -179,6 +183,8 @@ export {
   getRenderer,
   getContainerElement,
   getComposer,
+  canvas,
+  offscreenCanvas,
   scene,
   rootScene,
   camera,

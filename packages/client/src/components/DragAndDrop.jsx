@@ -92,7 +92,7 @@ const uploadCreateApp = async (item, {
 };
 
 const DragAndDrop = () => {
-  const {setState, account} = useContext(AppContext)
+  const {state, setState, account, getWalletItems} = useContext(AppContext)
   const [queue, setQueue] = useState([]);
   const [currentApp, setCurrentApp] = useState(null);
   const {mintNFT, minting, error, setError, WebaversecontractAddress} = useNFTContract(account.currentAddress);
@@ -133,58 +133,33 @@ const DragAndDrop = () => {
     window.addEventListener('dragover', dragover);
     const drop = async e => {
       e.preventDefault();
-
-      const renderer = getRenderer();
-      if (e.target === renderer?.domElement) {
-        /* const renderer = getRenderer();
-        const rect = renderer.domElement.getBoundingClientRect();
-        localVector2D.set(
-          ( e.clientX / rect.width ) * 2 - 1,
-          - ( e.clientY / rect.height ) * 2 + 1
-        );
-        localRaycaster.setFromCamera(localVector2D, camera);
-        const dropZOffset = 2;
-        const position = localRaycaster.ray.origin.clone()
-          .add(
-            localVector2.set(0, 0, -dropZOffset)
-              .applyQuaternion(
-                localQuaternion
-                  .setFromRotationMatrix(localMatrix.lookAt(
-                    localVector3.set(0, 0, 0),
-                    localRaycaster.ray.direction,
-                    localVector4.set(0, 1, 0)
-                  ))
-              )
-          );
-        const quaternion = camera.quaternion.clone(); */
-
-        const items = Array.from(e.dataTransfer.items);
-        await Promise.all(items.map(async item => {
-          const drop = _isJsonItem(item);
-          const app = await uploadCreateApp(item, {
-            drop,
-          });
-          if (app) {
-            if (drop) {
-              world.appManager.importApp(app);
-              setState({openedPanel: null});
-            } else {
-              setQueue(queue.concat([app]));
-            }
+      const items = Array.from(e.dataTransfer.items);
+      await Promise.all(items.map(async item => {
+        const drop = _isJsonItem(item);
+        const app = await uploadCreateApp(item, {
+          drop,
+        });
+        if (app) {
+          if (drop) {
+            world.appManager.importApp(app);
+            setState({openedPanel: null});
+          } else {
+            setQueue(queue.concat([app]));
           }
-        }));
-      
-        /* let arrowLoader = metaverseUi.makeArrowLoader();
-        arrowLoader.position.copy(position);
-        arrowLoader.quaternion.copy(quaternion);
-        scene.add(arrowLoader);
-        arrowLoader.updateMatrixWorld();
-      
-        if (arrowLoader) {
-          scene.remove(arrowLoader);
-          arrowLoader.destroy();
-        } */
-      }
+        }
+      }));
+    
+      /* let arrowLoader = metaverseUi.makeArrowLoader();
+      arrowLoader.position.copy(position);
+      arrowLoader.quaternion.copy(quaternion);
+      scene.add(arrowLoader);
+      arrowLoader.updateMatrixWorld();
+    
+      if (arrowLoader) {
+        scene.remove(arrowLoader);
+        arrowLoader.destroy();
+      } */
+    
     };
     window.addEventListener('drop', drop);
     return () => {
@@ -256,7 +231,9 @@ const DragAndDrop = () => {
       const app = currentApp;
       await mintNFT(app, () => {
         setMintComplete(true);
-        setPendingTx(false)
+        setPendingTx(false);
+        getWalletItems();
+        setCurrentApp(null);
       });
     }
     setCurrentApp(null);

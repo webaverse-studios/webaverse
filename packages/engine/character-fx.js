@@ -278,7 +278,10 @@ export class AvatarCharacterFx {
         })();
       }
     };
+    /*
+    // Nameplate code is currently not working.
     _updateNameplate();
+    */
     const _updateHealEffectMesh = () => {
       if (this.character.hasAction('cure')) {
         if (!this.healEffect) {

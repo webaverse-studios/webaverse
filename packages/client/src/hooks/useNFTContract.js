@@ -2,7 +2,7 @@ import {useEffect, useState, useContext} from 'react';
 import {ethers, BigNumber} from 'ethers';
 
 import {
-  CONTRACTS,
+  CONTRACTS, OTCollectionAddress
 } from './web3-constants.js';
 import {FTABI, NFTABI, WebaverseABI} from '../abis/Contract.jsx';
 import {ChainContext} from './chainProvider.jsx';
@@ -60,35 +60,43 @@ export default function useNFTContract(currentAccount) {
 
       const Bigmintfee = await Webaversecontract.mintFee();
       const mintfee = BigNumber.from(Bigmintfee).toNumber();
+      const Bigsilkbalance = await FTcontract.balanceOf(currentAccount);
+      const silkbalance = BigNumber.from(Bigsilkbalance).toNumber();
 
       if (mintfee > 0) {
-        // webaverse side chain mintfee != 0
-        const FTapprovetx = await FTcontract.approve(
-          NFTcontractAddress,
-          mintfee,
-        ); // mintfee = 10 default
-        const FTapproveres = await FTapprovetx.wait();
-        if (FTapproveres.transactionHash) {
-          try {
-            const minttx = await Webaversecontract.mint(
-              currentAccount,
-              1,
-              currentApp.contentId,
-              '0x',
-            );
-            const res = await minttx.wait();
-            if (res.transactionHash) {
-              afterminting();
+        // check if silk token balance is enough to mint the NFT
+        if(silkbalance < mintfee) {
+          console.warn('your silk token balance is not enough to mint NFT');
+          setError('Mint Failed');
+        } else {
+          // webaverse side chain mintfee != 0
+          const FTapprovetx = await FTcontract.approve(
+            WebaversecontractAddress,
+            mintfee,
+          ); // mintfee = 10 default
+          const FTapproveres = await FTapprovetx.wait();
+          if (FTapproveres.transactionHash) {
+            try {
+              const minttx = await Webaversecontract.mintCreatorNFT(
+                currentAccount,
+                1,
+                currentApp.contentId,
+                '0x',
+              );
+              const res = await minttx.wait();
+              if (res.transactionHash) {
+                afterminting();
+              }
+            } catch (err) {
+              console.warn('minting to webaverse contract failed');
+              setError('Mint Failed');
             }
-          } catch (err) {
-            console.warn('minting to webaverse contract failed');
-            setError('Mint Failed');
-          }
+          }    
         }
       } else {
         // mintfee = 0 for Polygon not webaverse sidechain
         try {
-          const minttx = await Webaversecontract.mint(
+          const minttx = await Webaversecontract.mintCreatorNFT(
             currentAccount,
             1,
             currentApp.contentId,
@@ -129,7 +137,16 @@ export default function useNFTContract(currentAccount) {
 
         const bigMintFee = await webaverseContract.mintFee();
         const mintfee = BigNumber.from(bigMintFee).toNumber();
+        const Bigsilkbalance = await FTcontract.balanceOf(currentAccount);
+        const silkbalance = BigNumber.from(Bigsilkbalance).toNumber();
+
         if (mintfee > 0) {
+
+        // check if silk token balance is enough to mint the NFT
+        if(silkbalance < mintfee) {
+          console.warn('your silk token balance is not enough to mint NFT');
+          setError('Mint Failed');
+        } else {
           // webaverse side chain mintfee != 0
           const FTapprovetx = await FTcontract.approve(
             WebaversecontractAddress,
@@ -137,7 +154,7 @@ export default function useNFTContract(currentAccount) {
           ); // mintfee = 10 default
           const FTapproveres = await FTapprovetx.wait();
           if (FTapproveres.transactionHash) {
-                if(app.serverDrop === true) {
+            if(app.serverDrop === true) {
               try {
                 const claimtx = await webaverseContract.claimServerDropNFT(
                   currentAccount,
@@ -155,7 +172,7 @@ export default function useNFTContract(currentAccount) {
               }
             } else {
               try {
-                const minttx = await webaverseContract.claim_NFT(
+                const minttx = await webaverseContract.claimUserDropNFT(
                   currentAccount,
                   app.voucher,
                 )
@@ -169,6 +186,7 @@ export default function useNFTContract(currentAccount) {
               }
             }
           }
+        }
         } else {
           if (app.serverDrop === true) {
             try {
@@ -188,7 +206,7 @@ export default function useNFTContract(currentAccount) {
             }
           } else {
             try {
-              const minttx = await webaverseContract.claim_NFT(
+              const minttx = await webaverseContract.claimUserDropNFT(
                 currentAccount,
                 app.voucher,
               );
@@ -222,7 +240,7 @@ export default function useNFTContract(currentAccount) {
 
         if (app.serverDrop === true) {
           try {
-            const minttx = await webaverseContract.claimServerDropFT(
+            const minttx = await webaverseContract.claimServerDropSilk(
               currentAccount,
               app.voucher,
             );
@@ -236,7 +254,7 @@ export default function useNFTContract(currentAccount) {
           }
         } else {
           try {
-            const minttx = await webaverseContract.claim_FT(
+            const minttx = await webaverseContract.claimUserDropSilk(
               currentAccount,
               app.voucher,
             );
@@ -260,7 +278,7 @@ export default function useNFTContract(currentAccount) {
 
   async function totalSupply() {
     const contract = await getContract();
-    const totalSupply = await contract.totalSupply();
+    const totalSupply = await contract.currentTokenId();
     return BigNumber.from(totalSupply).toNumber();
   }
 
@@ -296,6 +314,16 @@ export default function useNFTContract(currentAccount) {
     );
   }
 
+  async function getOTtokens(walletAddress = currentAccount) {
+    const network = "ETHEREUM"
+    const OTtoken = await fetch(`https://serverless-backend-blue.vercel.app/api/getOpenSeaNFTCollection?walletAddress=${walletAddress}&collectionAddress=${OTCollectionAddress}&network=${network}`,
+    {
+            method: 'get',
+            redirect: 'follow'
+    }).then(response => response.json())
+    return OTtoken;
+  }
+
   return {
     totalSupply,
     minting,
@@ -310,5 +338,6 @@ export default function useNFTContract(currentAccount) {
     error,
     setError,
     WebaversecontractAddress,
+    getOTtokens
   };
 }

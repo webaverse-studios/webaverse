@@ -204,7 +204,7 @@ export const UserBox = ({setLoginFrom}) => {
               </div>
             </li>
             <li>
-              <div className={styles.loggedInText}>
+              <div className={styles.loggedInText} onClick={openInventory}>
                 <div className={styles.chainName}>Polygon</div>
                 <div className={styles.walletAddress}>{ensName || address}</div>
               </div>
@@ -246,7 +246,7 @@ export const UserBox = ({setLoginFrom}) => {
             onClick={metaMaskLogin}
             onMouseEnter={_triggerClickSound}
           />
-          <CustomButton
+          {/* <CustomButton
             theme="light"
             icon="discord"
             text="Discord"
@@ -255,7 +255,7 @@ export const UserBox = ({setLoginFrom}) => {
             className={styles.methodButton}
             // onClick={metaMaskLogin}
             onMouseEnter={_triggerClickSound}
-          />
+          /> */}
           <CustomButton
             theme="light"
             icon="close"

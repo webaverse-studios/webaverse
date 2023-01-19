@@ -1,57 +1,43 @@
 
-import React, {useState, useEffect, useRef, useContext, createContext, Fragment} from 'react';
 import classnames from 'classnames';
+import React, {createContext, Fragment, useContext, useEffect, useRef, useState} from 'react';
 
-import game from '@webaverse-studios/engine/game.js';
-import {parseQuery} from '@webaverse-studios/engine/util.js'
-import Webaverse from '@webaverse-studios/engine/webaverse.js';
-import universe from '@webaverse-studios/engine/universe.js';
 import cameraManager from '@webaverse-studios/engine/camera-manager';
+import game from '@webaverse-studios/engine/game.js';
+import universe from '@webaverse-studios/engine/universe.js';
+import {parseQuery} from '@webaverse-studios/engine/util.js';
 import {world} from '@webaverse-studios/engine/world';
 
+import {defaultSceneName, scenesBaseUrl} from '@webaverse-studios/engine/endpoints.js';
+import {handleStoryKeyControls} from '@webaverse-studios/engine/story';
 import {Crosshair} from './Crosshair';
+import {DomRenderer} from './DomRenderer.jsx';
+import {FocusBar} from './FocusBar.jsx';
+import {GrabKeyIndicators} from './GrabKeyIndicators.jsx';
+import Header from './Header.jsx';
 import {IoHandler, registerIoEventHandler, unregisterIoEventHandler} from './IoHandler';
 import {LoadingBox} from './LoadingBox.jsx';
-import {FocusBar} from './FocusBar.jsx';
-import {DragAndDrop} from './DragAndDrop.jsx';
-import {GrabKeyIndicators} from './GrabKeyIndicators.jsx'
-import Header from './Header.jsx';
 import QuickMenu from './QuickMenu.jsx';
-import {DomRenderer} from './DomRenderer.jsx';
-import {handleStoryKeyControls} from '@webaverse-studios/engine/story';
-import {scenesBaseUrl, defaultSceneName} from '@webaverse-studios/engine/endpoints.js';
 
-import styles from './App.module.css';
-import '../../styles/globals.css';
-import raycastManager from '@webaverse-studios/engine/raycast-manager';
 import grabManager from '@webaverse-studios/engine/grab-manager';
+import raycastManager from '@webaverse-studios/engine/raycast-manager';
+import '../../styles/globals.css';
+import styles from './App.module.css';
 
-import {AccountContext} from '../hooks/web3AccountProvider';
-import {ChainContext} from '../hooks/chainProvider';
-import Modals from './Modals';
 import dropManager from '@webaverse-studios/engine/drop-manager';
+import {ChainContext} from '../hooks/chainProvider';
 import useNFTContract from '../hooks/useNFTContract';
+import {AccountContext} from '../hooks/web3AccountProvider';
+import Modals from './Modals';
 
+import {Chat} from './Chat';
 import {Hotbar} from './Hotbar';
 import {Infobox} from './Infobox';
-import {Chat} from './Chat';
 
 import {AiMenu} from './AiMenu';
 import {SceneMenu} from './SceneMenu';
+
 //
-
-const _startApp = async (weba, canvas) => {
-
-    weba.setContentLoaded();
-
-    weba.bindCanvas(canvas);
-
-    await weba.waitForLoad();
-    await game.load();
-
-    await weba.startLoop();
-
-};
 
 const _getCurrentSceneSrc = () => {
 
@@ -78,45 +64,26 @@ const _getCurrentRoom = () => {
 
 export const AppContext = createContext();
 
-const useWebaverseApp = (() => {
-  let webaverse = null;
-  return () => {
-        if (webaverse === null) {
-            webaverse = new Webaverse();
-        }
-        return webaverse;
-  };
-})();
-
-let appStarted = false;
+const appStarted = false;
 
 export const App = () => {
     const [ state, setState ] = useState({openedPanel: null, openedModal: null});
     const [ showUI, setShowUI ] = useState('normal');
 
     const canvasRef = useRef(null);
-    const app = useWebaverseApp();
     const [ selectedApp, setSelectedApp ] = useState(null);
     const [ selectedScene, setSelectedScene ] = useState(_getCurrentSceneSrc());
     const [ selectedRoom, setSelectedRoom ] = useState(_getCurrentRoom());
     const multiplayerConnected = !! selectedRoom;
     const [ editMode, setEditMode ] = useState(false);
     const [ claimableToken, setClaimableToken ] = useState([]);
+    const [ spawnItem, setSpawnItem ] = useState([]);
     const [ mintedToken, setMintedToken ] = useState([]);
+    const [ resourceToken, setResourceToken ] = useState([]);
     const [ apps, setApps ] = useState(world.appManager.getApps().slice());
     const account = useContext(AccountContext);
     const chain = useContext(ChainContext);
-    const {getTokens} = useNFTContract(account.currentAddress);
-    //
-    
-    useEffect(() => {
-        if(canvasRef.current && !appStarted) {
-
-            _startApp(app, canvasRef.current);
-
-            appStarted = true;
-        }
-    }, [ canvasRef ]);
+    const {getTokens, getOTtokens} = useNFTContract(account.currentAddress);
 
     const [domHover, setDomHover] = useState(null)
 
@@ -288,7 +255,7 @@ export const App = () => {
     useEffect(_loadUrlState, []);
 
     useEffect(() => {
-        const claimschange = async e => {
+        const claimsChange = async e => {
             const {claims, addedClaim} = e.data;
             const claimableItem = claims.map(({name, start_url, type, voucher, serverDrop, level}) => ({
                 name,
@@ -309,9 +276,33 @@ export const App = () => {
 
             setClaimableToken(claimableItem);
         };
-        dropManager.addEventListener('claimschange', claimschange);
+        const spawnsChange = async e => {
+            const {spawns} = e.data;
+            const spawnItem = spawns.map(({name, start_url}) => ({
+                name,
+                start_url: start_url.split("index.js")[0],
+                description: "This is the Spawn Drop",
+                params: [
+                    {
+                        label: 'Token type',
+                        value: 'Seasonal Spawn Drop (Not Token)',
+                    },
+                ],
+                isSpawn: true,
+                claimed: true,
+                // type,
+                // voucher,
+                // serverDrop,
+                // level
+            }))
+
+            setSpawnItem(spawnItem);
+        };
+        dropManager.addEventListener('claimsChange', claimsChange);
+        dropManager.addEventListener('spawnschange', spawnsChange);
         return () => {
-            dropManager.removeEventListener('claimschange', claimschange);
+            dropManager.removeEventListener('claimsChange', claimsChange);
+            dropManager.removeEventListener('spawnschange', spawnsChange);
         };
     }, []);
 
@@ -320,7 +311,7 @@ export const App = () => {
             getWalletItems();
         } else {
             setMintedToken([]);
-            console.log('could not query NFT collections')
+            // console.log('could not query NFT collections')
         }
     }, [account])
 
@@ -341,6 +332,16 @@ export const App = () => {
           }
         ))
         setMintedToken(nftData)
+
+        const OTTokens = await getOTtokens(); // will add more Resource
+        if(OTTokens.nftList.totalCount) {
+            setResourceToken([{
+                name: "OT",
+                start_url: "https://webaverse.github.io/ot-shard/shard.glb",
+                claimed: true,
+                value: OTTokens.nftList.totalCount,
+            }])
+        }
       }
 
     //
@@ -370,7 +371,6 @@ export const App = () => {
     };
 
     const AppContextValues = {
-        app,
         state,
         setState,
         setSelectedApp,
@@ -381,8 +381,11 @@ export const App = () => {
         chain,
         claimableToken,
         setClaimableToken,
+        spawnItem,
+        setSpawnItem,
         mintedToken,
         setMintedToken,
+        resourceToken,
         getWalletItems,
     }
 
@@ -397,7 +400,6 @@ export const App = () => {
         >
         <DomRenderer />
         <canvas className={ classnames(styles.canvas, domHover ? styles.domHover : null) } ref={ canvasRef } />
-        <DragAndDrop />
         <IoHandler />
         {showUI &&
             <Fragment>

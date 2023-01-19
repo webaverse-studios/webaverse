@@ -1,6 +1,6 @@
 import metaversefile from 'metaversefile';
 
-const baseUrl = `/core-modules/`;
+const baseUrl = `https://local.webaverse.com/core-modules/`;
 
 const moduleUrls = {
   button: `${baseUrl}button/`,
@@ -30,6 +30,8 @@ const moduleUrls = {
   flare: `${baseUrl}flare/`,
   firedrop: `${baseUrl}firedrop/`,
   meshLodItem: `${baseUrl}mesh-lod-item/`,
+  transformIndicators: `${baseUrl}transform-indicators/`,
+  glider: `${baseUrl}glider/`,
 };
 const importModule = async moduleName => {
   const moduleUrl = moduleUrls[moduleName];
