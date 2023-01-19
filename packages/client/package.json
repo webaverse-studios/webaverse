@@ -20,7 +20,7 @@
   "scripts": {
     "install-libs": "bash scripts/npm-preinstall.sh",
     "start": "vite",
-    "dev": "vite dev",
+    "dev": "node dev-server.mjs",
     "prod": "bash scripts/start-prod.sh",
     "build": "vite build",
     "serve": "vite preview",

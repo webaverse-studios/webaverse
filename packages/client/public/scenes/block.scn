@@ -1,5 +1,13 @@
 {
   "objects": [
-
+    {
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "start_url": "https://plankatron.github.io/scenes/grid.glb",
+      "dynamic": false
+    }
   ]
 }

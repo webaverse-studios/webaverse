@@ -29,6 +29,7 @@ const _proxy = (req, res, u) => new Promise((resolve, reject) => {
       reject(err);
     });
   } else {
+
     res.redirect(u);
   }
 });
@@ -64,6 +65,15 @@ export default async function handler(req, res) {
         // check if-none-match (multiple)
         if (req.headers['if-none-match'] && req.headers['if-none-match'].split(',').includes(et)) {
           res.statusCode = 304;
+          res.setHeader('Access-Control-Allow-Methods', '*');
+          res.setHeader('Access-Control-Allow-Headers', '*');
+
+          // res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+          res.setHeader('Cache-Control', 'no-cache');
+          res.setHeader('Access-Control-Allow-Origin', '*');
+          res.setHeader('Cross-Origin-Opener-Policy', 'unsafe-none');
+          res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+          res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
           console.log('304', u);
           res.end();
         } else {

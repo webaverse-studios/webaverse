@@ -1,6 +1,6 @@
 import metaversefile from 'metaversefile';
 
-const baseUrl = `https://webaverse.github.io/core-modules/`;
+const baseUrl = `/core-modules/`;
 
 const moduleUrls = {
   button: `${baseUrl}button/`,
