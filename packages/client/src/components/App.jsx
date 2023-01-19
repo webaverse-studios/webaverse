@@ -64,8 +64,6 @@ const _getCurrentRoom = () => {
 
 export const AppContext = createContext();
 
-const appStarted = false;
-
 export const App = () => {
     const [ state, setState ] = useState({openedPanel: null, openedModal: null});
     const [ showUI, setShowUI ] = useState('normal');

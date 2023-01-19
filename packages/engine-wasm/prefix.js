@@ -1,0 +1,1 @@
+wasmModule('vxl', function(Module) {

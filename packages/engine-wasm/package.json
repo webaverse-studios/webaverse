@@ -1,0 +1,11 @@
+{
+  "name": "@webaverse-studios/engine-wasm",
+  "version": "0.6.0",
+  "description": "",
+  "author": "Webaverse",
+  "license": "MIT",
+  "scripts": {
+    "build": "bash ./compile.sh",
+    "move-build": "cp -r ./bin/* ../client/public/bin"
+  }
+}

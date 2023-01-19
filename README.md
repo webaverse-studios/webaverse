@@ -73,7 +73,7 @@ Starting the application is as easy as:
 npm run dev
 ```
 
-Once the server has started up, you can press the "A" key to visit `https://localhost:4200`.
+Once the server has started up, you can press the "A" key to visit `https://local.webaverse.com`.
 
 ## Installation and Running on Windows
 

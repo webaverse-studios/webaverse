@@ -1,0 +1,24 @@
+name: Webaverse WASM build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install emscripten
+        uses: mymindstorm/setup-emsdk@v6
+        with:
+          # Make sure to set a version number!
+          version: 2.0.1
+          # This is the name of the cache folder.
+          # The cache folder will be placed in the build directory,
+          #  so make sure it doesn't conflict with anything!
+          actions-cache-folder: 'emsdk-cache'
+      - run: ./compile.sh
