@@ -37,7 +37,8 @@ import {Infobox} from './Infobox';
 import {AiMenu} from './AiMenu';
 import {SceneMenu} from './SceneMenu';
 
-import { IoButtons } from './IoButtons';
+import {IoButtons} from './IoButtons';
+import {DragAndDrop} from './DragAndDrop';
 
 //
 
@@ -403,6 +404,7 @@ export const App = () => {
         <IoHandler />
         {showUI &&
             <Fragment>
+            <DragAndDrop />
                 <Modals />
                 <Header setSelectedApp={ setSelectedApp } selectedApp={ selectedApp } />
                 <Crosshair />
