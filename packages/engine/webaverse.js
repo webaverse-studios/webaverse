@@ -91,6 +91,7 @@ export default class Webaverse extends EventTarget {
     canvas.style.margin = '0';
     canvas.style.padding = '0';
     canvas.style.zIndex = '-1';
+    canvas.className = 'engine-canvas';
 
     // add the canvas to the engine container
     document.body.appendChild(canvas);
@@ -227,6 +228,7 @@ export default class Webaverse extends EventTarget {
   bindCanvas(c) {
     bindCanvas(c);
     postProcessing.bindCanvas();
+    cameraManager.pointerLockElement = canvas;
   }
 
   async isXrSupported() {

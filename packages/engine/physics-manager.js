@@ -8,7 +8,7 @@ import physx from './physx.js'
 import metaversefileApi from 'metaversefile'
 import {getNextPhysicsId, freePhysicsId, convertMeshToPhysicsMesh} from './util.js'
 import {CapsuleGeometry} from './geometries.js'
-import physxWorkerManager from './physx-worker-manager.js';
+import physxWorkerManager from '../../packages/engine/physx-worker-manager.js';
 import {BoxGeometry} from 'three';
 import {GET, GET_NORMALIZED, GET_INVERSE} from './constants.js'
 

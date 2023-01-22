@@ -447,7 +447,7 @@ class IoManager extends EventTarget {
         if (timeDiff < doubleTapTime && !canRotate) {
           game.menuMiddleToggle();
         } else {
-          game.menuMiddleUp();
+          // game.menuMiddleUp();
 
           if (canRotate) {
             grabManager.menuRotate(-1);
@@ -655,9 +655,11 @@ class IoManager extends EventTarget {
   };
 
   click = e => {
+    console.log('click')
     if (cameraManager.pointerLockElement) {
       grabManager.menuClick(e);
     } else if (!game.hoverEnabled) {
+      console.log('requesting pointer lock')
         cameraManager.requestPointerLock();
       }
     raycastManager.setLastMouseEvent(e);
@@ -714,7 +716,7 @@ class IoManager extends EventTarget {
       }
     }
     if ((changedButtons & 4) && !(e.buttons & 4)) { // middle
-      game.menuMiddleUp();
+      // game.menuMiddleUp();
     }
     this.lastMouseButtons = e.buttons;
     raycastManager.setLastMouseEvent(e);

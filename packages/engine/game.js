@@ -5,28 +5,26 @@ usually, code starts here and is migrated to an appropriate manager.
 */
 
 import * as THREE from 'three';
-import {avatarManager} from './avatar-manager.js';
-import Avatar from './avatars/avatars.js';
+import physx from './physx.js';
 import cameraManager from './camera-manager.js';
-import {crouchSpeed, flySpeed, gliderSpeed, IS_FLYING_ENABLED, IS_NARUTO_RUN_ENABLED, realmSize, throwAnimationDuration, throwReleaseTime, walkSpeed} from './constants.js';
-import dioramaManager from './diorama/diorama-manager.js';
-import grabManager from './grab-manager.js';
 import ioManager from './io-manager.js';
+import dioramaManager from './diorama/diorama-manager.js';
+import {world} from './world.js';
+import {buildMaterial, highlightMaterial, selectMaterial, hoverMaterial, hoverEquipmentMaterial} from './shaders.js';
+import {getRenderer, sceneLowPriority, camera} from './renderer.js';
+import {downloadFile, snapPosition, getDropUrl, handleDropJsonItem, makeId} from './util.js';
+import {maxGrabDistance, throwReleaseTime, throwAnimationDuration, walkSpeed, crouchSpeed, flySpeed, IS_NARUTO_RUN_ENABLED, gliderSpeed, IS_FLYING_ENABLED} from './constants.js';
+import metaversefileApi from 'metaversefile';
 import loadoutManager from './loadout-manager.js';
-import metaversefileApi from './metaversefile-api.js';
-import npcManager from './npc-manager.js';
+import * as sounds from './sounds.js';
+import {playersManager} from './players-manager.js';
 import {partyManager} from './party-manager.js';
 import physicsManager from './physics-manager.js';
-import physx from './physx.js';
-import {playersManager} from './players-manager.js';
 import raycastManager from './raycast-manager.js';
-import {camera, getRenderer, sceneLowPriority} from './renderer.js';
-import {buildMaterial, highlightMaterial, hoverEquipmentMaterial, hoverMaterial, selectMaterial} from './shaders.js';
-import * as sounds from './sounds.js';
-import universe from './universe.js';
-import {downloadFile, getDropUrl, handleDropJsonItem, makeId} from './util.js';
-import {getVoucherFromUser} from './voucherHelpers';
-import {world} from './world.js';
+import Avatar from './avatars/avatars.js';
+import {avatarManager} from './avatar-manager.js';
+import npcManager from './npc-manager.js';
+import grabManager from './grab-manager.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -35,16 +33,11 @@ const localVector4 = new THREE.Vector3();
 const localVector5 = new THREE.Vector3();
 const localVector6 = new THREE.Vector3();
 const localVector7 = new THREE.Vector3();
-const localVector2D = new THREE.Vector2();
 const localQuaternion = new THREE.Quaternion();
 const localEuler = new THREE.Euler();
 const localMatrix2 = new THREE.Matrix4();
 const localBox = new THREE.Box3();
 const localRay = new THREE.Ray();
-const localRaycaster = new THREE.Raycaster();
-
-const zeroVector = new THREE.Vector3(0, 0, 0);
-const upVector = new THREE.Vector3(0, 1, 0);
 
 const hitRadius = 1;
 const hitHeight = 0.2;
@@ -68,8 +61,6 @@ class GameManager extends EventTarget {
   grabUseMesh = null;
   isMouseUp = false;
   lastUseIndex = 0;
-  lastTransform = [NaN, NaN, NaN, NaN, NaN, NaN, NaN];
-  lastVelocity = [NaN, NaN, NaN];
 
   highlightedPhysicsObject = null;
   highlightedPhysicsId = 0;
@@ -113,15 +104,7 @@ class GameManager extends EventTarget {
     sceneLowPriority.add(this.mouseDomEquipmentHoverPhysicsMesh);
   }
 
-  async load() {
-    await npcManager.initDefaultPlayer();
-    loadoutManager.initDefault();
-    await universe.handleUrlUpdate();
-    console.log('initing')
-    this.#localInit();
-  }
-
-  #localInit() {
+  load() {
     this.grabUseMesh = metaversefileApi.createApp();
     (async () => {
       const {importModule} = metaversefileApi.useDefaultModules();
@@ -355,7 +338,6 @@ class GameManager extends EventTarget {
 
   menuAim() {
     const localPlayer = playersManager.getLocalPlayer();
-
     if (!localPlayer.hasAction('aim')) {
       const wearApp = loadoutManager.getSelectedApp();
       const wearAimApp = (() => {
@@ -393,8 +375,17 @@ class GameManager extends EventTarget {
     }
   }
 
+  menuMiddleDown() {
+  }
+
   menuMiddle() {
     // nothing
+  }
+
+  menuMiddleUp() {
+  }
+
+  menuMiddleToggle() {
   }
 
   menuDragdownRight(e) {
@@ -479,7 +470,6 @@ class GameManager extends EventTarget {
 
   menuBUp() {
     const localPlayer = playersManager.getLocalPlayer();
-    localPlayer.removeAction('sss');
     localPlayer.removeAction('dance');
   }
 
@@ -503,6 +493,11 @@ class GameManager extends EventTarget {
     if (switched) {
       sounds.playSoundName('menuReady');
     }
+  }
+
+  isGlidering() {
+    const localPlayer = playersManager.getLocalPlayer();
+    return localPlayer.hasAction('glider');
   }
 
   isFlying() {
@@ -581,12 +576,13 @@ class GameManager extends EventTarget {
 
     const newObject = {...object}
     if (newObject && newObject.voucher === undefined) {
-      const {voucher, expiry} = await getVoucherFromUser(newObject.tokenId, currentAddress, WebaversecontractAddress)
-      if (voucher.signature !== undefined) {
-        newObject.voucher = voucher
-        // add blacklist and time counter add
-        afterDrop(true)
-      }
+      console.error('no voucher')
+      // const {voucher, expiry} = await getVoucherFromUser(newObject.tokenId, currentAddress, WebaversecontractAddress)
+      // if (voucher.signature !== undefined) {
+      //   newObject.voucher = voucher
+      //   // add blacklist and time counter add
+      //   afterDrop(true)
+      // }
     } else {
         afterDrop(false)
     }
@@ -797,8 +793,8 @@ class GameManager extends EventTarget {
       speed = crouchSpeed;
     } else if (gameManager.isFlying()) {
       speed = flySpeed;
-    // } else if (gameManager.isGlidering()) {
-    //   speed = gliderSpeed;
+    } else if (gameManager.isGlidering()) {
+      speed = gliderSpeed;
     } else {
       speed = walkSpeed;
     }
@@ -944,34 +940,39 @@ class GameManager extends EventTarget {
     const renderer = getRenderer();
     const localPlayer = playersManager.getLocalPlayer();
 
-    const _updateRealms = () => {
-      if (universe.multiplayerConnected) {
-        const transformCalc = localPlayer.transform.reduce((acc, val, i) => {
-          acc.transform.push(val);
-          acc.changed = acc.changed || val !== this.lastTransform[i];
-          return acc;
-        }, {transform: [], changed: false});
+    const _updateGrab = () => {
+      const renderer = getRenderer();
+      const _isWear = o => localPlayer.findAction(action => action.type === 'wear' && action.instanceId === o.instanceId);
 
-        if (transformCalc.changed) {
-          universe.realms.updatePosition(transformCalc.transform.slice(0, 3), realmSize);
-          const transformAndTimestamp = [...transformCalc.transform, performance.now()];
-          universe.realms.localPlayer.setKeyValue('transform', transformAndTimestamp);
-          this.lastTransform = transformCalc.transform;
-        }
+      this.grabUseMesh.visible = false;
+      if (!grabManager.editMode) {
+        const avatarHeight = localPlayer.avatar ? localPlayer.avatar.height : 0;
+        localVector.copy(localPlayer.position)
+          .add(localVector2.set(0, avatarHeight * (1 - localPlayer.getCrouchFactor()) * 0.5, -0.3).applyQuaternion(localPlayer.quaternion));
 
-        const velocityCalc = localPlayer.characterPhysics.velocity.toArray().reduce((acc, val, i) => {
-          acc.velocity.push(val);
-          acc.changed = acc.changed || val !== this.lastVelocity[i];
-          return acc;
-        }, {velocity: [], changed: false});
+        const radius = 1;
+        const halfHeight = 0.1;
+        const physicsScene = physicsManager.getScene();
+        const collision = physicsScene.getCollisionObject(radius, halfHeight, localVector, localPlayer.quaternion);
+        if (collision) {
+          const physicsId = collision.objectId;
+          const object = metaversefileApi.getAppByPhysicsId(physicsId);
+          // console.log('got collision', physicsId, object);
+          const physicsObject = metaversefileApi.getPhysicsObjectByPhysicsId(physicsId);
+          if (object && !_isWear(object) && physicsObject && !object.getComponent('invincible')) {
+            this.grabUseMesh.position.setFromMatrixPosition(physicsObject.physicsMesh.matrixWorld);
+            this.grabUseMesh.quaternion.copy(camera.quaternion);
+            this.grabUseMesh.updateMatrixWorld();
+            this.grabUseMesh.targetApp = object;
+            this.grabUseMesh.targetPhysicsId = physicsId;
+            this.grabUseMesh.setComponent('value', physx.physxWorker.getActionInterpolantAnimationAvatar(localPlayer.avatar.animationAvatarPtr, 'activate', 1));
 
-        if (velocityCalc.changed) {
-          universe.realms.localPlayer.setKeyValue('velocity', velocityCalc.velocity);
-          this.lastVelocity = velocityCalc.velocity;
+            this.grabUseMesh.visible = true;
+          }
         }
       }
     };
-    _updateRealms();
+    _updateGrab();
 
     const _handlePickUp = () => {
       const pickUpAction = localPlayer.getAction('pickUp');

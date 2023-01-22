@@ -184,7 +184,7 @@ export const startGame = async ({
   };
 
   // main game element
-  const gameEl = document.getElementById('game');
+  const gameEl = document.getElementById('engine-canvas');
   // realms canvases
   const realmsCanvases = new GameRealmsCanvases(realms);
   gameEl.appendChild(realmsCanvases.element);
@@ -604,16 +604,8 @@ export const startGame = async ({
     });
 
     // wait for the network to be ready befor binding controls
-    realms.addEventListener('networkreconfigure', e => {
-      const _bindControls = () => {
-        const mousemove = e => {
-          mouseState.x = e.clientX;
-          mouseState.y = e.clientY;
-        };
-        window.addEventListener('mousemove', mousemove);
-      };
-      _bindControls();
-    }, {once: true});
+    // realms.addEventListener('networkreconfigure', e => {
+    // }, {once: true});
   };
   _initLogic();
 
