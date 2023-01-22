@@ -15,6 +15,7 @@ export const Location = () => {
   const [scenesList, setScenesList] = useState([]);
   const [rooms, setRooms] = useState([]);
   const {
+    state,
     setState,
   } = useContext(AppContext);
 
@@ -33,7 +34,7 @@ export const Location = () => {
   }, []);
 
   const handleSceneSelect = (event, sceneName) => {
-    setState({openedModal: null});
+    setState({...state, openedModal: null});
     sceneName = sceneName ?? event.target.value;
     universe.pushUrl(`/?src=${encodeURIComponent(sceneName)}`);
   };
@@ -59,6 +60,7 @@ export const Location = () => {
   };
 
   const handleMultiplayerBtnClick = async () => {
+    setState({...state, openedModal: null});
     let {src} = parseQuery(window.location.search);
     if (src === undefined) {
       src = scenesBaseUrl + defaultSceneName;
