@@ -37,6 +37,8 @@ import {Infobox} from './Infobox';
 import {AiMenu} from './AiMenu';
 import {SceneMenu} from './SceneMenu';
 
+import { IoButtons } from './IoButtons';
+
 //
 
 const _getCurrentSceneSrc = () => {
@@ -404,6 +406,7 @@ export const App = () => {
                 <Modals />
                 <Header setSelectedApp={ setSelectedApp } selectedApp={ selectedApp } />
                 <Crosshair />
+                <IoButtons showUI={showUI} setShowUI={setShowUI} />
                 <Hotbar />
                 <Infobox />
                 <Chat />

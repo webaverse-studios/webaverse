@@ -1,0 +1,22 @@
+.locationMenu {
+    position: absolute;
+    top: 155px;
+    width: 128px;
+    height: 115px;
+    /* center the menu on the screen with a transform */
+    transform: translate(-50%, -50%);
+    left: 50%;
+    margin: 0 auto;
+    
+    
+}
+.locationMenu .controls {
+    top: -28px;
+    left: 4px;
+    text-align: center;
+    position: absolute;
+    width: 100%;
+}
+.locationMenu .controls .button {
+    margin: 0 1px;
+}
