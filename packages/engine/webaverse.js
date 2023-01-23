@@ -228,7 +228,6 @@ export default class Webaverse extends EventTarget {
   bindCanvas(c) {
     bindCanvas(c);
     postProcessing.bindCanvas();
-    cameraManager.pointerLockElement = canvas;
   }
 
   async isXrSupported() {
