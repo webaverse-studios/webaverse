@@ -119,6 +119,7 @@ namespace AnimationSystem {
     float useTime;
     float useAnimationEnvelopeLength;
     float hurtTime;
+    float readyGrabTime;
     float unuseTime;
     float aimTime;
     float aimMaxTime;
@@ -160,6 +161,7 @@ namespace AnimationSystem {
     bool danceState;
     bool emoteState;
     bool hurtState;
+    bool readyGrabState;
     bool rightHandState;
     bool leftHandState;
     bool sprintState;
@@ -188,6 +190,7 @@ namespace AnimationSystem {
     void addAction(char *scratchStack, unsigned int stringByteLength);
     void removeAction(char *scratchStack, unsigned int stringByteLength);
     float getActionInterpolant(char *scratchStack, unsigned int stringByteLength, unsigned int type = 0); // 0: get(), 1: getNormalized(), 2: getInverse()
+    void getValues(float *scratchStack);
   };
   class AnimationMixer {
   public:

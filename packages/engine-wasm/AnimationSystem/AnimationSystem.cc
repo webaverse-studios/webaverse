@@ -221,6 +221,7 @@ namespace AnimationSystem {
     avatar->actionInterpolants["fallLoop"] = new InfiniteActionInterpolant(0);
     avatar->actionInterpolants["fallLoopTransition"] = new BiActionInterpolant(0, 300);
     avatar->actionInterpolants["hurt"] = new InfiniteActionInterpolant(0);
+    avatar->actionInterpolants["readyGrab"] = new BiActionInterpolant(0, animationGroups[animationGroupIndexes.Single][singleAnimationIndexes.ReadyGrab]->duration * 1000);
     avatar->actionInterpolants["aimRightTransition"] = new BiActionInterpolant(0, 150);
     avatar->actionInterpolants["aimLeftTransition"] = new BiActionInterpolant(0, 150);
     avatar->actionInterpolants["sprint"] = new BiActionInterpolant(0, 200);
@@ -371,6 +372,7 @@ namespace AnimationSystem {
     this->actionInterpolants["fallLoop"]->update(timeDiff, this->fallLoopState);
     this->actionInterpolants["fallLoopTransition"]->update(timeDiff, this->fallLoopState);
     this->actionInterpolants["hurt"]->update(timeDiff, this->hurtState);
+    this->actionInterpolants["readyGrab"]->update(timeDiff, this->readyGrabState);
     this->actionInterpolants["aimRightTransition"]->update(timeDiff, this->aimState && this->rightHandState);
     this->actionInterpolants["aimLeftTransition"]->update(timeDiff, this->aimState && this->leftHandState);
     this->actionInterpolants["sprint"]->update(timeDiff, this->sprintState);
@@ -465,6 +467,8 @@ namespace AnimationSystem {
     this->fallLoopFactor = this->actionInterpolants["fallLoopTransition"]->getNormalized();
 
     this->hurtTime = this->actionInterpolants["hurt"]->get();
+
+    this->readyGrabTime = this->actionInterpolants["readyGrab"]->get();
 
     float sprintTime = this->actionInterpolants["sprint"]->get();
     this->sprintFactor = fmin(fmax(sprintTime / 200, 0), 1);
@@ -565,6 +569,8 @@ namespace AnimationSystem {
       this->emoteState = true;
     } else if (j["type"] == "hurt") {
       this->hurtState = true;
+    } else if (j["type"] == "readyGrab") {
+      this->readyGrabState = true;
     } else if (j["type"] == "rightHand") {
       this->rightHandState = true;
     } else if (j["type"] == "leftHand") {
@@ -624,6 +630,8 @@ namespace AnimationSystem {
       this->emoteState = false;
     } else if (j["type"] == "hurt") {
       this->hurtState = false;
+    } else if (j["type"] == "readyGrab") {
+      this->readyGrabState = false;
     } else if (j["type"] == "rightHand") {
       this->rightHandState = false;
     } else if (j["type"] == "leftHand") {
@@ -651,6 +659,82 @@ namespace AnimationSystem {
       return interpolantValue;
     }
     return -1;
+  }
+  void Avatar::getValues(float *scratchStack) {
+    unsigned int index = 0;
+    scratchStack[index++] = this->activateTime;
+    scratchStack[index++] = this->landTime;
+    scratchStack[index++] = this->fallLoopFactor;
+    scratchStack[index++] = this->fallLoopTime;
+    scratchStack[index++] = this->skydiveTime;
+    scratchStack[index++] = this->gliderTime;
+    scratchStack[index++] = this->flyTime;
+    scratchStack[index++] = this->doubleJumpTime;
+    scratchStack[index++] = this->jumpTime;
+    scratchStack[index++] = this->narutoRunTime;
+    scratchStack[index++] = this->danceFactor;
+    scratchStack[index++] = this->emoteFactor;
+    scratchStack[index++] = this->lastEmoteTime;
+    scratchStack[index++] = this->idleWalkFactor;
+    scratchStack[index++] = this->useTime;
+    scratchStack[index++] = this->useAnimationEnvelopeLength;
+    scratchStack[index++] = this->hurtTime;
+    scratchStack[index++] = this->readyGrabTime;
+    scratchStack[index++] = this->unuseTime;
+    scratchStack[index++] = this->aimTime;
+    scratchStack[index++] = this->aimMaxTime;
+    scratchStack[index++] = this->walkRunFactor;
+    scratchStack[index++] = this->crouchFactor;
+    scratchStack[index++] = this->pickUpTime;
+    scratchStack[index++] = this->forwardFactor;
+    scratchStack[index++] = this->backwardFactor;
+    scratchStack[index++] = this->leftFactor;
+    scratchStack[index++] = this->rightFactor;
+    scratchStack[index++] = this->mirrorLeftFactorReverse;
+    scratchStack[index++] = this->mirrorLeftFactor;
+    scratchStack[index++] = this->mirrorRightFactorReverse;
+    scratchStack[index++] = this->mirrorRightFactor;
+    scratchStack[index++] = this->landTimeS;
+    scratchStack[index++] = this->timeSinceLastMoveS;
+    scratchStack[index++] = this->swimTime;
+    scratchStack[index++] = this->movementsTime;
+    scratchStack[index++] = this->sprintFactor;
+    scratchStack[index++] = this->movementsTransitionFactor;
+    scratchStack[index++] = this->jumpState;
+    scratchStack[index++] = this->doubleJumpState;
+    scratchStack[index++] = this->landState;
+    scratchStack[index++] = this->flyState;
+    scratchStack[index++] = this->crouchState;
+    scratchStack[index++] = this->narutoRunState;
+    scratchStack[index++] = this->sitState;
+    scratchStack[index++] = this->holdState;
+    scratchStack[index++] = this->pickUpState;
+    scratchStack[index++] = this->swimState;
+    scratchStack[index++] = this->activateState;
+    scratchStack[index++] = this->useState;
+    scratchStack[index++] = this->aimState;
+    scratchStack[index++] = this->fallLoopState;
+    scratchStack[index++] = this->skydiveState;
+    scratchStack[index++] = this->gliderState;
+    scratchStack[index++] = this->danceState;
+    scratchStack[index++] = this->emoteState;
+    scratchStack[index++] = this->hurtState;
+    scratchStack[index++] = this->readyGrabState;
+    scratchStack[index++] = this->rightHandState;
+    scratchStack[index++] = this->leftHandState;
+    scratchStack[index++] = this->sprintState;
+    scratchStack[index++] = this->movementsState;
+    scratchStack[index++] = this->landWithMoving;
+    scratchStack[index++] = this->fallLoopFromJump;
+    scratchStack[index++] = this->activateAnimationIndex;
+    scratchStack[index++] = this->sitAnimationIndex;
+    scratchStack[index++] = this->danceAnimationIndex;
+    scratchStack[index++] = this->emoteAnimationIndex;
+    scratchStack[index++] = this->useAnimationIndex;
+    scratchStack[index++] = this->useAnimationComboIndex;
+    scratchStack[index++] = this->hurtAnimationIndex;
+    scratchStack[index++] = this->unuseAnimationIndex;
+    scratchStack[index++] = this->aimAnimationIndex;
   }
   AnimationMixer *createAnimationMixer() {
     AnimationMixer *animationMixer = new AnimationMixer();
@@ -1013,6 +1097,33 @@ namespace AnimationSystem {
     }
   }
 
+  void _blendReadyGrab(AnimationMapping &spec, Avatar *avatar) {
+    _handleDefault(spec, avatar);
+
+    Animation *readyGrabAnimation = animationGroups[animationGroupIndexes.Single][singleAnimationIndexes.ReadyGrab];
+    float t2 = avatar->readyGrabTime / 1000;
+    float *v2 = evaluateInterpolant(readyGrabAnimation, spec.index, t2);
+
+    // copyValue(spec.dst, v2, spec.isPosition);
+    float f = clamp(avatar->readyGrabTime / 200, 0, 1);
+
+    if (spec.index == boneIndexes.Spine || spec.index == boneIndexes.Chest || spec.index == boneIndexes.UpperChest || spec.index == boneIndexes.Neck || spec.index == boneIndexes.Head) {
+      if (!spec.isPosition) {
+        multiplyQuaternionsFlat(spec.dst, 0, v2, 0, spec.dst, 0);
+      } else {
+        interpolateFlat(spec.dst, 0, spec.dst, 0, v2, 0, f, spec.isPosition);
+      }
+    } else {
+      if (!spec.isTop) {
+        f *= (1 - avatar->idleWalkFactor);
+      }
+
+      interpolateFlat(spec.dst, 0, spec.dst, 0, v2, 0, f, spec.isPosition);
+    }
+
+    // _clearXZ(spec.dst, spec.isPosition);
+  }
+
   void _blendAim(AnimationMapping &spec, Avatar *avatar) {
     _handleDefault(spec, avatar);
 
@@ -1343,6 +1454,8 @@ namespace AnimationSystem {
         _blendHold(spec, this->avatar);
       } else if (avatar->pickUpState) {
         _blendPickUp(spec, this->avatar);
+      } else if (avatar->readyGrabTime > 0) {
+        _blendReadyGrab(spec, this->avatar);
       } else {
         _handleDefault(spec, this->avatar);
       }
