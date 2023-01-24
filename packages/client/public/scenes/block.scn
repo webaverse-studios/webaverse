@@ -1,13 +1,23 @@
 {
   "objects": [
     {
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "start_url": "https://plankatron.github.io/scenes/grid.glb",
-      "dynamic": false
-    }
+      "type": "application/light",
+      "content": {
+        "lightType": "ambient",
+        "args": [[255, 255, 255], 2]
+      }
+    },
+    {
+      "type": "application/light",
+      "content": {
+        "lightType": "directional",
+        "args": [[255, 255, 255], 2],
+        "position": [1, 2, 3]
+      }
+    },
+    
+    { "position": [-5, 0, 0], "quaternion": [0, 0, 0, 1], "start_url": "https://local.webaverse.com/hovercraft/" },
+
+    { "position": [ 0, 0, 0 ], "scale": [1, 1, 1], "start_url": "https://local.webaverse.com/block/grid.glb" }
   ]
 }

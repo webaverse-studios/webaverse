@@ -152,9 +152,9 @@ export default e => {
 
   e.waitUntil((async () => {
     let u2 = baseUrl + 'assets/iphone.glb';
-    if (/^https?:/.test(u2)) {
-      u2 = '/@proxy/' + u2;
-    }
+    // if (/^https?:/.test(u2)) {
+    //   u2 = '/@proxy/' + u2;
+    // }
     const phoneModel = await metaversefile.import(u2);
     phoneApp = metaversefile.createApp({
       name: u2,
@@ -171,30 +171,35 @@ export default e => {
       phoneApp.setComponent(key, value);
     }
     await phoneApp.addModule(phoneModel);
-
-    let u3 = baseUrl + 'assets/cone.glb';
-    if (/^https?:/.test(u3)) {
-      u3 = '/@proxy/' + u3;
-    }
-    const coneModel = await metaversefile.import(u3);
-    beamApp = metaversefile.createApp({
-      name: u3,
+    // debugger
+    phoneApp.getPhysicsObjects().forEach(physicsObject => {
+      // debugger
+      physics.disableActor(physicsObject); // todo: don't add physicsObjects at fisrt at all?
     });
-    beamApp.name = 'beam effect';
-    
-    app.add(beamApp);
-    beamApp.updateMatrixWorld();
-    beamApp.contentId = u3;
-    beamApp.instanceId = app.instanceId;
 
-    await beamApp.addModule(coneModel);
-    beamApp.position.y = 0.13;
-    beamApp.position.z = -0.02;
-    coneMesh = beamApp.children[0].children[0];
-    coneMesh.material = beamShaderMaterial;
-    coneMesh.rotation.x = -Math.PI / 2;
-    coneMesh.castShadow = false;
-    coneMesh.receiveShadow = false;
+    // let u3 = baseUrl + 'assets/cone.glb';
+    // // if (/^https?:/.test(u3)) {
+    // //   u3 = '/@proxy/' + u3;
+    // // }
+    // const coneModel = await metaversefile.import(u3);
+    // beamApp = metaversefile.createApp({
+    //   name: u3,
+    // });
+    // beamApp.name = 'beam effect';
+    
+    // app.add(beamApp);
+    // beamApp.updateMatrixWorld();
+    // beamApp.contentId = u3;
+    // beamApp.instanceId = app.instanceId;
+
+    // await beamApp.addModule(coneModel);
+    // beamApp.position.y = 0.13;
+    // beamApp.position.z = -0.02;
+    // coneMesh = beamApp.children[0].children[0];
+    // coneMesh.material = beamShaderMaterial;
+    // coneMesh.rotation.x = -Math.PI / 2;
+    // coneMesh.castShadow = false;
+    // coneMesh.receiveShadow = false;
   })());
 
   let wearing = false;
@@ -231,24 +236,43 @@ export default e => {
   };
 
   useFrame(({timestamp}) => {
-    const grabAction = localPlayer.getAction('grab');
-    if(wearing && grabAction && coneMesh) {
-      beamApp.matrixWorld.decompose(localVector2, localQuaternion, localVector3);
-      const o = getAppByInstanceId(grabAction.instanceId);
-      const box = getPhysicalBoundingBox(o);
-      const center = getBBCenter(box);
+    // app.getPhysicsObjects().forEach(physicsObject => {
+    //   debugger
+    //   physics.disableActor(physicsObject);
+    // });
 
-      beamApp.lookAt(center);
-      const distance = localVector2.distanceTo(center);
-      beamApp.scale.set(1, 1, distance).divideScalar(2);
-      beamApp.updateMatrixWorld();
+    // const grabAction = localPlayer.getAction('grab');
+    // if(wearing && grabAction && coneMesh) {
+    //   beamApp.matrixWorld.decompose(localVector2, localQuaternion, localVector3);
+    //   const o = getAppByInstanceId(grabAction.instanceId);
+    //   const box = getPhysicalBoundingBox(o);
+    //   const center = getBBCenter(box);
 
-      coneMesh.material.uniforms.uTime.value = timestamp / 1000;
-      coneMesh.material.uniforms.iResolution.value.set(window.innerWidth, window.innerHeight, 1);
-      coneMesh.material.uniforms.distance.value = distance;
-    } else if(!grabAction && coneMesh && coneMesh.material.uniforms.uTime.value > 0) {
-      coneMesh.material.uniforms.uTime.value = 0;
-      coneMesh.material.uniforms.iResolution.value.set(0, 0, 0);
+    //   beamApp.lookAt(center);
+    //   const distance = localVector2.distanceTo(center);
+    //   beamApp.scale.set(1, 1, distance).divideScalar(2);
+    //   beamApp.updateMatrixWorld();
+
+    //   coneMesh.material.uniforms.uTime.value = timestamp / 1000;
+    //   coneMesh.material.uniforms.iResolution.value.set(window.innerWidth, window.innerHeight, 1);
+    //   coneMesh.material.uniforms.distance.value = distance;
+    // } else if(!grabAction && coneMesh && coneMesh.material.uniforms.uTime.value > 0) {
+    //   coneMesh.material.uniforms.uTime.value = 0;
+    //   coneMesh.material.uniforms.iResolution.value.set(0, 0, 0);
+    // }
+    
+    // const readyGrabAction = localPlayer.getAction('readyGrab');
+    // if (readyGrabAction) {
+      
+    // }
+    if (phoneApp) {
+      localPlayer.avatar.foundModelBones.Right_wrist.matrixWorld.decompose(localVector, localQuaternion, localVector2);
+      phoneApp.position.copy(localVector);
+      phoneApp.position.add(localVector.set(-0.03, -0.05, -0.02));
+      phoneApp.quaternion.copy(localQuaternion).premultiply(localQuaternion.set(0.6272114, -0.3265056, 0.3265056, 0.6272114));
+      // phone
+      // phoneEditTool.matrix.copy(localPlayer.avatar.foundModelBones.Right_wrist.matrix);
+      phoneApp.updateMatrixWorld();
     }
   });
 
