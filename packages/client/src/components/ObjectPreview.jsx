@@ -60,7 +60,12 @@ const ObjectPreview = ({
         const controls = new OrbitControls(camera, canvas);
         // controls.update() must be called after any manual changes to the camera's transform
         // camera.position.set( 0, 20, 100 );
-        
+
+        const localVector = new THREE.Vector3();
+        const center = localBox.setFromObject(object).getCenter(localVector);
+        controls.target.copy(center)
+        controls.update();
+
         const _updateControls = () => {
           controls.update();
           frame = requestAnimationFrame(_updateControls);
