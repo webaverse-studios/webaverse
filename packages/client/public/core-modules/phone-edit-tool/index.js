@@ -266,12 +266,9 @@ export default e => {
       
     // }
     if (phoneApp) {
-      localPlayer.avatar.foundModelBones.Right_wrist.matrixWorld.decompose(localVector, localQuaternion, localVector2);
-      phoneApp.position.copy(localVector);
-      phoneApp.position.add(localVector.set(-0.03, -0.05, -0.02));
-      phoneApp.quaternion.copy(localQuaternion).premultiply(localQuaternion.set(0.6272114, -0.3265056, 0.3265056, 0.6272114));
-      // phone
-      // phoneEditTool.matrix.copy(localPlayer.avatar.foundModelBones.Right_wrist.matrix);
+      localPlayer.avatar.foundModelBones.Right_wrist.matrixWorld.decompose(phoneApp.position, phoneApp.quaternion, localVector);
+      phoneApp.position.add(localVector.set(-0.03, -0.05, -0.02).applyQuaternion(phoneApp.quaternion));
+      phoneApp.quaternion.multiply(localQuaternion.set(0.6272114, -0.3265056, 0.3265056, 0.6272114));
       phoneApp.updateMatrixWorld();
     }
   });
