@@ -400,7 +400,7 @@ class Grabmanager extends EventTarget {
         if (collision) {
           const physicsId = collision.objectId;
           const app = metaversefileApi.getAppByPhysicsId(physicsId);
-          if(!app.getComponent('invincible')) {
+          if(app && !app.getComponent('invincible')) {
             highlightedPhysicsObject = app;
             highlightedPhysicsId = physicsId;
           }
