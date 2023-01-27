@@ -141,7 +141,10 @@ const beamShaderMaterial = new THREE.ShaderMaterial({
 
 export default e => {
   const app = useApp();
+  window.app = app
+  app.visible = false;
   const physics = usePhysics()
+  window.physics = physics
   const localPlayer = useLocalPlayer();
   
   const {components} = app;
@@ -159,6 +162,7 @@ export default e => {
     phoneApp = metaversefile.createApp({
       name: u2,
     });
+    window.phoneApp = phoneApp
     phoneApp.name = 'phone';
     phoneApp.scale.set(0.07, 0.07, 0.07);
     
@@ -242,47 +246,51 @@ export default e => {
   };
 
   useFrame(({timestamp}) => {
-    // app.getPhysicsObjects().forEach(physicsObject => {
-    //   debugger
-    //   physics.disableActor(physicsObject);
-    // });
-
-    const grabAction = localPlayer.getAction('grab');
-    if (globalThis.isDebugger) debugger
-    if(grabAction && coneMesh) {
-      beamApp.matrixWorld.decompose(localVector2, localQuaternion, localVector3);
-      const o = getAppByInstanceId(grabAction.instanceId);
-      const box = getPhysicalBoundingBox(o);
-      const center = getBBCenter(box);
-
-      beamApp.lookAt(center);
-      const distance = localVector2.distanceTo(center);
-      beamApp.scale.set(1, 1, distance).divideScalar(2);
-      beamApp.updateMatrixWorld();
-
-      coneMesh.material.uniforms.uTime.value = timestamp / 1000;
-      coneMesh.material.uniforms.iResolution.value.set(window.innerWidth, window.innerHeight, 1);
-      coneMesh.material.uniforms.distance.value = distance;
-
-      console.log(`beamApp.visible = true;`)
-      beamApp.visible = true;
-    } else if(!grabAction && coneMesh && coneMesh.material.uniforms.uTime.value > 0) {
-      // coneMesh.material.uniforms.uTime.value = 0;
-      // coneMesh.material.uniforms.iResolution.value.set(0, 0, 0);
-
-      console.log(`beamApp.visible = false;`)
-      beamApp.visible = false;
-    }
-    
+    // console.log('useFrame')
     // const readyGrabAction = localPlayer.getAction('readyGrab');
-    // if (readyGrabAction) {
+    if (physics.getActionInterpolant(localPlayer, 'readyGrab') > 0) {
+      // app.getPhysicsObjects().forEach(physicsObject => {
+      //   debugger
+      //   physics.disableActor(physicsObject);
+      // });
+
+      const grabAction = localPlayer.getAction('grab');
+      if (globalThis.isDebugger) debugger
+      if(grabAction && coneMesh) {
+        beamApp.matrixWorld.decompose(localVector2, localQuaternion, localVector3);
+        const o = getAppByInstanceId(grabAction.instanceId);
+        const box = getPhysicalBoundingBox(o);
+        const center = getBBCenter(box);
+
+        beamApp.lookAt(center);
+        const distance = localVector2.distanceTo(center);
+        beamApp.scale.set(1, 1, distance).divideScalar(2);
+        beamApp.updateMatrixWorld();
+
+        coneMesh.material.uniforms.uTime.value = timestamp / 1000;
+        coneMesh.material.uniforms.iResolution.value.set(window.innerWidth, window.innerHeight, 1);
+        coneMesh.material.uniforms.distance.value = distance;
+
+        console.log(`beamApp.visible = true;`)
+        beamApp.visible = true;
+      } else if(!grabAction && coneMesh && coneMesh.material.uniforms.uTime.value > 0) {
+        // coneMesh.material.uniforms.uTime.value = 0;
+        // coneMesh.material.uniforms.iResolution.value.set(0, 0, 0);
+
+        console.log(`beamApp.visible = false;`)
+        beamApp.visible = false;
+      }
       
-    // }
-    if (app) {
-      localPlayer.avatar.foundModelBones.Right_wrist.matrixWorld.decompose(app.position, app.quaternion, localVector);
-      app.position.add(localVector.set(-0.03, -0.05, -0.02).applyQuaternion(app.quaternion));
-      app.quaternion.multiply(localQuaternion.set(0.6272114, -0.3265056, 0.3265056, 0.6272114));
-      app.updateMatrixWorld();
+      if (app) {
+        localPlayer.avatar.foundModelBones.Right_wrist.matrixWorld.decompose(app.position, app.quaternion, localVector);
+        app.position.add(localVector.set(-0.03, -0.05, -0.02).applyQuaternion(app.quaternion));
+        app.quaternion.multiply(localQuaternion.set(0.6272114, -0.3265056, 0.3265056, 0.6272114));
+        app.updateMatrixWorld();
+      }
+
+      app.visible = true;
+    } else {
+      app.visible = false;
     }
   });
 

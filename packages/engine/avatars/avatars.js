@@ -1830,6 +1830,7 @@ class Avatar {
       // physx.physxWorker.getValuesAnimationAvatar(this.animationAvatarPtr)
 
       // console.log(physx.physxWorker.getActionInterpolantAnimationAvatar(this.animationAvatarPtr, 'land', 0))
+      // console.log(physx.physxWorker.getActionInterpolantAnimationAvatar(this.animationAvatarPtr, 'readyGrab', 0))
 
       // if (actionsStr === 'movements,fallLoop') {
       // if (actionsStr === 'movements,fallLoop,fallLoopFromjump') {
