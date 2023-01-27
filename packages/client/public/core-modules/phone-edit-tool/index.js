@@ -141,10 +141,8 @@ const beamShaderMaterial = new THREE.ShaderMaterial({
 
 export default e => {
   const app = useApp();
-  window.app = app
   app.visible = false;
   const physics = usePhysics()
-  window.physics = physics
   const localPlayer = useLocalPlayer();
   
   const {components} = app;
@@ -155,14 +153,10 @@ export default e => {
 
   e.waitUntil((async () => {
     let u2 = baseUrl + 'assets/iphone.glb';
-    // if (/^https?:/.test(u2)) {
-    //   u2 = '/@proxy/' + u2;
-    // }
     const phoneModel = await metaversefile.import(u2);
     phoneApp = metaversefile.createApp({
       name: u2,
     });
-    window.phoneApp = phoneApp
     phoneApp.name = 'phone';
     phoneApp.scale.set(0.07, 0.07, 0.07);
     
@@ -175,23 +169,17 @@ export default e => {
       phoneApp.setComponent(key, value);
     }
     await phoneApp.addModule(phoneModel);
-    // debugger
     phoneApp.getPhysicsObjects().forEach(physicsObject => {
-      // debugger
-      physics.disableActor(physicsObject); // todo: don't add physicsObjects at fisrt at all?
+      physics.disableActor(physicsObject);
     });
 
     let u3 = baseUrl + 'assets/cone.glb';
-    // // if (/^https?:/.test(u3)) {
-    // //   u3 = '/@proxy/' + u3;
-    // // }
     const coneModel = await metaversefile.import(u3);
     beamApp = metaversefile.createApp({
       name: u3,
     });
     beamApp.name = 'beam effect';
     beamApp.visible = false;
-    window.beamApp = beamApp
     
     app.add(beamApp);
     beamApp.updateMatrixWorld();
@@ -207,8 +195,7 @@ export default e => {
     coneMesh.castShadow = false;
     coneMesh.receiveShadow = false;
     beamApp.getPhysicsObjects().forEach(physicsObject => {
-      // debugger
-      physics.disableActor(physicsObject); // todo: don't add physicsObjects at fisrt at all?
+      physics.disableActor(physicsObject);
     });
   })());
 
@@ -246,16 +233,8 @@ export default e => {
   };
 
   useFrame(({timestamp}) => {
-    // console.log('useFrame')
-    // const readyGrabAction = localPlayer.getAction('readyGrab');
     if (physics.getActionInterpolant(localPlayer, 'readyGrab') > 0) {
-      // app.getPhysicsObjects().forEach(physicsObject => {
-      //   debugger
-      //   physics.disableActor(physicsObject);
-      // });
-
       const grabAction = localPlayer.getAction('grab');
-      if (globalThis.isDebugger) debugger
       if(grabAction && coneMesh) {
         beamApp.matrixWorld.decompose(localVector2, localQuaternion, localVector3);
         const o = getAppByInstanceId(grabAction.instanceId);
@@ -271,13 +250,11 @@ export default e => {
         coneMesh.material.uniforms.iResolution.value.set(window.innerWidth, window.innerHeight, 1);
         coneMesh.material.uniforms.distance.value = distance;
 
-        console.log(`beamApp.visible = true;`)
         beamApp.visible = true;
       } else if(!grabAction && coneMesh && coneMesh.material.uniforms.uTime.value > 0) {
         // coneMesh.material.uniforms.uTime.value = 0;
         // coneMesh.material.uniforms.iResolution.value.set(0, 0, 0);
 
-        console.log(`beamApp.visible = false;`)
         beamApp.visible = false;
       }
       
