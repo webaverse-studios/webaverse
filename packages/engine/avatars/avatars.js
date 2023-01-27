@@ -345,7 +345,7 @@ class Avatar {
 
     this.options = options;
 
-    this.vrmExtension = object?.parser?.json?.extensions?.VRM;
+    this.vrmExtension = object?.parser?.json?.extensions?.VRM || object?.parser?.json?.extensions?.VRMC_vrm;
     this.firstPersonCurves = getFirstPersonCurves(this.vrmExtension); 
 
     //
@@ -693,20 +693,47 @@ class Avatar {
 
     this.debugMesh = null;
 
+    const isVrmVersion0 = parseFloat(this.vrmExtension.specVersion) < 1;
+
     this.faceposes = [];
     if (this.options.visemes) {
-      // ["Neutral", "A", "I", "U", "E", "O", "Blink", "Blink_L", "Blink_R", "Angry", "Fun", "Joy", "Sorrow", "Surprised"]
+      const presetNameMapV0toV1 = {
+        'blink_l': 'blinkLeft',
+        'blink_r': 'blinkRight',
+        'a': 'aa',
+        'e': 'ee',
+        'i': 'ih',
+        'o': 'oh',
+        'u': 'ou',
+        'neutral': 'neutral',
+        'angry': 'angry',
+        'fun': 'relaxed',
+        'joy': 'happy',
+        'sorrow': 'sad',
+      }
       const _getBlendShapeIndexForPresetName = presetName => {
-        const blendShapes = this.vrmExtension && this.vrmExtension.blendShapeMaster && this.vrmExtension.blendShapeMaster.blendShapeGroups;
-        if (Array.isArray(blendShapes)) {
-          const shape = blendShapes.find(blendShape => blendShape.presetName === presetName);
-          if (shape && shape.binds && shape.binds.length > 0 && typeof shape.binds[0].index === 'number') {
-            return shape.binds[0].index;
+        if (isVrmVersion0) {
+          // name:       ["Neutral", "A", "I", "U", "E", "O", "Blink", "Blink_L", "Blink_R", "Angry", "Fun", "Joy", "Sorrow", "Surprise"]
+          // presetName: ["neutral", "a", "i", "u", "e", "o", "blink", "blink_l", "blink_r", "angry", "fun", "joy", "sorrow", "unknown"]
+          const blendShapes = this.vrmExtension && this.vrmExtension.blendShapeMaster && this.vrmExtension.blendShapeMaster.blendShapeGroups;
+          if (Array.isArray(blendShapes)) {
+            const shape = blendShapes.find(blendShape => blendShape.presetName === presetName);
+            if (shape && shape.binds && shape.binds.length > 0 && typeof shape.binds[0].index === 'number') {
+              return shape.binds[0].index;
+            } else {
+              return -1;
+            }
           } else {
             return -1;
           }
         } else {
-          return -1;
+          // presetName: ["neutral", "aa", "ih", "ou", "ee", "oh", "blink", "blinkLeft", "blinkRight", "angry", "relaxed", "happy", "sad", "Surprise"]
+          const preset = this.vrmExtension.expressions.preset[presetNameMapV0toV1[presetName] || presetName];
+          if (preset && preset.morphTargetBinds && preset.morphTargetBinds.length > 0 && typeof preset.morphTargetBinds[0].index === 'number') {
+            return preset.morphTargetBinds[0].index;
+          } else {
+            return -1;
+          }
         }
       };
       const _getMorphTargetInfluenceIndexForRegex = (morphTargetDictionary, regex) => {
@@ -748,7 +775,12 @@ class Avatar {
           const funIndex = _getBlendShapeIndexForPresetName('fun');
           const joyIndex = _getBlendShapeIndexForPresetName('joy');
           const sorrowIndex = _getBlendShapeIndexForPresetName('sorrow');
-          const surpriseIndex = _getMorphTargetInfluenceIndexForRegex(morphTargetDictionary, /surprise/i);
+          let surpriseIndex;
+          if (isVrmVersion0) {
+            surpriseIndex = _getMorphTargetInfluenceIndexForRegex(morphTargetDictionary, /surprise/i);
+          } else {
+            surpriseIndex = _getBlendShapeIndexForPresetName('surprised');
+          }
           // const extraIndex = _getBlendShapeIndexForName('extra');
           return [
             morphTargetInfluences,
