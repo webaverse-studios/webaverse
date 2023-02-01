@@ -9,7 +9,7 @@ import {MMDLoader} from 'three/examples/jsm/loaders/MMDLoader.js';
 import {CharsetEncoder} from 'three/examples/jsm/libs/mmdparser.module.js';
 
 import {getAvatarHeight, getModelBones, modelBoneToAnimationBone} from './avatars/util.mjs';
-import {zbencode, zbdecode} from 'zjs/encoding.mjs';
+import {zbencode, zbdecode} from '../zjs/encoding.mjs';
 
 class ProgressEvent {
   constructor(type, options) {
@@ -151,13 +151,13 @@ globalThis.ProgressEvent = ProgressEvent;
 
       let o;
 
-      /* const content = fs.readFileSync('public/' + name);
+      /* const content = fs.readFileSync('packages/client/public/' + name);
       const text = charsetEncoder.s2u(content);
       // console.log('got text', text);
       const parser = mmdLoader._getParser();
       o = parser.parseVpd(text, true); */
 
-      const content = fs.readFileSync('public/' + name);
+      const content = fs.readFileSync('packages/client/public/' + name);
       var sjisArray = encoding.convert(content, 'UTF8');
       const text = new TextDecoder().decode(Uint8Array.from(sjisArray));
       const parser = mmdLoader._getParser();
@@ -563,12 +563,12 @@ globalThis.ProgressEvent = ProgressEvent;
       // console.log('got url 2', req.url);
       next();
     }); */
-    app.use(express.static('public'));
+    app.use(express.static('packages/client/public'));
     app.listen(9999);
-    const animationFileNames = fs.readdirSync('public/animations');
+    const animationFileNames = fs.readdirSync('packages/client/public/animations');
     const fbxFileNames = animationFileNames.filter(name => /\.fbx$/.test(name)).map(name => 'animations/' + name);
-    const vpdFileNames = findFilesWithExtension('public', 'poses', 'vpd');
-    const animationsResultFileName = 'public/animations/animations.z';
+    const vpdFileNames = findFilesWithExtension('packages/client/public', 'poses', 'vpd');
+    const animationsResultFileName = 'packages/client/public/animations/animations.z';
     await baker('http://localhost:9999/', fbxFileNames, vpdFileNames, animationsResultFileName).catch(e => {
       console.warn('bake error', e);
     });
