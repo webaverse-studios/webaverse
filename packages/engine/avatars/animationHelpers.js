@@ -502,14 +502,25 @@ export function getFirstPersonCurves(vrmExtension) {
     );
   }
   if (vrmExtension) {
-    const {firstPerson} = vrmExtension;
-    const {
-      lookAtHorizontalInner,
-      lookAtHorizontalOuter,
-      lookAtVerticalDown,
-      lookAtVerticalUp,
-      // lookAtTypeName,
-    } = firstPerson;
+    const isVrmVersion0 = parseFloat(vrmExtension.specVersion) < 1;
+    let lookAtHorizontalInner;
+    let lookAtHorizontalOuter;
+    let lookAtVerticalDown;
+    let lookAtVerticalUp;
+    // let lookAtTypeName;
+    if (isVrmVersion0) {
+      const {firstPerson} = vrmExtension;
+      lookAtHorizontalInner = firstPerson.lookAtHorizontalInner;
+      lookAtHorizontalOuter = firstPerson.lookAtHorizontalOuter;
+      lookAtVerticalDown = firstPerson.lookAtVerticalDown;
+      lookAtVerticalUp = firstPerson.lookAtVerticalUp;
+    } else {
+      const {lookAt} = vrmExtension;
+      lookAtHorizontalInner = lookAt.rangeMapHorizontalInner;
+      lookAtHorizontalOuter = lookAt.rangeMapHorizontalOuter;
+      lookAtVerticalDown = lookAt.rangeMapVerticalDown;
+      lookAtVerticalUp = lookAt.rangeMapVerticalUp;
+    }
 
     const lookAtHorizontalInnerCurve = _importCurveMapperBone(lookAtHorizontalInner);
     const lookAtHorizontalOuterCurve = _importCurveMapperBone(lookAtHorizontalOuter);
