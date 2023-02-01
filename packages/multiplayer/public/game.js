@@ -606,7 +606,14 @@ export const startGame = async ({
 
     // wait for the network to be ready befor binding controls
     realms.addEventListener('networkreconfigure', e => {
-      debugger
+      const _bindControls = () => {
+        const mousemove = e => {
+          mouseState.x = e.clientX;
+          mouseState.y = e.clientY;
+        };
+        window.addEventListener('mousemove', mousemove);
+      };
+      _bindControls();
     }, {once: true});
   };
   _initLogic();
