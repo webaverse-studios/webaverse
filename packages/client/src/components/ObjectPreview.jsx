@@ -46,7 +46,7 @@ const ObjectPreview = ({
           fitCameraToBoundingBox(
             camera,
             localBox.setFromObject(object),
-            1.2,
+            1.5,
           );
           camera.updateMatrixWorld();
         
@@ -65,6 +65,11 @@ const ObjectPreview = ({
         const center = localBox.setFromObject(object).getCenter(localVector);
         controls.target.copy(center)
         controls.update();
+        
+        // rotate camera 180 by center y-axis
+        camera.position.sub(center)
+          .applyAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI)
+          .add(center)
 
         const _updateControls = () => {
           controls.update();
