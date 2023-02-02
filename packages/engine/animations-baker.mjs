@@ -147,6 +147,11 @@ globalThis.ProgressEvent = ProgressEvent;
     })
     JSON.stringify(newMixamoBonesRotation)
   */
+ for (const key in newMixamoBonesRotation) { // revert rotation
+  for (let i = 0; i < 3; i++) { // conjugate
+    newMixamoBonesRotation[key][i] *= -1;
+  }
+ }
 
   const baker = async (uriPath = '', fbxFileNames, vpdFileNames, outFile) => {
     const animations = [];
@@ -264,6 +269,23 @@ globalThis.ProgressEvent = ProgressEvent;
             }
           }
           track.values = values2;
+        }
+      }
+
+      if (true /* isNewMixamo */) {
+        for (const track of animation.tracks) {
+          const [boneName, vectorOrQuaternion] = track.name.split('.');
+          if (vectorOrQuaternion === 'quaternion') {
+            const valueSize = track.getValueSize();
+            const numValues = track.values.length / valueSize;
+            for (let i = 0; i < numValues; i++) {
+              THREE.Quaternion.multiplyQuaternionsFlat(
+                track.values, i * 4,
+                track.values, i * 4,
+                newMixamoBonesRotation[boneName], 0,
+              )
+            }
+          }
         }
       }
 
