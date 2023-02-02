@@ -147,11 +147,11 @@ globalThis.ProgressEvent = ProgressEvent;
     })
     JSON.stringify(newMixamoBonesRotation)
   */
- for (const key in newMixamoBonesRotation) { // revert rotation
-  for (let i = 0; i < 3; i++) { // conjugate
-    newMixamoBonesRotation[key][i] *= -1;
+  for (const key in newMixamoBonesRotation) { // revert rotation
+    for (let i = 0; i < 3; i++) { // conjugate
+      newMixamoBonesRotation[key][i] *= -1;
+    }
   }
- }
 
   const baker = async (uriPath = '', fbxFileNames, vpdFileNames, outFile) => {
     const animations = [];
@@ -251,7 +251,9 @@ globalThis.ProgressEvent = ProgressEvent;
       });
       // console.log('got height', height);
       const animation = o.animations[0];
+      // const isNewMixamo = name.endsWith('_newMixamo.fbx');
       animation.name = name.slice('animations/'.length);
+      // if (isNewMixamo) animation.name = animation.name.substring(0, animation.name.length - 14) + '.fbx';
       animation.object = o;
 
       animation.tracks = animation.tracks.filter(track => trackNames.includes(track.name)); // Filter out unused tracks, required by indices based wasm animation system.
@@ -272,7 +274,7 @@ globalThis.ProgressEvent = ProgressEvent;
         }
       }
 
-      if (true /* isNewMixamo */) {
+      // if (isNewMixamo) {
         for (const track of animation.tracks) {
           const [boneName, vectorOrQuaternion] = track.name.split('.');
           if (vectorOrQuaternion === 'quaternion') {
@@ -281,13 +283,13 @@ globalThis.ProgressEvent = ProgressEvent;
             for (let i = 0; i < numValues; i++) {
               THREE.Quaternion.multiplyQuaternionsFlat(
                 track.values, i * 4,
-                track.values, i * 4,
                 newMixamoBonesRotation[boneName], 0,
+                track.values, i * 4,
               )
             }
           }
         }
-      }
+      // }
 
       animations.push(animation);
     }
