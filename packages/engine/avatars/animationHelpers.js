@@ -115,6 +115,8 @@ async function loadAnimations() {
   }
   window.animations = animations
 
+  globalThis.animations = animations;
+
   /* const animationIndices = animationStepIndices.find(i => i.name === 'Fast Run.fbx');
           for (let i = 0; i < animationIndices.leftFootYDeltas.length; i++) {
             const mesh = new Mesh(new BoxBufferGeometry(0.02, 0.02, 0.02), new MeshBasicMaterial({color: 0xff0000}));
