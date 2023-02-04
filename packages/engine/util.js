@@ -700,7 +700,8 @@ export function fitCameraToBoundingBox(camera, box, fitOffset = 1) {
 
   camera.near = Math.min(0.1, maxSize / 20.0);
   camera.updateProjectionMatrix();
-  camera.position.copy(center).add(direction);
+  // add only Z axis value
+  camera.position.copy(center.clone().add(new THREE.Vector3(0, 0, direction.z)))
   camera.quaternion.setFromRotationMatrix(
     localMatrix.lookAt(camera.position, center, camera.up)
   );
