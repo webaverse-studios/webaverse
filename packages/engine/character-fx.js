@@ -17,6 +17,7 @@ export class AvatarCharacterFx {
     this.sonicBoom = null;
     this.healEffect = null;
     this.healEffectInited = false;
+    this.phoneEditTool = false;
   }
 
   update(timestamp, timeDiffS) {
@@ -36,6 +37,21 @@ export class AvatarCharacterFx {
     //   }
     // };
     // _updateSonicBoomMesh();
+
+    const _updatePhoneEditToolMesh = () => {
+      if (!this.phoneEditTool && this.character.getControlMode() === 'controlled') {
+        this.phoneEditTool = metaversefile.createApp();
+        this.phoneEditTool.setComponent('player', this.character);
+        (async () => {
+          const {importModule} = metaversefile.useDefaultModules();
+          const m = await importModule('phoneEditTool');
+          await this.phoneEditTool.addModule(m);
+        })();
+        sceneLowPriority.add(this.phoneEditTool);
+      }
+    };
+    _updatePhoneEditToolMesh();
+
     const _updateNameplate = () => {
       if(!this.nameplate && this.character.getControlMode() === 'remote'){
         (async () => {
@@ -80,6 +96,11 @@ export class AvatarCharacterFx {
     //   this.sonicBoom.destroy();
     //   this.sonicBoom = null;
     // }
+    if (this.phoneEditTool) {
+      sceneLowPriority.remove(this.phoneEditTool);
+      this.phoneEditTool.destroy();
+      this.phoneEditTool = null;
+    }
     // if (this.nameplate) {
     //   sceneLowPriority.remove(this.nameplate);
     //   this.nameplate = null;

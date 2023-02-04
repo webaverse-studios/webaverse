@@ -141,6 +141,7 @@ const beamShaderMaterial = new THREE.ShaderMaterial({
 
 export default e => {
   const app = useApp();
+  app.visible = false;
   const physics = usePhysics()
   const localPlayer = useLocalPlayer();
   
@@ -152,9 +153,6 @@ export default e => {
 
   e.waitUntil((async () => {
     let u2 = baseUrl + 'assets/iphone.glb';
-    if (/^https?:/.test(u2)) {
-      u2 = '/@proxy/' + u2;
-    }
     const phoneModel = await metaversefile.import(u2);
     phoneApp = metaversefile.createApp({
       name: u2,
@@ -171,16 +169,17 @@ export default e => {
       phoneApp.setComponent(key, value);
     }
     await phoneApp.addModule(phoneModel);
+    phoneApp.getPhysicsObjects().forEach(physicsObject => {
+      physics.disableActor(physicsObject);
+    });
 
     let u3 = baseUrl + 'assets/cone.glb';
-    if (/^https?:/.test(u3)) {
-      u3 = '/@proxy/' + u3;
-    }
     const coneModel = await metaversefile.import(u3);
     beamApp = metaversefile.createApp({
       name: u3,
     });
     beamApp.name = 'beam effect';
+    beamApp.visible = false;
     
     app.add(beamApp);
     beamApp.updateMatrixWorld();
@@ -195,13 +194,16 @@ export default e => {
     coneMesh.rotation.x = -Math.PI / 2;
     coneMesh.castShadow = false;
     coneMesh.receiveShadow = false;
+    beamApp.getPhysicsObjects().forEach(physicsObject => {
+      physics.disableActor(physicsObject);
+    });
   })());
 
-  let wearing = false;
-  useWear(e => {
-    const {wear} = e;
-    wearing = !!wear;
-  });
+  // let wearing = false;
+  // useWear(e => {
+  //   const {wear} = e;
+  //   wearing = !!wear;
+  // });
 
   let using = false;
   useUse(e => {
@@ -231,24 +233,41 @@ export default e => {
   };
 
   useFrame(({timestamp}) => {
-    const grabAction = localPlayer.getAction('grab');
-    if(wearing && grabAction && coneMesh) {
-      beamApp.matrixWorld.decompose(localVector2, localQuaternion, localVector3);
-      const o = getAppByInstanceId(grabAction.instanceId);
-      const box = getPhysicalBoundingBox(o);
-      const center = getBBCenter(box);
+    if (physics.getActionInterpolant(localPlayer, 'readyGrab') > 0) {
+      const grabAction = localPlayer.getAction('grab');
+      if(grabAction && coneMesh) {
+        beamApp.matrixWorld.decompose(localVector2, localQuaternion, localVector3);
+        const o = getAppByInstanceId(grabAction.instanceId);
+        const box = getPhysicalBoundingBox(o);
+        const center = getBBCenter(box);
 
-      beamApp.lookAt(center);
-      const distance = localVector2.distanceTo(center);
-      beamApp.scale.set(1, 1, distance).divideScalar(2);
-      beamApp.updateMatrixWorld();
+        beamApp.lookAt(center);
+        const distance = localVector2.distanceTo(center);
+        beamApp.scale.set(1, 1, distance).divideScalar(2);
+        beamApp.updateMatrixWorld();
 
-      coneMesh.material.uniforms.uTime.value = timestamp / 1000;
-      coneMesh.material.uniforms.iResolution.value.set(window.innerWidth, window.innerHeight, 1);
-      coneMesh.material.uniforms.distance.value = distance;
-    } else if(!grabAction && coneMesh && coneMesh.material.uniforms.uTime.value > 0) {
-      coneMesh.material.uniforms.uTime.value = 0;
-      coneMesh.material.uniforms.iResolution.value.set(0, 0, 0);
+        coneMesh.material.uniforms.uTime.value = timestamp / 1000;
+        coneMesh.material.uniforms.iResolution.value.set(window.innerWidth, window.innerHeight, 1);
+        coneMesh.material.uniforms.distance.value = distance;
+
+        beamApp.visible = true;
+      } else if(!grabAction && coneMesh && coneMesh.material.uniforms.uTime.value > 0) {
+        // coneMesh.material.uniforms.uTime.value = 0;
+        // coneMesh.material.uniforms.iResolution.value.set(0, 0, 0);
+
+        beamApp.visible = false;
+      }
+      
+      if (app) {
+        localPlayer.avatar.foundModelBones.Right_wrist.matrixWorld.decompose(app.position, app.quaternion, localVector);
+        app.position.add(localVector.set(-0.03, -0.05, -0.02).applyQuaternion(app.quaternion));
+        app.quaternion.multiply(localQuaternion.set(0.6272114, -0.3265056, 0.3265056, 0.6272114));
+        app.updateMatrixWorld();
+      }
+
+      app.visible = true;
+    } else {
+      app.visible = false;
     }
   });
 
