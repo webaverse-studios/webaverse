@@ -41,7 +41,7 @@ export const polygonVigilKey = `0937c004ab133135c86586b55ca212a6c9ecd224`;
 const origin = (typeof location !== 'undefined') ?
   location.protocol + '//' + globalThis.location.hostname
 :
-  'https://local.webaverse.com';
+  import.meta.env.VITE_CLIENT_URL ?? 'https://local.webaverse.com';
 
 //
 
