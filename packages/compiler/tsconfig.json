@@ -12,7 +12,6 @@
     "isolatedModules": true,
     "incremental": true,
     "types": [
-      "jest",
       "node"
     ],
     "target": "es5",
