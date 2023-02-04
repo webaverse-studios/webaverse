@@ -504,6 +504,7 @@ export const startGame = async ({
   _initRenderers();
 
   const _initLogic = () => {
+    debugger
     // world
     // const worldItemRenderers = [];
     // bind
@@ -604,8 +605,16 @@ export const startGame = async ({
     });
 
     // wait for the network to be ready befor binding controls
-    // realms.addEventListener('networkreconfigure', e => {
-    // }, {once: true});
+    realms.addEventListener('networkreconfigure', e => {
+      const _bindControls = () => {
+        const mousemove = e => {
+          mouseState.x = e.clientX;
+          mouseState.y = e.clientY;
+        };
+        window.addEventListener('mousemove', mousemove);
+      };
+      _bindControls();
+    }, {once: true});
   };
   _initLogic();
 
@@ -739,7 +748,7 @@ export const startGame = async ({
         });
 
         // draw the world
-        const gameEl = document.getElementById(`game`);
+        const gameEl = document.getElementById(`engine-canvas`);
         const localPlayerEl = document.getElementById(`player-${realms.playerId}`);
         const worldAppsEl = document.getElementById('world-apps');
         const networkRealmsEl = document.getElementById('network-realms');

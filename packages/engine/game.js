@@ -13,7 +13,7 @@ import {world} from './world.js';
 import {buildMaterial, highlightMaterial, selectMaterial, hoverMaterial, hoverEquipmentMaterial} from './shaders.js';
 import {getRenderer, sceneLowPriority, camera} from './renderer.js';
 import {downloadFile, snapPosition, getDropUrl, handleDropJsonItem, makeId} from './util.js';
-import {maxGrabDistance, throwReleaseTime, throwAnimationDuration, walkSpeed, crouchSpeed, flySpeed, IS_NARUTO_RUN_ENABLED, gliderSpeed, IS_FLYING_ENABLED} from './constants.js';
+import {maxGrabDistance, throwReleaseTime, throwAnimationDuration, walkSpeed, crouchSpeed, flySpeed, IS_NARUTO_RUN_ENABLED, realmSize, gliderSpeed, IS_FLYING_ENABLED} from './constants.js';
 import metaversefileApi from 'metaversefile';
 import loadoutManager from './loadout-manager.js';
 import * as sounds from './sounds.js';
@@ -25,6 +25,7 @@ import Avatar from './avatars/avatars.js';
 import {avatarManager} from './avatar-manager.js';
 import npcManager from './npc-manager.js';
 import grabManager from './grab-manager.js';
+import universe from './universe.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -61,6 +62,8 @@ class GameManager extends EventTarget {
   grabUseMesh = null;
   isMouseUp = false;
   lastUseIndex = 0;
+  lastTransform = [NaN, NaN, NaN, NaN, NaN, NaN, NaN];
+  lastVelocity = [NaN, NaN, NaN];
 
   highlightedPhysicsObject = null;
   highlightedPhysicsId = 0;
@@ -939,6 +942,35 @@ class GameManager extends EventTarget {
     const now = timestamp;
     const renderer = getRenderer();
     const localPlayer = playersManager.getLocalPlayer();
+
+    const _updateRealms = () => {
+      if (universe.multiplayerConnected) {
+        const transformCalc = localPlayer.transform.reduce((acc, val, i) => {
+          acc.transform.push(val);
+          acc.changed = acc.changed || val !== this.lastTransform[i];
+          return acc;
+        }, {transform: [], changed: false});
+
+        if (transformCalc.changed) {
+          universe.realms.updatePosition(transformCalc.transform.slice(0, 3), realmSize);
+          const transformAndTimestamp = [...transformCalc.transform, performance.now()];
+          universe.realms.localPlayer.setKeyValue('transform', transformAndTimestamp);
+          this.lastTransform = transformCalc.transform;
+        }
+
+        const velocityCalc = localPlayer.characterPhysics.velocity.toArray().reduce((acc, val, i) => {
+          acc.velocity.push(val);
+          acc.changed = acc.changed || val !== this.lastVelocity[i];
+          return acc;
+        }, {velocity: [], changed: false});
+
+        if (velocityCalc.changed) {
+          universe.realms.localPlayer.setKeyValue('velocity', velocityCalc.velocity);
+          this.lastVelocity = velocityCalc.velocity;
+        }
+      }
+    };
+    _updateRealms();
 
     const _updateGrab = () => {
       const renderer = getRenderer();
