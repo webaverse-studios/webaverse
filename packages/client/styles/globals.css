@@ -131,10 +131,6 @@ a {
   src:  url('/fonts/tt-squares/TT Squares Condensed Bold Italic.otf');
 }
 @font-face {
-  font-family: 'TTSC-Bold';
-  src:  url('/fonts/tt-squares/TT Squares Condensed Bold.otf');
-}
-@font-face {
   font-family: 'TTSC-Light-Italic';
   src:  url('/fonts/tt-squares/TT Squares Condensed Light Italic.otf');
 }

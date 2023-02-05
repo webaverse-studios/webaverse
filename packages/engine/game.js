@@ -110,9 +110,9 @@ class GameManager extends EventTarget {
   load() {
     this.grabUseMesh = metaversefileApi.createApp();
     (async () => {
-      const {importModule} = metaversefileApi.useDefaultModules();
-      const m = await importModule('button');
-      await this.grabUseMesh.addModule(m);
+      // const {importModule} = metaversefileApi.useDefaultModules();
+      // const m = await importModule('button');
+      // await this.grabUseMesh.addModule(m);
     })();
     this.grabUseMesh.targetApp = null;
     this.grabUseMesh.targetPhysicsId = -1;
