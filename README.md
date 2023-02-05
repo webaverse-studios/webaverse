@@ -136,6 +136,13 @@ You can host the source files on either your Windows file system or on the Ubunt
 
 Start the application by running the NPM command at a WSL command prompt.
 
+### Deployment
+
+To deploy the compiler app to vercel, use the following build settings:
+build command: `npm run build`
+output directory: `dist/packages/compiler/.next`
+root directory: `./` or leave blank
+
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
