@@ -16,7 +16,6 @@ const moduleUrls = {
   filter: `${baseUrl}filter/`,
   barrier: `${baseUrl}barrier/`,
   comet: `${baseUrl}comet/`,
-  infinistreet: `${baseUrl}infinistreet/`,
   spawner: `${baseUrl}spawner/`,
   defaultScene: `${baseUrl}default-scene/`,
   path: `path/`,

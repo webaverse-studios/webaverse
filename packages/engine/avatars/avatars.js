@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {VRMSpringBoneLoaderPlugin} from '@pixiv/three-vrm';
+// import {VRMSpringBoneLoaderPlugin} from '@pixiv/three-vrm';
 import {AudioRecognizer} from '../audio-recognizer.js';
 import audioManager from '../audio-manager.js';
 import {scene} from '../renderer.js';
@@ -467,12 +467,12 @@ class Avatar {
     this.eyeballTargetEnabled = false;
 
     this.springBoneManager = null;
-    if (options.hair) {
-      const springBoneLoader = new VRMSpringBoneLoaderPlugin()
-      springBoneLoader._v0Import(object).then((boneManager)=>{
-        this.springBoneManager = boneManager
-      })
-    }
+    // if (options.hair) {
+    //   const springBoneLoader = new VRMSpringBoneLoaderPlugin()
+    //   springBoneLoader._v0Import(object).then((boneManager)=>{
+    //     this.springBoneManager = boneManager
+    //   })
+    // }
 
     const _getOffset = (bone, parent = bone?.parent) => bone && bone.getWorldPosition(new THREE.Vector3()).sub(parent.getWorldPosition(new THREE.Vector3()));
 

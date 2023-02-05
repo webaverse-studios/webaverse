@@ -156,15 +156,7 @@ export default e => {
                 subApp.setComponents(components);
               }
             });
-          })(),
-          (async () => {
-            const infinistreet = await metaversefile.createApp({
-              start_url: './metaverse_modules/infinistreet/',
-              components,
-            });
-            app.add(infinistreet);
-            subApps.push(infinistreet);
-          })(),
+          })()
         ])
     );
   })());
