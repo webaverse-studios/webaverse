@@ -483,7 +483,7 @@ export const getClosest2AnimationAngles = (key, angle) => {
 
 export const _findArmature = bone => {
   for (; ; bone = bone.parent) {
-    if (!bone.isBone) {
+    if (!bone.parent) {
       return bone;
     }
   }
