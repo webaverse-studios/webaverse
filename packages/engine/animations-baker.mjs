@@ -147,7 +147,7 @@ globalThis.ProgressEvent = ProgressEvent;
     "mixamorigNeck": [0, 0, 0, 1],
     "mixamorigHead": [0, 0, 0, 1],
     "mixamorigHeadTop_End": [0, 0, 0, 1],
-    "mixamorigRightShoulder": [-0.034007257690587, -1.985709973673248e-15, -0.7609390796506805, 0.6479314959814356],
+    "mixamorigRightShoulder": [-0.034007257690587, -1.985709973673248e-15, -0.7609390796506805, 0.6479314959814356], // todo: need calc from world positions.
     "mixamorigRightArm": [-0.006108543264012025, -2.185434947891529e-12, -0.7070803537144913, 0.7071068229696142],
     "mixamorigRightForeArm": [-0.016740170109669862, 1.251144594188942e-7, -0.7069117842567201, 0.7071035963588816],
     "mixamorigRightHand": [0, 0, 0, 1],
@@ -340,6 +340,24 @@ globalThis.ProgressEvent = ProgressEvent;
         }
       }
 
+      // // if (isNewMixamo) {
+      //   for (const track of animation.tracks) {
+      //     const [boneName, vectorOrQuaternion] = track.name.split('.');
+      //     if (vectorOrQuaternion === 'quaternion') {
+      //       const valueSize = track.getValueSize();
+      //       const numValues = track.values.length / valueSize;
+      //       for (let i = 0; i < numValues; i++) {
+      //         //
+      //         THREE.Quaternion.multiplyQuaternionsFlat(
+      //           track.values, i * 4,
+      //           track.values, i * 4,
+      //           newMixamoBonesRotation[boneName], 0,
+      //         )
+      //       }
+      //     }
+      //   }
+      // // }
+
       // if (isNewMixamo) {
         for (const track of animation.tracks) {
           const [boneName, vectorOrQuaternion] = track.name.split('.');
@@ -347,12 +365,18 @@ globalThis.ProgressEvent = ProgressEvent;
             const valueSize = track.getValueSize();
             const numValues = track.values.length / valueSize;
             for (let i = 0; i < numValues; i++) {
-              //
-              THREE.Quaternion.multiplyQuaternionsFlat(
-                track.values, i * 4,
-                track.values, i * 4,
-                newMixamoBonesRotation[boneName], 0,
-              )
+              const x = track.values[i * 4 + 0];
+              const y = track.values[i * 4 + 1];
+              const z = track.values[i * 4 + 2];
+              const w = track.values[i * 4 + 3];
+              const axis = new THREE.Vector3(x, y, z).normalize();
+              const angle = Math.acos(w) * 2;
+              axis.applyQuaternion(new THREE.Quaternion().fromArray(newMixamoBonesRotation[boneName])/* .conjugate() */);
+              const resultQuat = new THREE.Quaternion().setFromAxisAngle(axis, angle);
+              track.values[i * 4 + 0] = resultQuat.x;
+              track.values[i * 4 + 1] = resultQuat.y;
+              track.values[i * 4 + 2] = resultQuat.z;
+              track.values[i * 4 + 3] = resultQuat.w;
             }
           }
         }
