@@ -4,10 +4,6 @@ phases:
   install:
     runtime-versions:
       nodejs: latest
-    # commands:
-    #   - echo Entered the install phase...
-    #   - git submodule init
-    #   - git submodule update
   pre_build:
     commands:
       - REPOSITORY_URI=909695425273.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecrrepository-ws-webaverse-$AWS_DEFAULT_REGION
