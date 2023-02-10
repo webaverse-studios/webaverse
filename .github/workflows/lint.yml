@@ -17,6 +17,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '${{ matrix.node }}'
+          cache: 'npm'
+          cache-dependency-path: node_modules/@pixiv/three-vrm/three-vrm-core/package.json
       - name: 'Cache node_modules'
         uses: actions/cache@v3
         with:
