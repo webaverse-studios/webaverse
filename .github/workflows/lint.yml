@@ -25,6 +25,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-v${{ matrix.node }}-
       - name: Install Dependencies with npm-ci
-        run: npm ci
+        run: |
+          npm cache clean
+          npm ci
       - name: Lint code
         run: npm run lint
