@@ -466,10 +466,12 @@ class Avatar {
     this.eyeballTargetPlane = new THREE.Plane();
     this.eyeballTargetEnabled = false;
 
+    debugger
     this.springBoneManager = null;
     if (options.hair) {
       const springBoneLoader = new VRMSpringBoneLoaderPlugin()
-      springBoneLoader._v0Import(object).then((boneManager)=>{
+      springBoneLoader._v1Import(object).then((boneManager)=>{
+        debugger
         this.springBoneManager = boneManager
       })
     }
