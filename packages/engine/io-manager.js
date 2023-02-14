@@ -16,6 +16,7 @@ import transformControls from './transform-controls.js';
 import storyManager from './story.js';
 import raycastManager from './raycast-manager.js';
 import grabManager from './grab-manager.js';
+import xrManager from './xr-manager.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -109,7 +110,7 @@ class IoManager extends EventTarget {
             buttonsSrc[2] ? buttonsSrc[2].value : 0,
             buttonsSrc[3] ? buttonsSrc[3].value : 0,
             buttonsSrc[4] ? buttonsSrc[4].value : 0,
-            buttonsSrc[5] ? buttonsSrc[4].value : 0,
+            buttonsSrc[5] ? buttonsSrc[5].value : 0,
           ];
           if (handedness === 'left') {
             const dx = axes[0] + axes[2];
@@ -468,6 +469,12 @@ class IoManager extends EventTarget {
         e.preventDefault();
         e.stopPropagation();
         voiceInput.toggleSpeech();
+        break;
+      }
+      case 85: { // U
+        if (xrManager.isXrSupported()) {
+          xrManager.enterXr();
+        }
         break;
       }
       case 82: { // R

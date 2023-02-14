@@ -41,12 +41,7 @@ export function applyCharacterModesToAvatar(character, session, rig) {
     (!!session && (rig.inputs.leftGamepad.enabled || rig.inputs.rightGamepad.enabled)),
   );
   rig.setBottomEnabled(
-    (
-      rig.getTopEnabled() /* ||
-      rig.getHandEnabled(0) ||
-      rig.getHandEnabled(1) */
-    ) &&
-    rig.velocity.length() < 0.001,
+    false
   );
 }
 /* const _getPlayerByAppInstanceId = instanceId => {

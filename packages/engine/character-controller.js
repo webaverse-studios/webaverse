@@ -1111,6 +1111,8 @@ class LocalPlayer extends UninterpolatedPlayer {
     this.detached = opts.detached ?? false;
 
     this.actionsManager = new ActionsManager(this);
+
+    this.xrMode = false;
   }
 
   async setPlayerSpec(playerSpec) {
@@ -1349,6 +1351,14 @@ class LocalPlayer extends UninterpolatedPlayer {
       const timeDiffS = timeDiff / 1000;
       this.characterPhysics.update(timestamp, timeDiffS);
     }
+  }
+
+  enterXr() {
+    this.xrMode = true;
+  }
+
+  exitXr() {
+    this.xrMode = false;
   }
 
   updateAvatar(timestamp, timeDiff) {
