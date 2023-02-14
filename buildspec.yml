@@ -1,5 +1,9 @@
 version: 0.2
 
+env:
+  secrets-manager:
+    DOCKERHUB_PASSWORD: "/dockerhub/credentials:password"
+    DOCKERHUB_USERNAME: "/dockerhub/credentials:username"
 phases:
   install:
     runtime-versions:
