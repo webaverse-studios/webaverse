@@ -53,7 +53,7 @@ User documentation is <a href="https://webaverse.notion.site/User-Docs-3a36b223e
 - 10 GB Disk Space
 - 8 GB RAM
 - 4 Core CPU / vCPUs
-- Node version 18+. The recommended way to get node is `nvm`: https://github.com/nvm-sh/nvm
+- Node version 19.0.0. The recommended way to get node is `nvm`: https://github.com/nvm-sh/nvm
 
 ## Installation
 
@@ -90,7 +90,7 @@ Once you have WSL and Ubuntu set up, run `wsl` in a Windows command window to ge
 
 #### Node
 
-At a WSL command prompt, use `nvm` to install Node 18+.
+At a WSL command prompt, use `nvm` to install Node 19.0.0.
 
 #### Dependencies
 
