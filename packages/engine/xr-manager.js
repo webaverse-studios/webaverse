@@ -198,16 +198,6 @@ class XRManager extends EventTarget {
               .decompose(localVector2, localQuaternion2, localVector3);
             let playerPosition = localVector2.toArray();
             let playerRotation = localQuaternion2.toArray();
-            if (true) {
-              let offsetVec = localVector.set(0, 0, -2)
-                .applyQuaternion(localQuaternion2)
-                .toArray();
-              for (let k = 0; k < 3; k++) {
-                playerPosition[k] = playerPosition[k] + offsetVec[k];
-                leftGamepadPosition[k] = leftGamepadPosition[k] + offsetVec[k];
-                rightGamepadPosition[k] = rightGamepadPosition[k] + offsetVec[k];
-              }
-            }
 
             localPlayer.avatar.setLocalAvatarPose([
               [playerPosition, playerRotation],
