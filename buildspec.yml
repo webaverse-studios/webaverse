@@ -1,9 +1,9 @@
 version: 0.2
 
-env:
-  secrets-manager:
-    DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-    DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+# env:
+#   secrets-manager:
+#     DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+#     DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
 phases:
   install:
     runtime-versions:
