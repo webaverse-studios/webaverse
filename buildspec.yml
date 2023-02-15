@@ -5,7 +5,7 @@ phases:
     runtime-versions:
       nodejs: 16
     commands:
-      - n 19
+      - n 19.0.0
   pre_build:
     commands:
       - REPOSITORY_URI=909695425273.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecrrepository-ws-webaverse-$AWS_DEFAULT_REGION
