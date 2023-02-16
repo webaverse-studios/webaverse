@@ -1,4 +1,4 @@
-FROM node
+FROM node:19.0.0
 ARG pm2_secret_key	
 ENV LAST_UPDATED 20160605T165400
 ENV PM2_PUBLIC_KEY wicmdcymxzyukdq
