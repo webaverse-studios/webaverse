@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import metaversefile from 'metaversefile';
-const {useApp, usePhysics, useAvatarIconer, useAvatarRenderer, useCamera, useCleanup, useFrame, useActivate, useLocalPlayer, useExport} = metaversefile;
+const {useApp, usePhysics, useAvatarIconer, useAvatarRenderer, useCamera, useRenderer, useCleanup, useFrame, useActivate, useLocalPlayer, useExport} = metaversefile;
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -22,6 +22,7 @@ export default e => {
   const app = useApp();
   const camera = useCamera();
   const physics = usePhysics();
+  const renderer = useRenderer();
 
   const srcUrl = ${this.srcUrl};
   const quality = app.getComponent('quality') ?? undefined;
@@ -37,6 +38,7 @@ export default e => {
     avatarRenderer = new AvatarRenderer({
       arrayBuffer,
       srcUrl,
+      renderer,
       camera,
       quality,
     });

@@ -1435,6 +1435,31 @@ class Avatar {
     }
   }
 
+  setLocalAvatarPose(poseArray) {
+    const [
+      [hmdPosition, hmdQuaternion],
+      [leftGamepadPosition, leftGamepadQuaternion, leftGamepadPointer, leftGamepadGrip, leftGamepadEnabled],
+      [rightGamepadPosition, rightGamepadQuaternion, rightGamepadPointer, rightGamepadGrip, rightGamepadEnabled],
+    ] = poseArray;
+
+    this.inputs.hmd.position.fromArray(hmdPosition);
+    this.inputs.hmd.quaternion.fromArray(hmdQuaternion);
+    this.poseManager.vrTransforms.head.position.fromArray(hmdPosition);
+    this.poseManager.vrTransforms.head.quaternion.fromArray(hmdQuaternion);
+
+    this.inputs.leftGamepad.position.fromArray(leftGamepadPosition);
+    this.inputs.leftGamepad.quaternion.fromArray(leftGamepadQuaternion);
+    this.inputs.leftGamepad.pointer = leftGamepadPointer;
+    this.inputs.leftGamepad.grip = leftGamepadGrip;
+    this.inputs.leftGamepad.enabled = leftGamepadEnabled;
+
+    this.inputs.rightGamepad.position.fromArray(rightGamepadPosition);
+    this.inputs.rightGamepad.quaternion.fromArray(rightGamepadQuaternion);
+    this.inputs.rightGamepad.pointer = rightGamepadPointer;
+    this.inputs.rightGamepad.grip = rightGamepadGrip;
+    this.inputs.rightGamepad.enabled = rightGamepadEnabled;
+  }
+
   update(timestamp, timeDiff) {
     const now = timestamp;
     const timeDiffS = timeDiff / 1000;

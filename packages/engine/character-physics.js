@@ -471,10 +471,12 @@ class CharacterPhysics {
       const isSession = !!session;
       const isPlayerAiming = !!aimAction && !aimAction.playerAnimation;
       const isObjectAimable = !!aimComponent;
+      const isXrMode = !!this.character.xrMode;
       // const isPlayingEnvelopeIkAnimation = !!useAction && useAction.ik === 'bow';
       
       const isHandEnabled =
         isSession ||
+        isXrMode ||
         (isPlayerAiming &&
           isObjectAimable); /* && !isPlayingEnvelopeIkAnimation */
       for (let i = 0; i < 2; i++) {
@@ -485,7 +487,7 @@ class CharacterPhysics {
             : aimComponent?.ikHand === 'right'
             ? 0
             : null);
-        const enabled = isHandEnabled && isExpectedHandIndex;
+        const enabled = isHandEnabled && (isExpectedHandIndex || isXrMode);
         //
         if (this.character.hands[i].enabled !== enabled) {
           if (enabled) {
