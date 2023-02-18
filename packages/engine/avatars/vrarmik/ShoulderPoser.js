@@ -91,7 +91,7 @@ class ShoulderPoser {
 
       // this.shoulder.transform.rotation = Quaternion.identity;
       // this.positionShoulder();
-      this.rotateShoulderBase();
+      //this.rotateShoulderBase();
 
       /* if (this.enableDistinctShoulderRotation)
       {
@@ -109,12 +109,12 @@ class ShoulderPoser {
         this.shoulder.rightArm.transform.localPosition = Vector3.zero;
       } */
 
-      this.updateNeck();
+      //this.updateNeck();
 
       // Debug.DrawRay(this.shoulder.transform.position, this.shoulder.transform.forward);
     } else if (leftEnabled || rightEnabled) {
       // this.shoulder.spine.quaternion.set(0, 0, 0, 1);
-      this.updateHips();
+      //this.updateHips();
     }
   }
 

@@ -411,6 +411,7 @@ export class AvatarRenderer /* extends EventTarget */ {
   constructor({
     arrayBuffer,
     srcUrl,
+    renderer,
     camera = null, // if null, do not frustum cull
     quality = settingsManager.getCharacterQuality(),
     controlled = false,
@@ -421,6 +422,7 @@ export class AvatarRenderer /* extends EventTarget */ {
 
     this.arrayBuffer = arrayBuffer;
     this.srcUrl = srcUrl;
+    this.renderer = renderer;
     this.camera = camera;
     this.quality = quality;
     this.isControlled = controlled;
@@ -821,7 +823,8 @@ export class AvatarRenderer /* extends EventTarget */ {
     if (this.camera) {
       const currentMesh = this.#getCurrentMesh();
       if (currentMesh && currentMesh === this.spriteAvatarMesh) {
-        this.spriteAvatarMesh.update(timestamp, timeDiff, avatar, this.camera);
+        const xrCamera = this.renderer.xr.getSession() ? this.renderer.xr.getCamera(this.camera) : this.camera;
+        this.spriteAvatarMesh.update(timestamp, timeDiff, avatar, xrCamera);
       }
     }
   }
@@ -831,10 +834,11 @@ export class AvatarRenderer /* extends EventTarget */ {
     if (this.camera) {
       const currentMesh = this.#getCurrentMesh();
       if (currentMesh) {
+        const xrCamera = this.renderer.xr.getSession() ? this.renderer.xr.getCamera(this.camera) : this.camera;
         // XXX this can be optimized by initializing the frustum only once per frame and passing it in
         const projScreenMatrix = localMatrix2.multiplyMatrices(
-          this.camera.projectionMatrix,
-          this.camera.matrixWorldInverse
+          xrCamera.projectionMatrix,
+          xrCamera.matrixWorldInverse
         );
         localFrustum.setFromProjectionMatrix(projScreenMatrix);
 

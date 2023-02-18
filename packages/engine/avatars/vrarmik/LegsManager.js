@@ -267,13 +267,24 @@ class LegsManager {
 
       const floorHeight = this.poseManager.vrTransforms.floorHeight;
 
-      const hipsFloorPosition = localVector.copy(this.hips.position);
+      const hipsFloorPosition = localVector.copy(this.poseManager.vrTransforms.head.position);
       hipsFloorPosition.y = floorHeight;
-      const hipsFloorEuler = localEuler.setFromQuaternion(this.hips.quaternion, 'YXZ');
+      const hipsFloorEuler = localEuler.setFromQuaternion(this.poseManager.vrTransforms.head.quaternion, 'YXZ');
       hipsFloorEuler.x = 0;
       hipsFloorEuler.z = 0;
-      const planeMatrix = localMatrix.compose(hipsFloorPosition, localQuaternion.setFromEuler(hipsFloorEuler), oneVector);
+      hipsFloorEuler.y += Math.PI;
+      const hipsFloorQuaternion = localQuaternion.setFromEuler(hipsFloorEuler);
+      const planeMatrix = localMatrix.compose(hipsFloorPosition, hipsFloorQuaternion, oneVector);
       const planeMatrixInverse = localMatrix2.copy(planeMatrix).invert();
+
+      this.leftLeg.foot.stickTransform.position
+        .set(-this.legSeparation / 2, 0, 0)
+        .applyQuaternion(hipsFloorQuaternion)
+        .add(hipsFloorPosition);
+      this.rightLeg.foot.stickTransform.position
+        .set(this.legSeparation / 2, 0, 0)
+        .applyQuaternion(hipsFloorQuaternion)
+        .add(hipsFloorPosition);
 
       const fakePosition = localVector2;
       const fakeScale = localVector3;
@@ -358,7 +369,7 @@ class LegsManager {
 
       const leftCanStep = /* this.leftLeg.standing && */!this.leftLeg.stepping && (!this.rightLeg.stepping || this.rightLeg.stepFactor >= crossStepFactor);
       const rightCanStep = /* this.rightLeg.standing && */!this.rightLeg.stepping && (!this.leftLeg.stepping || this.leftLeg.stepFactor >= crossStepFactor);
-      const maxStepAngleFactor = 0;
+      /*const maxStepAngleFactor = 0;
       if (leftCanStep || rightCanStep) {
       	let leftStepDistance = 0;
       	let leftStepAngleDiff = 0;
@@ -429,7 +440,7 @@ class LegsManager {
         	this.rightLeg.balance = 0;
           this.leftLeg.balance = 1;
   			}
-  		}
+  		}*/
       
       // position
 

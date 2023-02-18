@@ -41,23 +41,16 @@ export const polygonVigilKey = `0937c004ab133135c86586b55ca212a6c9ecd224`;
 const origin = (typeof location !== 'undefined') ?
   location.protocol + '//' + globalThis.location.hostname
 :
-  'https://local.webaverse.com';
+  import.meta.env.VITE_CLIENT_URL ?? 'https://local.webaverse.com';
 
 //
 
 export const storageHost = 'https://ipfs.webaverse.com';
-export const previewHost = 'https://preview.exokit.org';
-export const worldsHost = 'https://worlds.exokit.org';
-export const accountsHost = `https://${chainName}sidechain-accounts.webaverse.com`;
-export const contractsHost = 'https://contracts.webaverse.com';
-export const localstorageHost = 'https://localstorage.webaverse.com';
-export const loginEndpoint = 'https://login.webaverse.com';
 export const tokensHost = `https://${chainName}all-tokens.webaverse.com`;
 export const landHost = `https://${chainName}sidechain-land.webaverse.com`;
 export const codeAiHost = `https://ai.webaverse.com/code`;
 export const web3MainnetSidechainEndpoint = 'https://mainnetsidechain.exokit.org';
 export const web3TestnetSidechainEndpoint = 'https://testnetsidechain.exokit.org';
-// export const worldUrl = 'worlds.webaverse.com';
 export const discordClientId = '684141574808272937';
 
 export const worldMapName = 'world';

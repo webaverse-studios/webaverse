@@ -40,6 +40,7 @@ export const screenshotAvatarUrl = async ({
     arrayBuffer,
     srcUrl: start_url,
     quality: maxAvatarQuality,
+    renderer: getRenderer(),
   });
   await avatarRenderer.waitForLoad();
   

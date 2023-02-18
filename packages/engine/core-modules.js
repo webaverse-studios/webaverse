@@ -1,6 +1,6 @@
 import metaversefile from 'metaversefile';
 
-const baseUrl = `https://local.webaverse.com/core-modules/`;
+const baseUrl = import.meta.env.VITE_CORE_MODULES_URL ?? import.meta.env.NEXT_CORE_MODULES_URL ?? `https://webaverse.github.io/core-modules/`;
 
 const moduleUrls = {
   button: `${baseUrl}button/`,
@@ -16,7 +16,6 @@ const moduleUrls = {
   filter: `${baseUrl}filter/`,
   barrier: `${baseUrl}barrier/`,
   comet: `${baseUrl}comet/`,
-  infinistreet: `${baseUrl}infinistreet/`,
   spawner: `${baseUrl}spawner/`,
   defaultScene: `${baseUrl}default-scene/`,
   path: `path/`,
@@ -32,6 +31,7 @@ const moduleUrls = {
   meshLodItem: `${baseUrl}mesh-lod-item/`,
   transformIndicators: `${baseUrl}transform-indicators/`,
   glider: `${baseUrl}glider/`,
+  phoneEditTool: `${baseUrl}phone-edit-tool/`,
 };
 const importModule = async moduleName => {
   const moduleUrl = moduleUrls[moduleName];

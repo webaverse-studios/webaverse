@@ -99,7 +99,6 @@ const DragAndDrop = () => {
   const [mintComplete, setMintComplete] = useState(false);
   const [pendingTx, setPendingTx] = useState(false);
 
-
   useEffect(() => {
     function keydown(e) {
       if (game.inputFocused()) return true;
@@ -192,7 +191,8 @@ const DragAndDrop = () => {
       .add(new THREE.Vector3(0, 0, -2).applyQuaternion(localPlayer.quaternion));
     const quaternion = localPlayer.quaternion;
 
-    app.position.copy(position);
+    // apply position.y = 0 because it is added from compiler/vrm
+    app.position.copy(new THREE.Vector3(position.x, 0, position.z));
     app.quaternion.copy(quaternion);
     app.updateMatrixWorld();
 

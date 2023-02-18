@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {VRMSpringBoneLoaderPlugin} from '@pixiv/three-vrm';
+// import {VRMSpringBoneLoaderPlugin} from '@pixiv/three-vrm';
 import {AudioRecognizer} from '../audio-recognizer.js';
 import audioManager from '../audio-manager.js';
 import {scene} from '../renderer.js';
@@ -467,12 +467,12 @@ class Avatar {
     this.eyeballTargetEnabled = false;
 
     this.springBoneManager = null;
-    if (options.hair) {
-      const springBoneLoader = new VRMSpringBoneLoaderPlugin()
-      springBoneLoader._v0Import(object).then((boneManager)=>{
-        this.springBoneManager = boneManager
-      })
-    }
+    // if (options.hair) {
+    //   const springBoneLoader = new VRMSpringBoneLoaderPlugin()
+    //   springBoneLoader._v0Import(object).then((boneManager)=>{
+    //     this.springBoneManager = boneManager
+    //   })
+    // }
 
     const _getOffset = (bone, parent = bone?.parent) => bone && bone.getWorldPosition(new THREE.Vector3()).sub(parent.getWorldPosition(new THREE.Vector3()));
 
@@ -1433,6 +1433,31 @@ class Avatar {
     if (this.velocity.length() > maxIdleVelocity) {
       this.lastMoveTime = timestamp;
     }
+  }
+
+  setLocalAvatarPose(poseArray) {
+    const [
+      [hmdPosition, hmdQuaternion],
+      [leftGamepadPosition, leftGamepadQuaternion, leftGamepadPointer, leftGamepadGrip, leftGamepadEnabled],
+      [rightGamepadPosition, rightGamepadQuaternion, rightGamepadPointer, rightGamepadGrip, rightGamepadEnabled],
+    ] = poseArray;
+
+    this.inputs.hmd.position.fromArray(hmdPosition);
+    this.inputs.hmd.quaternion.fromArray(hmdQuaternion);
+    this.poseManager.vrTransforms.head.position.fromArray(hmdPosition);
+    this.poseManager.vrTransforms.head.quaternion.fromArray(hmdQuaternion);
+
+    this.inputs.leftGamepad.position.fromArray(leftGamepadPosition);
+    this.inputs.leftGamepad.quaternion.fromArray(leftGamepadQuaternion);
+    this.inputs.leftGamepad.pointer = leftGamepadPointer;
+    this.inputs.leftGamepad.grip = leftGamepadGrip;
+    this.inputs.leftGamepad.enabled = leftGamepadEnabled;
+
+    this.inputs.rightGamepad.position.fromArray(rightGamepadPosition);
+    this.inputs.rightGamepad.quaternion.fromArray(rightGamepadQuaternion);
+    this.inputs.rightGamepad.pointer = rightGamepadPointer;
+    this.inputs.rightGamepad.grip = rightGamepadGrip;
+    this.inputs.rightGamepad.enabled = rightGamepadEnabled;
   }
 
   update(timestamp, timeDiff) {

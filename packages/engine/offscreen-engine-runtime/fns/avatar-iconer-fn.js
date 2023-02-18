@@ -3,6 +3,7 @@ import {AvatarRenderer} from '../../avatars/avatar-renderer.js';
 import {createAvatarForScreenshot, screenshotAvatar} from '../../avatar-screenshotter.js';
 import {maxAvatarQuality} from '../../constants.js';
 import {emotes} from '../../emotes/emote-manager.js';
+import {getRenderer} from '../../renderer.js';
 
 const allEmotions = [''].concat(emotes.map(emote => emote.name));
 
@@ -14,6 +15,7 @@ const makeAvatarIconRenderer = async (start_url) => {
   const avatarRenderer = new AvatarRenderer({
     arrayBuffer,
     srcUrl: start_url,
+    renderer: getRenderer(),
     quality: maxAvatarQuality,
     controlled: true,
   });
