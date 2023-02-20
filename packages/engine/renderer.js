@@ -14,7 +14,7 @@ import {WebaverseScene} from './webaverse-scene.js';
 
 let offscreenCanvas = null; let canvas = null; let context = null; let renderer = null; let composer = null;
 
-let waitPromise = makePromise();
+const waitPromise = makePromise();
 const waitForLoad = () => waitPromise;
 
 function bindCanvas(c) {
@@ -84,6 +84,23 @@ function getComposer() {
   return composer;
 }
 
+let renderBeforeFunc = null
+let renderAfterFunc = null
+function renderBeforeComposer() {
+  if (renderBeforeFunc) renderBeforeFunc()
+}
+
+function renderAfterComposer() {
+  if (renderAfterFunc) renderAfterFunc()
+}
+
+function setRenderBeforeComposer(func) {
+  renderBeforeFunc = func
+}
+function setRenderAfterComposer(func) {
+  renderAfterFunc = func
+}
+
 const scene = new THREE.Scene();
 scene.name = 'scene';
 const sceneHighPriority = new THREE.Scene();
@@ -113,7 +130,7 @@ scene.add(camera);
 const _getCanvasDimensions = () => {
   let width = globalThis.innerWidth;
   let height = globalThis.innerHeight;
-  let pixelRatio = globalThis.devicePixelRatio;
+  const pixelRatio = globalThis.devicePixelRatio;
 
   width = Math.max(width, minCanvasSize);
   height = Math.max(height, minCanvasSize);
@@ -183,6 +200,10 @@ export {
   getRenderer,
   getContainerElement,
   getComposer,
+  renderBeforeComposer,
+  renderAfterComposer,
+  setRenderBeforeComposer,
+  setRenderAfterComposer,
   canvas,
   offscreenCanvas,
   scene,

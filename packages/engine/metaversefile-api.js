@@ -10,7 +10,7 @@ import {Text} from 'troika-three-text';
 import React from 'react';
 // import * as ReactThreeFiber from '@react-three/fiber';
 import metaversefile from 'metaversefile';
-import {getRenderer, scene, sceneHighPriority, sceneLowPriority, sceneLowerPriority, sceneLowestPriority, rootScene, camera} from './renderer.js';
+import {getRenderer, scene, sceneHighPriority, sceneLowPriority, sceneLowerPriority, sceneLowestPriority, rootScene, camera, getComposer, setRenderBeforeComposer, setRenderAfterComposer} from './renderer.js';
 import cameraManager from './camera-manager.js';
 import physicsManager from './physics-manager.js';
 import Avatar from './avatars/avatars.js';
@@ -319,10 +319,10 @@ function createPointerEvents(store) {
       (acc, key) => ({...acc, [key]: handlePointer(key)}),
       {},
     )),
-    connect: (target) => {
+    connect: target => {
       const {set, events} = store.getState()
       events.disconnect?.()
-      set((state) => ({events: {...state.events, connected: target}}))
+      set(state => ({events: {...state.events, connected: target}}))
       Object.entries(events?.handlers ?? []).forEach(([name, event]) =>
         target.addEventListener(names[name], event, {passive: true}),
       )
@@ -335,7 +335,7 @@ function createPointerEvents(store) {
             events.connected.removeEventListener(names[name], event)
           }
         })
-        set((state) => ({events: {...state.events, connected: false}}))
+        set(state => ({events: {...state.events, connected: false}}))
       }
     },
   }
@@ -457,6 +457,15 @@ metaversefile.setApi({
   },
   useRenderer() {
     return getRenderer();
+  },
+  useComposer() {
+    return getComposer()
+  },
+  useSetBeforeComposer(func) {
+    return setRenderBeforeComposer(func)
+  },
+  useSetAfterComposer(func) {
+    return setRenderAfterComposer(func)
   },
   useRenderSettings() {
     return renderSettingsManager;
@@ -640,7 +649,7 @@ metaversefile.setApi({
     return playersManager.getLocalPlayer();
   },
   useRemotePlayer(playerId) {
-    let player = playersManager.getRemotePlayers().get(playerId);
+    const player = playersManager.getRemotePlayers().get(playerId);
     /* if (!player) {
       player = new RemotePlayer();
     } */
@@ -1105,7 +1114,7 @@ export default () => {
   },
   getPlayerByAppInstanceId(instanceId) {
     const localPlayer = playersManager.getLocalPlayer();
-    let result = localPlayer.appManager.getAppByInstanceId(instanceId);
+    const result = localPlayer.appManager.getAppByInstanceId(instanceId);
     if (result) {
       return localPlayer;
     } else {
@@ -1135,7 +1144,7 @@ export default () => {
   getAppByInstanceId(instanceId) {
     // local
     const localPlayer = playersManager.getLocalPlayer();
-    let result = world.appManager.getAppByInstanceId(instanceId) || localPlayer.appManager.getAppByInstanceId(instanceId);
+    const result = world.appManager.getAppByInstanceId(instanceId) || localPlayer.appManager.getAppByInstanceId(instanceId);
     if (result) {
       return result;
     }

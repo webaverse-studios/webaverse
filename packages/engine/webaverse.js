@@ -33,8 +33,10 @@ import {
   camera,
   bindCanvas,
   getComposer,
+  renderBeforeComposer,
+  renderAfterComposer,
   offscreenCanvas,
-  canvas
+  canvas,
 } from './renderer.js';
 import transformControls from './transform-controls.js';
 import dioramaManager from './diorama/diorama-manager.js';
@@ -373,7 +375,9 @@ export default class Webaverse extends EventTarget {
     frameEvent.data.timeDiff = timeDiff;
     game.dispatchEvent(frameEvent);
 
+    renderBeforeComposer()
     getComposer().render();
+    renderAfterComposer()
     
     // call transferimagebitmap to move the contents of offscreencanvas to canvas
   
