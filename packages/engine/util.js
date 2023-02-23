@@ -1075,7 +1075,7 @@ export const makeSquareImage = img => {
 
   // draw the image in the center
   drawImageContain(ctx, img);
-  
+
   return canvas;
 };
 export const imageToCanvas = (img, w, h) => {
@@ -1255,3 +1255,21 @@ export const lookAtQuaternion = (dirVec)=>{
   var mx = new THREE.Matrix4().lookAt(new THREE.Vector3(0,0,0), dirVec, new THREE.Vector3(0,1,0));
   return new THREE.Quaternion().setFromRotationMatrix(mx);
 };
+
+// deep copy of ArrayBuffer
+export function deepCopyArrayBuffer(buffer) {
+  // create a new buffer with the same byte length as the original
+  const newBuffer = new ArrayBuffer(buffer.byteLength);
+
+  // get the views for both buffers
+  const originalView = new Uint8Array(buffer);
+  const newView = new Uint8Array(newBuffer);
+
+  // copy the contents of the original buffer to the new buffer
+  for (let i = 0; i < originalView.length; i++) {
+    newView[i] = originalView[i];
+  }
+
+  // return the new buffer
+  return newBuffer;
+}

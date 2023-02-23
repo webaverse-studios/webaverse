@@ -82,9 +82,11 @@ export const getFuzzyEmotionMapping = emotionName => fuzzyEmotionMappings[emotio
 
 const _playerSay = async (player, message) => {
   const preloadedMessage = player.voicer.preloadMessage(message);
-  await chatManager.waitForVoiceTurn(() => {
+  await chatManager.waitForVoiceTurn(async () => {
+    const audio = await player.voicer.start(preloadedMessage);
+    console.log("player say", message, audio)
     // setText(message);
-    return player.voicer.start(preloadedMessage);
+    return audio
   });
   // setText('');
 };
@@ -198,7 +200,7 @@ class Conversation extends EventTarget {
         emote,
         done,
       } = await aiScene.generateChatMessage(this.messages, this.remotePlayer.name);
-
+      console.log('got comment', comment, emote, done, this.remotePlayer, this.localPlayer)
       if (!this.messages.some(m => m.text === comment && m.player === this.remotePlayer)) {
         this.addRemotePlayerMessage(comment, emote);
         done && this.finish();

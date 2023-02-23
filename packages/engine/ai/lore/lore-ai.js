@@ -105,6 +105,12 @@ class AIScene {
         object,
         target,
       });
+      console.log("pushing request message", this.localCharacter,
+        message,
+        emote,
+        action,
+        object,
+        target)
       while (this.messages.length > 8) {
         this.messages.shift();
       }
@@ -121,6 +127,12 @@ class AIScene {
         object,
         target,
       });
+      console.log("pushing response message", this.localCharacter,
+        message,
+        emote,
+        action,
+        object,
+        target)
       while (this.messages.length > 8) {
         this.messages.shift();
       }
@@ -282,6 +294,7 @@ class AIScene {
   }
 
   async generateChatMessage(messages, nextCharacter) {
+    console.log("generateChatMessage", {messages, nextCharacter});
     const prompt = makeChatPrompt({
       messages,
       nextCharacter,

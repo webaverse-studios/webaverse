@@ -9,6 +9,8 @@ class AudioAI {
 
     const res = await fetch(url);
     const blob = await res.blob();
+
+    console.log("AUDIO AI URL", prompt, url, blob);
     return blob;
     /* const audioContext = audioManager.getAudioContext();
     const audioData = await audioContext.decodeAudioData(arrayBuffer);

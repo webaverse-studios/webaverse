@@ -36,7 +36,8 @@ class ChatManager extends EventTarget {
     const emotion = match ? match.emotion : null;
     const value = emotion ? 1 : 0;
     player.addAction(m);
-    
+    console.log('add player message', m, emotion, value)
+
     const _addFacePose = () => {
       if (emotion) {
         player.addAction({
@@ -55,23 +56,23 @@ class ChatManager extends EventTarget {
         }
       }
     };
-    
+
     this.dispatchEvent(new MessageEvent('messageadd', {
       data: {
         player,
         message: m,
       },
     }));
-    
+
     const localTimeout = setTimeout(() => {
       this.removePlayerMessage(player, m);
-      
+
       _removeFacePose();
     }, timeout);
     m.cleanup = () => {
       clearTimeout(localTimeout);
     };
-    
+
     return m;
   }
 
@@ -86,19 +87,20 @@ class ChatManager extends EventTarget {
       message,
     };
 
+
     return this.addPlayerMessage(localPlayer, m, opts);
   }
 
   removePlayerMessage(player, m) {
     m.cleanup();
-    
+
     const actionIndex = player.findActionIndex(action => action.chatId === m.chatId);
     if (actionIndex !== -1) {
       player.removeActionIndex(actionIndex);
     } else {
       console.warn('remove unknown message action 2', m);
     }
-    
+
     this.dispatchEvent(new MessageEvent('messageremove', {
       data: {
         player,
@@ -114,7 +116,7 @@ class ChatManager extends EventTarget {
 
   async waitForVoiceTurn(fn) {
     // console.log('wait for voice queue', this.voiceRunning, this.voiceQueue.length);
-    
+
     if (!this.voiceRunning) {
       this.voiceRunning = true;
       // console.log('wait 0');
@@ -128,6 +130,7 @@ class ChatManager extends EventTarget {
         const fn2 = this.voiceQueue.shift();
         this.waitForVoiceTurn(fn2);
       }
+      console.log("if voices", result)
 
       return result;
     } else {
@@ -138,9 +141,11 @@ class ChatManager extends EventTarget {
         const result = await p2;
         // console.log('wait 4');
         p.accept(result);
+        console.log("else voices", result)
         return result;
       });
       const result = await p;
+      console.log("final voices", result)
       return result;
     }
   }
