@@ -3,7 +3,9 @@ import {
   fullscreenGeometry,
   fullscreenVertexShader,
 } from './common.js';
-import {getRenderer} from '../renderer.js';
+// import {getRenderer} from '../renderer.js';
+
+console.log('load poison BG FX mesh... this can be removed');
 
 export const poisonFragmentShader = `\
   uniform float iTime;
@@ -494,7 +496,9 @@ export const poisonFragmentShader = `\
 `;
 
 class PoisonBgFxMesh extends THREE.Mesh {
-  constructor() {
+  constructor({
+    webaverseRenderer,
+  }) {
     const geometry = fullscreenGeometry;
     const material = new THREE.ShaderMaterial({
       uniforms: {
@@ -518,6 +522,11 @@ class PoisonBgFxMesh extends THREE.Mesh {
     });
     super(geometry, material);
     this.frustumCulled = false;
+
+    if (!webaverseRenderer) {
+      debugger;
+    }
+    this.webaverseRenderer = webaverseRenderer;
   }
 
   update(timestamp, timeDiff, width, height) {
@@ -528,7 +537,8 @@ class PoisonBgFxMesh extends THREE.Mesh {
     this.material.uniforms.iFrame.value = Math.floor(timestampS * 60);
     this.material.uniforms.iFrame.needsUpdate = true;
 
-    const renderer = getRenderer();
+    // const renderer = getRenderer();
+    const {renderer} = this.webaverseRenderer;
     const pixelRatio = renderer.getPixelRatio();
     /* renderer.getSize(this.material.uniforms.iResolution.value)
       .multiplyScalar(pixelRatio);

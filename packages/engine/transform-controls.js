@@ -1,6 +1,10 @@
+/*
+this entire file should be removed... we don't need the gizmo
+*/
+
 import * as THREE from 'three';
-import {sceneLowPriority} from './renderer.js';
-import game from './game.js';
+// import {sceneLowPriority} from './renderer.js';
+// import game from './game.js';
 import TransformGizmo from './TransformGizmo.js';
 import {capitalize} from './util.js';
 
@@ -137,5 +141,5 @@ const transformControls = {
       this.transformGizmo.scale.copy(mouseSelectedObject.scale);
     }
   },
-};
-export default transformControls;
+}
+// export default transformControls;

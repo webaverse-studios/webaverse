@@ -2,7 +2,7 @@
 it controls the animated dioramas that happen when players perform actions.
 the HTML part of this code lives as part of the React app. */
 
-import {chatManager} from './chat-manager.js';
+// import {chatManager} from './chat-manager.js';
 
 const deadTimeoutTime = 2000;
 
@@ -48,7 +48,7 @@ class Hup extends EventTarget {
       },
     }));
     const preloadedMessage = this.parent.character.voicer.preloadMessage(message);
-    await chatManager.waitForVoiceTurn(() => {
+    await this.parent.chatManager.waitForVoiceTurn(() => {
       if (message) {
         if (this.fullText.length > 0) {
           this.fullText += '\n';
@@ -99,10 +99,19 @@ class Hup extends EventTarget {
   }
 }
 export class CharacterHups extends EventTarget {
-  constructor(character) {
+  constructor({
+    character,
+    chatManager,
+  }) {
     super();
     
+    if (!character || !chatManager) {
+      console.warn('invalid arguments', {character, chatManager});
+      // throw new Error('invalid arguments');
+      debugger;
+    }
     this.character = character;
+    this.chatManager = chatManager;
 
     this.hups = [];
 

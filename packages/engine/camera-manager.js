@@ -1,9 +1,11 @@
 import * as THREE from 'three';
-import {canvas, getRenderer, camera} from './renderer.js';
-import physicsManager from './physics-manager.js';
+// import {canvas, getRenderer, camera} from './renderer.js';
+import physicsManager from './physics/physics-manager.js';
 import {shakeAnimationSpeed, minFov, maxFov, midFov} from './constants.js';
 import Simplex from './simplex-noise.js';
-import {playersManager} from './players-manager.js';
+// import {
+//   PlayersManager,
+// } from './players-manager.js';
 import easing from './easing.js';
 import {isWorker} from './env.js';
 
@@ -112,58 +114,26 @@ class Shake extends THREE.Object3D {
   }
 }
 
-/* function lerpNum(value1, value2, amount) {
-  amount = amount < 0 ? 0 : amount;
-  amount = amount > 1 ? 1 : amount;
-  return value1 + (value2 - value1) * amount;
-}
-// Raycast from player to camera corner
-function initCameraRayParams(arrayIndex,originPoint) {
-  rayDirection.subVectors(localPlayer.position, originPoint).normalize();
-
-  rayMatrix.lookAt(rayDirection,rayVectorZero,rayVectorUp);
-  rayQuaternion.setFromRotationMatrix(rayMatrix);
-
-  // Slightly move ray start position towards camera (to avoid hair,hat)
-  rayStartPos.copy(localPlayer.position);
-  rayStartPos.add( rayDirection.multiplyScalar(0.1) );
-
-  rayOriginArray[arrayIndex].copy(rayStartPos);
-  rayDirectionArray[arrayIndex].copy(rayQuaternion);
-
-}
-// Raycast from player postition with small offset
-function initOffsetRayParams(arrayIndex,originPoint) {
-  rayDirection.subVectors(localPlayer.position, camera.position).normalize();
-
-  rayMatrix.lookAt(rayDirection,rayVectorZero,rayVectorUp);
-  rayQuaternion.setFromRotationMatrix(rayMatrix);
-
-  rayOriginArray[arrayIndex].copy(originPoint);
-  rayDirectionArray[arrayIndex].copy(rayQuaternion);
-} */
-
-/* const redMesh = (() => {
-  const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-  const material = new THREE.MeshBasicMaterial({color: 0xff0000});
-  const mesh = new THREE.Mesh(geometry, material);
-  // mesh.visible = false;
-  return mesh;
-})();
-scene.add(redMesh);
-
-const blueMesh = (() => {
-  const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-  const material = new THREE.MeshBasicMaterial({color: 0x0000ff});
-  const mesh = new THREE.Mesh(geometry, material);
-  // mesh.visible = false;
-  return mesh;
-})();
-scene.add(blueMesh); */
-
-class CameraManager extends EventTarget {
-  constructor() {
+export class CameraManager extends EventTarget {
+  constructor({
+    // camera,
+    webaverseRenderer,
+    playersManager,
+  })  {
     super();
+
+    if (/*!camera || */!webaverseRenderer || !playersManager) {
+      console.warn('missing required arguments', {
+        // camera,
+        playersManager,
+      });
+      throw new Error('missing required arguments');
+    }
+    // this.camera = camera;
+    this.webaverseRenderer = webaverseRenderer;
+    this.playersManager = playersManager;
+
+    const {camera} = this.webaverseRenderer;
 
     this.pointerLockElement = null;
     // this.pointerLockEpoch = 0;
@@ -187,95 +157,12 @@ class CameraManager extends EventTarget {
     this.lastTimestamp = 0;
     this.cinematicScript = null;
     this.cinematicScriptStartTime = -1;
-
-    this.bindEvents();
-  }
-
-  bindEvents() {
-    if (!isWorker) {
-      document.addEventListener('pointerlockchange', e => {
-        let pointerLockElement = document.pointerLockElement;
-        const renderer = getRenderer();
-        if (pointerLockElement !== null && pointerLockElement !== canvas) {
-          pointerLockElement = null;
-        }
-
-        this.pointerLockElement = pointerLockElement;
-        this.dispatchEvent(new MessageEvent('pointerlockchange', {
-          data: {
-            pointerLockElement,
-          },
-        }));
-      });
-    }
   }
 
   focusCamera(position) {
+    const {camera} = this.webaverseRenderer;
     camera.lookAt(position);
     camera.updateMatrixWorld();
-  }
-
-  async requestPointerLock() {
-    // const localPointerLockEpoch = ++this.pointerLockEpoch;
-    for (const options of [
-      {
-        unadjustedMovement: true,
-      },
-      undefined
-    ]) {
-      try {
-        await new Promise((accept, reject) => {
-          const renderer = getRenderer();
-          if (document.pointerLockElement !== renderer.domElement) {
-            if (document.activeElement) {
-              document.activeElement.blur();
-            }
-
-            const _pointerlockchange = e => {
-              // if (localPointerLockEpoch === this.pointerLockEpoch) {
-                accept();
-              // }
-              _cleanup();
-            };
-            document.addEventListener('pointerlockchange', _pointerlockchange);
-            const _pointerlockerror = err => {
-              reject(err);
-              _cleanup();
-              
-              /* notifications.addNotification(`\
-                <i class="icon fa fa-mouse-pointer"></i>
-                <div class=wrap>
-                  <div class=label>Whoa there!</div>
-                  <div class=text>
-                    Hold up champ! The browser wants you to slow down.
-                  </div>
-                  <div class=close-button>✕</div>
-                </div>
-              `, {
-                timeout: 3000,
-              }); */
-            };
-            document.addEventListener('pointerlockerror', _pointerlockerror);
-            const _cleanup = () => {
-              document.removeEventListener('pointerlockchange', _pointerlockchange);
-              document.removeEventListener('pointerlockerror', _pointerlockerror);
-            };
-            canvas.requestPointerLock(options)
-              .catch(_pointerlockerror);
-          } else {
-            accept();
-          }
-        });
-        break;
-      } catch (err) {
-        console.warn(err);
-        continue;
-      }
-    }
-  }
-
-  exitPointerLock() {
-    document.exitPointerLock();
   }
 
   getMode() {
@@ -292,6 +179,12 @@ class CameraManager extends EventTarget {
 
   handleMouseMove(e) {
     const {movementX, movementY} = e;
+    const {camera} = this.webaverseRenderer;
+
+    // console.log('got mouse move', {
+    //   movementX,
+    //   movementY,
+    // });
 
     camera.position.add(localVector.copy(this.getCameraOffset()).applyQuaternion(camera.quaternion));
   
@@ -438,6 +331,8 @@ class CameraManager extends EventTarget {
   }
 
   setStaticTarget(target = null, target2 = null) {
+    const {camera} = this.webaverseRenderer;
+
     this.targetType = 'static';
     this.target = target;
     this.target2 = target2;
@@ -451,7 +346,7 @@ class CameraManager extends EventTarget {
         cameraOffsetTargetZ = -1;
         cameraOffset.z = cameraOffsetTargetZ;
 
-        const localPlayer = playersManager.getLocalPlayer();
+        const localPlayer = this.playersManager.getLocalPlayer();
         const targetPosition = localVector.copy(localPlayer.position)
           .add(localVector2.set(0, 0, -cameraOffsetTargetZ).applyQuaternion(localPlayer.quaternion));
         const targetQuaternion = localPlayer.quaternion;
@@ -478,6 +373,12 @@ class CameraManager extends EventTarget {
   }
 
   setCameraToNullTarget() {
+    const {camera} = this.webaverseRenderer;
+
+    this.targetType = 'dynamic';
+    this.target = null;
+    this.target2 = null;
+    
     this.sourcePosition.copy(camera.position);
     this.sourceQuaternion.copy(camera.quaternion);
     this.sourceFov = camera.fov;
@@ -495,9 +396,11 @@ class CameraManager extends EventTarget {
   }
 
   updatePost(timestamp, timeDiff) {
-    const renderer = getRenderer();
-    const session = renderer.xr.getSession();
-    const localPlayer = playersManager.getLocalPlayer();
+    // const renderer = getRenderer();
+    const {renderer, camera} = this.webaverseRenderer;
+    // const session = renderer.xr.getSession();
+    const session = null;
+    const localPlayer = this.playersManager.getLocalPlayer();
 
     if (this.target) {
       const _setLerpDelta = (position, quaternion) => {
@@ -708,7 +611,7 @@ class CameraManager extends EventTarget {
           const fovInTime = 3;
           const fovOutTime = 0.3;
           
-          const narutoRun = localPlayer.getAction('narutoRun');
+          const narutoRun = localPlayer.actionManager.getActionType('narutoRun');
           if (narutoRun) {
             if (this.lastNonzeroDirectionVector.z < 0) {    
               this.fovFactor += timeDiff / 1000 / fovInTime;
@@ -762,6 +665,6 @@ class CameraManager extends EventTarget {
 
     this.lastTarget = this.target;
   }
-};
-const cameraManager = new CameraManager();
-export default cameraManager;
+}
+// const cameraManager = new CameraManager();
+// export default cameraManager;

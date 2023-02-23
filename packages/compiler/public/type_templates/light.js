@@ -1,13 +1,19 @@
 import * as THREE from 'three';
-import metaversefile from 'metaversefile';
-const {useApp, useFrame, useLocalPlayer, useCleanup, /*usePhysics, */ useWorld, useLightsManager} = metaversefile;
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
 
-export default e => {
+export default ctx => {
+  const {
+    useApp,
+    useFrame,
+    useLocalPlayer,
+    useCleanup,
+    useLightingManager,
+  } = ctx;
+
   const app = useApp();
-  const lightsManager = useLightsManager();
+  const lightingManager = useLightingManager();
 
   const srcUrl = ${this.srcUrl};
   
@@ -15,7 +21,7 @@ export default e => {
   app.light = null;
 
   let json = null;
-  e.waitUntil((async () => {
+  ctx.waitUntil((async () => {
     const res = await fetch(srcUrl);
     json = await res.json();
 
@@ -78,7 +84,7 @@ export default e => {
         }
       })();
       if (light) {
-        lightsManager.addLight(light, lightType, shadow, position);
+        lightingManager.addLight(light, lightType, shadow, position);
 
         worldLights.add(light);
         if (light.target) {
@@ -94,8 +100,8 @@ export default e => {
   };
 
   useFrame(() => {
-    if (lightsManager.lights.length > 0) {
-      for (const light of lightsManager.lights) {
+    if (lightingManager.lights.length > 0) {
+      for (const light of lightingManager.lights) {
         if (!light.lastAppMatrixWorld.equals(app.matrixWorld)) {
           light.position.copy(app.position);
           // light.quaternion.copy(app.quaternion);
@@ -117,7 +123,7 @@ export default e => {
       }
 
       const localPlayer = useLocalPlayer();
-      for (const light of lightsManager.lights) {
+      for (const light of lightingManager.lights) {
         if (light.isDirectionalLight) {
           light.plane.setFromNormalAndCoplanarPoint(localVector.set(0, 0, -1).applyQuaternion(light.shadow.camera.quaternion), light.shadow.camera.position);
           const planeTarget = light.plane.projectPoint(localPlayer.position, localVector);
@@ -141,8 +147,8 @@ export default e => {
   });
 
   useCleanup(() => {
-    for (const light of lightsManager.lights) {
-      lightsManager.removeLight(light);
+    for (const light of lightingManager.lights) {
+      lightingManager.removeLight(light);
     }
   });
 

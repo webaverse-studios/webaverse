@@ -3,7 +3,7 @@ import {
   fullscreenGeometry,
   fullscreenVertexShader,
 } from './common.js';
-import {getRenderer} from '../renderer.js';
+// import {getRenderer} from '../renderer.js';
 
 export const noiseFragmentShader = `\
   //Based on Andrew Baldwin's noise tutorial: http://thndl.com/?15
@@ -116,7 +116,9 @@ export const noiseFragmentShader = `\
 `;
 
 class NoiseBgFxMesh extends THREE.Mesh {
-  constructor() {
+  constructor({
+    webaverseRenderer,
+  }) {
     const geometry = fullscreenGeometry;
     const material = new THREE.ShaderMaterial({
       uniforms: {
@@ -164,6 +166,11 @@ class NoiseBgFxMesh extends THREE.Mesh {
     quad.frustumCulled = false; */
     super(geometry, material);
     this.frustumCulled = false;
+
+    if (!webaverseRenderer) {
+      debugger;
+    }
+    this.webaverseRenderer = webaverseRenderer;
   }
 
   update(timestamp, timeDiff, width, height) {
@@ -174,7 +181,8 @@ class NoiseBgFxMesh extends THREE.Mesh {
     this.material.uniforms.iFrame.value = Math.floor(timestampS * 60);
     this.material.uniforms.iFrame.needsUpdate = true;
 
-    const renderer = getRenderer();
+    // const renderer = getRenderer();
+    const {renderer} = this.webaverseRenderer;
     const pixelRatio = renderer.getPixelRatio();
     /* renderer.getSize(this.material.uniforms.iResolution.value)
       .multiplyScalar(pixelRatio);

@@ -1,12 +1,14 @@
 import * as THREE from 'three';
 import {VRMSpringBoneLoaderPlugin} from '@pixiv/three-vrm';
-import {AudioRecognizer} from '../audio-recognizer.js';
-import audioManager from '../audio-manager.js';
-import {scene} from '../renderer.js';
+import {AudioRecognizer} from '../audio/audio-recognizer.js';
+// import {
+//   AudioManager,
+// } from '../audio-manager.js';
+// import {scene} from '../renderer.js';
 import {
   getNextPhysicsId,
 } from '../util.js';
-import MicrophoneWorker from './microphone-worker.js';
+import MicrophoneWorker from '../audio/microphone-worker.js';
 import LegsManager from './vrarmik/LegsManager.js';
 import PoseManager from './vrarmik/PoseManager.js';
 import ShoulderTransforms from './vrarmik/ShoulderTransforms.js';
@@ -18,7 +20,7 @@ import {
   runSpeed,
   walkSpeed,
 } from '../constants.js';
-import metaversefile from 'metaversefile';
+// import metaversefile from 'metaversefile';
 import {easing} from '../math-utils.js';
 import {
   getAvatarHeight,
@@ -30,15 +32,16 @@ import {
   getTailBones,
 } from './util.mjs';
 
+import avatarsWasmManager from './avatars-wasm-manager.js';
 import {
   getClosest2AnimationAngles,
   getFirstPersonCurves,
   _findArmature,
   animations,
   animationStepIndices,
-  waitForLoad,
+  waitForLoad as animationHelpersWaitForLoad,
   _createAnimation,
-  _updateAnimation
+  _updateAnimation,
 } from './animationHelpers.js';
 
 import {animationMappingConfig} from './AnimationMapping.js';
@@ -47,7 +50,7 @@ import Emoter from './Emoter.js';
 import Looker from './Looker.js';
 import Nodder from './Nodder.js';
 
-import * as wind from './simulation/wind.js';
+// import * as wind from './simulation/wind.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -63,7 +66,6 @@ const localMatrix2 = new THREE.Matrix4();
 
 const maxIdleVelocity = 0.01;
 const maxHeadTargetTime = 2000;
-
 
 const upRotation = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI*0.5);
 // const downRotation = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI*0.5);
@@ -334,23 +336,29 @@ const _makeDebugMesh = avatar => {
 // scene.add(testMesh);
 
 class Avatar {
-  #audioRecognizer = null;
-	constructor(avatarRenderer, options = {}) {
-    this.avatarRenderer = avatarRenderer;
-    const object = avatarRenderer.controlObject;
+	constructor(avatarQuality, options = {}) {
+    // if (!avatarQuality) {
+    //   debugger;
+    // }
+
+    this.avatarQuality = avatarQuality;
+    const object = avatarQuality.controlObject;
     this.object = object;
 
-    const model = this.object.scene;
-    this.model = model; // XXX still needed?
+    // const model = this.object.scene;
+    // this.model = model; // XXX still needed?
 
     this.options = options;
+    // if (!this.options.environmentManager) {
+    //   debugger;
+    // }
 
     this.vrmExtension = object?.parser?.json?.extensions?.VRM || object?.parser?.json?.extensions?.VRMC_vrm;
     this.firstPersonCurves = getFirstPersonCurves(this.vrmExtension); 
 
     //
 
-    avatarRenderer.setControlled(true);
+    avatarQuality.setControlled(true);
 
     //
 
@@ -1364,7 +1372,7 @@ class Avatar {
   }
 
   async setQuality(quality) {
-    await this.avatarRenderer.setQuality(quality);
+    await this.avatarQuality.setQuality(quality);
   }
 
   lerpShoulderTransforms() {
@@ -1841,7 +1849,7 @@ class Avatar {
     const _updateWind = () =>{
       const headPosition = localVector.setFromMatrixPosition(this.modelBoneOutputs.Head.matrixWorld);
       // The avatar may not have spring bones, so we should make sure the avatar has springBone before updating the wind effect
-      wind.update(timestamp, headPosition, this.springBoneManager)
+      this.options.environmentManager.wind.update(timestamp, headPosition, this.springBoneManager)
     }
 
 
@@ -1898,9 +1906,9 @@ class Avatar {
     
     this.options.visemes && _updateVisemes();
   
-    this.avatarRenderer.update(timestamp, timeDiff, this);
+    this.avatarQuality.update(timestamp, timeDiff, this);
 
-    const debug = metaversefile.useDebug();
+    const debug = false; // XXX debug: metaversefile.useDebug();
     if (debug.enabled && !this.debugMesh) {
       this.debugMesh = _makeDebugMesh();
       this.debugMesh.wrapToAvatar(this);
@@ -1909,8 +1917,8 @@ class Avatar {
     if (this.debugMesh) {
       if (debug.enabled) {
         this.debugMesh.setFromAvatar(this);
-        if (this.avatarRenderer.currentMesh !== this.debugMesh.parent) {
-          this.avatarRenderer.currentMesh.add(this.debugMesh);
+        if (this.avatarQuality.currentMesh !== this.debugMesh.parent) {
+          this.avatarQuality.currentMesh.add(this.debugMesh);
         }
       }
       this.debugMesh.visible = debug.enabled;
@@ -1921,50 +1929,80 @@ class Avatar {
     return !!this.audioWorker;
   }
 
-  setAudioEnabled(enabled) {
-    // cleanup
+  #cleanupAudio() {
+    this.volume = 0;
+
     if (this.audioWorker) {
       this.audioWorker.close();
       this.audioWorker = null;
     }
-
-    // setup
-    if (enabled) {
-      this.volume = 0;
-
-      const audioContext = audioManager.getAudioContext();
-      if (audioContext.state === 'suspended') {
-        (async () => {
-          await audioContext.resume();
-        })();
-      }
-
-      const audioRecognizer = this.getAudioRecognizer();
+    if (this.audioRecognizer) {
+      this.audioRecognizer.destroy();
+      this.audioRecognizer = null;
+    }
+    if (this.microphoneWorker) {
+      this.microphoneWorker.close();
+      this.microphoneWorker = null;
+    }
+  }
+  getAudioRecognizer({
+    audioContext,
+  }) {
+    let {audioRecognizer} = this;
+    if (!audioRecognizer) {
+      audioRecognizer = new AudioRecognizer({
+        sampleRate: audioContext.sampleRate,
+      });
       audioRecognizer.addEventListener('result', e => {
         this.vowels.set(e.data);
       });
+      this.audioRecognizer = audioRecognizer;
+    }
+    return audioRecognizer;
+  }
+  setAudioEnabled({
+    audioContext,
+  }) {
+    if (!audioContext) {
+      debugger;
+    }
 
-      this.audioWorker = new MicrophoneWorker({
-        audioContext,
-        muted: false,
-        emitVolume: true,
-        emitBuffer: true,
-      });
+    if (audioContext) {
+      if (!this.audioWorker) {
+        // this.volume = 0;
 
-      const _volume = e => {
-        // the mouth is manually overridden by the CharacterBehavior class which is attached to all players
-        // this happens when a player is eating fruit or yelling while making an attack
-        if (!this.manuallySetMouth) {
-          this.volume = e.data;
-        }
+        // const {audioContext} = audioManager;
+        // if (audioContext.state === 'suspended') {
+        //   (async () => {
+        //     await audioContext.resume();
+        //   })();
+        // }
+
+        this.audioWorker = new MicrophoneWorker({
+          audioContext,
+          muted: false,
+          emitVolume: true,
+          emitBuffer: true,
+        });
+
+        const _volume = e => {
+          // the mouth is manually overridden by the CharacterBehavior class which is attached to all players
+          // this happens when a player is eating fruit or yelling while making an attack
+          if (!this.manuallySetMouth) {
+            this.volume = e.data;
+          }
+        };
+        const audioRecognizer = this.getAudioRecognizer({
+          audioContext,
+        });
+        const _buffer = e => {
+          audioRecognizer.send(e.data);
+        };
+        this.audioWorker.addEventListener('volume', _volume);
+        this.audioWorker.addEventListener('buffer', _buffer);
       }
-      const _buffer = e => {
-        audioRecognizer.send(e.data);
-      }
-      this.audioWorker.addEventListener('volume', _volume);
-      this.audioWorker.addEventListener('buffer', _buffer);
     } else {
-      this.volume = 0;
+      this.#cleanupAudio();
     }
   }
 
@@ -1972,27 +2010,26 @@ class Avatar {
     return this.audioWorker.getInput();
   }
 
-  setMicrophoneEnabled(enabled) {
-    // cleanup
-    if (this.microphoneWorker) {
-      this.microphoneWorker.close();
-      this.microphoneWorker = null;
+  setMicrophoneEnabled({
+    audioContext,
+  }) {
+    if (!audioContext) {
+      debugger;
     }
 
     // setup
-    if (enabled) {
-      this.volume = 0;
+    if (audioContext) {
+      // this.volume = 0;
      
-      const audioContext = audioManager.getAudioContext();
-      if (audioContext.state === 'suspended') {
-        (async () => {
-          await audioContext.resume();
-        })();
-      }
+      // const {audioContext} = audioManager;
+      // if (audioContext.state === 'suspended') {
+      //   (async () => {
+      //     await audioContext.resume();
+      //   })();
+      // }
 
-      const audioRecognizer = this.getAudioRecognizer();
-      audioRecognizer.addEventListener('result', e => {
-        this.vowels.set(e.data);
+      this.setAudioEnabled({
+        audioContext,
       });
 
       this.microphoneWorker = new MicrophoneWorker({
@@ -2005,13 +2042,21 @@ class Avatar {
       const _volume = e => {
         this.volume = this.volume * 0.8 + e.data * 0.2;
       };
+      const audioRecognizer = this.getAudioRecognizer({
+        audioContext,
+      });
       const _buffer = e => {
         audioRecognizer.send(e.data);
       };
       this.microphoneWorker.addEventListener('volume', _volume);
       this.microphoneWorker.addEventListener('buffer', _buffer);
     } else {
-      this.volume = 0;
+      // this.volume = 0;
+
+      if (this.microphoneWorker) {
+        this.microphoneWorker.close();
+        this.microphoneWorker = null;
+      }
     }
   }
 
@@ -2020,17 +2065,10 @@ class Avatar {
   }
 
   getMicrophoneInput() {
-    return this.microphoneWorker.getInput();
-  }
-
-  getAudioRecognizer() {
-    if (!this.#audioRecognizer) {
-      const audioContext = audioManager.getAudioContext();
-      this.#audioRecognizer = new AudioRecognizer({
-        sampleRate: audioContext.sampleRate,
-      });
+    if (!this.microphoneWorker) {
+      debugger;
     }
-    return this.#audioRecognizer;
+    return this.microphoneWorker.getInput();
   }
 
   decapitate() {
@@ -2090,13 +2128,18 @@ class Avatar {
   } */
 
   destroy() {
-    this.avatarRenderer.destroy();
-    scene.remove(this.avatarRenderer.scene);
+    this.avatarQuality.destroy();
+    this.avatarQuality.scene.parent && this.avatarQuality.scene.parent.remove(this.avatarQuality.scene);
 
-    this.setAudioEnabled(false);
+    this.#cleanupAudio();
   }
 }
-Avatar.waitForLoad = waitForLoad;
+Avatar.waitForLoad = async () => {
+  await Promise.all([
+    avatarsWasmManager.waitForLoad(),
+    animationHelpersWaitForLoad(),
+  ]);
+}
 Avatar.getAnimations = () => animations;
 Avatar.getAnimationStepIndices = () => animationStepIndices;
 Avatar.getAnimationMappingConfig = () => animationMappingConfig;

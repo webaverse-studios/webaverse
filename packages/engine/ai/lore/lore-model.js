@@ -1,4 +1,4 @@
-import {murmurhash3} from '../../procgen/murmurhash3.js';
+import murmurhash from 'murmurhash';
 
 export const defaultPlayerName = 'Anon';
 export const defaultPlayerBio = 'A new player. Not much is known about them.';
@@ -14,7 +14,7 @@ const shuffleArray = array => {
   return array;
 };
 
-const hash = s => murmurhash3(s).toString(16);
+const hash = s => murmurhash.v3(s).toString(16);
 const thingHash = (o, index) => `${hash(o.name)}/${o.name}#${index+1}`;
 const characterLore = `\
 # Overview

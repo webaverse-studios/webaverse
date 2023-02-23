@@ -1,5 +1,5 @@
 import {makeId, makePromise} from './util.js';
-import metaversefileApi from 'metaversefile';
+// import metaversefileApi from 'metaversefile';
 
 const _getEmotion = text => {
   let match;
@@ -23,7 +23,7 @@ const _getEmotion = text => {
   }
 };
 
-class ChatManager extends EventTarget {
+export class ChatManager extends EventTarget {
   constructor() {
     super();
 
@@ -137,7 +137,7 @@ class ChatManager extends EventTarget {
         // console.log('wait 3');
         const result = await p2;
         // console.log('wait 4');
-        p.accept(result);
+        p.resolve(result);
         return result;
       });
       const result = await p;
@@ -145,8 +145,7 @@ class ChatManager extends EventTarget {
     }
   }
 }
-const chatManager = new ChatManager();
-
-export {
-  chatManager,
-};
+// const chatManager = new ChatManager();
+// export {
+//   chatManager,
+// };

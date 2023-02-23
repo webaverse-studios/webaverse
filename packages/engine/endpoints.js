@@ -1,15 +1,12 @@
 import {isProd} from './env.js';
 
 export const compilerBaseUrl = isProd ?
-  `https://compiler.webaverse.com/`
+  `https://compiler-two.webaverse.com/`
 :
   `https://local-compiler.webaverse.com/`;
 
 // scenes
-export const scenesBaseUrl = isProd ?
-  `https://webaverse.github.io/scenes/`
-:
-  `/scenes/`;
+export const scenesBaseUrl = `/scenes/`;
 export const defaultSceneName = 'block.scn';
 
 // characters

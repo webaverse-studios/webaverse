@@ -1,0 +1,9 @@
+{
+  "name": "metaversefile/apps",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "apps.js",
+  "author": "Webaverse",
+  "license": "MIT"
+}

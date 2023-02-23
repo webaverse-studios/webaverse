@@ -36,7 +36,6 @@ export class Allocator {
 
 export class ScratchStack {
   constructor(moduleInstance, size) {
-    console.log('moduleInstance', moduleInstance)
     this.ptr = moduleInstance._doMalloc(size)
 
     this.u8 = new Uint8Array(

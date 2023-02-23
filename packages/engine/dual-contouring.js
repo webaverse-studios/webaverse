@@ -743,7 +743,7 @@ globalThis.handleResult = (id, result) => {
   const p = cbs.get(id);
   if (p) {
     cbs.delete(id);
-    p.accept(result);
+    p.resolve(result);
   } else {
     console.warn('failed to find promise for id', id, result);
   }

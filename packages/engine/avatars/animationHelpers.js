@@ -1,7 +1,8 @@
 import {MathUtils} from 'three';
 import loaders from '../loaders.js';
-import {zbdecode} from 'zjs/encoding.mjs';
-import physx from '../physx.js';
+import {zbdecode} from '../../zjs/encoding.mjs';
+// import physx from '../physics/avatarsWasmManager.js';
+import avatarsWasmManager from './avatars-wasm-manager.js';
 import {animationMappingConfig} from './AnimationMapping.js';
 
 import {
@@ -73,15 +74,6 @@ const animationsIdleArrays = {
   crouch: {name: 'Crouch Idle.fbx'},
 };
 
-// const cubicBezier = easing(0, 1, 0, 1);
-
-// const _clearXZ = (dst, isPosition) => {
-//   if (isPosition) {
-//     dst.x = 0;
-//     dst.z = 0;
-//   }
-// };
-
 const _normalizeAnimationDurations = (animations, baseAnimation, factor = 1) => {
   for (let i = 1; i < animations.length; i++) {
     const animation = animations[i];
@@ -113,20 +105,6 @@ async function loadAnimations() {
       animation.tracks.index[track.name] = track;
     }
   }
-
-  /* const animationIndices = animationStepIndices.find(i => i.name === 'Fast Run.fbx');
-          for (let i = 0; i < animationIndices.leftFootYDeltas.length; i++) {
-            const mesh = new Mesh(new BoxBufferGeometry(0.02, 0.02, 0.02), new MeshBasicMaterial({color: 0xff0000}));
-            mesh.position.set(-30 + i * 0.1, 10 + animationIndices.leftFootYDeltas[i] * 10, -15);
-            mesh.updateMatrixWorld();
-            scene.add(mesh);
-          }
-          for (let i = 0; i < animationIndices.rightFootYDeltas.length; i++) {
-            const mesh = new Mesh(new BoxBufferGeometry(0.02, 0.02, 0.02), new MeshBasicMaterial({color: 0x0000ff}));
-            mesh.position.set(-30 + i * 0.1, 10 + animationIndices.rightFootYDeltas[i] * 10, -15);
-            mesh.updateMatrixWorld();
-            scene.add(mesh);
-          } */
 }
 
 async function loadSkeleton() {
@@ -148,100 +126,104 @@ async function loadSkeleton() {
   }
 }
 
+let loadPromise = null;
 export const waitForLoad = async () => {
-  await Promise.resolve(); // wait for metaversefile to be defined
-
-  await Promise.all([
-    loadAnimations(),
-    loadSkeleton(),
-  ]);
-
-  for (const k in animationsAngleArrays) {
-    const as = animationsAngleArrays[k];
-    for (const a of as) {
-      a.animation = animations.index[a.name];
-    }
+  if (!loadPromise) {
+    loadPromise = (async () => {
+      await Promise.all([
+        avatarsWasmManager.waitForLoad(),
+        loadAnimations(),
+        loadSkeleton(),
+      ]);
+    
+      for (const k in animationsAngleArrays) {
+        const as = animationsAngleArrays[k];
+        for (const a of as) {
+          a.animation = animations.index[a.name];
+        }
+      }
+      for (const k in animationsAngleArraysMirror) {
+        const as = animationsAngleArraysMirror[k];
+        for (const a of as) {
+          a.animation = animations.index[a.name];
+        }
+      }
+      for (const k in animationsIdleArrays) {
+        animationsIdleArrays[k].animation = animations.index[animationsIdleArrays[k].name];
+      }
+    
+      const walkingAnimations = [
+        'walking.fbx',
+        'left strafe walking.fbx',
+        'right strafe walking.fbx',
+      ].map(name => animations.index[name]);
+      const walkingBackwardAnimations = [
+        'walking backwards.fbx',
+        'left strafe walking reverse.fbx',
+        'right strafe walking reverse.fbx',
+      ].map(name => animations.index[name]);
+      const runningAnimations = [
+        'Fast Run.fbx',
+        'left strafe.fbx',
+        'right strafe.fbx',
+      ].map(name => animations.index[name]);
+      const runningBackwardAnimations = [
+        'running backwards.fbx',
+        'left strafe reverse.fbx',
+        'right strafe reverse.fbx',
+      ].map(name => animations.index[name]);
+      const crouchingForwardAnimations = [
+        'Sneaking Forward.fbx',
+        'Crouched Sneaking Left.fbx',
+        'Crouched Sneaking Right.fbx',
+      ].map(name => animations.index[name]);
+      const crouchingBackwardAnimations = [
+        'Sneaking Forward reverse.fbx',
+        'Crouched Sneaking Left reverse.fbx',
+        'Crouched Sneaking Right reverse.fbx',
+      ].map(name => animations.index[name]);
+      for (const animation of animations) {
+        decorateAnimation(animation);
+      }
+    
+      _normalizeAnimationDurations(walkingAnimations, walkingAnimations[0]);
+      _normalizeAnimationDurations(walkingBackwardAnimations, walkingBackwardAnimations[0]);
+      _normalizeAnimationDurations(runningAnimations, runningAnimations[0]);
+      _normalizeAnimationDurations(runningBackwardAnimations, runningBackwardAnimations[0]);
+      _normalizeAnimationDurations(crouchingForwardAnimations, crouchingForwardAnimations[0], 0.5);
+      _normalizeAnimationDurations(crouchingBackwardAnimations, crouchingBackwardAnimations[0], 0.5);
+    
+      /* function mergeAnimations(a, b) {
+        const o = {};
+        for (const k in a) {
+          o[k] = a[k];
+        }
+        for (const k in b) {
+          o[k] = b[k];
+        }
+        return o;
+      } */
+      /* jumpAnimationSegments = {
+          chargeJump: animations.find(a => a.isChargeJump),
+          chargeJumpFall: animations.find(a => a.isChargeJumpFall),
+          isFallLoop: animations.find(a => a.isFallLoop),
+          isLanding: animations.find(a => a.isLanding)
+        }; */
+    
+      // chargeJump = animations.find(a => a.isChargeJump);
+      // standCharge = animations.find(a => a.isStandCharge);
+      // fallLoop = animations.find(a => a.isFallLoop);
+      // swordSideSlash = animations.find(a => a.isSwordSideSlash);
+      // swordTopDownSlash = animations.find(a => a.isSwordTopDownSlash)
+    
+      initAnimationSystem();
+    })();
   }
-  for (const k in animationsAngleArraysMirror) {
-    const as = animationsAngleArraysMirror[k];
-    for (const a of as) {
-      a.animation = animations.index[a.name];
-    }
-  }
-  for (const k in animationsIdleArrays) {
-    animationsIdleArrays[k].animation = animations.index[animationsIdleArrays[k].name];
-  }
-
-  const walkingAnimations = [
-    'walking.fbx',
-    'left strafe walking.fbx',
-    'right strafe walking.fbx',
-  ].map(name => animations.index[name]);
-  const walkingBackwardAnimations = [
-    'walking backwards.fbx',
-    'left strafe walking reverse.fbx',
-    'right strafe walking reverse.fbx',
-  ].map(name => animations.index[name]);
-  const runningAnimations = [
-    'Fast Run.fbx',
-    'left strafe.fbx',
-    'right strafe.fbx',
-  ].map(name => animations.index[name]);
-  const runningBackwardAnimations = [
-    'running backwards.fbx',
-    'left strafe reverse.fbx',
-    'right strafe reverse.fbx',
-  ].map(name => animations.index[name]);
-  const crouchingForwardAnimations = [
-    'Sneaking Forward.fbx',
-    'Crouched Sneaking Left.fbx',
-    'Crouched Sneaking Right.fbx',
-  ].map(name => animations.index[name]);
-  const crouchingBackwardAnimations = [
-    'Sneaking Forward reverse.fbx',
-    'Crouched Sneaking Left reverse.fbx',
-    'Crouched Sneaking Right reverse.fbx',
-  ].map(name => animations.index[name]);
-  for (const animation of animations) {
-    decorateAnimation(animation);
-  }
-
-  _normalizeAnimationDurations(walkingAnimations, walkingAnimations[0]);
-  _normalizeAnimationDurations(walkingBackwardAnimations, walkingBackwardAnimations[0]);
-  _normalizeAnimationDurations(runningAnimations, runningAnimations[0]);
-  _normalizeAnimationDurations(runningBackwardAnimations, runningBackwardAnimations[0]);
-  _normalizeAnimationDurations(crouchingForwardAnimations, crouchingForwardAnimations[0], 0.5);
-  _normalizeAnimationDurations(crouchingBackwardAnimations, crouchingBackwardAnimations[0], 0.5);
-
-  /* function mergeAnimations(a, b) {
-    const o = {};
-    for (const k in a) {
-      o[k] = a[k];
-    }
-    for (const k in b) {
-      o[k] = b[k];
-    }
-    return o;
-  } */
-  /* jumpAnimationSegments = {
-      chargeJump: animations.find(a => a.isChargeJump),
-      chargeJumpFall: animations.find(a => a.isChargeJumpFall),
-      isFallLoop: animations.find(a => a.isFallLoop),
-      isLanding: animations.find(a => a.isLanding)
-    }; */
-
-  // chargeJump = animations.find(a => a.isChargeJump);
-  // standCharge = animations.find(a => a.isStandCharge);
-  // fallLoop = animations.find(a => a.isFallLoop);
-  // swordSideSlash = animations.find(a => a.isSwordSideSlash);
-  // swordTopDownSlash = animations.find(a => a.isSwordTopDownSlash)
-
-  initAnimationSystem();
 };
 
-export const initAnimationSystem = () => {
+const initAnimationSystem = () => {
   for (const spec of animationMappingConfig) {
-    physx.physxWorker.createAnimationMapping(
+    avatarsWasmManager.physxWorker.createAnimationMapping(
       spec.isPosition,
       spec.index,
       spec.isTop,
@@ -254,7 +236,7 @@ export const initAnimationSystem = () => {
   for (const fileName in animations.index) {
     const animation = animations.index[fileName];
     animation.index = animationIndex;
-    const animationPtr = physx.physxWorker.createAnimation(animation.name, animation.duration);
+    const animationPtr = avatarsWasmManager.physxWorker.createAnimation(animation.name, animation.duration);
     animation.ptr = animationPtr;
     // for (const k in animation.interpolants) { // maybe wrong interpolant index order
     for (const spec of animationMappingConfig) { // correct interpolant index order
@@ -264,7 +246,7 @@ export const initAnimationSystem = () => {
 
       const track = animation.tracks.index[k];
       const valueSize = track.type === 'vector' ? 3 : 4;
-      physx.physxWorker.createAnimationInterpolant(
+      avatarsWasmManager.physxWorker.createAnimationInterpolant(
         animationPtr,
         track.times,
         track.values,
@@ -276,7 +258,7 @@ export const initAnimationSystem = () => {
 
   //
 
-  const animationGroupDeclarations = physx.physxWorker.initAnimationSystem();
+  const animationGroupDeclarations = avatarsWasmManager.physxWorker.initAnimationSystem();
 
   // get data back from wasm to js ------------------------------------------------
 
@@ -300,8 +282,8 @@ export const initAnimationSystem = () => {
 };
 
 export const _createAnimation = avatar => {
-  avatar.mixerPtr = physx.physxWorker.createAnimationMixer();
-  avatar.animationAvatarPtr = physx.physxWorker.createAnimationAvatar(avatar.mixerPtr);
+  avatar.mixerPtr = avatarsWasmManager.physxWorker.createAnimationMixer();
+  avatar.animationAvatarPtr = avatarsWasmManager.physxWorker.createAnimationAvatar(avatar.mixerPtr);
 };
 
 export const _updateAnimation = (avatar, now, timeDiff) => {
@@ -427,13 +409,13 @@ export const _updateAnimation = (avatar, now, timeDiff) => {
     avatar.useAnimationEnvelope.forEach(useAnimationEnvelopeName => {
       values.push(UseAnimationIndexes[useAnimationEnvelopeName] || 0);
     });
-    physx.physxWorker.updateAnimationAvatar(avatar.animationAvatarPtr, values, timeDiff);
+    avatarsWasmManager.physxWorker.updateAnimationAvatar(avatar.animationAvatarPtr, values, timeDiff);
   };
   updateValues();
 
   let resultValues;
   const doUpdate = () => {
-    resultValues = physx.physxWorker.updateAnimationMixer(avatar.mixerPtr, now, nowS);
+    resultValues = avatarsWasmManager.physxWorker.updateAnimationMixer(avatar.mixerPtr, now, nowS);
     let index = 0;
     for (const spec of avatar.animationMappings) {
       const {

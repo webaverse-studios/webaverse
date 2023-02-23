@@ -42,7 +42,7 @@ class Quest {
   }
 }
 
-class QuestManager extends EventTarget {
+export class QuestManager extends EventTarget {
   constructor() {
     super();
 
@@ -80,6 +80,5 @@ class QuestManager extends EventTarget {
     }
   }
 }
-const questManager = new QuestManager();
-
-export default questManager;
+// const questManager = new QuestManager();
+// export default questManager;

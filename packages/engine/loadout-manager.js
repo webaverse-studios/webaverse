@@ -1,9 +1,14 @@
-import {playersManager} from './players-manager.js';
+// import {playersManager} from './players-manager.js';
+// import {
+//   PlayersManager,
+// } from './players-manager.js';
+// import {
+//   NpcManager,
+// } from './npc-manager.js';
 import {LoadoutRenderer} from './loadout-renderer.js';
 import {InfoboxRenderer} from './infobox.js';
 import {createObjectSpriteAnimation} from './object-spriter.js';
 import {hotbarSize, infoboxSize} from './constants.js';
-import npcManager from './npc-manager.js';
 
 const numSlots = 8;
 
@@ -17,9 +22,20 @@ const _getAppSpritesheet = app => {
   return spritesheet;
 };
 
-class LoadoutManager extends EventTarget {
-  constructor() {
+export class LoadoutManager extends EventTarget {
+  constructor({
+    webaverseRenderer,
+    playersManager,
+    // npcManager,
+  }) {
     super();
+
+    if (!webaverseRenderer || !playersManager) {
+      throw new Error('missing required argument');
+    }
+    this.webaverseRenderer = webaverseRenderer;
+    this.playersManager = playersManager;
+    // this.npcManager = npcManager;
 
     this.appsPerPlayer = new WeakMap();
     this.selectedIndexPerPlayer = new WeakMap();
@@ -44,27 +60,27 @@ class LoadoutManager extends EventTarget {
       this.bindPlayer(player);
     };
 
-    playersManager.addEventListener('playerchange', playerSelectedFn);
+    this.playersManager.addEventListener('playerchange', playerSelectedFn);
 
-    const playerRemovedFn = e => {
-      const {
-        player,
-      } = e.data;
-      // delete loadout apps when player is destroyed
-      this.appsPerPlayer.delete(player);
-      this.selectedIndexPerPlayer.delete(player);
-    };
-    npcManager.addEventListener('playerremove', playerRemovedFn);
+    // const playerRemovedFn = e => {
+    //   const {
+    //     player,
+    //   } = e.data;
+    //   // delete loadout apps when player is destroyed
+    //   this.appsPerPlayer.delete(player);
+    //   this.selectedIndexPerPlayer.delete(player);
+    // };
+    // npcManager.addEventListener('playerremove', playerRemovedFn);
 
     this.removeListenerFn = () => {
-      playersManager.removeEventListener('playerchange', playerSelectedFn);
-      npcManager.removeEventListener('playerremove', playerRemovedFn);
+      this.playersManager.removeEventListener('playerchange', playerSelectedFn);
+      // npcManager.removeEventListener('playerremove', playerRemovedFn);
     };
   }
 
   initDefault() {
     // this is the initial event for the first player
-    const localPlayer = playersManager.getLocalPlayer();
+    const localPlayer = this.playersManager.getLocalPlayer();
     this.bindPlayer(localPlayer);
   }
 
@@ -144,12 +160,21 @@ class LoadoutManager extends EventTarget {
 
       for (let i = 0; i < numSlots; i++) {
         const selected = i === this.selectedIndex;
-        const hotbarRenderer = new LoadoutRenderer(size, size, selected);
+        const hotbarRenderer = new LoadoutRenderer({
+          width: size,
+          height: size,
+          selected,
+          webaverseRenderer: this.webaverseRenderer,
+        });
         this.hotbarRenderers.push(hotbarRenderer);
       }
     }
     if (!this.infoboxRenderer) {
-      this.infoboxRenderer = new InfoboxRenderer(infoboxSize, infoboxSize);
+      this.infoboxRenderer = new InfoboxRenderer({
+        width: infoboxSize,
+        height: infoboxSize,
+        webaverseRenderer: this.webaverseRenderer,
+      });
     }
   }
 
@@ -175,20 +200,20 @@ class LoadoutManager extends EventTarget {
     }
 
     if (index === -1 || this.apps[index]) {
-      for (let i = 0; i < this.hotbarRenderers.length; i++) {
-        this.hotbarRenderers[i].setSelected(i === index);
-      }
+      // for (let i = 0; i < this.hotbarRenderers.length; i++) {
+      //   this.hotbarRenderers[i].setSelected(i === index);
+      // }
       this.selectedIndex = index;
     }
 
-    if (this.selectedIndex !== -1) {
-      const app = this.apps[this.selectedIndex];
-      const spritesheet = _getAppSpritesheet(app);
+    // if (this.selectedIndex !== -1) {
+    //   const app = this.apps[this.selectedIndex];
+    //   const spritesheet = _getAppSpritesheet(app);
 
-      const hotbarRenderer = this.hotbarRenderers[this.selectedIndex];
-      hotbarRenderer.setSpritesheet(spritesheet);
-      this.infoboxRenderer.setSpritesheet(spritesheet);
-    }
+    //   const hotbarRenderer = this.hotbarRenderers[this.selectedIndex];
+    //   hotbarRenderer.setSpritesheet(spritesheet);
+    //   this.infoboxRenderer.setSpritesheet(spritesheet);
+    // }
 
     this.dispatchEvent(new MessageEvent('selectedchange', {
       data: {
@@ -226,6 +251,5 @@ class LoadoutManager extends EventTarget {
     }
   }
 }
-const loadoutManager = new LoadoutManager();
-
-export default loadoutManager;
+// const loadoutManager = new LoadoutManager();
+// export default loadoutManager;

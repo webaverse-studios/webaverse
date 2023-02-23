@@ -1,7 +1,7 @@
 import {loadJson} from './util.js';
 import {scenesBaseUrl} from './endpoints.js';
 
-class SceneManager {
+export class SceneManager {
   constructor() {
     this.sceneNamesPromise = null;
   }
@@ -17,8 +17,7 @@ class SceneManager {
     return scenesBaseUrl + sceneName;
   }
 }
-
-const sceneManager = new SceneManager();
-export {
-  sceneManager,
-};
+// const sceneManager = new SceneManager();
+// export {
+//   sceneManager,
+// };

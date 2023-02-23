@@ -1,10 +1,16 @@
 import * as THREE from 'three';
-import postProcessing from './post-processing.js';
+// import postProcessing from './post-processing.js';
+// import {
+//   PostProcessing,
+// } from './post-processing.js';
 
 const blackColor = new THREE.Color(0x000000);
 
 class RenderSettings {
-  constructor(json) {
+  constructor({
+    json,
+    postProcessing,
+  }) {
     this.background = this.#makeBackground(json.background);
     this.fog = this.#makeFog(json.fog);
     const {passes, internalPasses} = postProcessing.makePasses(json);
@@ -40,8 +46,17 @@ class RenderSettings {
   }
 }
 
-class RenderSettingsManager {
-  constructor() {
+export class RenderSettingsManager {
+  constructor({
+    postProcessing,
+  }) {
+    if (!postProcessing) {
+      console.warn('missing postProcessing', {postProcessing});
+      debugger;
+    }
+
+    this.postProcessing = postProcessing;
+
     this.fog = new THREE.FogExp2(0x000000, 0);
     this.extraPasses = [];
   }
@@ -55,7 +70,17 @@ class RenderSettingsManager {
   }
 
   makeRenderSettings(json) {
-    return new RenderSettings(json);
+    return new RenderSettings({
+      json,
+      postProcessing: this.postProcessing,
+    });
+  }
+
+  addRenderSettings(renderSettings) {
+    console.log('add render settings', {renderSettings});
+  }
+  removeRenderSettings(renderSettings) {
+    console.log('remove render settings', {renderSettings});
   }
 
   // traverse the scene to find render settings from a rendersettings app
@@ -131,5 +156,5 @@ class RenderSettingsManager {
     };
   }
 }
-const renderSettingsManager = new RenderSettingsManager();
-export default renderSettingsManager;
+// const renderSettingsManager = new RenderSettingsManager();
+// export default renderSettingsManager;

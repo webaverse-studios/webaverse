@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {getRenderer} from './renderer.js';
+// import {getRenderer} from './renderer.js';
 import easing from './easing.js';
 
 const cubicBezier = easing(0, 1, 0, 1);
@@ -338,10 +338,20 @@ const _makeLoadoutRendererScene = () => {
   return scene;
 };
 
-class LoadoutRenderer {
-  constructor(width, height, selected) {
+export class LoadoutRenderer {
+  constructor({
+    width,
+    height,
+    selected,
+    webaverseRenderer,
+  }) {
     this.width = width;
     this.height = height;
+
+    if (!webaverseRenderer) {
+      debugger;
+    }
+    this.webaverseRenderer = webaverseRenderer;
 
     this.scene = _makeLoadoutRendererScene();
     this.camera = new THREE.OrthographicCamera(
@@ -407,7 +417,8 @@ class LoadoutRenderer {
   }
 
   update(timestamp, timeDiff) {
-    const renderer = getRenderer();
+    // const renderer = getRenderer();
+    const {renderer} = this.webaverseRenderer;
     const size = renderer.getSize(localVector2D);
     const pixelRatio = renderer.getPixelRatio();
 
@@ -474,7 +485,3 @@ class LoadoutRenderer {
     }
   }
 }
-
-export {
-  LoadoutRenderer,
-};

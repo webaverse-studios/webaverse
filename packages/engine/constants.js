@@ -34,8 +34,6 @@ export {
   chainName,
   otherChainName,
 };
-export const polygonVigilKey = `0937c004ab133135c86586b55ca212a6c9ecd224`;
-
 //
 
 const origin = (typeof location !== 'undefined') ?
@@ -59,12 +57,6 @@ export const web3MainnetSidechainEndpoint = 'https://mainnetsidechain.exokit.org
 export const web3TestnetSidechainEndpoint = 'https://testnetsidechain.exokit.org';
 // export const worldUrl = 'worlds.webaverse.com';
 export const discordClientId = '684141574808272937';
-
-export const worldMapName = 'world';
-export const actionsMapName = 'actions';
-export const playersMapName = 'players';
-export const appsMapName = 'apps';
-export const partyMapName = 'party';
 
 // export const ceramicNodeUrl = `https://ceramic-clay.3boxlabs.com`;
 export const metaverseProfileDefinition = `kjzl6cwe1jw145wm7u2sy1wpa33hglvmuy6th9lys7x4iadaizn4zqgpp3tmu34`;
@@ -126,6 +118,7 @@ export const defaultMaxId = 8192;
 export const defaultMusicVolume = 0.35;
 
 export const defaultImageAICanvasSize = 512;
+
 export const chatTextSpeed = 15;
 export const shakeAnimationSpeed = 30;
 
@@ -152,7 +145,7 @@ export const offscreenCanvasSize = 2048;
 export const realmSize = 256;
 
 // dev mode
-const IS_DEV_MODE_ENABLED = false;
+const IS_DEV_MODE_ENABLED = true;
 
 export const IS_NARUTO_RUN_ENABLED = IS_DEV_MODE_ENABLED;
 export const IS_FLYING_ENABLED = IS_DEV_MODE_ENABLED;

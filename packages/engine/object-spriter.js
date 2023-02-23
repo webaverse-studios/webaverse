@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {getRenderer} from './renderer.js';
+// import {getRenderer} from './renderer.js';
 import {fitCameraToBoundingBox} from './util.js';
 
 const localVector = new THREE.Vector3();
@@ -41,6 +41,7 @@ const createObjectSpriteAnimation = (app, {
   // canvas,
   size = defaultSize,
   numFrames = defaultNumAnimationFrames,
+  webaverseRenderer = null,
 } = {}, {
   type = 'texture',
 } = {}) => {
@@ -48,7 +49,11 @@ const createObjectSpriteAnimation = (app, {
 
   // console.log('create object sprite', app, size, numFrames);
 
-  const renderer = getRenderer();
+  // const renderer = getRenderer();
+  if (!webaverseRenderer) {
+    debugger;
+  }
+  const {renderer} = webaverseRenderer;
   // const size = renderer.getSize(localVector2D);
   const pixelRatio = renderer.getPixelRatio();
 

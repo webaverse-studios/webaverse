@@ -37,6 +37,8 @@ import react from '../types/react.js';
 import group from '../types/group.js';
 import vircadia from '../types/vircadia.js';
 import directory from '../types/directory.js';
+import zine from '../types/zine.js';
+import item from '../types/item.js';
 
 // import upath from 'unix-path';
 import {getCwd, readFile} from '../util.js';
@@ -78,6 +80,8 @@ const loaders = {
   group,
   wind,
   vircadia,
+  zine,
+  item,
   '': directory,
 };
 
@@ -94,7 +98,7 @@ const _getType = id => {
     }
     let extension;
     let match2;
-    if (match2 = type.match(/^application\/(light|text|rendersettings|spawnpoint|lore|quest|npc|mob|react|group|wind|vircadia)$/)) {
+    if (match2 = type.match(/^application\/(light|text|rendersettings|spawnpoint|lore|quest|npc|mob|react|group|wind|vircadia|item)$/)) {
       extension = match2[1];
     } else if (match2 = type.match(/^application\/(javascript)$/)) {
       extension = 'js';

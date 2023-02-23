@@ -1,11 +1,5 @@
 import * as THREE from 'three';
-import metaversefile from 'metaversefile';
-const {useApp, usePhysics, useAvatarIconer, useAvatarRenderer, useCamera, useCleanup, useFrame, useActivate, useLocalPlayer, useExport} = metaversefile;
 
-const localVector = new THREE.Vector3();
-const localVector2 = new THREE.Vector3();
-const localQuaternion = new THREE.Quaternion();
-const localMatrix = new THREE.Matrix4();
 // const q180 = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
 
 const _fetchArrayBuffer = async srcUrl => {
@@ -18,10 +12,37 @@ const _fetchArrayBuffer = async srcUrl => {
   }
 };
 
-export default e => {
+export default ctx => {
+  // const app = useApp();
+  // const camera = useCamera();
+  // const physics = usePhysics();
+  // console.log('got context', ctx);
+  const {
+    useApp,
+    useFrame,
+    useActivate,
+    useCleanup,
+    useCamera,
+    usePhysics,
+    useExport,
+    useLoaders,
+    useAvatarManager,
+    useTempManager,
+    useEngine,
+  } = ctx;
+  // const THREE = ctx.useTHREE();
   const app = useApp();
   const camera = useCamera();
   const physics = usePhysics();
+  const loaders = useLoaders();
+  const avatarManager = useAvatarManager();
+  const tmpManager = useTempManager();
+  const engine = useEngine();
+
+  const localVector = tmpManager.get(THREE.Vector3);
+  const localVector2 = tmpManager.get(THREE.Vector3);
+  const localQuaternion = tmpManager.get(THREE.Quaternion);
+  const localMatrix = tmpManager.get(THREE.Matrix4);
 
   const srcUrl = ${this.srcUrl};
   const quality = app.getComponent('quality') ?? undefined;
@@ -30,25 +51,33 @@ export default e => {
   let physicsIds = [];
   let activateCb = null;
   let frameCb = null;
-  e.waitUntil((async () => {
-    const arrayBuffer = await _fetchArrayBuffer(srcUrl);
+  ctx.waitUntil((async () => {
+    const {
+      gltfLoader,
+    } = loaders;
 
-    const AvatarRenderer = useAvatarRenderer();
-    avatarRenderer = new AvatarRenderer({
-      arrayBuffer,
-      srcUrl,
-      camera,
-      quality,
+    const arrayBuffer = await _fetchArrayBuffer(srcUrl);
+    const gltf = await new Promise((accept, reject) => {
+      gltfLoader.parse(arrayBuffer, srcUrl, accept, reject);
     });
-    app.avatarRenderer = avatarRenderer;
-    await avatarRenderer.waitForLoad();
-    app.add(avatarRenderer.scene);
-    avatarRenderer.scene.updateMatrixWorld();
+    // console.log('got gltf', gltf);
+
+    const avatarQuality = avatarManager.makeQuality(gltf);
+    // avatarQuality = avatarManager.makeQuality({
+    //   arrayBuffer,
+    //   srcUrl,
+    //   camera,
+    //   quality,
+    // });
+    app.avatarQuality = avatarQuality;
+    // await avatarRenderer.waitForLoad();
+    app.add(avatarQuality.scene);
+    avatarQuality.scene.updateMatrixWorld();
 
     // globalThis.app = app;
     // globalThis.avatarRenderer = avatarRenderer;
 
-     const _addPhysics = () => {
+     /* const _addPhysics = () => {
       const {height, width} = app.avatarRenderer.getAvatarSize();
       const widthPadding = 0.5; // Padding around the avatar since the base width is computed from shoulder distance
 
@@ -76,12 +105,14 @@ export default e => {
     };
 
     if (app.getComponent('physics')) {
+      console.log('load physics');
+      debugger;
       _addPhysics();
-    }
+    } */
 
     // we don't want to have per-frame bone updates for unworn avatars
     const _disableSkeletonMatrixUpdates = () => {
-      avatarRenderer.scene.traverse(o => {
+      avatarQuality.scene.traverse(o => {
         if (o.isBone) {
           o.matrixAutoUpdate = false;
         }
@@ -91,25 +122,28 @@ export default e => {
 
     // handle wearing
     activateCb = async () => {
-      const localPlayer = useLocalPlayer();
+      const {
+        playersManager,
+      } = engine;
+      const localPlayer = playersManager.getLocalPlayer();
       localPlayer.setAvatarApp(app);
     };
 
-    frameCb = ({timestamp, timeDiff}) => {
-      if (!avatarRenderer.isControlled) {
-        avatarRenderer.scene.updateMatrixWorld();
-        avatarRenderer.update(timestamp, timeDiff);
-      }
-    };
+    // frameCb = ({timestamp, timeDiff}) => {
+    //   if (!avatarRenderer.isControlled) {
+    //     avatarRenderer.scene.updateMatrixWorld();
+    //     avatarRenderer.update(timestamp, timeDiff);
+    //   }
+    // };
   })());
 
   useActivate(() => {
     activateCb && activateCb();
   });
 
-  useFrame((e) => {
-    frameCb && frameCb(e);
-  });
+  // useFrame((e) => {
+  //   frameCb && frameCb(e);
+  // });
 
   // controlled tracking
   const _setPhysicsEnabled = enabled => {
@@ -125,7 +159,7 @@ export default e => {
       }
     }
   };
-  const _setControlled = controlled => {
+  /* const _setControlled = controlled => {
     avatarRenderer && avatarRenderer.setControlled(controlled);
     _setPhysicsEnabled(controlled);
   };
@@ -135,7 +169,7 @@ export default e => {
     if (key === 'controlled') {
       _setControlled(value);
     }
-  });
+  }); */
 
   // cleanup
   useCleanup(() => {

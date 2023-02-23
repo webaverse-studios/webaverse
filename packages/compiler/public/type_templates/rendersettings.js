@@ -1,8 +1,18 @@
 // import * as THREE from 'three';
-import metaversefile from 'metaversefile';
-const {useApp, useInternals, useRenderSettings, usePostProcessing, useCleanup} = metaversefile;
+// import metaversefile from 'metaversefile';
+// const {
+//   useApp,
+//   useRenderSettings,
+//   useCleanup,
+// } = metaversefile;
 
-export default e => {
+export default ctx => {
+  const {
+    useApp,
+    useRenderSettings,
+    useCleanup,
+  } = ctx;
+
   const app = useApp();
   const renderSettings = useRenderSettings();
 
@@ -17,14 +27,13 @@ export default e => {
     json = await res.json();
     if (!live) return;
     localRenderSettings = renderSettings.makeRenderSettings(json);
+    renderSettings.addRenderSettings(localRenderSettings);
   })();
   
   useCleanup(() => {
     live = false;
-    localRenderSettings = null;
+    renderSettings.removeRenderSettings(localRenderSettings);
   });
-
-  app.getRenderSettings = () => localRenderSettings;
 
   return app;
 };

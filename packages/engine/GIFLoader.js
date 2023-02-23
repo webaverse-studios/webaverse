@@ -11,7 +11,7 @@ class GIFLoader {
     worker.addEventListener('load', e => {
       console.log('gif loader worker started');
       
-      this.loadPromise.accept();
+      this.loadPromise.resolve();
     }); */
     worker.addEventListener('error', e => {
       console.warn('worker error', e);
@@ -36,7 +36,7 @@ class GIFLoader {
     const p = makePromise();
     const cb = (err, result) => {
       if (!err) {
-        p.accept(result);
+        p.resolve(result);
       } else {
         p.reject(err);
       }
@@ -59,7 +59,7 @@ class GIFLoader {
     const p = makePromise();
     const cb = (err, result) => {
       if (!err) {
-        p.accept(result);
+        p.resolve(result);
       } else {
         p.reject(err);
       }
@@ -82,7 +82,7 @@ class GIFLoader {
     const p = makePromise();
     const cb = (err, result) => {
       if (!err) {
-        p.accept(result);
+        p.resolve(result);
       } else {
         p.reject(err);
       }
@@ -105,7 +105,7 @@ class GIFLoader {
     const p = makePromise();
     const cb = (err, result) => {
       if (!err) {
-        p.accept(result);
+        p.resolve(result);
       } else {
         p.reject(err);
       }

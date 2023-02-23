@@ -1,7 +1,18 @@
 import * as THREE from 'three';
 
-import metaversefile from 'metaversefile';
-const {useApp, useFrame, useCleanup, useRenderer, useLocalPlayer, usePhysics, useLoaders, useActivate, useExport, useWriters} = metaversefile;
+// import metaversefile from 'metaversefile';
+// const {
+//   useApp,
+//   useFrame,
+//   useCleanup,
+//   useRenderer,
+//   useLocalPlayer,
+//   usePhysics,
+//   useLoaders,
+//   useActivate,
+//   useExport,
+//   useWriters,
+// } = metaversefile;
 
 // const wearableScale = 1;
 
@@ -22,13 +33,29 @@ const downQuaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3
 
 //
 
-export default e => {
+export default ctx => {
+  const {
+    useApp,
+    useEngine,
+    useFrame,
+    useActivate,
+    useCleanup,
+    useExport,
+    useLoaders,
+    usePhysics,
+    usePhysicsTracker,
+  } = ctx;
+
   const app = useApp();
   
   const {gltfLoader, exrLoader} = useLoaders();
-  const renderer = useRenderer();
+  // const renderer = useRenderer();
+  const engine = useEngine();
+  const {webaverseRenderer, playersManager} = engine;
+  const {renderer} = webaverseRenderer;
   const physics = usePhysics();
-  const localPlayer = useLocalPlayer();
+  const physicsTracker = usePhysicsTracker();
+  const localPlayer = playersManager.getLocalPlayer();
 
   const srcUrl = ${this.srcUrl};
   for (const {key, value} of components) {
@@ -38,8 +65,8 @@ export default e => {
   app.glb = null;
   const animationMixers = [];
   const uvScrolls = [];
-  const physicsIds = [];
-  app.physicsIds = physicsIds;
+  const physicsObjects = [];
+  // app.physicsObjects = physicsObjects;
   
   // glb state
   let animations;
@@ -48,7 +75,7 @@ export default e => {
   let sitSpec = null;
   
   let activateCb = null;
-  e.waitUntil((async () => {
+  ctx.waitUntil((async () => {
     let o;
     try {
       o = await new Promise((accept, reject) => {
@@ -209,13 +236,24 @@ export default e => {
       };
       _loadHubsComponents();
       
+      // console.log('got o', o);
+      // o.traverse(o => {
+      //   if (o.isMesh) {
+      //     // console.log('latch mesh', o);
+      //     o.onBeforeRender = renderer => {
+      //       debugger;
+      //     };
+      //   }
+      // });
+
       app.add(o);
       o.updateMatrixWorld();
       
       if (appHasPhysics) {
         const _addPhysics = async () => {
-          const physicsId = physics.addGeometry(o);
-          physicsIds.push(physicsId);
+          const physicsObject = physics.addGeometry(o);
+          physicsObjects.push(physicsObject);
+          physicsTracker.addAppPhysicsObject(app, physicsObject);
         };
 
         _addPhysics();
@@ -334,8 +372,9 @@ export default e => {
   });
   
   useCleanup(() => {
-    for (const physicsId of physicsIds) {
-      physics.removeGeometry(physicsId);
+    for (const physicsObject of physicsObjects) {
+      physics.removeGeometry(physicsObject);
+      physicsTracker.removeAppPhysicsObject(app, physicsObject);
     }
     _unwear();
   });

@@ -1,4 +1,4 @@
-import metaversefile from 'metaversefile';
+// import metaversefile from 'metaversefile';
 import {generateStats, types} from './procgen/procgen.js';
 import {screenshotObjectApp} from './object-screenshotter.js';
 import {screenshotAvatarUrl} from './avatar-screenshotter.js';

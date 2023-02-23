@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import {scene, camera} from './renderer.js';
-import physicsManager from './physics-manager.js';
+// import {scene, camera} from './renderer.js';
+// import physicsManager from './physics/physics-manager.js';
 import Avatar from './avatars/avatars.js';
-import metaversefile from 'metaversefile';
+// import metaversefile from 'metaversefile';
 import * as coreModules from './core-modules.js';
 
 const localVector = new THREE.Vector3();
@@ -13,146 +13,50 @@ const localMatrix = new THREE.Matrix4();
 
 //
 
+// const scene = 'not implemented'; // XXX
+
+//
+
 const hitAttemptEventData = {
   type: '',
   args: null,
 };
-const hitAttemptEvent = new MessageEvent('hitattempt', {
-  data: hitAttemptEventData,
-});
+// const hitAttemptEvent = new MessageEvent('hitattempt', {
+//   data: hitAttemptEventData,
+// });
 
 export class CharacterHitter {
-  constructor(character) {
+  constructor({
+    character,
+  }) {
     this.character = character;
 
     this.lastHitTime = -Infinity;
+    this.cleanupFns = [];
+
+    this.#listen();
   }
 
-  attemptHit({
-    type,
-    args,
-    timestamp = performance.now(),
-  }) {
-    hitAttemptEventData.type = type;
-    hitAttemptEventData.args = args;
-    hitManager.dispatchEvent(hitAttemptEvent);
-    switch (type) {
-      case 'sword': {
-        const {
-          hitRadius,
-          hitHalfHeight,
-          position,
-          quaternion,
-        } = args;
-        const physicsScene = physicsManager.getScene();
-        const collision = physicsScene.getCollisionObject(
-          hitRadius,
-          hitHalfHeight,
-          position,
-          quaternion,
-        );
-        if (collision) {
-          const collisionId = collision.objectId;
-          const timeDiff = timestamp - this.lastHitTime;
-          if (timeDiff > 1000){
-            hitAttemptEventData.args.physicsId = collisionId;
-            hitManager.dispatchEvent(hitAttemptEvent);
-            this.lastHitTime = timestamp;
-          }
-          const result = metaversefile.getPairByPhysicsId(collisionId);
-          if (result) {
-            const [app, physicsObject] = result;
-            if (timeDiff > 1000) {
-              const useAction = this.character.getAction('use');
-              const damage = typeof useAction.damage === 'number' ? useAction.damage : 10;
-              const hitDirection = app.position.clone()
-                .sub(this.character.position);
-              hitDirection.y = 0;
-              hitDirection.normalize();
-    
-              const damageMeshOffsetDistance = 1.5;
-              const hitPosition = localVector.copy(this.character.position)
-                .add(localVector2.set(0, 0, -damageMeshOffsetDistance).applyQuaternion(this.character.quaternion))
-                .clone();
-              localEuler.setFromQuaternion(camera.quaternion, 'YXZ');
-              localEuler.x = 0;
-              localEuler.z = 0;
-              const hitQuaternion = localQuaternion.setFromEuler(localEuler);
-    
-              // const willDie = app.willDieFrom(damage);
-              app.hit(damage, {
-                type: 'sword',
-                collisionId,
-                physicsObject,
-                hitPosition,
-                hitQuaternion,
-                hitDirection,
-                // willDie,
-              });
-            
-              this.lastHitTime = timestamp;
-
-              return collision;
-            }
-          }
-        }
-        return null;
-      }
-      case 'bullet': {
-        const result = physicsManager.raycast(args.position, args.quaternion);
-        if (result) {
-          hitAttemptEventData.args.physicsId = result.objectId;
-          hitManager.dispatchEvent(hitAttemptEvent);
-          const _performHit = () => {
-            const targetApp = metaversefile.getAppByPhysicsId(result.objectId);
-            if (targetApp) {
-              const damage = 2;
-
-              const hitPosition = new THREE.Vector3().fromArray(result.point);
-              const hitQuaternion = new THREE.Quaternion().setFromRotationMatrix(
-                localMatrix.lookAt(
-                  this.character.position,
-                  hitPosition,
-                  localVector.set(0, 1, 0)
-                )
-              );
-
-              const hitDirection = targetApp.position.clone()
-                .sub(this.character.position);
-              // hitDirection.y = 0;
-              hitDirection.normalize();
-              
-              // const willDie = targetApp.willDieFrom(damage);
-              targetApp.hit(damage, {
-                type: 'bullet',
-                collisionId: result.objectId,
-                hitPosition,
-                hitDirection,
-                hitQuaternion,
-                // willDie,
-              });
-            } else {
-              console.warn('no app with physics id', result.objectId);
-            }
-          };
-          _performHit();
-
-          return result
-        }
-        return null;
-      }
-      default: {
-        throw new Error('unknown hit type :' + type);
-      }
+  #listen() {
+    const hit = e => {
+      this.getHit();
+    };
+    this.character.addEventListener('hit', hit);
+    this.cleanupFns.push(() => {
+      this.character.removeEventListener('hit', hit);
+    });
+  }
+  destroy() {
+    for (const cleanupFn of this.cleanupFns) {
+      cleanupFn();
     }
   }
 
-  getHit(damage) {
-    const newAction = {
+  getHit() {
+    const hurtAction = this.character.actionManager.addAction({
       type: 'hurt',
       animation: Math.random() < 0.5 ? 'pain_arch' : 'pain_back',
-    };
-    const hurtAction = this.character.addAction(newAction);
+    });
 
     const emotions = [
       // 'joy',
@@ -163,7 +67,7 @@ export class CharacterHitter {
       'surprise',
     ];
     const emotion = emotions[Math.floor(Math.random() * emotions.length)];
-    const faceposeAction = this.character.addAction({
+    const faceposeAction = this.character.actionManager.addAction({
       type: 'facepose',
       emotion,
       value: 1,
@@ -180,8 +84,7 @@ export class CharacterHitter {
     // console.log('play grunt', emotion, gruntType);
     this.character.avatarCharacterSfx?.playGrunt(gruntType);
 
-
-    {
+    /* {
       const damageMeshApp = metaversefile.createApp();
       (async () => {
         // await coreModules.waitForLoad();
@@ -196,24 +99,24 @@ export class CharacterHitter {
       damageMeshApp.quaternion.setFromEuler(localEuler);
       damageMeshApp.updateMatrixWorld();
       scene.add(damageMeshApp);
-    }
+    } */
 
     const animations = Avatar.getAnimations();
     const hurtAnimation = animations.find(a => a.isHurt);
     const hurtAnimationDuration = hurtAnimation.duration;
     setTimeout(() => {
-      const hurtActionIndex = this.character.indexOfAction(hurtAction);
-      this.character.removeActionIndex(hurtActionIndex);
+      // const hurtActionIndex = this.character.indexOfAction(hurtAction);
+      this.character.actionManager.removeAction(hurtAction);
     }, hurtAnimationDuration * 1000);
     setTimeout(() => {
-      const faceposeActionIndex = this.character.indexOfAction(faceposeAction);
-      this.character.removeActionIndex(faceposeActionIndex);
+      // const faceposeActionIndex = this.character.indexOfAction(faceposeAction);
+      this.character.actionManager.removeAction(faceposeAction);
     }, 1000);
   }
 
   update() {
-    // nothing
+    // nothing, but still called
   }
 }
-const hitManager = new EventTarget();
-export default hitManager;
+// const hitManager = new EventTarget();
+// export default hitManager;

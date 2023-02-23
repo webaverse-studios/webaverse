@@ -201,27 +201,18 @@ function serializeMessage(m) {
 }
 
 const createWs = (roomname, playerId) => {
-  let wss = document.location.protocol === 'http:' ? 'ws://' : 'wss://';
-  let hostname = location.hostname;
+  // let wss = document.location.protocol === 'http:' ? 'ws://' : 'wss://';
+  let wss = 'wss://';
+  let hostname = 'multiplayer.webaverse.workers.dev';
 
   // The local development server's WebSocket is provided at ws://localhost.
   const isDevelopment = location.hostname === 'local.webaverse.com';
   if (isDevelopment) {
     wss = 'ws://';
-    hostname = 'localhost'
+    hostname = `localhost:${MULTIPLAYER_PORT}`;
   }
 
-  const ws = new WebSocket(`${wss}${hostname}:${MULTIPLAYER_PORT}/api/room/${roomname}/websocket?playerId=${playerId}`);
-  /* ws.waitForConnect = async () => {
-    return new Promise((accept, reject) => {
-      ws.onopen = () => {
-        accept();
-      };
-      ws.onerror = err => {
-        reject(err);
-      };
-    });
-  }; */
+  const ws = new WebSocket(`${wss}${hostname}/api/room/${roomname}/websocket?playerId=${playerId}`);
   return ws;
 };
 

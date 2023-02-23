@@ -3,7 +3,7 @@ import {
   fullscreenGeometry,
   fullscreenVertexShader,
 } from './common.js';
-import {getRenderer} from '../renderer.js';
+// import {getRenderer} from '../renderer.js';
 
 export const smokeFragmentShader = `\
   precision mediump sampler3D;
@@ -101,7 +101,9 @@ export const smokeFragmentShader = `\
 
 class SmokeBgFxMesh extends THREE.Mesh {
   static iChannel0 = null;
-  constructor() {
+  constructor({
+    webaberseRenderer,
+  }) {
     const geometry = fullscreenGeometry;
 
     const material = new THREE.ShaderMaterial({
@@ -130,6 +132,11 @@ class SmokeBgFxMesh extends THREE.Mesh {
     });
     super(geometry, material);
     this.frustumCulled = false;
+
+    if (!webaberseRenderer) {
+      debugger;
+    }
+    this.webaberseRenderer = webaberseRenderer;
   }
 
   update(timestamp, timeDiff, width, height) {
@@ -141,7 +148,8 @@ class SmokeBgFxMesh extends THREE.Mesh {
     this.material.uniforms.iFrame.value = Math.floor(timestampS * 60);
     this.material.uniforms.iFrame.needsUpdate = true;
 
-    const renderer = getRenderer();
+    // const renderer = getRenderer();
+    const {renderer} = this.webaberseRenderer;
     const pixelRatio = renderer.getPixelRatio();
     this.material.uniforms.iResolution.value.set(width, height, pixelRatio);
     this.material.uniforms.iResolution.needsUpdate = true;

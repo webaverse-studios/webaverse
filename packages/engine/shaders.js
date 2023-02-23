@@ -510,7 +510,6 @@ const offsetDepthSmall = 0.000075;
 const offsetDepthLarge = 0.00035;
 
 const highlightVertexShader = `
-    ${THREE.ShaderChunk.common}
     precision highp float;
     precision highp int;
     uniform float uVertexOffset;
@@ -1384,7 +1383,6 @@ const arrowGeometry = (() => {
   return geometry;
 })();
 const arrowVsh = `
-  ${THREE.ShaderChunk.common}
   #define PI 3.1415926535897932384626433832795
 
   uniform float uTime;

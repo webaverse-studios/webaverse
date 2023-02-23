@@ -1,0 +1,22 @@
+
+debug: true
+log_level: DEBUG
+
+service:
+  host: 127.0.0.1
+  http_port: 6333
+  # Uncomment to enable gRPC:
+  #grpc_port: 6334
+
+
+storage:
+  performance:
+    # Number of parallel threads used for search operations. If 0 - auto selection.
+    max_search_threads: 4
+
+  optimizers:
+    # Minimum interval between forced flushes.
+    flush_interval_sec: 5
+
+    # Do not create too much segments in dev
+    default_segment_number: 2

@@ -1,11 +1,13 @@
 import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {
-  playersMapName,
   tokensHost,
   storageHost,
   audioTimeoutTime,
 } from './constants.js';
+import {
+  playersMapName,
+} from './network-schema/constants.js';
 import {IdAllocator} from './id-allocator.js';
 import {isWorker} from './env.js';
 
@@ -101,12 +103,12 @@ export function snapRotation(o, rotationSnap) {
 }
 
 export function makePromise() {
-  let accept, reject;
+  let resolve, reject;
   const p = new Promise((a, r) => {
-    accept = a;
+    resolve = a;
     reject = r;
   });
-  p.accept = accept;
+  p.resolve = resolve;
   p.reject = reject;
   return p;
 }
@@ -129,7 +131,7 @@ export class WaitQueue {
       this.locked = true;
     } else {
       const p = makePromise();
-      this.waiterCbs.push(p.accept);
+      this.waiterCbs.push(p.resolve);
       await p;
     }
   }
@@ -1161,6 +1163,9 @@ export const selectVoice = (voicer) => {
   });
   const selectionIndex = weightedRandom(weights);
   const voiceSpec = voicer[selectionIndex];
+  if (!voiceSpec) {
+    debugger;
+  }
   voiceSpec.nonce++;
   while (voicer.every((voice) => voice.nonce > 0)) {
     for (const voiceSpec of voicer) {

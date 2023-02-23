@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {getRenderer} from './renderer.js';
+// import {getRenderer} from './renderer.js';
 import {copyScenePlaneGeometry, copySceneVertexShader, copyScene, copySceneCamera} from './shaders.js';
 
 /* const size = 1024;
@@ -12,7 +12,14 @@ const _makeRenderTarget = (width, height) => new THREE.WebGLRenderTarget(width, 
   // encoding: THREE.sRGBEncoding,
 });
 class ShaderToyPass {
-  constructor({type, is, code, os, renderTarget}, parent) {
+  constructor({
+    type,
+    is,
+    code,
+    os,
+    renderTarget,
+    webaverseRenderer,
+  }, parent) {
     this.type = type;
     this.is = is;
     this.code = code;
@@ -106,13 +113,19 @@ class ShaderToyPass {
     this.scene.add(this.mesh);
     
     this._copyBuffer = _makeRenderTarget(renderTarget.width, renderTarget.height);
+
+    if (!webaverseRenderer) {
+      debugger;
+    }
+    this.webaverseRenderer = webaverseRenderer;
   }
 
   update() {
     this.mesh.material.uniforms.iTime.value = this.parent.getITime();
     this.mesh.material.uniforms.iFrame.value = this.parent.getIFrame();
     
-    const renderer = getRenderer();
+    // const renderer = getRenderer();
+    const {renderer} = this.webaverseRenderer;
     {
       const [{buffer} = {}] = this.os;
       if (buffer) {

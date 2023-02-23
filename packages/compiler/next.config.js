@@ -26,6 +26,7 @@ const nextConfig = {
     dirs: ['pages', 'types', 'plugins'],
     ignoreDuringBuilds: true,
   },
+  // distDir: "dist",
   reactStrictMode: true,
   swcMinify: true,
   trailingSlash: true,

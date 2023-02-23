@@ -1,11 +1,23 @@
-import {playersManager} from '../players-manager.js';
+// import {playersManager} from '../players-manager.js';
+import {
+  PlayersManager,
+} from '../players-manager.js';
 import {emoteAnimations} from '../avatars/animationHelpers.js';
 import emotes from './emotes.json';
 
-class EmoteManager {
-  constructor() {
+export class EmoteManager {
+  constructor({
+    playersManager,
+  }) {
+    if (!playersManager) {
+      console.warn('no playersManager');
+      debugger;
+    }
+
     this.emoteTimeouts = new Map();
   }
+
+  // static emotes = emotes;
 
   getEmoteSpec(emoteName) {
     const emoteHardName = emoteName.replace(/Soft$/, '');
@@ -13,7 +25,15 @@ class EmoteManager {
     return emote;
   }
 
-  triggerEmote(emoteName, player = playersManager.getLocalPlayer()) {
+  triggerEmote(emoteName, player) {
+    if (!emoteName || !player) {
+      console.warn('bad player', {
+        emoteName,
+        player,
+      });
+      debugger;
+    }
+
     return new Promise((accept, reject) => {
       const emoteSpec = this.getEmoteSpec(emoteName);
       if (!emoteSpec) {
@@ -49,8 +69,8 @@ class EmoteManager {
     });
   }
 }
-export {
-  emotes,
-};
-const emoteManager = new EmoteManager();
-export default emoteManager;
+// export {
+//   emotes,
+// };
+// const emoteManager = new EmoteManager();
+// export default emoteManager;

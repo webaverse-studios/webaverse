@@ -2,13 +2,28 @@
 this manager provides music preloading, selection, and playing.
 */
 
-import audioManager from './audio-manager.js';
+// import {
+//   AudioManager,
+// } from './audio-manager.js';
 import {defaultMusicVolume} from './constants.js';
 
 class Music {
-  constructor({name, urls, url}) {
+  constructor({
+    name,
+    urls,
+    url,
+  }, {
+    audioManager,
+  }) {
     this.name = name;
     this.urls = urls ?? [url];
+
+    if (!audioManager) {
+      debugger;
+      throw new Error('no audio manager argument');
+    }
+    this.audioManager = audioManager;
+
     this.audioBuffers = null;
     this.audioBufferIndex = 0; // Math.floor(Math.random() * this.urls.length);
 
@@ -21,7 +36,7 @@ class Music {
     const audioBuffer = this.audioBuffers[this.audioBufferIndex];
     this.audioBufferIndex = (this.audioBufferIndex + 1) % this.audioBuffers.length;
     
-    const audioContext = audioManager.getAudioContext();
+    const {audioContext} = this.audioManager;
     const source = audioContext.createBufferSource();
     source.buffer = audioBuffer;
     source.loop = repeat;
@@ -45,7 +60,7 @@ class Music {
         this.audioBuffers = await Promise.all(this.urls.map(async url => {
           const res = await fetch(url);
           const arrayBuffer = await res.arrayBuffer();
-          const audioContext = audioManager.getAudioContext();
+          const {audioContext} = this.audioManager;
           return await audioContext.decodeAudioData(arrayBuffer);
         }));
       })();
@@ -99,8 +114,12 @@ const musicSpecs = [
     ],
   },
 ];
-class MusicManager {
-  constructor() {
+export class MusicManager {
+  constructor({
+    audioManager,
+  }) {
+    this.audioManager = audioManager;
+
     this.musics = [];
     this.loadPromise = null;
     this.currentMusic = null;
@@ -110,6 +129,8 @@ class MusicManager {
     const music = new Music({
       name,
       url,
+    }, {
+      audioManager: this.audioManager,
     });
     await music.waitForLoad();
     return music;
@@ -150,8 +171,11 @@ class MusicManager {
   waitForLoad() {
     if (!this.loadPromise) {
       this.loadPromise = (async () => {
+        const opts = {
+          audioManager: this.audioManager,
+        };
         this.musics = await Promise.all(musicSpecs.map(async musicSpec => {
-          const music = new Music(musicSpec);
+          const music = new Music(musicSpec, opts);
           await music.waitForLoad();
           return music;
         }));
@@ -160,5 +184,5 @@ class MusicManager {
     return this.loadPromise;
   }
 }
-const musicManager = new MusicManager();
-export default musicManager;
+// const musicManager = new MusicManager();
+// export default musicManager;

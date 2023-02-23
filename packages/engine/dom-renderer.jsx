@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import React from 'react';
 
 import easing from './easing.js';
-import physicsManager from './physics-manager.js';
+import physicsManager from './physics/physics-manager.js';
 
 const cubicBezier = easing(0, 1, 0, 1);
 

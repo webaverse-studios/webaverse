@@ -2,12 +2,12 @@
 it sets up and ticks the physics loop for our local character */
 
 import * as THREE from 'three';
-import physicsManager from './physics-manager.js';
+import physicsManager from './physics/physics-manager.js';
 import {applyVelocity} from './util.js';
 import {groundFriction, flyFriction, swimFriction, flatGroundJumpAirTime, jumpHeight, startSkydiveTimeS} from './constants.js';
-import {getRenderer, camera} from './renderer.js';
-import metaversefileApi from 'metaversefile';
-import physx from './physx.js';
+// import {getRenderer, camera} from './renderer.js';
+// import metaversefileApi from 'metaversefile';
+import avatarsWasmManager from './avatars/avatars-wasm-manager.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -46,6 +46,9 @@ class CharacterPhysics {
     this.targetMoveDistancePerFrame = new THREE.Vector3(); // note: see velocity.
     this.lastTargetMoveDistancePerFrame = new THREE.Vector3(); // note: see velocity.
     this.wantMoveDistancePerFrame = new THREE.Vector3(); // note: see velocity.
+    this.targetCameraQuaternion = new THREE.Quaternion();
+    
+    // this.lastJumpTime = 0;
     this.grounded = null;
     this.lastGrounded = null;
     this.lastGroundedTime = 0;
@@ -60,6 +63,9 @@ class CharacterPhysics {
   }
 
   loadCharacterController(characterWidth, characterHeight) {
+    // console.log('load character controller', new Error().stack);
+    // debugger;
+
     this.characterWidth = characterWidth;
     this.characterHeight = characterHeight;
 
@@ -84,12 +90,22 @@ class CharacterPhysics {
       stepOffset,
       position
     );
+    // if (!this.characterController) {
+    //   console.warn('no character controller 1');
+    //   debugger;
+    // }
   }
 
   setPosition(p) {
     localVector.copy(p);
     localVector.y -= this.characterHeight * 0.5;
     const physicsScene = physicsManager.getScene();
+    
+    // if (!this.characterController) {
+    //   console.warn('no character controller 2');
+    //   debugger;
+    // }
+    
     physicsScene.setCharacterControllerPosition(
       this.characterController,
       localVector
@@ -97,16 +113,22 @@ class CharacterPhysics {
   }
 
   /* apply the currently held keys to the character */
-  applyWasd(velocity, timeDiff) {
+  applyWasd(velocity, camera, timeDiff) {
+    // if (!camera?.isPespectiveCamera) {
+    //   console.warn('invalid camera');
+    //   debugger;
+    // }
     if (this.character.avatar) {
       this.targetVelocity.copy(velocity);
-      this.targetMoveDistancePerFrame.copy(this.targetVelocity).multiplyScalar(timeDiff / 1000);
+      this.targetMoveDistancePerFrame.copy(this.targetVelocity)
+        .multiplyScalar(timeDiff / 1000);
+      this.targetCameraQuaternion.copy(camera.quaternion);
     }
   }
 
   applyGravity(nowS, timeDiffS) {
     // if (this.character) {
-      const fallLoopAction = this.character.getAction('fallLoop');
+      const fallLoopAction = this.character.actionManager.getActionType('fallLoop');
       if (fallLoopAction) {
         const physicsScene = physicsManager.getScene();
         if (!this.lastFallLoopAction) {
@@ -122,8 +144,10 @@ class CharacterPhysics {
         }
         let t = nowS - this.fallLoopStartTimeS;
         if (t > startSkydiveTimeS) {
-          const newSkydiveAction = {type: 'skydive'};
-          this.character.actionsManager.tryAddAction(newSkydiveAction);
+          if (!this.character.actionManager.hasActionType('skydive') && !this.character.actionManager.hasActionType('glider')) {
+            const newSkydiveAction = {type: 'skydive'};
+            this.character.actionManager.addAction(newSkydiveAction);
+          }
           t = startSkydiveTimeS;
           this.wantVelocity.y = t * physicsScene.getGravity().y;
           this.wantMoveDistancePerFrame.y = this.wantVelocity.y * timeDiffS;
@@ -149,56 +173,123 @@ class CharacterPhysics {
       const minDist = 0;
       localVector3.copy(this.wantMoveDistancePerFrame);
 
-      // aesthetic jump
-      const jumpAction = this.character.getAction('jump');
-      if (jumpAction) {
-        const doubleJumpAction = this.character.getAction('doubleJump');
-        if (doubleJumpAction) {
-          const doubleJumpTime =
-            physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'doubleJump', 0);
-          localVector3.y =
-            Math.sin(doubleJumpTime * (Math.PI / flatGroundJumpAirTime)) *
-              jumpHeight +
-            doubleJumpAction.startPositionY -
-            this.lastCharacterControllerY;
-          if (doubleJumpTime >= flatGroundJumpAirTime) {
-            this.character.actionsManager.tryRemoveAction('doubleJump');
-            
-            const newFallLoopFromJumpAction = {
-              type: 'fallLoop',
-              from: 'jump',
-            }
-            this.character.actionsManager.tryAddAction(newFallLoopFromJumpAction);
-          }
-        } else {
-          const jumpTime = physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'jump', 0);
-          localVector3.y =
-            Math.sin(jumpTime * (Math.PI / flatGroundJumpAirTime)) *
-              jumpHeight +
-            jumpAction.startPositionY -
-            this.lastCharacterControllerY;
-          if (jumpTime >= flatGroundJumpAirTime) {
-            this.character.actionsManager.tryRemoveAction('jump');
+      // if (
+      //   this.character.actionManager.hasActionType('jump') ||
+      //   this.character.actionManager.hasActionType('doubleJump') ||
+      //   this.character.actionManager.hasActionType('fallLoop')
+      // ) {
+      //   this.lastJumpTime = now;
+      // }
 
-            const newFallLoopFromJumpAction = {
-              type: 'fallLoop',
-              from: 'jump',
+      let fallLoopFromJump = false;
+      const _updateJump = () => {
+        const jumpAction = this.character.actionManager.getActionType('jump');
+        if (jumpAction) {
+          this.grounded = false;
+
+          const doubleJumpAction = this.character.actionManager.getActionType('doubleJump');
+          if (doubleJumpAction) {
+            const doubleJumpTime =
+              avatarsWasmManager.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'doubleJump', 0);
+            localVector3.y =
+              Math.sin(doubleJumpTime * (Math.PI / flatGroundJumpAirTime)) *
+                jumpHeight +
+              doubleJumpAction.startPositionY -
+              this.lastCharacterControllerY;
+            if (doubleJumpTime >= flatGroundJumpAirTime) {
+              this.character.actionManager.removeActionType('jump');
+              this.character.actionManager.removeActionType('doubleJump');
+              fallLoopFromJump = true;              
             }
-            this.character.actionsManager.tryAddAction(newFallLoopFromJumpAction);
+          } else {
+            const jumpTime = avatarsWasmManager.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'jump', 0);
+            localVector3.y =
+              Math.sin(jumpTime * (Math.PI / flatGroundJumpAirTime)) *
+                jumpHeight +
+              jumpAction.startPositionY -
+              this.lastCharacterControllerY;
+            // console.log('apply jump', jumpTime, flatGroundJumpAirTime);
+            if (jumpTime >= flatGroundJumpAirTime) {
+              this.character.actionManager.removeActionType('jump');
+              fallLoopFromJump = true;            
+            }
           }
         }
-      }
+      };
+      _updateJump();
 
-      // console.log('got local vector', this.velocity.toArray().join(','), localVector3.toArray().join(','), timeDiffS);
-      if (
-        this.character.hasAction('swim') &&
-        this.character.getAction('swim').onSurface &&
-        !this.character.hasAction('fly')
-      ) {
-        if (this.character.characterPhysics.velocity.y >= 0) {
-          localVector3.y = 0;
+      const _updateAir = () => {
+        const localPlayer = this.character;
+        
+        const _updateLand = () => {
+          // console.log('update grounded', localPlayer.characterPhysics.grounded, new Error().stack);
+          if (this.grounded) {
+            let hadJumpAction = false;
+            if (localPlayer.actionManager.hasActionType('jump')) {
+              localPlayer.actionManager.removeActionType('jump');
+              hadJumpAction = true;
+            }
+            if (localPlayer.actionManager.hasActionType('doubleJump')) {
+              localPlayer.actionManager.removeActionType('doubleJump');
+              hadJumpAction = true;
+            }
+            if (localPlayer.actionManager.hasActionType('fallLoop')) {
+              localPlayer.actionManager.removeActionType('fallLoop');
+              hadJumpAction = true;
+            }
+  
+            // console.log('grounded clear jump', localPlayer.characterPhysics.grounded);
+  
+            if (hadJumpAction) {
+              const newLandAction = {
+                type: 'land',
+                time: now,
+                isMoving: localPlayer.avatar.idleWalkFactor > 0,
+              }
+              localPlayer.actionManager.addAction(newLandAction);
+            }
+          } else if (localPlayer.actionManager.hasActionType('land')) {
+            localPlayer.actionManager.removeActionType('land');
+          }
+        };
+        _updateLand();
+  
+        const _updateFallLoop = () => {
+          if (
+            !localPlayer.actionManager.hasActionType('fallLoop') &&
+            !localPlayer.actionManager.hasActionType('jump') &&
+            !localPlayer.actionManager.hasActionType('doubleJump') &&
+            !localPlayer.actionManager.hasActionType('fly') &&
+            !localPlayer.actionManager.hasActionType('glider') &&
+            !localPlayer.characterPhysics.grounded &&
+            (now - localPlayer.characterPhysics.lastGroundedTime) > 200
+          ) {
+            if (fallLoopFromJump) {
+              const newFallLoopAction = {type: 'fallLoop', from: 'jump'};
+              localPlayer.actionManager.addAction(newFallLoopAction);
+            } else {
+              const newFallLoopAction = {type: 'fallLoop'};
+              localPlayer.actionManager.addAction(newFallLoopAction);
+            }
+          }
+        };
+        _updateFallLoop();
+      };
+      _updateAir();
+
+      const _updateSwim = () => {
+        // console.log('got local vector', this.velocity.toArray().join(','), localVector3.toArray().join(','), timeDiffS);
+        if (
+          this.character.actionManager.hasActionType('swim') &&
+          this.character.actionManager.getActionType('swim').onSurface &&
+          !this.character.actionManager.hasActionType('fly')
+        ) {
+          if (this.character.characterPhysics.velocity.y >= 0) {
+            localVector3.y = 0;
+          }
         }
-      }
+      };
+      _updateSwim();
 
       const positionXZBefore = localVector2D.set(this.characterController.position.x, this.characterController.position.z);
       const positionYBefore = this.characterController.position.y;
@@ -236,9 +327,9 @@ class CharacterPhysics {
 
       if (
         !this.grounded &&
-        !this.character.getAction('jump') &&
-        !this.character.getAction('fly') &&
-        !this.character.hasAction('swim')
+        !this.character.actionManager.getActionType('jump') &&
+        !this.character.actionManager.getActionType('fly') &&
+        !this.character.actionManager.hasActionType('swim')
       ) {
         // prevent jump when go down slope
         const oldY = this.characterController.position.y;
@@ -259,7 +350,9 @@ class CharacterPhysics {
         }
       }
       
-      if (this.grounded) this.lastGroundedTime = now;
+      if (this.grounded) {
+        this.lastGroundedTime = now;
+      }
 
       this.characterController.updateMatrixWorld();
       this.characterController.matrixWorld.decompose(
@@ -274,7 +367,7 @@ class CharacterPhysics {
       localVector.y += halfCharacterHeight;
 
       // capsule physics
-      if (!this.character.hasAction('sit')) {
+      if (!this.character.actionManager.hasActionType('sit')) {
         // avatar facing direction
         if (velocityAvatarDirection) {
           const horizontalVelocity = localVector5.set(
@@ -288,14 +381,14 @@ class CharacterPhysics {
             );
           }
         } else {
-          localQuaternion.copy(camera.quaternion);
+          localQuaternion.copy(this.targetCameraQuaternion);
         }
 
       } else {
         // Outdated vehicle code
         this.velocity.y = 0;
 
-        const sitAction = this.character.getAction('sit');
+        const sitAction = this.character.actionManager.getActionType('sit');
 
         const objInstanceId = sitAction.controllingId;
         const controlledApp =
@@ -377,7 +470,7 @@ class CharacterPhysics {
       // this.character.updateMatrixWorld();
 
       /* if (this.avatar) {
-        if (this.character.hasAction('jump')) {
+        if (this.character.actionManager.hasActionType('jump')) {
           this.avatar.setFloorHeight(-0xFFFFFF);
         } else {
           this.avatar.setFloorHeight(localVector.y - this.character.avatar.height);
@@ -404,10 +497,10 @@ class CharacterPhysics {
       this.wantVelocity.y = THREE.MathUtils.damp(this.wantVelocity.y, this.lastTargetVelocity.y, factor, timeDiffS);
       // this.wantVelocity.y = this.targetVelocity.y;
     }
-    if (this.character.hasAction('fly')) {
+    if (this.character.actionManager.hasActionType('fly')) {
       doDamping(flyFriction);
     } 
-    else if(this.character.hasAction('swim')){
+    else if(this.character.actionManager.hasActionType('swim')){
       doDamping(swimFriction);
     }
     else {
@@ -420,7 +513,7 @@ class CharacterPhysics {
     // const session = renderer.xr.getSession();
 
     /* if (session) {
-      if (ioManager.currentWalked || this.character.hasAction('jump')) {
+      if (ioManager.currentWalked || this.character.actionManager.hasActionType('jump')) {
         // const originalPosition = avatarWorldObject.position.clone();
 
         this.applyCharacterPhysicsDetail(false, false, now, timeDiffS);
@@ -433,8 +526,8 @@ class CharacterPhysics {
       }
     } else { */
     if (
-      this.character.hasAction('firstperson') ||
-      (this.character.hasAction('aim') && !this.character.hasAction('narutoRun'))
+      this.character.actionManager.hasActionType('firstperson') ||
+      (this.character.actionManager.hasActionType('aim') && !this.character.actionManager.hasActionType('narutoRun'))
     ) {
       this.applyCharacterPhysicsDetail(false, true, now, timeDiffS);
     } else {
@@ -444,11 +537,12 @@ class CharacterPhysics {
   }
 
   applyCharacterActionKinematics(now, timeDiffS) {
-    const renderer = getRenderer();
-    const session = renderer.xr.getSession();
-    const aimAction = this.character.getAction('aim');
+    // const renderer = getRenderer();
+    // const session = renderer.xr.getSession();
+    const session = null; // XXX add VR support
+    const aimAction = this.character.actionManager.getActionType('aim');
     const aimComponent = (() => {
-      for (const action of this.character.getActions()) {
+      for (const action of this.character.actionManager.getActionsArray()) {
         if (action.type === 'wear') {
           const app = this.character.appManager.getAppByInstanceId(
             action.instanceId
@@ -465,7 +559,7 @@ class CharacterPhysics {
       }
       return null;
     })();
-    const useAction = this.character.getAction('use');
+    const useAction = this.character.actionManager.getActionType('use');
 
     const _updateHandsEnabled = () => {
       const isSession = !!session;
@@ -496,9 +590,9 @@ class CharacterPhysics {
             }
           } else {
             if (i === 0) {
-              this.character.removeAction('rightHand');
+              this.character.removeActionType('rightHand');
             } else if (i === 1) {
-              this.character.removeAction('leftHand');
+              this.character.removeActionType('leftHand');
             }
           }
         }
@@ -659,6 +753,8 @@ class CharacterPhysics {
     this.applyCharacterActionKinematics(now, timeDiffS);
 
     this.character.velocity.copy(this.velocity);
+
+    // console.log('character physics update');
 
     this.lastTargetVelocity.copy(this.targetVelocity);
     this.lastTargetMoveDistancePerFrame.copy(this.targetMoveDistancePerFrame);

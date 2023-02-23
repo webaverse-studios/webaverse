@@ -7,43 +7,72 @@ npcs includes,
 */
 
 import * as THREE from 'three';
-import Avatar from './avatars/avatars.js';
-import {LocalPlayer} from './character-controller.js';
-import {playersManager} from './players-manager.js';
-import * as voices from './voices.js';
-import {world} from './world.js';
-import {chatManager} from './chat-manager.js';
+// import Avatar from './avatars/avatars.js';
+// import {LocalPlayer} from './character-controller.js';
+import {NpcPlayer} from './character-controller.js';
+// import * as voices from './voices.js';
+// import {world} from './world.js';
+// import {chatManager} from './chat-manager.js';
 import {makeId, createRelativeUrl} from './util.js';
-import metaversefile from './metaversefile-api.js';
-import {characterSelectManager} from './characterselect-manager.js';
-import emoteManager from './emotes/emote-manager.js';
-import {startConversation, getFuzzyEmotionMapping} from './story.js';
-import {idleFn} from './npc-behavior.js';
+// import {characterSelectManager} from './characterselect-manager.js';
+// import {idleFn} from './npc-behavior.js';
+// import {
+//   createAppAsync,
+// } from '../metaversefile/apps';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
 
-const updatePhysicsFnMap = new WeakMap();
-const updateAvatarsFnMap = new WeakMap();
-const cancelFnsMap = new WeakMap();
-let targetSpec = null;
+// const updatePhysicsFnMap = new WeakMap();
+// const updateAvatarsFnMap = new WeakMap();
+// const cancelFnsMap = new WeakMap();
+// let targetSpec = null;
 
-const BehaviorType = {
-  IDLE: 0,
-  FOLLOW: 1,
-}
+//
 
-class NpcManager extends EventTarget {
-  constructor() {
+// const BehaviorType = {
+//   IDLE: 0,
+//   FOLLOW: 1,
+// };
+
+//
+
+export class NpcManager extends THREE.Object3D {
+  constructor({
+    engine,
+    physicsTracker,
+    environmentManager,
+    audioManager,
+    chatManager,
+    sounds,
+    characterSelectManager,
+    hitManager,
+  }) {
     super();
 
-    this.npcs = [];
-    this.detachedNpcs = [];
-    this.npcAppMap = new WeakMap();
-    this.targetMap = new WeakMap();
+    // members
+    if (!engine || !physicsTracker || !environmentManager || !audioManager || !chatManager || !sounds || !characterSelectManager || !hitManager) {
+      throw new Error('missing required arguments');
+    }
+    this.engine = engine;
+    this.physicsTracker = physicsTracker;
+    this.environmentManager = environmentManager;
+    this.audioManager = audioManager;
+    this.chatManager = chatManager;
+    this.sounds = sounds;
+    this.characterSelectManager = characterSelectManager;
+    this.hitManager = hitManager;
+
+    // locals
+    this.npcPlayers = new Set();
+
+    // this.npcs = [];
+    // this.detachedNpcs = [];
+    // this.npcAppMap = new WeakMap();
+    // this.targetMap = new WeakMap();
   }
 
-  getAppByNpc(npc) {
+  /* getAppByNpc(npc) {
     return this.npcAppMap.get(npc);
   }
 
@@ -61,12 +90,13 @@ class NpcManager extends EventTarget {
 
   async initDefaultPlayer() {
     const spec = await characterSelectManager.getDefaultSpecAsync();
-    const player = metaversefile.useLocalPlayer();
+    // const player = metaversefile.useLocalPlayer();
+    const player = this.playersManager.getLocalPlayer();
     // console.log('set player spec', spec);
     await player.setPlayerSpec(spec);
 
     const createPlayerApp = () => {
-      const app = metaversefile.createApp();
+      const app = createAppAsync();
       app.instanceId = makeId(5);
       app.name = 'player';
       app.contentId = spec.avatarUrl;
@@ -74,70 +104,88 @@ class NpcManager extends EventTarget {
     };
     const app = createPlayerApp();
 
-    await this.#setNpcApp({
-      npc: player,
-      app,
-      json: spec
-    });
-
     app.addEventListener('destroy', () => {
       this.removeNpcApp(app);
     });
-  }
+  } */
 
   async addNpcApp(app, srcUrl) {
-    const mode = app.getComponent('mode') ?? 'attached';
+    // const mode = app.getComponent('mode') ?? 'attached';
+
+    // console.log('add npc app', app, srcUrl);
 
     // load
-    if (mode === 'attached') {
+    // if (mode === 'attached') {
       // load json
       const res = await fetch(srcUrl);
       const json = await res.json();
 
+      // console.log('got npc json', json);
+
       // npc pameters
       const name = json.name;
       const avatarUrl = createRelativeUrl(json.avatarUrl, srcUrl);
-      const detached = !!json.detached;
+      // const detached = !!json.detached;
+      const {voice, voicePack} = json;
 
       const position = localVector.setFromMatrixPosition(app.matrixWorld)
         .add(localVector2.set(0, 1, 0));
       const quaternion = app.quaternion;
       const scale = app.scale;
-      const norenderer = app.getComponent('norenderer');
-      const components = [{
-        key: 'quality',
-        value: app.getComponent('quality'),
-      }];
+      // const norenderer = app.getComponent('norenderer');
+      // const components = [{
+      //   key: 'quality',
+      //   value: app.getComponent('quality'),
+      // }];
+      const components = [];
 
       // create npc
-      const npc = await this.#createNpcAsync({
+      const npcPlayer = await this.#createNpcAsync({
+        ownerApp: app,
         name,
         avatarUrl,
+        voice,
+        voicePack,
         position,
         quaternion,
         scale,
-        detached,
-        norenderer,
+        // detached,
+        // norenderer,
         components,
       });
 
-      await this.#setNpcApp({
-        npc,
-        app,
-        json,
-      });
-    }
+      {
+        const hitTracker = this.hitManager.createHitTracker({
+          app,
+        });
+        hitTracker.addEventListener('hit', e => {
+          const e2 = {...e};
+          npcPlayer.dispatchEvent(e2);
+        });
+        this.hitManager.addAppHitTracker(app, hitTracker);
+      }
+
+      return npcPlayer;
+
+      // await this.#setNpcApp({
+      //   npc,
+      //   app,
+      //   json,
+      // });
+    // }
   }
 
   removeNpcApp(app) {
-    const fn = cancelFnsMap.get(app);
-    if (fn) {
-      cancelFnsMap.delete(app);
-      fn();
-    }
+    this.hitManager.removeAppHitTracker(app);
+
+    // const fn = cancelFnsMap.get(app);
+    // if (fn) {
+    //   cancelFnsMap.delete(app);
+    //   fn();
+    // }
   }
 
-  updatePhysics(timestamp, timeDiff) {
+  /* updatePhysics(timestamp, timeDiff) {
     const allNpcs = [].concat(this.npcs, this.detachedNpcs);
     for (const npc of allNpcs) {
       const fn = updatePhysicsFnMap.get(this.getAppByNpc(npc));
@@ -163,52 +211,86 @@ class NpcManager extends EventTarget {
 
   getPartyTarget(player) {
     return this.targetMap.get(player);
-  }
+  } */
 
   async #createNpcAsync({
+    ownerApp,
     name,
     avatarUrl,
+    voice,
+    voicePack,
     position,
     quaternion,
     scale,
     detached,
-    norenderer,
+    // norenderer,
     components,
   }) {
-    const player = new LocalPlayer({
-      npc: true,
-      detached,
+    const playerId = makeId(5);
+    const npcPlayer = new NpcPlayer({
+      playerId,
+      engine: this.engine,
+      physicsTracker: this.physicsTracker,
+      environmentManager: this.environmentManager,
+      audioManager: this.audioManager,
+      chatManager: this.chatManager,
+      sounds: this.sounds,
     });
-    player.name = name;
+    npcPlayer.name = name ?? 'npc';
 
+    // update transform
     let matrixNeedsUpdate = false;
     if (position) {
-      player.position.copy(position);
+      npcPlayer.position.copy(position);
       matrixNeedsUpdate = true;
     }
     if (quaternion) {
-      player.quaternion.copy(quaternion);
+      npcPlayer.quaternion.copy(quaternion);
       matrixNeedsUpdate = true;
     }
     if (scale) {
-      player.scale.copy(scale);
+      npcPlayer.scale.copy(scale);
       matrixNeedsUpdate = true;
     }
     if (matrixNeedsUpdate) {
-      player.updateMatrixWorld();
+      npcPlayer.updateMatrixWorld();
     }
 
-    if (!norenderer) {
-      await player.loadAvatar(avatarUrl, {
-        components,
-      });
-      player.updateAvatar(0, 0);
-    }
+    npcPlayer.appManager.setOwnerApp(ownerApp); // for physics parent app resolution
 
-    return player;
+    const spec = await this.characterSelectManager.getDefaultSpecAsync();
+    // const player = this.playersManager.getLocalPlayer();
+    // console.log('got spec', npcPlayer, spec, {
+    //   avatarUrl,
+    // });
+    const npcSpec = {
+      avatarUrl,
+      voice,
+      voicePack,
+    };
+    await npcPlayer.setPlayerSpec(npcSpec);
+
+    this.add(npcPlayer.appManager);
+    npcPlayer.appManager.updateMatrixWorld();
+    this.npcPlayers.add(npcPlayer);
+
+    // if (!norenderer) {
+    //   await player.loadAvatar(avatarUrl, {
+    //     components,
+    //   });
+    //   player.updateAvatar(0, 0);
+    // }
+
+    return npcPlayer;
   }
 
-  async #setNpcApp({
+  updateAvatars(timestamp, timeDiff) {
+    for (const npcPlayer of this.npcPlayers) {
+      npcPlayer.updateAvatar(timestamp, timeDiff);
+    }
+  }
+
+  /* async #setNpcApp({
     npc,
     app,
     json,
@@ -273,14 +355,6 @@ class NpcManager extends EventTarget {
       player.removeEventListener('avatarupdate', avatarupdate);
     });
 
-    // lore spec
-    app.getLoreSpec = () => {
-      return {
-        name: json.name,
-        description: json.bio,
-      }
-    };
-
     // events
     
     const _listenEvents = () => {
@@ -310,20 +384,6 @@ class NpcManager extends EventTarget {
       const activate = () => {
         // check if the npc is a guest giver
         startConversation(app);
-
-        // if (player.getControlMode() === 'npc') {
-        //   this.dispatchEvent(new MessageEvent('playerinvited', {
-        //     data: {
-        //       player,
-        //     }
-        //   }));
-        // } else {
-        //   this.dispatchEvent(new MessageEvent('playerexpelled', {
-        //     data: {
-        //       player,
-        //     }
-        //   }));
-        // }
       };
       app.addEventListener('activate', activate);
       npc.cancelFns.push(() => {
@@ -331,10 +391,6 @@ class NpcManager extends EventTarget {
       });
 
       this.setBehaviorFn(app, idleFn);
-      if (!app.getComponent('state')) {
-        app.setComponent('state', {behavior: BehaviorType.IDLE, target: null});
-        app.setComponent('state', 0);
-      }
 
       const updateAvatarFn = (timestamp, timeDiff) => {
         player.updateAvatar(timestamp, timeDiff);
@@ -383,7 +439,7 @@ class NpcManager extends EventTarget {
         const _triggerEmotes = () => {
           const fuzzyEmotionName = getFuzzyEmotionMapping(emote);
           if (fuzzyEmotionName) {
-            emoteManager.triggerEmote(fuzzyEmotionName, player);
+            this.emoteManager.triggerEmote(fuzzyEmotionName, player);
           }
         };
         _triggerEmotes();
@@ -448,9 +504,6 @@ class NpcManager extends EventTarget {
           undefined,
           components,
         );
-        /* const app = await metaversefile.createAppAsync({
-          start_url,
-        }); */
 
         player.wear(app);
       })());
@@ -463,7 +516,5 @@ class NpcManager extends EventTarget {
     const npc = this.getNpcByApp(app);
     updatePhysicsFnMap.set(app, behaviorFn);
     npc.cancelFns.push(() => updatePhysicsFnMap.delete(app));
-  }
+  } */
 }
-const npcManager = new NpcManager();
-export default npcManager;

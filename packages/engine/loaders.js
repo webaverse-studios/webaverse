@@ -6,7 +6,7 @@ import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {DRACOLoader} from 'three/examples/jsm/loaders/DRACOLoader.js';
 import {KTX2Loader} from 'three/examples/jsm/loaders/KTX2Loader.js';
 import {MeshoptDecoder} from 'three/examples/jsm/libs/meshopt_decoder.module.js';
-import {getRenderer} from './renderer.js';
+// import {getRenderer} from './renderer.js';
 import {ShadertoyLoader} from './shadertoy.js';
 import {GIFLoader} from './GIFLoader.js';
 import {VOXLoader} from './VOXLoader.js';
@@ -62,7 +62,10 @@ const _ktx2Loader = memoize(() => {
   const ktx2Loader = new KTX2Loader();
   ktx2Loader.load = (_load => function load() {
     if (!this.workerConfig) {
-      const renderer = getRenderer();
+      // const renderer = getRenderer();
+      const renderer = new THREE.WebGLRenderer({
+        canvas: new OffscreenCanvas(1, 1),
+      });
       this.detectSupport(renderer);
     }
     return _load.apply(this, arguments);

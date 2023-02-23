@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import metaversefile from 'metaversefile';
+// import metaversefile from 'metaversefile';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -9,8 +9,10 @@ const localQuaternion3 = new THREE.Quaternion();
 const localEuler = new THREE.Euler();
 const localMatrix = new THREE.Matrix4();
 
-export default (app, component) => {
-  const {useFrame, useCleanup, useLocalPlayer, useRemotePlayers, getPlayerByAppInstanceId, useActivate} = metaversefile;
+export default (ctx, component) => {
+  const {useApp, useFrame, useCleanup, useLocalPlayer, useRemotePlayers, getPlayerByAppInstanceId, useActivate} = ctx;
+
+  const app = useApp();
 
   let petSpec = null;
   let petMixer = null;

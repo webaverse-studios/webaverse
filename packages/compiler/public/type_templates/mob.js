@@ -1,8 +1,13 @@
 // import * as THREE from 'three';
-import metaversefile from 'metaversefile';
-const {useApp, useMobManager, useCleanup} = metaversefile;
+// import metaversefile from 'metaversefile';
+// const {useApp, useMobManager, useCleanup} = metaversefile;
 
-export default e => {
+export default ctx => {
+  const {
+    useApp,
+    useMobManager,
+    useCleanup,
+  } = ctx;
   const app = useApp();
   const mobManager = useMobManager();
 

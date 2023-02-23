@@ -1,6 +1,6 @@
 import {DataClient, NetworkedDataClient, DCMap, DCArray} from './data-client.mjs';
 import {NetworkedIrcClient} from './irc-client.mjs';
-import {NetworkedAudioClient, initAudioContext, createMicrophoneSource} from './audio-client.mjs';
+import {NetworkedAudioClient, /*initAudioContext,*/ createMicrophoneSource} from './audio/audio-client.mjs';
 import {
   createWs,
   makePromise,
@@ -66,20 +66,25 @@ const makeTransactionHandler = () => {
 
 //
 
-const _getContainingHeadRealm = (position, realms) => {
+const _getContainingHeadRealm = (realmKey, realms) => {
+  // console.log('get containing realm', realmKey, realms);
+  
   for (const realm of realms) {
     if (realm.connected) {
-      const box = {
-        min: realm.min,
-        max: [
-          realm.min[0] + realm.size,
-          realm.min[1] + realm.size,
-          realm.min[2] + realm.size,
-        ],
-      };
-      if (boxContains(box, position)) {
+      if (realm.key === realmKey) {
         return realm;
       }
+      // const box = {
+      //   min: realm.min,
+      //   max: [
+      //     realm.min[0] + realm.size,
+      //     realm.min[1] + realm.size,
+      //     realm.min[2] + realm.size,
+      //   ],
+      // };
+      // if (boxContains(box, position)) {
+      //   return realm;
+      // }
     }
   }
   return null;
@@ -165,14 +170,15 @@ class HeadTracker extends EventTarget {
     }
   }
 
-  getHeadRealmForCreate(position) {
-    const headRealm = _getContainingHeadRealm(position, this.#connectedRealms.keys());
+  getHeadRealmForCreate(realmKey) {
+    const headRealm = _getContainingHeadRealm(realmKey, this.#connectedRealms.keys());
     return headRealm;
   }
 
-  async tryMigrate(headPosition) {
+  async tryMigrate(realmKey) {
+    // console.log('try migrate', realmKey, this.isLinked());
     if (this.isLinked()) {
-      const newHeadRealm = _getContainingHeadRealm(headPosition, Array.from(this.#connectedRealms.keys()));
+      const newHeadRealm = _getContainingHeadRealm(realmKey, Array.from(this.#connectedRealms.keys()));
       if (!this.#currentHeadRealm) {
         this.#currentHeadRealm = newHeadRealm;
         // console.log('init head realm', newHeadRealm.key);
@@ -256,7 +262,7 @@ class EntityTracker extends EventTarget {
     super();
 
     this.virtualMaps = new Map();
-    this.linkedRealms = new Map();
+    // this.linkedRealms = new Map();
     this.cleanupFns = new Map();
   }
 
@@ -281,6 +287,7 @@ class EntityTracker extends EventTarget {
               arrayId: map.arrayId,
               entityId: arrayIndexId,
               entity: virtualMap,
+              realm,
             },
           }));
         });
@@ -301,6 +308,7 @@ class EntityTracker extends EventTarget {
           arrayId: map.arrayId,
           entityId: map.arrayIndexId,
           entity: virtualMap,
+          realm,
         },
       }));
     }
@@ -420,7 +428,10 @@ class VirtualPlayer extends HeadTrackedEntity {
     actionVals = [],
     actionValIds = [],
   } = {}) {
-    const headRealm = this.headTracker.getHeadRealmForCreate(o.position);
+    const headRealm = this.headTracker.getHeadRealmForCreate(o.realmKey);
+    // if (!headRealm) {
+    //   debugger;
+    // }
 
     // console.log('initialize app', headRealm.key, o.position.join(','));
 
@@ -482,7 +493,9 @@ class VirtualPlayer extends HeadTrackedEntity {
     this.playerActions.link(realm);
 
     // link initial position
+    // console.log('player link to realm', !this.headTracker.isLinked(), realm);
     if (!this.headTracker.isLinked()) {
+      // console.log('dispatching join event', this);
       this.dispatchEvent(new MessageEvent('join'));
     }
     this.headTracker.linkRealm(realm);
@@ -506,6 +519,16 @@ class VirtualPlayer extends HeadTrackedEntity {
     if (!this.headTracker.isLinked()) {
       this.dispatchEvent(new MessageEvent('leave'));
     }
+  }
+
+  getKeys() {
+    const headRealm = this.headTracker.getHeadRealm();
+    const {dataClient} = headRealm;
+    const valueMap = dataClient.getArrayMap(this.arrayId, this.arrayIndexId, {
+      listen: false,
+    });
+    const keys = valueMap.getKeys();
+    return keys;
   }
 
   getKeyValue(key) {
@@ -550,6 +573,9 @@ class VirtualPlayersArray extends EventTarget {
   }
 
   getOrCreateVirtualPlayer(playerId) {
+    // console.log('get or create virtual player', {
+    //   playerId,
+    // });
     let virtualPlayer = this.virtualPlayers.get(playerId);
     if (!virtualPlayer) {
       virtualPlayer = new VirtualPlayer(this.arrayId, playerId, this.parent, 'remote', {
@@ -739,16 +765,16 @@ class VirtualEntityArray extends VirtualPlayersArray {
 
     this.entityTracker.addEventListener('entityremove', onentityremove);
 
-    // console.log('adding defaults', arrayId, this.entityTracker.virtualMaps, this.entityTracker.virtualMaps.size);
-    for (const [entityId, entity] of this.entityTracker.virtualMaps.entries()) {
-      // console.log('add initial entity', arrayId, entityId, entity);
-      onentityadd(new MessageEvent('entityadd', {
-        data: {
-          entityId,
-          entity,
-        },
-      }));
-    }
+    // // console.log('adding defaults', arrayId, this.entityTracker.virtualMaps, this.entityTracker.virtualMaps.size);
+    // for (const [entityId, entity] of this.entityTracker.virtualMaps.entries()) {
+    //   // console.log('add initial entity', arrayId, entityId, entity);
+    //   onentityadd(new MessageEvent('entityadd', {
+    //     data: {
+    //       entityId,
+    //       entity,
+    //     },
+    //   }));
+    // }
   }
 
   addEntityAt(arrayIndexId, val, realm) {
@@ -771,6 +797,224 @@ class VirtualEntityArray extends VirtualPlayersArray {
 
   removeEntityAt(arrayIndexId) {
     this.getVirtualMap(arrayIndexId).remove();
+  }
+
+  getMapEntity(map) {
+    let entity = null;
+    const realms = this.parent;
+    for (const e of realms.world.worldApps.needledVirtualEntities.keys()) {
+      if (e.arrayIndexId === map.arrayIndexId) {
+        entity = e;
+        break;
+      }
+    }
+    // if (!entity) {
+    //   debugger;
+    // }
+    return entity;
+  }
+
+  transplantEntityToRealm(arrayIndexId, targetRealm) {
+    console.log('transplant entity', {
+      arrayIndexId,
+      targetRealm,
+    });
+    debugger;
+    // const collidedAppJson = collidedVirtualMap.toObject();
+    // const targetRealm = realms.localPlayer.headTracker.getHeadRealm();
+    const newAppMap = realms.localPlayer.playerApps.addEntityAt(
+      collidedVirtualMap.entityMap.arrayIndexId,
+      collidedAppJson,
+      targetRealm,
+    );
+
+    // add new action
+    const action = {
+      position: targetPosition,
+      action: 'wear',
+      appId: collidedVirtualMap.entityMap.arrayIndexId,
+    };
+    const newActionMap = realms.localPlayer.playerActions.addEntity(action, targetRealm);
+
+    // remove from the old location (world)
+    // collidedVirtualMap.remove();
+    virtualWorld.worldApps.removeEntityAt(collidedVirtualMap.entityMap.arrayIndexId);
+
+    // action methods
+    const _pickupDrop = () => {
+      // console.log('drop 1');
+      const position = localPlayerCanvas.virtualPlayer.getKeyValue('position');
+      const direction = localPlayerCanvas.virtualPlayer.getKeyValue('direction');
+      const targetPosition = [
+        position[0] + direction[0] * frameSize,
+        0,
+        position[2] + direction[2] * frameSize - frameSize / 2,
+      ];
+      const targetBox = {
+        min: [
+          targetPosition[0] - frameSize / 2,
+          0,
+          targetPosition[2] - frameSize / 2,
+        ],
+        max: [
+          targetPosition[0] + frameSize / 2,
+          0,
+          targetPosition[2] + frameSize / 2,
+        ],
+      };
+      const _boxContains = (box, position) => {
+        return position[0] >= box.min[0] && position[0] <= box.max[0] &&
+          position[1] >= box.min[1] && position[1] <= box.max[1] &&
+          position[2] >= box.min[2] && position[2] <= box.max[2];
+      };
+      const _needledEntityIsWorn = needledEntity => {
+        const actions = realms.localPlayer.playerActions.toArray();
+        const action = actions.find(action => action.action === 'wear' && action.appId === needledEntity.entityMap.arrayIndexId);
+        return !!action;
+      };
+      const _getCollision = () => {
+        return Array.from(virtualWorld.worldApps.needledVirtualEntities.values()).find(needledEntityMap => {
+          const worn = _needledEntityIsWorn(needledEntityMap);
+          if (!worn) {
+            const position = needledEntityMap.get('position');
+            return !!position && _boxContains(targetBox, position);
+          } else {
+            return false;
+          }
+        });
+      };
+      
+      const collidedVirtualMap = _getCollision();
+      if (collidedVirtualMap) {
+        // deadhand
+        // Is emitted by addEntity().
+        /*
+        const sourceRealm = collidedVirtualMap.headTracker.getHeadRealm();
+        const deadHandUpdate = sourceRealm.dataClient.deadHandArrayMaps(
+          realms.localPlayer.playerApps.arrayId,
+          [collidedVirtualMap.entityMap.arrayIndexId],
+          realms.playerId,
+        );
+        sourceRealm.emitUpdate(deadHandUpdate);
+        */
+        
+        // track
+        // collidedVirtualMap.setHeadTracker(realms.localPlayer.playerApps.headTracker);
+
+        // add app to the new location (player)
+        const collidedAppJson = collidedVirtualMap.toObject();
+        const targetRealm = realms.localPlayer.headTracker.getHeadRealm();
+        const newAppMap = realms.localPlayer.playerApps.addEntityAt(
+          collidedVirtualMap.entityMap.arrayIndexId,
+          collidedAppJson,
+          targetRealm,
+        );
+
+        // add new action
+        const action = {
+          position: targetPosition,
+          action: 'wear',
+          appId: collidedVirtualMap.entityMap.arrayIndexId,
+        };
+        const newActionMap = realms.localPlayer.playerActions.addEntity(action, targetRealm);
+
+        // remove from the old location (world)
+        // collidedVirtualMap.remove();
+        virtualWorld.worldApps.removeEntityAt(collidedVirtualMap.entityMap.arrayIndexId);
+
+        // livehand
+        // Is emitted by addEntity().
+        /*
+        const liveHandUpdate = targetRealm.dataClient.liveHandArrayMaps(
+          realms.localPlayer.playerApps.arrayId,
+          [collidedVirtualMap.entityMap.arrayIndexId],
+          realms.playerId,
+        );
+        sourceRealm.emitUpdate(liveHandUpdate);
+        */
+      } else {
+        // console.log('got player apps', realms.localPlayer.playerApps.getSize());
+        if (realms.localPlayer.playerActions.getSize() > 0) {
+          const targetRealm = realms.getClosestRealm(targetPosition);
+          if (targetRealm) {
+            // console.log('drop to target realm', targetRealm.key, targetRealm);
+
+            // the app we will be dropping
+            const actions = realms.localPlayer.playerActions.toArray();
+            const wearActionIndex = actions.findIndex(action => action.action === 'wear');
+            const wearAction = actions[wearActionIndex];
+            const {appId} = wearAction;
+
+            const appIds = realms.localPlayer.playerApps.getKeys();
+            const wearAppIndex = appIds.indexOf(appId);
+
+            const firstAction = realms.localPlayer.playerActions.getVirtualMapAt(wearActionIndex);
+            const firstApp = realms.localPlayer.playerApps.getVirtualMapAt(wearAppIndex);
+
+            // const newHeadTracker = new HeadTracker('drop');
+            // newHeadTracker.setHeadRealm(firstApp.headTracker.getHeadRealm());
+            // newHeadTracker.setConnectedRealms(firstApp.headTracker.getConnectedRealms());
+            // firstApp.setHeadTracker(newHeadTracker);
+
+            // firstApp.set('position', targetPosition);
+
+            // set dead hands
+            // old location: player
+            // the player already has deadhand on all of its apps, probably?
+            // const deadHandUpdate = firstApp.headRealm.dataClient.deadHandArrayMaps(
+            //   realms.localPlayer.playerApps.arrayId,
+            //   [firstApp.entityMap.arrayIndexId],
+            //   realms.playerId,
+            // );
+            // firstApp.headRealm.emitUpdate(deadHandUpdate);
+            // new location: world
+            // deadhand
+            // Is emitted by addEntityAt().
+            /*
+            const deadHandUpdate = targetRealm.dataClient.deadHandArrayMaps(
+              'worldApps',
+              [firstApp.entityMap.arrayIndexId],
+              realms.playerId,
+            );
+            targetRealm.emitUpdate(deadHandUpdate);
+            */
+
+            // add at the new location (world)
+            const firstAppJson = firstApp.toObject();
+            firstAppJson.position = targetPosition;
+            const newPlayerAppMap = virtualWorld.worldApps.addEntityAt(
+              firstApp.entityMap.arrayIndexId,
+              firstAppJson,
+              targetRealm,
+            );
+            // const newPlayerApp = virtualWorld.worldApps.getVirtualMap(newPlayerAppMap.arrayIndexId);
+            // newPlayerApp.headTracker.setHeadRealm(targetRealm);
+
+            // remove from the old location (player)
+            // firstApp.remove();
+            // firstAction.remove();
+            realms.localPlayer.playerApps.removeEntityAt(appId);
+            realms.localPlayer.playerActions.removeEntityAt(firstAction.arrayIndexId);
+
+            // livehand
+            // Is emitted by addEntity().
+            /*
+            const liveHandUpdate = targetRealm.dataClient.liveHandArrayMap(
+              'worldApps',
+              [firstApp.entityMap.arrayIndexId],
+              realms.playerId,
+            );
+            targetRealm.emitUpdate(liveHandUpdate);
+            */
+
+          } else {
+            console.warn('no containing realm to drop to');
+          }
+        } else {
+          console.warn('nothing to drop');
+        }
+      }
+    };
   }
 
   getSize() {
@@ -810,11 +1054,11 @@ class VirtualEntityArray extends VirtualPlayersArray {
     });
   }
 
-  linkedRealms = new Map();
+  // linkedRealms = new Map();
 
   link(realm) {
     // if (!this.linkedRealms.has(realm.key)) {
-    this.linkedRealms.set(realm.key, new Error().stack);
+    // this.linkedRealms.set(realm.key, new Error().stack);
     // } else {
     //   debugger;
     // }
@@ -830,7 +1074,7 @@ class VirtualEntityArray extends VirtualPlayersArray {
 
   unlink(realm) {
     // if (this.linkedRealms.has(realm.key)) {
-    this.linkedRealms.delete(realm.key);
+    // this.linkedRealms.delete(realm.key);
     // } else {
     //   debugger;
     // }
@@ -1019,6 +1263,13 @@ class NeedledVirtualEntityMap extends HeadTrackedEntity {
     realm.emitUpdate(update);
   }
 
+  getKeys() {
+    const realm = this.headTracker.getHeadRealm();
+    const map = this.entityMap.getHeadMapFromRealm(realm);
+    const keys = map.getKeys();
+    return keys;
+  }
+
   toObject() {
     const realm = this.headTracker.getHeadRealm();
     const map = this.entityMap.getHeadMapFromRealm(realm);
@@ -1029,14 +1280,12 @@ class NeedledVirtualEntityMap extends HeadTrackedEntity {
 //
 
 export class NetworkRealm extends EventTarget {
-  constructor(id, min, size, parent) {
+  constructor(key, parent) {
     super();
 
-    this.min = min;
-    this.size = size;
     this.parent = parent;
 
-    this.key = id + ':' + min.join(':');
+    this.key = key;
     this.connected = false;
 
     const dc1 = new DataClient({
@@ -1053,7 +1302,10 @@ export class NetworkRealm extends EventTarget {
       },
     });
     this.networkedIrcClient = new NetworkedIrcClient(this.parent.playerId);
-    this.networkedAudioClient = new NetworkedAudioClient(this.parent.playerId);
+    this.networkedAudioClient = new NetworkedAudioClient({
+      playerId: this.parent.playerId,
+      audioContext: this.parent.audioContext,
+    });
 
     this.microphoneSource = null;
   }
@@ -1088,7 +1340,7 @@ export class NetworkRealm extends EventTarget {
     this.dispatchEvent(new Event('connect'));
   }
 
-  * getClearUpdateFns() {
+  *getClearUpdateFns() {
     const playersArray = this.dataClient.getArray('players', {
       listen: false,
     });
@@ -1177,18 +1429,29 @@ class VirtualWorld extends EventTarget {
 // - chat - MessageEvent fired when a chat message is receive from a remote player in the realms. Event data contains the chat
 //    message.
 export class NetworkRealms extends EventTarget {
-  // The 'chat' event is dispatched within VirtualIrc.
-
   // Constructs a NetworkRealms object and connects the local player to multiplayer.
   // - sceneId - A unique alphanumeric string identifying the scene.
   // - playerId - A unique alphanumeric string identifying the local player.
-  constructor(sceneId, playerId) {
+  // - audioContext - The Web Audio API AudioContext to use for audio.
+  // The 'chat' event is dispatched within VirtualIrc.
+  constructor({
+    sceneId,
+    playerId,
+    audioContext,
+  }) {
     super();
 
+    if (!sceneId || !playerId || !audioContext) {
+      console.warn('got bad network realms args', {sceneId, playerId, audioContext});
+      // throw new Error('invalid arguments');
+      debugger;
+    }
     this.sceneId = sceneId;
     this.playerId = playerId;
+    this.audioContext = audioContext;
 
-    this.lastPosition = [NaN, NaN, NaN];
+    // this.lastKey = '';
+    // this.lastPosition = [NaN, NaN, NaN];
     this.appsEntityTracker = new EntityTracker();
     this.localPlayer = new VirtualPlayer('players', this.playerId, this, 'local', {
       appsEntityTracker: this.appsEntityTracker,
@@ -1197,18 +1460,25 @@ export class NetworkRealms extends EventTarget {
       entityTracker: this.appsEntityTracker,
     });
 
+    this.lastRealmsKeys = [];
+
     // Provide entity add/remove events.
     this.appsEntityTracker.addEventListener('entityadd', e => {
       // Add to the event queue after allowing internal event handlers to have been called.
-      setTimeout(() => {
+      // setTimeout(() => {
+      // console.log('check is updating', e.data.realm.parent.isUpdating());
+      if (!e.data.realm.parent.isUpdating()) {
         this.dispatchEvent(new MessageEvent('entityadd', {data: e.data}));
-      }, 0);
+      }
+      // }, 0);
     });
     this.appsEntityTracker.addEventListener('entityremove', e => {
       // Add to the event queue after allowing internal event handlers to have been called.
-      setTimeout(() => {
+      // setTimeout(() => {
+      if (!e.data.realm.parent.isUpdating()) {
         this.dispatchEvent(new MessageEvent('entityremove', {data: e.data}));
-      }, 0);
+      }
+      // }, 0);
     });
 
     this.players = new VirtualPlayersArray('players', this, {
@@ -1319,7 +1589,7 @@ export class NetworkRealms extends EventTarget {
 
     this.irc = new VirtualIrc(this);
     this.connectedRealms = new Set();
-    this.tx = makeTransactionHandler();
+    this.migrateTx = makeTransactionHandler();
 
     this.realmsCleanupFns = new Map();
 
@@ -1354,6 +1624,21 @@ export class NetworkRealms extends EventTarget {
     });
   }
 
+  #updating = false;
+  isUpdating() {
+    return this.#updating;
+  }
+  tx(fn) {
+    this.#updating = true;
+    // console.log('set updating 1');
+    try {
+      fn();
+    } finally {
+      this.#updating = false;
+      // console.log('set updating 2');
+    }
+  }
+
   // Gets the other players also present in the local player's NetworkRealms.
   getVirtualPlayers() {
     return this.players;
@@ -1366,18 +1651,11 @@ export class NetworkRealms extends EventTarget {
 
   // Gets the realm connected to at the player's position.
   // Returns: The NetworkRealm at the player's position if there is one connected to, null if there's none.
-  getClosestRealm(position) {
+  // XXX in the future, this can be done by passing in a predicate function
+  getClosestRealm(realmKey) {
     for (const realm of this.connectedRealms) {
       if (realm.connected) {
-        const box = {
-          min: realm.min,
-          max: [
-            realm.min[0] + realm.size,
-            realm.min[1] + realm.size,
-            realm.min[2] + realm.size,
-          ],
-        };
-        if (boxContains(box, position)) {
+        if (realm.key === realmKey) {
           return realm;
         }
       }
@@ -1436,28 +1714,33 @@ export class NetworkRealms extends EventTarget {
   }
 
   // Initializes the AudioContext.
-  initAudioContext() {
+  /* initAudioContext() {
     initAudioContext();
-  }
+  } */
 
   // Returns whether or not the player's microphone is enabled.
   isMicEnabled() {
     return !!this.microphoneSource;
   }
 
-  // Toggles the player's microphone on/off.
+  /* // Toggles the player's microphone on/off.
   toggleMic() {
     if (!this.isMicEnabled()) {
       this.enableMic();
     } else {
       this.disableMic();
     }
-  }
+  } */
 
   // Enables the player's microphone.
-  async enableMic() {
+  async enableMic({
+    mediaStream,
+  }) {
     if (!this.microphoneSource) {
-      this.microphoneSource = await createMicrophoneSource();
+      this.microphoneSource = await createMicrophoneSource({
+        mediaStream,
+        audioContext: this.audioContext,
+      });
 
       this.dispatchEvent(new MessageEvent('micenabled', {
         data: {},
@@ -1471,7 +1754,8 @@ export class NetworkRealms extends EventTarget {
       const {networkedAudioClient} = headRealm;
       networkedAudioClient.addMicrophoneSource(this.microphoneSource);
     } else {
-      // debugger;
+      console.warn('already enabled mic');
+      debugger;
     }
   }
 
@@ -1490,7 +1774,8 @@ export class NetworkRealms extends EventTarget {
         data: {},
       }));
     } else {
-      // debugger;
+      console.warn('already disabled mic');
+      debugger;
     }
   }
 
@@ -1512,33 +1797,38 @@ export class NetworkRealms extends EventTarget {
   }
 
   // Updates the set of realms connected to based on the local player's position.
-  // - position: The local player's position.
-  // - realmsize: The size of the x and z dimensions of realms.
-  async updatePosition(position, realmSize, {
-    onConnect,
+  // - realmsKeys: The realm string keys to connect to; the first one is the one the local player is in.
+  // - onConnect: Optional callback to call when the realms are connected to.
+  async updateRealmsKeys(realmsKeys, {
+    onConnect = null,
   } = {}) {
-    position = position.slice();
+    if (realmsKeys.length === 0) {
+      throw new Error('at least one realm key required');
+    }
 
-    const snappedPosition = position.map(v => Math.floor(v / realmSize) * realmSize);
-    if (!arrayEquals(snappedPosition, this.lastPosition)) {
-      this.lastPosition[0] = snappedPosition[0];
-      this.lastPosition[1] = snappedPosition[1];
-      this.lastPosition[2] = snappedPosition[2];
+    // const snappedPosition = position.map(v => Math.floor(v / realmSize) * realmSize);
+    /* if (!arrayEquals(snappedPosition, this.lastPosition)) */
+    if (!arrayEquals(realmsKeys, this.lastRealmsKeys)) {
+      // this.lastPosition[0] = snappedPosition[0];
+      // this.lastPosition[1] = snappedPosition[1];
+      // this.lastPosition[2] = snappedPosition[2];
+      this.lastRealmsKeys = realmsKeys;
 
-      await this.tx(async () => {
+      await this.migrateTx(async () => {
         const oldNumConnectedRealms = this.connectedRealms.size;
 
         const candidateRealms = [];
-        for (let dz = -1; dz <= 1; dz++) {
-          for (let dx = -1; dx <= 1; dx++) {
-            const min = [
-              Math.floor((snappedPosition[0] + dx * realmSize) / realmSize) * realmSize,
-              0,
-              Math.floor((snappedPosition[2] + dz * realmSize) / realmSize) * realmSize,
-            ];
-            const realm = new NetworkRealm(this.sceneId, min, realmSize, this);
+        for (let i = 0; i < realmsKeys.length; i++) {
+          const realmsKey = realmsKeys[i];
+        //   for (let dx = -1; dx <= 1; dx++) {
+            // const min = [
+            //   Math.floor((snappedPosition[0] + dx * realmSize) / realmSize) * realmSize,
+            //   0,
+            //   Math.floor((snappedPosition[2] + dz * realmSize) / realmSize) * realmSize,
+            // ];
+            const realm = new NetworkRealm(realmsKey, /*min, realmSize,*/ this);
             candidateRealms.push(realm);
-          }
+        //   }
         }
 
         // check if we need to connect to new realms
@@ -1582,10 +1872,11 @@ export class NetworkRealms extends EventTarget {
 
         // if this is the first network configuration, initialize our local player
         if (oldNumConnectedRealms === 0 && connectPromises.length > 0) {
-          onConnect && await onConnect(position);
+          onConnect && await onConnect();
         }
         // we are in the middle of a network configuration, so take the opportunity to migrate the local player if necessary
-        await this.localPlayer.headTracker.tryMigrate(position);
+        // await this.localPlayer.headTracker.tryMigrate(position);
+        await this.localPlayer.headTracker.tryMigrate(realmsKeys[0]);
 
         // check if we need to disconnect from any realms
         const oldRealms = [];

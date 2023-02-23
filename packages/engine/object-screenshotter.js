@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import {getRenderer} from './renderer.js';
-import metaversefile from 'metaversefile';
+// import {getRenderer} from './renderer.js';
+// import metaversefile from 'metaversefile';
 import {fitCameraToBoundingBox} from './util.js';
 
 const localVector = new THREE.Vector3();

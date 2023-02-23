@@ -2,57 +2,122 @@
 player manager binds y.js data to player objects
 player objects load their own avatar and apps using this binding */
 
-import * as Z from 'zjs';
+// import * as Z from 'zjs';
+import * as THREE from 'three';
 import {LocalPlayer, RemotePlayer} from './character-controller.js';
 import {makeId} from './util.js';
-import {initialPosY, playersMapName} from './constants.js';
+import {initialPosY} from './constants.js';
 
-class PlayersManager extends EventTarget {
-  constructor() {
+export class PlayersManager extends THREE.Object3D {
+  #localPlayer = null;
+  #remotePlayers = new Map();
+
+  constructor({
+    engine,
+    physicsTracker,
+    environmentManager,
+    audioManager,
+    chatManager,
+    sounds,
+  }) {
     super();
-    this.playersArray = null;
-    this.localPlayer = null;
+
+    if (!engine || !physicsTracker || !environmentManager || !audioManager || !chatManager || !sounds) {
+      throw new Error('missing required arguments');
+    }
+    this.engine = engine;
+    this.physicsTracker = physicsTracker;
+    this.environmentManager = environmentManager;
+    this.audioManager = audioManager;
+    this.chatManager = chatManager;
+    this.sounds = sounds;
+
+    // this.playersArray = null;
     this.setLocalPlayer(this.#addLocalPlayer());
 
-    this.remotePlayers = new Map();
-    this.remotePlayersByInteger = new Map();
-    this.unbindStateFn = null;
-    this.removeListenerFn = null;
+    // this.remotePlayers = new Map();
+    // this.remotePlayersByInteger = new Map();
+    // this.unbindStateFn = null;
+    // this.removeListenerFn = null;
   }
 
-  #addLocalPlayer() {
-    const localPlayerId = makeId(5);
-    const localPlayersArray = new Z.Doc().getArray(playersMapName);
+  // XXX debugging
+  get playersArray() {
+    debugger;
+  }
+  set playersArray(playersArray) {
+    debugger;
+  }
+
+  #addLocalPlayer({
+    playerId = makeId(5),
+  } = {}) {
     const localPlayer = new LocalPlayer({
-      playerId: localPlayerId,
-      playersArray: localPlayersArray,
+      playerId,
+      engine: this.engine,
+      physicsTracker: this.physicsTracker,
+      environmentManager: this.environmentManager,
+      audioManager: this.audioManager,
+      chatManager: this.chatManager,
+      sounds: this.sounds,
     });
     localPlayer.position.y = initialPosY;
-    localPlayer.updateMatrixWorld();
-
+    this.add(localPlayer.appManager);
+    localPlayer.appManager.updateMatrixWorld();
     return localPlayer;
   }
 
   getLocalPlayer() {
-    return this.localPlayer;
+    return this.#localPlayer;
   }
 
   setLocalPlayer(newLocalPlayer) {
     const oldPlayer = this.localPlayer;
-    this.localPlayer = newLocalPlayer;
-    this.dispatchEvent(new MessageEvent('playerchange', {
-      data: {
+    this.#localPlayer = newLocalPlayer;
+
+    this.dispatchEvent({
+      type: 'playerchange',
+      // data: {
         oldPlayer: oldPlayer,
         player: this.localPlayer,
-      }
-    }));
+      // }
+    });
   }
 
-  getRemotePlayers(){
-    return this.remotePlayers;
+  addRemotePlayer({
+    playerId = makeId(5),
+  }) {
+    const remotePlayer = new RemotePlayer({
+      playerId,
+      engine: this.engine,
+      physicsTracker: this.physicsTracker,
+      environmentManager: this.environmentManager,
+      audioManager: this.audioManager,
+      chatManager: this.chatManager,
+      sounds: this.sounds,
+    });
+    // remotePlayer.position.y = initialPosY;
+    this.add(remotePlayer.appManager);
+    remotePlayer.appManager.updateMatrixWorld();
+    this.#remotePlayers.set(playerId, remotePlayer);
+    return remotePlayer;
   }
 
-  clearRemotePlayers() {
+  removeRemotePlayer(player) {
+    if (player.appManager.parent === this) {
+      this.remove(player.appManager);
+      this.#remotePlayers.delete(player.playerId);
+      player.destroy();
+    } else {
+      throw new Error('player app manager not a child of this players manager');
+    }
+  }
+
+  getRemotePlayers() {
+    return Array.from(this.#remotePlayers.values());
+  }
+
+  /* clearRemotePlayers() {
     const lastPlayers = this.playersArray;
     if (lastPlayers) {
       const playerSpecs = lastPlayers.toJSON();
@@ -66,13 +131,33 @@ class PlayersManager extends EventTarget {
         this.remotePlayersByInteger.delete(nonLocalPlayer.playerIdInt);
       }
     }
-  }
+  } */
 
   getPlayersState() {
     return this.playersArray;
   }
 
-  unbindState() {
+  updateAvatars(timestamp, timeDiff) {
+    const localPlayer = this.getLocalPlayer();
+    localPlayer.updateAvatar(timestamp, timeDiff);
+
+    for (const remotePlayer of this.#remotePlayers.values()) {
+      remotePlayer.updateAvatar(timestamp, timeDiff);
+    }
+  }
+  /* updateAppManagers(timestamp, timeDiff) {
+    // XXX all app updates happen in the frameTracker now
+    debugger;
+
+    const localPlayer = this.getLocalPlayer();
+    localPlayer.appManager.update(timestamp, timeDiff);
+
+    for (const remotePlayer of this.#remotePlayers.values()) {
+      remotePlayer.appManager.update(timestamp, timeDiff);
+    }
+  } */
+
+  /* unbindState() {
     if(this.unbindStateFn != null) {
       this.unbindStateFn();
     }
@@ -157,10 +242,9 @@ class PlayersManager extends EventTarget {
     for (const remotePlayer of this.remotePlayers.values()) {
       remotePlayer.update(timestamp, timeDiff);
     }
-  }
+  } */
 }
-const playersManager = new PlayersManager();
-
-export {
-  playersManager,
-};
+// const playersManager = new PlayersManager();
+// export {
+//   playersManager,
+// };

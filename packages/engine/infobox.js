@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {getRenderer} from './renderer.js';
+// import {getRenderer} from './renderer.js';
 
 const fullscreenVertexShader = `\
   varying vec2 vUv;
@@ -230,9 +230,19 @@ const _makeInfoboxRendererScene = () => {
 };
 
 class InfoboxRenderer {
-  constructor(width, height, selected) {
+  constructor({
+    width,
+    height,
+    selected,
+    webaverseRenderer,
+  }) {
     this.width = width;
     this.height = height;
+
+    if (!webaverseRenderer) {
+      debugger;
+    }
+    this.webaverseRenderer = webaverseRenderer;
 
     this.scene = _makeInfoboxRendererScene();
     this.camera = new THREE.OrthographicCamera(
@@ -291,7 +301,8 @@ class InfoboxRenderer {
   }
 
   update(timestamp, timeDiff) {
-    const renderer = getRenderer();
+    // const renderer = getRenderer();
+    const {renderer} = this.webaverseRenderer;
     const size = renderer.getSize(localVector2D);
     const pixelRatio = renderer.getPixelRatio();
 

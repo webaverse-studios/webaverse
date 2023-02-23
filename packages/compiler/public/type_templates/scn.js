@@ -1,6 +1,14 @@
 import * as THREE from 'three';
-import metaversefile from 'metaversefile';
-const {useApp, createApp, getObjectUrl, createAppAsync, addTrackedApp, removeTrackedApp, useCleanup} = metaversefile;
+// import metaversefile from 'metaversefile';
+// const {
+//   useApp,
+//   createApp,
+//   getObjectUrl,
+//   createAppAsync,
+//   addTrackedApp,
+//   removeTrackedApp,
+//   useCleanup,
+// } = metaversefile;
 
 function mergeComponents(a, b) {
   const result = a.map(({
@@ -27,9 +35,28 @@ function mergeComponents(a, b) {
   return result;
 }
 
-export default e => {
+export default ctx => {
+  const {
+    useApp,
+    // createApp,
+    // getObjectUrl,
+    // createAppAsync,
+    // addTrackedApp,
+    // removeTrackedApp,
+    useEngine,
+    // useImportManager,
+    useWorld,
+    useCleanup,
+  } = ctx;
   const app = useApp();
-  
+  const engine = useEngine();
+  const {
+    world,
+    importManager,
+  } = engine;
+  // const importManager = useImportManager();
+  // const world = useWorld();
+
   const srcUrl = ${this.srcUrl};
   
   const mode = app.getComponent('mode') ?? 'attached';
@@ -37,7 +64,7 @@ export default e => {
   const objectComponents = app.getComponent('objectComponents') ?? [];
   // console.log('scn got mode', app.getComponent('mode'), 'attached');
   const loadApp = (() => {
-    switch (mode) {
+    /* switch (mode) {
       case 'detached': {
         return async (url, position, quaternion, scale, components) => {
           const components2 = {};
@@ -75,20 +102,32 @@ export default e => {
           });
         };
       }
-      case 'attached': {
+      case 'attached': { */
         return async (url, position, quaternion, scale, components) => {
           components = mergeComponents(components, objectComponents);
-          await addTrackedApp(url, position, quaternion, scale, components);
+          
+          // console.log('scn add app', world?.appManager, {
+          //   url, position, quaternion, scale, components,
+          // });
+          await world.appManager.addAppAsync(
+            url,
+            position,
+            quaternion,
+            scale,
+            components,
+            // instanceId = getRandomString(),
+          );
+          // console.log('add app 2');
         };
-      }
-      default: {
-        throw new Error('unknown mode: ' + mode);
-      }
-    }
+      // }
+      // default: {
+      //   throw new Error('unknown mode: ' + mode);
+      // }
+    // }
   })();
   
   let live = true;
-  e.waitUntil((async () => {
+  ctx.waitUntil((async () => {
     console.log('loading scn', srcUrl);
     const res = await fetch(srcUrl);
     const j = await res.json();
@@ -118,7 +157,7 @@ export default e => {
           
           const baseUrl = import.meta.url;
           console.log('baseUrl', baseUrl);
-          const url = getObjectUrl(object, baseUrl);
+          const url = importManager.getObjectUrl(object, baseUrl);
           console.log('url', url)
           await loadApp(url, position, quaternion, scale, components);
         }

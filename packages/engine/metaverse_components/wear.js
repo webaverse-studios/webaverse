@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import metaversefile from 'metaversefile';
+// import metaversefile from 'metaversefile';
 import Avatar from '../avatars/avatars.js';
-import physicsManager from '../physics-manager.js';
-import dropManager from '../drop-manager.js';
+// import physicsManager from '../physics/physics-manager.js';
+// import dropManager from '../drop-manager.js';
 
 
 const localVector = new THREE.Vector3();
@@ -20,8 +20,11 @@ const identityVector = new THREE.Vector3();
 
 //
 
-export default (app, component) => {
-  const {useActivate} = metaversefile;
+export default (ctx, component) => {
+  const {useApp, useActivate, usePhysics, usePhysicsTracker} = ctx;
+  const app = useApp();
+  const physicsScene = usePhysics();
+  const physicsTracker = usePhysicsTracker();
   
   let wearSpec = null;
   let modelBones = null;
@@ -40,16 +43,10 @@ export default (app, component) => {
       initialScale.copy(app.scale);
       // console.log('wear activate', app, wearSpec, e);
       if (wearSpec) {
-        dropManager.addSpawnToBackpack(app);
+        // dropManager.addSpawnToBackpack(app);
 
         // const {app, wearSpec} = e.data;
         // console.log('got wear spec', [wearSpec.skinnedMesh, app.glb]);
-        
-        const physicsObjects = app.getPhysicsObjects();
-        const physicsScene = physicsManager.getScene();
-        for (const physicsObject of physicsObjects) {
-          physicsScene.disableActor(physicsObject);
-        }
         
         if (app.glb) {
           if (wearSpec.skinnedMesh) {
@@ -169,7 +166,9 @@ export default (app, component) => {
     }
   };
   app.addEventListener('wearupdate', wearupdate);
-  app.addEventListener('destroy', () => {
+  const destroy = () => {
+    // console.log('destroy');
+
     /* const remotePlayers = metaversefile.useRemotePlayers();
     const {npcs} = npcManager;
     const players = (player ? [player] : [])
@@ -178,25 +177,33 @@ export default (app, component) => {
     for (const player of players) { */
 
     // in case of npc destruction, there might be no wear action to remove
-    if (player?.isBound()) {
-      const wearActionIndex = player.findActionIndex(action => {
+    // if (player?.isBound()) {
+    if (player) {
+      const wearAction = player.actionManager.findAction(action => {
         return action.type === 'wear' && action.instanceId === app.instanceId;
       });
-      if (wearActionIndex !== -1) {
-        player.removeActionIndex(wearActionIndex);
+      if (wearAction) {
+        player.actionManager.removeAction(wearAction);
       }
     }
+  };
+  app.addEventListener('destroy', destroy);
+  ctx.useCleanup(() => {
+    // console.log('cleanup');
+    
+    app.removeEventListener('wearupdate', wearupdate);
+    app.removeEventListener('destroy', destroy);
   });
 
   const _unwear = () => {
+    // dropManager.removeSpawnFromBackpack(app);
     
-    dropManager.removeSpawnFromBackpack(app);
     if (wearSpec) {
-      const physicsObjects = app.getPhysicsObjects();
-      const physicsScene = physicsManager.getScene();
-      for (const physicsObject of physicsObjects) {
-        physicsScene.enableActor(physicsObject);
-      }
+      // const physicsObjects = app.getPhysicsObjects();
+      // const physicsObjects = physicsTracker.getAppPhysicsObjects(app);
+      // for (const physicsObject of physicsObjects) {
+      //   physicsScene.enableActor(physicsObject);
+      // }
 
       app.scale.copy(initialScale);
       app.updateMatrixWorld();
@@ -206,6 +213,7 @@ export default (app, component) => {
         modelBone.quaternion.copy(modelBone.initialQuaternion);
       }
       
+      player = null;
       wearSpec = null;
       modelBones = null;
     }
@@ -273,14 +281,21 @@ export default (app, component) => {
     }
     app.updateMatrixWorld();
   };
-  const frame = metaversefile.useFrame(({timestamp, timeDiff}) => {
+  const frame = ctx.useFrame(({timestamp, timeDiff}) => {
     if (wearSpec && player.avatar) {
       const {instanceId} = app;
 
+      // console.log('tick wear update', {
+      //   instanceId,
+      //   wearSpec,
+      //   player,
+      // });
+
       // animations
       if (app.glb) {
-        const appAimAction = Array.from(player.getActionsState())
-          .find(action => action.type === 'aim' && action.instanceId === instanceId);
+        const appAimAction = player.actionManager.findAction(action =>
+          action.type === 'aim' && action.instanceId === instanceId
+        );
         const {animations} = app.glb;
 
         const appAnimation = appAimAction?.appAnimation ? animations.find(a => a.name === appAimAction.appAnimation) : null;
@@ -317,13 +332,15 @@ export default (app, component) => {
       }
       // bone bindings
       {
-        const appUseAction = Array.from(player.getActionsState())
-          .find(action => action.type === 'use' && action.instanceId === instanceId);
+        const appUseAction = player.actionManager.findAction(action =>
+          action.type === 'use' && action.instanceId === instanceId
+        );
         if (appUseAction?.boneAttachment && wearSpec.boneAttachment) {
           _copyBoneAttachment(appUseAction);
         } else {
-          const appAimAction = Array.from(player.getActionsState())
-            .find(action => action.type === 'aim' && action.instanceId === instanceId);
+          const appAimAction = player.actionManager.findAction(action =>
+            action.type === 'aim' && action.instanceId === instanceId
+          );
           if (appAimAction?.boneAttachment && wearSpec.boneAttachment) {
             _copyBoneAttachment(appAimAction);
           } else {
@@ -354,14 +371,14 @@ export default (app, component) => {
     app.wear();
   });
 
-  return {
-    remove() {
-      // console.log('wear component remove');
+  // return {
+  //   remove() {
+  //     // console.log('wear component remove');
 
-      app.removeEventListener('wearupdate', wearupdate);
-      metaversefile.clearFrame(frame);
+  //     app.removeEventListener('wearupdate', wearupdate);
+  //     ctx.clearFrame(frame);
 
-      _unwear();
-    },
-  };
+  //     _unwear();
+  //   },
+  // };
 };

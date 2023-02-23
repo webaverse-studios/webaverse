@@ -2,53 +2,171 @@
 this file bootstraps the webaverse engine.
 it uses the help of various managers and stores, and executes the render loop.
 */
-import physxWorkerManager from './physx-worker-manager.js';
-
-import metaversefileApi from './metaversefile-api.js';
-import {playersManager} from './players-manager.js';
-import cameraManager from './camera-manager.js';
-import ioManager from './io-manager.js';
-import game from './game.js';
 
 import * as THREE from 'three';
-import npcManager from './npc-manager.js';
-import npcAiManager from './npc-ai-manager.js';
-import Avatar from './avatars/avatars.js';
-import * as sounds from './sounds.js';
-import physx from './physx.js';
-import physicsManager from './physics-manager.js';
-import {world} from './world.js';
-import hpManager from './hp-manager.js';
-import postProcessing from './post-processing.js';
-import particleSystemManager from './particle-system.js';
-import loadoutManager from './loadout-manager.js';
-import questManager from './quest-manager.js';
-import mobManager from './mob-manager.js';
+
+// import metaversefileApi from './metaversefile-api.js';
+
+// managers
+// import {
+//   App,
+// } from '../app-runtime/app.js';
 import {
-  getRenderer,
-  scene,
-  sceneHighPriority,
-  sceneLowPriority,
-  rootScene,
-  camera,
-  bindCanvas,
-  getComposer,
-  offscreenCanvas,
-  canvas
-} from './renderer.js';
-import transformControls from './transform-controls.js';
-import dioramaManager from './diorama/diorama-manager.js';
-import * as voices from './voices.js';
-import renderSettingsManager from './rendersettings-manager.js';
-import musicManager from './music-manager.js';
-import story from './story.js';
-import raycastManager from './raycast-manager.js';
-import universe from './universe.js';
-import settingsManager from './settings-manager.js';
-import grabManager from './grab-manager.js';
-import backgroundFx from './background-fx/background-fx.js';
-import {partyManager} from './party-manager';
-import {LoadingManager} from './loading-manager';
+  ImportManager,
+} from '../app-runtime/import-manager.js';
+import {
+  PlayersManager,
+} from './players-manager.js';
+import {
+  EnvironmentManager,
+} from './environment/environment-manager.js';
+import {
+  CameraManager,
+} from './camera-manager.js';
+import {
+  PointerLockManager,
+} from './io/pointerlock-manager.js';
+import {
+  AudioManager,
+} from './audio/audio-manager.js';
+import {
+  CharacterSelectManager,
+} from './characterselect-manager.js';
+import {
+  PartyManager,
+} from './party-manager.js';
+import {
+  IoManager,
+} from './io/io-manager.js';
+import {
+  SpawnManager,
+} from './spawn-manager.js';
+import {
+  LightingManager,
+} from './managers/lighting/lighting-manager.js';
+import {
+  SkyManager,
+} from './managers/environment/skybox/sky-manager.js';
+import {
+  GameManager,
+} from './game.js';
+// import {
+//   GameManager,
+// } from './game.js';
+// import {
+//   NpcAiManager,
+// } from './npc-ai-manager.js';
+// import {
+//   MobManager,
+// } from './mob-manager.js';
+
+import Avatar from './avatars/avatars.js';
+import {
+  Sounds,
+} from './sounds.js';
+import physx from './physics/physx.js';
+import physicsManager from './physics/physics-manager.js';
+import physxWorkerManager from './physics/physx-worker-manager.js';
+// import {
+//   World,
+// } from './world.js';
+// import {
+//   Universe,
+// } from './universe.js';
+import {
+  NpcManager,
+} from './npc-manager.js';
+import {
+  MobManager,
+} from './managers/mob/mob-manager.js';
+import {
+  ZTargetingManager,
+} from './managers/z-targeting/z-targeting-manager.js';
+import {
+  RealmManager,
+} from './realms/realm-manager.js';
+// import {
+//   HpManager,
+// } from './hp-manager.js';
+import {
+  PostProcessing,
+} from './post-processing.js';
+// import particleSystemManager from './particle-system.js';
+import {
+  LoadoutManager,
+} from './loadout-manager.js';
+// import {
+//   QuestManager,
+// } from './quest-manager.js';
+// import {
+//   getRenderer,
+//   scene,
+//   sceneHighPriority,
+//   sceneLowPriority,
+//   rootScene,
+//   camera,
+//   bindCanvas,
+//   getComposer,
+//   offscreenCanvas,
+//   canvas
+// } from './renderer.js';
+// import transformControls from './transform-controls.js';
+// import dioramaManager from './diorama/diorama-manager.js';
+import {
+  DioramaManager,
+} from './diorama/diorama-manager.js';
+import {
+  Voices,
+} from './voices.js';
+import {
+  RenderSettingsManager,
+} from './rendersettings-manager.js';
+// import musicManager from './music-manager.js';
+import {
+  MusicManager,
+} from './music-manager.js';
+// import story from './story.js';
+import {
+  RaycastManager,
+} from './raycast-manager.js';
+// import settingsManager from './settings-manager.js';
+import {
+  InteractionManager,
+} from './interaction-manager.js';
+import {
+  BackgroundFx,
+} from './background-fx/background-fx.js';
+import {
+  HitManager,
+} from './managers/interaction/hit-manager.js';
+// import {
+//   LoadingManager,
+// } from './loading-manager';
+import {
+  makeDefaultPerspectiveCamera,
+} from './renderer-utils.js';
+import {
+  MetaversefileCache,
+} from '../app-runtime/app-import-cache.js';
+import {
+  ChatManager,
+} from './chat-manager.js';
+import {
+  TempManager,
+} from './temp-manager.js';
+import {
+  FrameTracker,
+} from './frame-tracker.js';
+import {
+  PhysicsTracker,
+} from './physics/physics-tracker.js';
+import {
+  WebaverseRenderer,
+} from './renderers/webaverse-renderer.js';
+
+import './metaversefile-binding.js';
+
+//
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -74,37 +192,207 @@ const frameEvent = new MessageEvent('frame', {
   },
 });
 
-export default class Webaverse extends EventTarget {
-  constructor() {
+const metaversefileCache = new MetaversefileCache();
+globalThis.metaversefileCache = metaversefileCache;
+
+// let numWebaverseEngines = null;
+export class WebaverseEngine extends EventTarget {
+  camera = makeDefaultPerspectiveCamera();
+  webaverseRenderer = new WebaverseRenderer();
+  audioContext = new AudioContext();
+
+  importManager = new ImportManager();
+  tempManager = new TempManager();
+  frameTracker = new FrameTracker();
+
+  audioManager = new AudioManager({
+    audioContext: this.audioContext,
+  });
+  sounds = new Sounds({
+    audioManager: this.audioManager,
+  });
+  
+  physicsTracker = new PhysicsTracker();
+  environmentManager = new EnvironmentManager();
+  chatManager = new ChatManager();
+  playersManager = new PlayersManager({
+    physicsTracker: this.physicsTracker,
+    environmentManager: this.environmentManager,
+    audioManager: this.audioManager,
+    chatManager: this.chatManager,
+    sounds: this.sounds,
+    engine: this,
+  });
+  // hpManager = new HpManager();
+  cameraManager = new CameraManager({
+    webaverseRenderer: this.webaverseRenderer,
+    // camera: this.camera,
+    playersManager: this.playersManager,
+  });
+  pointerLockManager = new PointerLockManager({
+    engine: this,
+  });
+  spawnManager = new SpawnManager({
+    // cameraManager: this.cameraManager,
+    webaverseRenderer: this.webaverseRenderer,
+    playersManager: this.playersManager,
+  });
+  lightingManager = new LightingManager();
+  skyManager = new SkyManager({
+    lightingManager: this.lightingManager,
+  });
+
+  characterSelectManager = new CharacterSelectManager();
+
+  realmManager = new RealmManager({
+    playersManager: this.playersManager,
+    spawnManager: this.spawnManager,
+    engine: this,
+    characterSelectManager: this.characterSelectManager,
+    audioManager: this.audioManager,
+  });
+
+  raycastManager = new RaycastManager({
+    webaverseRenderer: this.webaverseRenderer,
+    cameraManager: this.cameraManager,
+    world: this.world,
+    physicsTracker: this.physicsTracker,
+  });
+  ioManager = new IoManager({
+    engine: this,
+    cameraManager: this.cameraManager,
+    pointerLockManager: this.pointerLockManager,
+    raycastManager: this.raycastManager,
+    webaverseRenderer: this.webaverseRenderer,
+    playersManager: this.playersManager,
+    realmManager: this.realmManager,
+  });
+  partyManager = new PartyManager({
+    playersManager: this.playersManager,
+    characterSelectManager: this.characterSelectManager,
+    engine: this,
+  });
+  
+  hitManager = new HitManager({
+    webaverseRenderer: this.webaverseRenderer,
+    playersManager: this.playersManager,
+    physicsTracker: this.physicsTracker,
+    sounds: this.sounds,
+  });
+  npcManager = new NpcManager({
+    physicsTracker: this.physicsTracker,
+    environmentManager: this.environmentManager,
+    audioManager: this.audioManager,
+    chatManager: this.chatManager,
+    sounds: this.sounds,
+    engine: this,
+    characterSelectManager: this.characterSelectManager,
+    hitManager: this.hitManager,
+  });
+  zTargetingManager = new ZTargetingManager({
+    webaverseRenderer: this.webaverseRenderer,
+    cameraManager: this.cameraManager,
+    playersManager: this.playersManager,
+    physicsTracker: this.physicsTracker,
+    sounds: this.sounds,
+  });
+  mobManager = new MobManager({
+    // physicsTracker: this.physicsTracker,
+    // environmentManager: this.environmentManager,
+  });
+
+  loadoutManager = new LoadoutManager({
+    webaverseRenderer: this.webaverseRenderer,
+    playersManager: this.playersManager,
+  });
+  interactionManager = new InteractionManager({
+    cameraManager: this.cameraManager,
+    playersManager: this.playersManager,
+    realmManager: this.realmManager,
+    ioManager: this.ioManager,
+    webaverseRenderer: this.webaverseRenderer,
+    physicsTracker: this.physicsTracker,
+  });
+  voices = new Voices({
+    playersManager: this.playersManager,
+  });
+  musicManager = new MusicManager({
+    audioManager: this.audioManager,
+  });
+  postProcessing = new PostProcessing({
+    webaverseRenderer: this.webaverseRenderer,
+    cameraManager: this.cameraManager,
+    playersManager: this.playersManager,
+  });
+  renderSettingsManager = new RenderSettingsManager({
+    postProcessing: this.postProcessing,
+  });
+  backgroundFx = new BackgroundFx();
+  game = new GameManager({
+    webaverseRenderer: this.webaverseRenderer,
+    ioManager: this.ioManager,
+    cameraManager: this.cameraManager,
+    playersManager: this.playersManager,
+    loadoutManager: this.loadoutManager,
+    interactionManager: this.interactionManager,
+    raycastManager: this.raycastManager,
+    realmManager: this.realmManager,
+    hitManager: this.hitManager,
+    zTargetingManager: this.zTargetingManager,
+  });
+  dioramaManager = new DioramaManager();
+
+  constructor({
+    dstCanvas,
+  }) {
     super();
 
-    console.log('constructing webaverse')
+    this.dstCanvas = dstCanvas;
 
-    this.loadingManager = new LoadingManager(this);
+    // if (++numWebaverseEngines > 1) {
+    //   debugger;
+    //   throw new Error('only one engine allowed');
+    // }
 
-    const canvas = document.createElement('canvas');
-    canvas.style.position = 'fixed';
-    canvas.style.top = '0';
-    canvas.style.left = '0';
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-    canvas.style.margin = '0';
-    canvas.style.padding = '0';
-    canvas.style.zIndex = '-1';
-    canvas.className = 'engine-canvas';
+    const _connectObjects = () => {
+      const {scene} = this.webaverseRenderer;
+      
+      scene.add(this.playersManager);
+      this.playersManager.updateMatrixWorld();
 
-    // add the canvas to the engine container
-    document.body.appendChild(canvas);
-    this.bindCanvas(canvas);
+      scene.add(this.npcManager);
+      this.npcManager.updateMatrixWorld();
 
-    story.listenHack();
+      scene.add(this.mobManager);
+      this.mobManager.updateMatrixWorld();
+
+      scene.add(this.zTargetingManager);
+      this.zTargetingManager.updateMatrixWorld();
+
+      scene.add(this.realmManager);
+      this.realmManager.updateMatrixWorld();
+    
+      scene.add(this.interactionManager);
+      this.interactionManager.updateMatrixWorld();
+    };
+    _connectObjects();
+
+    const _bindCanvasEvents = () => {
+      if (this.dstCanvas) {
+        this.webaverseRenderer.bindCanvasEvents(this.dstCanvas);
+      }
+    };
+    _bindCanvasEvents();
+
+    // console.warn('story listen hack...');
+    // story.listenHack();
 
     this.loadPromise = (async () => {
-      let index = 0;
-      const totalWaitForLoadFunctions = 14;
-      let loadProgressPercentage = 0;
+      // let index = 0;
+      // const totalWaitForLoadFunctions = 14;
+      // let loadProgressPercentage = 0;
 
-      const _updateLoadProgress = () => {
+      /* const _updateLoadProgress = () => {
         loadProgressPercentage = Math.round((index++) / totalWaitForLoadFunctions * 100);
 
         this.dispatchEvent(new MessageEvent('loadProgress', {
@@ -113,59 +401,49 @@ export default class Webaverse extends EventTarget {
           },
         }));
         // console.log('loadProgressPercentage', loadProgressPercentage);
-      }
+      } */
 
-      console.log('physx loading...')
+      // console.log('physx loading...')
       // physx needs to be loaded first, before everything else, otherwise we have a race condition
-      await physx.waitForLoad();      
-      _updateLoadProgress();
+      // await physx.waitForLoad();
+      // _updateLoadProgress();
 
-      console.log('metaversefileApi loading...')
+      // console.log('metaversefileApi loading...')
 
-      const waitForLoadFunctions = [
-        Avatar.waitForLoad(),
-        physxWorkerManager.waitForLoad(),
-        sounds.waitForLoad(),
-        particleSystemManager.waitForLoad(),
-        transformControls.waitForLoad(),
-        backgroundFx.waitForLoad(),
-        voices.waitForLoad(),
-        musicManager.waitForLoad(),
-      ];
-
-      console.log('game init...')
-
-      game.load();
-
-      // update the loading progress
-      _updateLoadProgress();
+      // console.log('game init...')
+      // game.load();
 
       // call the waitForLoad functions and update the loading progress
       // we need to load them simultaneously
-      await Promise.all(waitForLoadFunctions.map(async (waitForLoadFunction, index) => {
-        await waitForLoadFunction;
-        _updateLoadProgress();
-      }));
+      await Promise.all([
+        physx.waitForLoad(),
+        Avatar.waitForLoad(),
+        physxWorkerManager.waitForLoad(),
+        this.sounds.waitForLoad(),
+        this.voices.waitForLoad(),
+        // this.backgroundFx.waitForLoad(),
+        // this.musicManager.waitForLoad(),
+      ]);
 
-      await npcManager.initDefaultPlayer();
-      _updateLoadProgress();
+      const _initializePlayer = async () => {
+        await this.partyManager.initDefaultPlayer();
+        await this.partyManager.inviteDefaultPlayer();
+        this.loadoutManager.initDefault();
+      };
+      await _initializePlayer();
+      
+      const _initializeRealm = async () => {
+        await this.realmManager.handleUrlUpdate();
+      };
+      await _initializeRealm();
 
-      loadoutManager.initDefault();
-      _updateLoadProgress();
-
-      await universe.handleUrlUpdate();
-      _updateLoadProgress();
-
-      partyManager.inviteDefaultPlayer();
-
-      _updateLoadProgress();
-
-      await this.startLoop();
+      this.startLoop();
 
       this.setContentLoaded();
     })();
     this.contentLoaded = false;
-    const self = this
+    // const self = this
+
     /* // Todo: global variable for e2e automatic tests
     window.globalWebaverse = {
       metaversefileApi,
@@ -180,6 +458,21 @@ export default class Webaverse extends EventTarget {
       game,
     }; */
   }
+
+  /* connectCanvas(canvas) {
+    // const canvas = document.createElement('canvas');
+
+    // add the canvas to the engine container
+    // document.body.appendChild(canvas);
+    // this.bindCanvas(canvas);
+  } */
+
+  /* newApp() {
+    return new App();
+  } */
+  async createAppAsync(spec) {
+    return await this.importManager.createAppAsyncFromEngine(spec, this);
+  }
   
   async waitForLoad() {
     if (!this.loadPromise) {
@@ -189,8 +482,8 @@ export default class Webaverse extends EventTarget {
           Avatar.waitForLoad(),
           physxWorkerManager.waitForLoad(),
           sounds.waitForLoad(),
-          particleSystemManager.waitForLoad(),
-          transformControls.waitForLoad(),
+          // particleSystemManager.waitForLoad(),
+          // transformControls.waitForLoad(),
           backgroundFx.waitForLoad(),
           voices.waitForLoad(),
           musicManager.waitForLoad(),
@@ -200,7 +493,7 @@ export default class Webaverse extends EventTarget {
     await this.loadPromise();
   }
 
-  getRenderer() {
+  /* getRenderer() {
     return getRenderer();
   }
 
@@ -218,17 +511,17 @@ export default class Webaverse extends EventTarget {
 
   getCamera() {
     return camera;
-  }
+  } */
   
   setContentLoaded() {
     this.contentLoaded = true;
     this.dispatchEvent(new MessageEvent('loaded'));
   }
 
-  bindCanvas(c) {
-    bindCanvas(c);
-    postProcessing.bindCanvas();
-  }
+  // bindCanvas(c) {
+  //   // bindCanvas(c);
+  //   this.postProcessing.bindCanvas();
+  // }
 
   async isXrSupported() {
     if (navigator.xr) {
@@ -272,129 +565,21 @@ export default class Webaverse extends EventTarget {
     }
   }
   
-  /* injectRigInput() {
-    let leftGamepadPosition, leftGamepadQuaternion, leftGamepadPointer, leftGamepadGrip, leftGamepadEnabled;
-    let rightGamepadPosition, rightGamepadQuaternion, rightGamepadPointer, rightGamepadGrip, rightGamepadEnabled;
-
-    const localPlayer = metaversefileApi.useLocalPlayer();
-    const renderer = getRenderer();
-    const session = renderer.xr.getSession();
-    if (session) {
-      let inputSources = Array.from(session.inputSources);
-      inputSources = ['right', 'left']
-        .map(handedness => inputSources.find(inputSource => inputSource.handedness === handedness));
-      let pose;
-      if (inputSources[0] && (pose = frame.getPose(inputSources[0].gripSpace, renderer.xr.getReferenceSpace()))) {
-        localMatrix.fromArray(pose.transform.matrix)
-          .premultiply(dolly.matrix)
-          .decompose(localVector2, localQuaternion2, localVector3);
-        if (!inputSources[0].profiles.includes('oculus-hand')) {
-          localQuaternion2.multiply(localQuaternion3.setFromAxisAngle(localVector3.set(1, 0, 0), -Math.PI*0.5));
-        } else {
-          localQuaternion2.multiply(localQuaternion3.setFromAxisAngle(localVector3.set(0, 0, 1), Math.PI*0.5)).multiply(localQuaternion3.setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI*0.2));
-        }
-        leftGamepadPosition = localVector2.toArray(localArray);
-        leftGamepadQuaternion = localQuaternion2.toArray(localArray2);
-
-        const {gamepad} = inputSources[0];
-        if (gamepad && gamepad.buttons.length >= 2) {
-          const {buttons} = gamepad;
-          leftGamepadPointer = buttons[0].value;
-          leftGamepadGrip = buttons[1].value;
-        } else {
-          leftGamepadPointer = 0;
-          leftGamepadGrip = 0;
-        }
-        leftGamepadEnabled = true;
-      } else {
-        leftGamepadEnabled = false;
-      }
-      if (inputSources[1] && (pose = frame.getPose(inputSources[1].gripSpace, renderer.xr.getReferenceSpace()))) {
-        localMatrix.fromArray(pose.transform.matrix)
-          .premultiply(dolly.matrix)
-          .decompose(localVector2, localQuaternion2, localVector3);
-        if (!inputSources[1].profiles.includes('oculus-hand')) {
-          localQuaternion2.multiply(localQuaternion3.setFromAxisAngle(localVector3.set(1, 0, 0), -Math.PI*0.5));
-        } else {
-          localQuaternion2.multiply(localQuaternion3.setFromAxisAngle(localVector3.set(0, 0, 1), -Math.PI*0.5)).multiply(localQuaternion3.setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI*0.2));
-        }
-        rightGamepadPosition = localVector2.toArray(localArray3);
-        rightGamepadQuaternion = localQuaternion2.toArray(localArray4);
-
-        const {gamepad} = inputSources[1];
-        if (gamepad && gamepad.buttons.length >= 2) {
-          const {buttons} = gamepad;
-          rightGamepadPointer = buttons[0].value;
-          rightGamepadGrip = buttons[1].value;
-        } else {
-          rightGamepadPointer = 0;
-          rightGamepadGrip = 0;
-        }
-        rightGamepadEnabled = true;
-      } else {
-        rightGamepadEnabled = false;
-      }
-    } else {
-      localMatrix.copy(localPlayer.matrixWorld)
-        .decompose(localVector, localQuaternion, localVector2);
-    }
-
-    const handOffsetScale = localPlayer ? localPlayer.avatar.height / 1.5 : 1;
-    if (!leftGamepadPosition) {
-      leftGamepadPosition = localVector2.copy(localVector)
-        .add(localVector3.copy(leftHandOffset).multiplyScalar(handOffsetScale).applyQuaternion(localQuaternion))
-        .toArray();
-      leftGamepadQuaternion = localQuaternion.toArray();
-      leftGamepadPointer = 0;
-      leftGamepadGrip = 0;
-      leftGamepadEnabled = false;
-    }
-    if (!rightGamepadPosition) {
-      rightGamepadPosition = localVector2.copy(localVector)
-        .add(localVector3.copy(rightHandOffset).multiplyScalar(handOffsetScale).applyQuaternion(localQuaternion))
-        .toArray();
-      rightGamepadQuaternion = localQuaternion.toArray();
-      rightGamepadPointer = 0;
-      rightGamepadGrip = 0;
-      rightGamepadEnabled = false;
-    }
-
-    rigManager.setLocalAvatarPose([
-      [localVector.toArray(), localQuaternion.toArray()],
-      [leftGamepadPosition, leftGamepadQuaternion, leftGamepadPointer, leftGamepadGrip, leftGamepadEnabled],
-      [rightGamepadPosition, rightGamepadQuaternion, rightGamepadPointer, rightGamepadGrip, rightGamepadEnabled],
-    ]);
-  } */
-  
   render(timestamp, timeDiff) {
-    // console.log('frame 1');
+    // frameEvent.data.timestamp = timestamp;
+    // frameEvent.data.timeDiff = timeDiff;
+    // this.game.dispatchEvent(frameEvent);
 
-    frameEvent.data.timestamp = timestamp;
-    frameEvent.data.timeDiff = timeDiff;
-    game.dispatchEvent(frameEvent);
-
-    getComposer().render();
-    
-    // call transferimagebitmap to move the contents of offscreencanvas to canvas
-  
-    const context = canvas.getContext('bitmaprenderer');
-    const imageBitmap = offscreenCanvas.transferToImageBitmap();
-    context.transferFromImageBitmap(imageBitmap);
-
-    // TODO: reenable for mirror
-    // this.dispatchEvent(new MessageEvent('frameend', {
-    //   data: {
-    //     canvas: renderer.domElement,
-    //     context: renderer.getContext(),
-    //   }
-    // }));
-
-    // console.log('frame 2');
+    // const {
+    //   composer,
+    // } = this.webaverseRenderer;
+    this.webaverseRenderer.composer.render();
   }
   
   startLoop() {
-    const renderer = getRenderer();
-    if (!renderer) {
+    // const renderer = getRenderer();
+    const {renderer, camera} = this.webaverseRenderer;
+    if (!renderer || !camera) {
       throw new Error('must bind canvas first');
     }
     
@@ -406,37 +591,50 @@ export default class Webaverse extends EventTarget {
         const timeDiffCapped = Math.min(Math.max(timeDiff, 0), 100);
 
         const _pre = () => {
-          ioManager.update(timeDiffCapped);
-          // this.injectRigInput();
+          this.ioManager.update(timeDiffCapped);
           
           const physicsScene = physicsManager.getScene();
-          if (this.contentLoaded && physicsScene.getPhysicsEnabled()) {
+          if (this.contentLoaded /* && physicsScene.getPhysicsEnabled() */) {
             physicsScene.simulatePhysics(timeDiffCapped);
             physicsScene.getTriggerEvents();
-            npcAiManager.update(timestamp, timeDiffCapped);
-            npcManager.updatePhysics(timestamp, timeDiffCapped);
+            // npcAiManager.update(timestamp, timeDiffCapped);
+            // npcManager.updatePhysics(timestamp, timeDiffCapped);
           }
 
-          transformControls.update();
-          raycastManager.update(timestamp, timeDiffCapped);
-          game.update(timestamp, timeDiffCapped);
-          grabManager.update(timestamp, timeDiffCapped);
+          this.playersManager.updateAvatars(timestamp, timeDiffCapped);
+          this.npcManager.updateAvatars(timestamp, timeDiffCapped);
+          // npcManager.updateAvatar(timestamp, timeDiffCapped);
+          // this.playersManager.updateRemotePlayers(timestamp, timeDiffCapped);
 
-          npcManager.updateAvatar(timestamp, timeDiffCapped);
-          playersManager.updateRemotePlayers(timestamp, timeDiffCapped);
+          if (this.contentLoaded) {
+            // // update app managers
+            // // world
+            // this.world.appManager.update(timestamp, timeDiffCapped);
+            // this.playersManager.updateAppManagers(timestamp, timeDiffCapped);
           
-          world.appManager.tick(timestamp, timeDiffCapped, frame);
+            // update frame tracker
+            this.frameTracker.update(timestamp, timeDiffCapped);
+          }
 
-          mobManager.update(timestamp, timeDiffCapped);
-          hpManager.update(timestamp, timeDiffCapped);
-          questManager.update(timestamp, timeDiffCapped);
-          particleSystemManager.update(timestamp, timeDiffCapped);
+          // transformControls.update();
+          this.raycastManager.update(timestamp, timeDiffCapped);
+          this.zTargetingManager.update(timestamp, timeDiffCapped);
+          this.game.update(timestamp, timeDiffCapped);
+          this.interactionManager.update(timestamp, timeDiffCapped);
+          
+          // const rootRealm = this.realmManager.getRootRealm();
+          // rootRealm.appManager.tick(timestamp, timeDiffCapped, frame);
 
-          cameraManager.updatePost(timestamp, timeDiffCapped);
-          ioManager.updatePost();
+          // this.mobManager.update(timestamp, timeDiffCapped);
+          // this.hpManager.update(timestamp, timeDiffCapped); // XXX unlock this
+          // questManager.update(timestamp, timeDiffCapped);
+          // particleSystemManager.update(timestamp, timeDiffCapped);
 
-          game.pushAppUpdates();
-          game.pushPlayerUpdates();
+          this.cameraManager.updatePost(timestamp, timeDiffCapped);
+          this.ioManager.updatePost();
+
+          // this.game.pushAppUpdates();
+          // this.game.pushPlayerUpdates();
 
           const session = renderer.xr.getSession();
           const xrCamera = session ? renderer.xr.getCamera(camera) : camera;
@@ -450,15 +648,27 @@ export default class Webaverse extends EventTarget {
         _pre();
 
         // render scenes
-        dioramaManager.update(timestamp, timeDiffCapped);
-        loadoutManager.update(timestamp, timeDiffCapped);
+        this.dioramaManager.update(timestamp, timeDiffCapped);
+        this.loadoutManager.update(timestamp, timeDiffCapped);
 
         {
-          const popRenderSettings = renderSettingsManager.push(rootScene, undefined, {
-            postProcessing,
-          });
+          const popRenderSettings = this.renderSettingsManager.push(
+            this.webaverseRenderer.rootScene,
+            undefined,
+            {
+              postProcessing: this.postProcessing,
+            }
+          );
 
           this.render(timestamp, timeDiffCapped);
+          {
+            const {
+              dstCanvas,
+            } = this;
+            if (dstCanvas) {
+              this.webaverseRenderer.transferToCanvas(dstCanvas);
+            }
+          }
 
           popRenderSettings();
         }
@@ -468,12 +678,11 @@ export default class Webaverse extends EventTarget {
     }
     renderer.setAnimationLoop(animate);
 
-    _startHacks(this);
+    // _startHacks(this);
   }
 }
 
-// import {MMDLoader} from 'three/examples/jsm/loaders/MMDLoader.js';
-const _startHacks = webaverse => {
+/* const _startHacks = webaverse => {
   const localPlayer = playersManager.getLocalPlayer();
   const vpdAnimations = Avatar.getAnimations().filter(animation => animation.name.endsWith('.vpd'));
 
@@ -491,7 +700,6 @@ const _startHacks = webaverse => {
     }
   });
 
-  // let playerDiorama = null;
   const lastEmotionKey = {
     key: -1,
     timestamp: 0,
@@ -537,121 +745,6 @@ const _startHacks = webaverse => {
       localPlayer.addAction(poseAction);
     }
   };
-  /* let mikuModel = null;
-  let mikuLoaded = false;
-  const _ensureMikuModel = () => {
-    if (!mikuLoaded) {
-      mikuLoaded = true;
-
-      const mmdLoader = new MMDLoader();
-      mmdLoader.load(
-        // path to PMD/PMX file
-        '/avatars/Miku_Hatsune_Ver2.pmd',
-        function(mesh) {
-          mikuModel = mesh;
-          mikuModel.position.set(0, 0, 0);
-          mikuModel.scale.setScalar(0.07);
-          mikuModel.updateMatrixWorld();
-          scene.add(mikuModel);
-
-          _updateMikuModel();
-        },
-        // called when loading is in progresses
-        function (xhr) {
-          // console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-        },
-        // called when loading has errors
-        function(error) {
-          console.warn('An error happened', error);
-        }
-      );
-    }
-  };
-  const _updateMikuModel = () => {
-    if (mikuModel) {
-      const animation = vpdAnimations[poseAnimationIndex];
-
-      const _getBone = name => mikuModel.skeleton.bones.find(b => b.name === name);
-      const mmdBones = {
-        // Root: _getBone('センター'), // deliberately excluded
-
-        mixamorigHips: _getBone('下半身'),
-        // mixamorigSpine: _makeFakeBone(), // not present in mmd
-        mixamorigSpine1: _getBone('上半身'),
-        // mixamorigSpine2: _makeFakeBone(), // not present in mmd
-        mixamorigNeck: _getBone('首'),
-        mixamorigHead: _getBone('頭'),
-        // Eye_L: _getBone('左目'), // deliberately excluded
-        // Eye_R: _getBone('右目'), // deliberately excluded
-
-        mixamorigLeftShoulder: _getBone('左肩'),
-        mixamorigLeftArm: _getBone('左腕'),
-        mixamorigLeftForeArm: _getBone('左ひじ'),
-        mixamorigLeftHand: _getBone('左手首'),
-        mixamorigLeftHandThumb2: _getBone('左親指２'),
-        mixamorigLeftHandThumb1: _getBone('左親指１'),
-        // mixamorigLeftHandThumb0: _makeFakeBone(), // not present in mmd
-        mixamorigLeftHandIndex3: _getBone('左人指３'),
-        mixamorigLeftHandIndex2: _getBone('左人指２'),
-        mixamorigLeftHandIndex1: _getBone('左人指１'),
-        mixamorigLeftHandMiddle3: _getBone('左中指３'),
-        mixamorigLeftHandMiddle2: _getBone('左中指２'),
-        mixamorigLeftHandMiddle1: _getBone('左中指１'),
-        mixamorigLeftHandRing3: _getBone('左薬指３'),
-        mixamorigLeftHandRing2: _getBone('左薬指２'),
-        mixamorigLeftHandRing1: _getBone('左薬指１'),
-        mixamorigLeftHandPinky3: _getBone('左小指３'),
-        mixamorigLeftHandPinky2: _getBone('左小指２'),
-        mixamorigLeftHandPinky1: _getBone('左小指１'),
-        mixamorigLeftUpLeg: _getBone('左足'),
-        mixamorigLeftLeg: _getBone('左ひざ'),
-        mixamorigLeftFoot: _getBone('左足首'),
-
-        mixamorigRightShoulder: _getBone('右肩'),
-        mixamorigRightArm: _getBone('右腕'),
-        mixamorigRightForeArm: _getBone('右ひじ'),
-        mixamorigRightHand: _getBone('右手首'),
-        mixamorigRightHandThumb2: _getBone('右親指２'),
-        mixamorigRightHandThumb1: _getBone('右親指１'),
-        // mixamorigRightHandThumb0: _makeFakeBone(), // not present in mmd
-        mixamorigRightHandIndex3: _getBone('右人指３'),
-        mixamorigRightHandIndex2: _getBone('右人指２'),
-        mixamorigRightHandIndex1: _getBone('右人指１'),
-        mixamorigRightHandMiddle3: _getBone('右中指３'),
-        mixamorigRightHandMiddle2: _getBone('右中指２'),
-        mixamorigRightHandMiddle1: _getBone('右中指１'),
-        mixamorigRightHandRing3: _getBone('右薬指３'),
-        mixamorigRightHandRing2: _getBone('右薬指２'),
-        mixamorigRightHandRing1: _getBone('右薬指１'),
-        mixamorigRightHandPinky3: _getBone('右小指３'),
-        mixamorigRightHandPinky2: _getBone('右小指２'),
-        mixamorigRightHandPinky1: _getBone('右小指１'),
-        mixamorigRightUpLeg: _getBone('右足'),
-        mixamorigRightLeg: _getBone('右ひざ'),
-        mixamorigRightFoot: _getBone('右足首'),
-        mixamorigLeftToeBase: _getBone('左つま先'),
-        mixamorigRightToeBase: _getBone('右つま先'),
-      };
-
-      for (const k in animation.interpolants) {
-        const match = k.match(/^([\s\S]+?)\.(position|quaternion)$/);
-        const boneName = match[1];
-        const isPosition = match[2] === 'position';
-
-        const bone = mmdBones[boneName];
-        if (bone) {
-          const src = animation.interpolants[k];
-          const v = src.evaluate(0);
-          if (isPosition) {
-            // bone.position.fromArray(v);
-          } else {
-            bone.quaternion.fromArray(v);
-          }
-        }
-      }
-      mikuModel.updateMatrixWorld();
-    }
-  }; */
   webaverse.titleCardHack = false;
   // let haloMeshApp = null;
   (typeof window !== 'undefined') && window.addEventListener('keydown', e => {
@@ -694,6 +787,4 @@ const _startHacks = webaverse => {
       }
     }
   });
-};
-
-export const webaverse = new Webaverse();
+}; */

@@ -10,16 +10,6 @@ const FPS = 60;
 
 const localVector = new THREE.Vector3();
 
-/* const _makePromise = () => {
-  let accept, reject;
-  const p = new Promise((a, r) => {
-    accept = a;
-    reject = r;
-  });
-  p.accept = accept;
-  p.reject = reject;
-  return p;
-}; */
 const _makeRenderer = (width, height) => {
   const renderer = new THREE.WebGLRenderer({
     alpha: true,

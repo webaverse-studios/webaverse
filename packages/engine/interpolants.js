@@ -93,10 +93,15 @@ export class SnapshotInterpolant {
     this.snapshotWriteIndex = 0;
 
     this.value = constructor();
+    this.#tmpValue = constructor();
   }
+  #tmpValue;
 
-  update(timestamp, remoteTimeBias) {
-    this.readTime = timestamp + remoteTimeBias;
+  update(timestamp/*, remoteTimeBias*/) {
+    // if (remoteTimeBias !== undefined) {
+    //   debugger;
+    // }
+    this.readTime = timestamp;
 
     let effectiveReadTime = this.readTime - this.timeDelay;
     
@@ -135,11 +140,12 @@ export class SnapshotInterpolant {
         }
       }
     }
+    // globalThis.snap = this.snapshots;
     console.warn('could not seek to time', t, JSON.parse(JSON.stringify(this.snapshots)));
   }
 
   snapshot(remoteTimestamp) {
-    const value = this.fn();
+    const value = this.fn(this.#tmpValue);
     // console.log('got value', value.join(','), timeDiff);
     const writeSnapshot = this.snapshots[this.snapshotWriteIndex];
     
@@ -172,24 +178,148 @@ export class BinaryInterpolant extends SnapshotInterpolant {
 export class PositionInterpolant extends SnapshotInterpolant {
   constructor(fn, timeDelay, numFrames) {
     super(fn, timeDelay, numFrames, () => new THREE.Vector3(), (target, value) => {
-      target.fromArray(value);
-      if (isNaN(target.x) || isNaN(target.y) || isNaN(target.z)) {
-        throw new Error('target is NaN');
-      }
-      return target;
+      return target.fromArray(value);
+      // if (isNaN(target.x) || isNaN(target.y) || isNaN(target.z)) {
+      //   throw new Error('target is NaN');
+      // }
+      // return target;
     }, (target, src, dst, f) => {
-      target.copy(src).lerp(dst, f);
-      // console.log('position lerp', target.toArray(), f);
-      if (isNaN(target.x) || isNaN(target.y) || isNaN(target.z)) {
-        throw new Error('target is NaN');
-      }
-      return target;
+      return target.copy(src).lerp(dst, f);
+      // if (isNaN(target.x) || isNaN(target.y) || isNaN(target.z)) {
+      //   throw new Error('target is NaN');
+      // }
+      // return target;
     });
   }
 }
 
 export class QuaternionInterpolant extends SnapshotInterpolant {
   constructor(fn, timeDelay, numFrames) {
-    super(fn, timeDelay, numFrames, () => new THREE.Quaternion(), (target, value) => target.fromArray(value), (target, src, dst, f) => target.copy(src).slerp(dst, f));
+    super(fn, timeDelay, numFrames, () => new THREE.Quaternion(), (target, value) => {
+      return target.fromArray(value);
+    },
+    (target, src, dst, f) => {
+      return target.copy(src).slerp(dst, f);
+    });
+  }
+}
+
+
+export class VelocityInterpolant extends SnapshotInterpolant {
+  constructor(fn, timeDelay, numFrames) {
+    super(fn, timeDelay, numFrames, () => new THREE.Vector3(), (target, value) => {
+      target.fromArray(value);
+      // if (isNaN(target.x) || isNaN(target.y) || isNaN(target.z)) {
+      //   throw new Error('target is NaN');
+      // }
+      return target;
+    }, (target, src, dst, f) => {
+      return target.copy(src); // .lerp(dst, f);
+      // if (isNaN(target.x) || isNaN(target.y) || isNaN(target.z)) {
+      //   throw new Error('target is NaN');
+      // }
+      // return target;
+    });
+  }
+}
+
+//
+
+export class QueueInterpolant extends EventTarget {
+  constructor(timeDelay, bufferSize) {
+    super();
+    
+    this.timeDelay = timeDelay;
+    this.bufferSize = bufferSize;
+
+    this.snapshots = _makeSnapshots(() => ({
+      state: null,
+      timestamp: 0,
+    }), bufferSize);
+    this.snapshotWriteIndex = 0;
+    this.numSnapshots = 0;
+  }
+
+  update(timestamp) {
+    const effectiveReadTime = timestamp - this.timeDelay;
+
+    const snapshotStartIndex = mod(this.snapshotWriteIndex - this.numSnapshots, this.bufferSize);
+    const snapshotEndIndex = this.snapshotWriteIndex;
+    for (let i = snapshotStartIndex; i !== snapshotEndIndex; i = mod(i + 1, this.bufferSize)) {
+      const snapshot = this.snapshots[i];
+      if (effectiveReadTime >= snapshot.timestamp) {
+        this.dispatchEvent(new MessageEvent('statechange', {
+          data: snapshot.state,
+        }));
+        this.numSnapshots--;
+      } else {
+        break;
+      }
+    }
+  }
+
+  /* seekTo(t) {
+    for (let i = -(this.numFrames - 1); i < 0; i++) {
+      const index = this.snapshotWriteIndex + i;
+      const snapshot = this.snapshots[mod(index, this.numFrames)];
+      if (t <= snapshot.endTime) {
+        const prevSnapshot = this.snapshots[mod(index - 1, this.numFrames)];
+        const startTime = prevSnapshot.endTime;
+        if (t >= startTime) {
+          const duration = snapshot.endTime - startTime;
+          const f = (duration > 0 && duration < Infinity) ? ((t - startTime) / duration) : 0;
+          const {startValue} = prevSnapshot;
+          const {startValue: endValue} = snapshot;
+          this.value = this.seekFn(this.value, startValue, endValue, f);
+          return;
+        }
+      }
+    }
+    // globalThis.snap = this.snapshots;
+    // console.warn('could not seek to time', t, JSON.parse(JSON.stringify(this.snapshots)));
+  } */
+
+  snapshot(state, timestamp) {
+    if (this.numSnapshots < this.bufferSize) {
+      const writeSnapshot = this.snapshots[this.snapshotWriteIndex];
+      writeSnapshot.state = state;
+      writeSnapshot.timestamp = timestamp;
+
+      this.snapshotWriteIndex = mod(this.snapshotWriteIndex + 1, this.bufferSize);
+      this.numSnapshots++;
+      // console.log('push snapshot', {
+      //   state,
+      //   timestamp,
+      //   numSnapshots: this.numSnapshots,
+      // });
+
+      /* const value = this.fn(this.#tmpValue);
+      const writeSnapshot = this.snapshots[this.snapshotWriteIndex];
+      
+      writeSnapshot.startValue = this.readFn(writeSnapshot.startValue, value);
+      writeSnapshot.endTime = remoteTimestamp;
+      
+      this.snapshotWriteIndex = mod(this.snapshotWriteIndex + 1, this.numFrames); */
+    } else {
+      console.warn('queue interpolant overflow', {
+        snapshots: this.snapshots,
+        snapshotWriteIndex: this.snapshotWriteIndex,
+        numSnapshots: this.numSnapshots,
+      });
+      throw new Error('queue interpolant overflow');
+    }
+  }
+
+  /* get() {
+    return this.value;
+  } */
+}
+
+export class ActionInterpolant extends QueueInterpolant {
+  constructor(timeDelay, bufferSize) {
+    super(timeDelay, bufferSize);
+  }
+  pushAction(action, timestamp) {
+    this.snapshot(action, timestamp);
   }
 }

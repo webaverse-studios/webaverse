@@ -1,11 +1,11 @@
 import * as THREE from 'three';
-import metaversefile from 'metaversefile';
-import {world} from '../world.js';
-import physicsManager from '../physics-manager.js';
+// import metaversefile from 'metaversefile';
+// import {world} from '../world.js';
+// import physicsManager from '../physics/physics-manager.js';
 import {glowMaterial} from '../shaders.js';
 import easing from '../easing.js';
 import {rarityColors} from '../constants.js';
-import storyManager from '../story.js';
+// import storyManager from '../story.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -20,8 +20,10 @@ const gracePickupTime = 1000;
 
 //
 
-export default app => {
-  const dropComponent = app.getComponent('drop');
+export default (ctx, dropComponent) => {
+  const app = ctx.useApp();
+  const physicsScene = ctx.usePhysics();
+
   if (dropComponent) {
     let rotY = 0;
 
@@ -78,7 +80,7 @@ export default app => {
             localVector.copy(velocity)
               .multiplyScalar(timeDiffS)
           );
-        const physicsScene = physicsManager.getScene();
+        // const physicsScene = physicsManager.getScene();
         velocity.add(
           localVector.copy(physicsScene.getGravity())
             .multiplyScalar(timeDiffS)
@@ -164,6 +166,9 @@ export default app => {
                   instanceId: app.instanceId,
                 });
 
+                console.warn('local player comment');
+                debugger;
+                
                 const conversation = storyManager.startLocalPlayerComment('Scillia got the drop!');
                 conversation.addEventListener('close', () => {
                   localPlayer.removeAction('pickUp');

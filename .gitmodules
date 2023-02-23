@@ -1,0 +1,12 @@
+[submodule "packages/compiler"]
+	path = packages/compiler
+	url = https://github.com/upstreet-labs/compiler
+[submodule "packages/zine"]
+	path = packages/zine
+	url = https://github.com/webaverse/zine
+[submodule "packages/zine-aux"]
+	path = packages/zine-aux
+	url = https://github.com/webaverse/zine-aux
+[submodule "packages/zine-runtime"]
+	path = packages/zine-runtime
+	url = https://github.com/webaverse/zine-runtime

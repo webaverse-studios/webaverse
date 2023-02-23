@@ -3,7 +3,7 @@ import {getRenderer, camera} from './renderer.js';
 import {WebaverseShaderMaterial} from './materials.js';
 import renderSettingsManager from './rendersettings-manager.js';
 import {snapshotMapChunk} from './scene-cruncher.js';
-import metaversefile from 'metaversefile';
+// import metaversefile from 'metaversefile';
 
 const resolution = 2048;
 const worldSize = 10000;

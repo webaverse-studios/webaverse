@@ -8,8 +8,7 @@ import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {Text} from 'troika-three-text';
 import React from 'react';
-// import * as ReactThreeFiber from '@react-three/fiber';
-import metaversefile from 'metaversefile';
+// import metaversefile from 'metaversefile';
 import {getRenderer, scene, sceneHighPriority, sceneLowPriority, sceneLowerPriority, sceneLowestPriority, rootScene, camera} from './renderer.js';
 import cameraManager from './camera-manager.js';
 import physicsManager from './physics-manager.js';
@@ -32,7 +31,7 @@ import npcManager from './npc-manager.js';
 import mobManager from './mob-manager.js';
 import universe from './universe.js';
 import {PathFinder} from './npc-utils.js';
-import {avatarManager} from './avatar-manager.js';
+// import {avatarManager} from './avatar-manager.js';
 import {partyManager} from './party-manager.js';
 import {playersManager} from './players-manager.js';
 import loaders from './loaders.js';
@@ -41,7 +40,7 @@ import * as voices from './voices.js';
 import * as procgen from './procgen/procgen.js';
 import renderSettingsManager from './rendersettings-manager.js';
 import questManager from './quest-manager.js';
-import {murmurhash3} from './procgen/murmurhash3.js';
+// import {murmurhash3} from './procgen/murmurhash3.js';
 import debug from './debug.js';
 import * as scenePreviewer from './scene-previewer.js';
 import * as sounds from './sounds.js';
@@ -65,183 +64,10 @@ import {skyManager} from './engine-hooks/environment/skybox/sky-manager.js';
 import {compilerBaseUrl} from './endpoints.js';
 import {getDefaultCanvas} from './offscreen-engine-runtime/fns/avatar-iconer-fn.js';
 import {isWorker} from './env.js';
-import './metaversefile-binding.js';
+// import './metaversefile-binding.js';
 import spawnManager from './spawn-manager.js';
 
 // const localVector2D = new THREE.Vector2();
-
-class App extends THREE.Object3D {
-  constructor() {
-    super();
-
-    this.isApp = true;
-    this.components = [];
-    this.description = '';
-    this.appType = 'none';
-    this.modules = [];
-    this.modulesHash = 0;
-    // cleanup tracking
-    this.physicsObjects = [];
-    this.exports = [];
-    this.hitTracker = null;
-    this.hasSubApps = false;
-    this.lastMatrix = new THREE.Matrix4();
-  }
-
-  getComponent(key) {
-    const component = this.components.find(component => component.key === key);
-    return component ? component.value : null;
-  }
-
-  #setComponentInternal(key, value) {
-    let component = this.components.find(component => component.key === key);
-    if (!component) {
-      component = {key, value};
-      this.components.push(component);
-    }
-    component.key = key;
-    component.value = value;
-    this.dispatchEvent({
-      type: 'componentupdate',
-      key,
-      value,
-    });
-  }
-
-  setComponent(key, value = true) {
-    this.#setComponentInternal(key, value);
-    this.dispatchEvent({
-      type: 'componentsupdate',
-      keys: [key],
-    });
-  }
-
-  setComponents(o) {
-    const keys = Object.keys(o);
-    for (const k of keys) {
-      const v = o[k];
-      this.#setComponentInternal(k, v);
-    }
-    this.dispatchEvent({
-      type: 'componentsupdate',
-      keys,
-    });
-  }
-
-  hasComponent(key) {
-    return this.components.some(component => component.key === key);
-  }
-
-  removeComponent(key) {
-    const index = this.components.findIndex(component => component.key === key);
-    if (index !== -1) {
-      this.components.splice(index, 1);
-      this.dispatchEvent({
-        type: 'componentupdate',
-        key,
-        value: null,
-      });
-    }
-  }
-
-  get contentId() {
-    const contentIdComponent = this.getComponent('contentId');
-    return (contentIdComponent !== null) ? contentIdComponent : '';
-  }
-
-  set contentId(contentId) {
-    this.setComponent('contentId', contentId + '');
-  }
-
-  get instanceId() {
-    const instanceIdComponent = this.getComponent('instanceId');
-    return (instanceIdComponent !== null) ? instanceIdComponent : '';
-  }
-
-  set instanceId(instanceId) {
-    this.setComponent('instanceId', instanceId + '');
-  }
-
-  get paused() {
-    return this.getComponent('paused') === true;
-  }
-
-  set paused(paused) {
-    this.setComponent('paused', !!paused);
-  }
-
-  addModule(m) {
-    throw new Error('method not bound');
-  }
-
-  updateModulesHash() {
-    this.modulesHash = murmurhash3(this.modules.map(m => m.contentId).join(','));
-  }
-
-  getPhysicsObjects() {
-    return this.physicsObjects;
-  }
-
-  addPhysicsObject(object) {
-    this.physicsObjects.push(object);
-  }
-
-  removePhysicsObject(object) {
-    const removeIndex = this.physicsObjects.indexOf(object);
-    if (removeIndex !== -1) {
-      this.physicsObjects.splice(removeIndex);
-    }
-  }
-
-  setPhysicsObject(object) {
-    this.physicsObjects.length = 0;
-    this.physicsObjects.push(object);
-  }
-
-  hit(damage, opts) {
-    this.hitTracker && this.hitTracker.hit(damage, opts);
-  }
-
-  getRenderSettings() {
-    if (this.hasSubApps) {
-      return renderSettingsManager.findRenderSettings(this);
-    } else {
-      return null;
-    }
-  }
-
-  activate({
-    physicsId = -1,
-  } = {}) {
-    this.dispatchEvent({
-      type: 'activate',
-      physicsId,
-    });
-  }
-
-  wear() {
-    const localPlayer = playersManager.getLocalPlayer();
-    localPlayer.wear(this);
-  }
-
-  unwear() {
-    const localPlayer = playersManager.getLocalPlayer();
-    localPlayer.unwear(this);
-  }
-
-  use() {
-    this.dispatchEvent({
-      type: 'use',
-      use: true,
-    });
-  }
-
-  destroy() {
-    this.dispatchEvent({
-      type: 'destroy',
-    });
-  }
-}
 
 const defaultModules = {
   moduleUrls,
@@ -249,7 +75,7 @@ const defaultModules = {
 };
 
 const localPlayer = playersManager.getLocalPlayer();
-const loreAIScene = loreAI.createScene(localPlayer);
+/* const loreAIScene = loreAI.createScene(localPlayer);
 const _bindAppManagerToLoreAIScene = (appManager, loreAIScene) => {
   const bindings = new WeakMap();
   appManager.addEventListener('appadd', e => {
@@ -268,9 +94,9 @@ const _bindAppManagerToLoreAIScene = (appManager, loreAIScene) => {
   });
 };
 _bindAppManagerToLoreAIScene(world.appManager, loreAIScene);
-world.loreAIScene = loreAIScene;
+world.loreAIScene = loreAIScene; */
 
-class ErrorBoundary extends React.Component {
+/* class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
     this.state = {hasError: false};
@@ -293,8 +119,8 @@ class ErrorBoundary extends React.Component {
     }
     return this.props.children; 
   }
-}
-function createPointerEvents(store) {
+} */
+/* function createPointerEvents(store) {
   // const { handlePointer } = createEvents(store)
   const handlePointer = key => e => {
     // const handlers = eventObject.__r3f.handlers;
@@ -339,7 +165,7 @@ function createPointerEvents(store) {
       }
     },
   }
-}
+} */
 
 const _loadImageTexture = src => {
   const img = new Image();
@@ -378,15 +204,6 @@ const gradientMaps = {
   },
 };
 
-/* const abis = {
-  ERC721,
-  ERC1155,
-}; */
-
-/* debug.addEventListener('enabledchange', e => {
-  document.getElementById('statsBox').style.display = e.data.enabled ? null : 'none';
-}); */
-
 let currentAppRender = null;
 let iframeContainer = null;
 let recursion = 0;
@@ -394,7 +211,7 @@ let wasDecapitated = false;
 const mirrors = [];
 // eslint-disable-next-line no-new-func
 const importFn = new Function('u', 'console.log(u); return import(u)');
-metaversefile.setApi({
+const metaversefileApi = {
   async import(s) {
     if (/^[a-zA-Z0-9]+:/.test(s)) {
       s = `${compilerBaseUrl}${s.replace(compilerBaseUrl, '').replace(/^([a-zA-Z0-9]+:\/)\//, '$1')}`;
@@ -523,9 +340,9 @@ metaversefile.setApi({
   useLoreAI() {
     return loreAI;
   },
-  useLoreAIScene() {
-    return loreAIScene;
-  },
+  // useLoreAIScene() {
+  //   return loreAIScene;
+  // },
   useImageAI() {
     return imageAI;
   },
@@ -1500,9 +1317,7 @@ export default () => {
       throw new Error('unknown renderSpec');
     }
   },
-});
-App.prototype.addModule = function(m) {
-  return metaversefile.addModule(this, m);
 };
-
-export default metaversefile;
+// App.prototype.addModule = function(m) {
+//   return metaversefile.addModule(this, m);
+// };

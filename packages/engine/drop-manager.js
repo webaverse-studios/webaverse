@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import metaversefile from 'metaversefile';
+// import metaversefile from 'metaversefile';
 import generateStats from './procgen/stats.js';
 import {getVoucherFromServer} from './voucherHelpers'
 
@@ -84,7 +84,7 @@ class DropManager extends EventTarget {
     }));
   }
 
-  addSpawnToBackpack({name, contentId, uuid}) {
+  /* addSpawnToBackpack({name, contentId, uuid}) {
     // console.log("spawn pick up", app)
     const spawn = {
       name,
@@ -107,7 +107,7 @@ class DropManager extends EventTarget {
         spawns: newSpawns
       },
     }));
-  }
+  } */
 
   pickupApp(app) {
     this.addClaim(app.name, app.type, app.getComponent('drop').serverDrop, app.contentId, app.getComponent('voucher'));

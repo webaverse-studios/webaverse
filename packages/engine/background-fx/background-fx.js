@@ -9,7 +9,7 @@ import {RadialBgFxMesh} from './RadialBgFx.js';
 import {RainBgFxMesh} from './RainBgFx.js';
 import {SmokeBgFxMesh} from './SmokeBgFx.js';
 
-class BackgroundFx {
+export class BackgroundFx {
   async waitForLoad() {
     await Promise.all([
       DotsBgFxMesh.waitForLoad(),
@@ -25,5 +25,5 @@ class BackgroundFx {
     ]);
   }
 }
-const backgroundFx = new BackgroundFx();
-export default backgroundFx;
+// const backgroundFx = new BackgroundFx();
+// export default backgroundFx;

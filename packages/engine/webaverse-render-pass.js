@@ -1,16 +1,23 @@
 import {Pass} from 'three/examples/jsm/postprocessing/Pass.js';
-import {
-  rootScene,
-  camera,
-} from './renderer.js';
+// import {
+//   rootScene,
+//   camera,
+// } from './renderer.js';
 
 class WebaverseRenderPass extends Pass {
-  constructor() {
+  constructor({
+    webaverseRenderer,
+  }) {
     super();
 
+    // members
+    this.webaverseRenderer = webaverseRenderer;
+
+    // locals
     this.clear = false;
     this.needsSwap = true;
 
+    // internals
     this.internalDepthPass = null;
     this.internalRenderPass = null;
     this.onBeforeRenders = [];
@@ -42,7 +49,10 @@ class WebaverseRenderPass extends Pass {
     } else {
       renderer.setRenderTarget(this.renderToScreen ? null : renderTarget);
       renderer.clear();
-      renderer.render(rootScene, camera);
+      renderer.render(
+        this.webaverseRenderer.rootScene,
+        this.webaverseRenderer.camera
+      );
     }
     
     this.onAfterRender && this.onAfterRender();

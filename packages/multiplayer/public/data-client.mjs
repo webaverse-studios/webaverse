@@ -65,15 +65,20 @@ export class DCMap extends EventTarget {
 
   getRawObject() {
     const key = this.key();
-    if (!key) {
-      debugger;
-    }
+    // if (!key) {
+    //   debugger;
+    // }
     const crdtWrap = this.dataClient.crdt.get(key);
-    if (!crdtWrap) {
-      debugger;
-    }
+    // if (!crdtWrap) {
+    //   debugger;
+    // }
     const rawObject = crdtWrap[1];
     return rawObject;
+  }
+
+  getKeys() {
+    const rawObject = this.getRawObject();
+    return Object.keys(rawObject);
   }
 
   setRawObject(rawObject, epoch) {
@@ -1007,9 +1012,9 @@ export class DataClient extends EventTarget {
   addArrayMapElement(arrayId, arrayIndexId, val, epoch, {
     listen = true,
   } = {}) {
-    if (typeof epoch !== 'number') {
-      debugger;
-    }
+    // if (typeof epoch !== 'number') {
+    //   debugger;
+    // }
 
     const crdtVal = convertValToCrdtVal(val);
 

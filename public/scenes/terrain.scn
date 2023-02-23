@@ -1,0 +1,43 @@
+{
+  "objects": [
+    {
+      "type": "application/spawnpoint",
+      "content": {
+        "position": [0,400,0],
+        "quaternion": [0, 0.0,0, 0.0]
+      }
+    },
+    {
+      "type": "application/rendersettings",
+      "content": {
+        "fog": {
+          "fogType": "exp",
+          "args": [[30, 100, 255], 0.001]
+        }
+      }
+    },
+     {
+      "type": "application/light",
+      "content": {
+        "lightType": "ambient",
+        "args": [[255, 255, 255],1]
+      }
+    },
+    {
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "start_url": "https://webaverse.github.io/procgen-app/"
+    },
+    {
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "start_url": "https://webaverse.github.io/procgen-skybox/"
+    }
+  ]
+}

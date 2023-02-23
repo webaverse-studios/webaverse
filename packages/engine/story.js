@@ -2,30 +2,38 @@
 this file contains the story beat triggers (battles, victory, game over, etc.)
 */
 
+throw new Error('do not import');
+
 import * as THREE from 'three';
-import metaversefile from 'metaversefile';
+// import metaversefile from 'metaversefile';
 import {SwirlPass} from './SwirlPass.js';
-import {
-  getRenderer,
-  rootScene,
-  camera,
-} from './renderer.js';
+// import {
+//   getRenderer,
+//   rootScene,
+//   camera,
+// } from './renderer.js';
 import * as sounds from './sounds.js';
-import musicManager from './music-manager.js';
-import cameraManager from './camera-manager.js';
+// import {
+//   MusicManager,
+// } from './music-manager.js';
+// import {
+//   CameraManager,
+// } from './camera-manager.js';
 import npcManager from './npc-manager.js';
 import {chatManager} from './chat-manager.js';
 import {mod} from './util.js';
-import {playersManager} from './players-manager.js';
-import renderSettingsManager from './rendersettings-manager.js';
-
-import emoteManager from './emotes/emote-manager.js';
+// import {
+//   PlayersManager,
+// } from './players-manager.js';
+// import renderSettingsManager from './rendersettings-manager.js';
+// import {
+//   RenderSettingsManager,
+// } from './rendersettings-manager.js';
 
 //
 
-const localVector2D = new THREE.Vector2();
-
-const upVector = new THREE.Vector3(0, 1, 0);
+// const localVector2D = new THREE.Vector2();
+// const upVector = new THREE.Vector3(0, 1, 0);
 
 //
 
@@ -89,11 +97,20 @@ const _playerSay = async (player, message) => {
   // setText('');
 };
 class Conversation extends EventTarget {
-  constructor(localPlayer, remotePlayer) {
+  constructor({
+    localPlayer,
+    remotePlayer,
+    cameraManager,
+  }) {
     super();
 
     this.localPlayer = localPlayer;
     this.remotePlayer = remotePlayer;
+
+    if (!cameraManager) {
+      throw new Error('no camera manager');
+    }
+    this.cameraManager = cameraManager;
 
     this.messages = [];
     this.finished = false;
@@ -103,13 +120,6 @@ class Conversation extends EventTarget {
     this.options = null;
     this.option = null;
     this.hoverIndex = null;
-
-    /* this.addEventListener('message', e => {
-      if (this.options) {
-        const {message} = e.data;
-        this.#setOption(message.text);
-      }
-    }); */
   }
 
   addLocalPlayerMessage(text, type = 'chat') {
@@ -132,7 +142,7 @@ class Conversation extends EventTarget {
     })();
 
     const first = this.messages.length === 1;
-    cameraManager.setDynamicTarget(
+    this.cameraManager.setDynamicTarget(
       this.localPlayer.avatar.modelBones.Head,
       this.remotePlayer?.avatar.modelBones.Head,
       first,
@@ -160,7 +170,7 @@ class Conversation extends EventTarget {
     })();
 
     const first = this.messages.length === 1;
-    cameraManager.setDynamicTarget(
+    this.cameraManager.setDynamicTarget(
       this.remotePlayer.avatar.modelBones.Head,
       this.localPlayer.avatar.modelBones.Head,
       first,
@@ -399,6 +409,7 @@ class Conversation extends EventTarget {
 
 //
 
+// XXX should be externalized as constant
 const fieldMusicNames = [
   'dungeon',
   'homespace',
@@ -406,10 +417,10 @@ const fieldMusicNames = [
 
 //
 
+// XXX move this out; should not be global
 let currentFieldMusic = null;
 let currentFieldMusicIndex = 0;
 export const handleStoryKeyControls = async e => {
-
   switch (e.which) {
     case 48: { // 0
       await musicManager.waitForLoad();
@@ -451,7 +462,6 @@ export const handleStoryKeyControls = async e => {
   }
 
   return true;
-
 };
 
 export const startConversation = app => {
@@ -545,7 +555,7 @@ story.startLocalPlayerComment = comment => {
   return _startConversation(comment, null, true);
 };
 
-story.listenHack = () => {
+/* story.listenHack = () => {
   (typeof window !== 'undefined') && window.document.addEventListener('click', async e => {
     if (cameraManager.pointerLockElement) {
       if (e.button === 0 && currentConversation) {
@@ -555,6 +565,6 @@ story.listenHack = () => {
       }
     }
   });
-};
+}; */
 
 export default story;

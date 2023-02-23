@@ -1,4 +1,7 @@
-import audioManager from './audio-manager.js';
+// import {
+//   AudioManager,
+// } from './audio-manager.js';
+
 import {loadAudioBuffer} from './util.js';
 import soundFileSpecs from './sound-files.json';
 
@@ -77,45 +80,58 @@ const soundFiles = {
   water: _getSoundFiles(/^water\//),
 };
 
-let soundFileAudioBuffer;
-let loadPromise = null;
-const waitForLoad = () => {
-  if (!loadPromise) {
-    loadPromise = (async () => {
-      const audioContext = audioManager.getAudioContext();
-      soundFileAudioBuffer = await loadAudioBuffer(audioContext, '/sounds/sounds.mp3');
+// move to a class
+export class Sounds {
+  #soundFileAudioBuffer;
+  
+  constructor({
+    audioManager,
+  }) {
+    if (!audioManager) {
+      console.warn('no audioManager', {
+        audioManager,
+      });
+      debugger;
+    }
+    this.audioManager = audioManager;
+
+    this.loadPromise = (async () => {
+      const {audioContext} = this.audioManager;
+      this.#soundFileAudioBuffer = await loadAudioBuffer(
+        audioContext,
+        '/sounds/sounds.mp3'
+      );
     })();
   }
-  return loadPromise;
-};
 
-const getSoundFiles = () => soundFiles;
-const getSoundFileAudioBuffer = () => soundFileAudioBuffer;
-
-const playSound = audioSpec => {
-  const {offset, duration} = audioSpec;
-  const audioContext = audioManager.getAudioContext();
-  const audioBufferSourceNode = audioContext.createBufferSource();
-  audioBufferSourceNode.buffer = soundFileAudioBuffer;
-  audioBufferSourceNode.connect(audioContext.gain);
-  audioBufferSourceNode.start(0, offset, duration);
-  return audioBufferSourceNode;
-};
-const playSoundName = name => {
-  const snds = soundFiles[name];
-  if (snds) {
-    const sound = snds[Math.floor(Math.random() * snds.length)];
-    playSound(sound);
-    return true;
-  } else {
-    debugger;
-    return false;
+  getSoundFiles() {
+    return soundFiles;
   }
-};
-export {
-  waitForLoad,
-  getSoundFiles,
-  getSoundFileAudioBuffer,
-  playSound,
-  playSoundName,
-};
+  getSoundFileAudioBuffer() {
+    return this.#soundFileAudioBuffer;
+  }
+  playSound(audioSpec) {
+    const {offset, duration} = audioSpec;
+    const {audioContext} = this.audioManager;
+    const audioBufferSourceNode = audioContext.createBufferSource();
+    audioBufferSourceNode.buffer = this.#soundFileAudioBuffer;
+    audioBufferSourceNode.connect(audioContext.gain);
+    audioBufferSourceNode.start(0, offset, duration);
+    return audioBufferSourceNode;
+  }
+  playSoundName(name) {
+    const snds = soundFiles[name];
+    if (snds) {
+      const sound = snds[Math.floor(Math.random() * snds.length)];
+      this.playSound(sound);
+      return true;
+    } else {
+      debugger;
+      return false;
+    }
+  }
+
+  async waitForLoad() {
+    await this.loadPromise;
+  }
+}

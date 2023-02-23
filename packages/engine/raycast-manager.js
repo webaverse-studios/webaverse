@@ -1,10 +1,11 @@
 import * as THREE from 'three';
-import {getRenderer, camera} from './renderer.js';
-import cameraManager from './camera-manager.js';
-import {world} from './world.js';
-import physicsManager from './physics-manager.js';
+// import {getRenderer, camera} from './renderer.js';
+// import {
+//   CameraManager,
+// } from './camera-manager.js';
+import physicsManager from './physics/physics-manager.js';
 import domRenderer from './dom-renderer.jsx';
-import transformControls from './transform-controls.js';
+// import transformControls from './transform-controls.js';
 
 const localVector = new THREE.Vector3();
 const localQuaternion = new THREE.Quaternion();
@@ -38,9 +39,20 @@ class Collision {
   }
 }
 
-class RaycastManager extends EventTarget {
-  constructor() {
+export class RaycastManager extends EventTarget {
+  constructor({
+    webaverseRenderer,
+    cameraManager,
+    physicsTracker,
+  }) {
     super();
+
+    if (!webaverseRenderer || !cameraManager || !physicsTracker) {
+      throw new Error('missing required argument');
+    }
+    this.webaverseRenderer = webaverseRenderer;
+    this.cameraManager = cameraManager;
+    this.physicsTracker = physicsTracker;
 
     this.lastMouseEvent = new FakeMouseEvent();
     this.collision = new Collision();
@@ -70,7 +82,8 @@ class RaycastManager extends EventTarget {
   
     return function(e = this.lastMouseEvent) {
       const {clientX, clientY} = e;
-      const renderer = getRenderer();
+      // const renderer = getRenderer();
+      const {renderer} = this.webaverseRenderer;
       if (renderer) {
         renderer.getSize(localVector2D2);
         localVector2D.set(
@@ -81,7 +94,10 @@ class RaycastManager extends EventTarget {
           localVector2D.x >= -1 && localVector2D.x <= 1 &&
           localVector2D.y >= -1 && localVector2D.y <= 1
         ) {
-          /* const result = */localRaycaster.setFromCamera(localVector2D, camera);
+          /* const result = */localRaycaster.setFromCamera(
+            localVector2D,
+            this.webaverseRenderer.camera,
+          );
           // console.log('return raycaster', result);
           return localRaycaster;
         } else {
@@ -100,7 +116,8 @@ class RaycastManager extends EventTarget {
     const localVector2D2 = new THREE.Vector2();
 
     return function() {
-      const renderer = getRenderer();
+      // const renderer = getRenderer();
+      const {renderer} = this.webaverseRenderer;
       if (renderer) {
         const size = renderer.getSize(localVector2D2);
         fakeCenterEvent.clientX = size.width / 2;
@@ -121,7 +138,7 @@ class RaycastManager extends EventTarget {
 
     // try {
 
-    const mouseEvent = cameraManager.pointerLockElement ? this.getCenterEvent() : this.lastMouseEvent;
+    const mouseEvent = this.cameraManager.pointerLockElement ? this.getCenterEvent() : this.lastMouseEvent;
   
     let mouseHoverApp = null;
     let mouseHoverPhysicsObject = null;
@@ -135,7 +152,7 @@ class RaycastManager extends EventTarget {
     const raycaster = this.getMouseRaycaster(mouseEvent);
     let point = null;
     if (raycaster) {
-      transformControls.handleMouseMove(raycaster);
+      // transformControls.handleMouseMove(raycaster);
       
       const position = raycaster.ray.origin;
       const quaternion = localQuaternion.setFromUnitVectors(
@@ -149,7 +166,7 @@ class RaycastManager extends EventTarget {
         // console.log('raycast', result);
         
         // check world apps
-        const pair = world.appManager.getPairByPhysicsId(result.objectId);
+        const pair = this.physicsTracker.getPairByPhysicsId(result.objectId);
         if (pair) {
           const [app, physicsObject] = pair;
           point = localVector.fromArray(result.point);
@@ -199,5 +216,5 @@ class RaycastManager extends EventTarget {
     }
   }
 }
-const raycastManager = new RaycastManager();
-export default raycastManager;
+// const raycastManager = new RaycastManager();
+// export default raycastManager;

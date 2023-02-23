@@ -3,7 +3,7 @@ import {charactersBaseUrl, defaultCharacterName} from './endpoints.js';
 
 const getCharacterFullPath = filename => charactersBaseUrl + filename;
 
-class CharacterSelectManager {
+export class CharacterSelectManager {
   constructor() {
     this.charactersLoadPromise = null;
     this.charactersMapPromise = null;
@@ -46,8 +46,7 @@ class CharacterSelectManager {
     return this.charactersMapPromise;
   }
 }
-
-const characterSelectManager = new CharacterSelectManager();
-export {
-  characterSelectManager,
-};
+// const characterSelectManager = new CharacterSelectManager();
+// export {
+//   characterSelectManager,
+// };

@@ -1,0 +1,20 @@
+{
+  "name": "zine",
+  "version": "0.0.1",
+  "description": "",
+  "main": "zine-format.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webaverse/zine.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/webaverse/zine/issues"
+  },
+  "homepage": "https://github.com/webaverse/zine#readme"
+}

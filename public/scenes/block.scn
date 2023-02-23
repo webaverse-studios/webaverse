@@ -1,0 +1,25 @@
+{
+  "objects": [
+    {
+      "type": "application/light",
+      "content": {
+        "lightType": "ambient",
+        "args": [[255, 255, 255],1]
+      }
+    },
+    {
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "start_url": "https://plankatron.github.io/scenes/grid.glb",
+      "dynamic": false
+    },
+    {
+      "position": [0, 1, -2],
+      "quaternion": [0, 0, 0, 1],
+      "start_url": "https://webaverse.github.io/sword/"
+    }
+  ]
+}

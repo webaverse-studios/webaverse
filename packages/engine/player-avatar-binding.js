@@ -6,10 +6,11 @@ import Avatar from './avatars/avatars.js';
 import {
   getEyePosition,
 } from './avatars/util.mjs';
-import physx from './physx.js';
+import physx from './physics/physx.js';
+import avatarsWasmManager from './avatars/avatars-wasm-manager.js';
 // import {playersManager} from './players-manager.js';
 
-const appSymbol = 'app'; // Symbol('app');
+// const appSymbol = 'app'; // Symbol('app');
 const avatarSymbol = 'avatar'; // Symbol('avatar');
 const maxMirrorDistanace = 3;
 
@@ -30,7 +31,7 @@ export function applyCharacterTransformsToAvatar(character, session, rig) {
 }
 export function applyCharacterMetaTransformsToAvatar(character, session, rig) {
   if (!session) {
-    rig.velocity.copy(character.velocity);
+    rig.velocity.copy(character.avatarBinding.velocity);
   }
 }
 export function applyCharacterModesToAvatar(character, session, rig) {
@@ -63,53 +64,59 @@ export function applyCharacterModesToAvatar(character, session, rig) {
     }
   }
 }; */
-export function makeAvatar(app) {
+export function makeAvatar(app, environmentManager) {
   if (app?.appType === 'vrm') {
-    const avatar = new Avatar(app.avatarRenderer, {
+    // if (!app.avatarQuality) {
+    //   console.warn('no avatar quality set', app);
+    //   debugger;
+    // }
+    const avatar = new Avatar(app.avatarQuality, {
       fingers: true,
       hair: true,
       visemes: true,
       debug: false,
+      environmentManager,
     });
-    avatar[appSymbol] = app;
+    // avatar[appSymbol] = app;
 
     // unFrustumCull(app);
     // enableShadows(app);
 
     return avatar;
   } else {
-    return null;
+    debugger;
+    throw new Error('invalid app type for avatar');
   }
 }
 export function applyCharacterActionsToAvatar(character, rig) {
-  const jumpAction = character.getAction('jump');
-  const doubleJumpAction = character.getAction('doubleJump');
-  const landAction = character.getAction('land');
-  const flyAction = character.getAction('fly');
-  const swimAction = character.getAction('swim');
-  const useAction = character.getAction('use');
-  const pickUpAction = character.getAction('pickUp');
-  const narutoRunAction = character.getAction('narutoRun');
-  const sitAction = character.getAction('sit');
+  const jumpAction = character.actionManager.getActionType('jump');
+  const doubleJumpAction = character.actionManager.getActionType('doubleJump');
+  const landAction = character.actionManager.getActionType('land');
+  const flyAction = character.actionManager.getActionType('fly');
+  const swimAction = character.actionManager.getActionType('swim');
+  const useAction = character.actionManager.getActionType('use');
+  const pickUpAction = character.actionManager.getActionType('pickUp');
+  const narutoRunAction = character.actionManager.getActionType('narutoRun');
+  const sitAction = character.actionManager.getActionType('sit');
   // const sitAnimation = sitAction ? sitAction.animation : '';
-  // const danceAction = character.getAction('dance');
+  // const danceAction = character.actionManager.getActionType('dance');
   // const danceAnimation = danceAction ? danceAction.animation : '';
-  const emoteAction = character.getAction('emote');
+  const emoteAction = character.actionManager.getActionType('emote');
   const emoteAnimation = emoteAction ? emoteAction.animation : '';
-  // const throwAction = character.getAction('throw');
-  const aimAction = character.getAction('aim');
-  const crouchAction = character.getAction('crouch');
-  const wearAction = character.getAction('wear');
-  // const chargeJump = character.getAction('chargeJump');
+  // const throwAction = character.actionManager.getActionType('throw');
+  const aimAction = character.actionManager.getActionType('aim');
+  const crouchAction = character.actionManager.getActionType('crouch');
+  const wearAction = character.actionManager.getActionType('wear');
+  // const chargeJump = character.actionManager.getActionType('chargeJump');
   // const chargeJumpAnimation = chargeJump ? chargeJump.animation : '';
-  // const standCharge = character.getAction('standCharge');
+  // const standCharge = character.actionManager.getActionType('standCharge');
   // const standChargeAnimation = standCharge ? standCharge.animation : '';
-  const fallLoopAction = character.getAction('fallLoop');
+  const fallLoopAction = character.actionManager.getActionType('fallLoop');
   // const fallLoopAnimation = fallLoopAction ? fallLoopAction.animation : '';
-  // const hurtAction = character.getAction('hurt');
-  // const swordSideSlash = character.getAction('swordSideSlash');
+  // const hurtAction = character.actionManager.getActionType('hurt');
+  // const swordSideSlash = character.actionManager.getActionType('swordSideSlash');
   // const swordSideSlashAnimation = swordSideSlash ? swordSideSlash.animation : '';
-  // const swordTopDownSlash = character.getAction('swordTopDownSlash');
+  // const swordTopDownSlash = character.actionManager.getActionType('swordTopDownSlash');
   // const swordTopDownSlashAnimation = swordTopDownSlash ? swordTopDownSlash.animation : '';
 
   rig.jumpState = !!jumpAction;
@@ -149,7 +156,7 @@ export function applyCharacterActionsToAvatar(character, rig) {
     }
     rig.useAnimationIndex = useAction?.index;
     // rig.useTime = character.actionInterpolants.use.get();
-    rig.unuseTime = physx.physxWorker.getActionInterpolantAnimationAvatar(character.avatar.animationAvatarPtr, 'unuse', 0);
+    rig.unuseTime = avatarsWasmManager.physxWorker.getActionInterpolantAnimationAvatar(character.avatar.animationAvatarPtr, 'unuse', 0);
     if (rig.unuseTime === 0) { // this means use is active
       if (useAction?.animationEnvelope) {
         rig.unuseAnimation = rig.useAnimationEnvelope[2]; // the last animation in the triplet is the unuse animation
@@ -176,8 +183,8 @@ export function applyCharacterActionsToAvatar(character, rig) {
   // rig.narutoRunTime = character.actionInterpolants.narutoRun.get();
   rig.aimState = !!aimAction;
   // rig.aimTime = character.actionInterpolants.aim.get();
-  rig.aimRightTransitionTime = physx.physxWorker.getActionInterpolantAnimationAvatar(rig.animationAvatarPtr, 'aimRightTransition', 0);
-  rig.aimLeftTransitionTime = physx.physxWorker.getActionInterpolantAnimationAvatar(rig.animationAvatarPtr, 'aimLeftTransition', 0);
+  rig.aimRightTransitionTime = avatarsWasmManager.physxWorker.getActionInterpolantAnimationAvatar(rig.animationAvatarPtr, 'aimRightTransition', 0);
+  rig.aimLeftTransitionTime = avatarsWasmManager.physxWorker.getActionInterpolantAnimationAvatar(rig.animationAvatarPtr, 'aimLeftTransition', 0);
   // rig.aimAnimation = (aimAction?.characterAnimation) || '';
   // rig.aimDirection.set(0, 0, -1);
   // aimAction && rig.aimDirection.applyQuaternion(rig.inputs.hmd.quaternion);
@@ -247,6 +254,10 @@ export function applyCharacterEyesToAvatar(character, rig) {
 export function applyMirrorsToAvatar(character, rig, mirrors) {
   rig.eyeballTargetEnabled = false;
 
+  if (!mirrors) {
+    debugger;
+  }
+
   const closestMirror = mirrors.sort((a, b) => {
     const aDistance = character.position.distanceTo(a.position);
     const bDistance = character.position.distanceTo(b.position);
@@ -270,7 +281,7 @@ export function applyMirrorsToAvatar(character, rig, mirrors) {
   }
 }
 export function applyFacePoseToAvatar(character, rig) {
-  const facePoseActions = character.getActionsArray().filter(a => a.type === 'facepose');
+  const facePoseActions = character.actionManager.getActionsArray().filter(a => a.type === 'facepose');
   if (facePoseActions.length > 0) {
     character.avatar.faceposes = facePoseActions;
   } else {
@@ -280,7 +291,7 @@ export function applyFacePoseToAvatar(character, rig) {
   }
 }
 export function applyCharacterPoseToAvatar(character, rig) {
-  const poseAction = character.getAction('pose');
+  const poseAction = character.actionManager.getActionType('pose');
   rig.poseAnimation = poseAction?.animation || null;
 }
 export function applyCharacterToAvatar(character, session, rig, mirrors) {
@@ -290,13 +301,14 @@ export function applyCharacterToAvatar(character, session, rig, mirrors) {
   applyCharacterModesToAvatar(character, session, rig);
   applyCharacterActionsToAvatar(character, rig);
   applyCharacterHeadTargetToAvatar(character, rig);
-  applyCharacterEyesToAvatar(character, rig) || applyMirrorsToAvatar(character, rig, mirrors);
+  applyCharacterEyesToAvatar(character, rig) ||
+    applyMirrorsToAvatar(character, rig, mirrors);
   
   applyFacePoseToAvatar(character, rig);
   applyCharacterPoseToAvatar(character, rig);
 }
 
-export function switchAvatar(oldAvatar, newApp) {
+export function switchAvatar(oldAvatar, newApp, environmentManager) {
   let result;
 
   oldAvatar && oldAvatar[appSymbol].removeComponent('controlled');
@@ -305,7 +317,7 @@ export function switchAvatar(oldAvatar, newApp) {
     newApp.setComponent('controlled', true);
 
     if (!newApp[avatarSymbol]) {
-      newApp[avatarSymbol] = makeAvatar(newApp);
+      newApp[avatarSymbol] = makeAvatar(newApp, environmentManager);
     } else {
       throw new Error('already had an avatar');
     }

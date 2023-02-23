@@ -1,5 +1,8 @@
 import * as THREE from 'three';
-import {playersManager} from './players-manager.js';
+// import {playersManager} from './players-manager.js';
+import {
+  PlayersManager,
+} from './players-manager.js';
 import {world} from './world.js';
 import {scene} from './renderer.js';
 import {ScenePreviewer} from './scene-previewer.js';
@@ -260,6 +263,6 @@ const loadOverworld = async () => {
 
   await Promise.all(chunkAppPromises);
 };
-export {
-  loadOverworld,
-};
+// export {
+//   loadOverworld,
+// };
