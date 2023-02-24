@@ -17,7 +17,7 @@ const SERVER_NAME = 'local.webaverse.com';
 const COMPILER_NAME = 'local-compiler.webaverse.com';
 const RENDERER_NAME = 'local-renderer.webaverse.com';
 
-const port = parseInt(process.env.PORT, 10) || 443;
+const port = parseInt(process.env.PORT, 10) || 8080;
 const COMPILER_PORT = parseInt(process.env.COMPILER_PORT, 10) || 3333;
 const RENDERER_PORT = parseInt(process.env.RENDERER_PORT, 10) || 5555;
 
