@@ -32,6 +32,7 @@ const moduleUrls = {
   meshLodItem: `${baseUrl}mesh-lod-item/`,
   transformIndicators: `${baseUrl}transform-indicators/`,
   glider: `${baseUrl}glider/`,
+  phoneEditTool: `${baseUrl}phone-edit-tool/`,
 };
 const importModule = async moduleName => {
   const moduleUrl = moduleUrls[moduleName];
