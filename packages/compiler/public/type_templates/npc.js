@@ -4,43 +4,43 @@
 
 export default ctx => {
   const {
-    useApp,
-    useNpcManager,
-    useHitManager,
-    useCleanup,
-  } = ctx;
-  const app = useApp();
-  const npcManager = useNpcManager();
-  const hitManager = useHitManager();
+          useApp,
+          useNpcManager,
+          useHitManager,
+          useCleanup,
+        }          = ctx
+  const app        = useApp()
+  const npcManager = useNpcManager()
+  const hitManager = useHitManager()
 
-  const srcUrl = ${this.srcUrl};
-
-  let live = true;
-  const cleanupFns = [];
-  app.npc = null;
+  const srcUrl = ${this.srcUrl}
+  let live = true
+  const cleanupFns = []
+  app.npc          = null
   ctx.waitUntil((async () => {
-    const npc = await npcManager.addNpcApp(app, srcUrl);
-    if (!live) return;
+    const npc = await npcManager.addNpcApp(app, srcUrl)
+    if ( !live ) return
 
-    app.npc = npc;
+    app.npc = npc
     // npc.app = app;
     cleanupFns.push(() => {
-      npcManager.removeNpcApp(app);
-    });
-  })());
+      npcManager.removeNpcApp(app)
+
+    })
+  })())
 
   useCleanup(() => {
-    live = false;
+    live = false
 
-    for (const cleanupFn of cleanupFns) {
-      cleanupFn();
+    for ( const cleanupFn of cleanupFns ) {
+      cleanupFn()
     }
-  });
+  })
 
-  return app;
+  return app
 };
-export const contentId = ${this.contentId};
-export const name = ${this.name};
-export const description = ${this.description};
-export const type = 'npc';
-export const components = ${this.components};
+export const contentId   = ${this.contentId}
+export const name        = ${this.name}
+export const description = ${this.description}
+export const type        = 'npc'
+export const components  = ${this.components}

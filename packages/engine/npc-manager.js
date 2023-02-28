@@ -47,6 +47,7 @@ export class NpcManager extends THREE.Object3D {
     sounds,
     characterSelectManager,
     hitManager,
+    npcRenderManager,
   }) {
     super();
 
@@ -62,9 +63,11 @@ export class NpcManager extends THREE.Object3D {
     this.sounds = sounds;
     this.characterSelectManager = characterSelectManager;
     this.hitManager = hitManager;
+    this.npcRenderManager = npcRenderManager;
 
     // locals
     this.npcPlayers = new Set();
+    this.smartNpcs = new Set(); // smart npcs are npcs with additional AI logic (e.g. own visual cortex)
 
     // this.npcs = [];
     // this.detachedNpcs = [];
@@ -225,6 +228,7 @@ export class NpcManager extends THREE.Object3D {
     detached,
     // norenderer,
     components,
+    render=true,
   }) {
     const playerId = makeId(5);
     const npcPlayer = new NpcPlayer({
@@ -274,6 +278,11 @@ export class NpcManager extends THREE.Object3D {
     npcPlayer.appManager.updateMatrixWorld();
     this.npcPlayers.add(npcPlayer);
 
+    if (render) {
+      this.npcRenderManager.addNpc(npcPlayer);
+      this.smartNpcs.add(npcPlayer);
+    }
+
     // if (!norenderer) {
     //   await player.loadAvatar(avatarUrl, {
     //     components,
@@ -301,7 +310,7 @@ export class NpcManager extends THREE.Object3D {
         npc.destroy();
       },
     ];
-    
+
     cancelFnsMap.set(app, () => {
       for (const cancelFn of npc.cancelFns) {
         cancelFn();
@@ -356,7 +365,7 @@ export class NpcManager extends THREE.Object3D {
     });
 
     // events
-    
+
     const _listenEvents = () => {
       const animations = Avatar.getAnimations();
       const hurtAnimation = animations.find(a => a.isHurt);
@@ -369,7 +378,7 @@ export class NpcManager extends THREE.Object3D {
               animation: 'pain_back',
             };
             player.addAction(newAction);
-            
+
             setTimeout(() => {
               player.removeAction('hurt');
             }, hurtAnimationDuration * 1000);
@@ -435,7 +444,7 @@ export class NpcManager extends THREE.Object3D {
         };
 
         chatManager.addPlayerMessage(player, m);
-        
+
         const _triggerEmotes = () => {
           const fuzzyEmotionName = getFuzzyEmotionMapping(emote);
           if (fuzzyEmotionName) {

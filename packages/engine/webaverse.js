@@ -3,7 +3,7 @@ this file bootstraps the webaverse engine.
 it uses the help of various managers and stores, and executes the render loop.
 */
 
-import * as THREE from 'three';
+import * as THREE from 'three'
 
 // import metaversefileApi from './metaversefile-api.js';
 
@@ -13,43 +13,43 @@ import * as THREE from 'three';
 // } from '../app-runtime/app.js';
 import {
   ImportManager,
-} from '../app-runtime/import-manager.js';
+} from '../app-runtime/import-manager.js'
 import {
   PlayersManager,
-} from './players-manager.js';
+} from './players-manager.js'
 import {
   EnvironmentManager,
-} from './environment/environment-manager.js';
+} from './environment/environment-manager.js'
 import {
   CameraManager,
-} from './camera-manager.js';
+} from './camera-manager.js'
 import {
   PointerLockManager,
-} from './io/pointerlock-manager.js';
+} from './io/pointerlock-manager.js'
 import {
   AudioManager,
-} from './audio/audio-manager.js';
+} from './audio/audio-manager.js'
 import {
   CharacterSelectManager,
-} from './characterselect-manager.js';
+} from './characterselect-manager.js'
 import {
   PartyManager,
-} from './party-manager.js';
+} from './party-manager.js'
 import {
   IoManager,
-} from './io/io-manager.js';
+} from './io/io-manager.js'
 import {
   SpawnManager,
-} from './spawn-manager.js';
+} from './spawn-manager.js'
 import {
   LightingManager,
-} from './managers/lighting/lighting-manager.js';
+} from './managers/lighting/lighting-manager.js'
 import {
   SkyManager,
-} from './managers/environment/skybox/sky-manager.js';
+} from './managers/environment/skybox/sky-manager.js'
 import {
   GameManager,
-} from './game.js';
+} from './game.js'
 // import {
 //   GameManager,
 // } from './game.js';
@@ -60,13 +60,13 @@ import {
 //   MobManager,
 // } from './mob-manager.js';
 
-import Avatar from './avatars/avatars.js';
+import Avatar from './avatars/avatars.js'
 import {
   Sounds,
-} from './sounds.js';
-import physx from './physics/physx.js';
-import physicsManager from './physics/physics-manager.js';
-import physxWorkerManager from './physics/physx-worker-manager.js';
+} from './sounds.js'
+import physx from './physics/physx.js'
+import physicsManager from './physics/physics-manager.js'
+import physxWorkerManager from './physics/physx-worker-manager.js'
 // import {
 //   World,
 // } from './world.js';
@@ -75,26 +75,26 @@ import physxWorkerManager from './physics/physx-worker-manager.js';
 // } from './universe.js';
 import {
   NpcManager,
-} from './npc-manager.js';
+} from './npc-manager.js'
 import {
   MobManager,
-} from './managers/mob/mob-manager.js';
+} from './managers/mob/mob-manager.js'
 import {
   ZTargetingManager,
-} from './managers/z-targeting/z-targeting-manager.js';
+} from './managers/z-targeting/z-targeting-manager.js'
 import {
   RealmManager,
-} from './realms/realm-manager.js';
+} from './realms/realm-manager.js'
 // import {
 //   HpManager,
 // } from './hp-manager.js';
 import {
   PostProcessing,
-} from './post-processing.js';
+} from './post-processing.js'
 // import particleSystemManager from './particle-system.js';
 import {
   LoadoutManager,
-} from './loadout-manager.js';
+} from './loadout-manager.js'
 // import {
 //   QuestManager,
 // } from './quest-manager.js';
@@ -114,67 +114,68 @@ import {
 // import dioramaManager from './diorama/diorama-manager.js';
 import {
   DioramaManager,
-} from './diorama/diorama-manager.js';
+} from './diorama/diorama-manager.js'
 import {
   Voices,
-} from './voices.js';
+} from './voices.js'
 import {
   RenderSettingsManager,
-} from './rendersettings-manager.js';
+} from './rendersettings-manager.js'
 // import musicManager from './music-manager.js';
 import {
   MusicManager,
-} from './music-manager.js';
+} from './music-manager.js'
 // import story from './story.js';
 import {
   RaycastManager,
-} from './raycast-manager.js';
+} from './raycast-manager.js'
 // import settingsManager from './settings-manager.js';
 import {
   InteractionManager,
-} from './interaction-manager.js';
+} from './interaction-manager.js'
 import {
   BackgroundFx,
-} from './background-fx/background-fx.js';
+} from './background-fx/background-fx.js'
 import {
   HitManager,
-} from './managers/interaction/hit-manager.js';
+} from './managers/interaction/hit-manager.js'
 // import {
 //   LoadingManager,
 // } from './loading-manager';
 import {
   makeDefaultPerspectiveCamera,
-} from './renderer-utils.js';
+} from './renderer-utils.js'
 import {
   MetaversefileCache,
-} from '../app-runtime/app-import-cache.js';
+} from '../app-runtime/app-import-cache.js'
 import {
   ChatManager,
-} from './chat-manager.js';
+} from './chat-manager.js'
 import {
   TempManager,
-} from './temp-manager.js';
+} from './temp-manager.js'
 import {
   FrameTracker,
-} from './frame-tracker.js';
+} from './frame-tracker.js'
 import {
   PhysicsTracker,
-} from './physics/physics-tracker.js';
+} from './physics/physics-tracker.js'
 import {
   WebaverseRenderer,
-} from './renderers/webaverse-renderer.js';
+} from './renderers/webaverse-renderer.js'
 
-import './metaversefile-binding.js';
+import './metaversefile-binding.js'
+import {NpcRenderManager} from './npc-render-pipeline/render-manager.js'
 
 //
 
-const localVector = new THREE.Vector3();
-const localVector2 = new THREE.Vector3();
-const localQuaternion = new THREE.Quaternion();
-const localMatrix = new THREE.Matrix4();
-const localMatrix2 = new THREE.Matrix4();
+const localVector     = new THREE.Vector3()
+const localVector2    = new THREE.Vector3()
+const localQuaternion = new THREE.Quaternion()
+const localMatrix     = new THREE.Matrix4()
+const localMatrix2    = new THREE.Matrix4()
 
-const sessionMode = 'immersive-vr';
+const sessionMode = 'immersive-vr'
 const sessionOpts = {
   requiredFeatures: [
     'local-floor',
@@ -183,66 +184,69 @@ const sessionOpts = {
   optionalFeatures: [
     'hand-tracking',
   ],
-};
+}
 
 const frameEvent = new MessageEvent('frame', {
   data: {
     timestamp: 0,
     timeDiff: 0,
   },
-});
+})
 
-const metaversefileCache = new MetaversefileCache();
-globalThis.metaversefileCache = metaversefileCache;
+const metaversefileCache      = new MetaversefileCache()
+globalThis.metaversefileCache = metaversefileCache
 
 // let numWebaverseEngines = null;
 export class WebaverseEngine extends EventTarget {
-  camera = makeDefaultPerspectiveCamera();
-  webaverseRenderer = new WebaverseRenderer();
-  audioContext = new AudioContext();
+  camera            = makeDefaultPerspectiveCamera()
+  webaverseRenderer = new WebaverseRenderer()
+  audioContext      = new AudioContext()
 
-  importManager = new ImportManager();
-  tempManager = new TempManager();
-  frameTracker = new FrameTracker();
+  importManager = new ImportManager()
+  tempManager   = new TempManager()
+  frameTracker  = new FrameTracker()
 
   audioManager = new AudioManager({
     audioContext: this.audioContext,
-  });
-  sounds = new Sounds({
+  })
+  sounds       = new Sounds({
     audioManager: this.audioManager,
-  });
-  
-  physicsTracker = new PhysicsTracker();
-  environmentManager = new EnvironmentManager();
-  chatManager = new ChatManager();
-  playersManager = new PlayersManager({
+  })
+
+  physicsTracker     = new PhysicsTracker()
+  environmentManager = new EnvironmentManager()
+  chatManager        = new ChatManager()
+  playersManager     = new PlayersManager({
     physicsTracker: this.physicsTracker,
     environmentManager: this.environmentManager,
     audioManager: this.audioManager,
     chatManager: this.chatManager,
     sounds: this.sounds,
     engine: this,
-  });
+  })
+
+  npcRenderManager = new NpcRenderManager()
+
   // hpManager = new HpManager();
-  cameraManager = new CameraManager({
+  cameraManager      = new CameraManager({
     webaverseRenderer: this.webaverseRenderer,
     // camera: this.camera,
     playersManager: this.playersManager,
-  });
+  })
   pointerLockManager = new PointerLockManager({
     engine: this,
-  });
-  spawnManager = new SpawnManager({
+  })
+  spawnManager       = new SpawnManager({
     // cameraManager: this.cameraManager,
     webaverseRenderer: this.webaverseRenderer,
     playersManager: this.playersManager,
-  });
-  lightingManager = new LightingManager();
-  skyManager = new SkyManager({
+  })
+  lightingManager    = new LightingManager()
+  skyManager         = new SkyManager({
     lightingManager: this.lightingManager,
-  });
+  })
 
-  characterSelectManager = new CharacterSelectManager();
+  characterSelectManager = new CharacterSelectManager()
 
   realmManager = new RealmManager({
     playersManager: this.playersManager,
@@ -250,15 +254,15 @@ export class WebaverseEngine extends EventTarget {
     engine: this,
     characterSelectManager: this.characterSelectManager,
     audioManager: this.audioManager,
-  });
+  })
 
   raycastManager = new RaycastManager({
     webaverseRenderer: this.webaverseRenderer,
     cameraManager: this.cameraManager,
     world: this.world,
     physicsTracker: this.physicsTracker,
-  });
-  ioManager = new IoManager({
+  })
+  ioManager      = new IoManager({
     engine: this,
     cameraManager: this.cameraManager,
     pointerLockManager: this.pointerLockManager,
@@ -266,20 +270,20 @@ export class WebaverseEngine extends EventTarget {
     webaverseRenderer: this.webaverseRenderer,
     playersManager: this.playersManager,
     realmManager: this.realmManager,
-  });
-  partyManager = new PartyManager({
+  })
+  partyManager   = new PartyManager({
     playersManager: this.playersManager,
     characterSelectManager: this.characterSelectManager,
     engine: this,
-  });
-  
-  hitManager = new HitManager({
+  })
+
+  hitManager        = new HitManager({
     webaverseRenderer: this.webaverseRenderer,
     playersManager: this.playersManager,
     physicsTracker: this.physicsTracker,
     sounds: this.sounds,
-  });
-  npcManager = new NpcManager({
+  })
+  npcManager        = new NpcManager({
     physicsTracker: this.physicsTracker,
     environmentManager: this.environmentManager,
     audioManager: this.audioManager,
@@ -288,47 +292,48 @@ export class WebaverseEngine extends EventTarget {
     engine: this,
     characterSelectManager: this.characterSelectManager,
     hitManager: this.hitManager,
-  });
+    npcRenderManager: this.npcRenderManager,
+  })
   zTargetingManager = new ZTargetingManager({
     webaverseRenderer: this.webaverseRenderer,
     cameraManager: this.cameraManager,
     playersManager: this.playersManager,
     physicsTracker: this.physicsTracker,
     sounds: this.sounds,
-  });
-  mobManager = new MobManager({
+  })
+  mobManager        = new MobManager({
     // physicsTracker: this.physicsTracker,
     // environmentManager: this.environmentManager,
-  });
+  })
 
-  loadoutManager = new LoadoutManager({
+  loadoutManager        = new LoadoutManager({
     webaverseRenderer: this.webaverseRenderer,
     playersManager: this.playersManager,
-  });
-  interactionManager = new InteractionManager({
+  })
+  interactionManager    = new InteractionManager({
     cameraManager: this.cameraManager,
     playersManager: this.playersManager,
     realmManager: this.realmManager,
     ioManager: this.ioManager,
     webaverseRenderer: this.webaverseRenderer,
     physicsTracker: this.physicsTracker,
-  });
-  voices = new Voices({
+  })
+  voices                = new Voices({
     playersManager: this.playersManager,
-  });
-  musicManager = new MusicManager({
+  })
+  musicManager          = new MusicManager({
     audioManager: this.audioManager,
-  });
-  postProcessing = new PostProcessing({
+  })
+  postProcessing        = new PostProcessing({
     webaverseRenderer: this.webaverseRenderer,
     cameraManager: this.cameraManager,
     playersManager: this.playersManager,
-  });
+  })
   renderSettingsManager = new RenderSettingsManager({
     postProcessing: this.postProcessing,
-  });
-  backgroundFx = new BackgroundFx();
-  game = new GameManager({
+  })
+  backgroundFx          = new BackgroundFx()
+  game                  = new GameManager({
     webaverseRenderer: this.webaverseRenderer,
     ioManager: this.ioManager,
     cameraManager: this.cameraManager,
@@ -339,15 +344,15 @@ export class WebaverseEngine extends EventTarget {
     realmManager: this.realmManager,
     hitManager: this.hitManager,
     zTargetingManager: this.zTargetingManager,
-  });
-  dioramaManager = new DioramaManager();
+  })
+  dioramaManager        = new DioramaManager()
 
   constructor({
-    dstCanvas,
-  }) {
-    super();
+                dstCanvas,
+              }) {
+    super()
 
-    this.dstCanvas = dstCanvas;
+    this.dstCanvas = dstCanvas
 
     // if (++numWebaverseEngines > 1) {
     //   debugger;
@@ -355,39 +360,39 @@ export class WebaverseEngine extends EventTarget {
     // }
 
     const _connectObjects = () => {
-      const {scene} = this.webaverseRenderer;
-      
-      scene.add(this.playersManager);
-      this.playersManager.updateMatrixWorld();
+      const {scene} = this.webaverseRenderer
 
-      scene.add(this.npcManager);
-      this.npcManager.updateMatrixWorld();
+      scene.add(this.playersManager)
+      this.playersManager.updateMatrixWorld()
 
-      scene.add(this.mobManager);
-      this.mobManager.updateMatrixWorld();
+      scene.add(this.npcManager)
+      this.npcManager.updateMatrixWorld()
 
-      scene.add(this.zTargetingManager);
-      this.zTargetingManager.updateMatrixWorld();
+      scene.add(this.mobManager)
+      this.mobManager.updateMatrixWorld()
 
-      scene.add(this.realmManager);
-      this.realmManager.updateMatrixWorld();
-    
-      scene.add(this.interactionManager);
-      this.interactionManager.updateMatrixWorld();
-    };
-    _connectObjects();
+      scene.add(this.zTargetingManager)
+      this.zTargetingManager.updateMatrixWorld()
+
+      scene.add(this.realmManager)
+      this.realmManager.updateMatrixWorld()
+
+      scene.add(this.interactionManager)
+      this.interactionManager.updateMatrixWorld()
+    }
+    _connectObjects()
 
     const _bindCanvasEvents = () => {
-      if (this.dstCanvas) {
-        this.webaverseRenderer.bindCanvasEvents(this.dstCanvas);
+      if ( this.dstCanvas ) {
+        this.webaverseRenderer.bindCanvasEvents(this.dstCanvas)
       }
-    };
-    _bindCanvasEvents();
+    }
+    _bindCanvasEvents()
 
     // console.warn('story listen hack...');
     // story.listenHack();
 
-    this.loadPromise = (async () => {
+    this.loadPromise   = (async () => {
       // let index = 0;
       // const totalWaitForLoadFunctions = 14;
       // let loadProgressPercentage = 0;
@@ -423,25 +428,25 @@ export class WebaverseEngine extends EventTarget {
         this.voices.waitForLoad(),
         // this.backgroundFx.waitForLoad(),
         // this.musicManager.waitForLoad(),
-      ]);
+      ])
 
       const _initializePlayer = async () => {
-        await this.partyManager.initDefaultPlayer();
-        await this.partyManager.inviteDefaultPlayer();
-        this.loadoutManager.initDefault();
-      };
-      await _initializePlayer();
-      
+        await this.partyManager.initDefaultPlayer()
+        await this.partyManager.inviteDefaultPlayer()
+        this.loadoutManager.initDefault()
+      }
+      await _initializePlayer()
+
       const _initializeRealm = async () => {
-        await this.realmManager.handleUrlUpdate();
-      };
-      await _initializeRealm();
+        await this.realmManager.handleUrlUpdate()
+      }
+      await _initializeRealm()
 
-      this.startLoop();
+      this.startLoop()
 
-      this.setContentLoaded();
-    })();
-    this.contentLoaded = false;
+      this.setContentLoaded()
+    })()
+    this.contentLoaded = false
     // const self = this
 
     /* // Todo: global variable for e2e automatic tests
@@ -471,13 +476,13 @@ export class WebaverseEngine extends EventTarget {
     return new App();
   } */
   async createAppAsync(spec) {
-    return await this.importManager.createAppAsyncFromEngine(spec, this);
+    return await this.importManager.createAppAsyncFromEngine(spec, this)
   }
-  
+
   async waitForLoad() {
-    if (!this.loadPromise) {
+    if ( !this.loadPromise ) {
       this.loadPromise = async () => {
-        await physx.waitForLoad();
+        await physx.waitForLoad()
         await Promise.all([
           Avatar.waitForLoad(),
           physxWorkerManager.waitForLoad(),
@@ -487,10 +492,10 @@ export class WebaverseEngine extends EventTarget {
           backgroundFx.waitForLoad(),
           voices.waitForLoad(),
           musicManager.waitForLoad(),
-        ]);
-      };
+        ])
+      }
     }
-    await this.loadPromise();
+    await this.loadPromise()
   }
 
   /* getRenderer() {
@@ -512,10 +517,10 @@ export class WebaverseEngine extends EventTarget {
   getCamera() {
     return camera;
   } */
-  
+
   setContentLoaded() {
-    this.contentLoaded = true;
-    this.dispatchEvent(new MessageEvent('loaded'));
+    this.contentLoaded = true
+    this.dispatchEvent(new MessageEvent('loaded'))
   }
 
   // bindCanvas(c) {
@@ -524,47 +529,48 @@ export class WebaverseEngine extends EventTarget {
   // }
 
   async isXrSupported() {
-    if (navigator.xr) {
-      let ok = false;
+    if ( navigator.xr ) {
+      let ok = false
       try {
-        ok = await navigator.xr.isSessionSupported(sessionMode);
+        ok = await navigator.xr.isSessionSupported(sessionMode)
       } catch (err) {
-        console.warn(err);
+        console.warn(err)
       }
-      return ok;
+      return ok
     } else {
-      return false;
+      return false
     }
   }
 
   async enterXr() {
-    const renderer = getRenderer();
-    const session = renderer.xr.getSession();
-    if (session === null) {
-      let session = null;
+    const renderer = getRenderer()
+    const session  = renderer.xr.getSession()
+    if ( session === null ) {
+      let session = null
       try {
-        session = await navigator.xr.requestSession(sessionMode, sessionOpts);
-      } catch(err) {
+        session = await navigator.xr.requestSession(sessionMode, sessionOpts)
+      } catch (err) {
         try {
-          session = await navigator.xr.requestSession(sessionMode);
-        } catch(err) {
-          console.warn(err);
+          session = await navigator.xr.requestSession(sessionMode)
+        } catch (err) {
+          console.warn(err)
         }
       }
-      if (session) {
+      if ( session ) {
         function onSessionEnded(e) {
-          session.removeEventListener('end', onSessionEnded);
-          renderer.xr.setSession(null);
+          session.removeEventListener('end', onSessionEnded)
+          renderer.xr.setSession(null)
         }
-        session.addEventListener('end', onSessionEnded);
-        renderer.xr.setSession(session);
+
+        session.addEventListener('end', onSessionEnded)
+        renderer.xr.setSession(session)
         // renderer.xr.setReferenceSpaceType('local-floor');
       }
     } else {
-      await session.end();
+      await session.end()
     }
   }
-  
+
   render(timestamp, timeDiff) {
     // frameEvent.data.timestamp = timestamp;
     // frameEvent.data.timeDiff = timeDiff;
@@ -573,55 +579,55 @@ export class WebaverseEngine extends EventTarget {
     // const {
     //   composer,
     // } = this.webaverseRenderer;
-    this.webaverseRenderer.composer.render();
+    this.webaverseRenderer.composer.render()
   }
-  
+
   startLoop() {
     // const renderer = getRenderer();
-    const {renderer, camera} = this.webaverseRenderer;
-    if (!renderer || !camera) {
-      throw new Error('must bind canvas first');
+    const {renderer, camera} = this.webaverseRenderer
+    if ( !renderer || !camera ) {
+      throw new Error('must bind canvas first')
     }
-    
-    let lastTimestamp = performance.now();
-    const animate = (timestamp, frame) => {
+
+    let lastTimestamp = performance.now()
+    const animate     = (timestamp, frame) => {
       const _frame = () => {
-        timestamp = timestamp ?? performance.now();
-        const timeDiff = timestamp - lastTimestamp;
-        const timeDiffCapped = Math.min(Math.max(timeDiff, 0), 100);
+        timestamp            = timestamp ?? performance.now()
+        const timeDiff       = timestamp - lastTimestamp
+        const timeDiffCapped = Math.min(Math.max(timeDiff, 0), 100)
 
         const _pre = () => {
-          this.ioManager.update(timeDiffCapped);
-          
-          const physicsScene = physicsManager.getScene();
-          if (this.contentLoaded /* && physicsScene.getPhysicsEnabled() */) {
-            physicsScene.simulatePhysics(timeDiffCapped);
-            physicsScene.getTriggerEvents();
+          this.ioManager.update(timeDiffCapped)
+
+          const physicsScene = physicsManager.getScene()
+          if ( this.contentLoaded /* && physicsScene.getPhysicsEnabled() */ ) {
+            physicsScene.simulatePhysics(timeDiffCapped)
+            physicsScene.getTriggerEvents()
             // npcAiManager.update(timestamp, timeDiffCapped);
             // npcManager.updatePhysics(timestamp, timeDiffCapped);
           }
 
-          this.playersManager.updateAvatars(timestamp, timeDiffCapped);
-          this.npcManager.updateAvatars(timestamp, timeDiffCapped);
+          this.playersManager.updateAvatars(timestamp, timeDiffCapped)
+          this.npcManager.updateAvatars(timestamp, timeDiffCapped)
           // npcManager.updateAvatar(timestamp, timeDiffCapped);
           // this.playersManager.updateRemotePlayers(timestamp, timeDiffCapped);
 
-          if (this.contentLoaded) {
+          if ( this.contentLoaded ) {
             // // update app managers
             // // world
             // this.world.appManager.update(timestamp, timeDiffCapped);
             // this.playersManager.updateAppManagers(timestamp, timeDiffCapped);
-          
+
             // update frame tracker
-            this.frameTracker.update(timestamp, timeDiffCapped);
+            this.frameTracker.update(timestamp, timeDiffCapped)
           }
 
           // transformControls.update();
-          this.raycastManager.update(timestamp, timeDiffCapped);
-          this.zTargetingManager.update(timestamp, timeDiffCapped);
-          this.game.update(timestamp, timeDiffCapped);
-          this.interactionManager.update(timestamp, timeDiffCapped);
-          
+          this.raycastManager.update(timestamp, timeDiffCapped)
+          this.zTargetingManager.update(timestamp, timeDiffCapped)
+          this.game.update(timestamp, timeDiffCapped)
+          this.interactionManager.update(timestamp, timeDiffCapped)
+
           // const rootRealm = this.realmManager.getRootRealm();
           // rootRealm.appManager.tick(timestamp, timeDiffCapped, frame);
 
@@ -630,26 +636,26 @@ export class WebaverseEngine extends EventTarget {
           // questManager.update(timestamp, timeDiffCapped);
           // particleSystemManager.update(timestamp, timeDiffCapped);
 
-          this.cameraManager.updatePost(timestamp, timeDiffCapped);
-          this.ioManager.updatePost();
+          this.cameraManager.updatePost(timestamp, timeDiffCapped)
+          this.ioManager.updatePost()
 
           // this.game.pushAppUpdates();
           // this.game.pushPlayerUpdates();
 
-          const session = renderer.xr.getSession();
-          const xrCamera = session ? renderer.xr.getCamera(camera) : camera;
-          localMatrix.multiplyMatrices(xrCamera.projectionMatrix, /* localMatrix2.multiplyMatrices( */xrCamera.matrixWorldInverse/*, physx.worldContainer.matrixWorld) */);
+          const session  = renderer.xr.getSession()
+          const xrCamera = session ? renderer.xr.getCamera(camera) : camera
+          localMatrix.multiplyMatrices(xrCamera.projectionMatrix, /* localMatrix2.multiplyMatrices( */xrCamera.matrixWorldInverse/*, physx.worldContainer.matrixWorld) */)
           localMatrix2.copy(xrCamera.matrix)
             .premultiply(camera.matrix)
-            .decompose(localVector, localQuaternion, localVector2);
-          
-          lastTimestamp = timestamp;
-        };
-        _pre();
+            .decompose(localVector, localQuaternion, localVector2)
+
+          lastTimestamp = timestamp
+        }
+        _pre()
 
         // render scenes
-        this.dioramaManager.update(timestamp, timeDiffCapped);
-        this.loadoutManager.update(timestamp, timeDiffCapped);
+        this.dioramaManager.update(timestamp, timeDiffCapped)
+        this.loadoutManager.update(timestamp, timeDiffCapped)
 
         {
           const popRenderSettings = this.renderSettingsManager.push(
@@ -657,26 +663,28 @@ export class WebaverseEngine extends EventTarget {
             undefined,
             {
               postProcessing: this.postProcessing,
-            }
-          );
+            },
+          )
 
-          this.render(timestamp, timeDiffCapped);
+          this.npcRenderManager.render(this.webaverseRenderer.rootScene, this.npcManager.smartNpcs)
+
+          this.render(timestamp, timeDiffCapped)
           {
             const {
-              dstCanvas,
-            } = this;
-            if (dstCanvas) {
-              this.webaverseRenderer.transferToCanvas(dstCanvas);
+                    dstCanvas,
+                  } = this
+            if ( dstCanvas ) {
+              this.webaverseRenderer.transferToCanvas(dstCanvas)
             }
           }
 
-          popRenderSettings();
+          popRenderSettings()
         }
-      };
-      _frame();
+      }
+      _frame()
 
     }
-    renderer.setAnimationLoop(animate);
+    renderer.setAnimationLoop(animate)
 
     // _startHacks(this);
   }
@@ -712,7 +720,7 @@ export class WebaverseEngine extends EventTarget {
       const key1 = lastEmotionKey.key;
       const key2 = key;
       emotionIndex = (key1 * 10) + key2;
-      
+
       lastEmotionKey.key = -1;
       lastEmotionKey.timestamp = 0;
     } else {
@@ -755,7 +763,7 @@ export class WebaverseEngine extends EventTarget {
       poseAnimationIndex++;
       poseAnimationIndex = Math.min(Math.max(poseAnimationIndex, -1), vpdAnimations.length - 1);
       _updatePose();
-    
+
       // _ensureMikuModel();
       // _updateMikuModel();
     } else if (e.which === 109) { // -

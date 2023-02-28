@@ -190,7 +190,7 @@ class Character extends THREE.Object3D {
     });
 
     this.detached = false;
- 
+
     this.appManager = new AppManager({
       engine,
     });
@@ -213,10 +213,10 @@ class Character extends THREE.Object3D {
     this.headTarget = new THREE.Vector3();
     this.headTargetInverted = false;
     this.headTargetEnabled = false;
-    
+
     this.eyeballTarget = new THREE.Vector3();
     this.eyeballTargetEnabled = false;
-    
+
     this.voicePack = null;
     this.voiceEndpoint = null;
 
@@ -644,7 +644,7 @@ class Character extends THREE.Object3D {
         }
       };
       _enableAppPhysics();
-      
+
       const _removeAction = () => {
         // this.actionManager.removeActionIndex(wearActionIndex);
         this.actionManager.removeActionType('wear');
@@ -662,7 +662,7 @@ class Character extends THREE.Object3D {
         }
       };
       _removeApp(); */
-      
+
       const _emitEvents = () => {
         app.dispatchEvent({
           type: 'wearupdate',
@@ -746,11 +746,11 @@ class StateCharacter extends Character {
     this.playerIdInt = murmurhash.v3(playerId);
     this.playerData = new PlayerData();
     this.microphoneMediaStream = null;
- 
+
     // this.avatarEpoch = 0;
     // this.syncAvatarAbortController = null;
     this.unbindFns = [];
-    
+
     // this.transform = new Float32Array(11);
     // this.bindState(playersArray);
   }
@@ -833,14 +833,14 @@ class StateCharacter extends Character {
   /* bindState(nextPlayersArray) {
     // latch old state
     const oldState = this.detachState();
-    
+
     // unbind
     this.unbindState();
     this.appManager.unbindState();
     this.unbindCommonObservers();
-    
+
     // note: leave the old state as is. it is the host's responsibility to garbage collect us when we disconnect.
-    
+
     // blindly add to new state
     // this.playersArray = nextPlayersArray;
     this.attachState(oldState);
@@ -850,9 +850,9 @@ class StateCharacter extends Character {
   getAvatarInstanceId() {
     return this.playerData.get(avatarMapName);
   }
- 
+
   /* getActionsByType(type) {
-   const actions = this.getActionsState(); 
+   const actions = this.getActionsState();
    const typedActions = Array.from(actions).filter(action => action.type === type);
    return typedActions;
   } */
@@ -960,9 +960,9 @@ class StateCharacter extends Character {
       while (actions.length > 0) {
         actions.delete(actions.length - 1);
       }
-      
+
       this.playerMap.delete('avatar');
-      
+
       const apps = self.getAppsState();
       while (apps.length > 0) {
         apps.delete(apps.length - 1);
@@ -989,12 +989,12 @@ class StateCharacter extends Character {
       while (actions.length > 0) {
         actions.delete(actions.length - 1);
       }
-      
+
       const avatar = self.getAvatarInstanceId();
       if (avatar) {
         this.playerData.set('avatar', avatar);
       }
-      
+
       const apps = self.getAppsState();
       if (Array.isArray(j?.apps)) {
         for (const app of j.apps) {
@@ -1009,7 +1009,7 @@ class StateCharacter extends Character {
     // this.appManager.unbindState();
 
     this.appManager.destroy();
-  
+
     super.destroy();
   }
 }
@@ -1080,7 +1080,7 @@ class AvatarCharacter extends StateCharacter {
 
   async setPlayerSpec(playerSpec) {
     const p = this.loadAvatar(playerSpec.avatarUrl);
-    
+
     overrides.userVoiceEndpoint.set(playerSpec.voice ?? null);
     overrides.userVoicePack.set(playerSpec.voicePack ?? null);
 
@@ -1164,7 +1164,7 @@ class AvatarCharacter extends StateCharacter {
         app: avatarApp,
         avatar,
       });
-      
+
       const activate = () => {
         this.dispatchEvent({
           type: 'activate'
@@ -1424,7 +1424,7 @@ class InterpolatedPlayer extends AvatarCharacter {
     //   }, 0, crouchMaxTime),
     // };
     // this.actionInterpolantsArray = Object.keys(this.actionInterpolants).map(k => this.actionInterpolants[k]);
-    
+
     this.avatarBinding = {
       position: this.positionInterpolant.get(),
       quaternion: this.quaternionInterpolant.get(),
@@ -1465,7 +1465,7 @@ class InterpolatedPlayer extends AvatarCharacter {
 class UninterpolatedPlayer extends AvatarCharacter {
   constructor(opts) {
     super(opts);
-    
+
     UninterpolatedPlayer.init.apply(this, arguments)
   }
 
@@ -1519,7 +1519,7 @@ class LocalPlayer extends UninterpolatedPlayer {
       this.avatar.setMicrophoneEnabled({
         audioContext,
       });
-      
+
       const mediaStreamSource = audioContext.createMediaStreamSource(mediaStream);
 
       mediaStreamSource.connect(this.avatar.getMicrophoneInput(true));
@@ -1581,7 +1581,7 @@ class LocalPlayer extends UninterpolatedPlayer {
         .toArray()
     };
     this.actionManager.addAction(grabAction);
-    
+
     const physicsScene = physicsManager.getScene();
     physicsScene.disableAppPhysics(app)
 
@@ -1619,7 +1619,7 @@ class LocalPlayer extends UninterpolatedPlayer {
     // const self = this;
     // this.playersArray.doc.transact(() => {
     //   if (!this.matrixWorld.equals(this.lastMatrix)) {
-    //     self.position.toArray(self.transform);      
+    //     self.position.toArray(self.transform);
     //     self.quaternion.toArray(self.transform, 3);
     //     self.playerData.set('transform', self.transform);
     //     this.lastMatrix.copy(this.matrixWorld);
@@ -1654,7 +1654,7 @@ class LocalPlayer extends UninterpolatedPlayer {
         localMatrix.copy(xrCamera.matrix)
           .premultiply(dolly.matrix)
           .decompose(localVector, localQuaternion, localVector2);
-          
+
         dolly.matrix
           .premultiply(localMatrix.makeTranslation(position.x - localVector.x, position.y - localVector.y, position.z - localVector.z))
           // .premultiply(localMatrix.makeRotationFromQuaternion(localQuaternion3.copy(quaternion).inverse()))
@@ -1698,7 +1698,7 @@ export class NpcPlayer extends LocalPlayer {
 class RemotePlayer extends InterpolatedPlayer {
   constructor(opts) {
     super(opts);
-    
+
     this.isRemotePlayer = true;
     this.audioWorkletNode = null;
     this.audioWorkerLoaded = false;
@@ -1756,7 +1756,7 @@ class RemotePlayer extends InterpolatedPlayer {
     debugger;
 
     this.prepareAudioWorker();
-    
+
     if (this.audioWorkletNode) {
       this.audioDecoder.decode(data.data);
     }
@@ -1807,7 +1807,7 @@ class RemotePlayer extends InterpolatedPlayer {
     const timestamp = remoteTimestamp - localToRemoteTimestampBias;
     this.velocityInterpolant.snapshot(timestamp);
   }
-  // XXX the below code contains the rest of the multiplayer driving 
+  // XXX the below code contains the rest of the multiplayer driving
   /* attachState(oldState) {
     let index = -1;
     for (let i = 0; i < this.playersArray.length; i++) {
@@ -1892,9 +1892,9 @@ class RemotePlayer extends InterpolatedPlayer {
   updateAvatar(timestamp, timeDiff) {
     if (this.avatar) {
       const timeDiffS = timeDiff / 1000;
-      
+
       // this.characterPhysics.update(timestamp, timeDiffS);
-      
+
       // this.actionsManager.update(timestamp);
       // this.actionManager.update(timestamp);
       this.avatarCharacterSfx.update(timestamp, timeDiffS);

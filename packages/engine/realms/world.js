@@ -22,6 +22,7 @@ export class World extends THREE.Object3D {
       debugger;
     }
     this.engine = engine;
+    console.log('world engine', {engine})
 
     // locals
     this.appManager = new AppManager({
@@ -103,7 +104,7 @@ export class World extends THREE.Object3D {
     const {src} = realmSpec;
     const scnUrl = getScnUrl(src);
     await this.appManager.loadScnFromUrl(scnUrl);
-    
+
     // await loadScene({
     //   engine: this.engine,
     //   src,

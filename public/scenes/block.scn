@@ -7,19 +7,31 @@
         "args": [[255, 255, 255],1]
       }
     },
-    {
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "start_url": "https://plankatron.github.io/scenes/grid.glb",
-      "dynamic": false
-    },
+   {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "start_url": "https://webaverse.github.io/proto-sandbox/",
+        "dynamic": false
+      },
     {
       "position": [0, 1, -2],
       "quaternion": [0, 0, 0, 1],
       "start_url": "https://webaverse.github.io/sword/"
+    },
+    {
+     "position": [4, 0, 1],
+      "quaternion": [0, 0, 0, 1],
+      "type": "application/npc",
+      "content": {
+                         "name": "Ann",
+                         "avatarUrl": "/avatars/ann.vrm",
+                         "voice": "Maud Pie",
+                         "bio": "13/F Lisk Witch (black mage). She is 100% quirky and is always creating crazy new potions. She has a dark streak and is known to torment her teachers when they give her bad grades."
+                       }
     }
+
   ]
 }
