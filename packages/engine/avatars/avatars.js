@@ -47,7 +47,7 @@ import Emoter from './Emoter.js';
 import Looker from './Looker.js';
 import Nodder from './Nodder.js';
 
-import * as wind from './simulation/wind.js';
+// import * as wind from './simulation/wind.js';
 
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
@@ -469,6 +469,14 @@ class Avatar {
     this.springBoneManager = null;
     if (options.hair) {
       const springBoneLoader = new VRMSpringBoneLoaderPlugin()
+      // debugger
+      globalThis.gltf = object
+      object.userData.gltfExtensions.VRM.secondaryAnimation.colliderGroups.forEach(colliderGroup=>{
+        colliderGroup.colliders.forEach(collider=>{
+          // collider.radius=0.08;
+          collider.radius=0.1;
+        })
+      })
       springBoneLoader._v0Import(object).then((boneManager)=>{
         this.springBoneManager = boneManager
       })
@@ -1837,12 +1845,12 @@ class Avatar {
       }
     }
 
-    // update wind in simulation
-    const _updateWind = () =>{
-      const headPosition = localVector.setFromMatrixPosition(this.modelBoneOutputs.Head.matrixWorld);
-      // The avatar may not have spring bones, so we should make sure the avatar has springBone before updating the wind effect
-      wind.update(timestamp, headPosition, this.springBoneManager)
-    }
+    // // update wind in simulation
+    // const _updateWind = () =>{
+    //   const headPosition = localVector.setFromMatrixPosition(this.modelBoneOutputs.Head.matrixWorld);
+    //   // The avatar may not have spring bones, so we should make sure the avatar has springBone before updating the wind effect
+    //   wind.update(timestamp, headPosition, this.springBoneManager)
+    // }
 
 
     if (this.getTopEnabled() || this.getHandEnabled(0) || this.getHandEnabled(1)) {
@@ -1876,6 +1884,7 @@ class Avatar {
     _updateHeadTarget();
     _updateEyeballTarget();
 
+    this.modelBoneOutputs.Root.rotation.y += Math.PI;
     this.modelBoneOutputs.Root.updateMatrixWorld();
     Avatar.applyModelBoneOutputs(
       this,
@@ -1889,7 +1898,7 @@ class Avatar {
 
     if(this.springBoneManager){
       this.springBoneManager.update(timeDiffS);
-      _updateWind();
+      // _updateWind();
     }
 
     // XXX hook these up
