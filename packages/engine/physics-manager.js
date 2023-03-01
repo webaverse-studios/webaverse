@@ -520,7 +520,8 @@ class PhysicsScene extends EventTarget {
 
     const physicsObject = _makePhysicsObject(
       physicsId,
-      mesh.position,
+      // mesh.position,
+      localVector.set(0, 0, 0),
       mesh.quaternion,
       mesh.scale
     )

@@ -475,6 +475,7 @@ export default class Webaverse extends EventTarget {
 // import {MMDLoader} from 'three/examples/jsm/loaders/MMDLoader.js';
 const _startHacks = webaverse => {
   const localPlayer = playersManager.getLocalPlayer();
+  globalThis.localPlayer = localPlayer;
   const vpdAnimations = Avatar.getAnimations().filter(animation => animation.name.endsWith('.vpd'));
 
   // Press } to debug current state in console.
