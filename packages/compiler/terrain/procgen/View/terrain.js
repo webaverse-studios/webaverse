@@ -109,10 +109,15 @@ export default class Terrain {
     const columnScale = Math.abs(minZ - maxZ) / 5; // float, z axis
     // const rowScale = 1; // float, x axis
     // const columnScale = 1; // float, z axis
-    const numVerts = numRows * numColumns;
-    for (let i = 0; i < numVerts; i++) {
-      // heights.push(Math.round(Math.random() * 10));
-      heights.push(0);
+    // const numVerts = numRows * numColumns;
+    for (let column = 0; column < numColumns; column++) {
+      for (let row = 0; row < numRows; row++) {
+        if (column !== 0 && row !== 0 && column !== numColumns -1 && row !== numRows -1) {
+          heights.push(Math.round((Math.random() - 0.5) * 10));
+        } else {
+          heights.push(0);
+        }
+      }
     }
     // debugger
     // const positionMesh = new THREE.Object3D();
@@ -127,10 +132,10 @@ export default class Terrain {
   }
 
   destroy() {
-    // if(this.created) {
-    //   this.geometry.dispose()
-    //   this.scene.remove(this.mesh)
-    //   this.physics.removeGeometry(this.physicsId);
-    // }
+    if(this.created) {
+      this.geometry.dispose()
+      this.scene.remove(this.mesh)
+      this.physics.removeGeometry(this.physicsId);
+    }
   }
 }
