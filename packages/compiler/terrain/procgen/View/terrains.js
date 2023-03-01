@@ -7,16 +7,28 @@ import Terrain from './terrain.js';
 export default class Terrains
 {
   constructor() {
+    this.terrainsPool = [];
     this.state = State.getInstance();
     this.view = View.getInstance();
     
     this.setMaterial();
 
     this.state.terrains.events.on('create', (engineTerrain) => {
-      const terrain = new Terrain(this, engineTerrain);
-
+      let terrain;
+      if (this.terrainsPool.length <= 0) {
+        terrain = new Terrain(this, engineTerrain);
+      }
+      else {
+        terrain = this.terrainsPool[0];
+        terrain.reSet(this, engineTerrain);
+        const index = this.terrainsPool.indexOf(terrain);
+        if (index > -1) { 
+          this.terrainsPool.splice(index, 1);
+        }
+      }
       engineTerrain.events.on('destroy', () => {
         terrain.destroy();
+        this.terrainsPool.push(terrain);
       })
     })
   }
