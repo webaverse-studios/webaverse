@@ -5,3 +5,4 @@ rtfx
 dist
 config.json
 .DS_Store
+.idea
