@@ -76,7 +76,7 @@ class PhysicsWorkerManager {
       positions: mesh.geometry.attributes.position.array,
       indices: mesh.geometry.index.array,
     });
-    debugger
+    // debugger
     return result;
   }
 
