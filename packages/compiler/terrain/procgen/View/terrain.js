@@ -3,6 +3,10 @@ import * as THREE from 'three'
 import View from './view.js'
 import State from '../State/state.js';
 
+const localVector3D = new THREE.Vector3();
+const localVector3D2 = new THREE.Vector3();
+const localQuaternion = new THREE.Quaternion();
+
 export default class Terrain {
   constructor(terrains, terrainState) {
     this.state = State.getInstance();
@@ -48,18 +52,37 @@ export default class Terrain {
     this.mesh = new THREE.Mesh(this.geometry, this.terrains.material);
     
     this.mesh.userData.texture = this.texture
-    this.physicsId = this.physics.addGeometry(this.mesh);
 
-    this.scene.add(this.mesh)
+    const _handlePhysics = async () => {
+      const geometryBuffer = await this.physics.cookGeometryAsync(
+        this.mesh,
+      );
+      if (geometryBuffer && geometryBuffer.length !== 0) {
+        this.mesh.matrixWorld.decompose(
+          localVector3D,
+          localQuaternion,
+          localVector3D2,
+        );
+        this.physicsId = this.physics.addCookedGeometry(
+          geometryBuffer,
+          localVector3D,
+          localQuaternion,
+          localVector3D2,
+        );
+      }
+    }
+    _handlePhysics();
     
-    this.created = true
+    this.scene.add(this.mesh);
+    
+    this.created = true;
   }
 
   destroy() {
     if(this.created) {
-      this.geometry.dispose()
-      this.scene.remove(this.mesh)
-      this.physics.removeGeometry(this.physicsId);
+      this.geometry.dispose();
+      this.scene.remove(this.mesh);
+      this.physicsId && this.physics.removeGeometry(this.physicsId);
     }
   }
 }
