@@ -9,14 +9,17 @@ export default class Terrains
   constructor() {
     this.state = State.getInstance();
     this.view = View.getInstance();
+    this.terrains = [];
     
     this.setMaterial();
 
     this.state.terrains.events.on('create', (engineTerrain) => {
       const terrain = new Terrain(this, engineTerrain);
+      this.terrains.push(terrain);
 
       engineTerrain.events.on('destroy', () => {
         terrain.destroy();
+        this.terrains.splice(this.terrains.indexOf(terrain), 1);
       })
     })
   }
@@ -62,6 +65,8 @@ export default class Terrains
   }
 
   update(timestamp) {
-    
+    this.terrains.forEach(terrain => {
+      terrain.update(timestamp);
+    })
   }
 }

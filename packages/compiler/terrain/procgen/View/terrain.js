@@ -14,6 +14,7 @@ export default class Terrain {
     this.scene = this.view.scene;
     this.physics = this.view.physics;
     this.physicsId = null;
+    this.abortController = null;
     
     this.created = false;
 
@@ -26,7 +27,9 @@ export default class Terrain {
   }
 
   create() {
+    // console.log(this.terrainState.x, this.terrainState.z);
     const terrainsState = this.state.terrains;
+    // debugger
     this.geometry = new THREE.BufferGeometry();
     this.geometry.setAttribute('position', new THREE.Float32BufferAttribute(this.terrainState.positions, 3));
     this.geometry.setAttribute('uv', new THREE.Float32BufferAttribute(this.terrainState.uv, 2));
@@ -55,8 +58,8 @@ export default class Terrain {
     // this.physicsId = this.physics.addGeometry(this.mesh);
 
     const _handlePhysics = () => {
-      const controller = new AbortController();
-      const signal = controller.signal;
+      this.abortController = new AbortController();
+      const signal = this.abortController.signal;
       this.physics.cookGeometryAsync(
         this.mesh,
         {signal},
@@ -79,11 +82,22 @@ export default class Terrain {
         
         this.created = true
       })
-      setTimeout(() => {
-        controller.abort('aaa');
-      }, 1000);
     }
     _handlePhysics();
+  }
+
+  update(timestamp) {
+    if (this.abortController) {
+      // localVector3D.set(globalThis.localPlayer.position.x, 0, globalThis.localPlayer.position.z);
+      // localVector3D2.set(this.terrainState.x, 0, this.terrainState.z);
+      // if (localVector3D.sub(localVector3D2).length() > 1000) {
+      if (
+        Math.abs(globalThis.localPlayer.position.x - this.terrainState.x) > 512 ||
+        Math.abs(globalThis.localPlayer.position.z - this.terrainState.z) > 512
+      ) {
+        this.abortController.abort('chunk faraway, not needed');
+      }
+    }
   }
 
   destroy() {
