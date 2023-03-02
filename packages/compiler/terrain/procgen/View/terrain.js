@@ -55,9 +55,11 @@ export default class Terrain {
     // this.physicsId = this.physics.addGeometry(this.mesh);
 
     const _handlePhysics = async () => {
+      globalThis.cookCount++;
       const geometryBuffer = await this.physics.cookGeometryAsync(
         this.mesh,
       );
+      globalThis.createdCount++;
       if (geometryBuffer && geometryBuffer.length !== 0) {
         this.mesh.matrixWorld.decompose(
           localVector3D,
@@ -84,6 +86,7 @@ export default class Terrain {
       this.geometry.dispose()
       this.scene.remove(this.mesh)
       this.physics.removeGeometry(this.physicsId);
+      globalThis.disposeCount++;
     }
   }
 }

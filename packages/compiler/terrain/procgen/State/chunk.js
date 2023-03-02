@@ -244,7 +244,7 @@ export default class Chunk {
 
   destroy() {
     for(const [key, chunk] of this.children)
-      chunk.off('ready');
+      chunk.off('ready'); // todo: Uncaught TypeError: chunk.off is not a function
 
     if (this.splitted) {
       this.unsplit();

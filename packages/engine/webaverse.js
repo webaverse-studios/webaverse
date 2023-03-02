@@ -400,6 +400,7 @@ export default class Webaverse extends EventTarget {
     
     let lastTimestamp = performance.now();
     const animate = (timestamp, frame) => {
+      console.log(globalThis.cookCount, globalThis.createdCount, globalThis.disposeCount);
       const _frame = () => {
         timestamp = timestamp ?? performance.now();
         const timeDiff = timestamp - lastTimestamp;
@@ -475,6 +476,9 @@ export default class Webaverse extends EventTarget {
 // import {MMDLoader} from 'three/examples/jsm/loaders/MMDLoader.js';
 const _startHacks = webaverse => {
   const localPlayer = playersManager.getLocalPlayer();
+  globalThis.cookCount = 0;
+  globalThis.createdCount = 0;
+  globalThis.disposeCount = 0;
   const vpdAnimations = Avatar.getAnimations().filter(animation => animation.name.endsWith('.vpd'));
 
   // Press } to debug current state in console.
