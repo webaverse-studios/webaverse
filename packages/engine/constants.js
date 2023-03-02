@@ -152,7 +152,7 @@ export const offscreenCanvasSize = 2048;
 export const realmSize = 256;
 
 // dev mode
-const IS_DEV_MODE_ENABLED = false;
+const IS_DEV_MODE_ENABLED = true;
 
 export const IS_NARUTO_RUN_ENABLED = IS_DEV_MODE_ENABLED;
 export const IS_FLYING_ENABLED = IS_DEV_MODE_ENABLED;
