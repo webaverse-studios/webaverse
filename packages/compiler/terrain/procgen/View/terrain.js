@@ -54,7 +54,7 @@ export default class Terrain {
     this.mesh.userData.texture = this.texture
 
     const _handlePhysics = async () => {
-      const geometryBuffer = await this.physics.cookConvexGeometryAsync(
+      const geometryBuffer = await this.physics.cookGeometryAsync(
         this.mesh,
       );
       if (geometryBuffer && geometryBuffer.length !== 0) {
@@ -63,7 +63,7 @@ export default class Terrain {
           localQuaternion,
           localVector3D2,
         );
-        this.physicsId = this.physics.addCookedConvexGeometry(
+        this.physicsId = this.physics.addCookedGeometry(
           geometryBuffer,
           localVector3D,
           localQuaternion,
