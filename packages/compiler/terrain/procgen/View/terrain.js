@@ -3,6 +3,10 @@ import * as THREE from 'three'
 import View from './view.js'
 import State from '../State/state.js';
 
+const localVector3D = new THREE.Vector3();
+const localVector3D2 = new THREE.Vector3();
+const localQuaternion = new THREE.Quaternion();
+
 export default class Terrain {
   constructor(terrains, terrainState) {
     this.state = State.getInstance();
@@ -23,84 +27,62 @@ export default class Terrain {
 
   create() {
     const terrainsState = this.state.terrains;
+    this.geometry = new THREE.BufferGeometry();
+    this.geometry.setAttribute('position', new THREE.Float32BufferAttribute(this.terrainState.positions, 3));
+    this.geometry.setAttribute('uv', new THREE.Float32BufferAttribute(this.terrainState.uv, 2));
+   
+    this.geometry.index = new THREE.BufferAttribute(this.terrainState.indices, 1, false);
+    this.texture = new THREE.DataTexture(
+      this.terrainState.texture,
+      terrainsState.segments,
+      terrainsState.segments,
+      THREE.RGBAFormat,
+      THREE.FloatType,
+      THREE.UVMapping,
+      THREE.ClampToEdgeWrapping,
+      THREE.ClampToEdgeWrapping,
+      THREE.LinearFilter,
+      THREE.LinearFilter
+    );
+    this.texture.flipY = false;
+    this.texture.needsUpdate = true;
 
-    if(this.created) {
-      // // Dispose of old geometry
-      this.geometry.dispose();
+    
+    // Create mesh
+    this.mesh = new THREE.Mesh(this.geometry, this.terrains.material);
+    
+    this.mesh.userData.texture = this.texture
 
-      // // Create new geometry
-      this.geometry = new THREE.BufferGeometry();
-      this.geometry.setAttribute('position', new THREE.BufferAttribute(this.terrainState.positions, 3));
-      this.geometry.setAttribute('uv', new THREE.Float32BufferAttribute(this.terrainState.uv, 2));
-      this.geometry.setIndex(new THREE.BufferAttribute(this.terrainState.indices, 1, false));
-
-      this.texture = new THREE.DataTexture(
-        this.terrainState.texture,
-        terrainsState.segments,
-        terrainsState.segments,
-        THREE.RGBAFormat,
-        THREE.FloatType,
-        THREE.UVMapping,
-        THREE.ClampToEdgeWrapping,
-        THREE.ClampToEdgeWrapping,
-        THREE.LinearFilter,
-        THREE.LinearFilter
+    const _handlePhysics = async () => {
+      const geometryBuffer = await this.physics.cookGeometryAsync(
+        this.mesh,
       );
-      this.texture.flipY = false;
-      this.texture.needsUpdate = true;
-      this.mesh.userData.texture = this.texture
-      
-  
-      this.mesh.geometry = this.geometry;
-      this.physicsId = this.physics.addGeometry(this.mesh);
-      this.scene.add(this.mesh);
+      if (geometryBuffer && geometryBuffer.length !== 0) {
+        this.mesh.matrixWorld.decompose(
+          localVector3D,
+          localQuaternion,
+          localVector3D2,
+        );
+        this.physicsId = this.physics.addCookedGeometry(
+          geometryBuffer,
+          localVector3D,
+          localQuaternion,
+          localVector3D2,
+        );
+      }
     }
-    else {
-      this.geometry = new THREE.BufferGeometry();
-      this.geometry.setAttribute('position', new THREE.Float32BufferAttribute(this.terrainState.positions, 3));
-      this.geometry.setAttribute('uv', new THREE.Float32BufferAttribute(this.terrainState.uv, 2));
-      this.geometry.index = new THREE.BufferAttribute(this.terrainState.indices, 1, false);
-  
-      this.texture = new THREE.DataTexture(
-        this.terrainState.texture,
-        terrainsState.segments,
-        terrainsState.segments,
-        THREE.RGBAFormat,
-        THREE.FloatType,
-        THREE.UVMapping,
-        THREE.ClampToEdgeWrapping,
-        THREE.ClampToEdgeWrapping,
-        THREE.LinearFilter,
-        THREE.LinearFilter
-      );
-      this.texture.flipY = false;
-      this.texture.needsUpdate = true;
-        
-      // Create mesh
-      this.mesh = new THREE.Mesh(this.geometry, this.terrains.material);
-      
-      this.mesh.userData.texture = this.texture
-      this.physicsId = this.physics.addGeometry(this.mesh);
-  
-      this.scene.add(this.mesh);
-      
-      this.created = true;
-    }
-  }
-
-  reSet(terrains, terrainState) {
-    this.terrains = terrains;
-    this.terrainState = terrainState;
-    this.terrainState.renderInstance = this;
-    this.terrainState.events.on('ready', () => {
-      this.create()
-    })
+    _handlePhysics();
+    
+    this.scene.add(this.mesh);
+    
+    this.created = true;
   }
 
   destroy() {
     if(this.created) {
+      this.geometry.dispose();
       this.scene.remove(this.mesh);
-      this.physics.removeGeometry(this.physicsId);
+      this.physicsId && this.physics.removeGeometry(this.physicsId);
     }
   }
 }
