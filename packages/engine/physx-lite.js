@@ -75,7 +75,6 @@ physxLite.cookGeometryPhysics = (mesh) => {
 
   const result = Module.HEAPU8.slice(dataPtr, dataPtr + dataLength);
   
-  debugger
   allocator.freeAll();
   Module._deleteMemoryOutputStream(streamPtr);
 
