@@ -1487,7 +1487,7 @@ const physxWorker = (() => {
       id,
       materialAddress,
       +external,
-      0
+      shape
     )
     allocator.freeAll()
   }
