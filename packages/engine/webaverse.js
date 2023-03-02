@@ -476,6 +476,7 @@ export default class Webaverse extends EventTarget {
 // import {MMDLoader} from 'three/examples/jsm/loaders/MMDLoader.js';
 const _startHacks = webaverse => {
   const localPlayer = playersManager.getLocalPlayer();
+  globalThis.localPlayer = localPlayer;
   globalThis.cookCount = 0;
   globalThis.createdCount = 0;
   globalThis.disposeCount = 0;

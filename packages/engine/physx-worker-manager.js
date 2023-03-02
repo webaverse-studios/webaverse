@@ -71,10 +71,12 @@ class PhysicsWorkerManager {
     const worker = workers[this.nextWorker];
     this.nextWorker = (this.nextWorker + 1) % workers.length;
 
+    // debugger
     const result = await worker.request('cookGeometry', {
       positions: mesh.geometry.attributes.position.array,
       indices: mesh.geometry.index.array,
     });
+    debugger
     return result;
   }
 

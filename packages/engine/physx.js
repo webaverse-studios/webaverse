@@ -1460,6 +1460,8 @@ const physxWorker = (() => {
     const allocator = new Allocator(Module)
     const buffer2 = allocator.alloc(Uint8Array, buffer.length)
     buffer2.set(buffer)
+    debugger
+    w.free(buffer);
 
     const positionBuffer = scratchStack.f32.subarray(0, 3)
     position.toArray(positionBuffer)

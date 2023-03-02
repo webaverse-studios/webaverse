@@ -56,9 +56,11 @@ export default class Terrain {
 
     const _handlePhysics = async () => {
       globalThis.cookCount++;
+      // debugger
       const geometryBuffer = await this.physics.cookGeometryAsync(
         this.mesh,
       );
+      debugger
       globalThis.createdCount++;
       if (geometryBuffer && geometryBuffer.length !== 0) {
         this.mesh.matrixWorld.decompose(
