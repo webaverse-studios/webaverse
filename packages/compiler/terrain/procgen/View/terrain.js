@@ -73,12 +73,12 @@ export default class Terrain {
           localVector3D2,
         );
       }
+
+      this.scene.add(this.mesh)
+      
+      this.created = true
     }
     _handlePhysics();
-
-    this.scene.add(this.mesh)
-    
-    this.created = true
   }
 
   destroy() {
