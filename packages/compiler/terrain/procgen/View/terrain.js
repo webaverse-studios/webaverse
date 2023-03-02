@@ -54,29 +54,36 @@ export default class Terrain {
     this.mesh.userData.texture = this.texture
     // this.physicsId = this.physics.addGeometry(this.mesh);
 
-    const _handlePhysics = async () => {
-      const geometryBuffer = await this.physics.cookGeometryAsync(
+    const _handlePhysics = () => {
+      const controller = new AbortController();
+      const signal = controller.signal;
+      this.physics.cookGeometryAsync(
         this.mesh,
-      );
-      if (geometryBuffer && geometryBuffer.length !== 0) {
-        this.mesh.matrixWorld.decompose(
-          localVector3D,
-          localQuaternion,
-          localVector3D2,
-        );
-        this.physicsId = this.physics.addCookedGeometry(
-          geometryBuffer,
-          localVector3D,
-          localQuaternion,
-          localVector3D2,
-        );
-      }
+        {signal},
+      ).then(geometryBuffer => {
+        if (geometryBuffer && geometryBuffer.length !== 0) {
+          this.mesh.matrixWorld.decompose(
+            localVector3D,
+            localQuaternion,
+            localVector3D2,
+          );
+          this.physicsId = this.physics.addCookedGeometry(
+            geometryBuffer,
+            localVector3D,
+            localQuaternion,
+            localVector3D2,
+          );
+        }
+
+        this.scene.add(this.mesh)
+        
+        this.created = true
+      })
+      setTimeout(() => {
+        controller.abort('aaa');
+      }, 1000);
     }
     _handlePhysics();
-
-    this.scene.add(this.mesh)
-    
-    this.created = true
   }
 
   destroy() {
