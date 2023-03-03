@@ -2016,3 +2016,25 @@ void PScene::getCollisionObject(float radius, float halfHeight, float *position,
     }
   } */
 }
+
+//
+
+unsigned int PScene::testPrint(char *scratchStack, unsigned int stringByteLength) {
+
+  std::string testString = "";
+  for (unsigned int i = 0; i < stringByteLength; i++) {
+    testString += scratchStack[i];
+  }
+
+  std::cout << "Printed directly from wasm: " << testString << std::endl;
+
+  //
+
+  std::string newTestString = "new test string created in wasm, " + testString;
+  unsigned int newStrByteLength = newTestString.length();
+  for (unsigned int i = 0; i < newStrByteLength; i++)
+  {
+    scratchStack[i] = newTestString.at(i);
+  }
+  return newStrByteLength;
+}

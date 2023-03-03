@@ -170,6 +170,10 @@ public:
   unsigned int moveCharacterController(PxController *characterController, float *displacement, float minDist, float elapsedTime, float *positionOut);
   void setCharacterControllerPosition(PxController *characterController, float *position);
 
+  //
+
+  unsigned int testPrint(char *scratchStack, unsigned int stringByteLength);
+
   PxPhysics *physics = nullptr;
   PxScene *scene = nullptr;
   PxControllerManager *controllerManager = nullptr;

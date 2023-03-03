@@ -457,4 +457,10 @@ EMSCRIPTEN_KEEPALIVE uint8_t *createChunkMeshDualContouring(float x, float y, fl
     return DualContouring::drawDamage(x, y, z, radius, value);
 } */
 
+//
+
+EMSCRIPTEN_KEEPALIVE unsigned int testPrintPhysics(PScene *scene, char *scratchStack, unsigned int stringByteLength) {
+  return scene->testPrint(scratchStack, stringByteLength);
+}
+
 } // extern "C"

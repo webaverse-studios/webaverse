@@ -2651,6 +2651,34 @@ const physxWorker = (() => {
   }
 
   // End AnimationSystem
+  
+  /*
+    console_test:
+      physx.physxWorker.testPrintPhysics(physicsManager.getScene(), 'az')
+    output:
+      Printed directly from wasm: az
+      newStringByteLength: 35
+      newTestString: new test string created in wasm, az
+  */
+  w.testPrintPhysics = (physics, testString) => {
+    const bytes = textEncoder.encode(testString)
+    const stringByteLength = bytes.length;
+    for (let i = 0; i < stringByteLength; i++) {
+      scratchStack.u8[i] = bytes[i];
+    }
+
+    const newStringByteLength = Module._testPrintPhysics(
+      physics,
+      scratchStack.ptr,
+      stringByteLength,
+    )
+
+    console.log('newStringByteLength:', newStringByteLength);
+    const newTestString = textDecoder.decode(scratchStack.u8.slice(0, newStringByteLength));
+    console.log('newTestString:', newTestString);
+
+    return newTestString;
+  }
 
   return w;
 })()
@@ -2663,5 +2691,7 @@ const _updateGeometry = () => {
   physxWorker.update()
 }
 physx.update = _updateGeometry
+
+globalThis.physx = physx;
 
 export default physx

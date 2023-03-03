@@ -384,4 +384,8 @@ echo 'let accept, reject;const p = new Promise((a, r) => {  accept = a;  reject 
 echo 'done building worker'
 
 # Prevent compile window auto close after error, to see the error details. https://askubuntu.com/a/20353/1012283
-# exec $SHELL
+exec $SHELL
+
+# Run `packages/engine-wasm/compile.sh` to build wasm.
+# Copy/Paste all built `.js`s from `packages\engine-wasm\bin` to `packages\engine\bin`.
+# Copy/Paste all built `.wasm`s from `packages\engine-wasm\bin` to `packages\client\public\bin`.

@@ -1010,6 +1010,21 @@ class PhysicsScene extends EventTarget {
     const interpolantValue = physx.physxWorker.getActionInterpolantAnimationAvatar(character.avatar.animationAvatarPtr, actionName, type);
     return interpolantValue;
   }
+
+  //
+
+  /*
+    console_test:
+      physicsManager.getScene().testPring('az')
+    output:
+      Printed directly from wasm: az
+      newStringByteLength: 35
+      newTestString: new test string created in wasm, az
+  */
+  testPrint(testString) {
+    const newTestString = physx.physxWorker.testPrintPhysics(this.scene, testString)
+    return newTestString;
+  }
 }
 
 const physicsManager = {
@@ -1023,4 +1038,7 @@ const physicsManager = {
     return scene;
   },
 };
+
+globalThis.physicsManager = physicsManager;
+
 export default physicsManager;
