@@ -4,7 +4,7 @@ import metaversefile from 'metaversefile';
 import View from './procgen/View/view.js';
 import State from './procgen/State/state.js';
 
-const {useApp, useFrame, useLoaders, usePhysics, useCleanup, useLocalPlayer, useInternals} = metaversefile;
+const {useApp, useFrame, useLoaders, usePhysics, useCleanup, useLocalPlayer, useInternals, useTerrainWorkerManager} = metaversefile;
 
 const localVector = new THREE.Vector3(0, 0, 0);
 
@@ -14,9 +14,11 @@ export default () => {
   const app = useApp();
   const physics = usePhysics();
   const player = useLocalPlayer();
+  const terrainWorkerManager = useTerrainWorkerManager();
+  const terrainWorker = terrainWorkerManager.worker;
   const {camera, scene, renderer} = useInternals();
 
-  const state = new State(player);
+  const state = new State(player, terrainWorker);
   const view = new View(player, app, physics);
   
   

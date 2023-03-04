@@ -67,6 +67,7 @@ import {getDefaultCanvas} from './offscreen-engine-runtime/fns/avatar-iconer-fn.
 import {isWorker} from './env.js';
 import './metaversefile-binding.js';
 import spawnManager from './spawn-manager.js';
+import terrainWorkerManager from './terrain-worker-manager.js';
 
 // const localVector2D = new THREE.Vector2();
 
@@ -1371,6 +1372,9 @@ export default () => {
   },
   useProcGenManager() {
     return procGenManager;
+  },
+  useTerrainWorkerManager() {
+    return terrainWorkerManager;
   },
   useCardsManager() {
     return cardsManager;

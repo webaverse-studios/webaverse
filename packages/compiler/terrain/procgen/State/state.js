@@ -11,13 +11,14 @@ export default class State
       return State.instance
   }
 
-  constructor(player)
+  constructor(player, terrainWorker)
   {
     if(State.instance)
       return State.instance
 
     State.instance = this
     this.player = player;
+    this.terrainWorker = terrainWorker;
     this.terrains = new Terrains();
     this.chunks = new Chunks();
   }

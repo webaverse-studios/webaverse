@@ -1,6 +1,7 @@
 import EventEmitter from '../utils/events.js';
 import Terrain from './terrain.js'
 import alea from '../utils/alea.js';
+import State from './state.js';
 
 export default class Terrains
 {
@@ -9,8 +10,8 @@ export default class Terrains
   static ITERATIONS_FORMULA_MIX = 3;
   static ITERATIONS_FORMULA_POWERMIX = 4;
 
-  constructor()
-  {
+  constructor() {
+    this.state = State.getInstance();
     this.seed = 'webaverse';
     this.random = alea(this.seed);
     
@@ -41,9 +42,9 @@ export default class Terrains
   }
 
   setWorkers() {
-    // this.worker = new Worker(new URL('./procgen/State/Worker.js', import.meta.url));
-    
-    this.worker = new Worker('./terrain-worker.js');
+    // this.worker = new Worker('./terrain-worker.js');
+
+    this.worker = this.state.terrainWorker;
     
     this.worker.onmessage = (event) => {
       const terrain = this.terrains.get(event.data.id);
@@ -79,7 +80,6 @@ export default class Terrains
     this.terrains.set(terrain.id, terrain);
 
     // Post to worker
-    // console.time(`terrains: worker (${terrain.id})`)
     this.worker.postMessage({
       id: terrain.id,
       x,
@@ -94,7 +94,8 @@ export default class Terrains
       baseAmplitude: this.baseAmplitude,
       power: this.power,
       elevationOffset: this.elevationOffset,
-      iterationsOffsets: this.iterationsOffsets
+      iterationsOffsets: this.iterationsOffsets,
+      maxIterations: this.maxIterations,
     })
     
     this.events.emit('create', terrain);
