@@ -20,8 +20,8 @@ export default class Terrains
     this.persistence = 0.45;
     this.maxIterations = 6;
     this.baseFrequency = 0.003;
-    this.baseAmplitude = 180;
-    this.power = 2.5;
+    this.baseAmplitude = 90;
+    this.power = 2;
     this.elevationOffset = 1;
 
     this.segments = this.subdivisions + 1;

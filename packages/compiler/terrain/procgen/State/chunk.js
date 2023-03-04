@@ -243,8 +243,8 @@ export default class Chunk {
   }
 
   destroy() {
-    for(const [key, chunk] of this.children)
-      chunk.off('ready');
+    // for(const [key, chunk] of this.children)
+    //   chunk.off('ready');
 
     if (this.splitted) {
       this.unsplit();
