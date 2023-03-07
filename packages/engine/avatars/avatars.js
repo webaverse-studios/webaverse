@@ -469,14 +469,15 @@ class Avatar {
     this.springBoneManager = null;
     if (options.hair) {
       const springBoneLoader = new VRMSpringBoneLoaderPlugin()
-      // debugger
+      // mark
       globalThis.gltf = object
-      object.userData.gltfExtensions.VRM.secondaryAnimation.colliderGroups.forEach(colliderGroup=>{
-        colliderGroup.colliders.forEach(collider=>{
-          // collider.radius=0.08;
-          collider.radius=0.1;
-        })
-      })
+      // debugger
+      // object.userData.gltfExtensions.VRM.secondaryAnimation.colliderGroups.forEach(colliderGroup=>{
+      //   colliderGroup.colliders.forEach(collider=>{
+      //     // collider.radius=0.08;
+      //     collider.radius=0.1;
+      //   })
+      // })
       springBoneLoader._v0Import(object).then((boneManager)=>{
         this.springBoneManager = boneManager
       })
@@ -1884,6 +1885,7 @@ class Avatar {
     _updateHeadTarget();
     _updateEyeballTarget();
 
+    // mark
     this.modelBoneOutputs.Root.rotation.y += Math.PI;
     this.modelBoneOutputs.Root.updateMatrixWorld();
     Avatar.applyModelBoneOutputs(
