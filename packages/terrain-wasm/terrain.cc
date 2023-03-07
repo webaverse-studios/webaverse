@@ -6,6 +6,14 @@
 
 using namespace std;
 
+double clamp(double x, double lower, double upper) {
+    return std::max(lower, std::min(x, upper));
+}
+
+float lerp(float start, float end, float t) {
+    return start + (end - start) * t;
+}
+
 double getElevation(double x, double y, double lacunarity, double persistence, int iterations,
                     double baseFrequency, double baseAmplitude, double power,
                     double elevationOffset, const vector<pair<double, double>>& iterationsOffsets) {
@@ -22,11 +30,18 @@ double getElevation(double x, double y, double lacunarity, double persistence, i
       amplitude *= persistence;
       frequency *= lacunarity;
     }
+    // terrace
+    double tnoise = (SimplexNoise::noise(x * 0.01, y * 0.01) + 1) * 0.5;
+    float terrace = clamp(elevation, -1, 0.8);
+    elevation = lerp(elevation, terrace, tnoise);
+    elevation = fabs(elevation);
 
     elevation /= normalisation;
     elevation = pow(fabs(elevation), power) * (elevation >= 0 ? 1 : -1);
     elevation *= baseAmplitude;
-    elevation += elevationOffset;
+
+    double elevationOffsetNoise = SimplexNoise::noise(x * 0.001, y * 0.001) * 15; // add noise for elevation;
+    elevation += elevationOffset + elevationOffsetNoise;
 
     return elevation;
 }

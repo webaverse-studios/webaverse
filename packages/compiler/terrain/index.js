@@ -21,9 +21,17 @@ export default () => {
   const state = new State(player, terrainWorker);
   const view = new View(player, app, physics);
   
+
+  const geometry = new THREE.PlaneGeometry( 2000, 2000 );
+  const material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+  const sea = new THREE.Mesh( geometry, material );
+  sea.rotation.x = -Math.PI / 2;
+  app.add( sea );
   
   const resetPositionThreshold = -80; // just in case player fall below the terrain initially
   useFrame(({timestamp}) => {
+    sea.position.x = player.position.x;
+    sea.position.z = player.position.z;
     view.update(timestamp);
 	  state.update(timestamp);
 
