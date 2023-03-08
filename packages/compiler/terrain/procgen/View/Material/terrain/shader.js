@@ -14,22 +14,30 @@ const terrainVertexShader = `\
   varying vec3 vViewNormal;
 
   varying vec4 vWeight;
+
+  #include <common>
+  #include <shadowmap_pars_vertex>
   
   void main() {
-   
-    // Terrain data
-    vec4 terrainData = texture2D(uTexture, uv);
-    vNormal = normalize(terrainData.rgb);
-    vPos = position;
-
-    vWeight = weight;
 
     vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+
+    vec4 terrainData = texture2D(uTexture, uv);
+    vec3 transformedNormal = normalize(terrainData.rgb);
+    vNormal = transformedNormal;
+    vPos = position;
+    vWeight = weight;
+
+    vec3 transformed = position;
+    vec4 worldPosition = modelPosition;
+    #include <shadowmap_vertex>
+
     vWorldPosition = modelPosition.xyz;
     vec4 viewPosition = viewMatrix * modelPosition;
     vDepth = - viewPosition.z;
     vec4 projectionPosition = projectionMatrix * viewPosition;
     gl_Position = projectionPosition;
+    
   }
 `;
 const terrainFragmentShader = `\
@@ -122,9 +130,17 @@ const terrainFragmentShader = `\
         result /= total_weight;
     }
     return result;
-}
+  }
+
+  #include <common>
+  #include <packing>
+  #include <lights_pars_begin>
+  #include <shadowmap_pars_fragment>
+  #include <shadowmask_pars_fragment>
+  
 
   void main() {
+
     //################################################## terrain color ################################################## 
     float noiseScale = 0.01;
     vec3 noisetexture = texture2D(noiseTexture, vWorldPosition.xz * noiseScale).rgb;
@@ -140,8 +156,6 @@ const terrainFragmentShader = `\
       dirtTexture = blendTwoTextures(dirtTexture, 0.95, brickTexture, 0.05);
     }
     
-    
-    
     float rockScale = 0.1;
     vec4 rocktexture = texture2D(terrainRockTexture, vWorldPosition.xz * rockScale);
 
@@ -151,6 +165,13 @@ const terrainFragmentShader = `\
     vec4 terrainColor = blendFourTextures(grassTexture, vWeight.x, rocktexture, vWeight.y, dirtTexture, vWeight.z, sandtexture, vWeight.w);
 
     gl_FragColor = vec4(terrainColor.rgb * vNormal.g, 1.0);
+
+    
+    vec3 finalColor = gl_FragColor.rgb;
+    vec3 shadowColor = vec3(0, 0, 0);
+    float shadowPower = 0.5;
+    
+    gl_FragColor = vec4( mix(finalColor, shadowColor, (1.0 - getShadowMask() ) * shadowPower), 1.0);
   }
 `;
 export {

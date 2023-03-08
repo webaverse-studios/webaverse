@@ -6,12 +6,16 @@ import Terrain from './terrain.js';
 
 import {terrainVertexShader, terrainFragmentShader,} from './Material/terrain/shader.js';
 
+
+
 export default class Terrains
 {
   constructor() {
     this.state = State.getInstance();
     this.view = View.getInstance();
     this.texturePacks = this.view.texturePacks;
+
+    
     
     this.setMaterial();
 
@@ -30,33 +34,36 @@ export default class Terrains
 
  
   setMaterial() {
-    this.material = new THREE.ShaderMaterial({
-      uniforms: {
-        uTexture: {
-          value: null
-        },
-        terrainRockTexture: {
-          value: this.getTexureByName('terrain-rock')
-        },
-        terrainDirtTexture: {
-          value: this.getTexureByName('terrain-dirt')
-        },
-        terrainSandTexture: {
-          value: this.getTexureByName('terrain-sand')
-        },
-        terrainGrassTexture: {
-          value: this.getTexureByName('terrain-grass')
-        },
-        terrainBrickTexture: {
-          value: this.getTexureByName('terrain-brick')
-        },
+    const terrainUniforms = {
+      uTexture: {
+        value: null
       },
+      terrainRockTexture: {
+        value: this.getTexureByName('terrain-rock')
+      },
+      terrainDirtTexture: {
+        value: this.getTexureByName('terrain-dirt')
+      },
+      terrainSandTexture: {
+        value: this.getTexureByName('terrain-sand')
+      },
+      terrainGrassTexture: {
+        value: this.getTexureByName('terrain-grass')
+      },
+      terrainBrickTexture: {
+        value: this.getTexureByName('terrain-brick')
+      },
+    }
+    const uniforms = Object.assign({}, THREE.UniformsLib.lights, terrainUniforms);
+    
+    this.material = new THREE.ShaderMaterial({
+      uniforms: uniforms,
       vertexShader: terrainVertexShader,
       fragmentShader: terrainFragmentShader,
       transparent: true,
-      // wireframe: true
+      lights: true,
     });
-
+    
     
     this.material.onBeforeRender = (renderer, scene, camera, geometry, mesh) => {
       this.material.uniforms.uTexture.value = mesh.userData.texture;

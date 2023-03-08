@@ -51,6 +51,8 @@ export default class Terrain {
     
     // Create mesh
     this.mesh = new THREE.Mesh(this.geometry, this.terrains.material);
+    this.mesh.receiveShadow = true;
+    // this.mesh.castShadow = true;
     
     this.mesh.userData.texture = this.texture
 
