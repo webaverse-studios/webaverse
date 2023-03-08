@@ -30,6 +30,7 @@ export default class Terrain {
     this.geometry = new THREE.BufferGeometry();
     this.geometry.setAttribute('position', new THREE.Float32BufferAttribute(this.terrainState.positions, 3));
     this.geometry.setAttribute('uv', new THREE.Float32BufferAttribute(this.terrainState.uv, 2));
+    this.geometry.setAttribute('weight', new THREE.Float32BufferAttribute(this.terrainState.biomeWeight, 4));
    
     this.geometry.index = new THREE.BufferAttribute(this.terrainState.indices, 1, false);
     this.texture = new THREE.DataTexture(

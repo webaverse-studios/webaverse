@@ -7,7 +7,7 @@ export default class View {
     return View.instance
   }
 
-  constructor(player, scene, physics) {
+  constructor(player, scene, physics, texturePacks) {
     if(View.instance)
       return View.instance
 
@@ -15,6 +15,7 @@ export default class View {
     this.player = player;
     this.scene = scene;
     this.physics = physics;
+    this.texturePacks = texturePacks;
     this.terrains = new Terrains();
     
   }

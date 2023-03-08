@@ -23,6 +23,8 @@ export default class Terrain
     this.indices = data.indices;
     this.texture = data.texture;
     this.uv = data.uv;
+    
+    this.biomeWeight = data.biomeWeight;
 
     this.weight = data.weight;
     

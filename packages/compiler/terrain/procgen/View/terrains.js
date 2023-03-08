@@ -4,11 +4,14 @@ import State from "../State/state.js";
 import View from './view.js';
 import Terrain from './terrain.js';
 
+import {terrainVertexShader, terrainFragmentShader,} from './Material/terrain/shader.js';
+
 export default class Terrains
 {
   constructor() {
     this.state = State.getInstance();
     this.view = View.getInstance();
+    this.texturePacks = this.view.texturePacks;
     
     this.setMaterial();
 
@@ -21,6 +24,10 @@ export default class Terrains
     })
   }
 
+  getTexureByName(textureName) {
+    return this.texturePacks.find(x => x.name === textureName).texture;
+  }
+
  
   setMaterial() {
     this.material = new THREE.ShaderMaterial({
@@ -28,28 +35,21 @@ export default class Terrains
         uTexture: {
           value: null
         },
+        terrainRockTexture: {
+          value: this.getTexureByName('terrain-rock')
+        },
+        terrainDirtTexture: {
+          value: this.getTexureByName('terrain-dirt')
+        },
+        terrainSandTexture: {
+          value: this.getTexureByName('terrain-sand')
+        },
+        terrainGrassTexture: {
+          value: this.getTexureByName('terrain-grass')
+        },
       },
-      vertexShader: `\   
-        
-        uniform sampler2D uTexture;
-       
-        varying vec3 vNormal;
-      
-        void main() {
-          vec4 terrainData = texture2D(uTexture, uv);
-          vNormal = normalize(terrainData.rgb);
-          
-      
-          vec4 modelPosition = modelMatrix * vec4(position, 1.0);
-          vec4 viewPosition = viewMatrix * modelPosition;
-          vec4 projectionPosition = projectionMatrix * viewPosition;
-          gl_Position = projectionPosition;
-      }`,
-      fragmentShader: `\
-        varying vec3 vNormal;
-        void main() {
-          gl_FragColor = vec4(vec3(0., vNormal.g, 0.), 1.0);
-      }`,
+      vertexShader: terrainVertexShader,
+      fragmentShader: terrainFragmentShader,
       transparent: true,
       // wireframe: true
     });

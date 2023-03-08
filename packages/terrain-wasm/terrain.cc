@@ -14,6 +14,29 @@ float lerp(float start, float end, float t) {
     return start + (end - start) * t;
 }
 
+// Generate 2D ridge noise value at (x, y)
+double ridge_noise(double x, double y)
+{
+    double value = 0.0;
+    double frequency = 1.0;
+    double amplitude = 50.0;
+    double gain = 0.45;
+    double lacunarity = 2.0;
+    int octaves = 1;
+    
+    for (int i = 0; i < octaves; i++)
+    {
+        double n = SimplexNoise::noise(x * frequency, y * frequency);
+        n = pow(n, 2.0);
+        value += n * amplitude;
+
+        frequency *= lacunarity;
+        amplitude *= gain;
+    }
+
+    return fabs(value);
+}
+
 double getElevation(double x, double y, double lacunarity, double persistence, int iterations,
                     double baseFrequency, double baseAmplitude, double power,
                     double elevationOffset, const vector<pair<double, double>>& iterationsOffsets) {
@@ -425,6 +448,9 @@ void Terrain::getTerrain(
   const int textureCount = segments * segments * 4;
   vector<float> texture(textureCount);
 
+  const int biomeWeightCount = segments * segments * 4;
+  vector<float> biomeWeight(biomeWeightCount);
+
   // const grassPosition = [];
   for (int iZ = 0; iZ < segments; iZ++) {
     for (int iX = 0; iX < segments; iX++) {
@@ -436,6 +462,81 @@ void Terrain::getTerrain(
       };
 
       const int iNormalStride = (iZ * segments + iX) * 3;
+
+
+
+      
+
+      const float maxHeight = 15.0f;
+      const float minHeight = -15.0f;
+      float posY = positions[iPositionStride + 1];
+      float heightWeight = std::max(0.0f, std::min(1.0f, (posY - minHeight) / (maxHeight - minHeight)));
+      float slopeWeight = std::max(0.0f, std::min(1.0f, 1.0f - normals[iNormalStride + 1]));
+
+      bool isBeach = posY < 1.2;
+      bool isMountain = posY > 20;
+      
+
+      float grassWeight = 0.0f;
+      float rockWeight = 0.0f;
+      float dirtWeight = 0.0f;
+      float sandWeight = 0.0f;
+
+      if (isBeach) {
+        sandWeight = 1.0f;
+      }
+      else {
+        // if (normals[iNormalStride + 1] < 0.9) {
+        //   rockWeight = 1.0f;
+        // }
+        // else {
+          
+          if (isMountain) {
+            if (normals[iNormalStride + 1] < 0.9) {
+              float normalLerp = pow(slopeWeight, 0.3f);
+
+              grassWeight = std::max(0.0f, std::min(1.0f, (1.0f - normalLerp)));
+              rockWeight = std::max(0.0f, std::min(1.0f, normalLerp));
+            }
+            else {
+              float normalLerp = pow(slopeWeight, 0.9f);
+              
+              float grassFrequency = 0.01f;
+              float grassNoiseScale = 0.1f;
+              float grassNoise = SimplexNoise::noise(position[0] * grassFrequency, position[2] * grassFrequency);
+              grassNoise = grassNoise * grassNoiseScale;
+
+              dirtWeight = std::max(0.0f, std::min(1.0f, (1.0f - normalLerp) * grassNoise));
+              grassWeight = std::max(0.0f, std::min(1.0f, (1.0f - normalLerp) * (1.0f - grassNoise)));
+              rockWeight = std::max(0.0f, std::min(1.0f, normalLerp));
+            }
+          }
+          else {
+
+            float dirtNoise = ridge_noise(position[0] * 0.005, position[2] * 0.005);
+            // dirtWeight = (1.0f - dirtNoise);
+            // grassWeight = dirtNoise;
+
+            dirtWeight = std::max(0.0f, std::min(1.0f, (1.0f - dirtNoise) * (1.0f - heightWeight)));
+            grassWeight = std::max(0.0f, std::min(1.0f, dirtNoise * heightWeight));
+            
+            // grassWeight = normalLerp * (heightWeight + grassNoise * noiseScale);
+            // dirtWeight = (1. - normalLerp) * (1. - heightWeight);
+          }
+          
+        // }
+      }
+
+      // float grassWeight = std::max(0.0f, std::min(1.0f, (1.0f - slopeWeight) * heightWeight));
+      // float rockWeight = std::max(0.0f, std::min(1.0f, slopeWeight * heightWeight));
+      // float dirtWeight = isBeach ? 1.0f : std::max(0.0f, std::min(1.0f, (1.0f - heightWeight)));
+      // float sandWeight = 0.0f;
+
+      int iWeightStride = (iZ * segments + iX) * 4;
+      biomeWeight[iWeightStride    ] = grassWeight;
+      biomeWeight[iWeightStride + 1] = rockWeight;
+      biomeWeight[iWeightStride + 2] = dirtWeight;
+      biomeWeight[iWeightStride + 3] = sandWeight;
 
       // Final texture
       const int iTextureStride = (iZ * segments + iX) * 4;
@@ -470,6 +571,11 @@ void Terrain::getTerrain(
 
   for (int i = 0; i < uv.size(); i++) {
     scratchStack[resultIndex] = uv[i];
+    resultIndex ++;
+  }
+
+  for (int i = 0; i < biomeWeight.size(); i++) {
+    scratchStack[resultIndex] = biomeWeight[i];
     resultIndex ++;
   }
   
