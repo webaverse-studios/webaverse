@@ -17,7 +17,7 @@ const texturePacks = [
   {name: 'terrain-dirt', texture: null, ext: 'png', repeat: true},
   {name: 'terrain-sand', texture: null, ext: 'png', repeat: true},
   {name: 'terrain-grass', texture: null, ext: 'png', repeat: true},
-  
+  {name: 'terrain-brick', texture: null, ext: 'png', repeat: true},
 ];
 const texturesPromise = (async () => {
   for(const texturePack of texturePacks){

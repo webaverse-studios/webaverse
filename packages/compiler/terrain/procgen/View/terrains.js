@@ -47,6 +47,9 @@ export default class Terrains
         terrainGrassTexture: {
           value: this.getTexureByName('terrain-grass')
         },
+        terrainBrickTexture: {
+          value: this.getTexureByName('terrain-brick')
+        },
       },
       vertexShader: terrainVertexShader,
       fragmentShader: terrainFragmentShader,

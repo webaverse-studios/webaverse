@@ -45,10 +45,12 @@ const terrainFragmentShader = `\
   uniform sampler2D terrainDirtTexture;
   uniform sampler2D terrainSandTexture;
   uniform sampler2D terrainGrassTexture;
+  uniform sampler2D terrainBrickTexture;
+  
   uniform sampler2D noiseTexture;
 
   vec4 blendTwoTextures(vec4 texture1, float a1, vec4 texture2, float a2) {
-    float depth = 0.5;
+    float depth = 0.9;
     float ma = max(texture1.a + a1, texture2.a + a2) - depth;
 
     float b1 = max(texture1.a + a1 - ma, 0.);
@@ -133,6 +135,12 @@ const terrainFragmentShader = `\
     
     float dirtScale = 0.3;
     vec4 dirtTexture = texture2D(terrainDirtTexture, vWorldPosition.xz * dirtScale);
+    if (vWeight.z > vWeight.x || vWeight.z > vWeight.y || vWeight.z > vWeight.w) {
+      vec4 brickTexture = texture2D(terrainBrickTexture, vWorldPosition.xz * 0.2);
+      dirtTexture = blendTwoTextures(dirtTexture, 0.95, brickTexture, 0.05);
+    }
+    
+    
     
     float rockScale = 0.1;
     vec4 rocktexture = texture2D(terrainRockTexture, vWorldPosition.xz * rockScale);

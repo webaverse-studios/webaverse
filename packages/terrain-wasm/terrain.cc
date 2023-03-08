@@ -517,8 +517,8 @@ void Terrain::getTerrain(
             // dirtWeight = (1.0f - dirtNoise);
             // grassWeight = dirtNoise;
 
-            dirtWeight = std::max(0.0f, std::min(1.0f, (1.0f - dirtNoise) * (1.0f - heightWeight)));
-            grassWeight = std::max(0.0f, std::min(1.0f, dirtNoise * heightWeight));
+            dirtWeight = std::max(0.0f, std::min(1.0f, (1.0f - dirtNoise)));
+            grassWeight = std::max(0.0f, std::min(1.0f, dirtNoise));
             
             // grassWeight = normalLerp * (heightWeight + grassNoise * noiseScale);
             // dirtWeight = (1. - normalLerp) * (1. - heightWeight);
