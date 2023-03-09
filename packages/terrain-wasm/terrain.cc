@@ -3,6 +3,8 @@
 #include <iostream>
 
 #include <vector>
+#include <array>
+#include <cmath>
 
 using namespace std;
 
@@ -69,6 +71,104 @@ double getElevation(double x, double y, double lacunarity, double persistence, i
     return elevation;
 }
 
+std::array<float, 4> getPlantInfo(float targetX, float targetZ, int subdivisions, float size, float x, float z, float* positions, float* normals, float* weights) {
+    const int segments = subdivisions + 1;
+    const float subSize = size / subdivisions;
+
+    // Relative position
+    const float halfSize = size * 0.5;
+    const float relativeX = targetX - x + halfSize;
+    const float relativeZ = targetZ - z + halfSize;
+
+    // Ratio
+    const float xRatio = std::fmod(relativeX / subSize, 1.0f);
+    const float zRatio = std::fmod(relativeZ / subSize, 1.0f);
+
+    // Indexes
+    const int aIndexX = std::floor(relativeX / subSize);
+    const int aIndexZ = std::floor(relativeZ / subSize);
+
+    const int cIndexX = aIndexX + 1;
+    const int cIndexZ = aIndexZ + 1;
+
+    const int bIndexX = xRatio < zRatio ? aIndexX : aIndexX + 1;
+    const int bIndexZ = xRatio < zRatio ? aIndexZ + 1 : aIndexZ;
+
+    const int aStrideIndex = (aIndexZ * segments + aIndexX) * 3;
+    const int bStrideIndex = (bIndexZ * segments + bIndexX) * 3;
+    const int cStrideIndex = (cIndexZ * segments + cIndexX) * 3;
+
+    const int aWeightIndex = (aIndexZ * segments + aIndexX) * 4;
+    const int bWeightIndex = (bIndexZ * segments + bIndexX) * 4;
+    const int cWeightIndex = (cIndexZ * segments + cIndexX) * 4;
+
+    // Weights
+    const float weight1 = xRatio < zRatio ? 1 - zRatio : 1 - xRatio;
+    const float weight2 = xRatio < zRatio ? - (xRatio - zRatio) : xRatio - zRatio;
+    const float weight3 = 1 - weight1 - weight2;
+
+    if (aWeightIndex >= segments * segments * 4 || bWeightIndex >= segments * segments * 4 || cWeightIndex >= segments * segments * 4) {
+        return {false, false, false, false};
+    }
+
+    // Normal
+    const float aNormal = normals[aStrideIndex + 1];
+    const float bNormal = normals[bStrideIndex + 1];
+    const float cNormal = normals[cStrideIndex + 1];
+    const float normalY = aNormal * weight1 + bNormal * weight2 + cNormal * weight3;
+
+    // Weight
+    const float aGrassWeight = weights[aWeightIndex + 0];
+    const float bGrassWeight = weights[bWeightIndex + 0];
+    const float cGrassWeight = weights[cWeightIndex + 0];
+    const float grassWeight = aGrassWeight * weight1 + bGrassWeight * weight2 + cGrassWeight * weight3;
+
+    const float aRockWeight = weights[aWeightIndex + 1];
+    const float bRockWeight = weights[bWeightIndex + 1];
+    const float cRockWeight = weights[cWeightIndex + 1];
+    const float rockWeight = aRockWeight * weight1 + bRockWeight * weight2 + cRockWeight * weight3;
+
+    const float aDirtWeight = weights[aWeightIndex + 2];
+    const float bDirtWeight = weights[bWeightIndex + 2];
+    const float cDirtWeight = weights[cWeightIndex + 2];
+    const float dirtWeight = aDirtWeight * weight1 + bDirtWeight * weight2 + cDirtWeight * weight3;
+
+    const float aSandWeight = weights[aWeightIndex + 3];
+    const float bSandWeight = weights[bWeightIndex + 3];
+    const float cSandWeight = weights[cWeightIndex + 3];
+    const float sandWeight = aSandWeight * weight1 + bSandWeight * weight2 + cSandWeight * weight3;
+
+    const float thresHoldOfGrass = 0.1;
+    if (
+      normalY > 0.1 
+      && grassWeight > 0.9
+      // && grassWeight - rockWeight > thresHoldOfGrass 
+      // && grassWeight - dirtWeight > thresHoldOfGrass
+      // && grassWeight - sandWeight > thresHoldOfGrass
+    ) {
+        // Elevation
+        const float aElevation = positions[aStrideIndex + 1];
+        const float bElevation = positions[bStrideIndex + 1];
+        const float cElevation = positions[cStrideIndex + 1];
+        const float elevation = aElevation * weight1 + bElevation * weight2 + cElevation * weight3;
+
+        const float aNormalX = normals[aStrideIndex];
+        const float bNormalX = normals[bStrideIndex];
+        const float cNormalX = normals[cStrideIndex];
+        const float normalX = aNormalX * weight1 + bNormalX * weight2 + cNormalX * weight3;
+
+        const float aNormalZ = normals[aStrideIndex + 2];
+        const float bNormalZ = normals[bStrideIndex + 2];
+        const float cNormalZ = normals[cStrideIndex + 2];
+        const float normalZ = aNormalZ * weight1 + bNormalZ * weight2 + cNormalZ * weight3;
+
+        return {normalX, normalY, normalZ, elevation};
+    }
+    else {
+        return {false, false, false, false};
+    }
+}
+
 void Terrain::getTerrain(
   float *scratchStack
 ) {
@@ -88,6 +188,11 @@ void Terrain::getTerrain(
   const int maxIterations = scratchStack[12];
   const int segments =  (int)subdivisions + 1;
 
+  float xMin = scratchStack[13];
+  float xMax = scratchStack[14];
+  float zMin = scratchStack[15];
+  float zMax = scratchStack[16];
+
   // std::cout << size << std::endl;
   // std::cout << baseX << std::endl;
   // std::cout << baseZ << std::endl;
@@ -106,8 +211,8 @@ void Terrain::getTerrain(
   vector<pair<double, double>> iterationsOffsets;
 
   for (int i = 0; i < maxIterations * 2; i += 2) {
-    double x = scratchStack[13 + i];
-    double y = scratchStack[13 + i + 1];
+    double x = scratchStack[17 + i];
+    double y = scratchStack[17 + i + 1];
     iterationsOffsets.push_back(make_pair(x, y));
   }
 
@@ -451,7 +556,6 @@ void Terrain::getTerrain(
   const int biomeWeightCount = segments * segments * 4;
   vector<float> biomeWeight(biomeWeightCount);
 
-  // const grassPosition = [];
   for (int iZ = 0; iZ < segments; iZ++) {
     for (int iX = 0; iX < segments; iX++) {
       const int iPositionStride = (iZ * segments + iX) * 3;
@@ -462,10 +566,6 @@ void Terrain::getTerrain(
       };
 
       const int iNormalStride = (iZ * segments + iX) * 3;
-
-
-
-      
 
       const float maxHeight = 15.0f;
       const float minHeight = -15.0f;
@@ -483,7 +583,7 @@ void Terrain::getTerrain(
       float sandWeight = 0.0f;
 
       if (isBeach) {
-        sandWeight = 1.0f;
+        sandWeight = 1.0f * heightWeight;
       }
       else {
         // if (normals[iNormalStride + 1] < 0.9) {
@@ -547,6 +647,35 @@ void Terrain::getTerrain(
     }
   }
 
+
+  std::vector<float> grassPositions;
+  std::vector<float> grassTerrainSlopes;
+
+  int maxGrassPerChunk = 4096;
+  const float grassOffset = 0.5f;
+  for (float x = xMin; x < xMax && maxGrassPerChunk > 0; x += grassOffset) {
+    for (float z = zMin; z < zMax && maxGrassPerChunk > 0; z += grassOffset) {
+      const float grassPosNoise = SimplexNoise::noise(x * 1.0f, z * 1.0f);
+      const bool hasGrass = (grassPosNoise + 1) * 0.5f > 0.67f;
+      if (hasGrass) {
+        std::array<float, 4> plantInfo = getPlantInfo(x, z, subdivisions, size, baseX, baseZ, positions.data(), normals.data(), biomeWeight.data());
+        const float plantElevation = plantInfo[3];
+
+        if (plantElevation != false) {
+          grassPositions.push_back(x);
+          grassPositions.push_back(plantElevation);
+          grassPositions.push_back(z);
+
+          grassTerrainSlopes.push_back(plantInfo[0]);
+          grassTerrainSlopes.push_back(plantInfo[1]);
+          grassTerrainSlopes.push_back(plantInfo[2]);
+
+          maxGrassPerChunk--;
+        }
+      }
+    }
+  }
+
   // std::cout << positions.size() << std::endl;
   int resultIndex = 0;
   for (int i = 0; i < positions.size(); i++) {
@@ -576,6 +705,20 @@ void Terrain::getTerrain(
 
   for (int i = 0; i < biomeWeight.size(); i++) {
     scratchStack[resultIndex] = biomeWeight[i];
+    resultIndex ++;
+  }
+
+  scratchStack[resultIndex] = grassPositions.size();
+  resultIndex ++;
+  for (int i = 0; i < grassPositions.size(); i++) {
+    scratchStack[resultIndex] = grassPositions[i];
+    resultIndex ++;
+  }
+
+  scratchStack[resultIndex] = grassTerrainSlopes.size();
+  resultIndex ++;
+  for (int i = 0; i < grassTerrainSlopes.size(); i++) {
+    scratchStack[resultIndex] = grassTerrainSlopes[i];
     resultIndex ++;
   }
   
