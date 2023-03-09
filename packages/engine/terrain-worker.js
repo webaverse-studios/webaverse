@@ -149,6 +149,19 @@ onmessage = async function(event) {
     const grassTerrainSlopesEndIndex = grassTerrainSlopesStartIndex + grassTerrainSlopesSize; 
     grassTerrainSlopesArray.set(scratchStack.f32.subarray(grassTerrainSlopesStartIndex, grassTerrainSlopesEndIndex), 0);
 
+
+    const flowerPositionsSize = scratchStack.f32[grassTerrainSlopesEndIndex];
+    const flowerPositionsArray = new Float32Array(flowerPositionsSize);
+    const flowerPositionsStartIndex = grassTerrainSlopesEndIndex + 1;
+    const flowerPositionsEndIndex = flowerPositionsStartIndex + flowerPositionsSize; 
+    flowerPositionsArray.set(scratchStack.f32.subarray(flowerPositionsStartIndex, flowerPositionsEndIndex), 0);
+
+    const flowerTerrainSlopesSize = scratchStack.f32[flowerPositionsEndIndex];
+    const flowerTerrainSlopesArray = new Float32Array(flowerTerrainSlopesSize);
+    const flowerTerrainSlopesStartIndex = flowerPositionsEndIndex + 1;
+    const flowerTerrainSlopesEndIndex = flowerTerrainSlopesStartIndex + flowerTerrainSlopesSize; 
+    flowerTerrainSlopesArray.set(scratchStack.f32.subarray(flowerTerrainSlopesStartIndex, flowerTerrainSlopesEndIndex), 0);
+
     // console.log(grassPositionsSize, grassPositionsArray, grassTerrainSlopesSize, grassTerrainSlopesArray);
 
 
@@ -163,6 +176,8 @@ onmessage = async function(event) {
       biomeWeight: biomeWeightArray,
       grassPositions: grassPositionsArray,
       grassTerrainSlopes: grassTerrainSlopesArray,
+      flowerPositions: flowerPositionsArray,
+      flowerTerrainSlopes: flowerTerrainSlopesArray,
     })
   }
 

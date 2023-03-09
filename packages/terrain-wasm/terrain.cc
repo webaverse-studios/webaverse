@@ -8,6 +8,8 @@
 
 using namespace std;
 
+const float mountainHeight = 40.f;
+
 double clamp(double x, double lower, double upper) {
     return std::max(lower, std::min(x, upper));
 }
@@ -65,7 +67,7 @@ double getElevation(double x, double y, double lacunarity, double persistence, i
     elevation = pow(fabs(elevation), power) * (elevation >= 0 ? 1 : -1);
     elevation *= baseAmplitude;
 
-    double elevationOffsetNoise = SimplexNoise::noise(x * 0.001, y * 0.001) * 15; // add noise for elevation;
+    double elevationOffsetNoise = SimplexNoise::noise(x * 0.001, y * 0.001) * mountainHeight; // add noise for elevation;
     elevation += elevationOffset + elevationOffsetNoise;
 
     return elevation;
@@ -574,7 +576,7 @@ void Terrain::getTerrain(
       float slopeWeight = std::max(0.0f, std::min(1.0f, 1.0f - normals[iNormalStride + 1]));
 
       bool isBeach = posY < 1.2;
-      bool isMountain = posY > 20;
+      bool isMountain = posY > mountainHeight;
       
 
       float grassWeight = 0.0f;
@@ -651,8 +653,14 @@ void Terrain::getTerrain(
   std::vector<float> grassPositions;
   std::vector<float> grassTerrainSlopes;
 
+  std::vector<float> flowerPositions;
+  std::vector<float> flowerTerrainSlopes;
+
   int maxGrassPerChunk = 4096;
+  int maxFlowersPerChunk = 1024;
+
   const float grassOffset = 0.5f;
+
   for (float x = xMin; x < xMax && maxGrassPerChunk > 0; x += grassOffset) {
     for (float z = zMin; z < zMax && maxGrassPerChunk > 0; z += grassOffset) {
       const float grassPosNoise = SimplexNoise::noise(x * 1.0f, z * 1.0f);
@@ -671,12 +679,24 @@ void Terrain::getTerrain(
           grassTerrainSlopes.push_back(plantInfo[2]);
 
           maxGrassPerChunk--;
+
+          // only set the flower if there is the grasses
+          const bool hasFlower = (grassPosNoise + 1) * 0.5f > 0.9f;
+          if (hasFlower && maxFlowersPerChunk > 0) {
+            flowerPositions.push_back(x);
+            flowerPositions.push_back(plantElevation);
+            flowerPositions.push_back(z);
+
+            flowerTerrainSlopes.push_back(plantInfo[0]);
+            flowerTerrainSlopes.push_back(plantInfo[1]);
+            flowerTerrainSlopes.push_back(plantInfo[2]);
+            maxFlowersPerChunk --;
+          }
         }
       }
     }
   }
 
-  // std::cout << positions.size() << std::endl;
   int resultIndex = 0;
   for (int i = 0; i < positions.size(); i++) {
     scratchStack[resultIndex] = positions[i];
@@ -719,6 +739,20 @@ void Terrain::getTerrain(
   resultIndex ++;
   for (int i = 0; i < grassTerrainSlopes.size(); i++) {
     scratchStack[resultIndex] = grassTerrainSlopes[i];
+    resultIndex ++;
+  }
+
+  scratchStack[resultIndex] = flowerPositions.size();
+  resultIndex ++;
+  for (int i = 0; i < flowerPositions.size(); i++) {
+    scratchStack[resultIndex] = flowerPositions[i];
+    resultIndex ++;
+  }
+
+  scratchStack[resultIndex] = flowerTerrainSlopes.size();
+  resultIndex ++;
+  for (int i = 0; i < flowerTerrainSlopes.size(); i++) {
+    scratchStack[resultIndex] = flowerTerrainSlopes[i];
     resultIndex ++;
   }
   
