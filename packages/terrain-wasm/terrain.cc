@@ -656,8 +656,15 @@ void Terrain::getTerrain(
   std::vector<float> flowerPositions;
   std::vector<float> flowerTerrainSlopes;
 
+  std::vector<float> treeOnePositions;
+  std::vector<float> treeOneTerrainSlopes;
+
+  std::vector<float> treeTwoPositions;
+  std::vector<float> treeTwoTerrainSlopes;
+
   int maxGrassPerChunk = 4096;
   int maxFlowersPerChunk = 1024;
+  int maxTreesPerChunk = 8;
 
   const float grassOffset = 0.5f;
 
@@ -691,6 +698,34 @@ void Terrain::getTerrain(
             flowerTerrainSlopes.push_back(plantInfo[1]);
             flowerTerrainSlopes.push_back(plantInfo[2]);
             maxFlowersPerChunk --;
+          }
+
+          // only set the tree when there is the grass
+          const bool hasTree = (grassPosNoise + 1) * 0.5f > 0.998f && plantInfo[1] > 0.9;
+          if (hasTree && maxTreesPerChunk > 0) {
+
+            const float treeTypeNoise = (SimplexNoise::noise(x * 0.5f, z * 0.5f) + 1) * 0.5;
+            if (treeTypeNoise < 0.5) {
+              treeOnePositions.push_back(x);
+              treeOnePositions.push_back(plantElevation);
+              treeOnePositions.push_back(z);
+
+              treeOneTerrainSlopes.push_back(plantInfo[0]);
+              treeOneTerrainSlopes.push_back(plantInfo[1]);
+              treeOneTerrainSlopes.push_back(plantInfo[2]);
+            }
+            else {
+              treeTwoPositions.push_back(x);
+              treeTwoPositions.push_back(plantElevation);
+              treeTwoPositions.push_back(z);
+
+              treeTwoTerrainSlopes.push_back(plantInfo[0]);
+              treeTwoTerrainSlopes.push_back(plantInfo[1]);
+              treeTwoTerrainSlopes.push_back(plantInfo[2]);
+            }
+
+            
+            maxTreesPerChunk --;
           }
         }
       }
@@ -753,6 +788,34 @@ void Terrain::getTerrain(
   resultIndex ++;
   for (int i = 0; i < flowerTerrainSlopes.size(); i++) {
     scratchStack[resultIndex] = flowerTerrainSlopes[i];
+    resultIndex ++;
+  }
+
+  scratchStack[resultIndex] = treeOnePositions.size();
+  resultIndex ++;
+  for (int i = 0; i < treeOnePositions.size(); i++) {
+    scratchStack[resultIndex] = treeOnePositions[i];
+    resultIndex ++;
+  }
+
+  scratchStack[resultIndex] = treeOneTerrainSlopes.size();
+  resultIndex ++;
+  for (int i = 0; i < treeOneTerrainSlopes.size(); i++) {
+    scratchStack[resultIndex] = treeOneTerrainSlopes[i];
+    resultIndex ++;
+  }
+
+  scratchStack[resultIndex] = treeTwoPositions.size();
+  resultIndex ++;
+  for (int i = 0; i < treeTwoPositions.size(); i++) {
+    scratchStack[resultIndex] = treeTwoPositions[i];
+    resultIndex ++;
+  }
+
+  scratchStack[resultIndex] = treeTwoTerrainSlopes.size();
+  resultIndex ++;
+  for (int i = 0; i < treeTwoTerrainSlopes.size(); i++) {
+    scratchStack[resultIndex] = treeTwoTerrainSlopes[i];
     resultIndex ++;
   }
   
