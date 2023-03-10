@@ -11,11 +11,17 @@ using namespace std;
 const float mountainHeight = 40.f;
 
 double clamp(double x, double lower, double upper) {
-    return std::max(lower, std::min(x, upper));
+  return std::max(lower, std::min(x, upper));
 }
 
 float lerp(float start, float end, float t) {
-    return start + (end - start) * t;
+  return start + (end - start) * t;
+}
+
+double distance(double x1, double y1, double x2, double y2) {
+  double dx = x2 - x1;
+  double dy = y2 - y1;
+  return sqrt(pow(dx, 2) + pow(dy, 2));
 }
 
 // Generate 2D ridge noise value at (x, y)
@@ -671,6 +677,9 @@ void Terrain::getTerrain(
 
   const float grassOffset = 0.5f;
 
+  std::array<float, 2> previousTreePosition;
+  bool setFirstTree = false;
+
   for (float x = xMin; x < xMax && maxGrassPerChunk > 0; x += grassOffset) {
     for (float z = zMin; z < zMax && maxGrassPerChunk > 0; z += grassOffset) {
       const float grassPosNoise = SimplexNoise::noise(x * 1.0f, z * 1.0f);
@@ -703,10 +712,28 @@ void Terrain::getTerrain(
             maxFlowersPerChunk --;
           }
 
-          // only set the tree when there is the grass
-          const bool hasTree = (grassPosNoise + 1) * 0.5f > 0.998f && plantInfo[1] > 0.9;
-          if (hasTree && maxTreesPerChunk > 0) {
 
+          // only set the tree when there is the grass
+          const float treeOffset = 3.0;
+          bool treeOffsetCheck = false;
+          if (!setFirstTree) {
+            previousTreePosition[0] = x;
+            previousTreePosition[1] = z;
+            setFirstTree = true;
+            treeOffsetCheck = true;
+          }
+          else {
+            if (distance(previousTreePosition[0], previousTreePosition[1], x, z) > treeOffset) {
+              previousTreePosition[0] = x;
+              previousTreePosition[1] = z;
+              treeOffsetCheck = true;
+            }
+            else {
+              treeOffsetCheck = false;
+            }
+          }
+          const bool hasTree = treeOffsetCheck && (grassPosNoise + 1) * 0.5f > 0.998f && plantInfo[1] > 0.9;
+          if (hasTree && maxTreesPerChunk > 0) {
             const float treeTypeNoise = (SimplexNoise::noise(x * 0.5f, z * 0.5f) + 1) * 0.5;
             if (treeTypeNoise < 0.35) {
               treeOnePositions.push_back(x);
