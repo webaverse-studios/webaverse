@@ -143,10 +143,10 @@ std::array<float, 4> getPlantInfo(float targetX, float targetZ, int subdivisions
     const float thresHoldOfGrass = 0.1;
     if (
       normalY > 0.1 
-      && grassWeight > 0.9
-      // && grassWeight - rockWeight > thresHoldOfGrass 
-      // && grassWeight - dirtWeight > thresHoldOfGrass
-      // && grassWeight - sandWeight > thresHoldOfGrass
+      // && grassWeight > 0.9
+      && grassWeight - rockWeight > thresHoldOfGrass 
+      && grassWeight - dirtWeight > thresHoldOfGrass
+      && grassWeight - sandWeight > thresHoldOfGrass
     ) {
         // Elevation
         const float aElevation = positions[aStrideIndex + 1];
