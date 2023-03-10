@@ -1,13 +1,12 @@
 {
+  "name": "The Valley of the Mists",
+  "description": "A peaceful area of the region shrouded in a never ending expanse of mist. It is said that the mists have been around for centuries, long before anyone can remember, and protect the area from the ravages of time and change. And those who venture into the mist find a serene and tranquil beauty. It is a haven for those in search of solitude or a magical place to explore. It is also said to be a great place to find rare ingredients, items, and potions - as long as you’re willing to accept the risk of the mists.",
   "objects": [
-    {
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "start_url": "https://plankatron.github.io/scenes/grid.glb",
-      "dynamic": false
-    }
+    { "type": "application/light", "content": { "lightType": "ambient", "args": [[255, 255, 255], 2] } },
+    { "type": "application/light", "content": { "lightType": "directional", "args": [[255, 255, 255], 2], "position": [1, 2, 3] } },
+    
+    { "position": [0, 1, -2], "quaternion": [0, 0, 0, 1], "start_url": "https://local.webaverse.com/sword/" },
+    
+    { "position": [ 0, 0, 0 ], "start_url": "https://local.webaverse.com/block/grid.glb", "dynamic": false }
   ]
 }

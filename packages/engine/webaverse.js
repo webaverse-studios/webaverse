@@ -477,6 +477,8 @@ const _startHacks = webaverse => {
   const localPlayer = playersManager.getLocalPlayer();
   const vpdAnimations = Avatar.getAnimations().filter(animation => animation.name.endsWith('.vpd'));
 
+  globalThis.world = world;
+
   // Press } to debug current state in console.
   (typeof window !== 'undefined') && window.addEventListener('keydown', event => {
     if (event.key === '}') {
