@@ -162,10 +162,40 @@ onmessage = async function(event) {
     const flowerTerrainSlopesEndIndex = flowerTerrainSlopesStartIndex + flowerTerrainSlopesSize; 
     flowerTerrainSlopesArray.set(scratchStack.f32.subarray(flowerTerrainSlopesStartIndex, flowerTerrainSlopesEndIndex), 0);
 
+    const bushPositionsSize = scratchStack.f32[flowerTerrainSlopesEndIndex];
+    const bushPositionsArray = new Float32Array(bushPositionsSize);
+    const bushPositionsStartIndex = flowerTerrainSlopesEndIndex + 1;
+    const bushPositionsEndIndex = bushPositionsStartIndex + bushPositionsSize; 
+    bushPositionsArray.set(scratchStack.f32.subarray(bushPositionsStartIndex, bushPositionsEndIndex), 0);
 
-    const treeOnePositionsSize = scratchStack.f32[flowerTerrainSlopesEndIndex];
+    const bushTerrainSlopesSize = scratchStack.f32[bushPositionsEndIndex];
+    const bushTerrainSlopesArray = new Float32Array(bushTerrainSlopesSize);
+    const bushTerrainSlopesStartIndex = bushPositionsEndIndex + 1;
+    const bushTerrainSlopesEndIndex = bushTerrainSlopesStartIndex + bushTerrainSlopesSize; 
+    bushTerrainSlopesArray.set(scratchStack.f32.subarray(bushTerrainSlopesStartIndex, bushTerrainSlopesEndIndex), 0);
+
+    const rockPositionsSize = scratchStack.f32[bushTerrainSlopesEndIndex];
+    const rockPositionsArray = new Float32Array(rockPositionsSize);
+    const rockPositionsStartIndex = bushTerrainSlopesEndIndex + 1;
+    const rockPositionsEndIndex = rockPositionsStartIndex + rockPositionsSize; 
+    rockPositionsArray.set(scratchStack.f32.subarray(rockPositionsStartIndex, rockPositionsEndIndex), 0);
+
+    const rockTerrainSlopesSize = scratchStack.f32[rockPositionsEndIndex];
+    const rockTerrainSlopesArray = new Float32Array(rockTerrainSlopesSize);
+    const rockTerrainSlopesStartIndex = rockPositionsEndIndex + 1;
+    const rockTerrainSlopesEndIndex = rockTerrainSlopesStartIndex + rockTerrainSlopesSize; 
+    rockTerrainSlopesArray.set(scratchStack.f32.subarray(rockTerrainSlopesStartIndex, rockTerrainSlopesEndIndex), 0);
+
+    const rockInfosSize = scratchStack.f32[rockTerrainSlopesEndIndex];
+    const rockInfosArray = new Float32Array(rockInfosSize);
+    const rockInfosStartIndex = rockTerrainSlopesEndIndex + 1;
+    const rockInfosEndIndex = rockInfosStartIndex + rockInfosSize; 
+    rockInfosArray.set(scratchStack.f32.subarray(rockInfosStartIndex, rockInfosEndIndex), 0);
+
+
+    const treeOnePositionsSize = scratchStack.f32[rockInfosEndIndex];
     const treeOnePositionsArray = new Float32Array(treeOnePositionsSize);
-    const treeOnePositionsStartIndex = flowerTerrainSlopesEndIndex + 1;
+    const treeOnePositionsStartIndex = rockInfosEndIndex + 1;
     const treeOnePositionsEndIndex = treeOnePositionsStartIndex + treeOnePositionsSize; 
     treeOnePositionsArray.set(scratchStack.f32.subarray(treeOnePositionsStartIndex, treeOnePositionsEndIndex), 0);
 
@@ -175,9 +205,15 @@ onmessage = async function(event) {
     const treeOneTerrainSlopesEndIndex = treeOneTerrainSlopesStartIndex + treeOneTerrainSlopesSize; 
     treeOneTerrainSlopesArray.set(scratchStack.f32.subarray(treeOneTerrainSlopesStartIndex, treeOneTerrainSlopesEndIndex), 0);
 
-    const treeTwoPositionsSize = scratchStack.f32[treeOneTerrainSlopesEndIndex];
+    const treeOneInfosSize = scratchStack.f32[treeOneTerrainSlopesEndIndex];
+    const treeOneInfosArray = new Float32Array(treeOneInfosSize);
+    const treeOneInfosStartIndex = treeOneTerrainSlopesEndIndex + 1;
+    const treeOneInfosEndIndex = treeOneInfosStartIndex + treeOneInfosSize; 
+    treeOneInfosArray.set(scratchStack.f32.subarray(treeOneInfosStartIndex, treeOneInfosEndIndex), 0);
+
+    const treeTwoPositionsSize = scratchStack.f32[treeOneInfosEndIndex];
     const treeTwoPositionsArray = new Float32Array(treeTwoPositionsSize);
-    const treeTwoPositionsStartIndex = treeOneTerrainSlopesEndIndex + 1;
+    const treeTwoPositionsStartIndex = treeOneInfosEndIndex + 1;
     const treeTwoPositionsEndIndex = treeTwoPositionsStartIndex + treeTwoPositionsSize; 
     treeTwoPositionsArray.set(scratchStack.f32.subarray(treeTwoPositionsStartIndex, treeTwoPositionsEndIndex), 0);
 
@@ -187,9 +223,15 @@ onmessage = async function(event) {
     const treeTwoTerrainSlopesEndIndex = treeTwoTerrainSlopesStartIndex + treeTwoTerrainSlopesSize; 
     treeTwoTerrainSlopesArray.set(scratchStack.f32.subarray(treeTwoTerrainSlopesStartIndex, treeTwoTerrainSlopesEndIndex), 0);
 
-    const treeThreePositionsSize = scratchStack.f32[treeTwoTerrainSlopesEndIndex];
+    const treeTwoInfosSize = scratchStack.f32[treeTwoTerrainSlopesEndIndex];
+    const treeTwoInfosArray = new Float32Array(treeTwoInfosSize);
+    const treeTwoInfosStartIndex = treeTwoTerrainSlopesEndIndex + 1;
+    const treeTwoInfosEndIndex = treeTwoInfosStartIndex + treeTwoInfosSize; 
+    treeTwoInfosArray.set(scratchStack.f32.subarray(treeTwoInfosStartIndex, treeTwoInfosEndIndex), 0);
+
+    const treeThreePositionsSize = scratchStack.f32[treeTwoInfosEndIndex];
     const treeThreePositionsArray = new Float32Array(treeThreePositionsSize);
-    const treeThreePositionsStartIndex = treeTwoTerrainSlopesEndIndex + 1;
+    const treeThreePositionsStartIndex = treeTwoInfosEndIndex + 1;
     const treeThreePositionsEndIndex = treeThreePositionsStartIndex + treeThreePositionsSize; 
     treeThreePositionsArray.set(scratchStack.f32.subarray(treeThreePositionsStartIndex, treeThreePositionsEndIndex), 0);
 
@@ -198,6 +240,12 @@ onmessage = async function(event) {
     const treeThreeTerrainSlopesStartIndex = treeThreePositionsEndIndex + 1;
     const treeThreeTerrainSlopesEndIndex = treeThreeTerrainSlopesStartIndex + treeThreeTerrainSlopesSize; 
     treeThreeTerrainSlopesArray.set(scratchStack.f32.subarray(treeThreeTerrainSlopesStartIndex, treeThreeTerrainSlopesEndIndex), 0);
+
+    const treeThreeInfosSize = scratchStack.f32[treeThreeTerrainSlopesEndIndex];
+    const treeThreeInfosArray = new Float32Array(treeThreeInfosSize);
+    const treeThreeInfosStartIndex = treeThreeTerrainSlopesEndIndex + 1;
+    const treeThreeInfosEndIndex = treeThreeInfosStartIndex + treeThreeInfosSize; 
+    treeThreeInfosArray.set(scratchStack.f32.subarray(treeThreeInfosStartIndex, treeThreeInfosEndIndex), 0);
 
     // console.log(grassPositionsSize, grassPositionsArray, grassTerrainSlopesSize, grassTerrainSlopesArray);
 
@@ -211,16 +259,31 @@ onmessage = async function(event) {
       texture: textureArray,
       uv: uvArray,
       biomeWeight: biomeWeightArray,
+
       grassPositions: grassPositionsArray,
       grassTerrainSlopes: grassTerrainSlopesArray,
+
       flowerPositions: flowerPositionsArray,
       flowerTerrainSlopes: flowerTerrainSlopesArray,
+
+      bushPositions: bushPositionsArray,
+      bushTerrainSlopes: bushTerrainSlopesArray,
+
+      rockPositions: rockPositionsArray,
+      rockTerrainSlopes: rockTerrainSlopesArray,
+      rockInfos: rockInfosArray,
+
       treeOnePositions: treeOnePositionsArray,
       treeOneTerrainSlopes: treeOneTerrainSlopesArray,
+      treeOneInfos: treeOneInfosArray,
+
       treeTwoPositions: treeTwoPositionsArray,
       treeTwoTerrainSlopes: treeTwoTerrainSlopesArray,
+      treeTwoInfos: treeTwoInfosArray,
+
       treeThreePositions: treeThreePositionsArray,
       treeThreeTerrainSlopes: treeThreeTerrainSlopesArray,
+      treeThreeInfos: treeThreeInfosArray,
     })
   }
 

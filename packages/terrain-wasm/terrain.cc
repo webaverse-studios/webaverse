@@ -662,23 +662,35 @@ void Terrain::getTerrain(
   std::vector<float> flowerPositions;
   std::vector<float> flowerTerrainSlopes;
 
+  std::vector<float> bushPositions;
+  std::vector<float> bushTerrainSlopes;
+
+  std::vector<float> rockPositions;
+  std::vector<float> rockTerrainSlopes;
+  std::vector<float> rockInfos;
+
   std::vector<float> treeOnePositions;
   std::vector<float> treeOneTerrainSlopes;
+  std::vector<float> treeOneInfos;
 
   std::vector<float> treeTwoPositions;
   std::vector<float> treeTwoTerrainSlopes;
+  std::vector<float> treeTwoInfos;
 
   std::vector<float> treeThreePositions;
   std::vector<float> treeThreeTerrainSlopes;
+  std::vector<float> treeThreeInfos;
+
+  
 
   int maxGrassPerChunk = 4096;
   int maxFlowersPerChunk = 1024;
-  int maxTreesPerChunk = 8;
+  int maxBushesPerChunk = 4;
+  int maxRocksPerChunk = 3;
+  int maxTreesPerChunk = 6;
+  
 
   const float grassOffset = 0.5f;
-
-  std::array<float, 2> previousTreePosition;
-  bool setFirstTree = false;
 
   for (float x = xMin; x < xMax && maxGrassPerChunk > 0; x += grassOffset) {
     for (float z = zMin; z < zMax && maxGrassPerChunk > 0; z += grassOffset) {
@@ -699,8 +711,27 @@ void Terrain::getTerrain(
 
           maxGrassPerChunk--;
 
-          // only set the flower if there is the grasses
+          // has flower
           const bool hasFlower = (grassPosNoise + 1) * 0.5f > 0.9f;
+
+          // has bush
+          const float bushNoiseOffset = 20.0;
+          const float bushPosNoise = SimplexNoise::noise(x * 0.15f + bushNoiseOffset, z * 0.15f + bushNoiseOffset);
+          const bool hasbush = pow((bushPosNoise + 1) * 0.5f, 5.0f) > 0.9f && plantInfo[1] > 0.9 ; 
+
+          // has rock
+          const float rockNoiseOffset = 15.0;
+          const float rockPosNoise = SimplexNoise::noise(x * 0.3f + rockNoiseOffset, z * 0.3f + rockNoiseOffset);
+          const bool hasRock = pow((rockPosNoise + 1) * 0.5f, 5.0f) > 0.9f && plantInfo[1] > 0.9 ; 
+
+          // has tree
+          const float treeNoiseOffset = 20.0;
+          const float treePosNoise = SimplexNoise::noise(x * 0.25f + treeNoiseOffset, z * 0.25f + treeNoiseOffset);
+          const float treeOffset = 3.0;
+          const bool hasTree = pow((treePosNoise + 1) * 0.5f, 5.0f) > 0.5f 
+                              && plantInfo[1] > 0.9 
+                              && std::fmod(z - zMin, treeOffset) == 0.0f && std::fmod(x - xMin, treeOffset) == 0.0f;
+
           if (hasFlower && maxFlowersPerChunk > 0) {
             flowerPositions.push_back(x);
             flowerPositions.push_back(plantElevation);
@@ -711,30 +742,42 @@ void Terrain::getTerrain(
             flowerTerrainSlopes.push_back(plantInfo[2]);
             maxFlowersPerChunk --;
           }
+          else if (hasbush && maxBushesPerChunk > 0) {
+            bushPositions.push_back(x);
+            bushPositions.push_back(plantElevation);
+            bushPositions.push_back(z);
 
+            bushTerrainSlopes.push_back(plantInfo[0]);
+            bushTerrainSlopes.push_back(plantInfo[1]);
+            bushTerrainSlopes.push_back(plantInfo[2]);
+            maxBushesPerChunk --;
+          }
+          else if (hasRock && maxRocksPerChunk > 0) {
+            const float rockTotalScale = 1.0 + (SimplexNoise::noise(x * 0.1f, z * 0.1f) + 1) * 0.5;
+            const float rockScaleXNoise = (0.5 + (SimplexNoise::noise(x * 0.4f, z * 0.4f) + 1) * 0.5) * rockTotalScale;
+            const float rockScaleYNoise = (0.5 + (SimplexNoise::noise(x * 0.5f, z * 0.5f) + 1) * 0.5) * rockTotalScale;
+            const float rockScaleZNoise = (0.5 + (SimplexNoise::noise(x * 0.6f, z * 0.6f) + 1) * 0.5) * rockTotalScale;
+            const float rockQuaternionNoise = (SimplexNoise::noise(x * 0.7f, z * 0.7f) + 1) * 0.5 * M_PI;
+            rockPositions.push_back(x);
+            rockPositions.push_back(plantElevation);
+            rockPositions.push_back(z);
 
-          // only set the tree when there is the grass
-          const float treeOffset = 3.0;
-          bool treeOffsetCheck = false;
-          if (!setFirstTree) {
-            previousTreePosition[0] = x;
-            previousTreePosition[1] = z;
-            setFirstTree = true;
-            treeOffsetCheck = true;
+            rockTerrainSlopes.push_back(plantInfo[0]);
+            rockTerrainSlopes.push_back(plantInfo[1]);
+            rockTerrainSlopes.push_back(plantInfo[2]);
+
+            rockInfos.push_back(rockScaleXNoise);
+            rockInfos.push_back(rockScaleYNoise);
+            rockInfos.push_back(rockScaleZNoise);
+            rockInfos.push_back(rockQuaternionNoise);
+            maxRocksPerChunk --;
           }
-          else {
-            if (distance(previousTreePosition[0], previousTreePosition[1], x, z) > treeOffset) {
-              previousTreePosition[0] = x;
-              previousTreePosition[1] = z;
-              treeOffsetCheck = true;
-            }
-            else {
-              treeOffsetCheck = false;
-            }
-          }
-          const bool hasTree = treeOffsetCheck && (grassPosNoise + 1) * 0.5f > 0.998f && plantInfo[1] > 0.9;
-          if (hasTree && maxTreesPerChunk > 0) {
+          else if (hasTree && maxTreesPerChunk > 0) {
             const float treeTypeNoise = (SimplexNoise::noise(x * 0.5f, z * 0.5f) + 1) * 0.5;
+
+            const float treeScaleNoise = 0.5 + (SimplexNoise::noise(x * 0.6f, z * 0.6f) + 1) * 0.1;
+            const float treeQuaternionNoise = (SimplexNoise::noise(x * 0.7f, z * 0.7f) + 1) * 0.5 * M_PI;
+            // const float treeColorNoise = (SimplexNoise::noise(x * 0.8f, z * 0.8f) + 1) * 0.5;
             if (treeTypeNoise < 0.35) {
               treeOnePositions.push_back(x);
               treeOnePositions.push_back(plantElevation);
@@ -743,6 +786,10 @@ void Terrain::getTerrain(
               treeOneTerrainSlopes.push_back(plantInfo[0]);
               treeOneTerrainSlopes.push_back(plantInfo[1]);
               treeOneTerrainSlopes.push_back(plantInfo[2]);
+
+              treeOneInfos.push_back(treeScaleNoise);
+              treeOneInfos.push_back(treeQuaternionNoise);
+              treeOneInfos.push_back(0.0);
             }
             else if (treeTypeNoise < 0.7){
               treeTwoPositions.push_back(x);
@@ -752,6 +799,10 @@ void Terrain::getTerrain(
               treeTwoTerrainSlopes.push_back(plantInfo[0]);
               treeTwoTerrainSlopes.push_back(plantInfo[1]);
               treeTwoTerrainSlopes.push_back(plantInfo[2]);
+
+              treeTwoInfos.push_back(treeScaleNoise);
+              treeTwoInfos.push_back(treeQuaternionNoise);
+              treeTwoInfos.push_back(1.0);
             }
             else {
               treeThreePositions.push_back(x);
@@ -761,6 +812,10 @@ void Terrain::getTerrain(
               treeThreeTerrainSlopes.push_back(plantInfo[0]);
               treeThreeTerrainSlopes.push_back(plantInfo[1]);
               treeThreeTerrainSlopes.push_back(plantInfo[2]);
+
+              treeThreeInfos.push_back(treeScaleNoise);
+              treeThreeInfos.push_back(treeQuaternionNoise);
+              treeThreeInfos.push_back(2.0);
             }
 
             
@@ -830,6 +885,41 @@ void Terrain::getTerrain(
     resultIndex ++;
   }
 
+  scratchStack[resultIndex] = bushPositions.size();
+  resultIndex ++;
+  for (int i = 0; i < bushPositions.size(); i++) {
+    scratchStack[resultIndex] = bushPositions[i];
+    resultIndex ++;
+  }
+
+  scratchStack[resultIndex] = bushTerrainSlopes.size();
+  resultIndex ++;
+  for (int i = 0; i < bushTerrainSlopes.size(); i++) {
+    scratchStack[resultIndex] = bushTerrainSlopes[i];
+    resultIndex ++;
+  }
+
+  scratchStack[resultIndex] = rockPositions.size();
+  resultIndex ++;
+  for (int i = 0; i < rockPositions.size(); i++) {
+    scratchStack[resultIndex] = rockPositions[i];
+    resultIndex ++;
+  }
+
+  scratchStack[resultIndex] = rockTerrainSlopes.size();
+  resultIndex ++;
+  for (int i = 0; i < rockTerrainSlopes.size(); i++) {
+    scratchStack[resultIndex] = rockTerrainSlopes[i];
+    resultIndex ++;
+  }
+
+  scratchStack[resultIndex] = rockInfos.size();
+  resultIndex ++;
+  for (int i = 0; i < rockInfos.size(); i++) {
+    scratchStack[resultIndex] = rockInfos[i];
+    resultIndex ++;
+  }
+
   scratchStack[resultIndex] = treeOnePositions.size();
   resultIndex ++;
   for (int i = 0; i < treeOnePositions.size(); i++) {
@@ -841,6 +931,13 @@ void Terrain::getTerrain(
   resultIndex ++;
   for (int i = 0; i < treeOneTerrainSlopes.size(); i++) {
     scratchStack[resultIndex] = treeOneTerrainSlopes[i];
+    resultIndex ++;
+  }
+
+  scratchStack[resultIndex] = treeOneInfos.size();
+  resultIndex ++;
+  for (int i = 0; i < treeOneInfos.size(); i++) {
+    scratchStack[resultIndex] = treeOneInfos[i];
     resultIndex ++;
   }
 
@@ -858,6 +955,13 @@ void Terrain::getTerrain(
     resultIndex ++;
   }
 
+  scratchStack[resultIndex] = treeTwoInfos.size();
+  resultIndex ++;
+  for (int i = 0; i < treeTwoInfos.size(); i++) {
+    scratchStack[resultIndex] = treeTwoInfos[i];
+    resultIndex ++;
+  }
+
   scratchStack[resultIndex] = treeThreePositions.size();
   resultIndex ++;
   for (int i = 0; i < treeThreePositions.size(); i++) {
@@ -869,6 +973,13 @@ void Terrain::getTerrain(
   resultIndex ++;
   for (int i = 0; i < treeThreeTerrainSlopes.size(); i++) {
     scratchStack[resultIndex] = treeThreeTerrainSlopes[i];
+    resultIndex ++;
+  }
+
+  scratchStack[resultIndex] = treeThreeInfos.size();
+  resultIndex ++;
+  for (int i = 0; i < treeThreeInfos.size(); i++) {
+    scratchStack[resultIndex] = treeThreeInfos[i];
     resultIndex ++;
   }
   
