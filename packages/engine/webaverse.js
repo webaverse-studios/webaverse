@@ -50,6 +50,10 @@ import backgroundFx from './background-fx/background-fx.js';
 import {partyManager} from './party-manager';
 import {LoadingManager} from './loading-manager';
 
+import Stats from 'stats.js';
+var stats = new Stats();
+document.body.appendChild(stats.dom);
+
 const localVector = new THREE.Vector3();
 const localVector2 = new THREE.Vector3();
 const localQuaternion = new THREE.Quaternion();
@@ -400,6 +404,7 @@ export default class Webaverse extends EventTarget {
     
     let lastTimestamp = performance.now();
     const animate = (timestamp, frame) => {
+      stats.begin();
       const _frame = () => {
         timestamp = timestamp ?? performance.now();
         const timeDiff = timestamp - lastTimestamp;
@@ -465,6 +470,7 @@ export default class Webaverse extends EventTarget {
       };
       _frame();
 
+      stats.end();
     }
     renderer.setAnimationLoop(animate);
 

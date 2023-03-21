@@ -1,0 +1,19 @@
+{
+  "objects": [
+    {
+      "type": "application/light",
+      "content": {
+        "lightType": "ambient",
+        "args": [[30, 100, 255], 1]
+      }
+    },
+    {
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "start_url": "https://local.webaverse.com/infinite-terrain/"
+    }
+  ]
+}
