@@ -60,15 +60,17 @@ export const Location = () => {
   };
 
   const handleMultiplayerBtnClick = async () => {
-    setState({...state, openedModal: null});
-    let {src} = parseQuery(window.location.search);
-    if (src === undefined) {
-      src = scenesBaseUrl + defaultSceneName;
-    }
+    // setState({...state, openedModal: null});
+    // let {src} = parseQuery(window.location.search);
+    // if (src === undefined) {
+    //   src = scenesBaseUrl + defaultSceneName;
+    // }
 
-    const sceneName = src.trim();
-    const roomName = makeId(5);
-    universe.enterMultiplayer(`/?src=${encodeURIComponent(sceneName)}&room=${roomName}`);
+    // const sceneName = src.trim();
+    // const roomName = makeId(5);
+    // universe.enterMultiplayer(`/?src=${encodeURIComponent(sceneName)}&room=${roomName}`);
+    
+    universe.toggleMultiplayer();
   }
 
   const handleRoomCreateBtnClick = async () => {

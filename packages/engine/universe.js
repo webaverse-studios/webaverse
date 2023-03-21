@@ -4,23 +4,21 @@ responsibilities include loading the world on url change.
 */
 
 import metaversefile from 'metaversefile';
-import {NetworkRealms} from 'multiplayer/public/network-realms.mjs';
+import {NetworkRealms} from 'multiplayer-do/public/network-realms.mjs';
 import WSRTC from 'wsrtc/wsrtc.js';
 import * as Z from 'zjs';
 
 import {actionsMapName, appsMapName, partyMapName, initialPosY, playersMapName, realmSize} from './constants.js';
+import {characterSelectManager} from './characterselect-manager.js';
 import {loadOverworld} from './overworld.js';
 import {partyManager} from './party-manager.js';
 import physicsManager from './physics-manager.js';
 import physxWorkerManager from './physx-worker-manager.js';
 import {playersManager} from './players-manager.js';
-import {parseQuery} from './util.js';
+import {makeId, parseQuery} from './util.js';
 import voiceInput from './voice-input/voice-input.js';
 import {world} from './world.js';
-import {defaultSceneName} from './endpoints.js';
 import {sceneManager} from './scene-manager.js';
-import spawnManager from './spawn-manager.js';
-import {rootScene} from './renderer.js';
 import physx from './physx.js';
 
 class Universe extends EventTarget {
@@ -35,8 +33,7 @@ class Universe extends EventTarget {
     this.multiplayerConnected = false;
     this.realms = null;
     this.actionsPrefix = 'actions.';
-    this.appsPrefix = 'apps.';
-    this.playerCleanupFns = [];
+    this.actionsCleanupFns = [];
   }
 
   getWorldsHost() {
@@ -45,9 +42,8 @@ class Universe extends EventTarget {
   }
 
   async enterWorld(worldSpec, locationSpec) {
-    this.disconnectSingleplayer();
     this.disconnectMultiplayer();
-    // this.disconnectRoom();
+    this.disconnectRoom();
     
     const localPlayer = metaversefile.useLocalPlayer();
     /* localPlayer.teleportTo(new THREE.Vector3(0, 1.5, 0), camera.quaternion, {
@@ -71,48 +67,42 @@ class Universe extends EventTarget {
 
       const promises = [];
       const {src, room} = worldSpec;
-      this.multiplayerEnabled = room !== undefined;
-      if (!this.multiplayerEnabled) {
-        await this.connectSinglePlayer();
+      if (!this.multiplayerEnabled && !room) {
+        const state = new Z.Doc();
+        this.connectState(state);
 
         let match;
-        if (src === undefined) { // default load
-          // const sceneNames = await sceneManager.getSceneNamesAsync();
-          const p = (async () => {
-            const app = await metaversefile.createAppAsync({
-              start_url: sceneManager.getSceneUrl(defaultSceneName),
-            });
-            return app;
-          })();
-          promises.push(p);
-        } else if (src === '') { // blank load
+        if (src === undefined) {
+          const sceneNames = await sceneManager.getSceneNamesAsync();
+          const sceneUrl = sceneManager.getSceneUrl(sceneNames[0]);
+          worldSpec = {src: sceneUrl};
+          promises.push(metaversefile.createAppAsync({
+            start_url: sceneUrl,
+          }));
+        } else if (src === '') {
           // nothing
-        } else if (match = src.match(/^weba:\/\/(-?[0-9\.]+),(-?[0-9\.]+)(?:\/|$)/i)) { // world load
+        } else if (match = src.match(/^weba:\/\/(-?[0-9\.]+),(-?[0-9\.]+)(?:\/|$)/i)) {
           const [, x, y] = match;
           const [x1, y1] = [parseFloat(x), parseFloat(y)];
           const p = loadOverworld(x1, y1);
           promises.push(p);
-        } else { // src load
-          const p = (async () => {
-            const app = await metaversefile.createAppAsync({
-              start_url: src,
-            });
-            rootScene.add(app);
-            return app;
-          })();
+        } else {
+          const p = metaversefile.createAppAsync({
+            start_url: src,
+          });
           promises.push(p);
         }
-      } else {
+      } else if (this.multiplayerEnabled) {
         const p = (async () => {
-          await this.connectMultiplayer(src, room);
+          await this.connectMultiplayer(src);
         })();
         promises.push(p);
-      // } else {
-      //  const p = (async () => {
-      //    const roomUrl = this.getWorldsHost() + room;
-      //    await this.connectRoom(roomUrl);
-      //  })();
-      //  promises.push(p);
+      } else {
+        const p = (async () => {
+          const roomUrl = this.getWorldsHost() + room;
+          await this.connectRoom(roomUrl);
+        })();
+        promises.push(p);
       }
       
       this.sceneLoadedPromise = Promise.all(promises)
@@ -128,14 +118,12 @@ class Universe extends EventTarget {
 
     this.currentWorld = worldSpec;
 
-    await spawnManager.spawn();
-
     this.dispatchEvent(new MessageEvent('worldload'));
   }
 
-  // async reload() {
-  //   await this.enterWorld(this.currentWorld);
-  // }
+  async reload() {
+    await this.enterWorld(this.currentWorld);
+  }
 
   async pushUrl(u) {
     history.pushState({}, '', u);
@@ -148,14 +136,13 @@ class Universe extends EventTarget {
     await this.enterWorld(q);
   }
 
-  async enterMultiplayer(url) {
-    history.pushState({}, '', url);
-    window.dispatchEvent(new MessageEvent('pushstate'));
-    const worldSpec = parseQuery(location.search);
-    const locationSpec = {
-      position: playersManager.getLocalPlayer().position,
-    };
-    await this.enterWorld(worldSpec, locationSpec);
+  toggleMultiplayer() {
+    this.multiplayerEnabled = !this.multiplayerEnabled;
+    console.log(this.multiplayerEnabled ? 'Enter multiplayer' : 'Exit multiplayer');
+    const localPlayer = playersManager.getLocalPlayer();
+    this.enterWorld(this.currentWorld, {
+      position: localPlayer.position,
+    });
   }
 
   isSceneLoaded() {
@@ -182,6 +169,8 @@ class Universe extends EventTarget {
 
   getConnection() { return this.wsrtc; }
 
+  // called by enterWorld() in universe.js
+  // This is called in single player mode instead of connectRoom
   connectState(state) {
     this.state = state;
     state.setResolvePriority(1);
@@ -201,30 +190,49 @@ class Universe extends EventTarget {
     localPlayer.bindState(state.getArray(playersMapName));
   }
 
-  // Called by enterWorld() when a player connects as single-player.
-  async connectSinglePlayer(state = new Z.Doc()) {
-    this.connectState(state);
-  }
-
-  // Called by enterWorld() to ensure we aren't connected as single player.
-  disconnectSingleplayer() {
-    // Nothing to do.
-  }
-
   // Called by enterWorld() when a player enables multi-player.
-  async connectMultiplayer(src, room, state = new Z.Doc()) {
-    console.log('Connect multiplayer');
-    if (src === undefined || room === undefined) {
-      console.error('Multiplayer src and room must be defined.')
-      return;
-    }
-
+  async connectMultiplayer(src, state = new Z.Doc()) {
     this.connectState(state);
 
     // Set up the network realms.
+    // https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
+    const hashCode = s => s.split('').reduce((a, b) => (((a << 5) - a) + b.charCodeAt(0)) | 0, 0);
+    const sceneId = hashCode(src).toString();
     const localPlayer = playersManager.getLocalPlayer();
-    this.realms = new NetworkRealms(room, localPlayer.playerId);
+    this.realms = new NetworkRealms(sceneId, localPlayer.playerId);
     await this.realms.initAudioContext();
+    this.realmsCleanupFns = new Map();
+
+    this.realms.addEventListener('realmjoin', e => {
+      const {realm} = e.data;
+      const {dataClient, networkedDataClient} = realm;
+
+      const onsyn = e => {
+        const {synId} = e.data;
+        const synAckMessage = dataClient.getSynAckMessage(synId);
+        networkedDataClient.emitUpdate(synAckMessage);
+      };
+      dataClient.addEventListener('syn', onsyn);
+
+      const cleanupFns = [
+        () => {
+          dataClient.removeEventListener('syn', onsyn);
+        },
+      ];
+
+      this.realmsCleanupFns.set(realm, () => {
+        for (const cleanupFn of cleanupFns) {
+          cleanupFn();
+        }
+      });
+    });
+
+    this.realms.addEventListener('realmleave', e => {
+      const {realm} = e.data;
+
+      this.realmsCleanupFns.get(realm)();
+      this.realmsCleanupFns.delete(realm);
+    });
 
     // Handle remote players joining and leaving the set of realms.
     // These events are received both upon starting and during multiplayer.
@@ -233,6 +241,7 @@ class Universe extends EventTarget {
       const {playerId, player} = e.data;
       console.log('Player joined:', playerId);
 
+      const defaultPlayerSpec = await characterSelectManager.getDefaultSpecAsync();
       const defaultTransform = new Float32Array([0, 0, 0, 0, 0, 0, 1, 1, 1, 1]);
 
       const playersArray = this.state.getArray(playersMapName);
@@ -240,11 +249,24 @@ class Universe extends EventTarget {
       playersArray.doc.transact(() => {
         playerMap.set('playerId', playerId);
 
+        const appId = makeId(5);
+
         const appsArray = new Z.Array();
+        const avatarApp = {
+          instanceId: appId,
+          contentId: defaultPlayerSpec.avatarUrl,
+          transform: defaultTransform,
+          components: [],
+        };
+        appsArray.push([avatarApp]);
         playerMap.set(appsMapName, appsArray);
 
         const actionsArray = new Z.Array();
+        // TODO: Add landAction?
         playerMap.set(actionsMapName, actionsArray);
+
+        playerMap.set('avatar', appId);
+        // TODO: Add voiceSpec?
 
         playersArray.push([playerMap]);
       });
@@ -256,7 +278,7 @@ class Universe extends EventTarget {
           playerMap.set(actionsMapName, actionsArray);
         }
         return actionsArray;
-      };
+      }
 
       // Handle remote player updates.
       player.addEventListener('update', e => {
@@ -298,74 +320,13 @@ class Universe extends EventTarget {
               }
             }
           });
-        } else if (key.startsWith(this.appsPrefix)) {
-          playersArray.doc.transact(() => {
-            const apps = playerMap.get(appsMapName);
-
-            if (val !== null) {
-              // Add app to state.
-              apps.push([{
-                components: [],
-                transform: defaultTransform.slice(),
-                ...val,
-              }]);
-            } else {
-              // Remove app from state.
-              const appKey = key.slice(this.appsPrefix.length);
-              let index = 0;
-              for (const app of apps) {
-                if (app.get('instanceId') === appKey) {
-                  apps.delete(index);
-                  break;
-                }
-                index += 1;
-              }
-            }
-          });
-        } else if (key === 'avatar') {
-          // Set new avatar instanceId.
-          playersArray.doc.transact(() => {
-            playerMap.set('avatar', val);
-          });
-        } else if (key === 'voiceSpec') {
-          playersArray.doc.transact(() => {
-            playerMap.set('voiceSpec', val);
-          });
         }
       });
 
-      // Add this player to player map.
       const transform = player.getKeyValue('transform');
       if (transform) {
         playersArray.doc.transact(() => {
           playerMap.set('transform', transform);
-          playerMap.set('velocity', [0, 0, 0]);
-        });
-      }
-      const voiceSpec = player.getKeyValue('voiceSpec');
-      if (voiceSpec) {
-        playersArray.doc.transact(() => {
-          playerMap.set('voiceSpec', voiceSpec);
-        });
-      }
-      const avatar = player.getKeyValue('avatar');
-      if (avatar) {
-        const avatarApp = player.getKeyValue(this.appsPrefix + avatar);
-        if (avatarApp) {
-          // Add new avatar app.
-          playersArray.doc.transact(() => {
-            const apps = playerMap.get(appsMapName);
-            apps.push([{
-              instanceId: avatar,
-              contentId: avatarApp.contentId,
-              components: [],
-              transform: defaultTransform.slice(),
-            }]);
-          });
-        }
-        playersArray.doc.transact(() => {
-          // Set new avatar instanceId.
-          playerMap.set('avatar', avatar);
         });
       }
     });
@@ -383,194 +344,70 @@ class Universe extends EventTarget {
       }
     });
 
-    // Handle scene updates from network realms.
-    // In particular, 'entityadd' events for world apps are received by player 2+ when they join a room.
-    const onWorldAppEntityAdd = e => {
-      const {arrayId, entityId} = e.data;
-      const instanceId = entityId;
-      if (arrayId === "worldApps" && !world.appManager.hasTrackedApp(instanceId)) {
-        const virtualWorld = this.realms.getVirtualWorld();
-        const {contentId, transform, components} = virtualWorld.worldApps.getVirtualMap(instanceId).toObject();
-        const appsArray = state.getArray(appsMapName);
-        appsArray.doc.transact(() => {
-          const appMap = new Z.Map();
-          appMap.set('instanceId', instanceId);
-          appMap.set('contentId', contentId);
-          appMap.set('transform', new Float32Array(transform));
-          appMap.set('components', components);
-          appsArray.push([appMap]);
-        });
-      }
-    };
-    this.realms.addEventListener('entityadd', onWorldAppEntityAdd);
-    const onWorldAppEntityRemove = e => {
-      // TODO
-      console.warn('onWorldAppEntityRemove() not implemented');
-    };
-    this.realms.addEventListener('entityremove', onWorldAppEntityRemove);
+    // Use default scene if none specified.
+    if (src === undefined) {
+      const sceneNames = await sceneManager.getSceneNamesAsync();
+      src = sceneManager.getSceneUrl(sceneNames[0]);
+    }
 
+    // Load the scene.
+    await metaversefile.createAppAsync({
+      start_url: src,
+    });
 
-    const onConnect = async position => {
+    const onConnect = position => {
+
+      // Default player apps and actions can be included here.
+
+      // Player actions.
       const localPlayer = playersManager.getLocalPlayer();
-      const virtualWorld = this.realms.getVirtualWorld();
-
-      // World app initialization.
-      // 'trackedappadd' events occur when player 1 loads the scene upon entering multiplayer. These apps are added to the
-      // realms for other players to obtain when they join via realms 'entityadd' events.
-      // TODO: Won't need this once the multiplayer-do state is used instead of current Z state.
-      const onTrackedAppAdd = async e => {
-        const {trackedApp} = e.data;
-        const {instanceId, contentId, transform, components} = trackedApp.toJSON();
-        const position = [...transform].slice(0, 3);
-        const realm = this.realms.getClosestRealm(position);
-        virtualWorld.worldApps.addEntityAt(instanceId, {instanceId, contentId, transform, components}, realm);
-      };
-      world.appManager.addEventListener('trackedappadd', onTrackedAppAdd);
-      this.playerCleanupFns.push(() => {
-        world.appManager.removeEventListener('trackedappadd', onTrackedAppAdd);
-      });
-      /*
-      const onTrackedAppRemove = async e => {
-        console.warn('onTrackedAppRemove() not implemented');
-      };
-      world.appManager.addEventListener('trackedappremove', onTrackedAppRemove);
-      this.playerCleanupFns.push(() => {
-        world.appManager.removeEventListener('trackedappremove', onTrackedAppRemove);
-      });
-      */
-
-      // Player app changes.
-      // TODO: Use realms.localPlayer.playerApps collection instead of key values.
-      const onAppAdd = e => {
-        const app = e.data;
-        const components = app.components.reduce((acc, val) => {
-          acc[val.key] = val.value;
-          return acc;
-        }, {});
-        this.realms.localPlayer.setKeyValue(this.appsPrefix + app.instanceId, {
-          instanceId: app.instanceId,
-          ...components,
-        });
-      };
-      localPlayer.appManager.addEventListener('appadd', onAppAdd);
-      this.playerCleanupFns.push(() => {
-        localPlayer.appManager.removeEventListener('appadd', onAppAdd);
-      });
-      const onAppRemove = e => {
-        const app = e.data;
-        this.realms.localPlayer.setKeyValue(this.appsPrefix + app.instanceId, null);
-      };
-      localPlayer.appManager.addEventListener('appremove', onAppRemove);
-      this.playerCleanupFns.push(() => {
-        localPlayer.appManager.removeEventListener('appremove', onAppRemove);
-      });
-
-      // Player avatar changes.
-      const onAvatarChange = e => {
-        this.realms.localPlayer.setKeyValue('avatar', localPlayer.getAvatarInstanceId());
-      };
-      localPlayer.addEventListener('avatarchange', onAvatarChange);
-      this.playerCleanupFns.push(() => {
-        localPlayer.appManager.removeEventListener('avatarchange', onAvatarChange);
-      });
-      const onAvatarUpdate = e => {
-        // Nothing to do.
-      };
-      localPlayer.addEventListener('avatarupdate', onAvatarUpdate);
-      this.playerCleanupFns.push(() => {
-        localPlayer.appManager.removeEventListener('avatarupdate', onAvatarUpdate);
-      });
-
-      // Player action changes.
-      // TODO: Use realms.localPlayer.playerActions collection instead of key values.
       const onActionAdd = e => {
-        this.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, e.action);
+        universe.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, e.action);
       };
       localPlayer.addEventListener('actionadd', onActionAdd);
-      this.playerCleanupFns.push(() => {
+      this.actionsCleanupFns.push(() => {
         localPlayer.removeEventListener('actionadd', onActionAdd);
       });
       const onActionRemove = e => {
-        this.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, null);
+        universe.realms.localPlayer.setKeyValue(this.actionsPrefix + e.action.type, null);
       };
       localPlayer.addEventListener('actionremove', onActionRemove);
-      this.playerCleanupFns.push(() => {
+      this.actionsCleanupFns.push(() => {
         localPlayer.removeEventListener('actionremove', onActionRemove);
       });
 
-      // Initialize network realms player.
       this.realms.localPlayer.initializePlayer({
         position,
       }, {});
       const transformAndTimestamp = [...localPlayer.transform, performance.now()];
-      this.realms.localPlayer.setKeyValue('transform', transformAndTimestamp);
-      this.realms.localPlayer.setKeyValue('voiceSpec', localPlayer.playerMap.get('voiceSpec'));
+      universe.realms.localPlayer.setKeyValue('transform', transformAndTimestamp);
 
-      // Avatar model.
-      const apps = localPlayer.playerMap.get(appsMapName);
-      const appsArray = Array.from(apps);
-      const avatarInstanceId = localPlayer.getAvatarInstanceId();
-      const avatarApp = appsArray.find(app => app.get('instanceId') === avatarInstanceId);
-      const components = {
-        contentId: avatarApp.get('contentId'),
-        instanceId: avatarInstanceId,
-      };
-      this.realms.localPlayer.setKeyValue(this.appsPrefix + avatarInstanceId, components);
-      this.realms.localPlayer.setKeyValue('avatar', avatarInstanceId);
-
-      // Mic state.
       if (voiceInput.micEnabled()) {
         this.realms.enableMic();
-      }
-
-      // Load the scene.
-      // First player loads scene from src.
-      // Second and subsequent players load scene from network realms.
-      // TODO: Won't need to load the scene once the multiplayer-do state is used instead of the current Z state.
-      if (virtualWorld.worldApps.getSize() === 0) {
-        await metaversefile.createAppAsync({
-          start_url: src,
-        });
       }
 
       console.log('Multiplayer connected');
       this.multiplayerConnected = true;
     };
 
-    // Initiate network realms connection.
-    await this.realms.updatePosition(localPlayer.position.toArray(), realmSize, {
+    this.realms.updatePosition(localPlayer.position.toArray(), realmSize, {
       onConnect,
     });
-
-
-    // Wait for world apps to be loaded so that avatar doesn't fall.
-    const TEST_INTERVAL = 100;
-    const MAX_TIMEOUT = 20000;
-    const startTime = Date.now();
-    while (world.appManager.pendingAddPromises.size > 0 && (Date.now() - startTime) < MAX_TIMEOUT) {
-      await new Promise(resolve => setTimeout(resolve, TEST_INTERVAL));
-    }
   }
 
   // Called by enterWorld() to ensure we aren't connected to multi-player.
   disconnectMultiplayer() {
-    if (!this.multiplayerConnected) {
-      return;
-    }
-
     this.multiplayerConnected = false;
 
-    for (const cleanupFn of this.playerCleanupFns) {
+    for (const cleanupFn of this.actionsCleanupFns) {
       cleanupFn();
     }
-    this.playerCleanupFns = [];
+    this.actionsCleanupFns = [];
 
     if (this.realms) {
       this.realms.disconnect();
       this.realms = null;
     }
-
-    console.log('Multiplayer disconnected');
   }
 
   // called by enterWorld() in universe.js
