@@ -239,6 +239,19 @@ class HaltSit extends b3.Condition {
     }
   }
 }
+class Swim extends b3.Action {
+  tick(tick) {
+    const tickResults = tick.blackboard.get('tickResults');
+    // const frameTryStopActions = tick.blackboard.get('frameTryStopActions');
+    const localPlayer = tick.target;
+    if (localPlayer.position.y < 0.5) {
+      tickResults.swim = true;
+      return b3.SUCCESS;
+    } else {
+      return b3.FAILURE;
+    }
+  }
+}
 class StartGlider extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
@@ -279,6 +292,7 @@ tree.root = new b3.MemSequence({title:'root',children: [
             new Sit(),
           ]}),
         ]}),
+        new Swim({title:'Swim'}),
         new b3.Sequence({title:'fly & narutoRun',children:[
           new Fly({title:'Fly'}),
           new b3.Succeedor({child: new NarutoRun({title:'NarutoRun'})}),
@@ -310,7 +324,10 @@ tree.root = new b3.MemSequence({title:'root',children: [
         ]}),
         new NarutoRun({title:'NarutoRun'}),
       ]}), // end: base
-      new Land({title:'Land'}),
+      new b3.Priority({title:'swim & land',children:[
+        new Swim({title:'Swim'}),
+        new Land({title:'Land'}),
+      ]}),
     ]}), // end: main
   }), // end: loaded
 ]}); // end: root
@@ -403,6 +420,14 @@ const postFrameSettings = (localPlayer, blackboard) => {
     }
     if (!tickResults.sit && lastFrameResults.sit) {
       localPlayer.removeAction('sit');
+    }
+  
+    if (tickResults.swim && !lastFrameResults.swim) {
+      const newSwimAction = {type: 'swim', swimDamping: 1};
+      localPlayer.addAction(newSwimAction);
+    }
+    if (!tickResults.swim && lastFrameResults.swim) {
+      localPlayer.removeAction('swim');
     }
   
     if (tickResults.glider && !lastFrameResults.glider) {
