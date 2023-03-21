@@ -30,17 +30,26 @@ class EmoteManager {
       }
 
       // add new emote
-      const newAction = {
+      const newEmoteAction = {
         type: 'emote',
         animation: emoteHardName,
       };
-      player.addAction(newAction);
+      player.addAction(newEmoteAction);
+
+      const newFacePoseAction = {
+        type: 'facepose',
+        emotion: emoteHardName,
+      };
+      player.addAction(newFacePoseAction);
 
       const emoteAnimation = emoteAnimations[emoteHardName];
       const emoteAnimationDuration = emoteAnimation.duration;
       const newEmoteTimeout = setTimeout(() => {
-        const actionIndex = player.findActionIndex(action => action.type === 'emote' && action.animation === emoteHardName);
-        player.removeActionIndex(actionIndex);
+        const emoteActionIndex = player.findActionIndex(action => action.type === 'emote' && action.animation === emoteHardName);
+        player.removeActionIndex(emoteActionIndex);
+        this.emoteTimeouts.delete(player);
+        const faceposeActionIndex = player.findActionIndex(action => action.type === 'facepose' && action.emotion === emoteHardName);
+        player.removeActionIndex(faceposeActionIndex);
         this.emoteTimeouts.delete(player);
 
         accept();
