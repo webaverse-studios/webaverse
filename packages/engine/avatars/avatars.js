@@ -1733,24 +1733,38 @@ class Avatar {
                   index = neutralIndex;
                   break;
                 }
+                case 'alert': {
+                  morphTargetInfluences[joyIndex] = 1;
+                  break;
+                }
                 case 'angry': {
-                  index = angryIndex;
+                  morphTargetInfluences[angryIndex] = 1;
                   break;
                 }
-                case 'fun': {
-                  index = funIndex;
+                case 'embarrassed': {
+                  morphTargetInfluences[funIndex] = 0.4;
+                  morphTargetInfluences[sorrowIndex] = 0.4;
                   break;
                 }
-                case 'joy': {
-                  index = joyIndex;
+                case 'headNod': {
+                  morphTargetInfluences[funIndex] = 1;
                   break;
                 }
-                case 'sorrow': {
-                  index = sorrowIndex;
+                case 'headShake': {
+                  morphTargetInfluences[angryIndex] = 0.4;
+                  morphTargetInfluences[sorrowIndex] = 0.4;
+                  break;
+                }
+                case 'sad': {
+                  morphTargetInfluences[sorrowIndex] = 1;
                   break;
                 }
                 case 'surprise': {
-                  index = surpriseIndex;
+                  morphTargetInfluences[surpriseIndex] = 1;
+                  break;
+                }
+                case 'victory': {
+                  morphTargetInfluences[joyIndex] = 1;
                   break;
                 }
                 default: {
@@ -1758,11 +1772,11 @@ class Avatar {
                   if (match) {
                     index = parseInt(match[1], 10);
                   }
+                  if (index !== -1) {
+                    morphTargetInfluences[index] = facepose.value ?? 1;
+                  }
                   break;
                 }
-              }
-              if (index !== -1) {
-                morphTargetInfluences[index] = facepose.value ?? 1;
               }
             }
           }
