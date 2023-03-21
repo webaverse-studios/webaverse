@@ -8,7 +8,23 @@
     { "position": [0, 1, -2], "quaternion": [0, 0, 0, 1], "start_url": "https://local.webaverse.com/sword/" },
 
     {
-      "position": [ 3, 0, 0 ],
+      "position": [ 3, 3, 0 ],
+      "quaternion": [ 0, 0.7071067811865475, 0, 0.7071067811865475 ],
+      "type": "application/npc",
+      "content": {
+        "name": "Drake",
+        "previewUrl": "./images/characters/upstreet/small/drake.png",
+        "avatarUrl": "/avatars/Drake_hacker_v8_Guilty.vrm",
+        "voice": "Shining Armor",
+        "voicePack": "Andrew voice pack",
+        "class": "Neural Hacker",
+        "bio": "His nickname is DRK. 15/M hacker. Loves guns. Likes plotting new hacks. He has the best equipment and is always ready for a fight.",
+        "themeSongUrl": "https://webaverse.github.io/music/themes/129079005-im-gonna-find-it-mystery-sci-f.mp3"
+      }
+    },
+
+    {
+      "position": [ -3, 0, 0 ],
       "quaternion": [ 0, 0, 0, 1 ],
       "start_url": "https://local.webaverse.com/avatars/Drake_hacker_v8_Guilty.vrm",
       "components": [
