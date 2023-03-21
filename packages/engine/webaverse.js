@@ -405,6 +405,9 @@ export default class Webaverse extends EventTarget {
     let lastTimestamp = performance.now();
     const animate = (timestamp, frame) => {
       stats.begin();
+      // console.log('---animate')
+      window.domInfo.innerHTML = '';
+
       const _frame = () => {
         timestamp = timestamp ?? performance.now();
         const timeDiff = timestamp - lastTimestamp;
@@ -483,7 +486,38 @@ const _startHacks = webaverse => {
   const localPlayer = playersManager.getLocalPlayer();
   const vpdAnimations = Avatar.getAnimations().filter(animation => animation.name.endsWith('.vpd'));
 
+  // ---
+
+  globalThis.logNum = function(n) {
+    const nStr = n.toFixed(2);
+    return (n < 0 ? '' : '+') + nStr;
+  }
+  
+  globalThis.logVector3 = function(v) {
+    return globalThis.logNum(v.x) + ' ' + globalThis.logNum(v.y) + ' ' + globalThis.logNum(v.z);
+  }
+  
+  globalThis.logVector4 = function(v) {
+    return globalThis.logNum(v.x) + ' ' + globalThis.logNum(v.y) + ' ' + globalThis.logNum(v.z) + ' ' + globalThis.logNum(v.w);
+  }
+
+  window.localPlayer = localPlayer;
+  window.THREE = THREE;
+  window.physicsManager = physicsManager;
+  window.physx = physx;
+  window.metaversefileApi = metaversefileApi;
+  window.rootScene = rootScene;
+  window.loadoutManager = loadoutManager;
+  window.game = game;
+  window.cameraManager = cameraManager;
+  window.camera = camera;
+  window.ioManager = ioManager;
+  // window.npcManager = npcManager;
   globalThis.world = world;
+
+  window.isDebugger = false;
+
+  // ---
 
   // Press } to debug current state in console.
   (typeof window !== 'undefined') && window.addEventListener('keydown', event => {
