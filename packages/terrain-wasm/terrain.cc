@@ -727,10 +727,10 @@ void Terrain::getTerrain(
           // has tree
           const float treeNoiseOffset = 20.0;
           const float treePosNoise = SimplexNoise::noise(x * 0.25f + treeNoiseOffset, z * 0.25f + treeNoiseOffset);
-          const float treeOffset = 3.0;
-          const bool hasTree = pow((treePosNoise + 1) * 0.5f, 5.0f) > 0.5f 
-                              && plantInfo[1] > 0.9 
-                              && std::fmod(z - zMin, treeOffset) == 0.0f && std::fmod(x - xMin, treeOffset) == 0.0f;
+          // const float treeOffset = 3.0;
+          const bool hasTree = pow((treePosNoise + 1) * 0.5f, 5.0f) > 0.95f 
+                              && plantInfo[1] > 0.9; 
+                              // && std::fmod(z - zMin, treeOffset) == 0.0f && std::fmod(x - xMin, treeOffset) == 0.0f;
 
           if (hasFlower && maxFlowersPerChunk > 0) {
             flowerPositions.push_back(x);
