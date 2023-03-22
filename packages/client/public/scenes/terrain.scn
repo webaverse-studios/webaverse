@@ -1,6 +1,12 @@
 {
   "objects": [
     {
+      "type": "application/spawnpoint",
+      "content": {
+        "position": [0, 100, 0]
+      }
+    },
+    {
       "type": "application/light",
       "content": {
         "lightType": "ambient",
