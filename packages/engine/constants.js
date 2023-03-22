@@ -108,6 +108,8 @@ export const flatGroundJumpAirTime = 666;
 
 export const startSkydiveTimeS = 2;
 
+export const swimCharacterControllerHeight = -0.46; // -0.45 has precision problem, will cause jitter.
+
 export const avatarInterpolationFrameRate = 60;
 export const avatarInterpolationTimeDelay = 1000/(avatarInterpolationFrameRate * 0.5);
 export const avatarInterpolationNumFrames = 15; // For chrome "Network throttling: Slow 3G", old value `4` is too less to hit snapshots cache. `10` can hit most. `15` can hit almot all and safe for worse real network connections.
@@ -152,7 +154,7 @@ export const offscreenCanvasSize = 2048;
 export const realmSize = 256;
 
 // dev mode
-const IS_DEV_MODE_ENABLED = false;
+const IS_DEV_MODE_ENABLED = true;
 
 export const IS_NARUTO_RUN_ENABLED = IS_DEV_MODE_ENABLED;
 export const IS_FLYING_ENABLED = IS_DEV_MODE_ENABLED;

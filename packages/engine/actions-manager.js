@@ -1,5 +1,6 @@
 import * as b3 from './lib/behavior3js/index.js';
 import metaversefileApi from 'metaversefile';
+import { swimCharacterControllerHeight } from './constants.js';
 
 // note: doc/explain: https://github.com/upstreet-labs/app/pull/393#issue-1486522153 , https://github.com/upstreet-labs/app/pull/359#issuecomment-1338063650 .
 
@@ -241,10 +242,11 @@ class HaltSit extends b3.Condition {
 }
 class Swim extends b3.Action {
   tick(tick) {
+    // console.log('bt')
     const tickResults = tick.blackboard.get('tickResults');
     // const frameTryStopActions = tick.blackboard.get('frameTryStopActions');
     const localPlayer = tick.target;
-    if (localPlayer.position.y < 0.5) {
+    if (localPlayer.characterPhysics.characterController.position.y <= swimCharacterControllerHeight) {
       tickResults.swim = true;
       return b3.SUCCESS;
     } else {
