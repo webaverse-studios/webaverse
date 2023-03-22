@@ -97,7 +97,6 @@ export class AvatarCharacterSfx {
     };
 
     this.currentStep = null;
-    this.currentSwimmingHand = null;
     this.setSwimmingHand = true;
 
     this.lastLandState = false;
