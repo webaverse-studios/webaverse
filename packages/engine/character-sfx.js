@@ -97,7 +97,6 @@ export class AvatarCharacterSfx {
     };
 
     this.currentStep = null;
-    this.currentSwimmingHand = null;
     this.setSwimmingHand = true;
 
     this.lastLandState = false;
@@ -240,46 +239,46 @@ export class AvatarCharacterSfx {
       _handleStep();
     }
     const _handleSwim = () => {
-      if(this.character.hasAction('swim')){
-          // const candidateAudios = soundFiles.water;
-          // console.log(candidateAudios);
-          if(this.character.getAction('swim').animationType === 'breaststroke'){
-              if(this.setSwimmingHand && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % breaststrokeDuration <= breaststrokeOffset){
-                  this.setSwimmingHand = false;
-                  this.currentSwimmingHand = null;
-              }
-              else if(!this.setSwimmingHand && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % breaststrokeDuration > breaststrokeOffset){
-                  let regex = new RegExp('^water/swim[0-9]*.wav$');
-                  const candidateAudios = soundFiles.water.filter(f => regex.test(f.name));
-                  const audioSpec = candidateAudios[Math.floor(Math.random() * candidateAudios.length)];
-                  if(this.character.getAction('swim').onSurface)
-                    sounds.playSound(audioSpec);
-
-                  this.setSwimmingHand = true;
-                  this.currentSwimmingHand = 'right';
-              }
-
+      const hasSwim = !!this.character.getAction('swim');
+      const hasSprint = !!this.character.getAction('sprint');
+      if (hasSwim) {
+        if (!hasSprint) {
+          if (
+            this.setSwimmingHand 
+            && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % breaststrokeDuration <= breaststrokeOffset
+          ) {
+            this.setSwimmingHand = false;
           }
-          else if(this.character.getAction('swim').animationType === 'freestyle'){
-              let regex = new RegExp('^water/swim_fast[0-9]*.wav$');
-              const candidateAudios = soundFiles.water.filter(f => regex.test(f.name));
-              const audioSpec = candidateAudios[Math.floor(Math.random() * candidateAudios.length)];
-
-              if(this.setSwimmingHand && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % freestyleDuration <= freestyleOffset){
-                  // console.log('left hand')
-                  if(this.character.getAction('swim').onSurface)
-                    sounds.playSound(audioSpec);
-                  this.currentSwimmingHand = 'left';
-                  this.setSwimmingHand = false;
-              }
-              else if(!this.setSwimmingHand && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % freestyleDuration > freestyleOffset){
-                  // console.log('right hand')
-                  if(this.character.getAction('swim').onSurface)
-                    sounds.playSound(audioSpec);
-                  this.currentSwimmingHand = 'right';
-                  this.setSwimmingHand = true;
-              }
-          }  
+          else if(
+            !this.setSwimmingHand 
+            && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % breaststrokeDuration > breaststrokeOffset
+          ) {
+            let regex = new RegExp('^water/swim[0-9]*.wav$');
+            const candidateAudios = soundFiles.water.filter(f => regex.test(f.name));
+            const audioSpec = candidateAudios[Math.floor(Math.random() * candidateAudios.length)];
+            sounds.playSound(audioSpec);
+            this.setSwimmingHand = true;
+          }
+        }
+        else if (hasSprint) {
+          let regex = new RegExp('^water/swim_fast[0-9]*.wav$');
+          const candidateAudios = soundFiles.water.filter(f => regex.test(f.name));
+          const audioSpec = candidateAudios[Math.floor(Math.random() * candidateAudios.length)];
+          if (
+            this.setSwimmingHand 
+            && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % freestyleDuration <= freestyleOffset
+          ) {
+            sounds.playSound(audioSpec);
+            this.setSwimmingHand = false;
+          }
+          else if (
+            !this.setSwimmingHand 
+            && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % freestyleDuration > freestyleOffset
+          ) {
+            sounds.playSound(audioSpec);
+            this.setSwimmingHand = true;
+          }
+        }  
       }
     }
     _handleSwim();
