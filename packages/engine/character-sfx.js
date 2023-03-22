@@ -241,9 +241,9 @@ export class AvatarCharacterSfx {
     }
     const _handleSwim = () => {
       const hasSwim = !!this.character.getAction('swim');
-      const hasFreestyle = hasSwim && !!this.character.getAction('sprint');
+      const hasSprint = !!this.character.getAction('sprint');
       if (hasSwim) {
-        if (!hasFreestyle) {
+        if (!hasSprint) {
           if (
             this.setSwimmingHand 
             && physx.physxWorker.getActionInterpolantAnimationAvatar(this.character.avatar.animationAvatarPtr, 'movements', 0) % breaststrokeDuration <= breaststrokeOffset
@@ -261,7 +261,7 @@ export class AvatarCharacterSfx {
             this.setSwimmingHand = true;
           }
         }
-        else if (hasFreestyle) {
+        else if (hasSprint) {
           let regex = new RegExp('^water/swim_fast[0-9]*.wav$');
           const candidateAudios = soundFiles.water.filter(f => regex.test(f.name));
           const audioSpec = candidateAudios[Math.floor(Math.random() * candidateAudios.length)];
