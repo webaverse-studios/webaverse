@@ -216,18 +216,7 @@ class IoManager extends EventTarget {
       } else {
         cameraManager.lastNonzeroDirectionVector.copy(this.keysDirection);
       }
-
-      if (localPlayer.hasAction('swim')) {
-        if (ioManager.keys.shift && this.keysDirection.length() > 0) {
-          localPlayer.getAction('swim').animationType = 'freestyle';
-        }
-        else if (!ioManager.keys.shift && this.keysDirection.length() > 0) {
-          localPlayer.getAction('swim').animationType = 'breaststroke';
-        }
-        else {
-          localPlayer.getAction('swim').animationType = 'null';
-        }
-      }
+      
       if (localPlayer.hasAction('fly') || localPlayer.hasAction('swim')) {
         this.keysDirection.applyQuaternion(camera.quaternion);
         _updateVertical(this.keysDirection);

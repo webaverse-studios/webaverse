@@ -572,7 +572,7 @@ const controlActionTypes = [
   // 'crouch',
   // 'fly',
   // 'sit',
-  'swim',
+  // 'swim',
 ];
 class StateCharacter extends Character {
   constructor({

@@ -785,7 +785,7 @@ class GameManager extends EventTarget {
     let speed = 0;
 
     const isCrouched = gameManager.isCrouched();
-    const isSwimming = gameManager.isSwimming();
+    // const isSwimming = gameManager.isSwimming();
     const isFlying = gameManager.isFlying();
     const isRunning = ioManager.keys.shift && !isCrouched;
     const isMovingBackward = gameManager.isMovingBackward();
