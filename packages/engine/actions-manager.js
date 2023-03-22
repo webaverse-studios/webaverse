@@ -1,6 +1,5 @@
 import * as b3 from './lib/behavior3js/index.js';
 import metaversefileApi from 'metaversefile';
-import { swimCharacterControllerHeight } from './constants.js';
 
 // note: doc/explain: https://github.com/upstreet-labs/app/pull/393#issue-1486522153 , https://github.com/upstreet-labs/app/pull/359#issuecomment-1338063650 .
 
@@ -240,17 +239,27 @@ class HaltSit extends b3.Condition {
     }
   }
 }
-class Swim extends b3.Action {
+class StartSwim extends b3.Action {
   tick(tick) {
-    // console.log('bt')
     const tickResults = tick.blackboard.get('tickResults');
-    // const frameTryStopActions = tick.blackboard.get('frameTryStopActions');
-    const localPlayer = tick.target;
-    if (localPlayer.characterPhysics.characterController.position.y <= swimCharacterControllerHeight) {
+    const frameTryActions = tick.blackboard.get('frameTryActions');
+    if (frameTryActions.swim) {
       tickResults.swim = true;
       return b3.SUCCESS;
     } else {
       return b3.FAILURE;
+    }
+  }
+}
+class Swim extends b3.Action {
+  tick(tick) {
+    const tickResults = tick.blackboard.get('tickResults');
+    const frameTryStopActions = tick.blackboard.get('frameTryStopActions');
+    if (frameTryStopActions.swim) {
+      return b3.FAILURE;
+    } else {
+      tickResults.swim = true;
+      return b3.RUNNING;
     }
   }
 }
@@ -286,8 +295,11 @@ tree.root = new b3.MemSequence({title:'root',children: [
   new Loading({title:'Loading',}),
   new b3.Runnor({title:'loaded',child:
     new b3.Parallel({title:'main',children:[
-      new b3.Priority({title:'swim & others',children:[
-        new Swim({title:'Swim'}),
+      new b3.Priority({title:'swim & base & land',children:[
+        new b3.MemSequence({title:'swim',children:[
+          new StartSwim(),
+          new Swim(),
+        ]}),
         new b3.Priority({title:'base',children:[
           new b3.MemSequence({title:'sit',children:[
             new StartSit(),
@@ -424,8 +436,7 @@ const postFrameSettings = (localPlayer, blackboard) => {
     }
   
     if (tickResults.swim && !lastFrameResults.swim) {
-      const newSwimAction = {type: 'swim', swimDamping: 1};
-      localPlayer.addAction(newSwimAction);
+      localPlayer.addAction(frameTryActions.swim);
     }
     if (!tickResults.swim && lastFrameResults.swim) {
       localPlayer.removeAction('swim');

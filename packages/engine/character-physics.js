@@ -4,7 +4,7 @@ it sets up and ticks the physics loop for our local character */
 import * as THREE from 'three';
 import physicsManager from './physics-manager.js';
 import {applyVelocity} from './util.js';
-import {groundFriction, flyFriction, swimFriction, flatGroundJumpAirTime, jumpHeight, startSkydiveTimeS, swimCharacterControllerHeight} from './constants.js';
+import {groundFriction, flyFriction, swimFriction, flatGroundJumpAirTime, jumpHeight, startSkydiveTimeS} from './constants.js';
 import {getRenderer, camera} from './renderer.js';
 import metaversefileApi from 'metaversefile';
 import physx from './physx.js';
@@ -205,10 +205,11 @@ class CharacterPhysics {
       // console.log(this.characterController.position.y)
       // console.log('character-physics')
       
-      if (this.character.hasAction('swim')) {
+      const swimAction = this.character.getAction('swim');
+      if (swimAction) {
         localVector3.y = 0;
         localVector5.copy(this.characterController.position);
-        localVector5.y = swimCharacterControllerHeight;
+        localVector5.y = swimAction.waterCharacterControllerHeight;
         physicsScene.setCharacterControllerPosition(this.characterController, localVector5);
       }
 
