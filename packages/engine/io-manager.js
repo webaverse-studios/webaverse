@@ -655,11 +655,11 @@ class IoManager extends EventTarget {
   };
 
   click = e => {
-    console.log('click')
+    // console.log('click')
     if (cameraManager.pointerLockElement) {
       grabManager.menuClick(e);
     } else if (!game.hoverEnabled) {
-      console.log('requesting pointer lock')
+      // console.log('requesting pointer lock')
         cameraManager.requestPointerLock();
       }
     raycastManager.setLastMouseEvent(e);
