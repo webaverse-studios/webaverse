@@ -284,48 +284,47 @@ tree.root = new b3.MemSequence({title:'root',children: [
   new Loading({title:'Loading',}),
   new b3.Runnor({title:'loaded',child:
     new b3.Parallel({title:'main',children:[
-      new b3.Priority({title:'base',children:[
-        new b3.MemSequence({title:'sit',children:[
-          new StartSit(),
-          new b3.Priority({children:[
-            new HaltSit(),
-            new Sit(),
-          ]}),
-        ]}),
+      new b3.Priority({title:'swim & others',children:[
         new Swim({title:'Swim'}),
-        new b3.Sequence({title:'fly & narutoRun',children:[
-          new Fly({title:'Fly'}),
-          new b3.Succeedor({child: new NarutoRun({title:'NarutoRun'})}),
-        ]}),
-        new b3.MemSequence({title:'jump & doubleJump',children:[
-          new StartJump({title:'StartJump'}),
-          new WaitOneFrame({title:'WaitOneFrame',setTrueKey:'jump'}), // note: wait leave ground.
-          new Jump({title:'Jump'}),
-          new DoubleJump({title:'DoubleJump'}),
-        ]}),
-        new b3.MemSequence({title:'fallLoop & skydive & glider',children:[
-          new b3.Priority({children:[
-            new StartSkydive({title:'StartSkydive'}),
-            new FallLoop({title:'FallLoop'}),
-          ]}),
-          new b3.Priority({children:[
-            new StartGlider({title:'StartGlider'}),
-            new b3.Parallel({children:[
-              new FallLoop({title:'FallLoop'}),
-              new Skydive({title:'Skydive'}),
+        new b3.Priority({title:'base',children:[
+          new b3.MemSequence({title:'sit',children:[
+            new StartSit(),
+            new b3.Priority({children:[
+              new HaltSit(),
+              new Sit(),
             ]}),
           ]}),
-          new WaitOneFrame({title:'WaitOneFrame',setTrueKey:'glider'}), // note: WaitOneFrame to prevent remove glider immediately, because add/remove glider all triggered by space key.
-          new Glider({title:'Glider'}),
-        ]}),
-        new b3.MemSequence({title:'crouch',children:[
-          new StartCrouch({title:'StartCrouch'}),
-          new Crouch({title:'Crouch'}),
-        ]}),
-        new NarutoRun({title:'NarutoRun'}),
-      ]}), // end: base
-      new b3.Priority({title:'swim & land',children:[
-        new Swim({title:'Swim'}),
+          new b3.Sequence({title:'fly & narutoRun',children:[
+            new Fly({title:'Fly'}),
+            new b3.Succeedor({child: new NarutoRun({title:'NarutoRun'})}),
+          ]}),
+          new b3.MemSequence({title:'jump & doubleJump',children:[
+            new StartJump({title:'StartJump'}),
+            new WaitOneFrame({title:'WaitOneFrame',setTrueKey:'jump'}), // note: wait leave ground.
+            new Jump({title:'Jump'}),
+            new DoubleJump({title:'DoubleJump'}),
+          ]}),
+          new b3.MemSequence({title:'fallLoop & skydive & glider',children:[
+            new b3.Priority({children:[
+              new StartSkydive({title:'StartSkydive'}),
+              new FallLoop({title:'FallLoop'}),
+            ]}),
+            new b3.Priority({children:[
+              new StartGlider({title:'StartGlider'}),
+              new b3.Parallel({children:[
+                new FallLoop({title:'FallLoop'}),
+                new Skydive({title:'Skydive'}),
+              ]}),
+            ]}),
+            new WaitOneFrame({title:'WaitOneFrame',setTrueKey:'glider'}), // note: WaitOneFrame to prevent remove glider immediately, because add/remove glider all triggered by space key.
+            new Glider({title:'Glider'}),
+          ]}),
+          new b3.MemSequence({title:'crouch',children:[
+            new StartCrouch({title:'StartCrouch'}),
+            new Crouch({title:'Crouch'}),
+          ]}),
+          new NarutoRun({title:'NarutoRun'}),
+        ]}), // end: base
         new Land({title:'Land'}),
       ]}),
     ]}), // end: main
