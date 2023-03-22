@@ -802,7 +802,7 @@ class GameManager extends EventTarget {
     const sprintMultiplier = isRunning ?
       (localPlayer.hasAction('narutoRun') ? 20 : 3)
       :
-      ((isSwimming && !isFlying) ? 5 - localPlayer.getAction('swim').swimDamping : 1);
+      1;
     speed *= sprintMultiplier;
 
     const backwardMultiplier = isMovingBackward ? (isRunning ? 0.8 : 0.7) : 1;

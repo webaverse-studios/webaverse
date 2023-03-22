@@ -4,7 +4,7 @@ it sets up and ticks the physics loop for our local character */
 import * as THREE from 'three';
 import physicsManager from './physics-manager.js';
 import {applyVelocity} from './util.js';
-import {groundFriction, flyFriction, swimFriction, flatGroundJumpAirTime, jumpHeight, startSkydiveTimeS} from './constants.js';
+import {groundFriction, flyFriction, swimFriction, flatGroundJumpAirTime, jumpHeight, startSkydiveTimeS, swimCharacterControllerHeight} from './constants.js';
 import {getRenderer, camera} from './renderer.js';
 import metaversefileApi from 'metaversefile';
 import physx from './physx.js';
@@ -191,8 +191,6 @@ class CharacterPhysics {
 
       // console.log('got local vector', this.velocity.toArray().join(','), localVector3.toArray().join(','), timeDiffS);
       if (
-        this.character.hasAction('swim') &&
-        this.character.getAction('swim').onSurface &&
         !this.character.hasAction('fly')
       ) {
         if (this.character.characterPhysics.velocity.y >= 0) {
@@ -203,6 +201,14 @@ class CharacterPhysics {
       const positionXZBefore = localVector2D.set(this.characterController.position.x, this.characterController.position.z);
       const positionYBefore = this.characterController.position.y;
       const physicsScene = physicsManager.getScene();
+
+      if (this.character.hasAction('swim')) {
+        localVector3.y = 0;
+        localVector5.copy(this.characterController.position);
+        localVector5.y = swimCharacterControllerHeight;
+        physicsScene.setCharacterControllerPosition(this.characterController, localVector5);
+      }
+
       const flags = physicsScene.moveCharacterController(
         this.characterController,
         localVector3,

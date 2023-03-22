@@ -1,5 +1,6 @@
 import * as b3 from './lib/behavior3js/index.js';
 import metaversefileApi from 'metaversefile';
+import { swimCharacterControllerHeight } from './constants.js';
 
 // note: doc/explain: https://github.com/upstreet-labs/app/pull/393#issue-1486522153 , https://github.com/upstreet-labs/app/pull/359#issuecomment-1338063650 .
 
@@ -239,6 +240,19 @@ class HaltSit extends b3.Condition {
     }
   }
 }
+class Swim extends b3.Action {
+  tick(tick) {
+    const tickResults = tick.blackboard.get('tickResults');
+    // const frameTryStopActions = tick.blackboard.get('frameTryStopActions');
+    const localPlayer = tick.target;
+    if (localPlayer.characterPhysics.characterController.position.y <= swimCharacterControllerHeight) {
+      tickResults.swim = true;
+      return b3.SUCCESS;
+    } else {
+      return b3.FAILURE;
+    }
+  }
+}
 class StartGlider extends b3.Action {
   tick(tick) {
     const tickResults = tick.blackboard.get('tickResults');
@@ -271,46 +285,49 @@ tree.root = new b3.MemSequence({title:'root',children: [
   new Loading({title:'Loading',}),
   new b3.Runnor({title:'loaded',child:
     new b3.Parallel({title:'main',children:[
-      new b3.Priority({title:'base',children:[
-        new b3.MemSequence({title:'sit',children:[
-          new StartSit(),
-          new b3.Priority({children:[
-            new HaltSit(),
-            new Sit(),
-          ]}),
-        ]}),
-        new b3.Sequence({title:'fly & narutoRun',children:[
-          new Fly({title:'Fly'}),
-          new b3.Succeedor({child: new NarutoRun({title:'NarutoRun'})}),
-        ]}),
-        new b3.MemSequence({title:'jump & doubleJump',children:[
-          new StartJump({title:'StartJump'}),
-          new WaitOneFrame({title:'WaitOneFrame',setTrueKey:'jump'}), // note: wait leave ground.
-          new Jump({title:'Jump'}),
-          new DoubleJump({title:'DoubleJump'}),
-        ]}),
-        new b3.MemSequence({title:'fallLoop & skydive & glider',children:[
-          new b3.Priority({children:[
-            new StartSkydive({title:'StartSkydive'}),
-            new FallLoop({title:'FallLoop'}),
-          ]}),
-          new b3.Priority({children:[
-            new StartGlider({title:'StartGlider'}),
-            new b3.Parallel({children:[
-              new FallLoop({title:'FallLoop'}),
-              new Skydive({title:'Skydive'}),
+      new b3.Priority({title:'swim & others',children:[
+        new Swim({title:'Swim'}),
+        new b3.Priority({title:'base',children:[
+          new b3.MemSequence({title:'sit',children:[
+            new StartSit(),
+            new b3.Priority({children:[
+              new HaltSit(),
+              new Sit(),
             ]}),
           ]}),
-          new WaitOneFrame({title:'WaitOneFrame',setTrueKey:'glider'}), // note: WaitOneFrame to prevent remove glider immediately, because add/remove glider all triggered by space key.
-          new Glider({title:'Glider'}),
-        ]}),
-        new b3.MemSequence({title:'crouch',children:[
-          new StartCrouch({title:'StartCrouch'}),
-          new Crouch({title:'Crouch'}),
-        ]}),
-        new NarutoRun({title:'NarutoRun'}),
-      ]}), // end: base
-      new Land({title:'Land'}),
+          new b3.Sequence({title:'fly & narutoRun',children:[
+            new Fly({title:'Fly'}),
+            new b3.Succeedor({child: new NarutoRun({title:'NarutoRun'})}),
+          ]}),
+          new b3.MemSequence({title:'jump & doubleJump',children:[
+            new StartJump({title:'StartJump'}),
+            new WaitOneFrame({title:'WaitOneFrame',setTrueKey:'jump'}), // note: wait leave ground.
+            new Jump({title:'Jump'}),
+            new DoubleJump({title:'DoubleJump'}),
+          ]}),
+          new b3.MemSequence({title:'fallLoop & skydive & glider',children:[
+            new b3.Priority({children:[
+              new StartSkydive({title:'StartSkydive'}),
+              new FallLoop({title:'FallLoop'}),
+            ]}),
+            new b3.Priority({children:[
+              new StartGlider({title:'StartGlider'}),
+              new b3.Parallel({children:[
+                new FallLoop({title:'FallLoop'}),
+                new Skydive({title:'Skydive'}),
+              ]}),
+            ]}),
+            new WaitOneFrame({title:'WaitOneFrame',setTrueKey:'glider'}), // note: WaitOneFrame to prevent remove glider immediately, because add/remove glider all triggered by space key.
+            new Glider({title:'Glider'}),
+          ]}),
+          new b3.MemSequence({title:'crouch',children:[
+            new StartCrouch({title:'StartCrouch'}),
+            new Crouch({title:'Crouch'}),
+          ]}),
+          new NarutoRun({title:'NarutoRun'}),
+        ]}), // end: base
+        new Land({title:'Land'}),
+      ]}),
     ]}), // end: main
   }), // end: loaded
 ]}); // end: root
@@ -403,6 +420,14 @@ const postFrameSettings = (localPlayer, blackboard) => {
     }
     if (!tickResults.sit && lastFrameResults.sit) {
       localPlayer.removeAction('sit');
+    }
+  
+    if (tickResults.swim && !lastFrameResults.swim) {
+      const newSwimAction = {type: 'swim', swimDamping: 1};
+      localPlayer.addAction(newSwimAction);
+    }
+    if (!tickResults.swim && lastFrameResults.swim) {
+      localPlayer.removeAction('swim');
     }
   
     if (tickResults.glider && !lastFrameResults.glider) {
