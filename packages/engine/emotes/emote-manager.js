@@ -23,6 +23,7 @@ class EmoteManager {
 
       // clear old emote
       player.removeAction('emote');
+      player.removeAction('facepose');
       const oldEmoteTimeout = this.emoteTimeouts.get(player);
       if (oldEmoteTimeout) {
         clearTimeout(oldEmoteTimeout);
