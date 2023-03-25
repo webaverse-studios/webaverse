@@ -477,6 +477,39 @@ const _startHacks = webaverse => {
   const localPlayer = playersManager.getLocalPlayer();
   const vpdAnimations = Avatar.getAnimations().filter(animation => animation.name.endsWith('.vpd'));
 
+  // ---
+
+  globalThis.logNum = function(n) {
+    const nStr = n.toFixed(2);
+    return (n < 0 ? '' : '+') + nStr;
+  }
+  
+  globalThis.logVector3 = function(v) {
+    return globalThis.logNum(v.x) + ' ' + globalThis.logNum(v.y) + ' ' + globalThis.logNum(v.z);
+  }
+  
+  globalThis.logVector4 = function(v) {
+    return globalThis.logNum(v.x) + ' ' + globalThis.logNum(v.y) + ' ' + globalThis.logNum(v.z) + ' ' + globalThis.logNum(v.w);
+  }
+
+  globalThis.localPlayer = localPlayer;
+  globalThis.THREE = THREE;
+  globalThis.physicsManager = physicsManager;
+  globalThis.physx = physx;
+  globalThis.metaversefileApi = metaversefileApi;
+  globalThis.rootScene = rootScene;
+  globalThis.loadoutManager = loadoutManager;
+  globalThis.game = game;
+  globalThis.cameraManager = cameraManager;
+  globalThis.camera = camera;
+  globalThis.ioManager = ioManager;
+  // globalThis.npcManager = npcManager;
+  globalThis.world = world;
+
+  globalThis.isDebugger = false;
+
+  // ---
+
   // Press } to debug current state in console.
   (typeof window !== 'undefined') && window.addEventListener('keydown', event => {
     if (event.key === '}') {
